@@ -1,3 +1,50 @@
+## About
+
+This is an experimental Java client for Arcus memcached with
+replication support.  Replication takes place at the server side using
+a master-slave approach.  It is transparent to the client.  There are
+no changes to the Arcus client API.
+
+However, the ZooKeeper based clustering mechanism changes somewhat.
+It uses a tree structure different from the previous Arcus version to
+expose the master servers in the cluster.  The client code needs to
+understand this new tree structure and parse information
+appropriately.
+
+Here is an example ZooKeeper directory structure for one memcached
+group that includes one master and one slave.
+
+```
+$ cat setup-test-zk.bash
+
+ZK_CLI="./zookeeper/bin/zkCli.sh"
+ZK_ADDR="-server localhost:17288"
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7 0
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7/client_list 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/client_list/test 0
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_log 0
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_list 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_list/test 0
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_group 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_group/test 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_group/test/g0 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_group/test/g0/lock 0
+
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_mapping 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_mapping/127.0.0.1:11211 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_mapping/127.0.0.1:11211/test^g0^127.0.0.1:20121^ 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_mapping/127.0.0.1:11212 0
+$ZK_CLI $ZK_ADDR create /arcus_1_7/cache_server_mapping/127.0.0.1:11212/test^g0^127.0.0.1:20122^ 0
+```
+
+Below is the original README.md from the master branch.  Everything
+still applies.
+
 ## arcus-java-client: Arcus Java Client
 
 This is a fork of [spymemcached][spymemcached] with the following modifications

@@ -1013,6 +1013,7 @@ public class MemcachedClient extends SpyThread
 			validateKey(key);
 			final MemcachedNode primaryNode=locator.getPrimary(key);
 			MemcachedNode node=null;
+			// FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
 			if(primaryNode.isActive()) {
 				node=primaryNode;
 			} else {

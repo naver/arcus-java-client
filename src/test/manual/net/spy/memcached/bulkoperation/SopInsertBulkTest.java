@@ -52,7 +52,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
 							new CollectionAttributes());
 			try {
 				Map<String, CollectionOperationStatus> errorList = future.get(
-						100L, TimeUnit.MILLISECONDS);
+						1000L, TimeUnit.MILLISECONDS);
 				Assert.assertTrue("Error list is not empty.",
 						errorList.isEmpty());
 			} catch (TimeoutException e) {

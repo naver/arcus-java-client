@@ -88,7 +88,23 @@ public final class MemcachedConnection extends SpyObject {
 
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
-	
+
+	private boolean arcus17;
+	private boolean gracefulFailover;
+	private long shutdownDelay = 10000; // milliseconds
+	private List<ShutdownNode> delayedShutdownNodes;
+
+	// Just to hold both node and time-to-die
+	class ShutdownNode {
+		MemcachedNode node;
+		long millis; // absolute time
+
+		ShutdownNode(MemcachedNode n, long t) {
+			node = n;
+			millis = t;
+		}
+	};
+
 	/**
 	 * Construct a memcached connection.
 	 *
@@ -117,6 +133,27 @@ public final class MemcachedConnection extends SpyObject {
 			connections.add(attachMemcachedNode(sa));
 		}
 		locator=f.createLocator(connections);
+
+		// By default, the 1.7 client supports graceful failover.
+		// It just means that we do not shutdown the removed nodes right away.
+		// But wait till it becomes empty (no ongoing requests).
+		// At the moment, we simply wait for 10 seconds and then kill the node...
+		gracefulFailover = "true".equals(System.getProperty("arcus.gracefulFailover", "true"));
+		delayedShutdownNodes = new ArrayList<ShutdownNode>();
+		String delay = System.getProperty("arcus.gracefulFailoverShutdownDelay");
+		if (delay != null) {
+			try {
+				shutdownDelay = Integer.valueOf(delay);
+			} catch (Exception e) {
+			}
+		}
+	}
+
+	// handleNodeManageQueue and updateConnections behave slightly differently
+	// depending on the Arcus version.  We could have created a subclass and overload
+	// those methods.  But, MemcachedConnection is a final class.
+	void setArcus17(boolean b) {
+		arcus17 = b;
 	}
 
 	private boolean selectorsMakeSense() {
@@ -169,6 +206,11 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		getLogger().debug("Selecting with delay of %sms", delay);
 		assert selectorsMakeSense() : "Selectors don't make sense.";
+		if (!delayedShutdownNodes.isEmpty()) {
+			// Wake up in a second to see if we can clean up nodes.
+			if (delay == 0 || delay > 1000)
+				delay = 1000;
+		}
 		int selected=selector.select(delay);
 		Set<SelectionKey> selectedKeys=selector.selectedKeys();
 
@@ -219,6 +261,32 @@ public final class MemcachedConnection extends SpyObject {
 		if(!shutDown && !reconnectQueue.isEmpty()) {
 			attemptReconnects();
 		}
+
+		// Arcus 1.7 graceful failover/shutdown
+		while (!delayedShutdownNodes.isEmpty()) {
+			long now = System.currentTimeMillis();
+			ShutdownNode n = delayedShutdownNodes.get(0);
+			if (now >= n.millis) {
+				delayedShutdownNodes.remove(0);
+				try {
+					n.node.getSk().attach(null);
+					n.node.shutdown();
+				} catch (IOException e) {
+					n.node.setSk(null);
+				}
+				// In case the node is trying to reconnect, remove it from
+				// the reconnect queue as well.  Otherwise, we may end up
+				// leaking the node and its socket.
+				for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
+					if (n.node.equals(each.getValue())) {
+						reconnectQueue.remove(each.getKey());
+						break;
+					}
+				}
+			}
+			else
+				break;
+		}
 	}
 	
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
@@ -226,11 +294,47 @@ public final class MemcachedConnection extends SpyObject {
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 		
 		// Classify the incoming node list.
-		for (MemcachedNode node : locator.getAll()) {
-			if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
-				addrs.remove((InetSocketAddress) node.getSocketAddress());
-			} else {
-				removeNodes.add(node);
+		if (arcus17) {
+			// If there's an existing node with the same group name as the new node,
+			// remove it.  And add the new node.
+			for (MemcachedNode node : locator.getAll()) {
+				Arcus17NodeAddress oldNode = (Arcus17NodeAddress)node.getSocketAddress();
+				Iterator<InetSocketAddress> itr = addrs.iterator();
+				while (itr.hasNext()) {
+					Arcus17NodeAddress newNode = (Arcus17NodeAddress)itr.next();
+					if (oldNode.group.equals(newNode.group)) {
+						if (oldNode.master == newNode.master &&
+						    oldNode.ip.equals(newNode.ip) &&
+						    oldNode.port == newNode.port) {
+							// The exactly same node appears in the new list.
+							// Leave it alone.
+							itr.remove();
+							node = null;
+						}
+						else {
+							// The new list has a node with the same group name
+							// as the old node.  But they are not the same.
+							// Remove the old node and add the new node.
+						}
+						break;
+					}
+				}
+				if (node != null) {
+					removeNodes.add(node);
+					if (gracefulFailover && !node.isFake()) {
+						long now = System.currentTimeMillis();
+						delayedShutdownNodes.add(new ShutdownNode(node, now + shutdownDelay));
+					}
+				}
+			}
+		}
+		else {
+			for (MemcachedNode node : locator.getAll()) {
+				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
+					addrs.remove((InetSocketAddress) node.getSocketAddress());
+				} else {
+					removeNodes.add(node);
+				}
 			}
 		}
 		
@@ -263,11 +367,21 @@ public final class MemcachedConnection extends SpyObject {
 		int ops = 0;
 		ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
 		ch.socket().setReuseAddress(true);
+		// Do not attempt to connect if this node is fake.
+		// Otherwise, we keep connecting to a non-existent listen address
+		// and keep failing/reconnecting.
+		if (qa.isFake()) {
+			// Locator assumes non-null selectionkey.  So add a dummy one...
+			qa.setSk(ch.register(selector, ops, qa));
+			return qa;
+		}
 		// Initially I had attempted to skirt this by queueing every
 		// connect, but it considerably slowed down start time.
 		try {
 			if (ch.connect(sa)) {
 				getLogger().info("new memcached node connected to %s immediately", qa);
+				// FIXME.  Do we ever execute this path?
+				// This method does not call observer.connectionEstablished.
 				qa.connected();
 			} else {
 				getLogger().info("new memcached node added %s to connect queue", qa);
@@ -298,7 +412,10 @@ public final class MemcachedConnection extends SpyObject {
 		String addrs = _nodeManageQueue.poll();
 		
 		// Update the memcached server group.
-		updateConnections(AddrUtil.getAddresses(addrs));
+		if (arcus17)
+			updateConnections(Arcus17NodeAddress.getAddresses(addrs));
+		else
+			updateConnections(AddrUtil.getAddresses(addrs));
 	}	
 	
 	// Handle any requests that have been made against the client.
@@ -525,6 +642,25 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			qa.setChannel(null);
 
+			// Arcus 1.7 and graceful failover.  We let the removed node hang around
+			// for 10 seconds.  If the node dies, and the connection terminates
+			// (e.g. connection reset by peer), then the code tries to reconnect.
+			// If the node is dead, this is useless, and we only see connection refused.
+			// If we lose the connection, assume that the node is really dead, not
+			// in middle of a graceful failover.  And, do not attempt to reconnect.
+			// This is really ugly.  FIXME
+			if (arcus17 && gracefulFailover) {
+				for (ShutdownNode n : delayedShutdownNodes) {
+					if (n.node.equals(qa)) {
+						// Do not touch operations.  They will time out.
+						// Timeout is the 1.6 behavior when the node dies.
+						getLogger().warn("The node is already removed from the cache list." +
+								 " Do not attempt to reconnect. node=%s", qa);
+						return;
+					}
+				}
+			}
+
 			long delay = (long)Math.min(maxDelay,
 					Math.pow(2, qa.getReconnectCount())) * 1000;
 			long reconTime = System.currentTimeMillis() + delay;
@@ -650,7 +786,16 @@ public final class MemcachedConnection extends SpyObject {
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
 		MemcachedNode primary = locator.getPrimary(key);
-		if(primary.isActive() || failureMode == FailureMode.Retry) {
+		boolean valid = false;
+		// Arcus 1.7 behavior.  It is mainly for graceful failover, but not strictly just that.
+		// isActive() returns true iff the node has a connected socket.
+		// If it is connecting, the method returns false, and we end up cancelling
+		// the operation.  Connect may take some time, so do not be so strict.
+		// Enqueue the operation to the node and let it wait a bit till connect completes.
+		if (arcus17 && gracefulFailover) {
+			valid = !primary.isFake() && primary.getChannel() != null;
+		}
+		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
 			o.setHandlingNode(primary);
@@ -816,6 +961,7 @@ public final class MemcachedConnection extends SpyObject {
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
 		MemcachedNode primary = locator.getPrimary(key);
+		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {

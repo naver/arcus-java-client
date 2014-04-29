@@ -16,6 +16,8 @@
  */
 package net.spy.memcached;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -75,6 +77,12 @@ public class ConnectionFactoryBuilder {
 	
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
+	private boolean arcus17 = false;
+
+	public void setArcus17(boolean b) {
+		arcus17 = b;
+	}
+
 	/**
 	 * Set the operation queue factory.
 	 */
@@ -314,6 +322,14 @@ public class ConnectionFactoryBuilder {
 		return new DefaultConnectionFactory() {
 
 			@Override
+			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+				throws IOException {
+				MemcachedConnection c = super.createConnection(addrs);
+				c.setArcus17(arcus17);
+				return c;
+			}
+
+			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
 				return opQueueFactory == null ?
 						super.createOperationQueue() : opQueueFactory.create();
@@ -341,7 +357,17 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
-						return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						if (arcus17) {
+							// Arcus 1.7
+							// This locator uses Arcus17KetamaNodeLocatorConfiguration
+							// which builds keys off the server's group name, not 
+							// its ip:port.
+							return new Arcus17KetamaNodeLocator(nodes, getHashAlg());
+						}
+						else {
+							// Arcus 1.6
+							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						}
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);
 				}

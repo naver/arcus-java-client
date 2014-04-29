@@ -35,6 +35,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 	ZooKeeper zk;
 
+	String cacheListPath;
+
 	String serviceCode;
 
 	volatile boolean dead;
@@ -52,6 +54,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
 
+	/* We only use this for demo, to show more readable node names when the cache list changes. */
+	boolean demoPrintClusterDiff = false;
+
 	/**
 	 * Constructor
 	 * 
@@ -64,11 +69,14 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * @param listener
 	 *            Callback listener
 	 */
-	public CacheMonitor(ZooKeeper zk, String serviceCode,
+	public CacheMonitor(ZooKeeper zk, String cacheListPath, String serviceCode,
 			CacheMonitorListener listener) {
 		this.zk = zk;
+		this.cacheListPath = cacheListPath;
 		this.serviceCode = serviceCode;
 		this.listener = listener;
+
+		demoPrintClusterDiff = "true".equals(System.getProperty("arcus.demoPrintClusterDiff", "false"));
 
 		getLogger().info("Initializing the CacheMonitor.");
 		
@@ -155,10 +163,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	void asyncGetCacheList() {
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Set a new watch on " + (CacheManager.CACHE_LIST_PATH + serviceCode));
+			getLogger().debug("Set a new watch on " + (cacheListPath + serviceCode));
 		}
 		
-		zk.getChildren(CacheManager.CACHE_LIST_PATH + serviceCode, true, this, null);
+		zk.getChildren(cacheListPath + serviceCode, true, this, null);
 	}
 
 	/**
@@ -175,6 +183,34 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 		if (!children.equals(prevChildren)) {
 			getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " + getInfo());
+			if (demoPrintClusterDiff) {
+				// Assume 1.7 cluster
+				System.out.println("\nCLUSTER CHANGE\n---PREVIOUS---");
+				if (prevChildren == null) {
+					System.out.println("NO NODES");
+				}
+				else {
+					for (String s : prevChildren) {
+						try {
+							System.out.println(Arcus17NodeAddress.parseNodeName(s));
+						} catch (Exception e) {
+						}
+					}
+				}
+				System.out.println("---CURRENT---");
+				if (children == null) {
+					System.out.println("NO NODES");
+				}
+				else {
+					for (String s : children) {
+						try {
+							System.out.println(Arcus17NodeAddress.parseNodeName(s));
+						} catch (Exception e) {
+						}
+					}
+				}
+				System.out.println("");
+			}
 		}
 		
 		// Store the current children.

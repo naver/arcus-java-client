@@ -46,9 +46,13 @@ import org.apache.zookeeper.ZooDefs.Ids;
 
 public class CacheManager extends SpyThread implements Watcher,
 		CacheMonitor.CacheMonitorListener {
-	public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
+	private static final String CACHE_LIST_PATH = "/arcus/cache_list/";
 
-	public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+	private static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+
+	private static final String CACHE_1_7_LIST_PATH = "/arcus_1_7/cache_list/";
+
+	private static final String CLIENT_1_7_INFO_PATH = "/arcus_1_7/client_list/";
 
 	private static final int SESSION_TIMEOUT = 15000;
 	
@@ -75,6 +79,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	private volatile boolean shutdownRequested = false;
 
 	private CountDownLatch zkInitLatch;
+
+	private boolean arcus17 = false;
 	
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
@@ -108,7 +114,18 @@ public class CacheManager extends SpyThread implements Watcher,
 			try {
 				zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS);
 				
-				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
+				// Check /arcus_1_7/cache_list/{svc} first
+				// If it exists, the service code belongs to a 1.7 cluster
+				if (zk.exists(CACHE_1_7_LIST_PATH + serviceCode, false) != null) {
+					arcus17 = true;
+					cfb.setArcus17(true);
+					getLogger().info("Connecting to Arcus 1.7 cluster");
+				}
+				else if (zk.exists(CACHE_LIST_PATH + serviceCode, false) != null) {
+					arcus17 = false;
+					cfb.setArcus17(false);
+				}
+				else {
 					getLogger().fatal(
 							"Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
@@ -143,7 +160,8 @@ public class CacheManager extends SpyThread implements Watcher,
 						"Can't initialize Arcus client.", e);
 			}
 
-			cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			String cachePath = arcus17 ? CACHE_1_7_LIST_PATH : CACHE_LIST_PATH;
+			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 		} catch (IOException e) {
 			throw new InitializeClientException(
 					"Can't initialize Arcus client.", e);
@@ -159,7 +177,11 @@ public class CacheManager extends SpyThread implements Watcher,
 			
 			// create the ephemeral znode 
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
-			path = CLIENT_INFO_PATH + serviceCode + "/" 
+			if (arcus17)
+				path = CLIENT_1_7_INFO_PATH; // /arcus_1_7/client_list/...
+			else
+				path = CLIENT_INFO_PATH; // /arcus/client_list/...
+			path = path + serviceCode + "/" 
 					+ InetAddress.getLocalHost().getHostName() + "_"
 					+ InetAddress.getLocalHost().getHostAddress() + "_"
 					+ this.poolSize
@@ -245,13 +267,33 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            new children node list
 	 */
 	public void commandNodeChange(List<String> children) {
+		// children is the current list of znodes in the cache_list directory
+		// Arcus 1.6 and 1.7 use different znode names.
+		//
+		// Arcus 1.6
+		// Znode names are ip:port-hostname.  Just remove -hostname and concat
+		// all names separated by commas.  AddrUtil turns ip:port into InetSocketAddress.
+		//
+		// Arcus 1.7
+		// Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
+		// by commas.  Arcus17NodeAddress turns these names into Arcus17NodeAddress.
+
 		String addrs = "";
-		for (int i = 0; i < children.size(); i++) {
-			String[] temp = children.get(i).split("-");
-			if (i != 0) {
-				addrs = addrs + "," + temp[0];
-			} else {
-				addrs = temp[0];
+		if (arcus17) {
+			for (int i = 0; i < children.size(); i++) {
+				if (i > 0)
+					addrs = addrs + ",";
+				addrs = addrs + children.get(i);
+			}
+		}
+		else {
+			for (int i = 0; i < children.size(); i++) {
+				String[] temp = children.get(i).split("-");
+				if (i != 0) {
+					addrs = addrs + "," + temp[0];
+				} else {
+					addrs = temp[0];
+				}
 			}
 		}
 
@@ -274,10 +316,30 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            current available Memcached Addresses
 	 */
 	private void createArcusClient(String addrs) {
+		List<InetSocketAddress> socketList;
+		int count;
+		if (arcus17) {
+			socketList = Arcus17NodeAddress.getAddresses(addrs);
 
-		List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
+			// Exclude fake server addresses (slaves) in the initial latch count.
+			// Otherwise we may block here for a while trying to connect to
+			// slave-only groups.
+			count = 0;
+			for (InetSocketAddress a : socketList) {
+				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
+				boolean isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString());
+				if (!isFake)
+					count++;
+			}
+		}
+		else {
+			socketList = AddrUtil.getAddresses(addrs);
+			// Preserve 1.6 behavior.  The initial latch count
+			// includes fake server addresses.
+			count = socketList.size();
+		}
 
-		final CountDownLatch latch = new CountDownLatch(socketList.size());
+		final CountDownLatch latch = new CountDownLatch(count);
 		final ConnectionObserver observer = new ConnectionObserver() {
 
 			@Override
@@ -296,7 +358,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 		int _awaitTime = 0;
 		if (waitTimeForConnect == 0)
-			_awaitTime = 50 * socketList.size();
+			_awaitTime = 50 * count;
 		else
 			_awaitTime = waitTimeForConnect;
 
