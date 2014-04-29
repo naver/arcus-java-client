@@ -1,5 +1,3 @@
-## About
-
 This is an experimental Java client for Arcus memcached with
 replication support.  Replication takes place at the server side using
 a master-slave approach.  It is transparent to the client.  There are
