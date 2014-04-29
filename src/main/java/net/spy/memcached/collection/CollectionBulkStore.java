@@ -1,0 +1,280 @@
+/*
+ * arcus-java-client : Arcus Java client
+ * Copyright 2010-2014 NAVER Corp.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package net.spy.memcached.collection;
+
+import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.List;
+
+import net.spy.memcached.CachedData;
+import net.spy.memcached.KeyUtil;
+import net.spy.memcached.transcoders.Transcoder;
+import net.spy.memcached.util.BTreeUtil;
+
+public abstract class CollectionBulkStore<T> extends CollectionObject {
+
+	public static final String PIPE = "pipe";
+	public static final int MAX_PIPED_ITEM_COUNT = 500;
+
+	protected List<String> keyList;
+	protected T value;
+	protected CachedData cachedData;
+	protected boolean createKeyIfNotExists;
+	protected Transcoder<T> tc;
+	protected int itemCount;
+
+	protected CollectionAttributes attribute;
+
+	public abstract ByteBuffer getAsciiCommand();
+
+	public abstract ByteBuffer getBinaryCommand();
+
+	/**
+	 * 
+	 */
+	public static class BTreeBulkStore<T> extends CollectionBulkStore<T> {
+
+		private static final String COMMAND = "bop insert";
+
+		private final String bkey;
+		private final String eflag;
+
+		public BTreeBulkStore(List<String> keyList, long bkey, byte[] eflag,
+				T value, CollectionAttributes attr, Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.bkey = String.valueOf(bkey);
+			this.eflag = BTreeUtil.toHex(eflag);
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public BTreeBulkStore(List<String> keyList, byte[] bkey,
+				byte[] eflag, T value, CollectionAttributes attr,
+				Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.bkey = BTreeUtil.toHex(bkey);
+			this.eflag = BTreeUtil.toHex(eflag);
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// estimate the buffer capacity
+			int eachExtraSize = bkey.length()
+					+ ((eflag != null) ? eflag.length() : 0)
+					+ cachedData.getData().length + 64;
+			for (String eachKey : keyList) {
+				capacity += KeyUtil.getKeyBytes(eachKey).length;
+			}
+			capacity += eachExtraSize * keyList.size();
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			Iterator<String> iterator = keyList.iterator();
+
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						bkey,
+						(eflag != null) ? eflag : "",
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(iterator.hasNext()) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+	public static class SetBulkStore<T> extends CollectionBulkStore<T> {
+
+		private static final String COMMAND = "sop insert";
+
+		public SetBulkStore(List<String> keyList, T value,
+				CollectionAttributes attr, Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// estimate the buffer capacity
+			int eachExtraSize = cachedData.getData().length + 64;
+			for (String eachKey : keyList) {
+				capacity += KeyUtil.getKeyBytes(eachKey).length;
+			}
+			capacity += eachExtraSize * keyList.size();
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			Iterator<String> iterator = keyList.iterator();
+
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(iterator.hasNext()) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+	public static class ListBulkStore<T> extends CollectionBulkStore<T> {
+
+		private static final String COMMAND = "lop insert";
+		private int index;
+
+		public ListBulkStore(List<String> keyList, int index, T value,
+				CollectionAttributes attr, Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.index = index;
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// estimate the buffer capacity
+			int eachExtraSize = String.valueOf(index).length()
+					+ cachedData.getData().length + 64;
+			for (String eachKey : keyList) {
+				capacity += KeyUtil.getKeyBytes(eachKey).length;
+			}
+			capacity += eachExtraSize * keyList.size();
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			Iterator<String> iterator = keyList.iterator();
+
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						index,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(iterator.hasNext()) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+	public List<String> getKeyList() {
+		return this.keyList;
+	}
+
+	public int getItemCount() {
+		return this.itemCount;
+	}
+}

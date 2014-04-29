@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%-5p](%-35c{1}:%-3L) %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="net.spy.memcached.StatisticsHandler" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="console" />
+	</logger>
+	
+	<logger name="net.spy.memcached.ArcusClient" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="console" />
+	</logger>
+
+<!-- uncomment below to debug
+	<logger name="net.spy.memcached.protocol.ascii.BTreeGetBulkOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionPipedStoreOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.BTreeSortMergeGetOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionDeleteOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.CollectionPipedExistOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.MemcachedConnection" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="console" />
+	</logger>
+	<logger name="net.spy.memcached.protocol.ascii.StoreOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+
+	<logger name="net.spy.memcached.protocol.ascii.ExtendedBTreeGetOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+
+	<logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+
+	<logger name="net.spy.memcached.protocol.ascii.CollectionCountOperationImpl" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="console" />
+	</logger>
+ -->
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="console" />
+	</root>
+</log4j:configuration>

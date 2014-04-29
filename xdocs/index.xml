@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!-- Copyright (c) 2006  Dustin Sallings (dustin@spy.net) -->
+
+<document>
+	<properties>
+		<author email="dustin@spy.net">Dustin Sallings</author>
+		<title>java memcached client</title>
+	</properties>
+
+	<body>
+		<section name="Overview">
+			<p>
+				This project is now primarily hosted at
+				<a href="http://code.google.com/p/spymemcached/">google code
+				hosting</a> with the source at <a
+				href="http://github.com/dustin/java-memcached-client">github</a>.
+			</p>
+      <p>
+        <a href="changelog.html">Changelog</a>
+      </p>
+		</section>
+	</body>
+</document>
