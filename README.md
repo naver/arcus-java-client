@@ -28,7 +28,7 @@ Just add arcus-java-client artifact into your pom.xml.
 
 - [Getting Started Guide (in Korean)][getting-started-guide]
 
-[getting-started-guide]: http://yobi.navercorp.com/openarcus/arcus-java-client/code/master/docs/arcus-java-client-getting-started.md "guide"
+[getting-started-guide]: docs/arcus-java-client-getting-started.md "guide"
 
 ## Building
 
