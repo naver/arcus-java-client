@@ -64,7 +64,17 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<!-- TODO arcus maven repo 위치가 정해지면 추가해야 함 -->
+	<!-- Temporary repo for Maven artifacts -->
+	<repositories>
+		<repository>
+			<id>arcus-java-client-repo</id>
+			<url>https://raw.github.com/naver/arcus-java-client-repo/master/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- 편의상 JUnit 버전을 4.x로 변경합니다. -->
@@ -279,6 +289,9 @@ public class HelloArcus {
 ```
 
 #### 테스트
+
+위 예제는 127.0.0.1:2181 에 ZooKeeper 가 작동하고 있고 memcached 서버가 구동하고 있다고 가정합니다.
+아직 준비 않되어 있다면 다음 페이지 Running Test Cases 를 따라 준비합니다.
 
 테스트가 통과하는지 확인해봅니다.
 
