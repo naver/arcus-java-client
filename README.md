@@ -13,17 +13,28 @@ to support Arcus memcached cloud.
 
 ## Getting Started
 
-The latest artifacts would be published to maven central.
-Just add arcus-java-client artifact into your pom.xml.
+Maven artifacts are currently on github.  We are in the process of deploying them to the central Maven repository.
+In the meantime, add the following repository along with the dependency on arcus-java-client to your pom.xml.
 
 ```xml
 <dependencies>
 	<dependency>
-		<groupId>com.navercorp</groupId>
+		<groupId>com.navercorp.arcus</groupId>
 		<artifactId>arcus-java-client</artifactId>
-		<version>1.7.0</version> <!-- or whatever the latest version is -->
+		<version>1.7.0</version>
 	</dependency>
 </dependencies>
+
+<repositories>
+    <repository>
+        <id>arcus-java-client-repo</id>
+        <url>https://raw.github.com/naver/arcus-java-client-repo/master/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
 ```
 
 - [Getting Started Guide (in Korean)][getting-started-guide]
