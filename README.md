@@ -128,7 +128,7 @@ https://github.com/naver/arcus-java-client/issues
 In addition to those who had contributed to the original libmemcached, the
 following people at NAVER have contributed to arcus-java-client.
 
-Chisu Ryu (netspider) <chisu.yu@navercorp.com>; <puseori9th@gmail.com>  
+Chisu Yu (netspider) <chisu.yu@navercorp.com>; <puseori9th@gmail.com>  
 Hoonmin Kim (harebox) <hoonmin.kim@navercorp.com>; <harebox@gmail.com>  
 YeaSol Kim (ngleader) <sol.k@navercorp.com>; <ngleader@gmail.com>  
 SeongHwa Ahn <getconnected@sk.com>; <ash@nhn.com>  
