@@ -293,6 +293,8 @@ public class HelloArcus {
 위 예제는 127.0.0.1:2181 에 ZooKeeper 가 작동하고 있고 memcached 서버가 구동하고 있다고 가정합니다.
 아직 준비 않되어 있다면 다음 페이지 Running Test Cases 를 따라 준비합니다.
 
+https://github.com/naver/arcus-java-client/blob/master/README.md
+
 테스트가 통과하는지 확인해봅니다.
 
 ```bash
