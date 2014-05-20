@@ -25,6 +25,8 @@
 			<id>harebox</id>
 			<name>Hoonmin Kim</name>
 			<email>harebox@gmail.com</email>
+			<organization>NAVER Corp.</organization>
+			<organizationUrl>http://www.naver.com</organizationUrl>
 		</developer>
 	</developers>
 
@@ -125,8 +127,10 @@
 				<version>2.7</version>
 				<executions>
 					<execution>
-						<id>generate-java-doc</id>
-						<phase>package</phase>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
@@ -185,9 +189,19 @@
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.1</version>
-				<configuration>
-					<altDeploymentRepository>tmp-repo::default::file://${project.build.directory}/tmp-repo</altDeploymentRepository>
-				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<extensions>
@@ -199,14 +213,14 @@
 		</extensions>
 	</build>
 
-	<!-- Deploy to a local directory and then upload to arcus-java-client-repo.
-	     This is a temporary arrangement until we start deploying to the central maven repo.
-	  -->
 	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
 		<repository>
-			<id>tmp-repo</id>
-			<name>Temporary repo</name>
-			<url>file://${project.build.directory}/tmp-repo</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
 </project>
