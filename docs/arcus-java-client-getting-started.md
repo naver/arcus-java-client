@@ -64,18 +64,6 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<!-- Temporary repo for Maven artifacts -->
-	<repositories>
-		<repository>
-			<id>arcus-java-client-repo</id>
-			<url>https://raw.github.com/naver/arcus-java-client-repo/master/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<!-- 편의상 JUnit 버전을 4.x로 변경합니다. -->
 		<dependency>
