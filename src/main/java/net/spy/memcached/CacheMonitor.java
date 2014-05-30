@@ -57,10 +57,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * 
 	 * @param zk
 	 *            ZooKeeper connection
-	 * @param znode
-	 *            A node to be watched
-	 * @param latch
-	 *            Connection establishment checker
+	 * @param serviceCode
+	 *            service code (or cloud name) to identify each cloud
 	 * @param listener
 	 *            Callback listener
 	 */

@@ -1865,7 +1865,7 @@ public class MemcachedClient extends SpyThread
 	
 	/**
 	 * get current local cache manager
-	 * @return
+	 * @return current local cache manager
 	 */
 	public LocalCacheManager getLocalCacheManager() {
 		return localCacheManager;

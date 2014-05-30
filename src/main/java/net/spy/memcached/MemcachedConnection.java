@@ -811,7 +811,7 @@ public final class MemcachedConnection extends SpyObject {
     /**
      * find memcachednode for key
      * @param key
-     * @return
+     * @return a memcached node
      */
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
