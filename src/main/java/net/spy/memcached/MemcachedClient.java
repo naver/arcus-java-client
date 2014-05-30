@@ -1085,7 +1085,7 @@ public class MemcachedClient extends SpyThread
 	 */
 	public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
 		Transcoder<T> tc) {
-		return asyncGetBulk(keys, new SingleElementInfiniteIterator(tc));
+		return asyncGetBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
 	}
 
 	/**
