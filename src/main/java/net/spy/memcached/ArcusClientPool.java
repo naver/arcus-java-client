@@ -317,14 +317,6 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
-	public CollectionFuture<Boolean> asyncSetAttr(String key,
-			Integer expireTime, Long maxCount,
-			CollectionOverflowAction overflowAction) {
-		return this.getClient().asyncSetAttr(key, expireTime, maxCount,
-				overflowAction);
-	}
-
-	@Override
 	public CollectionFuture<CollectionAttributes> asyncGetAttr(String key) {
 		return this.getClient().asyncGetAttr(key);
 	}

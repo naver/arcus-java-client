@@ -85,7 +85,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
 			mc.asyncLopInsert(key, 0, "value1", new CollectionAttributes())
 					.get();
 
-			mc.asyncSetAttr(key, 0, 1L, CollectionOverflowAction.error).get();
+			mc.asyncSetAttr(key, new CollectionAttributes(0, 1L, CollectionOverflowAction.error)).get();
 
 			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
 					.asyncLopPipedInsertBulk(key, 0, valueList,

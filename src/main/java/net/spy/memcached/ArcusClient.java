@@ -431,38 +431,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	}
 	
 	/* (non-Javadoc)
-	 * @see net.spy.memcached.ArcusClient#asyncSetAttr(java.lang.String, java.lang.Integer, java.lang.Long, net.spy.memcached.collection.CollectionOverflowAction)
-	 */
-	@Override
-	@Deprecated
-	public CollectionFuture<Boolean> asyncSetAttr(String key,
-			Integer expireTime, Long maxCount,
-			CollectionOverflowAction overflowAction) {
-		CollectionAttributes attrs = new CollectionAttributes(expireTime,
-				maxCount, overflowAction);
-
-		final CountDownLatch latch = new CountDownLatch(1);
-		final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
-				latch, operationTimeout);
-		Operation op = opFact.setAttr(key, attrs, new OperationCallback() {
-			public void receivedStatus(OperationStatus val) {
-				if (val instanceof CollectionOperationStatus) {
-					rv.set(val.isSuccess(), (CollectionOperationStatus) val);
-				} else {
-					getLogger().warn("Unhandled state: " + val);
-				}
-			}
-
-			public void complete() {
-				latch.countDown();
-			}
-		});
-		rv.setOperation(op);
-		addOp(key, op);
-		return rv;
-	}
-
-	/* (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClient#asyncGetAttr(java.lang.String)
 	 */
 	@Override

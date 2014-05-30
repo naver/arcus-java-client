@@ -57,22 +57,6 @@ public interface ArcusClientIF {
 			Attributes attrs);
 
 	/**
-	 * Sets attributes (metadata) associated with each key
-	 * of collections including lists, sets, and B+ trees.
-	 * 
-	 * @param key key key of a collection (list, set, B+ tree)
-	 * @param expireTime memcached key expire time
-	 * @param maxCount maximum number of items in a collection
-	 * @param overflowAction specify what to do when the number of elements
-	 * 				already reached the maximum allowable element count in a list
-	 * 				upon insertion (only valid for list),
-	 * @return whether or not the operation was performed
-	 */
-	public abstract CollectionFuture<Boolean> asyncSetAttr(String key,
-			Integer expireTime, Long maxCount,
-			CollectionOverflowAction overflowAction);
-
-	/**
 	 * Gets attributes (metadata) associated with each key
 	 * of collections including lists, sets, and B+ trees.
 	 * 

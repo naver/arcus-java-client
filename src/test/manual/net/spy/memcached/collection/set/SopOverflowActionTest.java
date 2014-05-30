@@ -75,28 +75,28 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
 		// Set OverflowAction
 		// error
-		assertTrue(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.error)
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
 		// head_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.head_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// tail_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.tail_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.tail_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// smallest_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.smallest_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.smallest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// largest_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.largest_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.largest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		mc.asyncSopDelete(key, "item0", false).get(1000, TimeUnit.MILLISECONDS);
