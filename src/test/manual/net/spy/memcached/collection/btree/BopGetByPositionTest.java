@@ -41,6 +41,12 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			new byte[] { 15 }, new byte[] { 16 }, new byte[] { 17 },
 			new byte[] { 18 }, new byte[] { 19 } };
 
+    private byte[] eflag = new byte[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+            11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+            31 };
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
@@ -54,7 +60,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (long each : longBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
@@ -79,11 +85,40 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		}
 	}
 
+    public void testLongBKeySingleWithoutEflag() throws Exception {
+        // insert
+        CollectionAttributes attrs = new CollectionAttributes();
+        for (long each : longBkeys) {
+            mc.asyncBopInsert(key, each, null, "val", attrs).get();
+        }
+
+        // bop gbp
+        int pos = 5;
+        CollectionFuture<Map<Integer, Element<Object>>> f = mc
+                .asyncBopGetByPosition(key, BTreeOrder.ASC, pos);
+        Map<Integer, Element<Object>> result = f.get(1000,
+                TimeUnit.MILLISECONDS);
+
+        assertEquals(1, result.size());
+        assertEquals(CollectionResponse.END, f.getOperationStatus()
+                .getResponse());
+
+        for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+            // System.out.println(String.format("index:%d, bkey:%d, value:%s",
+            // each.getKey(), each.getValue().getLongBkey(), each
+            // .getValue().getValue()));
+            assertEquals("invalid index", pos, each.getKey().intValue());
+            assertEquals("invalid bkey", longBkeys[pos], each.getValue()
+                    .getLongBkey());
+            assertEquals("invalid value", "val", each.getValue().getValue());
+        }
+    }
+
 	public void testLongBKeyMultiple() throws Exception {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (long each : longBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
@@ -115,7 +150,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (long each : longBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
@@ -147,7 +182,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
@@ -172,11 +207,40 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		}
 	}
 
+    public void testByteArrayBKeySingleWithoutEflag() throws Exception {
+        // insert
+        CollectionAttributes attrs = new CollectionAttributes();
+        for (byte[] each : byteArrayBkeys) {
+            mc.asyncBopInsert(key, each, null, "val", attrs).get();
+        }
+
+        // bop gbp
+        int pos = 5;
+        CollectionFuture<Map<Integer, Element<Object>>> f = mc
+                .asyncBopGetByPosition(key, BTreeOrder.ASC, pos);
+        Map<Integer, Element<Object>> result = f.get(1000,
+                TimeUnit.MILLISECONDS);
+
+        assertEquals(1, result.size());
+        assertEquals(CollectionResponse.END, f.getOperationStatus()
+                .getResponse());
+
+        for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+            // System.out.println(String.format("index:%d, bkey:%s, value:%s",
+            // each.getKey(), each.getValue().getBkeyByHex(), each
+            // .getValue().getValue()));
+            assertEquals("invalid index", pos, each.getKey().intValue());
+            assertTrue("invalid bkey", Arrays.equals(byteArrayBkeys[pos], each
+                    .getValue().getByteArrayBkey()));
+            assertEquals("invalid value", "val", each.getValue().getValue());
+        }
+    }
+
 	public void testByteArrayBKeyMultiple() throws Exception {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
@@ -208,7 +272,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 		// insert
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
+			mc.asyncBopInsert(key, each, eflag, "val", attrs).get();
 		}
 
 		// bop gbp
