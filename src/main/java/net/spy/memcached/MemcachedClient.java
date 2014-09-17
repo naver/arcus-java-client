@@ -227,7 +227,7 @@ public class MemcachedClient extends SpyThread
 	 * working and what's not working.
 	 * </p>
 	 *
-	 * @return point-in-time view of currently available servers
+	 * @return point-in-time view of currently unavailable servers
 	 */
 	public Collection<SocketAddress> getUnavailableServers() {
 		ArrayList<SocketAddress> rv=new ArrayList<SocketAddress>();
