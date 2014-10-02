@@ -34,8 +34,11 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 	private String invalidKey = "InvalidBopGetByPositionTest";
 	private String kvKey = "KvBopGetByPositionTest";
 
-	private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L,
-			19L };
+	/* bkey values larger than maximum value of 4 bytes integer */
+	private long[] longBkeys = { 9000000000L,
+			9000000001L, 9000000002L, 9000000003L,
+			9000000004L, 9000000005L, 9000000006L,
+			9000000007L, 9000000008L, 9000000009L };
 	private byte[][] byteArrayBkeys = { new byte[] { 10 }, new byte[] { 11 },
 			new byte[] { 12 }, new byte[] { 13 }, new byte[] { 14 },
 			new byte[] { 15 }, new byte[] { 16 }, new byte[] { 17 },

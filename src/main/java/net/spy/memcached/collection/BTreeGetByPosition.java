@@ -102,7 +102,7 @@ public class BTreeGetByPosition<T> extends CollectionGet<T> {
 		if (splited[BKEY].startsWith("0x")) {
 			this.bkey = new BKeyObject(splited[0].substring(2));
 		} else {
-			this.bkey = new BKeyObject(Integer.parseInt(splited[0]));
+			this.bkey = new BKeyObject(Long.parseLong(splited[0]));
 		}
 
 		// <eflag> or <bytes>
