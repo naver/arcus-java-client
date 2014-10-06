@@ -87,7 +87,7 @@ public class BTreeStoreAndGet<T> extends BTreeStore<T> {
 		if (splited[BKEY].startsWith("0x")) {
 			this.bkeyObject = new BKeyObject(splited[0].substring(2));
 		} else {
-			this.bkeyObject = new BKeyObject(Integer.parseInt(splited[0]));
+			this.bkeyObject = new BKeyObject(Long.parseLong(splited[0]));
 		}
 
 		// <eflag> or <bytes>
