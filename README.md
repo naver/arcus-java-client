@@ -117,6 +117,11 @@ Tests run: 722, Failures: 0, Errors: 0, Skipped: 8
 [INFO] ------------------------------------------------------------------------
 ```
 
+## API Documentation
+
+Please refer to [Arcus Java Client User Guide](docs/arcus-java-client-user-guide.md)
+for the detailed usage of Arcus java client.
+
 ## Issues
 
 If you find a bug, please report it via the GitHub issues page.
