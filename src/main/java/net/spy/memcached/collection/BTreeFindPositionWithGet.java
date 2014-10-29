@@ -38,18 +38,18 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class BTreeFindPositionWithGet<T> extends CollectionGet<T> {
 
-    public static final int HEADER_EFLAG_POSITION = 1; // 0-based
+	public static final int HEADER_EFLAG_POSITION = 1; // 0-based
 
 	private static final String command = "bop pwg";
-	
+
 	private final BKeyObject bkeyObject;
 	private final BTreeOrder order;
 	private final int count;
 	//private String str;
 
-    private BKeyObject bkey;
-    private byte[] eflag;
-    private int bytes;
+	private BKeyObject bkey;
+	private byte[] eflag;
+	private int bytes;
 
 	public BTreeFindPositionWithGet(long longBKey, BTreeOrder order, int count) {
 		this.bkeyObject = new BKeyObject(longBKey);
@@ -65,16 +65,16 @@ public class BTreeFindPositionWithGet<T> extends CollectionGet<T> {
 
 	public String stringify() {
 		if (str == null) {
-            StringBuilder b = new StringBuilder();
-    		b.append(bkeyObject.getBKeyAsString());
-    		b.append(" ");
-            b.append(order.getAscii());
-            if (count > 0) {
-                b.append(" ");
-                b.append(String.valueOf(count));
-            }
-    		str = b.toString();
-        }
+			StringBuilder b = new StringBuilder();
+			b.append(bkeyObject.getBKeyAsString());
+			b.append(" ");
+			b.append(order.getAscii());
+			if (count > 0) {
+				b.append(" ");
+				b.append(String.valueOf(count));
+			}
+			str = b.toString();
+		}
 		return str;
 	}
 	
@@ -89,51 +89,51 @@ public class BTreeFindPositionWithGet<T> extends CollectionGet<T> {
 	public BTreeOrder getOrder() {
 		return order;
 	}
-	
+
 	public int getCount() {
 		return count;
 	}
 
-    @Override
-    public boolean headerReady(int spaceCount) {
-        return spaceCount == 2;
-    }
+	@Override
+	public boolean headerReady(int spaceCount) {
+		return spaceCount == 2;
+	}
 
-    /*
-     * VALUE <position> <flags> <count> <index>\r\n
-     * <bkey> [<eflag>] <bytes> <data>\r\n
-     * END\r\n
-     */
-    public void decodeItemHeader(String itemHeader) {
-        String[] splited = itemHeader.split(" ");
+	/*
+	 * VALUE <position> <flags> <count> <index>\r\n
+	 * <bkey> [<eflag>] <bytes> <data>\r\n
+	 * END\r\n
+	 */
+	public void decodeItemHeader(String itemHeader) {
+		String[] splited = itemHeader.split(" ");
 
-        // <bkey>
-        if (splited[0].startsWith("0x")) {
-            this.bkey = new BKeyObject(splited[0].substring(2));
-        } else {
-            this.bkey = new BKeyObject(Long.parseLong(splited[0]));
-        }
-        if (splited[1].startsWith("0x")) {
-            // <eflag> <bytes>
-            this.eflag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-            this.bytes = Integer.parseInt(splited[2]);
-        } else {
-            // <bytes> only
-            this.bytes = Integer.parseInt(splited[1]);
-        }
+		// <bkey>
+		if (splited[0].startsWith("0x")) {
+			this.bkey = new BKeyObject(splited[0].substring(2));
+		} else {
+			this.bkey = new BKeyObject(Long.parseLong(splited[0]));
+		}
+		if (splited[1].startsWith("0x")) {
+			// <eflag> <bytes>
+			this.eflag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
+			this.bytes = Integer.parseInt(splited[2]);
+		} else {
+			// <bytes> only
+			this.bytes = Integer.parseInt(splited[1]);
+		}
 
-        this.dataLength = bytes;
-    }
+		this.dataLength = bytes;
+	}
 
-    public BKeyObject getBkey() {
-        return bkey;
-    }
+	public BKeyObject getBkey() {
+		return bkey;
+	}
 
-    public byte[] getEflag() {
-        return eflag;
-    }
+	public byte[] getEflag() {
+		return eflag;
+	}
 
-    public int getBytes() {
-        return bytes;
-    }
+	public int getBytes() {
+		return bytes;
+	}
 }
