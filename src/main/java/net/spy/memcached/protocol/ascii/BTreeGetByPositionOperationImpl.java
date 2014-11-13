@@ -117,8 +117,8 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 				byte b = bb.get();
 				// Handle spaces to parse the header.
 				if (b == ' ') {
-					// One-time check to find if this responses have eflags.
-					if (hasEFlag == null && spaceCount == BTreeGetByPosition.HEADER_EFLAG_POSITION + 1) {
+                    // One-time check to find if this responses have eflags.
+					if (hasEFlag == null && spaceCount == BTreeGetByPosition.HEADER_EFLAG_POSITION) {
 						String[] chunk = new String(byteBuffer.toByteArray())
 								.split(" ");
 						if (chunk[BTreeGetByPosition.HEADER_EFLAG_POSITION].startsWith("0x")) {
@@ -127,7 +127,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 							hasEFlag = false;
 						}
 					}
-					
+
 					spaceCount++;
 
 					// Parse the value header.

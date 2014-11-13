@@ -179,8 +179,8 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes());
 
 		// smallest_trim
-		assertTrue(mc.asyncSetAttr(key, null, 1L,
-				CollectionOverflowAction.smallest_trim).get(1000,
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, 1L, CollectionOverflowAction.smallest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// test
@@ -196,8 +196,8 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes());
 
 		// largest_trim
-		assertTrue(mc.asyncSetAttr(key, null, 1L,
-				CollectionOverflowAction.largest_trim).get(1000,
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// test
@@ -214,28 +214,28 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
 		// Set OverflowAction
 		// error
-		assertTrue(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.error)
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
 		// head_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.head_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// tail_trim
-		assertFalse(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.tail_trim).get(1000,
+		assertFalse(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.tail_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// smallest_trim
-		assertTrue(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.smallest_trim).get(1000,
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.smallest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		// largest_trim
-		assertTrue(mc.asyncSetAttr(key, null, null,
-				CollectionOverflowAction.largest_trim).get(1000,
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, null, CollectionOverflowAction.largest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		mc.asyncBopDelete(key, 0, ElementFlagFilter.DO_NOT_FILTER, false).get(

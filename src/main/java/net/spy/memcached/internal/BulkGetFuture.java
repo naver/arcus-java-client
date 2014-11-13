@@ -129,13 +129,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
 	/**
 	 * refactored code common to both get(long, TimeUnit) and getSome(long,
 	 * TimeUnit)
-	 * 
-	 * @param to
-	 * @param unit
-	 * @param timedoutOps
-	 * @return
-	 * @throws InterruptedException
-	 * @throws ExecutionException
 	 */
 	private Map<String, T> internalGet(long to, TimeUnit unit,
 			Collection<Operation> timedoutOps) throws InterruptedException,

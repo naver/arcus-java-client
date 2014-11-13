@@ -216,7 +216,7 @@ public interface MemcachedNode {
 	
 	/**
 	 * Is this a fake node?
-	 * @return
+	 * @return true or false
 	 */
 	boolean isFake();
 	
@@ -227,7 +227,7 @@ public interface MemcachedNode {
 	
 	/**
 	 * get operation queue status
-	 * @return
+	 * @return status string
 	 */
 	String getStatus();
 }

@@ -228,83 +228,90 @@ public interface OperationFactory {
 			OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param attrs
-	 * @param cb
-	 * @return
+	 * Set item attributes
+	 *
+	 * @param key key of an item
+	 * @param attrs new attribute information
+	 * @param cb the status callback
+	 * @return a new SetAttrOperation
 	 */
 	SetAttrOperation setAttr(String key, Attributes attrs,
 			OperationCallback cb);
 	
 	/**
+	 * Get item attributes
 	 * 
-	 * @param key
-	 * @param cb
-	 * @return
+	 * @param key key of an item
+	 * @param cb the callback that will contain the results
+	 * @return a new GetAttrOperation
 	 */
 	GetAttrOperation getAttr(String key, GetAttrOperation.Callback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param subkey
-	 * @param collectionStore
-	 * @param data
-	 * @param cb
-	 * @return
+	 * Store operation for collection items.
+	 *
+	 * @param key collection item's key
+	 * @param subkey element key (list index, b+tree bkey)
+	 * @param collectionStore operation parameters (value, eflags, attributes, and so on)
+	 * @param data the serialized value
+	 * @param cb the status callback
+	 * @return a new CollectionStoreOperation
 	 */
 	CollectionStoreOperation collectionStore(String key, String subkey, 
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param store
-	 * @param cb
-	 * @return
+	 * Pipelined store operation for collection items.
+	 *
+	 * @param key collection item's key
+	 * @param store operation parameters (values, attributes, and so on)
+	 * @param cb the status callback
+	 * @return a new CollectionPipedStoreOperation
 	 */
 	CollectionPipedStoreOperation collectionPipedStore(String key,
 			CollectionPipedStore<?> store, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param collectionGet
-	 * @param cb
-	 * @return
+	 * Get operation for collection items.
+	 *
+	 * @param key collection item's key
+	 * @param collectionGet operation parameters (element keys and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionGetOperation
 	 */
 	CollectionGetOperation collectionGet(String key, 
 			CollectionGet<?> collectionGet, CollectionGetOperation.Callback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param collectionGet
-	 * @param cb
-	 * @return
+	 * Get operation for collection items (b+tree items).
+	 *
+	 * @param key collection(b+tree) item's key
+	 * @param collectionGet operation parameters (element keys and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionGetOperation
 	 */
 	CollectionGetOperation collectionGet2(String key, 
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb);
 	
 	/**
+	 * Delete operation for collection items.
 	 * 
-	 * @param key
-	 * @param collectionDelete
-	 * @param cb
-	 * @return
+	 * @param key collection item's key
+	 * @param collectionDelete operation parameters (element index/key, value, and so on)
+	 * @param cb the status callback
+	 * @return a new CollectionDeleteOperation
 	 */
 	CollectionDeleteOperation collectionDelete(String key,
 			CollectionDelete<?> collectionDelete, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param subkey
-	 * @param setPipedExist
-	 * @param data
-	 * @param cb
-	 * @return
+	 * Existence operation for collection items. 
+	 *
+	 * @param key collection item's key
+	 * @param subkey element key (list index, b+tree bkey)
+	 * @param collectionExist operation parameters (element value and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionExistOperation
 	 */
 	CollectionExistOperation collectionExist(String key, String subkey, 
 			CollectionExist<?> collectionExist, OperationCallback cb); 
@@ -332,140 +339,154 @@ public interface OperationFactory {
 	Collection<Operation> clone(KeyedOperation op);
 
 	/**
-	 * 
-	 * @param key
-	 * @param collectionCreate
-	 * @param cb
-	 * @return
+	 * Create operation for collection items. 
+	 *
+	 * @param key collection item's key
+	 * @param collectionCreate operation parameters (flags, expiration time, and so on)
+	 * @param cb the status callback
+	 * @return a new CollectionCreateOperation
 	 */
 	CollectionCreateOperation collectionCreate(String key,
 			CollectionCreate collectionCreate, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param collectionCount
-	 * @param cb
-	 * @return
+	 * Count operation for collection items. 
+	 *
+	 * @param key collection item's key
+	 * @param collectionCount operation parameters (element key range, eflags, and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionCountOperation
 	 */
 	CollectionCountOperation collectionCount(String key,
 			CollectionCount collectionCount, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param prefix
-	 * @param delay delay until flush.
-	 * @param noreply
-	 * @param cb
-	 * @return
+	 * Flush operation on a given prefix.
+	 *
+	 * @param prefix prefix of the keys
+	 * @param delay the period of time to delay, in seconds
+	 * @param noreply flag to make no response
+	 * @param cb the status callback
+	 * @return a new FlushOperation
 	 */
 	FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param smget
-	 * @param cb
-	 * @return
+	 * SMGet(Sort-Merge Get) operation for multiple b+tree items. 
+	 *
+	 * @param smGet smget parameters (keys, eflags, and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeSortMergeGetOperation
 	 */
 	BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet, BTreeSortMergeGetOperation.Callback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param subkey
-	 * @param collectionStore
-	 * @param data
-	 * @param cb
-	 * @return
+	 * Upsert(Update or Insert) operation for collection items (b+tree items). 
+	 *
+	 * @param key collection item's key
+	 * @param subkey element key (b+tree bkey)
+	 * @param collectionStore operation parameters (value, eflag, and so on)
+	 * @param data the serialized value
+	 * @param cb the status callback
+	 * @return a new CollectionStoreOperation
 	 */
 	CollectionStoreOperation collectionUpsert(String key, String subkey, 
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param subkey
-	 * @param collectionUpdate
-	 * @param data
-	 * @param cb
-	 * @return
+	 * Update operation for collection items.
+	 *
+	 * @param key collection item's key
+	 * @param subkey element key (list index, b+tree bkey)
+	 * @param collectionUpdate (element value and so on)
+	 * @param data the serialized value
+	 * @param cb the status callback
+	 * @return a new CollectionUpdateOperation
 	 */
 	CollectionUpdateOperation collectionUpdate(String key, String subkey, 
 			CollectionUpdate<?> collectionUpdate, byte[] data, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param update
-	 * @param cb
-	 * @return
+	 * Pipelined update operation for collection items.
+	 *
+	 * @param key  collection item's key
+	 * @param update operation parameters (values and so on)
+	 * @param cb the status callback
+	 * @return a new CollectionPipedUpdateOperation
 	 */
 	CollectionPipedUpdateOperation collectionPipedUpdate(String key,
 			CollectionPipedUpdate<?> update, OperationCallback cb);
 
 	/**
+	 * Increment/Decrement operation for collection items (b+tree items).
 	 *
-	 * @param key
-	 * @param subkey
-	 * @param collectionMutate
-	 * @param cb
-	 * @return
+	 * @param key b+tree item's key
+	 * @param subkey element key
+	 * @param collectionMutate operation parameters (increment/decrement amount and so on)
+	 * @param cb the callback that will contain the incremented/decremented result
+	 * @return a new CollectionMutateOperation
 	 */
 	CollectionMutateOperation collectionMutate(String key, String subkey, 
 			CollectionMutate collectionMutate, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param exist
-	 * @param cb
-	 * @return
+	 * Pipelined existence operation for collection items (set items)
+	 *
+	 * @param key set item's key
+	 * @param exist operation parameters (element values)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionPipedExistOperation
 	 */
 	CollectionPipedExistOperation collectionPipedExist(String key,
 			SetPipedExist<?> exist, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param store
-	 * @param cb
-	 * @return
+	 * Bulk store operation for collection items.
+	 *
+	 * @param key  collection item's key
+	 * @param store operation parameters (element values, and so on)
+	 * @param cb the status callback
+	 * @return a new CollectionBulkStoreOperation
 	 */
 	CollectionBulkStoreOperation collectionBulkStore(List<String> key,
 			CollectionBulkStore<?> store, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param get
-	 * @param cb
-	 * @return
+	 * Bulk get opearation for b+tree items.
+	 *
+	 * @param get operation parameters (item key, element key range, and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeGetBulkOperation
 	 */
 	BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get, BTreeGetBulkOperation.Callback<?> cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param get
-	 * @param cb
-	 * @return
+	 * Get operation for b+tree items using positions. 
+	 *
+	 * @param key b+tree item's key
+	 * @param get operation parameters (element position and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeGetByPositionOperation
 	 */
 	BTreeGetByPositionOperation bopGetByPosition(String key, BTreeGetByPosition<?> get, OperationCallback cb);
 
 	/**
-	 * 
-	 * @param key
-	 * @param get
-	 * @param cb
-	 * @return
+	 * Find-position operation for b+tree items. 
+	 *
+	 * @param key b+tree item's key
+	 * @param get operation parameters (element key and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeFindPositionOperation
 	 */
 	BTreeFindPositionOperation bopFindPosition(String key, BTreeFindPosition get, OperationCallback cb);
 	
 	/**
-	 * 
-	 * @param key
-	 * @param get
-	 * @param cb
-	 * @return
+	 * Insert/upsert and get the trimmed element for b+tree items.
+	 *
+	 * @param key b+tree item's key
+	 * @param get operation parameters (element key and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeStoreAndGetOperation
 	 */
 	BTreeStoreAndGetOperation bopStoreAndGet(String key,
 			BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb);

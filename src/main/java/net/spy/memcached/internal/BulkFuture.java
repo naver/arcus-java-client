@@ -28,18 +28,17 @@ public interface BulkFuture<V> extends Future<V> {
 	public boolean isTimeout();
 
     /**
-     * Wait for the operation to complete and return results
+     * Wait for the operation to complete and return results.
      *
      * If operation could not complete within specified
      * timeout, partial result is returned. Otherwise, the
      * behavior is identical to {@link #get(long, TimeUnit)}
      *
-     *
-     * @param timeout
-     * @param unit
-     * @return
-     * @throws InterruptedException
-     * @throws ExecutionException
+     * @param timeout the maximum time to wait
+     * @param unit the time unit of the timeout argument
+     * @return the computed result
+     * @throws InterruptedException if the current thread was interrupted while waiting
+     * @throws ExecutionException if the computation threw an exception
      */
 	public V getSome(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException;

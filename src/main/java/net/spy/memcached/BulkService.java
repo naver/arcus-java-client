@@ -90,9 +90,9 @@ class BulkService extends SpyObject {
 	private static class Task<T> extends FutureTask<T> {
 		private final BulkWorker worker;
 
-		public Task(BulkWorker w) {
-			super((Callable) w);
-			this.worker = w;
+		public Task(Callable<T> callable) {
+			super(callable);
+			this.worker = (BulkWorker) callable;
 		}
 
 		@Override
@@ -108,7 +108,7 @@ class BulkService extends SpyObject {
 			Callable<Map<String, CollectionOperationStatus>> {
 
 		protected final ArcusClient[] clientList;
-		protected final Future<Boolean>[] future;
+		protected final ArrayList<Future<Boolean>> future;
 		protected final long operationTimeout;
 		protected final AtomicBoolean isRunnable = new AtomicBoolean(true);
 		protected final Map<String, CollectionOperationStatus> errorList;
@@ -119,7 +119,7 @@ class BulkService extends SpyObject {
 
 		public BulkWorker(int keySize, long timeout, Transcoder<T> tc,
 				ArcusClient[] clientList) {
-			this.future = new Future[keySize];
+			this.future = new ArrayList<Future<Boolean>>(keySize);
 			this.operationTimeout = timeout;
 			this.clientList = getOptimalClients(clientList);
 			this.errorList = new HashMap<String, CollectionOperationStatus>();
@@ -165,7 +165,7 @@ class BulkService extends SpyObject {
 
 		protected void setErrorOpStatus(String key, int indexOfFuture) {
 			errorList.put(key,
-					((CollectionFuture<Boolean>) future[indexOfFuture])
+					((CollectionFuture<Boolean>) future.get(indexOfFuture))
 							.getOperationStatus());
 		}
 
@@ -190,7 +190,7 @@ class BulkService extends SpyObject {
 				}
 				try {
 					if (isRunnable()) {
-						future[pos] = processItem(pos);
+						future.add(pos, processItem(pos));
 					}
 				} catch (IllegalStateException e) {
 					if (Thread.currentThread().isInterrupted()) {
@@ -255,7 +255,7 @@ class BulkService extends SpyObject {
 		@Override
 		public void awaitProcessResult(int index) {
 			try {
-				boolean success = future[index].get(operationTimeout,
+				boolean success = future.get(index).get(operationTimeout,
 						TimeUnit.MILLISECONDS);
 				if (!success) {
 					errorList.put(
@@ -264,7 +264,7 @@ class BulkService extends SpyObject {
 									.valueOf(success), CollectionResponse.END));
 				}
 			} catch (Exception e) {
-				future[index].cancel(true);
+				future.get(index).cancel(true);
 				errorList.put(keys.get(index), new CollectionOperationStatus(
 						false, e.getMessage(), CollectionResponse.EXCEPTION));
 			}

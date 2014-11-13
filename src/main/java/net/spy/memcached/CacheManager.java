@@ -201,7 +201,6 @@ public class CacheManager extends SpyThread implements Watcher,
 	 * We do process only child node change event ourselves, we just need to
 	 * forward them on.
 	 * 
-	 * @see org.apache.zookeeper.Watcher#process(org.apache.zookeeper.proto.WatcherEvent)
 	 */
 	public void process(WatchedEvent event) {
 		if (event.getType() == Event.EventType.None) {

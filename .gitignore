@@ -1,5 +1,6 @@
 .settings
 cobertura.ser
+.idea/
 target/
 reports/
 junit*

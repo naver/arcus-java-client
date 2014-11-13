@@ -57,22 +57,6 @@ public interface ArcusClientIF {
 			Attributes attrs);
 
 	/**
-	 * Sets attributes (metadata) associated with each key
-	 * of collections including lists, sets, and B+ trees.
-	 * 
-	 * @param key key key of a collection (list, set, B+ tree)
-	 * @param expireTime memcached key expire time
-	 * @param maxCount maximum number of items in a collection
-	 * @param overflowAction specify what to do when the number of elements
-	 * 				already reached the maximum allowable element count in a list
-	 * 				upon insertion (only valid for list),
-	 * @return whether or not the operation was performed
-	 */
-	public abstract CollectionFuture<Boolean> asyncSetAttr(String key,
-			Integer expireTime, Long maxCount,
-			CollectionOverflowAction overflowAction);
-
-	/**
 	 * Gets attributes (metadata) associated with each key
 	 * of collections including lists, sets, and B+ trees.
 	 * 
@@ -189,7 +173,7 @@ public interface ArcusClientIF {
 	 *            exists.
 	 * @param tc
 	 *            transcoder to encode value
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
 			List<String> keyList, long bkey, byte[] eFlag, T value, CollectionAttributes attributesForCreate,
@@ -210,7 +194,7 @@ public interface ArcusClientIF {
 	 * @param attributesForCreate
 	 *            create a b+tree with this attributes, if given key is not
 	 *            exists.
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public abstract Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
 			List<String> keyList, long bkey, byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
@@ -693,7 +677,6 @@ public interface ArcusClientIF {
 	 * @param index list index (the item will be inserted before the element with the given index)   
 	 * @param value a value to insert into each list
 	 * @param attributesForCreate attributes of the key
-	 * @param keyList a key list of list
 	 *  
 	 * @return a future that will indicate the failure list of each operation
 	 */
@@ -741,9 +724,6 @@ public interface ArcusClientIF {
 	 * @param value a value to insert into each list
 	 * @param attributesForCreate attributes of the key
 	 * @param tc a transcoder to encode the value
-	 * @param keyList a key list of list
-	 *  
-	 * @param <T>
 	 * @return a future that will indicate the failure list of each operation
 	 */
 	public <T> CollectionFuture<Boolean> asyncLopInsert(String key, int index,
@@ -908,7 +888,7 @@ public interface ArcusClientIF {
 	 * @param attributesForCreate
 	 *            create a b+tree with this attributes, if given key of b+tree
 	 *            is not exists.
-	 * @returna future indicating success, false if there was no key and
+	 * @return a future indicating success, false if there was no key and
 	 *          attributesForCreate argument is null.
 	 */
 	public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
@@ -933,7 +913,7 @@ public interface ArcusClientIF {
 	 *            create a b+tree with this attributes, if given key of b+tree
 	 *            is not exists.
 	 * @param tc transcoder to encode value
-	 * @returna future indicating success, false if there was no key and
+	 * @return a future indicating success, false if there was no key and
 	 *          attributesForCreate argument is null.
 	 */
 	public <T> CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
@@ -953,7 +933,7 @@ public interface ArcusClientIF {
 	 * @param value
 	 *            new value of element.
 	 *            do not update the value if this argument is null.
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
 			ElementFlagUpdate eFlagUpdate, Object value);
@@ -973,7 +953,7 @@ public interface ArcusClientIF {
 	 *            do not update the value if this argument is null.
 	 * @param tc
 	 *            a transcoder to encode the value of element
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
 			ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc);
@@ -985,7 +965,7 @@ public interface ArcusClientIF {
 	 *            key of a b+tree
 	 * @param elements
 	 *            list of b+tree elements
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
 			String key, List<Element<Object>> elements);
@@ -999,7 +979,7 @@ public interface ArcusClientIF {
 	 *            list of b+tree elements
 	 * @param tc
 	 *            a transcoder to encode the value of element
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
 			String key, List<Element<T>> elements, Transcoder<T> tc);
@@ -1019,7 +999,7 @@ public interface ArcusClientIF {
 	 * @param attributesForCreate
 	 *            create a b+tree with this attributes, if given key is not
 	 *            exists.
-	 * @returna future indicating success, false if there was no key and attributesForCreate argument is null
+	 * @return a future indicating success, false if there was no key and attributesForCreate argument is null
 	 */
 	public CollectionFuture<Boolean> asyncBopInsert(String key,
 			byte[] bkey, byte[] eFlag, Object value,
@@ -1043,7 +1023,7 @@ public interface ArcusClientIF {
 	 *            exists.
 	 * @param tc
 	 *            transcoder to encode value
-	 * @returna future indicating success, false if there was no key and attributesForCreate argument is null
+	 * @return a future indicating success, false if there was no key and attributesForCreate argument is null
 	 */
 	public <T> CollectionFuture<Boolean> asyncBopInsert(String key,
 			byte[] bkey, byte[] eFlag, T value,
@@ -1116,7 +1096,7 @@ public interface ArcusClientIF {
 	 * @param attributesForCreate
 	 *            create a b+tree with this attributes, if given key of b+tree
 	 *            is not exists.
-	 * @returna future indicating success, false if there was no key and
+	 * @return a future indicating success, false if there was no key and
 	 *          attributesForCreate argument is null.
 	 */
 	public CollectionFuture<Boolean> asyncBopUpsert(String key,
@@ -1144,7 +1124,7 @@ public interface ArcusClientIF {
 	 *            is not exists.
 	 * @param tc
 	 *            transcoder to encode value
-	 * @returna future indicating success, false if there was no key and
+	 * @return a future indicating success, false if there was no key and
 	 *          attributesForCreate argument is null.
 	 */
 	public <T> CollectionFuture<Boolean> asyncBopUpsert(String key,
@@ -1180,7 +1160,7 @@ public interface ArcusClientIF {
 	 * @param value
 	 *            new value of element. do not update the value if this argument
 	 *            is null.
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public CollectionFuture<Boolean> asyncBopUpdate(String key,
 			byte[] bkey, ElementFlagUpdate eFlagUpdate, Object value);
@@ -1200,7 +1180,7 @@ public interface ArcusClientIF {
 	 *            is null.
 	 * @param tc
 	 *            transcoder to encode value
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
 			byte[] bkey, ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc);
@@ -1259,9 +1239,9 @@ public interface ArcusClientIF {
 	 * @param elements
 	 *            element list which insert into b+tree
 	 * @param attributesForCreate
-	 *            create a b+tree with this attributes, if given key is not
-	 *            exists.
-	 * @tc transcoder to decode value
+	 *            create a b+tree with this attributes, if given key is not exists.
+	 * @param tc
+	 *            transcoder to decode value
 	 * @return a future that will hold the index of iteration sequence which
 	 *         failed elements and result code.
 	 * 
@@ -1348,7 +1328,7 @@ public interface ArcusClientIF {
 	 * @param attributesForCreate
 	 *            create a b+tree with this attributes, if given key is not
 	 *            exists.
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public abstract Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
 			List<String> keyList, byte[] bkey, byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
@@ -1370,7 +1350,7 @@ public interface ArcusClientIF {
 	 *            exists.
 	 * @param tc
 	 *            transcoder to encode value
-	 * @returna future indicating success
+	 * @return a future indicating success
 	 */
 	public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
 			List<String> keyList, byte[] bkey, byte[] eFlag, T value, CollectionAttributes attributesForCreate,

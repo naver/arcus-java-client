@@ -98,8 +98,8 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 				.asyncBopInsert(key, 1, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(key, null, 1L,
-				CollectionOverflowAction.largest_trim).get(1000,
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim)).get(1000,
 				TimeUnit.MILLISECONDS));
 
 		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 2, null,
@@ -116,8 +116,8 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(key, null, 1L,
-				CollectionOverflowAction.error)
+		assertTrue(mc.asyncSetAttr(key,
+				new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
 		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 1, null,

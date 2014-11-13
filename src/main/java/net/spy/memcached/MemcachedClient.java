@@ -227,7 +227,7 @@ public class MemcachedClient extends SpyThread
 	 * working and what's not working.
 	 * </p>
 	 *
-	 * @return point-in-time view of currently available servers
+	 * @return point-in-time view of currently unavailable servers
 	 */
 	public Collection<SocketAddress> getUnavailableServers() {
 		ArrayList<SocketAddress> rv=new ArrayList<SocketAddress>();
@@ -1086,7 +1086,7 @@ public class MemcachedClient extends SpyThread
 	 */
 	public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
 		Transcoder<T> tc) {
-		return asyncGetBulk(keys, new SingleElementInfiniteIterator(tc));
+		return asyncGetBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
 	}
 
 	/**
@@ -1866,7 +1866,7 @@ public class MemcachedClient extends SpyThread
 	
 	/**
 	 * get current local cache manager
-	 * @return
+	 * @return current local cache manager
 	 */
 	public LocalCacheManager getLocalCacheManager() {
 		return localCacheManager;

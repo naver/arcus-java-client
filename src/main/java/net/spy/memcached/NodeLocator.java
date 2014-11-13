@@ -54,7 +54,6 @@ public interface NodeLocator {
 	/**
 	 * Update all memcached nodes. Note that this feature is
 	 * only available in ArcusKetamaNodeLocator.
-	 * @param nodes
 	 */
 	void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
 }
