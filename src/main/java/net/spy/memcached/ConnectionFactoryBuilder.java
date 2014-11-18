@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 package net.spy.memcached;
-
+/* ENABLE_REPLICATION start */
 import java.io.IOException;
 import java.net.InetSocketAddress;
+/* ENABLE_REPLICATION end */
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -77,11 +78,13 @@ public class ConnectionFactoryBuilder {
 	
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
+	/* ENABLE_REPLICATION start */
 	private boolean arcus17 = false;
 
 	public void setArcus17(boolean b) {
 		arcus17 = b;
 	}
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Set the operation queue factory.
@@ -321,6 +324,7 @@ public class ConnectionFactoryBuilder {
 	public ConnectionFactory build() {
 		return new DefaultConnectionFactory() {
 
+			/* ENABLE_REPLICATION start */
 			@Override
 			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
 				throws IOException {
@@ -328,6 +332,7 @@ public class ConnectionFactoryBuilder {
 				c.setArcus17(arcus17);
 				return c;
 			}
+			/* ENABLE_REPLICATION end */
 
 			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
@@ -357,6 +362,7 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
+						/* ENABLE_REPLICATION start */
 						if (arcus17) {
 							// Arcus 1.7
 							// This locator uses Arcus17KetamaNodeLocatorConfiguration
@@ -368,6 +374,9 @@ public class ConnectionFactoryBuilder {
 							// Arcus 1.6
 							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
 						}
+						/* ENABLE_REPLICATION else */
+						//return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						/* ENABLE_REPLICATION end */
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);
 				}

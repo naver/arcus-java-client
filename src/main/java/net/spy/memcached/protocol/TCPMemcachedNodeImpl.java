@@ -17,8 +17,10 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
+/* ENABLE_REPLICATION start */
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+/* ENABLE_REPLICATION end */
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -95,6 +97,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		setupForAuth();
 
 		// is this a fake node?
+		/* ENABLE_REPLICATION start */
 		if (sa instanceof InetSocketAddress) {
 			InetSocketAddress inetSockAddr = (InetSocketAddress)sa;
 			InetAddress inetAddr = inetSockAddr.getAddress();
@@ -103,6 +106,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 				isFake = CacheMonitor.FAKE_SERVER_NODE.equals(ipport);
 			}
 		}
+		/* ENABLE_REPLICATION else */
+		//isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(sa.toString());
+		/* ENABLE_REPLICATION end */
 	}
 
 	/* (non-Javadoc)

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* ENABLE_REPLICATION start */
 package net.spy.memcached;
 
 import java.io.IOException;
@@ -76,3 +77,4 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 		}
 	}
 }
+/* ENABLE_REPLICATION end */

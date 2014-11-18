@@ -89,6 +89,7 @@ public final class MemcachedConnection extends SpyObject {
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
 
+	/* ENABLE_REPLICATION start */
 	private boolean arcus17;
 	private boolean gracefulFailover;
 	private long shutdownDelay = 10000; // milliseconds
@@ -104,6 +105,7 @@ public final class MemcachedConnection extends SpyObject {
 			millis = t;
 		}
 	};
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Construct a memcached connection.
@@ -134,6 +136,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		locator=f.createLocator(connections);
 
+		/* ENABLE_REPLICATION start */
 		// By default, the 1.7 client supports graceful failover.
 		// It just means that we do not shutdown the removed nodes right away.
 		// But wait till it becomes empty (no ongoing requests).
@@ -147,14 +150,17 @@ public final class MemcachedConnection extends SpyObject {
 			} catch (Exception e) {
 			}
 		}
+		/* ENABLE_REPLICATION end */
 	}
 
+	/* ENABLE_REPLICATION start */
 	// handleNodeManageQueue and updateConnections behave slightly differently
 	// depending on the Arcus version.  We could have created a subclass and overload
 	// those methods.  But, MemcachedConnection is a final class.
 	void setArcus17(boolean b) {
 		arcus17 = b;
 	}
+	/* ENABLE_REPLICATION end */
 
 	private boolean selectorsMakeSense() {
 		for(MemcachedNode qa : locator.getAll()) {
@@ -206,11 +212,13 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		getLogger().debug("Selecting with delay of %sms", delay);
 		assert selectorsMakeSense() : "Selectors don't make sense.";
+		/* ENABLE_REPLICATION start */
 		if (!delayedShutdownNodes.isEmpty()) {
 			// Wake up in a second to see if we can clean up nodes.
 			if (delay == 0 || delay > 1000)
 				delay = 1000;
 		}
+		/* ENABLE_REPLICATION end */
 		int selected=selector.select(delay);
 		Set<SelectionKey> selectedKeys=selector.selectedKeys();
 
@@ -262,6 +270,7 @@ public final class MemcachedConnection extends SpyObject {
 			attemptReconnects();
 		}
 
+		/* ENABLE_REPLICATION start */
 		// Arcus 1.7 graceful failover/shutdown
 		while (!delayedShutdownNodes.isEmpty()) {
 			long now = System.currentTimeMillis();
@@ -287,6 +296,7 @@ public final class MemcachedConnection extends SpyObject {
 			else
 				break;
 		}
+		/* ENABLE_REPLICATION end */
 	}
 	
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
@@ -294,6 +304,7 @@ public final class MemcachedConnection extends SpyObject {
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 		
 		// Classify the incoming node list.
+		/* ENABLE_REPLICATION start */
 		if (arcus17) {
 			// If there's an existing node with the same group name as the new node,
 			// remove it.  And add the new node.
@@ -337,6 +348,15 @@ public final class MemcachedConnection extends SpyObject {
 				}
 			}
 		}
+		/* ENABLE_REPLICATION else */
+		//for (MemcachedNode node : locator.getAll()) {
+		//	if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
+		//		addrs.remove((InetSocketAddress) node.getSocketAddress());
+		//	} else {
+		//		removeNodes.add(node);
+		//	}
+		//}
+		/* ENABLE_REPLICATION end */
 		
 		// Make connections to the newly added nodes.
 		for (SocketAddress sa : addrs) {
@@ -367,6 +387,7 @@ public final class MemcachedConnection extends SpyObject {
 		int ops = 0;
 		ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
 		ch.socket().setReuseAddress(true);
+		/* ENABLE_REPLICATION start */
 		// Do not attempt to connect if this node is fake.
 		// Otherwise, we keep connecting to a non-existent listen address
 		// and keep failing/reconnecting.
@@ -375,13 +396,16 @@ public final class MemcachedConnection extends SpyObject {
 			qa.setSk(ch.register(selector, ops, qa));
 			return qa;
 		}
+		/* ENABLE_REPLICATION end */
 		// Initially I had attempted to skirt this by queueing every
 		// connect, but it considerably slowed down start time.
 		try {
 			if (ch.connect(sa)) {
 				getLogger().info("new memcached node connected to %s immediately", qa);
+				/* ENABLE_REPLICATION start */
 				// FIXME.  Do we ever execute this path?
 				// This method does not call observer.connectionEstablished.
+				/* ENABLE_REPLICATION end */
 				qa.connected();
 			} else {
 				getLogger().info("new memcached node added %s to connect queue", qa);
@@ -412,10 +436,14 @@ public final class MemcachedConnection extends SpyObject {
 		String addrs = _nodeManageQueue.poll();
 		
 		// Update the memcached server group.
+		/* ENABLE_REPLICATION start */
 		if (arcus17)
 			updateConnections(Arcus17NodeAddress.getAddresses(addrs));
 		else
 			updateConnections(AddrUtil.getAddresses(addrs));
+		/* ENABLE_REPLICATION else */
+		//updateConnections(AddrUtil.getAddresses(addrs));
+		/* ENABLE_REPLICATION end */
 	}	
 	
 	// Handle any requests that have been made against the client.
@@ -642,6 +670,7 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			qa.setChannel(null);
 
+			/* ENABLE_REPLICATION start */
 			// Arcus 1.7 and graceful failover.  We let the removed node hang around
 			// for 10 seconds.  If the node dies, and the connection terminates
 			// (e.g. connection reset by peer), then the code tries to reconnect.
@@ -660,6 +689,7 @@ public final class MemcachedConnection extends SpyObject {
 					}
 				}
 			}
+			/* ENABLE_REPLICATION end */
 
 			long delay = (long)Math.min(maxDelay,
 					Math.pow(2, qa.getReconnectCount())) * 1000;
@@ -786,6 +816,7 @@ public final class MemcachedConnection extends SpyObject {
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
 		MemcachedNode primary = locator.getPrimary(key);
+		/* ENABLE_REPLICATION start */
 		boolean valid = false;
 		// Arcus 1.7 behavior.  It is mainly for graceful failover, but not strictly just that.
 		// isActive() returns true iff the node has a connected socket.
@@ -796,6 +827,9 @@ public final class MemcachedConnection extends SpyObject {
 			valid = !primary.isFake() && primary.getChannel() != null;
 		}
 		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {
+		/* ENABLE_REPLICATION else */
+		//if(primary.isActive() || failureMode == FailureMode.Retry) {
+		/* ENABLE_REPLICATION end */
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
 			o.setHandlingNode(primary);
@@ -961,7 +995,9 @@ public final class MemcachedConnection extends SpyObject {
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
 		MemcachedNode primary = locator.getPrimary(key);
+		/* ENABLE_REPLICATION start */
 		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
+		/* ENABLE_REPLICATION end */
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {

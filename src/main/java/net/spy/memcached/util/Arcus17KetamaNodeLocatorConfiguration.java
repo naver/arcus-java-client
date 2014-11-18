@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* ENABLE_REPLICATION start */
 package net.spy.memcached.util;
 
 import net.spy.memcached.MemcachedNode;
@@ -28,3 +29,4 @@ public class Arcus17KetamaNodeLocatorConfiguration extends
 		return key;
 	}
 }
+/* ENABLE_REPLICATION end */

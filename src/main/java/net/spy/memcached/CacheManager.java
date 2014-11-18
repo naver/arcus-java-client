@@ -46,6 +46,7 @@ import org.apache.zookeeper.ZooDefs.Ids;
 
 public class CacheManager extends SpyThread implements Watcher,
 		CacheMonitor.CacheMonitorListener {
+	/* ENABLE_REPLICATION start */
 	private static final String CACHE_LIST_PATH = "/arcus/cache_list/";
 
 	private static final String CLIENT_INFO_PATH = "/arcus/client_list/";
@@ -53,6 +54,11 @@ public class CacheManager extends SpyThread implements Watcher,
 	private static final String CACHE_1_7_LIST_PATH = "/arcus_1_7/cache_list/";
 
 	private static final String CLIENT_1_7_INFO_PATH = "/arcus_1_7/client_list/";
+	/* ENABLE_REPLICATION else */
+	//public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
+
+	//public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+	/* ENABLE_REPLICATION end */
 
 	private static final int SESSION_TIMEOUT = 15000;
 	
@@ -80,7 +86,9 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private CountDownLatch zkInitLatch;
 
+	/* ENABLE_REPLICATION start */
 	private boolean arcus17 = false;
+	/* ENABLE_REPLICATION end */
 	
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
@@ -114,6 +122,8 @@ public class CacheManager extends SpyThread implements Watcher,
 			try {
 				zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS);
 				
+				
+				/* ENABLE_REPLICATION start */
 				// Check /arcus_1_7/cache_list/{svc} first
 				// If it exists, the service code belongs to a 1.7 cluster
 				if (zk.exists(CACHE_1_7_LIST_PATH + serviceCode, false) != null) {
@@ -130,6 +140,14 @@ public class CacheManager extends SpyThread implements Watcher,
 							"Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
+				/* ENABLE_REPLICATION else */
+				//if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
+				//	getLogger().fatal(
+				//			"Service code not found. (" + serviceCode + ")");
+				//	throw new NotExistsServiceCodeException(serviceCode);
+				//}
+				/* ENABLE_REPLICATION end */
+
 
 				String path = getClientInfo();
 				if (path.isEmpty()) {
@@ -160,8 +178,12 @@ public class CacheManager extends SpyThread implements Watcher,
 						"Can't initialize Arcus client.", e);
 			}
 
+			/* ENABLE_REPLICATION start */
 			String cachePath = arcus17 ? CACHE_1_7_LIST_PATH : CACHE_LIST_PATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
+			/* ENABLE_REPLICATION else */
+			//cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			/* ENABLE_REPLICATION end */
 		} catch (IOException e) {
 			throw new InitializeClientException(
 					"Can't initialize Arcus client.", e);
@@ -177,6 +199,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			
 			// create the ephemeral znode 
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
+			/* ENABLE_REPLICATION start */
 			if (arcus17)
 				path = CLIENT_1_7_INFO_PATH; // /arcus_1_7/client_list/...
 			else
@@ -189,6 +212,16 @@ public class CacheManager extends SpyThread implements Watcher,
 					+ ArcusClient.VERSION + "_"
 					+ simpleDateFormat.format(currentTime) + "_" 
 					+ zk.getSessionId();
+			/* ENABLE_REPLICATION else */
+			//path = CLIENT_INFO_PATH + serviceCode + "/"
+			//		+ InetAddress.getLocalHost().getHostName() + "_"
+			//		+ InetAddress.getLocalHost().getHostAddress() + "_"
+			//		+ this.poolSize
+			//		+ "_java_"
+			//		+ ArcusClient.VERSION + "_"
+			//		+ simpleDateFormat.format(currentTime) + "_" 
+			//		+ zk.getSessionId();
+			/* ENABLE_REPLICATION end */
 			
 		} catch (UnknownHostException e) {
 			return null;
@@ -266,6 +299,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            new children node list
 	 */
 	public void commandNodeChange(List<String> children) {
+		/* ENABLE_REPLICATION start */
 		// children is the current list of znodes in the cache_list directory
 		// Arcus 1.6 and 1.7 use different znode names.
 		//
@@ -276,8 +310,10 @@ public class CacheManager extends SpyThread implements Watcher,
 		// Arcus 1.7
 		// Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
 		// by commas.  Arcus17NodeAddress turns these names into Arcus17NodeAddress.
+		/* ENABLE_REPLICATION end */
 
 		String addrs = "";
+		/* ENABLE_REPLICATION start */
 		if (arcus17) {
 			for (int i = 0; i < children.size(); i++) {
 				if (i > 0)
@@ -295,6 +331,16 @@ public class CacheManager extends SpyThread implements Watcher,
 				}
 			}
 		}
+		/* ENABLE_REPLICATION else */
+		//for (int i = 0; i < children.size(); i++) {
+		//	String[] temp = children.get(i).split("-");
+		//	if (i != 0) {
+		//		addrs = addrs + "," + temp[0];
+		//	} else {
+		//		addrs = temp[0];
+		//	}
+		//}
+		/* ENABLE_REPLICATION end */
 
 		if (client == null) {
 			createArcusClient(addrs);
@@ -315,6 +361,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            current available Memcached Addresses
 	 */
 	private void createArcusClient(String addrs) {
+		/* ENABLE_REPLICATION start */
 		List<InetSocketAddress> socketList;
 		int count;
 		if (arcus17) {
@@ -339,6 +386,11 @@ public class CacheManager extends SpyThread implements Watcher,
 		}
 
 		final CountDownLatch latch = new CountDownLatch(count);
+		/* ENABLE_REPLICATION else */
+		//List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
+
+		//final CountDownLatch latch = new CountDownLatch(socketList.size());
+		/* ENABLE_REPLICATION end */
 		final ConnectionObserver observer = new ConnectionObserver() {
 
 			@Override
@@ -356,10 +408,17 @@ public class CacheManager extends SpyThread implements Watcher,
 		cfb.setInitialObservers(Collections.singleton(observer));
 
 		int _awaitTime = 0;
+		/* ENABLE_REPLICATION start */
 		if (waitTimeForConnect == 0)
 			_awaitTime = 50 * count;
 		else
 			_awaitTime = waitTimeForConnect;
+		/* ENABLE_REPLICATION else */
+		//if (waitTimeForConnect == 0)
+		//	_awaitTime = 50 * socketList.size();
+		//else
+		//	_awaitTime = waitTimeForConnect;
+		/* ENABLE_REPLICATION end */
 
 		client = new ArcusClient[poolSize];
 		for (int i = 0; i < poolSize; i++) {

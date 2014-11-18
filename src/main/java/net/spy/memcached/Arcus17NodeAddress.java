@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* ENABLE_REPLICATION start */
 package net.spy.memcached;
 
 import java.net.InetSocketAddress;
@@ -137,3 +138,4 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		return Arcus17NodeAddress.create(group, master, ipport);
 	}
 }
+/* ENABLE_REPLICATION end */

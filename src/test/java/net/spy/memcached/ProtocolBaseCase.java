@@ -453,7 +453,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	}
 
 	public void testAvailableServers() {
+		/* ENABLE_REPLICATION start */
 		if (USE_ZK) return; // We don't know the server address priori
+		/* ENABLE_REPLICATION end */
 		client.getVersions();
 		assertEquals(new ArrayList<String>(
 				Collections.singleton(getExpectedVersionSource())),
@@ -468,7 +470,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	protected abstract String getExpectedVersionSource();
 
 	public void testGetVersions() throws Exception {
+		/* ENABLE_REPLICATION start */
 		if (USE_ZK) return; // We don't know the server address priori
+		/* ENABLE_REPLICATION end */
 		Map<SocketAddress, String> vs=client.getVersions();
 		assertEquals(1, vs.size());
 		Map.Entry<SocketAddress, String> me=vs.entrySet().iterator().next();

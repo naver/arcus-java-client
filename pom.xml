@@ -87,6 +87,7 @@
 					<showDeprecations>true</showDeprecations>
 					<!-- <compilerArgument>-Xlint:unchecked</compilerArgument> -->
 				</configuration>
+				<!-- ENABLE_REPLICATION start -->
 				<executions>
 					<execution>
 						<id>default-testCompile</id>
@@ -101,6 +102,7 @@
 						</goals>
 					</execution>
 				</executions>
+				<!-- ENABLE_REPLICATION end -->
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

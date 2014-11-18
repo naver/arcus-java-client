@@ -51,8 +51,13 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
 					.asyncSopInsertBulk(Arrays.asList(keys), value,
 							new CollectionAttributes());
 			try {
+				/* ENABLE_REPLICATION start */
 				Map<String, CollectionOperationStatus> errorList = future.get(
 						1000L, TimeUnit.MILLISECONDS);
+				/* ENABLE_REPLICATION else */
+				//Map<String, CollectionOperationStatus> errorList = future.get(
+				//		100L, TimeUnit.MILLISECONDS);
+				/* ENABLE_REPLICATION end */
 				Assert.assertTrue("Error list is not empty.",
 						errorList.isEmpty());
 			} catch (TimeoutException e) {

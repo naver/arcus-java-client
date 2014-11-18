@@ -35,7 +35,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 	ZooKeeper zk;
 
+	/* ENABLE_REPLICATION start */
 	String cacheListPath;
+	/* ENABLE_REPLICATION end */
 
 	String serviceCode;
 
@@ -54,8 +56,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
 
+	/* ENABLE_REPLICATION start */
 	/* We only use this for demo, to show more readable node names when the cache list changes. */
 	boolean demoPrintClusterDiff = false;
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Constructor
@@ -67,6 +71,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * @param listener
 	 *            Callback listener
 	 */
+	/* ENABLE_REPLICATION start */
 	public CacheMonitor(ZooKeeper zk, String cacheListPath, String serviceCode,
 			CacheMonitorListener listener) {
 		this.zk = zk;
@@ -82,6 +87,20 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		// Returning list would be processed in processResult().
 		asyncGetCacheList();
 	}
+	/* ENABLE_REPLICATION else */
+	//public CacheMonitor(ZooKeeper zk, String serviceCode,
+	//		CacheMonitorListener listener) {
+	//	this.zk = zk;
+	//	this.serviceCode = serviceCode;
+	//	this.listener = listener;
+
+	//	getLogger().info("Initializing the CacheMonitor.");
+		
+	//	// Get the cache list from the Arcus admin asynchronously.
+	//	// Returning list would be processed in processResult().
+	//	asyncGetCacheList();
+	//}
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Other classes use the CacheMonitor by implementing this method
@@ -161,10 +180,18 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	void asyncGetCacheList() {
 		if (getLogger().isDebugEnabled()) {
+			/* ENABLE_REPLICATION start */
 			getLogger().debug("Set a new watch on " + (cacheListPath + serviceCode));
+			/* ENABLE_REPLICATION else */
+			//getLogger().debug("Set a new watch on " + (CacheManager.CACHE_LIST_PATH + serviceCode));
+			/* ENABLE_REPLICATION end */
 		}
 		
+		/* ENABLE_REPLICATION start */
 		zk.getChildren(cacheListPath + serviceCode, true, this, null);
+		/* ENABLE_REPLICATION else */
+		//zk.getChildren(CacheManager.CACHE_LIST_PATH + serviceCode, true, this, null);
+		/* ENABLE_REPLICATION end */
 	}
 
 	/**
@@ -181,6 +208,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 		if (!children.equals(prevChildren)) {
 			getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " + getInfo());
+			/* ENABLE_REPLICATION start */
 			if (demoPrintClusterDiff) {
 				// Assume 1.7 cluster
 				System.out.println("\nCLUSTER CHANGE\n---PREVIOUS---");
@@ -209,6 +237,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 				}
 				System.out.println("");
 			}
+			/* ENABLE_REPLICATION end */
 		}
 		
 		// Store the current children.
