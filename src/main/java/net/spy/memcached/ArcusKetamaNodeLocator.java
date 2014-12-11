@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,7 +31,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
 public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
-	SortedMap<Long, MemcachedNode> ketamaNodes;
+	TreeMap<Long, MemcachedNode> ketamaNodes;
 	Collection<MemcachedNode> allNodes;
 
 	HashAlgorithm hashAlg;
@@ -67,7 +66,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		assert ketamaNodes.size() == numReps * nodes.size();
 	}
 
-	private ArcusKetamaNodeLocator(SortedMap<Long, MemcachedNode> smn,
+	private ArcusKetamaNodeLocator(TreeMap<Long, MemcachedNode> smn,
 			Collection<MemcachedNode> an, HashAlgorithm alg,
 			ArcusKetamaNodeLocatorConfiguration conf) {
 		super();
@@ -93,19 +92,27 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
 	MemcachedNode getNodeForKey(long hash) {
 		MemcachedNode rv;
+		Long node_hash;
 
 		lock.lock();
 		try {
 			if (!ketamaNodes.containsKey(hash)) {
+				node_hash = ketamaNodes.ceilingKey(hash);
+				if (node_hash == null) {
+					hash = ketamaNodes.firstKey();
+				} else {
+					hash = node_hash.longValue();
+				}
 				// Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
 				// in a lot of places, so I'm doing this myself.
-				SortedMap<Long, MemcachedNode> tailMap = ketamaNodes
-						.tailMap(hash);
+				/*
+				SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
 				if (tailMap.isEmpty()) {
 					hash = ketamaNodes.firstKey();
 				} else {
 					hash = tailMap.firstKey();
 				}
+				*/
 			}
 			rv = ketamaNodes.get(hash);
 		} catch (RuntimeException e) {
@@ -121,7 +128,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 	}
 
 	public NodeLocator getReadonlyCopy() {
-		SortedMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
+		TreeMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
 				ketamaNodes);
 		Collection<MemcachedNode> an = new ArrayList<MemcachedNode>(
 				allNodes.size());
