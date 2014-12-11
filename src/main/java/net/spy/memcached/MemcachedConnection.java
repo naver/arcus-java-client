@@ -310,13 +310,10 @@ public final class MemcachedConnection extends SpyObject {
 			// Transfer the queue into a hashset.  There are very likely more
 			// additions than there are nodes.
 			Collection<MemcachedNode> todo=new HashSet<MemcachedNode>();
-			try {
-				MemcachedNode qa=null;
-				while((qa=addedQueue.remove()) != null) {
-					todo.add(qa);
-				}
-			} catch(NoSuchElementException e) {
-				// Found everything
+
+			MemcachedNode node;
+			while ((node = addedQueue.poll()) != null) {
+				todo.add(node);
 			}
 
 			// Now process the queue.
