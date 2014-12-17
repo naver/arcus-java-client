@@ -92,16 +92,15 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
 	MemcachedNode getNodeForKey(long hash) {
 		MemcachedNode rv;
-		Long node_hash;
 
 		lock.lock();
 		try {
 			if (!ketamaNodes.containsKey(hash)) {
-				node_hash = ketamaNodes.ceilingKey(hash);
-				if (node_hash == null) {
+				Long nodeHash = ketamaNodes.ceilingKey(hash);
+				if (nodeHash == null) {
 					hash = ketamaNodes.firstKey();
 				} else {
-					hash = node_hash.longValue();
+					hash = nodeHash.longValue();
 				}
 				// Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
 				// in a lot of places, so I'm doing this myself.
