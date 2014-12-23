@@ -62,6 +62,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
 
+	// # of operations added into inputQueue
+	private long addOpCount;
+
 	// fake node
 	private boolean isFake = false; 
 	
@@ -88,6 +91,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		readQ=rq;
 		writeQ=wq;
 		inputQueue=iq;
+		addOpCount=0;
 		this.opQueueMaxBlockTime = opQueueMaxBlockTime;
 		shouldAuth = waitForAuth;
 		setupForAuth();
@@ -304,6 +308,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 				throw new IllegalStateException("Timed out waiting to add "
 						+ op + "(max wait=" + opQueueMaxBlockTime + "ms)");
 			}
+			addOpCount += 1;
 		} catch(InterruptedException e) {
 			// Restore the interrupted status
 			Thread.currentThread().interrupt();
@@ -321,6 +326,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		tmp.add(op);
 		inputQueue.drainTo(tmp);
 		inputQueue.addAll(tmp);
+		addOpCount += 1;
 	}
 
 	/* (non-Javadoc)
@@ -556,7 +562,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	@Override
 	public String getStatus() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("#iq=").append(getInputQueueSize());
+		sb.append("#Tops=").append(addOpCount);
+		sb.append(" #iq=").append(getInputQueueSize());
 		sb.append(" #Wops=").append(getWriteQueueSize());
 		sb.append(" #Rops=").append(getReadQueueSize());
 		sb.append(" #CT=").append(getContinuousTimeout());
