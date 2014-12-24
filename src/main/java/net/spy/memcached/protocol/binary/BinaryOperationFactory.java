@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
@@ -42,6 +43,7 @@ import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
@@ -327,6 +329,13 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 			BTreeFindPosition get, OperationCallback cb) {
 		throw new RuntimeException(
 				"BTree find position operation is not supported in binary protocol yet.");
+	}
+
+	@Override
+	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
+			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+		throw new RuntimeException(
+				"BTree find position with get operation is not supported in binary protocol yet.");
 	}
 
 	@Override
