@@ -52,7 +52,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final int SESSION_TIMEOUT = 15000;
 	
-	private static final long ZK_CONNECT_TIMEOUT = 2000L;
+	private static final long ZK_CONNECT_TIMEOUT = 5000L;
 
 	private final String hostPort;
 
