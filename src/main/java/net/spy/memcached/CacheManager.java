@@ -52,7 +52,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final int SESSION_TIMEOUT = 15000;
 	
-	private static final long ZK_CONNECT_TIMEOUT = 2000L;
+	private static final long ZK_CONNECT_TIMEOUT = 5000L;
 
 	private final String hostPort;
 
@@ -106,7 +106,11 @@ public class CacheManager extends SpyThread implements Watcher,
 			zk = new ZooKeeper(hostPort, SESSION_TIMEOUT, this);
 
 			try {
-				zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS);
+				if (zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS) == false) {
+					getLogger().fatal("Connecting to Arcus admin(%s) timed out : %d miliseconds",
+							hostPort, ZK_CONNECT_TIMEOUT);
+					throw new AdminConnectTimeoutException(hostPort);
+				}
 				
 				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
 					getLogger().fatal(
@@ -127,6 +131,9 @@ public class CacheManager extends SpyThread implements Watcher,
 					zk.create(path, null, Ids.OPEN_ACL_UNSAFE,
 							CreateMode.EPHEMERAL);
 				}
+			} catch (AdminConnectTimeoutException e) {
+				shutdownZooKeeperClient();
+				throw e;
 			} catch (NotExistsServiceCodeException e) {
 				shutdownZooKeeperClient();
 				throw e;
@@ -214,6 +221,8 @@ public class CacheManager extends SpyThread implements Watcher,
 						try {
 							shutdownZooKeeperClient();
 							initZooKeeperClient();
+						} catch (AdminConnectTimeoutException e) {
+							Thread.sleep(5000L);
 						} catch (NotExistsServiceCodeException e) {
 							Thread.sleep(5000L);
 						} catch (InitializeClientException e) {
