@@ -52,7 +52,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final int SESSION_TIMEOUT = 15000;
 	
-	private static final long ZK_CONNECT_TIMEOUT = 5000L;
+	private static final long ZK_CONNECT_TIMEOUT = SESSION_TIMEOUT;
 
 	private final String hostPort;
 
@@ -106,6 +106,12 @@ public class CacheManager extends SpyThread implements Watcher,
 			zk = new ZooKeeper(hostPort, SESSION_TIMEOUT, this);
 
 			try {
+				/* In the above ZooKeeper() internals, reverse DNS lookup occurs
+				 * when the getHostName() of InetSocketAddress class is called.
+				 * In Windows, the reverse DNS lookup includes NetBIOS lookup
+				 * that bring delay of 5 seconds (as well as dns and host file lookup).
+				 * So, ZK_CONNECT_TIMEOUT is set as much like ZK session timeout.
+				 */
 				if (zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS) == false) {
 					getLogger().fatal("Connecting to Arcus admin(%s) timed out : %d miliseconds",
 							hostPort, ZK_CONNECT_TIMEOUT);
