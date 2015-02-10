@@ -51,9 +51,9 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final String CLIENT_INFO_PATH = "/arcus/client_list/";
 
-	private static final String CACHE_1_7_LIST_PATH = "/arcus_1_7/cache_list/";
+	private static final String REPL_CACHE_LIST_PATH = "/arcus_repl/cache_list/";
 
-	private static final String CLIENT_1_7_INFO_PATH = "/arcus_1_7/client_list/";
+	private static final String REPL_CLIENT_INFO_PATH = "/arcus_repl/client_list/";
 	/* ENABLE_REPLICATION else */
 	//public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
 
@@ -124,12 +124,12 @@ public class CacheManager extends SpyThread implements Watcher,
 				
 				
 				/* ENABLE_REPLICATION start */
-				// Check /arcus_1_7/cache_list/{svc} first
-				// If it exists, the service code belongs to a 1.7 cluster
-				if (zk.exists(CACHE_1_7_LIST_PATH + serviceCode, false) != null) {
+				// Check /arcus_repl/cache_list/{svc} first
+				// If it exists, the service code belongs to a repl cluster
+				if (zk.exists(REPL_CACHE_LIST_PATH + serviceCode, false) != null) {
 					arcus17 = true;
 					cfb.setArcus17(true);
-					getLogger().info("Connecting to Arcus 1.7 cluster");
+					getLogger().info("Connecting to Arcus repl cluster");
 				}
 				else if (zk.exists(CACHE_LIST_PATH + serviceCode, false) != null) {
 					arcus17 = false;
@@ -179,7 +179,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION start */
-			String cachePath = arcus17 ? CACHE_1_7_LIST_PATH : CACHE_LIST_PATH;
+			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH : CACHE_LIST_PATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			//cacheMonitor = new CacheMonitor(zk, serviceCode, this);
@@ -201,7 +201,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 			/* ENABLE_REPLICATION start */
 			if (arcus17)
-				path = CLIENT_1_7_INFO_PATH; // /arcus_1_7/client_list/...
+				path = REPL_CLIENT_INFO_PATH; // /arcus_repl/client_list/...
 			else
 				path = CLIENT_INFO_PATH; // /arcus/client_list/...
 			path = path + serviceCode + "/" 
@@ -301,13 +301,13 @@ public class CacheManager extends SpyThread implements Watcher,
 	public void commandNodeChange(List<String> children) {
 		/* ENABLE_REPLICATION start */
 		// children is the current list of znodes in the cache_list directory
-		// Arcus 1.6 and 1.7 use different znode names.
+		// Arcus base cluster and repl cluster use different znode names.
 		//
-		// Arcus 1.6
+		// Arcus base cluster
 		// Znode names are ip:port-hostname.  Just remove -hostname and concat
 		// all names separated by commas.  AddrUtil turns ip:port into InetSocketAddress.
 		//
-		// Arcus 1.7
+		// Arcus repl cluster
 		// Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
 		// by commas.  Arcus17NodeAddress turns these names into Arcus17NodeAddress.
 		/* ENABLE_REPLICATION end */
@@ -380,7 +380,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		}
 		else {
 			socketList = AddrUtil.getAddresses(addrs);
-			// Preserve 1.6 behavior.  The initial latch count
+			// Preserve base cluster behavior.  The initial latch count
 			// includes fake server addresses.
 			count = socketList.size();
 		}
