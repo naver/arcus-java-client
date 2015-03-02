@@ -123,7 +123,7 @@ public class DefaultConnectionFactory extends SpyObject
     /**
      * Default bulk service single operation timeout
      */
-    public static final long DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT = 1000L;
+    public static final long DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT = 700L;
     
     /**
      * Max smget key chunk size per request
