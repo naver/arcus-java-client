@@ -87,8 +87,13 @@ public class DefaultConnectionFactory extends SpyObject
 
     /**
      * Default operation timeout in milliseconds.
+     * 
+     * operation timeout : 700ms
+     * It avoids the occurence of operation timeout
+     * even if two packet retransmissions exist in linux.
+     * 
      */
-    public static final long DEFAULT_OPERATION_TIMEOUT = 700;
+    public static final long DEFAULT_OPERATION_TIMEOUT = 700L;
 
     /**
      * Maximum amount of time (in seconds) to wait between reconnect attempts.
@@ -122,6 +127,11 @@ public class DefaultConnectionFactory extends SpyObject
     
     /**
      * Default bulk service single operation timeout
+     * 
+     * operation timeout : 700ms
+     * It avoids the occurence of operation timeout
+     * even if two packet retransmissions exist in linux.
+     * 
      */
     public static final long DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT = 700L;
     
