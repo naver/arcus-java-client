@@ -1,0 +1,15 @@
+2015-01-13 [version 1.8.1]
+	* Throw AdminConnectTimeoutException
+	  if connecting to arcus admin timed out.
+	* Increase ZK_CONNECT_TIMEOUT (2000 => 5000 ms)
+
+2014-12-30 [version 1.8.0]
+	* Add asyncBopFindPositionWithGet API.
+	* Optimize the performance in finding the memcached node for a key. 
+	* Add "# of operations added to memcached node"
+	  in operation timeout message.
+	* Add arcus java user guide document.
+	* Fix - parse bkey string with long type, instead of int type.
+
+2014-05-15 
+	* arcus-java-client 1.7.0 is opened. (Apache License 2.0)

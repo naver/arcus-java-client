@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.spy.memcached.compat.SpyObject;
@@ -40,7 +39,7 @@ import net.spy.memcached.util.KetamaNodeLocatorConfiguration;
 public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 
 
-	final SortedMap<Long, MemcachedNode> ketamaNodes;
+	final TreeMap<Long, MemcachedNode> ketamaNodes;
 	final Collection<MemcachedNode> allNodes;
 
 	final HashAlgorithm hashAlg;
@@ -83,7 +82,7 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 		assert ketamaNodes.size() == numReps * nodes.size();
     }
 
-	private KetamaNodeLocator(SortedMap<Long, MemcachedNode> smn,
+	private KetamaNodeLocator(TreeMap<Long, MemcachedNode> smn,
 			Collection<MemcachedNode> an, HashAlgorithm alg, KetamaNodeLocatorConfiguration conf) {
 		super();
 		ketamaNodes=smn;
@@ -109,14 +108,22 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 	MemcachedNode getNodeForKey(long hash) {
 		final MemcachedNode rv;
 		if(!ketamaNodes.containsKey(hash)) {
+			Long nodeHash = ketamaNodes.ceilingKey(hash);
+			if (nodeHash == null) {
+				hash = ketamaNodes.firstKey();
+			} else {
+				hash = nodeHash.longValue();
+			}
 			// Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
 			// in a lot of places, so I'm doing this myself.
+			/*
 			SortedMap<Long, MemcachedNode> tailMap=ketamaNodes.tailMap(hash);
 			if(tailMap.isEmpty()) {
 				hash=ketamaNodes.firstKey();
 			} else {
 				hash=tailMap.firstKey();
 			}
+			*/
 		}
 		rv=ketamaNodes.get(hash);
 		return rv;
@@ -127,7 +134,7 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 	}
 
 	public NodeLocator getReadonlyCopy() {
-		SortedMap<Long, MemcachedNode> smn=new TreeMap<Long, MemcachedNode>(
+		TreeMap<Long, MemcachedNode> smn=new TreeMap<Long, MemcachedNode>(
 			ketamaNodes);
 		Collection<MemcachedNode> an=
 			new ArrayList<MemcachedNode>(allNodes.size());
