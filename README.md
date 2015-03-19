@@ -60,7 +60,7 @@ to support Arcus memcached cloud.
 
 ## Getting Started
 
-The Maven artifact for version 1.7.0 is in the central Maven repository.
+The Maven artifact for version 1.8.0 is in the central Maven repository.
 To use it, add the following dependency to your pom.xml.
 
 ```xml
@@ -68,7 +68,7 @@ To use it, add the following dependency to your pom.xml.
 	<dependency>
 		<groupId>com.navercorp.arcus</groupId>
 		<artifactId>arcus-java-client</artifactId>
-		<version>1.7.0</version>
+		<version>1.8.0</version>
 	</dependency>
 </dependencies>
 ```

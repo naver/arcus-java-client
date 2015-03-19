@@ -14,24 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached;
+package net.spy.memcached.ops;
 
-/**
- * Thrown by {@link MemcachedClient} when any internal operations timeout.
- *
- * @author Ray Krueger
- * @see net.spy.memcached.ConnectionFactory#getOperationTimeout()
- */
-public class OperationTimeoutException extends RuntimeException {
+import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 
-	private static final long serialVersionUID = 1479557202445843619L;
+public interface BTreeFindPositionWithGetOperation extends KeyedOperation {
 
-	public OperationTimeoutException(String message) {
-        super(message);
-    }
-
-    public OperationTimeoutException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	BTreeFindPositionWithGet<?> getGet();
+	
+	interface Callback extends OperationCallback {
+		void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data);
+	}
 
 }

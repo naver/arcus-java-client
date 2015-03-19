@@ -1,6 +1,6 @@
 /*
  * arcus-java-client : Arcus Java client
- * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,12 @@
  */
 package net.spy.memcached;
 
-/**
- * Thrown by {@link MemcachedClient} when any internal operations timeout.
- *
- * @author Ray Krueger
- * @see net.spy.memcached.ConnectionFactory#getOperationTimeout()
- */
-public class OperationTimeoutException extends RuntimeException {
+public class AdminConnectTimeoutException extends RuntimeException {
+	
+	private static final long serialVersionUID = -1461409015284668293L;
 
-	private static final long serialVersionUID = 1479557202445843619L;
-
-	public OperationTimeoutException(String message) {
-        super(message);
-    }
-
-    public OperationTimeoutException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+	public AdminConnectTimeoutException(String message) {
+		super(message);
+	}
+	
 }

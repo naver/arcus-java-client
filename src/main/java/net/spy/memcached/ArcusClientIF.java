@@ -1558,6 +1558,56 @@ public interface ArcusClientIF {
 			String key, byte[] byteArrayBKey, BTreeOrder order);
 	
 	/**
+	 * Get the position, element, and neighbor elements of given bkey in b+tree.
+	 *
+	 * @param key  b+tree item's key
+	 * @param longBKey  element's bkey (long type bkey)
+	 * @param order  ascending/descending order
+	 * @param count  number of elements requested in both direction
+	 * @return future holding the element's position
+	 */
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count);
+	
+	/**
+	 * Get the position, element, and neighbor elements of given bkey in b+tree.
+	 *
+	 * @param key  b+tree item's key
+	 * @param longBKey  element's bkey (long type bkey)
+	 * @param order  ascending/descending order
+	 * @param count  number of elements requested in both direction
+	 * @param tc  a transcoder to decode returned values
+	 * @return future holding the element's position
+	 */
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count, Transcoder<T> tc);
+
+	/**
+	 * Get the position, element, and neighbor elements of given bkey in b+tree.
+	 *
+	 * @param key  b+tree item's key
+	 * @param byteArrayBKey  element's bkey (byte-array type bkey)
+	 * @param order  ascending/descending order
+	 * @param count  number of elements requested in both direction
+	 * @return future holding the element's position
+	 */
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count);
+	
+	/**
+	 * Get the position, element, and neighbor elements of given bkey in b+tree.
+	 *
+	 * @param key  b+tree item's key
+	 * @param byteArrayBKey  element's bkey (byte-array type bkey)
+	 * @param order  ascending/descending order
+	 * @param count  number of elements requested in both direction
+	 * @param tc  a transcoder to decode returned values
+	 * @return future holding the element's position
+	 */
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count, Transcoder<T> tc);
+	
+	/**
 	 * Insert an element into b+tree and also get the "trimmed" element if any.
 	 *
 	 * @param key  b+tree item's key

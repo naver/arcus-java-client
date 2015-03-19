@@ -30,10 +30,10 @@ attribute.setReadable(false);
 CollectionFuture<Boolean> createFuture = mc.asyncLopCreate(KEY, ElementValueType.STRING, attribute);
 
 try {
-createFuture.get(300L, TimeUnit.MILLISECONDS);
+    createFuture.get(300L, TimeUnit.MILLISECONDS);
 } catch (Exception e) {
-createFuture.cancel(true);
-// throw an exception or logging.
+    createFuture.cancel(true);
+    // throw an exception or logging.
 }
 
 // 여기에서 List를 갱신한다. 이 상태에서는 collection을 읽을 수 없다. 쓰기, 수정, 삭제만 가능하다.
@@ -44,10 +44,10 @@ attrs.setReadable(true);
 
 CollectionFuture<Boolean> setAttrFuture = mc.asyncSetAttr(KEY, attrs);
 try {
-setAttrFuture.get(300L, TimeUnit.MILLISECONDS);
+    setAttrFuture.get(300L, TimeUnit.MILLISECONDS);
 } catch (Exception e) {
-setAttrFuture.cancel(true);
-// throw an exception or logging.
+    setAttrFuture.cancel(true);
+    // throw an exception or logging.
 }
 
 // 이제 collection을 읽을 수 있다.
@@ -62,25 +62,25 @@ String key = "Sample:Object";
 CollectionFuture<Boolean> future = null;
 
 try {
-Attributes attrs = new Attributes(); // (1)
-attrs.setExpireTime(1);
-future = client.asyncSetAttr(key, attrs); // (2)
+    Attributes attrs = new Attributes(); // (1)
+    attrs.setExpireTime(1);
+    future = client.asyncSetAttr(key, attrs); // (2)
 } catch (IllegalStateException e) {
-// handle exception
+    // handle exception
 }
 
 if (future == null)
-return;
+    return;
 
 try {
-Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (3)
-System.out.println(result);
+    Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (3)
+    System.out.println(result);
 } catch (TimeoutException e) {
-future.cancel(true);
+    future.cancel(true);
 } catch (InterruptedException e) {
-future.cancel(true);
+    future.cancel(true);
 } catch (ExecutionException e) {
-future.cancel(true);
+    future.cancel(true);
 }
 ```
 
@@ -107,31 +107,31 @@ String key = "Sample:List";
 CollectionFuture<CollectionAttributes> future = null;
 
 try {
-future = client.asyncGetAttr(key); // (1)
+    future = client.asyncGetAttr(key); // (1)
 } catch (IllegalStateException e) {
-// handle exception
+    // handle exception
 }
 
 if (future == null) {
-return;
+    return;
 }
 
 try {
-CollectionAttributes result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+    CollectionAttributes result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
 
-if (result == null) { // (3)
-System.out.println("Key가 없습니다.");
-return;
-}
+    if (result == null) { // (3)
+        System.out.println("Key가 없습니다.");
+        return;
+    }
 
-long totalItemCountOfBTree = result.getCount(); // (4)
-System.out.println("Item count=" + totalItemCountOfBTree);
+    long totalItemCountOfBTree = result.getCount(); // (4)
+    System.out.println("Item count=" + totalItemCountOfBTree);
 } catch (InterruptedException e) {
-future.cancel(true);
+    future.cancel(true);
 } catch (TimeoutException e) {
-future.cancel(true);
+    future.cancel(true);
 } catch (ExecutionException e) {
-future.cancel(true);
+    future.cancel(true);
 }
 ```
 
