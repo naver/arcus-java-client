@@ -939,6 +939,30 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count) {
+		return this.getClient().asyncBopFindPositionWithGet(key, longBKey, order, count);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count, Transcoder<T> tc) {
+		return this.getClient().asyncBopFindPositionWithGet(key, longBKey, order, count, tc);
+	}
+
+	@Override
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count) {
+		return this.getClient().asyncBopFindPositionWithGet(key, byteArrayBKey, order, count);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count, Transcoder<T> tc) {
+		return this.getClient().asyncBopFindPositionWithGet(key, byteArrayBKey, order, count, tc);
+	}
+
+	@Override
 	public BTreeStoreAndGetFuture<Boolean, Object> asyncBopInsertAndGetTrimmed(
 			String key, long bkey, byte[] eFlag, Object value,
 			CollectionAttributes attributesForCreate) {

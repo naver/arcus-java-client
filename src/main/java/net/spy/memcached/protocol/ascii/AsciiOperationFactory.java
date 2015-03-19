@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
@@ -42,6 +43,7 @@ import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
@@ -284,6 +286,12 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	public BTreeFindPositionOperation bopFindPosition(String key,
 			BTreeFindPosition get, OperationCallback cb) {
 		return new BTreeFindPositionOperationImpl(key, get, cb);
+	}
+
+	@Override
+	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
+			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+		return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
 	}
 
 	@Override
