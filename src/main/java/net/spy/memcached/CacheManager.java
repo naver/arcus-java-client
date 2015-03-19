@@ -134,7 +134,6 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new AdminConnectTimeoutException(hostPort);
 				}
 				
-				
 				/* ENABLE_REPLICATION start */
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
@@ -153,7 +152,7 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* ENABLE_REPLICATION else */
-				/* 
+				/*
 				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
 					getLogger().fatal(
 							"Service code not found. (" + serviceCode + ")");
@@ -223,17 +222,12 @@ public class CacheManager extends SpyThread implements Watcher,
 				path = REPL_CLIENT_INFO_PATH; // /arcus_repl/client_list/...
 			else
 				path = CLIENT_INFO_PATH; // /arcus/client_list/...
-			path = path + serviceCode + "/" 
-					+ InetAddress.getLocalHost().getHostName() + "_"
-					+ InetAddress.getLocalHost().getHostAddress() + "_"
-					+ this.poolSize
-					+ "_java_"
-					+ ArcusClient.VERSION + "_"
-					+ simpleDateFormat.format(currentTime) + "_" 
-					+ zk.getSessionId();
+			path = path + serviceCode + "/"
 			/* ENABLE_REPLICATION else */
 			/*
 			path = CLIENT_INFO_PATH + serviceCode + "/"
+			*/
+			/* ENABLE_REPLICATION end */
 					+ InetAddress.getLocalHost().getHostName() + "_"
 					+ InetAddress.getLocalHost().getHostAddress() + "_"
 					+ this.poolSize
@@ -241,8 +235,6 @@ public class CacheManager extends SpyThread implements Watcher,
 					+ ArcusClient.VERSION + "_"
 					+ simpleDateFormat.format(currentTime) + "_" 
 					+ zk.getSessionId();
-			*/
-			/* ENABLE_REPLICATION end */
 			
 		} catch (UnknownHostException e) {
 			return null;

@@ -49,7 +49,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		int port = Integer.parseInt(temp[1]);
 		return new Arcus17NodeAddress(group, master, ip, port);
 	}
-	
+
 	private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
 		List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 		for (String node : s.split(",")) {
@@ -62,15 +62,15 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			// an unexpected format.  Abort the whole method instead of
 			// trying to ignore malformed strings.
 			// Is this the right behavior?  FIXME
-			
-			// Turn slave servers into fake ones.  We still create MemcachedNode's 
+
+			// Turn slave servers into fake ones.  We still create MemcachedNode's
 			// for groups without masters.  We don't want these to connect to actual
 			// slave servers.
 			if (!master)
 				ipport = CacheMonitor.FAKE_SERVER_NODE;
 
 			Arcus17NodeAddress a = Arcus17NodeAddress.create(group, master, ipport);
-			
+
 			// We want exactly one node per group in this version.
 			// If a node exists and the new one is the master, replace the old one
 			// with the new one.
@@ -112,7 +112,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			} catch (Exception e) {
 				// May see an exception if nodes do not follow the 1.7 naming convention
 				ArcusClient.arcusLogger.error("Exception caught while parsing node" +
-							      " addresses. cache_list=" + s + 
+							      " addresses. cache_list=" + s +
 							      "\n" + e);
 				e.printStackTrace();
 				list = null;
@@ -134,7 +134,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		boolean master = temp[1].equals("M") ? true : false;
 		String[] temp2 = temp[2].split("-");
 		String ipport = temp2[0];
-			
+
 		return Arcus17NodeAddress.create(group, master, ipport);
 	}
 }

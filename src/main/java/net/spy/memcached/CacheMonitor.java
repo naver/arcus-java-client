@@ -82,7 +82,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		demoPrintClusterDiff = "true".equals(System.getProperty("arcus.demoPrintClusterDiff", "false"));
 
 		getLogger().info("Initializing the CacheMonitor.");
-		
+
 		// Get the cache list from the Arcus admin asynchronously.
 		// Returning list would be processed in processResult().
 		asyncGetCacheList();

@@ -366,7 +366,7 @@ public class ConnectionFactoryBuilder {
 						if (arcus17) {
 							// Arcus 1.7
 							// This locator uses Arcus17KetamaNodeLocatorConfiguration
-							// which builds keys off the server's group name, not 
+							// which builds keys off the server's group name, not
 							// its ip:port.
 							return new Arcus17KetamaNodeLocator(nodes, getHashAlg());
 						}

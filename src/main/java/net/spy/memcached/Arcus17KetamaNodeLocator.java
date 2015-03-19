@@ -48,7 +48,7 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 			for (MemcachedNode node : toDelete) {
 				allNodes.remove(node);
 				updateHash(node, true);
-				
+
 				if (gracefulFailover && !node.isFake()) {
 					// MemcachedConnection shuts down the node later on.
 					continue;
