@@ -88,18 +88,20 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		asyncGetCacheList();
 	}
 	/* ENABLE_REPLICATION else */
-	//public CacheMonitor(ZooKeeper zk, String serviceCode,
-	//		CacheMonitorListener listener) {
-	//	this.zk = zk;
-	//	this.serviceCode = serviceCode;
-	//	this.listener = listener;
+	/*
+	public CacheMonitor(ZooKeeper zk, String serviceCode,
+			CacheMonitorListener listener) {
+		this.zk = zk;
+		this.serviceCode = serviceCode;
+		this.listener = listener;
 
-	//	getLogger().info("Initializing the CacheMonitor.");
+		getLogger().info("Initializing the CacheMonitor.");
 		
-	//	// Get the cache list from the Arcus admin asynchronously.
-	//	// Returning list would be processed in processResult().
-	//	asyncGetCacheList();
-	//}
+		// Get the cache list from the Arcus admin asynchronously.
+		// Returning list would be processed in processResult().
+		asyncGetCacheList();
+	}
+	*/
 	/* ENABLE_REPLICATION end */
 
 	/**
@@ -183,14 +185,18 @@ public class CacheMonitor extends SpyObject implements Watcher,
 			/* ENABLE_REPLICATION start */
 			getLogger().debug("Set a new watch on " + (cacheListPath + serviceCode));
 			/* ENABLE_REPLICATION else */
-			//getLogger().debug("Set a new watch on " + (CacheManager.CACHE_LIST_PATH + serviceCode));
+			/*
+			getLogger().debug("Set a new watch on " + (CacheManager.CACHE_LIST_PATH + serviceCode));
+			*/
 			/* ENABLE_REPLICATION end */
 		}
 		
 		/* ENABLE_REPLICATION start */
 		zk.getChildren(cacheListPath + serviceCode, true, this, null);
 		/* ENABLE_REPLICATION else */
-		//zk.getChildren(CacheManager.CACHE_LIST_PATH + serviceCode, true, this, null);
+		/*
+		zk.getChildren(CacheManager.CACHE_LIST_PATH + serviceCode, true, this, null);
+		*/
 		/* ENABLE_REPLICATION end */
 	}
 

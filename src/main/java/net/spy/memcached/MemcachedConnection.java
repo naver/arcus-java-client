@@ -348,13 +348,15 @@ public final class MemcachedConnection extends SpyObject {
 			}
 		}
 		/* ENABLE_REPLICATION else */
-		//for (MemcachedNode node : locator.getAll()) {
-		//	if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
-		//		addrs.remove((InetSocketAddress) node.getSocketAddress());
-		//	} else {
-		//		removeNodes.add(node);
-		//	}
-		//}
+		/*
+		for (MemcachedNode node : locator.getAll()) {
+			if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
+				addrs.remove((InetSocketAddress) node.getSocketAddress());
+			} else {
+				removeNodes.add(node);
+			}
+		}
+		*/
 		/* ENABLE_REPLICATION end */
 		
 		// Make connections to the newly added nodes.
@@ -441,7 +443,9 @@ public final class MemcachedConnection extends SpyObject {
 		else
 			updateConnections(AddrUtil.getAddresses(addrs));
 		/* ENABLE_REPLICATION else */
-		//updateConnections(AddrUtil.getAddresses(addrs));
+		/*
+		updateConnections(AddrUtil.getAddresses(addrs));
+		*/
 		/* ENABLE_REPLICATION end */
 	}	
 	
@@ -824,7 +828,9 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {
 		/* ENABLE_REPLICATION else */
-		//if(primary.isActive() || failureMode == FailureMode.Retry) {
+		/*
+		if(primary.isActive() || failureMode == FailureMode.Retry) {
+		*/
 		/* ENABLE_REPLICATION end */
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {

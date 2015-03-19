@@ -111,7 +111,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			}
 		}
 		/* ENABLE_REPLICATION else */
-		//isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(sa.toString());
+		/*
+		isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(sa.toString());
+		*/
 		/* ENABLE_REPLICATION end */
 	}
 

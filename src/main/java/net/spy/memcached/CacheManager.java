@@ -55,9 +55,11 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final String REPL_CLIENT_INFO_PATH = "/arcus_repl/client_list/";
 	/* ENABLE_REPLICATION else */
-	//public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
+	/*
+	public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
 
-	//public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+	public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+	*/
 	/* ENABLE_REPLICATION end */
 
 	private static final int SESSION_TIMEOUT = 15000;
@@ -151,11 +153,13 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* ENABLE_REPLICATION else */
-				//if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
-				//	getLogger().fatal(
-				//			"Service code not found. (" + serviceCode + ")");
-				//	throw new NotExistsServiceCodeException(serviceCode);
-				//}
+				/* 
+				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
+					getLogger().fatal(
+							"Service code not found. (" + serviceCode + ")");
+					throw new NotExistsServiceCodeException(serviceCode);
+				}
+				*/
 				/* ENABLE_REPLICATION end */
 
 
@@ -195,7 +199,9 @@ public class CacheManager extends SpyThread implements Watcher,
 			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH : CACHE_LIST_PATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
-			//cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			/*
+			cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			*/
 			/* ENABLE_REPLICATION end */
 		} catch (IOException e) {
 			throw new InitializeClientException(
@@ -226,14 +232,16 @@ public class CacheManager extends SpyThread implements Watcher,
 					+ simpleDateFormat.format(currentTime) + "_" 
 					+ zk.getSessionId();
 			/* ENABLE_REPLICATION else */
-			//path = CLIENT_INFO_PATH + serviceCode + "/"
-			//		+ InetAddress.getLocalHost().getHostName() + "_"
-			//		+ InetAddress.getLocalHost().getHostAddress() + "_"
-			//		+ this.poolSize
-			//		+ "_java_"
-			//		+ ArcusClient.VERSION + "_"
-			//		+ simpleDateFormat.format(currentTime) + "_" 
-			//		+ zk.getSessionId();
+			/*
+			path = CLIENT_INFO_PATH + serviceCode + "/"
+					+ InetAddress.getLocalHost().getHostName() + "_"
+					+ InetAddress.getLocalHost().getHostAddress() + "_"
+					+ this.poolSize
+					+ "_java_"
+					+ ArcusClient.VERSION + "_"
+					+ simpleDateFormat.format(currentTime) + "_" 
+					+ zk.getSessionId();
+			*/
 			/* ENABLE_REPLICATION end */
 			
 		} catch (UnknownHostException e) {
@@ -347,14 +355,16 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 		}
 		/* ENABLE_REPLICATION else */
-		//for (int i = 0; i < children.size(); i++) {
-		//	String[] temp = children.get(i).split("-");
-		//	if (i != 0) {
-		//		addrs = addrs + "," + temp[0];
-		//	} else {
-		//		addrs = temp[0];
-		//	}
-		//}
+		/*
+		for (int i = 0; i < children.size(); i++) {
+			String[] temp = children.get(i).split("-");
+			if (i != 0) {
+				addrs = addrs + "," + temp[0];
+			} else {
+				addrs = temp[0];
+			}
+		}
+		*/
 		/* ENABLE_REPLICATION end */
 
 		if (client == null) {
@@ -402,9 +412,11 @@ public class CacheManager extends SpyThread implements Watcher,
 
 		final CountDownLatch latch = new CountDownLatch(count);
 		/* ENABLE_REPLICATION else */
-		//List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
+		/*
+		List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
 
-		//final CountDownLatch latch = new CountDownLatch(socketList.size());
+		final CountDownLatch latch = new CountDownLatch(socketList.size());
+		*/
 		/* ENABLE_REPLICATION end */
 		final ConnectionObserver observer = new ConnectionObserver() {
 
@@ -429,10 +441,12 @@ public class CacheManager extends SpyThread implements Watcher,
 		else
 			_awaitTime = waitTimeForConnect;
 		/* ENABLE_REPLICATION else */
-		//if (waitTimeForConnect == 0)
-		//	_awaitTime = 50 * socketList.size();
-		//else
-		//	_awaitTime = waitTimeForConnect;
+		/*
+		if (waitTimeForConnect == 0)
+			_awaitTime = 50 * socketList.size();
+		else
+			_awaitTime = waitTimeForConnect;
+		*/
 		/* ENABLE_REPLICATION end */
 
 		client = new ArcusClient[poolSize];

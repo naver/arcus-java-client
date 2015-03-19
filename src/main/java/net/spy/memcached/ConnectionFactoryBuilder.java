@@ -375,7 +375,9 @@ public class ConnectionFactoryBuilder {
 							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
 						}
 						/* ENABLE_REPLICATION else */
-						//return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						/*
+						return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						*/
 						/* ENABLE_REPLICATION end */
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);

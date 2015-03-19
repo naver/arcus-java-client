@@ -47,8 +47,10 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 			/* ENABLE_REPLICATION else */
-			//fail(e.getMessage());
-			//e.printStackTrace();
+			/*
+			fail(e.getMessage());
+			e.printStackTrace();
+			*/
 			/* ENABLE_REPLICATION end */
 		}
 	}
