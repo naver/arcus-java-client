@@ -46,13 +46,13 @@ import org.apache.zookeeper.ZooDefs.Ids;
 
 public class CacheManager extends SpyThread implements Watcher,
 		CacheMonitor.CacheMonitorListener {
-	public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
+	private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
-	public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
+	private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
 
-	private static final int SESSION_TIMEOUT = 15000;
+	private static final int ZK_SESSION_TIMEOUT = 15000;
 	
-	private static final long ZK_CONNECT_TIMEOUT = SESSION_TIMEOUT;
+	private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
 
 	private final String hostPort;
 
@@ -103,7 +103,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
 			
 			zkInitLatch = new CountDownLatch(1);
-			zk = new ZooKeeper(hostPort, SESSION_TIMEOUT, this);
+			zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
 
 			try {
 				/* In the above ZooKeeper() internals, reverse DNS lookup occurs
@@ -118,7 +118,7 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new AdminConnectTimeoutException(hostPort);
 				}
 				
-				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
+				if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) == null) {
 					getLogger().fatal(
 							"Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
@@ -156,7 +156,7 @@ public class CacheManager extends SpyThread implements Watcher,
 						"Can't initialize Arcus client.", e);
 			}
 
-			cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			cacheMonitor = new CacheMonitor(zk, ARCUS_BASE_CACHE_LIST_ZPATH, serviceCode, this);
 		} catch (IOException e) {
 			throw new InitializeClientException(
 					"Can't initialize Arcus client.", e);
@@ -172,7 +172,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			
 			// create the ephemeral znode 
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
-			path = CLIENT_INFO_PATH + serviceCode + "/" 
+			path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/" 
 					+ InetAddress.getLocalHost().getHostName() + "_"
 					+ InetAddress.getLocalHost().getHostAddress() + "_"
 					+ this.poolSize

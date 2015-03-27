@@ -35,6 +35,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 	ZooKeeper zk;
 
+	String cacheListZPath;
+	
 	String serviceCode;
 
 	volatile boolean dead;
@@ -62,9 +64,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * @param listener
 	 *            Callback listener
 	 */
-	public CacheMonitor(ZooKeeper zk, String serviceCode,
+	public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
 			CacheMonitorListener listener) {
 		this.zk = zk;
+		this.cacheListZPath = cacheListZPath;
 		this.serviceCode = serviceCode;
 		this.listener = listener;
 
@@ -153,10 +156,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	void asyncGetCacheList() {
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Set a new watch on " + (CacheManager.CACHE_LIST_PATH + serviceCode));
+			getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
 		}
 		
-		zk.getChildren(CacheManager.CACHE_LIST_PATH + serviceCode, true, this, null);
+		zk.getChildren(cacheListZPath + serviceCode, true, this, null);
 	}
 
 	/**
