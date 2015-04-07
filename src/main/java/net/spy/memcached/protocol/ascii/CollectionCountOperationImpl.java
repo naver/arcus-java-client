@@ -27,6 +27,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to get exists item count from collection in a memcached server.
@@ -56,6 +57,7 @@ public class CollectionCountOperationImpl extends OperationImpl implements
 		super(cb);
 		this.key = key;
 		this.collectionCount = collectionCount;
+		setOperationType(OperationType.READ);
 	}
 
 	/**

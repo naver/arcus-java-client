@@ -30,6 +30,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		BTreeStoreAndGetOperation {
@@ -95,6 +96,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.get = get;
 		this.dataToStore = dataToStore;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

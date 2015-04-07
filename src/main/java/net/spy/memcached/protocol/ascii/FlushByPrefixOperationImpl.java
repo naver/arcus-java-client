@@ -22,6 +22,7 @@ import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Arcus flush by prefix operation.
@@ -42,6 +43,7 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
 		this.prefix = prefix;
 		this.delay = delay;
 		this.noreply = noreply;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

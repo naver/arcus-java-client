@@ -27,6 +27,7 @@ import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Base class for protocol-specific operation implementations.
@@ -45,6 +46,15 @@ public abstract class BaseOperationImpl extends SpyObject {
 	protected OperationCallback callback = null;
 	private volatile MemcachedNode handlingNode = null;
 	
+	private OperationType operationType = OperationType.NONE;
+
+	public OperationType getOperationType() {
+		return operationType;
+	}
+
+	public void setOperationType(OperationType operationType) {
+		this.operationType = operationType;
+	}
 	public BaseOperationImpl() {
 		super();
 	}

@@ -30,6 +30,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to retrieve collection data in a memcached server.
@@ -78,6 +79,10 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionGet = collectionGet;
+		if (collectionGet.isDelete() || collectionGet.isDropIfEmpty())
+			setOperationType(OperationType.WRITE);
+		else
+			setOperationType(OperationType.READ);
 	}
 	
 	/**

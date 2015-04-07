@@ -28,6 +28,7 @@ import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation for mutating integers inside of memcached.
@@ -54,6 +55,7 @@ final class MutatorOperationImpl extends OperationImpl
 		amount=amt;
 		def=d;
 		exp=e;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override
