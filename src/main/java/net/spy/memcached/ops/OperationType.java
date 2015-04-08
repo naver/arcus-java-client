@@ -4,7 +4,7 @@ public enum OperationType {
 	/* 
 	 * only Ascii Operation have WRITE or READ, ETC OperationType
 	 * Binary Operation has only UNDEFIED OperationType
-	 * because Arcus Client not use Binary Operation.
+	 * because Arcus Client don't use Binary Operation.
 	 */
 	
 	/*
@@ -54,9 +54,8 @@ public enum OperationType {
 	ETC,
 	
 	/*
-	 * This is net.spy.memcached.protocol.BaseOperationImpl initial value
-	 * If it is wrang that operation type of instance is NONE
-	 * operation type is must WRITE / READ / ETC 
+	 * When the type of an operation is undefined,
+	 * it has the operation type of UNDEFINED.
 	 */
 	UNDEFINED
 }
