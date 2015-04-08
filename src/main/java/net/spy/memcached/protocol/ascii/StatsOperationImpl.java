@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatsOperation;
 
 /**
@@ -45,6 +46,7 @@ final class StatsOperationImpl extends OperationImpl
 		} else {
 			msg=("stats " + arg + "\r\n").getBytes();
 		}
+		setOperationType(OperationType.ETC);
 	}
 
 	@Override

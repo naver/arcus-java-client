@@ -46,15 +46,8 @@ public abstract class BaseOperationImpl extends SpyObject {
 	protected OperationCallback callback = null;
 	private volatile MemcachedNode handlingNode = null;
 	
-	private OperationType operationType = OperationType.NONE;
+	private OperationType opType = OperationType.UNDEFINED;
 
-	public OperationType getOperationType() {
-		return operationType;
-	}
-
-	public void setOperationType(OperationType operationType) {
-		this.operationType = operationType;
-	}
 	public BaseOperationImpl() {
 		super();
 	}
@@ -171,5 +164,13 @@ public abstract class BaseOperationImpl extends SpyObject {
 
 	public void setHandlingNode(MemcachedNode to) {
 		handlingNode = to;
+	}
+
+	public OperationType getOperationType() {
+		return opType;
+	}
+
+	public void setOperationType(OperationType opType) {
+		this.opType = opType;
 	}
 }

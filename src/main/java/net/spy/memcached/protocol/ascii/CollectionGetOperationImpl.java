@@ -77,7 +77,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionGet = collectionGet;
-		if (collectionGet.isDelete() || collectionGet.isDropIfEmpty())
+		if (collectionGet.isDelete())
 			setOperationType(OperationType.WRITE);
 		else
 			setOperationType(OperationType.READ);

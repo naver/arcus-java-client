@@ -1,15 +1,23 @@
 package net.spy.memcached.ops;
 
 public enum OperationType {
+	/* 
+	 * only Ascii Operation have WRITE or READ, ETC OperationType
+	 * Binary Operation has only UNDEFIED OperationType
+	 * because Arcus Client not use Binary Operation.
+	 */
+	
 	/*
 	 * StoreOperationImpl (add / replace / set / asyncSetBulk)
 	 * ConcatenationOperationImpl (append / prepend)
 	 * MutatorOperationImpl (asyncIncr / asyncDecr)
 	 * DeleteOperationImpl (delete)
+	 * CASOperationImpl (asyncCAS, cas)
 	 * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
 	 * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert)
 	 * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
-	 * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) withDelete and dropIfEmtpy are WRITE
+	 * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
+	 * ExtendedBTreeGetOperationImpl (asyncBopGet) is WRITE, when withDelete is true
 	 * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk) 
 	 * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
 	 * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
@@ -25,8 +33,8 @@ public enum OperationType {
 	/*
 	 * GetOperationImpl (asyncGet / asyncGetBulk)
 	 * GetsOperationImpl (asyncGets)
-	 * CollectionGetOperationImpl (asynBopGet / asyncLopGet / asyncSopGet) but, withDelete and dropIfEmtpy are WRITE
-	 * ExtendedBTreeGetOperationImpl (asyncBopGet)
+	 * CollectionGetOperationImpl (asynBopGet / asyncLopGet / asyncSopGet) is READ, when withDelete is false.
+	 * ExtendedBTreeGetOperationImpl (asyncBopGet) is READ, when withDelete is false.
 	 * CollectionExistOperationImpl (asyncSopExist)
 	 * CollectionPipedExistOperationImpl (asyncSopPipedExistBulk)
 	 * CollectionCountOperationImpl (asyncBopGetItemCount)
@@ -40,7 +48,8 @@ public enum OperationType {
 	READ,
 	
 	/*
-	 * 
+	 * StatsOperationImpl (getStats)
+	 * VersionOperationImpl (getVersions) 
 	 */
 	ETC,
 	
@@ -49,7 +58,7 @@ public enum OperationType {
 	 * If it is wrang that operation type of instance is NONE
 	 * operation type is must WRITE / READ / ETC 
 	 */
-	NONE
+	UNDEFINED
 }
 
 /* Operation Hierarchy (only ascii type)
