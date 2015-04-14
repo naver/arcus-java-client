@@ -74,8 +74,8 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 				assertNull(object2);
 			}
 		} catch (Exception e) {
-			fail(e.getMessage());
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 	}
 
@@ -106,8 +106,8 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 				}
 			}
 		} catch (Exception e) {
-			fail(e.getMessage());
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 	}
 
@@ -138,8 +138,8 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 			if (flushFuture != null)
 				flushFuture.cancel(true);
 		} catch (Exception e) {
-			fail(e.getMessage());
 			e.printStackTrace();
+			fail(e.getMessage());
 		}
 	}
 
