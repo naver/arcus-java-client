@@ -36,7 +36,7 @@ import net.spy.memcached.ops.OperationType;
  * Operation to retrieve collection data in a memcached server.
  */
 public class ExtendedBTreeGetOperationImpl extends OperationImpl 
-	implements CollectionGetOperation {
+	implements ExtendedBTreeGetOperation {
 
 	private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 

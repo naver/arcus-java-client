@@ -24,7 +24,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.CollectionStoreOperation;
+import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -34,7 +34,7 @@ import net.spy.memcached.ops.OperationType;
  * Operation to store collection data in a memcached server.
  */
 public class CollectionUpsertOperationImpl extends OperationImpl implements
-		CollectionStoreOperation {
+		CollectionUpsertOperation {
 
 	private static final int OVERHEAD = 32;
 
