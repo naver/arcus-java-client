@@ -24,16 +24,16 @@ import java.util.List;
 import net.spy.memcached.util.Arcus17KetamaNodeLocatorConfiguration;
 
 public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
-	boolean gracefulFailover;
+	boolean switchover;
 
 	public Arcus17KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
 		// This configuration class is aware that InetSocketAddress is really
 		// Arcus17NodeAddress.  Its getKeyForNode uses the group name, instead
 		// of the socket address.
 		super(nodes, alg, new Arcus17KetamaNodeLocatorConfiguration());
-		// By default, the 1.7 client support graceful failover.
+		// By default, the 1.7 client support switchover.
 		// It just means that we do not shutdown the removed nodes right away.
-		gracefulFailover = "true".equals(System.getProperty("arcus.gracefulFailover", "true"));
+		switchover = "true".equals(System.getProperty("arcus.switchover", "true"));
 	}
 
 	// This is same as super's update.  The only difference is that we
@@ -49,7 +49,7 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 				allNodes.remove(node);
 				updateHash(node, true);
 
-				if (gracefulFailover && !node.isFake()) {
+				if (switchover && !node.isFake()) {
 					// MemcachedConnection shuts down the node later on.
 					continue;
 				}

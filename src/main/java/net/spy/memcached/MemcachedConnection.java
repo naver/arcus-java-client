@@ -90,7 +90,7 @@ public final class MemcachedConnection extends SpyObject {
 
 	/* ENABLE_REPLICATION start */
 	private boolean arcus17;
-	private boolean gracefulFailover;
+	private boolean switchover;
 	private long shutdownDelay = 10000; // milliseconds
 	private List<ShutdownNode> delayedShutdownNodes;
 
@@ -136,13 +136,13 @@ public final class MemcachedConnection extends SpyObject {
 		locator=f.createLocator(connections);
 
 		/* ENABLE_REPLICATION start */
-		// By default, the 1.7 client supports graceful failover.
+		// By default, the 1.7 client supports switchover.
 		// It just means that we do not shutdown the removed nodes right away.
 		// But wait till it becomes empty (no ongoing requests).
 		// At the moment, we simply wait for 10 seconds and then kill the node...
-		gracefulFailover = "true".equals(System.getProperty("arcus.gracefulFailover", "true"));
+		switchover = "true".equals(System.getProperty("arcus.switchover", "true"));
 		delayedShutdownNodes = new ArrayList<ShutdownNode>();
-		String delay = System.getProperty("arcus.gracefulFailoverShutdownDelay");
+		String delay = System.getProperty("arcus.switchoverShutdownDelay");
 		if (delay != null) {
 			try {
 				shutdownDelay = Integer.valueOf(delay);
@@ -270,7 +270,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 
 		/* ENABLE_REPLICATION start */
-		// Arcus 1.7 graceful failover/shutdown
+		// Arcus 1.7 switchover/shutdown
 		while (!delayedShutdownNodes.isEmpty()) {
 			long now = System.currentTimeMillis();
 			ShutdownNode n = delayedShutdownNodes.get(0);
@@ -331,7 +331,7 @@ public final class MemcachedConnection extends SpyObject {
 				}
 				if (node != null) {
 					removeNodes.add(node);
-					if (gracefulFailover && !node.isFake()) {
+					if (switchover && !node.isFake()) {
 						long now = System.currentTimeMillis();
 						delayedShutdownNodes.add(new ShutdownNode(node, now + shutdownDelay));
 					}
@@ -671,14 +671,14 @@ public final class MemcachedConnection extends SpyObject {
 			qa.setChannel(null);
 
 			/* ENABLE_REPLICATION start */
-			// Arcus 1.7 and graceful failover.  We let the removed node hang around
+			// Arcus 1.7 and switchover.  We let the removed node hang around
 			// for 10 seconds.  If the node dies, and the connection terminates
 			// (e.g. connection reset by peer), then the code tries to reconnect.
 			// If the node is dead, this is useless, and we only see connection refused.
 			// If we lose the connection, assume that the node is really dead, not
-			// in middle of a graceful failover.  And, do not attempt to reconnect.
+			// in middle of a switchover.  And, do not attempt to reconnect.
 			// This is really ugly.  FIXME
-			if (arcus17 && gracefulFailover) {
+			if (arcus17 && switchover) {
 				for (ShutdownNode n : delayedShutdownNodes) {
 					if (n.node.equals(qa)) {
 						// Do not touch operations.  They will time out.
@@ -818,12 +818,12 @@ public final class MemcachedConnection extends SpyObject {
 		MemcachedNode primary = locator.getPrimary(key);
 		/* ENABLE_REPLICATION start */
 		boolean valid = false;
-		// Arcus 1.7 behavior.  It is mainly for graceful failover, but not strictly just that.
+		// Arcus 1.7 behavior.  It is mainly for switchover, but not strictly just that.
 		// isActive() returns true iff the node has a connected socket.
 		// If it is connecting, the method returns false, and we end up cancelling
 		// the operation.  Connect may take some time, so do not be so strict.
 		// Enqueue the operation to the node and let it wait a bit till connect completes.
-		if (arcus17 && gracefulFailover) {
+		if (arcus17 && switchover) {
 			valid = !primary.isFake() && primary.getChannel() != null;
 		}
 		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {
