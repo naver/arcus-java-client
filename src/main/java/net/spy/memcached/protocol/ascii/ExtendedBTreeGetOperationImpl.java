@@ -24,7 +24,6 @@ import java.util.Collections;
 import net.spy.memcached.collection.ExtendedBTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
