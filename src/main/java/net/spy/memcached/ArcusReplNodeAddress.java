@@ -79,8 +79,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 					if (master) {
 						// The new node is the master.  Replace.
 						addrs.set(i, a);
-					}
-					else {
+					} else {
 						// The new node is the slave.  Do not add.
 					}
 					// In any case, we've found a previous node with
@@ -105,15 +104,13 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		if (s.equals(CacheMonitor.FAKE_SERVER_NODE)) {
 			// Special case the empty cache_list.
 			// CacheMonitor adds one FAKE_SERVER_NODE to children before calling this method.
-		}
-		else {
+		} else {
 			try {
 				list = parseNodeNames(s);
 			} catch (Exception e) {
 				// May see an exception if nodes do not follow the replication naming convention
 				ArcusClient.arcusLogger.error("Exception caught while parsing node" +
-							      " addresses. cache_list=" + s +
-							      "\n" + e);
+											" addresses. cache_list=" + s + "\n" + e);
 				e.printStackTrace();
 				list = null;
 			}
