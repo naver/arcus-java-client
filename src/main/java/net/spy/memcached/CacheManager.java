@@ -51,9 +51,9 @@ public class CacheManager extends SpyThread implements Watcher,
 	private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
 
 	/* ENABLE_REPLICATION start */
-	private static final String REPL_CACHE_LIST_PATH = "/arcus_repl/cache_list/";
+	private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
-	private static final String REPL_CLIENT_INFO_PATH = "/arcus_repl/client_list/";
+	private static final String ARCUS_REPL_CLIENT_INFO_ZPATH = "/arcus_repl/client_list/";
 	/* ENABLE_REPLICATION end */
 
 	private static final int ZK_SESSION_TIMEOUT = 15000;
@@ -131,7 +131,7 @@ public class CacheManager extends SpyThread implements Watcher,
 				/* ENABLE_REPLICATION start */
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
-				if (zk.exists(REPL_CACHE_LIST_PATH + serviceCode, false) != null) {
+				if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
 					arcus17 = true;
 					cfb.setArcus17(true);
 					getLogger().info("Connecting to Arcus repl cluster");
@@ -188,7 +188,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION start */
-			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH 
+			String cachePath = arcus17 ? ARCUS_REPL_CACHE_LIST_ZPATH 
                                        : ARCUS_BASE_CACHE_LIST_ZPATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
@@ -213,7 +213,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 			/* ENABLE_REPLICATION start */
 			if (arcus17)
-				path = REPL_CLIENT_INFO_PATH; // /arcus_repl/client_list/...
+				path = ARCUS_REPL_CLIENT_INFO_ZPATH; // /arcus_repl/client_list/...
 			else
 				path = ARCUS_BASE_CLIENT_INFO_ZPATH; // /arcus/client_list/...
 			path = path + serviceCode + "/"
