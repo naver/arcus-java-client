@@ -54,11 +54,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
 
-	/* ENABLE_REPLICATION start */
-	/* We only use this for demo, to show more readable node names when the cache list changes. */
-	boolean demoPrintClusterDiff = false;
-	/* ENABLE_REPLICATION end */
-
 	/**
 	 * Constructor
 	 * 
@@ -75,10 +70,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		this.cacheListZPath = cacheListZPath;
 		this.serviceCode = serviceCode;
 		this.listener = listener;
-
-	    /* ENABLE_REPLICATION start */
-		demoPrintClusterDiff = "true".equals(System.getProperty("arcus.demoPrintClusterDiff", "false"));
-	    /* ENABLE_REPLICATION end */
 
 		getLogger().info("Initializing the CacheMonitor.");
 		
@@ -185,36 +176,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 		if (!children.equals(prevChildren)) {
 			getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " + getInfo());
-			/* ENABLE_REPLICATION start */
-			if (demoPrintClusterDiff) {
-				// Assume 1.7 cluster
-				System.out.println("\nCLUSTER CHANGE\n---PREVIOUS---");
-				if (prevChildren == null) {
-					System.out.println("NO NODES");
-				}
-				else {
-					for (String s : prevChildren) {
-						try {
-							System.out.println(Arcus17NodeAddress.parseNodeName(s));
-						} catch (Exception e) {
-						}
-					}
-				}
-				System.out.println("---CURRENT---");
-				if (children == null) {
-					System.out.println("NO NODES");
-				}
-				else {
-					for (String s : children) {
-						try {
-							System.out.println(Arcus17NodeAddress.parseNodeName(s));
-						} catch (Exception e) {
-						}
-					}
-				}
-				System.out.println("");
-			}
-			/* ENABLE_REPLICATION end */
 		}
 		
 		// Store the current children.
