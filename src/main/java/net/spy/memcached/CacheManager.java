@@ -329,8 +329,7 @@ public class CacheManager extends SpyThread implements Watcher,
 					addrs = addrs + ",";
 				addrs = addrs + children.get(i);
 			}
-		}
-		else {
+		} else {
 			for (int i = 0; i < children.size(); i++) {
 				String[] temp = children.get(i).split("-");
 				if (i != 0) {
@@ -384,12 +383,10 @@ public class CacheManager extends SpyThread implements Watcher,
 			count = 0;
 			for (InetSocketAddress a : socketList) {
 				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
-				boolean isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString());
-				if (!isFake)
+				if (("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString()) != true)
 					count++;
 			}
-		}
-		else {
+		} else {
 			socketList = AddrUtil.getAddresses(addrs);
 			// Preserve base cluster behavior.  The initial latch count
 			// includes fake server addresses.

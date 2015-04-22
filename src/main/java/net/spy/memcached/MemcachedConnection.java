@@ -291,9 +291,9 @@ public final class MemcachedConnection extends SpyObject {
 						break;
 					}
 				}
-			}
-			else
+			} else {
 				break;
+			}
 		}
 		/* ENABLE_REPLICATION end */
 	}
@@ -320,8 +320,7 @@ public final class MemcachedConnection extends SpyObject {
 							// Leave it alone.
 							itr.remove();
 							node = null;
-						}
-						else {
+						} else {
 							// The new list has a node with the same group name
 							// as the old node.  But they are not the same.
 							// Remove the old node and add the new node.
@@ -337,8 +336,7 @@ public final class MemcachedConnection extends SpyObject {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			for (MemcachedNode node : locator.getAll()) {
 				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
 					addrs.remove((InetSocketAddress) node.getSocketAddress());
