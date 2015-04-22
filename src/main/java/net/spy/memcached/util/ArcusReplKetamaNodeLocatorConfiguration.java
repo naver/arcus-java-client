@@ -18,13 +18,13 @@
 package net.spy.memcached.util;
 
 import net.spy.memcached.MemcachedNode;
-import net.spy.memcached.Arcus17NodeAddress;
+import net.spy.memcached.ArcusReplNodeAddress;
 
-public class Arcus17KetamaNodeLocatorConfiguration extends
+public class ArcusReplKetamaNodeLocatorConfiguration extends
 		ArcusKetamaNodeLocatorConfiguration {
 
 	public String getKeyForNode(MemcachedNode node, int repetition) {
-		Arcus17NodeAddress addr = (Arcus17NodeAddress)node.getSocketAddress();
+		ArcusReplNodeAddress addr = (ArcusReplNodeAddress)node.getSocketAddress();
 		String key = addr.getGroupName() + "-" + repetition;
 		return key;
 	}

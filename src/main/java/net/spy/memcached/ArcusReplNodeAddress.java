@@ -21,13 +21,13 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Arcus17NodeAddress extends InetSocketAddress {
+public class ArcusReplNodeAddress extends InetSocketAddress {
 	boolean master;
 	String group;
 	String ip;
 	int port;
 
-	Arcus17NodeAddress(String group, boolean master, String ip, int port) {
+	ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
 		super(ip, port);
 		this.group = group;
 		this.master = master;
@@ -43,11 +43,11 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		return group;
 	}
 
-	static Arcus17NodeAddress create(String group, boolean master, String ipport) {
+	static ArcusReplNodeAddress create(String group, boolean master, String ipport) {
 		String[] temp = ipport.split(":");
 		String ip = temp[0];
 		int port = Integer.parseInt(temp[1]);
-		return new Arcus17NodeAddress(group, master, ip, port);
+		return new ArcusReplNodeAddress(group, master, ip, port);
 	}
 
 	private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
@@ -69,13 +69,13 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			if (!master)
 				ipport = CacheMonitor.FAKE_SERVER_NODE;
 
-			Arcus17NodeAddress a = Arcus17NodeAddress.create(group, master, ipport);
+			ArcusReplNodeAddress a = ArcusReplNodeAddress.create(group, master, ipport);
 
 			// We want exactly one node per group in this version.
 			// If a node exists and the new one is the master, replace the old one
 			// with the new one.
 			for (int i = 0; i < addrs.size(); i++) {
-				if (((Arcus17NodeAddress)addrs.get(i)).group.equals(group)) {
+				if (((ArcusReplNodeAddress)addrs.get(i)).group.equals(group)) {
 					if (master) {
 						// The new node is the master.  Replace.
 						addrs.set(i, a);
@@ -123,19 +123,19 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		if (list == null || list.size() == 0) {
 			list = new ArrayList<InetSocketAddress>(1);
 			list.add((InetSocketAddress)
-				 Arcus17NodeAddress.create("invalid", false, CacheMonitor.FAKE_SERVER_NODE));
+				 ArcusReplNodeAddress.create("invalid", false, CacheMonitor.FAKE_SERVER_NODE));
 		}
 		return list;
 	}
 
-	public static Arcus17NodeAddress parseNodeName(String node) throws Exception {
+	public static ArcusReplNodeAddress parseNodeName(String node) throws Exception {
 		String[] temp = node.split("\\^");
 		String group = temp[0];
 		boolean master = temp[1].equals("M") ? true : false;
 		String[] temp2 = temp[2].split("-");
 		String ipport = temp2[0];
 
-		return Arcus17NodeAddress.create(group, master, ipport);
+		return ArcusReplNodeAddress.create(group, master, ipport);
 	}
 }
 /* ENABLE_REPLICATION end */

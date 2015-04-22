@@ -318,7 +318,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		//
 		// Arcus repl cluster
 		// Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
-		// by commas.  Arcus17NodeAddress turns these names into Arcus17NodeAddress.
+		// by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
 		/* ENABLE_REPLICATION end */
 
 		String addrs = "";
@@ -376,7 +376,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		List<InetSocketAddress> socketList;
 		int count;
 		if (arcusReplEnabled) {
-			socketList = Arcus17NodeAddress.getAddresses(addrs);
+			socketList = ArcusReplNodeAddress.getAddresses(addrs);
 
 			// Exclude fake server addresses (slaves) in the initial latch count.
 			// Otherwise we may block here for a while trying to connect to

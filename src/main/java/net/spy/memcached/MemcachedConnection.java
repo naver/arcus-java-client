@@ -308,10 +308,10 @@ public final class MemcachedConnection extends SpyObject {
 			// If there's an existing node with the same group name as the new node,
 			// remove it.  And add the new node.
 			for (MemcachedNode node : locator.getAll()) {
-				Arcus17NodeAddress oldNode = (Arcus17NodeAddress)node.getSocketAddress();
+				ArcusReplNodeAddress oldNode = (ArcusReplNodeAddress)node.getSocketAddress();
 				Iterator<InetSocketAddress> itr = addrs.iterator();
 				while (itr.hasNext()) {
-					Arcus17NodeAddress newNode = (Arcus17NodeAddress)itr.next();
+					ArcusReplNodeAddress newNode = (ArcusReplNodeAddress)itr.next();
 					if (oldNode.group.equals(newNode.group)) {
 						if (oldNode.master == newNode.master &&
 						    oldNode.ip.equals(newNode.ip) &&
@@ -439,7 +439,7 @@ public final class MemcachedConnection extends SpyObject {
 		// Update the memcached server group.
 		/* ENABLE_REPLICATION start */
 		if (arcusReplEnabled)
-			updateConnections(Arcus17NodeAddress.getAddresses(addrs));
+			updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
 		else
 			updateConnections(AddrUtil.getAddresses(addrs));
 		/* ENABLE_REPLICATION else */

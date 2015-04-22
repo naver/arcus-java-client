@@ -21,16 +21,16 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import net.spy.memcached.util.Arcus17KetamaNodeLocatorConfiguration;
+import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
-public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
+public class ArcusReplKetamaNodeLocator extends ArcusKetamaNodeLocator {
 	boolean switchover;
 
-	public Arcus17KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
+	public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
 		// This configuration class is aware that InetSocketAddress is really
-		// Arcus17NodeAddress.  Its getKeyForNode uses the group name, instead
+		// ArcusReplNodeAddress.  Its getKeyForNode uses the group name, instead
 		// of the socket address.
-		super(nodes, alg, new Arcus17KetamaNodeLocatorConfiguration());
+		super(nodes, alg, new ArcusReplKetamaNodeLocatorConfiguration());
 		// By default, Arcus replication client support switchover.
 		// It just means that we do not shutdown the removed nodes right away.
 		switchover = "true".equals(System.getProperty("arcus.switchover", "true"));

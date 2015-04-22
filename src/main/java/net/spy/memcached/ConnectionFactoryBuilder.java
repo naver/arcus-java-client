@@ -365,10 +365,10 @@ public class ConnectionFactoryBuilder {
 						/* ENABLE_REPLICATION start */
 						if (arcusReplEnabled) {
 							// Arcus repl cluster
-							// This locator uses Arcus17KetamaNodeLocatorConfiguration
+							// This locator uses ArcusReplKetamaNodeLocatorConfiguration
 							// which builds keys off the server's group name, not
 							// its ip:port.
-							return new Arcus17KetamaNodeLocator(nodes, getHashAlg());
+							return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
 						}
 						else {
 							// Arcus base cluster
