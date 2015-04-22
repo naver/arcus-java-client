@@ -43,15 +43,8 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 			Object object2 = mc.asyncGet(PREFIX + DELIMITER + KEY).get();
 			assertNull(object2);
 		} catch (Exception e) {
-			/* ENABLE_REPLICATION start */
 			e.printStackTrace();
 			fail(e.getMessage());
-			/* ENABLE_REPLICATION else */
-			/*
-			fail(e.getMessage());
-			e.printStackTrace();
-			*/
-			/* ENABLE_REPLICATION end */
 		}
 	}
 
