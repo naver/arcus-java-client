@@ -267,6 +267,8 @@ public final class MemcachedConnection extends SpyObject {
 		try {
 			if (ch.connect(sa)) {
 				getLogger().info("new memcached node connected to %s immediately", qa);
+				// FIXME.  Do we ever execute this path?
+				// This method does not call observer.connectionEstablished.
 				qa.connected();
 			} else {
 				getLogger().info("new memcached node added %s to connect queue", qa);
@@ -812,6 +814,7 @@ public final class MemcachedConnection extends SpyObject {
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
 		MemcachedNode primary = locator.getPrimary(key);
+		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {
