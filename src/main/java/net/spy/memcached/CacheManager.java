@@ -46,25 +46,19 @@ import org.apache.zookeeper.ZooDefs.Ids;
 
 public class CacheManager extends SpyThread implements Watcher,
 		CacheMonitor.CacheMonitorListener {
+	private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
+
+	private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
+
 	/* ENABLE_REPLICATION start */
-	private static final String CACHE_LIST_PATH = "/arcus/cache_list/";
-
-	private static final String CLIENT_INFO_PATH = "/arcus/client_list/";
-
 	private static final String REPL_CACHE_LIST_PATH = "/arcus_repl/cache_list/";
 
 	private static final String REPL_CLIENT_INFO_PATH = "/arcus_repl/client_list/";
-	/* ENABLE_REPLICATION else */
-	/*
-	public static final String CACHE_LIST_PATH = "/arcus/cache_list/";
-
-	public static final String CLIENT_INFO_PATH = "/arcus/client_list/";
-	*/
 	/* ENABLE_REPLICATION end */
 
-	private static final int SESSION_TIMEOUT = 15000;
+	private static final int ZK_SESSION_TIMEOUT = 15000;
 	
-	private static final long ZK_CONNECT_TIMEOUT = SESSION_TIMEOUT;
+	private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
 
 	private final String hostPort;
 
@@ -119,7 +113,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
 			
 			zkInitLatch = new CountDownLatch(1);
-			zk = new ZooKeeper(hostPort, SESSION_TIMEOUT, this);
+			zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
 
 			try {
 				/* In the above ZooKeeper() internals, reverse DNS lookup occurs
@@ -142,18 +136,17 @@ public class CacheManager extends SpyThread implements Watcher,
 					cfb.setArcus17(true);
 					getLogger().info("Connecting to Arcus repl cluster");
 				}
-				else if (zk.exists(CACHE_LIST_PATH + serviceCode, false) != null) {
+				else if (zk.exists(ARCUS_BASE_CACHE_LIST_PATH + serviceCode, false) != null) {
 					arcus17 = false;
 					cfb.setArcus17(false);
 				}
 				else {
-					getLogger().fatal(
-							"Service code not found. (" + serviceCode + ")");
+					getLogger().fatal("Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* ENABLE_REPLICATION else */
 				/*
-				if (zk.exists(CacheManager.CACHE_LIST_PATH + serviceCode, false) == null) {
+				if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) == null) {
 					getLogger().fatal(
 							"Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
@@ -195,11 +188,12 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION start */
-			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH : CACHE_LIST_PATH;
+			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH 
+                                       : ARCUS_BASE_CACHE_LIST_PATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			/*
-			cacheMonitor = new CacheMonitor(zk, serviceCode, this);
+			cacheMonitor = new CacheMonitor(zk, ARCUS_BASE_CACHE_LIST_ZPATH, serviceCode, this);
 			*/
 			/* ENABLE_REPLICATION end */
 		} catch (IOException e) {
@@ -221,11 +215,11 @@ public class CacheManager extends SpyThread implements Watcher,
 			if (arcus17)
 				path = REPL_CLIENT_INFO_PATH; // /arcus_repl/client_list/...
 			else
-				path = CLIENT_INFO_PATH; // /arcus/client_list/...
+				path = ARCUS_BASE_CLIENT_INFO_PATH; // /arcus/client_list/...
 			path = path + serviceCode + "/"
 			/* ENABLE_REPLICATION else */
 			/*
-			path = CLIENT_INFO_PATH + serviceCode + "/"
+			path = ARCUS_BASE_CLIENT_INFO_PATH + serviceCode + "/"
 			*/
 			/* ENABLE_REPLICATION end */
 					+ InetAddress.getLocalHost().getHostName() + "_"

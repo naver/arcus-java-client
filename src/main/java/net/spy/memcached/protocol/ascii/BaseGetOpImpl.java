@@ -9,6 +9,7 @@ import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Base class for get and gets handlers.
@@ -31,6 +32,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
 		super(cb);
 		cmd=c;
 		keys=k;
+		setOperationType(OperationType.READ);
 	}
 
 	/**

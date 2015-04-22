@@ -28,6 +28,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 public class BTreeFindPositionWithGetOperationImpl extends OperationImpl implements
 		BTreeFindPositionWithGetOperation {
@@ -71,6 +72,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		super(cb);
 		this.key = key;
 		this.get = get;
+		setOperationType(OperationType.READ);
 	}
 
 	@Override

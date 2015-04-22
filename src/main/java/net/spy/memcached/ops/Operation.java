@@ -80,4 +80,8 @@ public interface Operation {
 	 * @param to a memcached node
 	 */
 	void setHandlingNode(MemcachedNode to);
+
+	OperationType getOperationType();
+
+	void setOperationType(OperationType operationType);
 }

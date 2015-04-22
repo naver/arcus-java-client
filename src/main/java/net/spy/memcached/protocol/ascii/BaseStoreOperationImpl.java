@@ -24,6 +24,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Base class for ascii store operations (add, set, replace, append, prepend).
@@ -47,6 +48,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
 		flags=f;
 		exp=e;
 		data=d;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

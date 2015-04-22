@@ -28,6 +28,7 @@ import net.spy.memcached.ops.CollectionUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to update collection data in a memcached server.
@@ -70,6 +71,7 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 		this.subkey = subkey;
 		this.collectionUpdate = collectionUpdate;
 		this.data = data;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Memcached flush_all operation.
@@ -25,6 +26,7 @@ final class FlushOperationImpl extends OperationImpl
 	public FlushOperationImpl(int d, OperationCallback cb) {
 		super(cb);
 		delay=d;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

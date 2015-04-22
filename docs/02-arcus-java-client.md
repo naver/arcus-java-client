@@ -140,7 +140,7 @@ ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 ArcusClient client = ArcusClient.createArcusClient(ARCUS_ADMIN, SERVICE_CODE, cfb);
 ```
 
-하나의 Arcus Client만으로는 응용의 requests를 처리하는 용량 즉, trhoughput에 한계가 있다.
+하나의 Arcus Client만으로는 응용의 requests를 처리하는 용량 즉, throughput에 한계가 있다.
 예를 들어, 하나의 연결을 통해 하나의 request가 처리되는 시간이 1ms라 가정하면,
 그 연결을 통해 최대 1000 requests/second 밖에 처리할 수 없다.
 따라서, 많은 요청 처리량이 필요한 응용인 경우는 다수의 Arcus client 객체를 생성하여야 한다.
