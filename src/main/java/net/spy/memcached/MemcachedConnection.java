@@ -90,20 +90,6 @@ public final class MemcachedConnection extends SpyObject {
 
 	/* ENABLE_REPLICATION start */
 	private boolean arcusReplEnabled;
-	private boolean switchover;
-	private long shutdownDelay = 10000; // milliseconds
-	private List<ShutdownNode> delayedShutdownNodes;
-
-	// Just to hold both node and time-to-die
-	class ShutdownNode {
-		MemcachedNode node;
-		long millis; // absolute time
-
-		ShutdownNode(MemcachedNode n, long t) {
-			node = n;
-			millis = t;
-		}
-	};
 	/* ENABLE_REPLICATION end */
 
 	/**
@@ -134,22 +120,6 @@ public final class MemcachedConnection extends SpyObject {
 			connections.add(attachMemcachedNode(sa));
 		}
 		locator=f.createLocator(connections);
-
-		/* ENABLE_REPLICATION start */
-		// By default, Arcus replication client supports switchover.
-		// It just means that we do not shutdown the removed nodes right away.
-		// But wait till it becomes empty (no ongoing requests).
-		// At the moment, we simply wait for 10 seconds and then kill the node...
-		switchover = "true".equals(System.getProperty("arcus.switchover", "true"));
-		delayedShutdownNodes = new ArrayList<ShutdownNode>();
-		String delay = System.getProperty("arcus.switchoverShutdownDelay");
-		if (delay != null) {
-			try {
-				shutdownDelay = Integer.valueOf(delay);
-			} catch (Exception e) {
-			}
-		}
-		/* ENABLE_REPLICATION end */
 	}
 
 	/* ENABLE_REPLICATION start */
@@ -211,13 +181,6 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		getLogger().debug("Selecting with delay of %sms", delay);
 		assert selectorsMakeSense() : "Selectors don't make sense.";
-		/* ENABLE_REPLICATION start */
-		if (!delayedShutdownNodes.isEmpty()) {
-			// Wake up in a second to see if we can clean up nodes.
-			if (delay == 0 || delay > 1000)
-				delay = 1000;
-		}
-		/* ENABLE_REPLICATION end */
 		int selected=selector.select(delay);
 		Set<SelectionKey> selectedKeys=selector.selectedKeys();
 
@@ -268,34 +231,6 @@ public final class MemcachedConnection extends SpyObject {
 		if(!shutDown && !reconnectQueue.isEmpty()) {
 			attemptReconnects();
 		}
-
-		/* ENABLE_REPLICATION start */
-		// Arcus replication switchover/shutdown
-		while (!delayedShutdownNodes.isEmpty()) {
-			long now = System.currentTimeMillis();
-			ShutdownNode n = delayedShutdownNodes.get(0);
-			if (now >= n.millis) {
-				delayedShutdownNodes.remove(0);
-				try {
-					n.node.getSk().attach(null);
-					n.node.shutdown();
-				} catch (IOException e) {
-					n.node.setSk(null);
-				}
-				// In case the node is trying to reconnect, remove it from
-				// the reconnect queue as well.  Otherwise, we may end up
-				// leaking the node and its socket.
-				for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-					if (n.node.equals(each.getValue())) {
-						reconnectQueue.remove(each.getKey());
-						break;
-					}
-				}
-			} else {
-				break;
-			}
-		}
-		/* ENABLE_REPLICATION end */
 	}
 	
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
@@ -330,10 +265,6 @@ public final class MemcachedConnection extends SpyObject {
 				}
 				if (node != null) {
 					removeNodes.add(node);
-					if (switchover && !node.isFake()) {
-						long now = System.currentTimeMillis();
-						delayedShutdownNodes.add(new ShutdownNode(node, now + shutdownDelay));
-					}
 				}
 			}
 		} else {
@@ -666,27 +597,6 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			qa.setChannel(null);
 
-			/* ENABLE_REPLICATION start */
-			// Arcus replication and switchover.  We let the removed node hang around
-			// for 10 seconds.  If the node dies, and the connection terminates
-			// (e.g. connection reset by peer), then the code tries to reconnect.
-			// If the node is dead, this is useless, and we only see connection refused.
-			// If we lose the connection, assume that the node is really dead, not
-			// in middle of a switchover.  And, do not attempt to reconnect.
-			// This is really ugly.  FIXME
-			if (arcusReplEnabled && switchover) {
-				for (ShutdownNode n : delayedShutdownNodes) {
-					if (n.node.equals(qa)) {
-						// Do not touch operations.  They will time out.
-						// Timeout is the base behavior when the node dies.
-						getLogger().warn("The node is already removed from the cache list." +
-								 " Do not attempt to reconnect. node=%s", qa);
-						return;
-					}
-				}
-			}
-			/* ENABLE_REPLICATION end */
-
 			long delay = (long)Math.min(maxDelay,
 					Math.pow(2, qa.getReconnectCount())) * 1000;
 			long reconTime = System.currentTimeMillis() + delay;
@@ -812,22 +722,7 @@ public final class MemcachedConnection extends SpyObject {
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
 		MemcachedNode primary = locator.getPrimary(key);
-		/* ENABLE_REPLICATION start */
-		boolean valid = false;
-		// Arcus replication behavior.  It is mainly for switchover, but not strictly just that.
-		// isActive() returns true iff the node has a connected socket.
-		// If it is connecting, the method returns false, and we end up cancelling
-		// the operation.  Connect may take some time, so do not be so strict.
-		// Enqueue the operation to the node and let it wait a bit till connect completes.
-		if (arcusReplEnabled && switchover) {
-			valid = !primary.isFake() && primary.getChannel() != null;
-		}
-		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {
-		/* ENABLE_REPLICATION else */
-		/*
 		if(primary.isActive() || failureMode == FailureMode.Retry) {
-		*/
-		/* ENABLE_REPLICATION end */
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
 			o.setHandlingNode(primary);
