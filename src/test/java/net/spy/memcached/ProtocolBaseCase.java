@@ -453,6 +453,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	}
 
 	public void testAvailableServers() {
+		if (USE_ZK) return; // We don't know the server address priori
 		client.getVersions();
 		assertEquals(new ArrayList<String>(
 				Collections.singleton(getExpectedVersionSource())),
@@ -467,6 +468,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	protected abstract String getExpectedVersionSource();
 
 	public void testGetVersions() throws Exception {
+		if (USE_ZK) return; // We don't know the server address priori
 		Map<SocketAddress, String> vs=client.getVersions();
 		assertEquals(1, vs.size());
 		Map.Entry<SocketAddress, String> me=vs.entrySet().iterator().next();
