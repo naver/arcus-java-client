@@ -136,7 +136,7 @@ public class CacheManager extends SpyThread implements Watcher,
 					cfb.setArcus17(true);
 					getLogger().info("Connecting to Arcus repl cluster");
 				}
-				else if (zk.exists(ARCUS_BASE_CACHE_LIST_PATH + serviceCode, false) != null) {
+				else if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
 					arcus17 = false;
 					cfb.setArcus17(false);
 				}
@@ -189,7 +189,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 			/* ENABLE_REPLICATION start */
 			String cachePath = arcus17 ? REPL_CACHE_LIST_PATH 
-                                       : ARCUS_BASE_CACHE_LIST_PATH;
+                                       : ARCUS_BASE_CACHE_LIST_ZPATH;
 			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			/*
@@ -215,11 +215,11 @@ public class CacheManager extends SpyThread implements Watcher,
 			if (arcus17)
 				path = REPL_CLIENT_INFO_PATH; // /arcus_repl/client_list/...
 			else
-				path = ARCUS_BASE_CLIENT_INFO_PATH; // /arcus/client_list/...
+				path = ARCUS_BASE_CLIENT_INFO_ZPATH; // /arcus/client_list/...
 			path = path + serviceCode + "/"
 			/* ENABLE_REPLICATION else */
 			/*
-			path = ARCUS_BASE_CLIENT_INFO_PATH + serviceCode + "/"
+			path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/"
 			*/
 			/* ENABLE_REPLICATION end */
 					+ InetAddress.getLocalHost().getHostName() + "_"
