@@ -97,7 +97,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		return addrs;
 	}
 
-	// Similar to AddrUtil.getAddresses.  This version parses 1.7 znode names.
+	// Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
 	// Znode names are group^{M,S}^ip:port-hostname
 	static List<InetSocketAddress> getAddresses(String s) {
 		List<InetSocketAddress> list = null;
@@ -110,7 +110,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			try {
 				list = parseNodeNames(s);
 			} catch (Exception e) {
-				// May see an exception if nodes do not follow the 1.7 naming convention
+				// May see an exception if nodes do not follow the replication naming convention
 				ArcusClient.arcusLogger.error("Exception caught while parsing node" +
 							      " addresses. cache_list=" + s +
 							      "\n" + e);

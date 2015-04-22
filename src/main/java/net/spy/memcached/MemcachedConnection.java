@@ -89,7 +89,7 @@ public final class MemcachedConnection extends SpyObject {
 	private final ConnectionFactory f;
 
 	/* ENABLE_REPLICATION start */
-	private boolean arcus17;
+	private boolean arcusReplEnabled;
 	private boolean switchover;
 	private long shutdownDelay = 10000; // milliseconds
 	private List<ShutdownNode> delayedShutdownNodes;
@@ -136,7 +136,7 @@ public final class MemcachedConnection extends SpyObject {
 		locator=f.createLocator(connections);
 
 		/* ENABLE_REPLICATION start */
-		// By default, the 1.7 client supports switchover.
+		// By default, Arcus replication client supports switchover.
 		// It just means that we do not shutdown the removed nodes right away.
 		// But wait till it becomes empty (no ongoing requests).
 		// At the moment, we simply wait for 10 seconds and then kill the node...
@@ -156,8 +156,8 @@ public final class MemcachedConnection extends SpyObject {
 	// handleNodeManageQueue and updateConnections behave slightly differently
 	// depending on the Arcus version.  We could have created a subclass and overload
 	// those methods.  But, MemcachedConnection is a final class.
-	void setArcus17(boolean b) {
-		arcus17 = b;
+	void setArcusReplEnabled(boolean b) {
+		arcusReplEnabled = b;
 	}
 	/* ENABLE_REPLICATION end */
 
@@ -270,7 +270,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 
 		/* ENABLE_REPLICATION start */
-		// Arcus 1.7 switchover/shutdown
+		// Arcus replication switchover/shutdown
 		while (!delayedShutdownNodes.isEmpty()) {
 			long now = System.currentTimeMillis();
 			ShutdownNode n = delayedShutdownNodes.get(0);
@@ -304,7 +304,7 @@ public final class MemcachedConnection extends SpyObject {
 		
 		// Classify the incoming node list.
 		/* ENABLE_REPLICATION start */
-		if (arcus17) {
+		if (arcusReplEnabled) {
 			// If there's an existing node with the same group name as the new node,
 			// remove it.  And add the new node.
 			for (MemcachedNode node : locator.getAll()) {
@@ -438,7 +438,7 @@ public final class MemcachedConnection extends SpyObject {
 		
 		// Update the memcached server group.
 		/* ENABLE_REPLICATION start */
-		if (arcus17)
+		if (arcusReplEnabled)
 			updateConnections(Arcus17NodeAddress.getAddresses(addrs));
 		else
 			updateConnections(AddrUtil.getAddresses(addrs));
@@ -671,18 +671,18 @@ public final class MemcachedConnection extends SpyObject {
 			qa.setChannel(null);
 
 			/* ENABLE_REPLICATION start */
-			// Arcus 1.7 and switchover.  We let the removed node hang around
+			// Arcus replication and switchover.  We let the removed node hang around
 			// for 10 seconds.  If the node dies, and the connection terminates
 			// (e.g. connection reset by peer), then the code tries to reconnect.
 			// If the node is dead, this is useless, and we only see connection refused.
 			// If we lose the connection, assume that the node is really dead, not
 			// in middle of a switchover.  And, do not attempt to reconnect.
 			// This is really ugly.  FIXME
-			if (arcus17 && switchover) {
+			if (arcusReplEnabled && switchover) {
 				for (ShutdownNode n : delayedShutdownNodes) {
 					if (n.node.equals(qa)) {
 						// Do not touch operations.  They will time out.
-						// Timeout is the 1.6 behavior when the node dies.
+						// Timeout is the base behavior when the node dies.
 						getLogger().warn("The node is already removed from the cache list." +
 								 " Do not attempt to reconnect. node=%s", qa);
 						return;
@@ -818,12 +818,12 @@ public final class MemcachedConnection extends SpyObject {
 		MemcachedNode primary = locator.getPrimary(key);
 		/* ENABLE_REPLICATION start */
 		boolean valid = false;
-		// Arcus 1.7 behavior.  It is mainly for switchover, but not strictly just that.
+		// Arcus replication behavior.  It is mainly for switchover, but not strictly just that.
 		// isActive() returns true iff the node has a connected socket.
 		// If it is connecting, the method returns false, and we end up cancelling
 		// the operation.  Connect may take some time, so do not be so strict.
 		// Enqueue the operation to the node and let it wait a bit till connect completes.
-		if (arcus17 && switchover) {
+		if (arcusReplEnabled && switchover) {
 			valid = !primary.isFake() && primary.getChannel() != null;
 		}
 		if (valid || primary.isActive() || failureMode == FailureMode.Retry) {

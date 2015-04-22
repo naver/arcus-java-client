@@ -31,7 +31,7 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 		// Arcus17NodeAddress.  Its getKeyForNode uses the group name, instead
 		// of the socket address.
 		super(nodes, alg, new Arcus17KetamaNodeLocatorConfiguration());
-		// By default, the 1.7 client support switchover.
+		// By default, Arcus replication client support switchover.
 		// It just means that we do not shutdown the removed nodes right away.
 		switchover = "true".equals(System.getProperty("arcus.switchover", "true"));
 	}
@@ -53,7 +53,7 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 					// MemcachedConnection shuts down the node later on.
 					continue;
 				}
-				// This is the old 1.6 behavior.  We shut down the node right away.
+				// This is the base client behavior.  We shut down the node right away.
 				// We stop processing ongoing requests, and the user will see
 				// timeouts.
 				try {

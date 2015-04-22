@@ -83,7 +83,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	private CountDownLatch zkInitLatch;
 
 	/* ENABLE_REPLICATION start */
-	private boolean arcus17 = false;
+	private boolean arcusReplEnabled = false;
 	/* ENABLE_REPLICATION end */
 	
 	public CacheManager(String hostPort, String serviceCode,
@@ -132,13 +132,13 @@ public class CacheManager extends SpyThread implements Watcher,
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
 				if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-					arcus17 = true;
-					cfb.setArcus17(true);
+					arcusReplEnabled = true;
+					cfb.setArcusReplEnabled(true);
 					getLogger().info("Connecting to Arcus repl cluster");
 				}
 				else if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-					arcus17 = false;
-					cfb.setArcus17(false);
+					arcusReplEnabled = false;
+					cfb.setArcusReplEnabled(false);
 				}
 				else {
 					getLogger().fatal("Service code not found. (" + serviceCode + ")");
@@ -188,9 +188,9 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION start */
-			String cachePath = arcus17 ? ARCUS_REPL_CACHE_LIST_ZPATH 
-                                       : ARCUS_BASE_CACHE_LIST_ZPATH;
-			cacheMonitor = new CacheMonitor(zk, cachePath, serviceCode, this);
+			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH 
+                                                     : ARCUS_BASE_CACHE_LIST_ZPATH;
+			cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			/*
 			cacheMonitor = new CacheMonitor(zk, ARCUS_BASE_CACHE_LIST_ZPATH, serviceCode, this);
@@ -212,7 +212,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			// create the ephemeral znode 
 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 			/* ENABLE_REPLICATION start */
-			if (arcus17)
+			if (arcusReplEnabled)
 				path = ARCUS_REPL_CLIENT_INFO_ZPATH; // /arcus_repl/client_list/...
 			else
 				path = ARCUS_BASE_CLIENT_INFO_ZPATH; // /arcus/client_list/...
@@ -323,7 +323,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 		String addrs = "";
 		/* ENABLE_REPLICATION start */
-		if (arcus17) {
+		if (arcusReplEnabled) {
 			for (int i = 0; i < children.size(); i++) {
 				if (i > 0)
 					addrs = addrs + ",";
@@ -375,7 +375,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		/* ENABLE_REPLICATION start */
 		List<InetSocketAddress> socketList;
 		int count;
-		if (arcus17) {
+		if (arcusReplEnabled) {
 			socketList = Arcus17NodeAddress.getAddresses(addrs);
 
 			// Exclude fake server addresses (slaves) in the initial latch count.

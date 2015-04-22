@@ -79,10 +79,10 @@ public class ConnectionFactoryBuilder {
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
 	/* ENABLE_REPLICATION start */
-	private boolean arcus17 = false;
+	private boolean arcusReplEnabled = false;
 
-	public void setArcus17(boolean b) {
-		arcus17 = b;
+	public void setArcusReplEnabled(boolean b) {
+		arcusReplEnabled = b;
 	}
 	/* ENABLE_REPLICATION end */
 
@@ -329,7 +329,7 @@ public class ConnectionFactoryBuilder {
 			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
 				throws IOException {
 				MemcachedConnection c = super.createConnection(addrs);
-				c.setArcus17(arcus17);
+				c.setArcusReplEnabled(arcusReplEnabled);
 				return c;
 			}
 			/* ENABLE_REPLICATION end */
@@ -363,15 +363,15 @@ public class ConnectionFactoryBuilder {
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
 						/* ENABLE_REPLICATION start */
-						if (arcus17) {
-							// Arcus 1.7
+						if (arcusReplEnabled) {
+							// Arcus repl cluster
 							// This locator uses Arcus17KetamaNodeLocatorConfiguration
 							// which builds keys off the server's group name, not
 							// its ip:port.
 							return new Arcus17KetamaNodeLocator(nodes, getHashAlg());
 						}
 						else {
-							// Arcus 1.6
+							// Arcus base cluster
 							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
 						}
 						/* ENABLE_REPLICATION else */
