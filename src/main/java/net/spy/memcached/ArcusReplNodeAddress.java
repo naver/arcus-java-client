@@ -124,15 +124,5 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		}
 		return list;
 	}
-
-	public static ArcusReplNodeAddress parseNodeName(String node) throws Exception {
-		String[] temp = node.split("\\^");
-		String group = temp[0];
-		boolean master = temp[1].equals("M") ? true : false;
-		String[] temp2 = temp[2].split("-");
-		String ipport = temp2[0];
-
-		return ArcusReplNodeAddress.create(group, master, ipport);
-	}
 }
 /* ENABLE_REPLICATION end */
