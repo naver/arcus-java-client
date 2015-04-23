@@ -317,18 +317,18 @@ public class CacheManager extends SpyThread implements Watcher,
 		/* ENABLE_REPLICATION start */
 		if (arcusReplEnabled) {
 			for (int i = 0; i < children.size(); i++) {
-				if (i > 0)
-					addrs = addrs + ",";
-				addrs = addrs + children.get(i);
+				if (i == 0)
+					addrs = children.get(i);
+				else
+					addrs = addrs + "," + children.get(i);
 			}
 		} else {
 			for (int i = 0; i < children.size(); i++) {
 				String[] temp = children.get(i).split("-");
-				if (i != 0) {
-					addrs = addrs + "," + temp[0];
-				} else {
+				if (i == 0)
 					addrs = temp[0];
-				}
+				else
+					addrs = addrs + "," + temp[0];
 			}
 		}
 		/* ENABLE_REPLICATION else */
@@ -365,35 +365,33 @@ public class CacheManager extends SpyThread implements Watcher,
 	private void createArcusClient(String addrs) {
 		/* ENABLE_REPLICATION start */
 		List<InetSocketAddress> socketList;
-		int count;
+		int addrCount;
 		if (arcusReplEnabled) {
 			socketList = ArcusReplNodeAddress.getAddresses(addrs);
 
 			// Exclude fake server addresses (slaves) in the initial latch count.
 			// Otherwise we may block here for a while trying to connect to
 			// slave-only groups.
-			count = 0;
+			addrCount = 0;
 			for (InetSocketAddress a : socketList) {
 				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
 				if (("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString()) != true)
-					count++;
+					addrCount++;
 			}
 		} else {
 			socketList = AddrUtil.getAddresses(addrs);
 			// Preserve base cluster behavior.  The initial latch count
 			// includes fake server addresses.
-			count = socketList.size();
+			addrCount = socketList.size();
 		}
-
-		final CountDownLatch latch = new CountDownLatch(count);
 		/* ENABLE_REPLICATION else */
 		/*
 		List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
 		int addrCount = socketList.size();
-
-		final CountDownLatch latch = new CountDownLatch(addrCount);
 		*/
 		/* ENABLE_REPLICATION end */
+
+		final CountDownLatch latch = new CountDownLatch(addrCount);
 		final ConnectionObserver observer = new ConnectionObserver() {
 
 			@Override
@@ -410,19 +408,10 @@ public class CacheManager extends SpyThread implements Watcher,
 		cfb.setInitialObservers(Collections.singleton(observer));
 
 		int _awaitTime = 0;
-		/* ENABLE_REPLICATION start */
-		if (waitTimeForConnect == 0)
-			_awaitTime = 50 * count;
-		else
-			_awaitTime = waitTimeForConnect;
-		/* ENABLE_REPLICATION else */
-		/*
 		if (waitTimeForConnect == 0)
 			_awaitTime = 50 * addrCount;
 		else
 			_awaitTime = waitTimeForConnect;
-		*/
-		/* ENABLE_REPLICATION end */
 
 		client = new ArcusClient[poolSize];
 		for (int i = 0; i < poolSize; i++) {
