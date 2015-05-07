@@ -77,7 +77,6 @@ import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionMutate;
-import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.BTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ByteArraysBTreePipedStore;
@@ -303,7 +302,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 
-		net.spy.memcached.CacheManager exe = new net.spy.memcached.CacheManager(
+		CacheManager exe = new CacheManager(
 				hostPorts, serviceCode, cfb, latch, poolSize,
 				waitTimeForConnect);
 
