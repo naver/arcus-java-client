@@ -173,4 +173,12 @@ public abstract class BaseOperationImpl extends SpyObject {
 	public void setOperationType(OperationType opType) {
 		this.opType = opType;
 	}
+	
+	public boolean isWriteOperation() {
+		return this.opType == OperationType.WRITE;
+	}
+	
+	public boolean isReadOperation() {
+		return this.opType == OperationType.READ;
+	}
 }

@@ -84,4 +84,8 @@ public interface Operation {
 	OperationType getOperationType();
 
 	void setOperationType(OperationType operationType);
+	
+	public boolean isWriteOperation();
+
+	public boolean isReadOperation();
 }
