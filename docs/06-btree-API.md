@@ -1043,9 +1043,9 @@ asyncBopPipedUpdateBulk(String key, List<Element<Object>> elements)
 eFlagFilter 조건을 만족하는 elements 중 offset 위치부터 count 개수만큼 조회한다.
 
 ```java
-CollectionFuture<Map<String, BTreeGetResult<Long, Object>
+CollectionFuture <Map<String, BTreeGetResult<Long, Object>>>
 asyncBopGetBulk(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count)
-CollectionFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>
+CollectionFuture <Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
 asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count)
 ```
 
