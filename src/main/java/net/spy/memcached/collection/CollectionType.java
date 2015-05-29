@@ -36,7 +36,7 @@ public enum CollectionType {
 	/**
 	 * B+ tree collection
 	 */
-	btree("b+")
+	btree("b+tree")
 	;
 	
 	String stringValue;
