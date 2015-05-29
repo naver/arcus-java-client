@@ -123,9 +123,13 @@ public interface MemcachedClientIF {
 		throws OperationTimeoutException;
 
 	Future<Long> asyncIncr(String key, int by);
+	
+	Future<Long> asyncIncr(String key, int by, long def, int exp); 
 
 	Future<Long> asyncDecr(String key, int by);
 
+	Future<Long> asyncDecr(String key, int by, long def, int exp);
+	
 	long incr(String key, int by, long def)
 		throws OperationTimeoutException;
 
