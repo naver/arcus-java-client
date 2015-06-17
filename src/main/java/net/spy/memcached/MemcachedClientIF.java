@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -43,12 +44,21 @@ public interface MemcachedClientIF {
 
 	Future<CASResponse> asyncCAS(String key, long casId, Object value);
 
-	<T> CASResponse cas(String key, long casId, T value,
+	Future<CASResponse> asyncCAS(String key, long casId, int exp, Object value);
+
+	<T> Future<CASResponse> asyncCAS(String key, long casId, int exp,
+			T value, Transcoder<T> tc);
+	
+	<T> CASResponse cas(String key, long casId, int exp, T value,
 			Transcoder<T> tc) throws OperationTimeoutException;
 
 	CASResponse cas(String key, long casId, Object value)
 				throws OperationTimeoutException;
 
+	CASResponse cas(String key, long casId, int exp, Object value);
+
+	<T> CASResponse cas(String key, long casId, T value, Transcoder<T> tc);
+	  
 	<T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc);
 
 	Future<Boolean> add(String key, int exp, Object o);
