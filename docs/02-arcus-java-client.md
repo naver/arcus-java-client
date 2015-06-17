@@ -463,9 +463,8 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
 - setOpQueueMaxBlockTime(long t)
 
   Operation을 요청할 때 비동기식으로 Operation queue에 등록하여 작업을 요청하게 되어 있는데,
-  이 옵션은 Queue가 모두 꽉 찬 상태가 되었을 때 최대 기다릴 수 있는 시간을 의미한다.
-  기본값은 Queue에 공간이 생길 때까지 영원히 기다리는 것인데, 10으로 설정할 것을 권장한다.
-  단위는 millisecond이다.
+  이 옵션은 Queue가 모두 꽉 찬 상태가 되었을 때 최대 기다리는 시간을 의미한다.
+  단위는 millisecond 이고, 기본값은 10000ms이다.
   
 - setBulkServiceLoopLimit(int limit)
 
