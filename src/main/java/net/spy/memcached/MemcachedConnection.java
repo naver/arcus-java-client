@@ -118,6 +118,10 @@ public final class MemcachedConnection extends SpyObject {
 		locator=f.createLocator(connections);
 	}
 
+	FailureMode getFailureMode() {
+		return failureMode;
+	}
+
 	private boolean selectorsMakeSense() {
 		for(MemcachedNode qa : locator.getAll()) {
 			if(qa.getSk() != null && qa.getSk().isValid()) {

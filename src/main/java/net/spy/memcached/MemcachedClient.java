@@ -1043,11 +1043,14 @@ public class MemcachedClient extends SpyThread
 			
 			tc_map.put(key, tc);
 			validateKey(key);
-			final MemcachedNode primaryNode=locator.getPrimary(key);
+			FailureMode failureMode = conn.getFailureMode();
+			final MemcachedNode primaryNode= locator.getPrimary(key);
 			MemcachedNode node=null;
 			// FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
-			if(primaryNode.isActive()) {
-				node=primaryNode;
+			if (primaryNode.isActive() || failureMode == FailureMode.Retry) {
+				node = primaryNode;
+			} else if (failureMode == FailureMode.Cancel) {
+				node = null;
 			} else {
 				for(Iterator<MemcachedNode> i=locator.getSequence(key);
 					node == null && i.hasNext();) {
@@ -1097,7 +1100,10 @@ public class MemcachedClient extends SpyThread
 		for(Map.Entry<MemcachedNode, Collection<String>> me
 				: chunks.entrySet()) {
 			Operation op=opFact.get(me.getValue(), cb);
-			mops.put(me.getKey(), op);
+			if (me.getKey() == null)
+				op.cancel();
+			else
+				mops.put(me.getKey(), op);
 			ops.add(op);
 		}
 		assert mops.size() == chunks.size();
