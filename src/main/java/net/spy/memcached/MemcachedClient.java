@@ -516,7 +516,6 @@ public class MemcachedClient extends SpyThread
 	 * @throws IllegalStateException in the rare circumstance where queue is too
 	 * 			full to accept any more requests
 	 */
-	@Override
 	public Future<CASResponse> asyncCAS(String key, long casId,
 			int exp, Object value) {
 		return asyncCAS(key, casId, exp, value, transcoder);
@@ -598,7 +597,6 @@ public class MemcachedClient extends SpyThread
 	 * @throws IllegalStateException in the rare circumstance where queue is too 
 	 *			full to accept any more requests
 	 */
-	@Override
 	public CASResponse cas(String key, long casId, int exp, Object value) {
 		return cas(key, casId, exp, value, transcoder);
 	}
