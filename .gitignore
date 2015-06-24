@@ -3,6 +3,7 @@ cobertura.ser
 .idea/
 target/
 reports/
+devtools/
 junit*
 *.iml
 *~
