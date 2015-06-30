@@ -182,11 +182,10 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		}
 	}
 
-	void updateHash(MemcachedNode node, boolean remove) {
+	private void updateHash(MemcachedNode node, boolean remove) {
 		// Ketama does some special work with md5 where it reuses chunks.
 		for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
-			byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node,
-					i));
+			byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node, i));
 			for (int h = 0; h < 4; h++) {
 				Long k = ((long) (digest[3 + h * 4] & 0xFF) << 24)
 						| ((long) (digest[2 + h * 4] & 0xFF) << 16)
@@ -194,11 +193,13 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 						| (digest[h * 4] & 0xFF);
 				if (remove) {
 					ketamaNodes.remove(k);
-					config.removeNode(node);
 				} else {
 					ketamaNodes.put(k, node);
 				}
 			}
+		}
+		if (remove) {
+			config.removeNode(node);
 		}
 	}
 
