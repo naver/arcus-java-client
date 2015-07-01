@@ -22,6 +22,14 @@ public class ArcusKetamaNodeLocatorConfiguration extends
 		DefaultKetamaNodeLocatorConfiguration {
 
 	/**
+	 * insert a node from the internal node-address map.
+	 * @param node
+	 */
+	public void insertNode(MemcachedNode node) {
+		getSocketAddressForNode(node);
+	}
+
+	/**
 	 * Removes a node from the internal node-address map.
 	 * @param node
 	 */
