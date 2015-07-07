@@ -75,6 +75,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	private volatile boolean shutdownRequested = false;
 
 	private CountDownLatch zkInitLatch;
+
+	private List<String> prevChildren;
 	
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
@@ -242,6 +244,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	}
 
 	/**
+	 * If there's no children in the znode, make a fake server node.
+	 * 
 	 * Change current MemcachedNodes to new MemcachedNodes but intersection of
 	 * current and new will be ruled out.
 	 * 
@@ -249,6 +253,24 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            new children node list
 	 */
 	public void commandNodeChange(List<String> children) {
+		// If there's no children, add a fake server node to the list.
+		if (children.size() == 0) {
+			getLogger().error("Cannot find any cache nodes for your service code. " +
+								"Please contact Arcus support to solve this problem. " + 
+								"[serviceCode=" + serviceCode + ", addminSessionId=0x" + 
+								Long.toHexString(zk.getSessionId()));
+			children.add(CacheMonitor.FAKE_SERVER_NODE);
+		}
+
+		if (!children.equals(prevChildren)) {
+			getLogger().warn("Cache list has been changed : From=" + prevChildren +  ", To=" + children + ", " + 
+								"[serviceCode=" + serviceCode + ", addminSessionId=0x" + 
+								Long.toHexString(zk.getSessionId()));
+		}
+		
+		// Store the current children.
+		prevChildren = children;
+
 		String addrs = "";
 		for (int i = 0; i < children.size(); i++) {
 			String[] temp = children.get(i).split("-");
@@ -269,6 +291,10 @@ public class CacheManager extends SpyThread implements Watcher,
 			conn.putMemcachedQueue(addrs);
 			conn.getSelector().wakeup();
 		}
+	}
+	
+	public List<String> getPrevChildren() {
+		return this.prevChildren;
 	}
 
 	/**

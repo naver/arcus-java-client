@@ -43,8 +43,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 	CacheMonitorListener listener;
 
-	List<String> prevChildren;
-	
 	/**
 	 * The locator class of the spymemcached has an assumption
 	 * that it should have one cache node at least. 
@@ -87,6 +85,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		 */
 		void commandNodeChange(List<String> children);
 
+		List<String> getPrevChildren();
 		/**
 		 * The ZooKeeper session is no longer valid.
 		 */
@@ -127,7 +126,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 			List<String> children) {
 		switch (Code.get(rc)) {
 		case OK:
-			commandNodeChange(children);
+			listener.commandNodeChange(children);
 			return;
 		case NONODE:
 			getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());
@@ -160,29 +159,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		}
 		
 		zk.getChildren(cacheListZPath + serviceCode, true, this, null);
-	}
-
-	/**
-	 * Let the CacheManager change the cache list. 
-	 * If there's no children in the znode, make a fake server node.
-	 * @param children
-	 */
-	void commandNodeChange(List<String> children) {
-		// If there's no children, add a fake server node to the list.
-		if (children.size() == 0) {
-			getLogger().error("Cannot find any cache nodes for your service code. Please contact Arcus support to solve this problem. " + getInfo());
-			children.add(FAKE_SERVER_NODE);
-		}
-
-		if (!children.equals(prevChildren)) {
-			getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " + getInfo());
-		}
-		
-		// Store the current children.
-		prevChildren = children;
-
-		// Change the memcached node list.
-		listener.commandNodeChange(children);
 	}
 
 	/**
