@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.spy.memcached.CacheMonitor;
+import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.Operation;
@@ -97,7 +97,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		setupForAuth();
 
 		// is this a fake node?
-		isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(sa.toString());
+		isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(sa.toString());
 	}
 
 	/* (non-Javadoc)

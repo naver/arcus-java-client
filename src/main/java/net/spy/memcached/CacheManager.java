@@ -77,7 +77,16 @@ public class CacheManager extends SpyThread implements Watcher,
 	private CountDownLatch zkInitLatch;
 
 	private List<String> prevChildren;
-	
+
+	/**
+	 * The locator class of the spymemcached has an assumption
+	 * that it should have one cache node at least. 
+	 * Thus, we add a fake server node in it
+	 * if there's no cache servers for the given service code.
+	 * This is just a work-around, but it works really. 
+	 */
+	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
+
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
 			int waitTimeForConnect) {
@@ -259,7 +268,7 @@ public class CacheManager extends SpyThread implements Watcher,
 								"Please contact Arcus support to solve this problem. " + 
 								"[serviceCode=" + serviceCode + ", addminSessionId=0x" + 
 								Long.toHexString(zk.getSessionId()));
-			children.add(CacheMonitor.FAKE_SERVER_NODE);
+			children.add(CacheManager.FAKE_SERVER_NODE);
 		}
 
 		if (!children.equals(prevChildren)) {

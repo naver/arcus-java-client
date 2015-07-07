@@ -44,15 +44,6 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	CacheMonitorListener listener;
 
 	/**
-	 * The locator class of the spymemcached has an assumption
-	 * that it should have one cache node at least. 
-	 * Thus, we add a fake server node in it
-	 * if there's no cache servers for the given service code.
-	 * This is just a work-around, but it works really. 
-	 */
-	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
-
-	/**
 	 * Constructor
 	 * 
 	 * @param zk
