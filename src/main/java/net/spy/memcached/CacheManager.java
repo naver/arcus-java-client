@@ -82,6 +82,17 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private CountDownLatch zkInitLatch;
 
+	private List<String> prevChildren;
+
+	/**
+	 * The locator class of the spymemcached has an assumption
+	 * that it should have one cache node at least. 
+	 * Thus, we add a fake server node in it
+	 * if there's no cache servers for the given service code.
+	 * This is just a work-around, but it works really. 
+	 */
+	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
+
 	/* ENABLE_REPLICATION start */
 	private boolean arcusReplEnabled = false;
 	/* ENABLE_REPLICATION end */
@@ -293,6 +304,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	}
 
 	/**
+	 * If there's no children in the znode, make a fake server node.
+	 * 
 	 * Change current MemcachedNodes to new MemcachedNodes but intersection of
 	 * current and new will be ruled out.
 	 * 
@@ -300,6 +313,24 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            new children node list
 	 */
 	public void commandNodeChange(List<String> children) {
+		// If there's no children, add a fake server node to the list.
+		if (children.size() == 0) {
+			getLogger().error("Cannot find any cache nodes for your service code. " +
+								"Please contact Arcus support to solve this problem. " + 
+								"[serviceCode=" + serviceCode + ", addminSessionId=0x" + 
+								Long.toHexString(zk.getSessionId()));
+			children.add(CacheManager.FAKE_SERVER_NODE);
+		}
+
+		if (!children.equals(prevChildren)) {
+			getLogger().warn("Cache list has been changed : From=" + prevChildren +  ", To=" + children + ", " + 
+								"[serviceCode=" + serviceCode + ", addminSessionId=0x" + 
+								Long.toHexString(zk.getSessionId()));
+		}
+		
+		// Store the current children.
+		prevChildren = children;
+
 		/* ENABLE_REPLICATION start */
 		// children is the current list of znodes in the cache_list directory
 		// Arcus base cluster and repl cluster use different znode names.
@@ -354,6 +385,10 @@ public class CacheManager extends SpyThread implements Watcher,
 			conn.putMemcachedQueue(addrs);
 			conn.getSelector().wakeup();
 		}
+	}
+	
+	public List<String> getPrevChildren() {
+		return this.prevChildren;
 	}
 
 	/**
