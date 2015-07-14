@@ -14,25 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import net.spy.memcached.util.Arcus17KetamaNodeLocatorConfiguration;
+import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
-public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
-	boolean gracefulFailover;
+public class ArcusReplKetamaNodeLocator extends ArcusKetamaNodeLocator {
 
-	public Arcus17KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
+	public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
 		// This configuration class is aware that InetSocketAddress is really
-		// Arcus17NodeAddress.  Its getKeyForNode uses the group name, instead
+		// ArcusReplNodeAddress.  Its getKeyForNode uses the group name, instead
 		// of the socket address.
-		super(nodes, alg, new Arcus17KetamaNodeLocatorConfiguration());
-		// By default, the 1.7 client support graceful failover.
-		// It just means that we do not shutdown the removed nodes right away.
-		gracefulFailover = "true".equals(System.getProperty("arcus.gracefulFailover", "true"));
+		super(nodes, alg, new ArcusReplKetamaNodeLocatorConfiguration());
 	}
 
 	// This is same as super's update.  The only difference is that we
@@ -47,12 +44,8 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 			for (MemcachedNode node : toDelete) {
 				allNodes.remove(node);
 				updateHash(node, true);
-				
-				if (gracefulFailover && !node.isFake()) {
-					// MemcachedConnection shuts down the node later on.
-					continue;
-				}
-				// This is the old 1.6 behavior.  We shut down the node right away.
+
+				// This is the base client behavior.  We shut down the node right away.
 				// We stop processing ongoing requests, and the user will see
 				// timeouts.
 				try {
@@ -76,3 +69,4 @@ public class Arcus17KetamaNodeLocator extends ArcusKetamaNodeLocator {
 		}
 	}
 }
+/* ENABLE_REPLICATION end */

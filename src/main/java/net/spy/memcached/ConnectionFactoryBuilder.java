@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 package net.spy.memcached;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -77,11 +76,13 @@ public class ConnectionFactoryBuilder {
 	
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
-	private boolean arcus17 = false;
+	/* ENABLE_REPLICATION if */
+	private boolean arcusReplEnabled = false;
 
-	public void setArcus17(boolean b) {
-		arcus17 = b;
+	public void setArcusReplEnabled(boolean b) {
+		arcusReplEnabled = b;
 	}
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Set the operation queue factory.
@@ -321,13 +322,15 @@ public class ConnectionFactoryBuilder {
 	public ConnectionFactory build() {
 		return new DefaultConnectionFactory() {
 
+			/* ENABLE_REPLICATION if */
 			@Override
 			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
 				throws IOException {
 				MemcachedConnection c = super.createConnection(addrs);
-				c.setArcus17(arcus17);
+				c.setArcusReplEnabled(arcusReplEnabled);
 				return c;
 			}
+			/* ENABLE_REPLICATION end */
 
 			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
@@ -357,17 +360,23 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
-						if (arcus17) {
-							// Arcus 1.7
-							// This locator uses Arcus17KetamaNodeLocatorConfiguration
-							// which builds keys off the server's group name, not 
+						/* ENABLE_REPLICATION if */
+						if (arcusReplEnabled) {
+							// Arcus repl cluster
+							// This locator uses ArcusReplKetamaNodeLocatorConfiguration
+							// which builds keys off the server's group name, not
 							// its ip:port.
-							return new Arcus17KetamaNodeLocator(nodes, getHashAlg());
+							return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
 						}
 						else {
-							// Arcus 1.6
+							// Arcus base cluster
 							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
 						}
+						/* ENABLE_REPLICATION else */
+						/*
+						return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						*/
+						/* ENABLE_REPLICATION end */
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);
 				}

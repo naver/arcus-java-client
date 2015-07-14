@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Arcus17NodeAddress extends InetSocketAddress {
+public class ArcusReplNodeAddress extends InetSocketAddress {
 	boolean master;
 	String group;
 	String ip;
 	int port;
 
-	Arcus17NodeAddress(String group, boolean master, String ip, int port) {
+	ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
 		super(ip, port);
 		this.group = group;
 		this.master = master;
@@ -42,13 +43,13 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		return group;
 	}
 
-	static Arcus17NodeAddress create(String group, boolean master, String ipport) {
+	static ArcusReplNodeAddress create(String group, boolean master, String ipport) {
 		String[] temp = ipport.split(":");
 		String ip = temp[0];
 		int port = Integer.parseInt(temp[1]);
-		return new Arcus17NodeAddress(group, master, ip, port);
+		return new ArcusReplNodeAddress(group, master, ip, port);
 	}
-	
+
 	private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
 		List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 		for (String node : s.split(",")) {
@@ -61,25 +62,24 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			// an unexpected format.  Abort the whole method instead of
 			// trying to ignore malformed strings.
 			// Is this the right behavior?  FIXME
-			
-			// Turn slave servers into fake ones.  We still create MemcachedNode's 
+
+			// Turn slave servers into fake ones.  We still create MemcachedNode's
 			// for groups without masters.  We don't want these to connect to actual
 			// slave servers.
 			if (!master)
 				ipport = CacheManager.FAKE_SERVER_NODE;
 
-			Arcus17NodeAddress a = Arcus17NodeAddress.create(group, master, ipport);
-			
+			ArcusReplNodeAddress a = ArcusReplNodeAddress.create(group, master, ipport);
+
 			// We want exactly one node per group in this version.
 			// If a node exists and the new one is the master, replace the old one
 			// with the new one.
 			for (int i = 0; i < addrs.size(); i++) {
-				if (((Arcus17NodeAddress)addrs.get(i)).group.equals(group)) {
+				if (((ArcusReplNodeAddress)addrs.get(i)).group.equals(group)) {
 					if (master) {
 						// The new node is the master.  Replace.
 						addrs.set(i, a);
-					}
-					else {
+					} else {
 						// The new node is the slave.  Do not add.
 					}
 					// In any case, we've found a previous node with
@@ -96,7 +96,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		return addrs;
 	}
 
-	// Similar to AddrUtil.getAddresses.  This version parses 1.7 znode names.
+	// Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
 	// Znode names are group^{M,S}^ip:port-hostname
 	static List<InetSocketAddress> getAddresses(String s) {
 		List<InetSocketAddress> list = null;
@@ -104,15 +104,13 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		if (s.equals(CacheManager.FAKE_SERVER_NODE)) {
 			// Special case the empty cache_list.
 			// CacheMonitor adds one FAKE_SERVER_NODE to children before calling this method.
-		}
-		else {
+		} else {
 			try {
 				list = parseNodeNames(s);
 			} catch (Exception e) {
-				// May see an exception if nodes do not follow the 1.7 naming convention
+				// May see an exception if nodes do not follow the replication naming convention
 				ArcusClient.arcusLogger.error("Exception caught while parsing node" +
-							      " addresses. cache_list=" + s + 
-							      "\n" + e);
+											" addresses. cache_list=" + s + "\n" + e);
 				e.printStackTrace();
 				list = null;
 			}
@@ -122,18 +120,9 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		if (list == null || list.size() == 0) {
 			list = new ArrayList<InetSocketAddress>(1);
 			list.add((InetSocketAddress)
-				 Arcus17NodeAddress.create("invalid", false, CacheManager.FAKE_SERVER_NODE));
+				 ArcusReplNodeAddress.create("invalid", false, CacheManager.FAKE_SERVER_NODE));
 		}
 		return list;
 	}
-
-	public static Arcus17NodeAddress parseNodeName(String node) throws Exception {
-		String[] temp = node.split("\\^");
-		String group = temp[0];
-		boolean master = temp[1].equals("M") ? true : false;
-		String[] temp2 = temp[2].split("-");
-		String ipport = temp2[0];
-			
-		return Arcus17NodeAddress.create(group, master, ipport);
-	}
 }
+/* ENABLE_REPLICATION end */

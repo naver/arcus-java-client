@@ -99,7 +99,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		setupForAuth();
 
 		// is this a fake node?
+		/* ENABLE_REPLICATION if */
+		if (sa instanceof InetSocketAddress) {
+			InetSocketAddress inetSockAddr = (InetSocketAddress)sa;
+			InetAddress inetAddr = inetSockAddr.getAddress();
+			if (inetAddr != null) {
+				String ipport = inetAddr.getHostAddress() + ":" +inetSockAddr.getPort();
+				isFake = CacheManager.FAKE_SERVER_NODE.equals(ipport);
+			}
+		}
+		/* ENABLE_REPLICATION else */
+		/*
 		isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(sa.toString());
+		*/
+		/* ENABLE_REPLICATION end */
 	}
 
 	/* (non-Javadoc)
