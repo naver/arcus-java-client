@@ -182,7 +182,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		}
 	}
 
-	private void updateHash(MemcachedNode node, boolean remove) {
+	void updateHash(MemcachedNode node, boolean remove) {
 		if (!remove) {
 			config.insertNode(node);
 		}

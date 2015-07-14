@@ -368,7 +368,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			addrCount = 0;
 			for (InetSocketAddress a : socketList) {
 				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
-				boolean isFake = ("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString());
+				boolean isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(a.toString());
 				if (!isFake)
 					addrCount++;
 			}

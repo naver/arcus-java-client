@@ -66,7 +66,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 			// for groups without masters.  We don't want these to connect to actual
 			// slave servers.
 			if (!master)
-				ipport = CacheMonitor.FAKE_SERVER_NODE;
+				ipport = CacheManager.FAKE_SERVER_NODE;
 
 			Arcus17NodeAddress a = Arcus17NodeAddress.create(group, master, ipport);
 			
@@ -101,7 +101,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 	static List<InetSocketAddress> getAddresses(String s) {
 		List<InetSocketAddress> list = null;
 
-		if (s.equals(CacheMonitor.FAKE_SERVER_NODE)) {
+		if (s.equals(CacheManager.FAKE_SERVER_NODE)) {
 			// Special case the empty cache_list.
 			// CacheMonitor adds one FAKE_SERVER_NODE to children before calling this method.
 		}
@@ -122,7 +122,7 @@ public class Arcus17NodeAddress extends InetSocketAddress {
 		if (list == null || list.size() == 0) {
 			list = new ArrayList<InetSocketAddress>(1);
 			list.add((InetSocketAddress)
-				 Arcus17NodeAddress.create("invalid", false, CacheMonitor.FAKE_SERVER_NODE));
+				 Arcus17NodeAddress.create("invalid", false, CacheManager.FAKE_SERVER_NODE));
 		}
 		return list;
 	}
