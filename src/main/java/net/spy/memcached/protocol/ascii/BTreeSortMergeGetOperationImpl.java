@@ -27,6 +27,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to retrieve b+tree data with multiple keys
@@ -72,6 +73,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 			OperationCallback cb) {
 		super(cb);
 		this.smGet = smGet;
+		setOperationType(OperationType.READ);
 	}
 	
 	/**

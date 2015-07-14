@@ -27,6 +27,7 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to store collection data in a memcached server.
@@ -73,6 +74,7 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 		this.key = key;
 		this.store = store;
 		this.cb = (Callback) cb;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

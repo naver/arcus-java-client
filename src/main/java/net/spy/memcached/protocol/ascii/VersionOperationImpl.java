@@ -8,6 +8,7 @@ import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.VersionOperation;
 
 /**
@@ -20,6 +21,7 @@ final class VersionOperationImpl extends OperationImpl
 
 	public VersionOperationImpl(OperationCallback c) {
 		super(c);
+		setOperationType(OperationType.ETC);
 	}
 
 	@Override

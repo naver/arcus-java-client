@@ -51,6 +51,7 @@ import net.spy.memcached.collection.BTreeCreate;
 import net.spy.memcached.collection.BTreeDelete;
 import net.spy.memcached.collection.BTreeElement;
 import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
@@ -76,7 +77,6 @@ import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionMutate;
-import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.BTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ByteArraysBTreePipedStore;
@@ -112,6 +112,7 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
@@ -301,7 +302,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 
-		net.spy.memcached.CacheManager exe = new net.spy.memcached.CacheManager(
+		CacheManager exe = new CacheManager(
 				hostPorts, serviceCode, cfb, latch, poolSize,
 				waitTimeForConnect);
 
@@ -1209,9 +1210,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementValueType type, CollectionAttributes attributes) {
 		int flag = CollectionTranscoder.examineFlags(type);
 		boolean noreply = false;
-		CollectionCreate bTreeCreate = new SetCreate(flag,
+		CollectionCreate setCreate = new SetCreate(flag,
 				attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
-		return asyncCollectionCreate(key, bTreeCreate);
+		return asyncCollectionCreate(key, setCreate);
 	}
 
 	/*
@@ -1223,10 +1224,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementValueType type, CollectionAttributes attributes) {
 		int flag = CollectionTranscoder.examineFlags(type);
 		boolean noreply = false;
-		CollectionCreate bTreeCreate = new ListCreate(flag,
+		CollectionCreate listCreate = new ListCreate(flag,
 				attributes.getExpireTime(), attributes.getMaxCount(),
 				attributes.getOverflowAction(), attributes.getReadable(), noreply);
-		return asyncCollectionCreate(key, bTreeCreate);
+		return asyncCollectionCreate(key, listCreate);
 	}
 
 	/**
@@ -2739,6 +2740,126 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			
 			public void gotData(int position) {
 				this.position = position;
+			}
+		});
+		rv.setOperation(op);
+		addOp(k, op);
+		return rv;
+	}
+
+	@Override
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count) {
+		BTreeFindPositionWithGet<Object> get = new BTreeFindPositionWithGet<Object>(longBKey, order, count);
+		return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
+	}
+	
+	@Override
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, long longBKey, BTreeOrder order, int count, Transcoder<T> tc) {
+		BTreeFindPositionWithGet<T> get = new BTreeFindPositionWithGet<T>(longBKey, order, count);
+		return asyncBopFindPositionWithGet(key, get, tc);
+	}
+	
+	@Override
+	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count) {
+		BTreeFindPositionWithGet<Object> get = new BTreeFindPositionWithGet<Object>(byteArrayBKey, order, count);
+		return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			String key, byte[] byteArrayBKey, BTreeOrder order, int count, Transcoder<T> tc) {
+		BTreeFindPositionWithGet<T> get = new BTreeFindPositionWithGet<T>(byteArrayBKey, order, count);
+		return asyncBopFindPositionWithGet(key, get, tc);
+	}
+
+	
+	/**
+	 * Generic find position with get operation for b+tree items. Public methods for b+tree items call this method.
+	 *
+	 * @param k  b+tree item's key
+	 * @param get  operation parameters (element key and so on)
+	 * @param tc  transcoder to serialize and unserialize value
+	 * @return future holding the element's position
+	 */
+	private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
+			final String k, final BTreeFindPositionWithGet<T> get, final Transcoder<T> tc) {
+		if (get.getOrder() == null) {
+			throw new IllegalArgumentException("BTreeOrder must not be null");
+		}
+		if (get.getCount() < 0 || get.getCount() > 100) {
+			throw new IllegalArgumentException("Count must be a value between 0 and 100.");
+		}
+
+		final CountDownLatch latch = new CountDownLatch(1);
+		final CollectionFuture<Map<Integer, Element<T>>> rv = new CollectionFuture<Map<Integer, Element<T>>>(
+				latch, operationTimeout);
+
+		Operation op = opFact.bopFindPositionWithGet(k, get, new BTreeFindPositionWithGetOperation.Callback() {
+			
+			TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
+
+			public void receivedStatus(OperationStatus status) {
+				CollectionOperationStatus cstatus;
+				if (status instanceof CollectionOperationStatus) {
+					cstatus = (CollectionOperationStatus) status;
+				} else {
+					getLogger().warn("Unhandled state: " + status);
+					return;
+				}
+				if (cstatus.isSuccess()) {
+					rv.set(map, cstatus);
+					return;
+				}
+				switch (cstatus.getResponse()) {
+				case NOT_FOUND:
+					rv.set(null, cstatus);
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("Key(%s) not found : %s", k, cstatus);
+					}
+					break;
+				case NOT_FOUND_ELEMENT:
+					rv.set(null, cstatus);
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("Element(%s) not found : %s", k, cstatus);
+					}
+					break;
+				case UNREADABLE:
+					rv.set(null, cstatus);
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
+					}
+					break;
+				case BKEY_MISMATCH:
+					rv.set(null, cstatus);
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("Collection(%s) has wrong bkey : %s(%s)",
+								k, cstatus, get.getBkeyObject().getType());
+					}
+					break;
+				case TYPE_MISMATCH:
+					rv.set(null, cstatus);
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
+					}
+					break;
+				default:
+					getLogger().warn("Unhandled state: " + status);
+				}
+			}
+			
+			public void complete() {
+				latch.countDown();
+			}
+			
+			public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+				assert key.equals(k) : "Wrong key returned";
+				Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
+				if (element != null) {
+					map.put(pos, element);
+				}
 			}
 		});
 		rv.setOperation(op);

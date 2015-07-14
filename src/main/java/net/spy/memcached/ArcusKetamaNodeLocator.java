@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,7 +31,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
 public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
-	SortedMap<Long, MemcachedNode> ketamaNodes;
+	TreeMap<Long, MemcachedNode> ketamaNodes;
 	Collection<MemcachedNode> allNodes;
 
 	HashAlgorithm hashAlg;
@@ -67,7 +66,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		assert ketamaNodes.size() == numReps * nodes.size();
 	}
 
-	private ArcusKetamaNodeLocator(SortedMap<Long, MemcachedNode> smn,
+	private ArcusKetamaNodeLocator(TreeMap<Long, MemcachedNode> smn,
 			Collection<MemcachedNode> an, HashAlgorithm alg,
 			ArcusKetamaNodeLocatorConfiguration conf) {
 		super();
@@ -97,15 +96,22 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		lock.lock();
 		try {
 			if (!ketamaNodes.containsKey(hash)) {
+				Long nodeHash = ketamaNodes.ceilingKey(hash);
+				if (nodeHash == null) {
+					hash = ketamaNodes.firstKey();
+				} else {
+					hash = nodeHash.longValue();
+				}
 				// Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
 				// in a lot of places, so I'm doing this myself.
-				SortedMap<Long, MemcachedNode> tailMap = ketamaNodes
-						.tailMap(hash);
+				/*
+				SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
 				if (tailMap.isEmpty()) {
 					hash = ketamaNodes.firstKey();
 				} else {
 					hash = tailMap.firstKey();
 				}
+				*/
 			}
 			rv = ketamaNodes.get(hash);
 		} catch (RuntimeException e) {
@@ -121,7 +127,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 	}
 
 	public NodeLocator getReadonlyCopy() {
-		SortedMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
+		TreeMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
 				ketamaNodes);
 		Collection<MemcachedNode> an = new ArrayList<MemcachedNode>(
 				allNodes.size());
@@ -176,23 +182,31 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 		}
 	}
 
-	void updateHash(MemcachedNode node, boolean remove) {
+	private void updateHash(MemcachedNode node, boolean remove) {
+		if (!remove) {
+			config.insertNode(node);
+		}
+		
 		// Ketama does some special work with md5 where it reuses chunks.
 		for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
-			byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node,
-					i));
+			
+			byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node, i));
 			for (int h = 0; h < 4; h++) {
 				Long k = ((long) (digest[3 + h * 4] & 0xFF) << 24)
 						| ((long) (digest[2 + h * 4] & 0xFF) << 16)
 						| ((long) (digest[1 + h * 4] & 0xFF) << 8)
 						| (digest[h * 4] & 0xFF);
+
 				if (remove) {
 					ketamaNodes.remove(k);
-					config.removeNode(node);
 				} else {
 					ketamaNodes.put(k, node);
 				}
 			}
+		}
+		
+		if (remove) {
+			config.removeNode(node);
 		}
 	}
 

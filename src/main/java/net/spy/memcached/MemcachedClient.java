@@ -506,6 +506,22 @@ public class MemcachedClient extends SpyThread
 	}
 
 	/**
+	 * Asynchronous CAS operation using the default transcoder with expiration.
+	 *
+	 * @param key the key
+	 * @param casId the CAS identifier (from a gets operation)
+	 * @param exp the expiration of this object
+	 * @param value the new value
+	 * @return a future that will indicate the status of the CAS
+	 * @throws IllegalStateException in the rare circumstance where queue is too
+	 * 			full to accept any more requests
+	 */
+	public Future<CASResponse> asyncCAS(String key, long casId,
+			int exp, Object value) {
+		return asyncCAS(key, casId, exp, value, transcoder);
+	}
+
+	/**
      * Perform a synchronous CAS operation.
      *
      * @param <T>
@@ -567,6 +583,22 @@ public class MemcachedClient extends SpyThread
 	 */
 	public CASResponse cas(String key, long casId, Object value) {
 		return cas(key, casId, value, transcoder);
+	}
+
+	/**
+	 * Perform a synchronous CAS operation with the default transcoder.
+	 *
+	 * @param key the key
+	 * @param casId the CAS identifier (from a gets operation)
+	 * @param exp the expiration of this object
+	 * @param value the new value
+	 * @return a CASResponse
+	 * @throws OperationTimeoutException if the global operation timeout is exceeded
+	 * @throws IllegalStateException in the rare circumstance where queue is too 
+	 *			full to accept any more requests
+	 */
+	public CASResponse cas(String key, long casId, int exp, Object value) {
+		return cas(key, casId, exp, value, transcoder);
 	}
 
 	/**

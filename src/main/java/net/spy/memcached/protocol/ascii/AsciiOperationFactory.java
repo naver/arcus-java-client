@@ -25,6 +25,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
@@ -42,6 +43,7 @@ import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
@@ -60,6 +62,7 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
+import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -193,7 +196,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 		return new CollectionGetOperationImpl(key, collectionGet, cb);
 	}
 	
-	public CollectionGetOperation collectionGet2(String key,
+	public ExtendedBTreeGetOperation collectionGet2(String key,
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
 		return new ExtendedBTreeGetOperationImpl(key, collectionGet, cb);
 	}
@@ -228,7 +231,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 
 	@Override
-	public CollectionStoreOperation collectionUpsert(String key, String subkey,
+	public CollectionUpsertOperation collectionUpsert(String key, String subkey,
 			CollectionStore<?> collectionStore, byte[] data,
 			OperationCallback cb) {
 		return new CollectionUpsertOperationImpl(key, subkey, collectionStore,
@@ -284,6 +287,12 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	public BTreeFindPositionOperation bopFindPosition(String key,
 			BTreeFindPosition get, OperationCallback cb) {
 		return new BTreeFindPositionOperationImpl(key, get, cb);
+	}
+
+	@Override
+	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
+			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+		return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
 	}
 
 	@Override

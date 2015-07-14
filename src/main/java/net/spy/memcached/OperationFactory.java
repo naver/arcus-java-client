@@ -24,6 +24,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
@@ -41,6 +42,7 @@ import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
@@ -58,6 +60,7 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
+import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -290,7 +293,7 @@ public interface OperationFactory {
 	 * @param cb the callback that will contain the results
 	 * @return a new CollectionGetOperation
 	 */
-	CollectionGetOperation collectionGet2(String key, 
+	ExtendedBTreeGetOperation collectionGet2(String key, 
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb);
 	
 	/**
@@ -390,7 +393,7 @@ public interface OperationFactory {
 	 * @param cb the status callback
 	 * @return a new CollectionStoreOperation
 	 */
-	CollectionStoreOperation collectionUpsert(String key, String subkey, 
+	CollectionUpsertOperation collectionUpsert(String key, String subkey, 
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
 
 	/**
@@ -480,6 +483,16 @@ public interface OperationFactory {
 	 */
 	BTreeFindPositionOperation bopFindPosition(String key, BTreeFindPosition get, OperationCallback cb);
 	
+	/**
+	 * Find-position-with-get operation for b+tree items. 
+	 *
+	 * @param key b+tree item's key
+	 * @param get operation parameters (element key and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new BTreeFindPositionWithGetOperation
+	 */
+	BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key, BTreeFindPositionWithGet<?> get, OperationCallback cb);
+
 	/**
 	 * Insert/upsert and get the trimmed element for b+tree items.
 	 *

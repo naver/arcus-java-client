@@ -1,6 +1,6 @@
 /*
  * arcus-java-client : Arcus Java client
- * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,17 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.spy.memcached.collection.BTreeGetByPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.ops.BTreeGetByPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class BTreeGetByPositionOperationImpl extends OperationImpl implements
-		BTreeGetByPositionOperation {
+public class BTreeFindPositionWithGetOperationImpl extends OperationImpl implements
+		BTreeFindPositionWithGetOperation {
 
 	private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
@@ -44,16 +44,20 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
 	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
+	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
+			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 	private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
 			false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
 
 	protected final String key;
-	protected final BTreeGetByPosition<?> get;
+	protected final BTreeFindPositionWithGet<?> get;
 
+	protected int position = 0;
 	protected int flags = 0;
 	protected int count = 0;
+	protected int index = 0;
 	protected int pos = 0;
 	protected int posDiff = 0;
 	protected byte[] data = null;
@@ -63,8 +67,8 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 
 	private Boolean hasEFlag = null;
 
-	public BTreeGetByPositionOperationImpl(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+	public BTreeFindPositionWithGetOperationImpl(String key,
+			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
 		super(cb);
 		this.key = key;
 		this.get = get;
@@ -72,7 +76,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 	}
 
 	@Override
-	public BTreeGetByPosition<?> getGet() {
+	public BTreeFindPositionWithGet<?> getGet() {
 		return get;
 	}
 
@@ -82,32 +86,31 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 			getLogger().debug("Got line %s", line);
 		}
 
-		// VALUE <flags> <count>\r\n
 		if (line.startsWith("VALUE ")) {
+			// VALUE <position> <flags> <count> <index>\r\n
 			String[] stuff = line.split(" ");
-			assert stuff.length == 3;
-			assert "VALUE".equals(stuff[0]);
+			assert stuff.length == 5;
 
-			flags = Integer.parseInt(stuff[1]);
-			count = Integer.parseInt(stuff[2]);
+			position = Integer.parseInt(stuff[1]);
+			flags = Integer.parseInt(stuff[2]);
+			count = Integer.parseInt(stuff[3]);
+			index = Integer.parseInt(stuff[4]);
 
-			if (count > 0) {
-				// position counter
-				pos = get.isReversed() ? get.getPosTo() + count - 1 : get.getPosFrom();
-				posDiff = get.isReversed() ? -1 : 1;
-				
-				// start to read actual data
-				setReadType(OperationReadType.DATA);
-			}
+			assert count > 0;
+			// position counter
+			pos = position - index;
+			posDiff = 1; 
+
+			// start to read actual data
+			setReadType(OperationReadType.DATA);
 		} else {
-			OperationStatus status = matchStatus(line, END, NOT_FOUND,
-					UNREADABLE, TYPE_MISMATCH, NOT_FOUND_ELEMENT);
+			OperationStatus status = matchStatus(line, END, NOT_FOUND, NOT_FOUND_ELEMENT,
+												UNREADABLE, TYPE_MISMATCH, BKEY_MISMATCH);
 			if (getLogger().isDebugEnabled()) {
 				getLogger().debug(status);
 			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
-			return;
 		}
 	}
 
@@ -117,13 +120,11 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		if (lookingFor == '\0' && data == null) {
 			for (int i = 0; bb.remaining() > 0; i++) {
 				byte b = bb.get();
-				// Handle spaces to parse the header.
-				if (b == ' ') {
-                    // One-time check to find if this responses have eflags.
-					if (hasEFlag == null && spaceCount == BTreeGetByPosition.HEADER_EFLAG_POSITION) {
-						String[] chunk = new String(byteBuffer.toByteArray())
-								.split(" ");
-						if (chunk[BTreeGetByPosition.HEADER_EFLAG_POSITION].startsWith("0x")) {
+				if (b == ' ') { // Handle spaces to parse the header.
+					// One-time check to find if this responses have eflags.
+					if (hasEFlag == null && spaceCount == 1) {
+						String[] chunk = new String(byteBuffer.toByteArray()).split(" ");
+						if (chunk[1].startsWith("0x")) {
 							hasEFlag = true;
 						} else {
 							hasEFlag = false;
@@ -144,17 +145,12 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 						break;
 					}
 				}
-
-				// Ready to finish.
-				if (b == '\r') {
+				else if (b == '\r') { // Ready to finish.
 					continue;
 				}
-
-				// Finish the operation.
-				if (b == '\n') {
-					OperationStatus status = matchStatus(byteBuffer.toString(),
-							END, NOT_FOUND, UNREADABLE, TYPE_MISMATCH,
-							NOT_FOUND_ELEMENT);
+				else if (b == '\n') { // Finish the operation.
+					OperationStatus status = matchStatus(byteBuffer.toString(), END,
+							NOT_FOUND, NOT_FOUND_ELEMENT, UNREADABLE, TYPE_MISMATCH, BKEY_MISMATCH);
 
 					if (getLogger().isDebugEnabled()) {
 						getLogger().debug("Get complete!");
@@ -197,7 +193,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
-			BTreeGetByPositionOperation.Callback cb = (BTreeGetByPositionOperation.Callback) getCallback();
+			BTreeFindPositionWithGetOperation.Callback cb = (BTreeFindPositionWithGetOperation.Callback) getCallback();
 			cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
 			
 			// next position.
@@ -236,18 +232,13 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		String cmd = get.getCommand();
 		String args = get.stringify();
 
-		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + key.length()
-				+ args.length() + 16);
-
+		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + key.length() + args.length() + 16);
 		setArguments(bb, cmd, key, args);
 		bb.flip();
 		setBuffer(bb);
-
+		
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug(
-					"Request in ascii protocol: "
-							+ (new String(bb.array()))
-									.replace("\r\n", "\\r\\n"));
+			getLogger().debug("Request in ascii protocol: " + (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
 
@@ -259,5 +250,4 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-
 }

@@ -14,47 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.collection;
+package net.spy.memcached.ops;
 
-/**
- * Supported collection types.
- */
-public enum CollectionType {
+import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 
-	/**
-	 * Key-value
-	 */
-	kv("kv"),
-	/**
-	 * List collection
-	 */
-	list("list"),
-	/**
-	 * Set collection
-	 */
-	set("set"),
-	/**
-	 * B+ tree collection
-	 */
-	btree("b+tree")
-	;
+public interface BTreeFindPositionWithGetOperation extends KeyedOperation {
+
+	BTreeFindPositionWithGet<?> getGet();
 	
-	String stringValue;
-	CollectionType(String stringValue) {
-		this.stringValue = stringValue;
+	interface Callback extends OperationCallback {
+		void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data);
 	}
-	
-	public String getStringValue() {
-		return stringValue;
-	}
-	
-	public static CollectionType find(String value) {
-		for (CollectionType each : CollectionType.values()) {
-			if (each.stringValue.equals(value)) {
-				return each;
-			}
-		}
-		return null;
-	}
-	
+
 }

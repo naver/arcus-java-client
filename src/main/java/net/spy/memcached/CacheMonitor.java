@@ -35,27 +35,13 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
 	ZooKeeper zk;
 
-	String cacheListPath;
-
+	String cacheListZPath;
+	
 	String serviceCode;
 
 	volatile boolean dead;
 
 	CacheMonitorListener listener;
-
-	List<String> prevChildren;
-	
-	/**
-	 * The locator class of the spymemcached has an assumption
-	 * that it should have one cache node at least. 
-	 * Thus, we add a fake server node in it
-	 * if there's no cache servers for the given service code.
-	 * This is just a work-around, but it works really. 
-	 */
-	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
-
-	/* We only use this for demo, to show more readable node names when the cache list changes. */
-	boolean demoPrintClusterDiff = false;
 
 	/**
 	 * Constructor
@@ -67,14 +53,12 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * @param listener
 	 *            Callback listener
 	 */
-	public CacheMonitor(ZooKeeper zk, String cacheListPath, String serviceCode,
+	public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
 			CacheMonitorListener listener) {
 		this.zk = zk;
-		this.cacheListPath = cacheListPath;
+		this.cacheListZPath = cacheListZPath;
 		this.serviceCode = serviceCode;
 		this.listener = listener;
-
-		demoPrintClusterDiff = "true".equals(System.getProperty("arcus.demoPrintClusterDiff", "false"));
 
 		getLogger().info("Initializing the CacheMonitor.");
 		
@@ -92,6 +76,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 		 */
 		void commandNodeChange(List<String> children);
 
+		List<String> getPrevChildren();
 		/**
 		 * The ZooKeeper session is no longer valid.
 		 */
@@ -132,7 +117,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 			List<String> children) {
 		switch (Code.get(rc)) {
 		case OK:
-			commandNodeChange(children);
+			listener.commandNodeChange(children);
 			return;
 		case NONODE:
 			getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());
@@ -161,61 +146,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 */
 	void asyncGetCacheList() {
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Set a new watch on " + (cacheListPath + serviceCode));
+			getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
 		}
 		
-		zk.getChildren(cacheListPath + serviceCode, true, this, null);
-	}
-
-	/**
-	 * Let the CacheManager change the cache list. 
-	 * If there's no children in the znode, make a fake server node.
-	 * @param children
-	 */
-	void commandNodeChange(List<String> children) {
-		// If there's no children, add a fake server node to the list.
-		if (children.size() == 0) {
-			getLogger().error("Cannot find any cache nodes for your service code. Please contact Arcus support to solve this problem. " + getInfo());
-			children.add(FAKE_SERVER_NODE);
-		}
-
-		if (!children.equals(prevChildren)) {
-			getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " + getInfo());
-			if (demoPrintClusterDiff) {
-				// Assume 1.7 cluster
-				System.out.println("\nCLUSTER CHANGE\n---PREVIOUS---");
-				if (prevChildren == null) {
-					System.out.println("NO NODES");
-				}
-				else {
-					for (String s : prevChildren) {
-						try {
-							System.out.println(Arcus17NodeAddress.parseNodeName(s));
-						} catch (Exception e) {
-						}
-					}
-				}
-				System.out.println("---CURRENT---");
-				if (children == null) {
-					System.out.println("NO NODES");
-				}
-				else {
-					for (String s : children) {
-						try {
-							System.out.println(Arcus17NodeAddress.parseNodeName(s));
-						} catch (Exception e) {
-						}
-					}
-				}
-				System.out.println("");
-			}
-		}
-		
-		// Store the current children.
-		prevChildren = children;
-
-		// Change the memcached node list.
-		listener.commandNodeChange(children);
+		zk.getChildren(cacheListZPath + serviceCode, true, this, null);
 	}
 
 	/**
