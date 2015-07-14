@@ -87,7 +87,7 @@ public final class MemcachedConnection extends SpyObject {
 
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
-
+	
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled;
 	/* ENABLE_REPLICATION end */

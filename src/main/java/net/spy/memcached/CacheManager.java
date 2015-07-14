@@ -96,7 +96,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
 	/* ENABLE_REPLICATION end */
-	
+
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
 			int waitTimeForConnect) {
@@ -192,7 +192,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION if */
-			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH 
+			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH
                                                      : ARCUS_BASE_CACHE_LIST_ZPATH;
 			cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
@@ -398,6 +398,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            current available Memcached Addresses
 	 */
 	private void createArcusClient(String addrs) {
+
 		/* ENABLE_REPLICATION if */
 		List<InetSocketAddress> socketList;
 		int addrCount;
