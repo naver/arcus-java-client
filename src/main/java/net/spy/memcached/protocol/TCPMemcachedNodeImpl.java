@@ -63,8 +63,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
 
-	// # of operations added into inputQueue
-	private long addOpCount;
+	/* # of operations added into inputQueue as a hint.
+	 * If we need a correct count, AtomicLong object must be used.
+	 */
+	private volatile long addOpCount;
 
 	// fake node
 	private boolean isFake = false; 
