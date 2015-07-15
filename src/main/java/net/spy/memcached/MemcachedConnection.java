@@ -87,8 +87,8 @@ public final class MemcachedConnection extends SpyObject {
 
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
-
-	/* ENABLE_REPLICATION start */
+	
+	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled;
 	/* ENABLE_REPLICATION end */
 
@@ -122,7 +122,7 @@ public final class MemcachedConnection extends SpyObject {
 		locator=f.createLocator(connections);
 	}
 
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	// handleNodeManageQueue and updateConnections behave slightly differently
 	// depending on the Arcus version.  We could have created a subclass and overload
 	// those methods.  But, MemcachedConnection is a final class.
@@ -238,7 +238,7 @@ public final class MemcachedConnection extends SpyObject {
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 		
 		// Classify the incoming node list.
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {
 			// If there's an existing node with the same group name as the new node,
 			// remove it.  And add the new node.
@@ -317,7 +317,7 @@ public final class MemcachedConnection extends SpyObject {
 		int ops = 0;
 		ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
 		ch.socket().setReuseAddress(true);
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		// Do not attempt to connect if this node is fake.
 		// Otherwise, we keep connecting to a non-existent listen address
 		// and keep failing/reconnecting.
@@ -364,7 +364,7 @@ public final class MemcachedConnection extends SpyObject {
 		String addrs = _nodeManageQueue.poll();
 		
 		// Update the memcached server group.
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled)
 			updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
 		else

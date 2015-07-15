@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* ENABLE_REPLICATION start */
+/* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
 import java.net.InetSocketAddress;
@@ -67,7 +67,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 			// for groups without masters.  We don't want these to connect to actual
 			// slave servers.
 			if (!master)
-				ipport = CacheMonitor.FAKE_SERVER_NODE;
+				ipport = CacheManager.FAKE_SERVER_NODE;
 
 			ArcusReplNodeAddress a = ArcusReplNodeAddress.create(group, master, ipport);
 
@@ -101,7 +101,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 	static List<InetSocketAddress> getAddresses(String s) {
 		List<InetSocketAddress> list = null;
 
-		if (s.equals(CacheMonitor.FAKE_SERVER_NODE)) {
+		if (s.equals(CacheManager.FAKE_SERVER_NODE)) {
 			// Special case the empty cache_list.
 			// CacheMonitor adds one FAKE_SERVER_NODE to children before calling this method.
 		} else {
@@ -120,7 +120,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		if (list == null || list.size() == 0) {
 			list = new ArrayList<InetSocketAddress>(1);
 			list.add((InetSocketAddress)
-				 ArcusReplNodeAddress.create("invalid", false, CacheMonitor.FAKE_SERVER_NODE));
+				 ArcusReplNodeAddress.create("invalid", false, CacheManager.FAKE_SERVER_NODE));
 		}
 		return list;
 	}

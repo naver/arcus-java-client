@@ -78,7 +78,7 @@ public class ConnectionFactoryBuilder {
 	
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
 
 	public void setArcusReplEnabled(boolean b) {
@@ -324,7 +324,7 @@ public class ConnectionFactoryBuilder {
 	public ConnectionFactory build() {
 		return new DefaultConnectionFactory() {
 
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			@Override
 			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
 				throws IOException {
@@ -362,7 +362,7 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
-						/* ENABLE_REPLICATION start */
+						/* ENABLE_REPLICATION if */
 						if (arcusReplEnabled) {
 							// Arcus repl cluster
 							// This locator uses ArcusReplKetamaNodeLocatorConfiguration

@@ -50,7 +50,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
 
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
 	private static final String ARCUS_REPL_CLIENT_INFO_ZPATH = "/arcus_repl/client_list/";
@@ -93,10 +93,10 @@ public class CacheManager extends SpyThread implements Watcher,
 	 */
 	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
 
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
 	/* ENABLE_REPLICATION end */
-	
+
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
 			int waitTimeForConnect) {
@@ -138,7 +138,7 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new AdminConnectTimeoutException(hostPort);
 				}
 				
-				/* ENABLE_REPLICATION start */
+				/* ENABLE_REPLICATION if */
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
 				if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
@@ -191,8 +191,8 @@ public class CacheManager extends SpyThread implements Watcher,
 				throw new InitializeClientException("Can't initialize Arcus client.", e);
 			}
 
-			/* ENABLE_REPLICATION start */
-			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH 
+			/* ENABLE_REPLICATION if */
+			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH
                                                      : ARCUS_BASE_CACHE_LIST_ZPATH;
 			cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
@@ -211,10 +211,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		try {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date currentTime = new Date();
-			
-			// create the ephemeral znode 
-			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			if (arcusReplEnabled) {
 				// /arcus_repl/client_list/{service_code}/...
 				path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
@@ -331,7 +328,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		// Store the current children.
 		prevChildren = children;
 
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		// children is the current list of znodes in the cache_list directory
 		// Arcus base cluster and repl cluster use different znode names.
 		//
@@ -345,7 +342,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		/* ENABLE_REPLICATION end */
 
 		String addrs = "";
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {
 			for (int i = 0; i < children.size(); i++) {
 				if (i == 0)
@@ -398,7 +395,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	 *            current available Memcached Addresses
 	 */
 	private void createArcusClient(String addrs) {
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		List<InetSocketAddress> socketList;
 		int addrCount;
 		if (arcusReplEnabled) {
@@ -410,7 +407,7 @@ public class CacheManager extends SpyThread implements Watcher,
 			addrCount = 0;
 			for (InetSocketAddress a : socketList) {
 				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
-				if (("/" + CacheMonitor.FAKE_SERVER_NODE).equals(a.toString()) != true)
+				if (("/" + CacheManager.FAKE_SERVER_NODE).equals(a.toString()) != true)
 					addrCount++;
 			}
 		} else {
