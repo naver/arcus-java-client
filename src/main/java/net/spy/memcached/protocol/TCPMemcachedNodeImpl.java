@@ -17,7 +17,6 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -99,20 +98,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		setupForAuth();
 
 		// is this a fake node?
-		/* ENABLE_REPLICATION if */
 		if (sa instanceof InetSocketAddress) {
 			InetSocketAddress inetSockAddr = (InetSocketAddress)sa;
-			InetAddress inetAddr = inetSockAddr.getAddress();
-			if (inetAddr != null) {
-				String ipport = inetAddr.getHostAddress() + ":" +inetSockAddr.getPort();
-				isFake = CacheManager.FAKE_SERVER_NODE.equals(ipport);
-			}
+			String ipport = inetSockAddr.getAddress() + ":" + inetSockAddr.getPort();
+			isFake = CacheManager.FAKE_SERVER_NODE.equals(ipport);
 		}
-		/* ENABLE_REPLICATION else */
-		/*
-		isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(sa.toString());
-		*/
-		/* ENABLE_REPLICATION end */
 	}
 
 	/* (non-Javadoc)
