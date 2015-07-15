@@ -411,7 +411,8 @@ public class CacheManager extends SpyThread implements Watcher,
 			addrCount = 0;
 			for (InetSocketAddress a : socketList) {
 				// See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
-				if (("/" + CacheManager.FAKE_SERVER_NODE).equals(a.toString()) != true)
+				if (("/" + CacheManager.FAKE_SERVER_NODE).equals(
+											a.getAddress() + ":" + a.getPort()) != true)
 					addrCount++;
 			}
 		} else {
