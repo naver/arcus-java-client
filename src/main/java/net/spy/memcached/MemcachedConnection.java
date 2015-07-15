@@ -799,7 +799,8 @@ public final class MemcachedConnection extends SpyObject {
             	LoggerFactory.getLogger(MemcachedConnection.class).debug("handling node for operation is not set");
             }
             else {
-                node.setContinuousTimeout(isTimeout);
+                if (isTimeout || !op.isCancelled())
+                    node.setContinuousTimeout(isTimeout);
             }
         } catch (Exception e) {
             LoggerFactory.getLogger(MemcachedConnection.class).error(e.getMessage());
