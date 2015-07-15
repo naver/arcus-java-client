@@ -65,7 +65,7 @@ public class MockMemcachedNode implements MemcachedNode {
 	public void copyInputQueue() {
 		// noop
 	}
-	public void setupResend() {
+	public void setupResend(boolean cancelWrite) {
 		// noop
 	}
 	public void fillWriteBuffer(boolean optimizeGets) {

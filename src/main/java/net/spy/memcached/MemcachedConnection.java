@@ -537,7 +537,7 @@ public final class MemcachedConnection extends SpyObject {
 			reconnectQueue.put(reconTime, qa);
 
 			// Need to do a little queue management.
-			qa.setupResend();
+			qa.setupResend(failureMode == FailureMode.Cancel);
 
 			if(failureMode == FailureMode.Redistribute) {
 				redistributeOperations(qa.destroyInputQueue());

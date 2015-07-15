@@ -129,11 +129,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#setupResend()
 	 */
-	public final void setupResend() {
+	public final void setupResend(boolean cancelWrite) {
 		// First, reset the current write op, or cancel it if we should
 		// be authenticating
 		Operation op=getCurrentWriteOp();
-		if(shouldAuth && op != null) {
+		if(cancelWrite && op != null) {
 		    op.cancel();
 		} else if(op != null) {
 			ByteBuffer buf=op.getBuffer();
@@ -154,7 +154,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			}
 		}
 
-		while(shouldAuth && hasWriteOp()) {
+		while(cancelWrite && hasWriteOp()) {
 			op=removeCurrentWriteOp();
 			getLogger().warn("Discarding partially completed op: %s", op);
 			op.cancel();
@@ -533,7 +533,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 				inputQueue.drainTo(reconnectBlocked);
 			}
 			assert(inputQueue.size() == 0);
-			setupResend();
+			setupResend(true);
 		} else {
 			authLatch = new CountDownLatch(0);
 		}
