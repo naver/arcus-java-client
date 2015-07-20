@@ -130,11 +130,9 @@ public final class MemcachedConnection extends SpyObject {
 		arcusReplEnabled = b;
 	}
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	boolean getArcusReplEnabled() {
 		return arcusReplEnabled;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	private boolean selectorsMakeSense() {
@@ -243,15 +241,12 @@ public final class MemcachedConnection extends SpyObject {
 		List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 		/* ENABLE_REPLICATION start */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 		
 		// Classify the incoming node list.
 		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			Map<String, List<ArcusReplNodeAddress>> newAllGroups = 
 					ArcusReplNodeAddress.makeGroupAddrsList(addrs);
 			
@@ -375,37 +370,6 @@ public final class MemcachedConnection extends SpyObject {
 						attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
 				}
 			}
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-			/*
-			// If there's an existing node with the same group name as the new node,
-			// remove it.  And add the new node.
-			for (MemcachedNode node : locator.getAll()) {
-				ArcusReplNodeAddress oldNode = (ArcusReplNodeAddress)node.getSocketAddress();
-				Iterator<InetSocketAddress> itr = addrs.iterator();
-				while (itr.hasNext()) {
-					ArcusReplNodeAddress newNode = (ArcusReplNodeAddress)itr.next();
-					if (oldNode.group.equals(newNode.group)) {
-						if (oldNode.master == newNode.master &&
-						    oldNode.ip.equals(newNode.ip) &&
-						    oldNode.port == newNode.port) {
-							// The exactly same node appears in the new list.
-							// Leave it alone.
-							itr.remove();
-							node = null;
-						} else {
-							// The new list has a node with the same group name
-							// as the old node.  But they are not the same.
-							// Remove the old node and add the new node.
-						}
-						break;
-					}
-				}
-				if (node != null) {
-					removeNodes.add(node);
-				}
-			}
-			*/
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		} else {
 			for (MemcachedNode node : locator.getAll()) {
 				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
@@ -415,11 +379,9 @@ public final class MemcachedConnection extends SpyObject {
 				}
 			}
 
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			for (SocketAddress sa : addrs) {
 				attachNodes.add(attachMemcachedNode(sa));
 			}
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		}
 		/* ENABLE_REPLICATION else */
 		/*
@@ -430,18 +392,13 @@ public final class MemcachedConnection extends SpyObject {
 				removeNodes.add(node);
 			}
 		}
-		*/
-		/* ENABLE_REPLICATION end */
 
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
 		// Make connections to the newly added nodes.
 		for (SocketAddress sa : addrs) {
 			attachNodes.add(attachMemcachedNode(sa));
 		}
 		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 
 		// Remove unavailable nodes in the reconnect queue.
 		for (MemcachedNode node : removeNodes) {
@@ -454,20 +411,17 @@ public final class MemcachedConnection extends SpyObject {
 			}
 		}
 		
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		/* ENABLE_REPLICATION start */
 		if (arcusReplEnabled && changeRoleGroups.size() > 0)
 			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
 		else
 			locator.update(attachNodes, removeNodes);
 		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 		/*
 		// Update the hash.
 		locator.update(attachNodes, removeNodes);
 		*/
 		/* ENABLE_REPLICATION end */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	}
 	
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
@@ -486,9 +440,7 @@ public final class MemcachedConnection extends SpyObject {
 		if (qa.isFake()) {
 			// Locator assumes non-null selectionkey.  So add a dummy one...
 			qa.setSk(ch.register(selector, ops, qa));
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			getLogger().info("new fake memcached node added %s to connect queue", qa);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			return qa;
 		}
 		/* ENABLE_REPLICATION end */
@@ -886,7 +838,6 @@ public final class MemcachedConnection extends SpyObject {
 	 */
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		/* ENABLE_REPLICATION start */
 		MemcachedNode primary = null;
 		if (this.arcusReplEnabled) {
@@ -894,12 +845,10 @@ public final class MemcachedConnection extends SpyObject {
 		} else
 			primary = locator.getPrimary(key);
 		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 		/*
 		MemcachedNode primary = locator.getPrimary(key);
 		/*
 		/* ENABLE_REPLICATION end */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		if(primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
@@ -907,7 +856,6 @@ public final class MemcachedConnection extends SpyObject {
 			o.cancel();
 		} else {
 			// Look for another node in sequence that is ready.
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			/* ENABLE_REPLICATION start */
 			Iterator<MemcachedNode> iter = this.arcusReplEnabled 
 					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key, getReplicaPick(o))
@@ -919,7 +867,6 @@ public final class MemcachedConnection extends SpyObject {
 				}
 			}
 			/* ENABLE_REPLICATION else */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 			/*
 			for(Iterator<MemcachedNode> i=locator.getSequence(key);
 				placeIn == null && i.hasNext(); ) {
@@ -930,7 +877,6 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			*/
 			/* ENABLE_REPLICATION end */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			// If we didn't find an active node, queue it in the primary node
 			// and wait for it to come back online.
 			if(placeIn == null) {
@@ -949,7 +895,6 @@ public final class MemcachedConnection extends SpyObject {
 	}
 
 	/* ENABLE_REPLICATION start */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	private ReplicaPick getReplicaPick(final Operation o) {
 		if (o.isWriteOperation())
 			return ReplicaPick.MASTER; 
@@ -970,7 +915,6 @@ public final class MemcachedConnection extends SpyObject {
 		
 		return pick;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	public void insertOperation(final MemcachedNode node, final Operation o) {
@@ -1107,7 +1051,6 @@ public final class MemcachedConnection extends SpyObject {
      */
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		/* ENABLE_REPLICATION start */
 		MemcachedNode primary = null;
 		if (this.arcusReplEnabled) {
@@ -1116,18 +1059,15 @@ public final class MemcachedConnection extends SpyObject {
 		} else
 			primary = locator.getPrimary(key);
 		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 		/*
 		MemcachedNode primary = locator.getPrimary(key);
 		/*
 		/* ENABLE_REPLICATION end */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			/* ENABLE_REPLICATION start */
 			Iterator<MemcachedNode> iter = this.arcusReplEnabled
 					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key,  getReplicaPick())
@@ -1139,7 +1079,6 @@ public final class MemcachedConnection extends SpyObject {
 				}
 			}
 			/* ENABLE_REPLICATION else */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 			/*
 			for (Iterator<MemcachedNode> i = locator.getSequence(key); placeIn == null
 					&& i.hasNext();) {
@@ -1150,7 +1089,6 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			*/
 			/* ENABLE_REPLICATION end */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			if (placeIn == null) {
 				placeIn = primary;
 			}

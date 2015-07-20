@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 /* ENABLE_REPLICATION start */
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 package net.spy.memcached;
 
 public abstract class MemcachedReplicaGroup {
@@ -88,5 +87,4 @@ public abstract class MemcachedReplicaGroup {
 		return ((ArcusReplNodeAddress)node.getSocketAddress()).getGroupName();
 	}
 }
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 /* ENABLE_REPLICATION end */

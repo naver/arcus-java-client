@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 /* ENABLE_REPLICATION start */
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 package net.spy.memcached;
 
 public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
@@ -74,5 +73,4 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 		return true;
 	}
 }
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 /* ENABLE_REPLICATION end */

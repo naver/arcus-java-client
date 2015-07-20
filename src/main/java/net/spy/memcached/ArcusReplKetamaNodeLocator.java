@@ -31,14 +31,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator {
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-/*
-public class ArcusReplKetamaNodeLocator extends ArcusKetamaNodeLocator {
-*/
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+
 	private TreeMap<Long, MemcachedReplicaGroup> ketamaGroups;
 	private HashMap<String, MemcachedReplicaGroup> allGroups;
 	private Collection<MemcachedNode> allNodes;
@@ -47,22 +41,14 @@ public class ArcusReplKetamaNodeLocator extends ArcusKetamaNodeLocator {
 	private ArcusReplKetamaNodeLocatorConfiguration config;
 
 	Lock lock = new ReentrantLock();
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
 		// This configuration class is aware that InetSocketAddress is really
 		// ArcusReplNodeAddress.  Its getKeyForNode uses the group name, instead
 		// of the socket address.
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		this (nodes, alg, new ArcusReplKetamaNodeLocatorConfiguration());
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		super(nodes, alg, new ArcusReplKetamaNodeLocatorConfiguration());
-		/*
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	}
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	private ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg,
 			ArcusReplKetamaNodeLocatorConfiguration conf) {
 		super();
@@ -349,45 +335,5 @@ public class ArcusReplKetamaNodeLocator extends ArcusKetamaNodeLocator {
 			throw new UnsupportedOperationException("remove not supported");
 		}
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-	/*
-	// This is same as super's update.  The only difference is that we
-	// first remove nodes and then add new ones.  The order matters now because
-	// old and new ones may have the same group name but different socket addresses.
-	// For example, we remove the slave node and add the master node of group "g0".
-	// If we add first and then remove, we end up with empty ketamaNodes.
-	public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
-		lock.lock();
-		try {
-			// Remove memcached nodes.
-			for (MemcachedNode node : toDelete) {
-				allNodes.remove(node);
-				updateHash(node, true);
-
-				// This is the base client behavior.  We shut down the node right away.
-				// We stop processing ongoing requests, and the user will see
-				// timeouts.
-				try {
-					node.getSk().attach(null);
-					node.shutdown();
-				} catch (IOException e) {
-					getLogger().error("Failed to shutdown the node : " + node.toString());
-					node.setSk(null);
-				}
-			}
-
-			// Add memcached nodes.
-			for (MemcachedNode node : toAttach) {
-				allNodes.add(node);
-				updateHash(node, false);
-			}
-		} catch (RuntimeException e) {
-			throw e;
-		} finally {
-			lock.unlock();
-		}
-	}
-	*/
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 }
 /* ENABLE_REPLICATION end */

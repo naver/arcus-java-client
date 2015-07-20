@@ -219,12 +219,10 @@ public abstract class ClientBaseCase extends TestCase {
 				}
 
 				/* ENABLE_REPLICATION start */
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 				@Override
 				public ReadPriority getReadPriority() {
 					return inner.getReadPriority();
 				}
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 				/* ENABLE_REPLICATION end */
 			};
 		}
