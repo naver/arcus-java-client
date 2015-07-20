@@ -19,14 +19,37 @@ package net.spy.memcached.util;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.ArcusReplNodeAddress;
+import net.spy.memcached.MemcachedReplicaGroup;
 
+/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+public class ArcusReplKetamaNodeLocatorConfiguration implements
+		KetamaNodeLocatorConfiguration {
+/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+/*
 public class ArcusReplKetamaNodeLocatorConfiguration extends
 		ArcusKetamaNodeLocatorConfiguration {
+*/
+/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+	final int NUM_REPS=160;
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public String getKeyForNode(MemcachedNode node, int repetition) {
 		ArcusReplNodeAddress addr = (ArcusReplNodeAddress)node.getSocketAddress();
 		String key = addr.getGroupName() + "-" + repetition;
 		return key;
 	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+	public String getKeyForGroup(MemcachedReplicaGroup group, int repetition) {
+		String key = group.getGroupName() + "-" + repetition;
+		return key;
+	}
+
+	public int getNodeRepetitions() {
+		return NUM_REPS;
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 }
 /* ENABLE_REPLICATION end */
