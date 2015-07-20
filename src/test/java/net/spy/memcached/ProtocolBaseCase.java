@@ -52,7 +52,16 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	public void testGetStats() throws Exception {
 		Map<SocketAddress, Map<String, String>> stats = client.getStats();
 		System.out.println("Stats:  " + stats);
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+		assertEquals(client.getAllNodes().size(), stats.size());
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		assertEquals(1, stats.size());
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		Map<String, String> oneStat=stats.values().iterator().next();
 		assertTrue(oneStat.containsKey("total_items"));
 	}
@@ -63,7 +72,16 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 		client.set("slabinitializer", 0, "hi");
 		Map<SocketAddress, Map<String, String>> stats = client.getStats("slabs");
 		System.out.println("Stats:  " + stats);
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+		assertEquals(client.getAllNodes().size(), stats.size());
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		assertEquals(1, stats.size());
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		Map<String, String> oneStat=stats.values().iterator().next();
 		assertTrue(oneStat.containsKey("0:chunk_size"));
 	}

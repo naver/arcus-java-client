@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 package net.spy.memcached;
-/* ENABLE_REPLICATION start */
 import java.io.IOException;
 import java.net.InetSocketAddress;
-/* ENABLE_REPLICATION end */
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -80,6 +78,10 @@ public class ConnectionFactoryBuilder {
 	
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+	private ReadPriority readPriority = ReadPriority.MASTER;
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public void setArcusReplEnabled(boolean b) {
 		arcusReplEnabled = b;
@@ -318,6 +320,18 @@ public class ConnectionFactoryBuilder {
 		return this;
 	}
 	
+	/* ENABLE_REPLICATION start */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+	/**
+	 * Set read prioirty for choosing replica node to read data
+	 */
+	public ConnectionFactoryBuilder setReadPriority(ReadPriority priority) {
+		readPriority = priority;
+		return this;
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
+
 	/**
 	 * Get the ConnectionFactory set up with the provided parameters.
 	 */
@@ -499,6 +513,15 @@ public class ConnectionFactoryBuilder {
 			public String getFrontCacheName() {
 				return frontCacheName;
 			}
+
+			/* ENABLE_REPLICATION start */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+			@Override
+			public ReadPriority getReadPriority() {
+				return readPriority;
+			}
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		};
 	}
 

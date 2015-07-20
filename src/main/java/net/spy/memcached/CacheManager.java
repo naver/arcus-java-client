@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -342,7 +343,10 @@ public class CacheManager extends SpyThread implements Watcher,
 		/* ENABLE_REPLICATION end */
 
 		String addrs = "";
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 		/* ENABLE_REPLICATION if */
+		/*
 		if (arcusReplEnabled) {
 			for (int i = 0; i < children.size(); i++) {
 				if (i == 0)
@@ -359,8 +363,11 @@ public class CacheManager extends SpyThread implements Watcher,
 					addrs = addrs + "," + temp[0];
 			}
 		}
+		*/
 		/* ENABLE_REPLICATION else */
 		/*
+ 		*/ 		
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		for (int i = 0; i < children.size(); i++) {
 			String[] temp = children.get(i).split("-");
 			if (i != 0) {
@@ -369,8 +376,12 @@ public class CacheManager extends SpyThread implements Watcher,
 				addrs = temp[0];
 			}
 		}
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		*/
 		/* ENABLE_REPLICATION end */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 		if (client == null) {
 			createArcusClient(addrs);
@@ -401,7 +412,25 @@ public class CacheManager extends SpyThread implements Watcher,
 		if (arcusReplEnabled) {
 			socketList = ArcusReplNodeAddress.getAddresses(addrs);
 
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+			Map<String, List<ArcusReplNodeAddress>> newAllGroups = 
+					ArcusReplNodeAddress.makeGroupAddrsList(socketList);
+			
+			/* recreate socket list */
+			socketList.clear();
+			for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+				if (entry.getValue().size() == 0)
+					socketList.add(ArcusReplNodeAddress.createFake(entry.getKey()));
+				else
+					socketList.addAll(entry.getValue());
+			}
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+			// Exclude fake server addresses in the initial latch count.
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 			// Exclude fake server addresses (slaves) in the initial latch count.
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			// Otherwise we may block here for a while trying to connect to
 			// slave-only groups.
 			addrCount = 0;
