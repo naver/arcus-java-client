@@ -215,6 +215,12 @@ public interface MemcachedNode {
 	void setContinuousTimeout(boolean timedOut);
 
 	int getContinuousTimeout();
+
+	/* JOON_TIMEOUT_RATIO if */
+	void enableTimeoutRatio();
+
+	int getTimeoutRatioNow();
+	/* JOON_TIMEOUT_RATIO end */
 	
 	/**
 	 * Is this a fake node?

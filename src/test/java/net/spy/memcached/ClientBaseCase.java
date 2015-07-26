@@ -183,6 +183,13 @@ public abstract class ClientBaseCase extends TestCase {
 					return inner.getTimeoutExceptionThreshold();
 				}
 
+				/* JOON_TIMEOUT_RATIO if */
+				@Override
+				public int getTimeoutRatioThreshold() {
+					return inner.getTimeoutRatioThreshold();
+				}
+				/* JOON_TIMEOUT_RATIO end */
+
 				@Override
 				public int getMaxFrontCacheElements() {
 					return inner.getMaxFrontCacheElements();

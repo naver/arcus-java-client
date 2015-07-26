@@ -28,6 +28,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
@@ -62,6 +64,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
+	/* JOON_TIMEOUT_RATIO if */
+	private boolean toRatioEnabled = false;
+	private int[] toCountArray;
+	private int toCountMax = 100;   /* to count array size */
+	private int toCountIdx;         /* to count array index */
+	private int toRatioMax;         /* maximum timeout ratio */
+	private int toRatioNow;         /* current timeout ratio */
+	private Lock toRatioLock = new ReentrantLock();
+	/* JOON_TIMEOUT_RATIO end */
 
 	/* # of operations added into inputQueue as a hint.
 	 * If we need a correct count, AtomicLong object must be used.
@@ -74,6 +85,40 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public boolean isFake() {
 		return isFake;
 	}
+
+	/* JOON_TIMEOUT_RATIO if */
+	private void resetTimeoutRatioCount() {
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			for (int i=0; i < toCountMax; i++) {
+				toCountArray[i] = 0;
+			}
+			toCountIdx = -1;
+			toRatioMax = 0;
+			toRatioNow = 0;
+			toRatioLock.unlock();
+		}
+	}
+
+	private void addTimeoutRatioCount(boolean timedOut) {
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			if ((++toCountIdx) >= toCountMax)
+				toCountIdx = 0;
+			if (toCountArray[toCountIdx] > 0) {
+				toRatioNow -= toCountArray[toCountIdx];
+				toCountArray[toCountIdx] = 0;
+			}
+			if (timedOut) {
+				toCountArray[toCountIdx] = 1;
+				toRatioNow += 1;
+				if (toRatioNow > toRatioMax)
+					toRatioMax = toRatioNow;
+			}
+			toRatioLock.unlock();
+		}
+	}
+	/* JOON_TIMEOUT_RATIO end */
 
 	public TCPMemcachedNodeImpl(SocketAddress sa, SocketChannel c,
 			int bufSize, BlockingQueue<Operation> rq,
@@ -389,6 +434,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void reconnecting() {
 		reconnectAttempt++;
 		continuousTimeout.set(0);
+		/* JOON_TIMEOUT_RATIO if */
+		resetTimeoutRatioCount();
+		/* JOON_TIMEOUT_RATIO end */
 	}
 
 	/* (non-Javadoc)
@@ -397,6 +445,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void connected() {
 		reconnectAttempt=0;
 		continuousTimeout.set(0);
+		/* JOON_TIMEOUT_RATIO if */
+		resetTimeoutRatioCount();
+		/* JOON_TIMEOUT_RATIO end */
 	}
 
 	/* (non-Javadoc)
@@ -491,6 +542,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 * @see net.spy.memcached.MemcachedNode#setContinuousTimeout
 	 */
 	public void setContinuousTimeout(boolean timedOut) {
+		/* JOON_TIMEOUT_RATIO if */
+		if (isActive()) {
+			addTimeoutRatioCount(timedOut);
+		}
+		/* JOON_TIMEOUT_RATIO end */
 		if (timedOut && isActive()) {
 			continuousTimeout.incrementAndGet();
 		} else {
@@ -505,6 +561,29 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		return continuousTimeout.get();
 	}
 
+	/* JOON_TIMEOUT_RATIO if */
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#enableTimeoutRatio
+	 */
+	public void enableTimeoutRatio() {
+		toRatioEnabled = true;
+		toCountArray = new int[toCountMax];
+		resetTimeoutRatioCount();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#getTimeoutRatioNow
+	 */
+	public int getTimeoutRatioNow() {
+		int ratio = -1; // invalid
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			ratio = toRatioNow;
+			toRatioLock.unlock();
+		}
+		return ratio;
+	}
+	/* JOON_TIMEOUT_RATIO end */
 
 	public final void fixupOps() {
 		// As the selection key can be changed at any point due to node
@@ -574,6 +653,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		sb.append(" #Wops=").append(getWriteQueueSize());
 		sb.append(" #Rops=").append(getReadQueueSize());
 		sb.append(" #CT=").append(getContinuousTimeout());
+		/* JOON_TIMEOUT_RATIO if */
+		sb.append(" #TR=").append(getTimeoutRatioNow());
+		/* JOON_TIMEOUT_RATIO if */
 		return sb.toString();
 	}
 }

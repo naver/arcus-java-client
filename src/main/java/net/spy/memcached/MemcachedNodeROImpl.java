@@ -174,6 +174,16 @@ class MemcachedNodeROImpl implements MemcachedNode {
 		throw new UnsupportedOperationException();
 	}
 	
+	/* JOON_TIMEOUT_RATIO if */
+	public void enableTimeoutRatio() {
+		throw new UnsupportedOperationException();
+	}
+
+	public int getTimeoutRatioNow() {
+		throw new UnsupportedOperationException();
+	}
+	/* JOON_TIMEOUT_RATIO end */
+
 	public boolean isFake() {
 		throw new UnsupportedOperationException(); 
 	}
