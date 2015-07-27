@@ -105,12 +105,10 @@ public class DefaultConnectionFactory extends SpyObject
      */
     public static final int DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD = 998;
     
-	/* JOON_TIMEOUT_RATIO if */
 	/**
 	* Maximum timeout ratio for shutdown connection
 	*/
 	public static final int DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD = 0;
-	/* JOON_TIMEOUT_RATIO end */
 
     /**
      * Maximum number of Front cache elements
@@ -363,14 +361,12 @@ public class DefaultConnectionFactory extends SpyObject
 		return DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
 	}
 
-	/* JOON_TIMEOUT_RATIO if */
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getTimeoutRatioThreshold()
 	 */
 	public int getTimeoutRatioThreshold() {
 		return DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
 	}
-	/* JOON_TIMEOUT_RATIO end */
 	
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getMaxFrontCacheElements()

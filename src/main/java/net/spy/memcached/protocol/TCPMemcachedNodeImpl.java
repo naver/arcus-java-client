@@ -64,7 +64,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
-	/* JOON_TIMEOUT_RATIO if */
 	private boolean toRatioEnabled = false;
 	private int[] toCountArray;
 	private final static int MAX_TOCOUNT = 100;   /* to count array size */
@@ -72,7 +71,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private int toRatioMax;         /* maximum timeout ratio */
 	private int toRatioNow;         /* current timeout ratio */
 	private Lock toRatioLock = new ReentrantLock();
-	/* JOON_TIMEOUT_RATIO end */
 
 	/* # of operations added into inputQueue as a hint.
 	 * If we need a correct count, AtomicLong object must be used.
@@ -86,7 +84,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		return isFake;
 	}
 
-	/* JOON_TIMEOUT_RATIO if */
 	private void resetTimeoutRatioCount() {
 		if (toRatioEnabled) {
 			toRatioLock.lock();
@@ -118,7 +115,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			toRatioLock.unlock();
 		}
 	}
-	/* JOON_TIMEOUT_RATIO end */
 
 	public TCPMemcachedNodeImpl(SocketAddress sa, SocketChannel c,
 			int bufSize, BlockingQueue<Operation> rq,
@@ -434,9 +430,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void reconnecting() {
 		reconnectAttempt++;
 		continuousTimeout.set(0);
-		/* JOON_TIMEOUT_RATIO if */
 		resetTimeoutRatioCount();
-		/* JOON_TIMEOUT_RATIO end */
 	}
 
 	/* (non-Javadoc)
@@ -445,9 +439,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void connected() {
 		reconnectAttempt=0;
 		continuousTimeout.set(0);
-		/* JOON_TIMEOUT_RATIO if */
 		resetTimeoutRatioCount();
-		/* JOON_TIMEOUT_RATIO end */
 	}
 
 	/* (non-Javadoc)
@@ -542,11 +534,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 * @see net.spy.memcached.MemcachedNode#setContinuousTimeout
 	 */
 	public void setContinuousTimeout(boolean timedOut) {
-		/* JOON_TIMEOUT_RATIO if */
 		if (isActive()) {
 			addTimeoutRatioCount(timedOut);
 		}
-		/* JOON_TIMEOUT_RATIO end */
 		if (timedOut && isActive()) {
 			continuousTimeout.incrementAndGet();
 		} else {
@@ -561,7 +551,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		return continuousTimeout.get();
 	}
 
-	/* JOON_TIMEOUT_RATIO if */
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#enableTimeoutRatio
 	 */
@@ -583,7 +572,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		}
 		return ratio;
 	}
-	/* JOON_TIMEOUT_RATIO end */
 
 	public final void fixupOps() {
 		// As the selection key can be changed at any point due to node
@@ -653,9 +641,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		sb.append(" #Wops=").append(getWriteQueueSize());
 		sb.append(" #Rops=").append(getReadQueueSize());
 		sb.append(" #CT=").append(getContinuousTimeout());
-		/* JOON_TIMEOUT_RATIO if */
 		sb.append(" #TR=").append(getTimeoutRatioNow());
-		/* JOON_TIMEOUT_RATIO if */
 		return sb.toString();
 	}
 }

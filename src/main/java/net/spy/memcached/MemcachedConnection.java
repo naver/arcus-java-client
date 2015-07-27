@@ -84,9 +84,7 @@ public final class MemcachedConnection extends SpyObject {
 		new ConcurrentLinkedQueue<ConnectionObserver>();
 	private final OperationFactory opFact;
 	private final int timeoutExceptionThreshold;
-	/* JOON_TIMEOUT_RATIO if */
 	private final int timeoutRatioThreshold;
-	/* JOON_TIMEOUT_RATIO end */
 
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
@@ -113,9 +111,7 @@ public final class MemcachedConnection extends SpyObject {
 		maxDelay = f.getMaxReconnectDelay();
 		opFact = opfactory;
 		timeoutExceptionThreshold = f.getTimeoutExceptionThreshold();
-		/* JOON_TIMEOUT_RATIO if */
 		timeoutRatioThreshold = f.getTimeoutRatioThreshold();
-		/* JOON_TIMEOUT_RATIO end */
 		selector=Selector.open();
 		List<MemcachedNode> connections=new ArrayList<MemcachedNode>(a.size());
 		for(SocketAddress sa : a) {
@@ -216,7 +212,6 @@ public final class MemcachedConnection extends SpyObject {
 						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
 				lostConnection(mn);
 			}
-			/* JOON_TIMEOUT_RATIO if */
 			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
 			{
 				getLogger().warn(
@@ -224,7 +219,6 @@ public final class MemcachedConnection extends SpyObject {
 						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
 				lostConnection(mn);
 			}
-			/* JOON_TIMEOUT_RATIO endif */
 		}
 
 		// Deal with the memcached server group that's been added by CacheManager.  
@@ -272,13 +266,10 @@ public final class MemcachedConnection extends SpyObject {
 		SocketChannel ch = SocketChannel.open();
 		ch.configureBlocking(false);
 		// bufSize : 16384 (default value)
-		MemcachedNode qa = 
-				f.createMemcachedNode(sa, ch, f.getReadBufSize());
-		/* JOON_TIMEOUT_RATIO if */
+		MemcachedNode qa = f.createMemcachedNode(sa, ch, f.getReadBufSize());
 		if (timeoutRatioThreshold > 0) {
 			qa.enableTimeoutRatio();
 		}
-		/* JOON_TIMEOUT_RATIO end */
 		int ops = 0;
 		ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
 		ch.socket().setReuseAddress(true);

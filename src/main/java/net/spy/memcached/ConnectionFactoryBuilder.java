@@ -63,9 +63,7 @@ public class ConnectionFactoryBuilder {
 
 //	private int timeoutExceptionThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
 	private int timeoutExceptionThreshold = 10;
-	/* JOON_TIMEOUT_RATIO if */
 	private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
-	/* JOON_TIMEOUT_RATIO end */
 	
 	private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
 	private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
@@ -257,7 +255,6 @@ public class ConnectionFactoryBuilder {
 		return this;
 	}
 	
-	/* JOON_TIMEOUT_RATIO if */
 	/**
 	 * Set the maximum timeout ratio threshold: 0(disabled, default), 1~99
 	 */
@@ -269,7 +266,6 @@ public class ConnectionFactoryBuilder {
 			timeoutRatioThreshold = to;
 		return this;
 	}
-	/* JOON_TIMEOUT_RATIO end */
 
 	/**
 	 * Set the maximum number of front cache elements.
@@ -445,12 +441,10 @@ public class ConnectionFactoryBuilder {
 				return timeoutExceptionThreshold;
 			}
 			
-			/* JOON_TIMEOUT_RATIO if */
 			@Override
 			public int getTimeoutRatioThreshold() {
 				return timeoutRatioThreshold;
 			}
-			/* JOON_TIMEOUT_RATIO end */
 
 			@Override
 			public int getMaxFrontCacheElements() {

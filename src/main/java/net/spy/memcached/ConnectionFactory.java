@@ -160,12 +160,10 @@ public interface ConnectionFactory {
 	 */
 	int getTimeoutExceptionThreshold();
 	
-	/* JOON_TIMEOUT_RATIO if */
 	/**
 	 * Maximum timeout ratio for shutdown connection
 	 */
 	int getTimeoutRatioThreshold();
-	/* JOON_TIMEOUT_RATIO end */
 
 	/**
 	 * Set the maximum number of front cache elements.

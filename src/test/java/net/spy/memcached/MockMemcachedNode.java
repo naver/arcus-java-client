@@ -134,7 +134,6 @@ public class MockMemcachedNode implements MemcachedNode {
 		// noop
 	}
 	
-	/* JOON_TIMEOUT if */
 	public void enableTimeoutRatio() {
 		// noop
 	}
@@ -142,7 +141,6 @@ public class MockMemcachedNode implements MemcachedNode {
 	public int getTimeoutRatioNow() {
 		return -1; // disabled
 	}
-	/* JOON_TIMEOUT end */
 
 	public boolean isFake() {
 		return false;
