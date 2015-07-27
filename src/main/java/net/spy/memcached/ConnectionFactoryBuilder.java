@@ -263,7 +263,10 @@ public class ConnectionFactoryBuilder {
 	 */
 	public ConnectionFactoryBuilder setTimeoutRatioThreshold(int to) {
 		assert (to >= 0 && to < 100) : "Timeout ratio threshold range is 0~99.";
-		timeoutRatioThreshold = to;
+		if (to < 0 || to >= 100)
+			timeoutRatioThreshold = 0; // disable
+		else
+			timeoutRatioThreshold = to;
 		return this;
 	}
 	/* JOON_TIMEOUT_RATIO end */
