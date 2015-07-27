@@ -149,7 +149,7 @@ public class DefaultConnectionFactory extends SpyObject
 	private final int readBufSize;
 	private final HashAlgorithm hashAlg;
 
-	/* ENABLE_REPLICATION if */
+	/* ENABLE_REPLICATION start */
 	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
 	/* ENABLE_REPLICATION end */
 

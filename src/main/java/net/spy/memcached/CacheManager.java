@@ -212,6 +212,8 @@ public class CacheManager extends SpyThread implements Watcher,
 		try {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date currentTime = new Date();
+			// create the ephemeral znode 
+ 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 			/* ENABLE_REPLICATION if */
 			if (arcusReplEnabled) {
 				path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";

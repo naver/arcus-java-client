@@ -1048,6 +1048,7 @@ public class MemcachedClient extends SpyThread
 			final MemcachedNode primaryNode =  arcusReplEnabled
 					? ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, conn.getReplicaPick())
 					: locator.getPrimary(key);
+			/* ENABLE_REPLICATION else */
 			/*
 			final MemcachedNode primaryNode=locator.getPrimary(key);
 			*/
