@@ -469,11 +469,6 @@ public final class MemcachedConnection extends SpyObject {
 		ByteBuffer rbuf=qa.getRbuf();
 		final SocketChannel channel = qa.getChannel();
 		int read=channel.read(rbuf);
-		if (read < 0) {
-		    // our model is to keep the connection alive for future ops
-		    // so we'll queue a reconnect if disconnected via an IOException
-		    throw new IOException("Disconnected unexpected, will reconnect.");
-		}
 		while(read > 0) {
 			getLogger().debug("Read %d bytes", read);
 			rbuf.flip();
@@ -494,6 +489,11 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			rbuf.clear();
 			read=channel.read(rbuf);
+		}
+		if (read < 0) {
+		    // our model is to keep the connection alive for future ops
+		    // so we'll queue a reconnect if disconnected via an IOException
+		    throw new IOException("Disconnected unexpected, will reconnect.");
 		}
 	}
 
