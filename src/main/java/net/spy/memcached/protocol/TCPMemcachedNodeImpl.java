@@ -67,7 +67,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	/* JOON_TIMEOUT_RATIO if */
 	private boolean toRatioEnabled = false;
 	private int[] toCountArray;
-	private int toCountMax = 100;   /* to count array size */
+	private final static int MAX_TOCOUNT = 100;   /* to count array size */
 	private int toCountIdx;         /* to count array index */
 	private int toRatioMax;         /* maximum timeout ratio */
 	private int toRatioNow;         /* current timeout ratio */
@@ -90,7 +90,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private void resetTimeoutRatioCount() {
 		if (toRatioEnabled) {
 			toRatioLock.lock();
-			for (int i=0; i < toCountMax; i++) {
+			for (int i=0; i < MAX_TOCOUNT; i++) {
 				toCountArray[i] = 0;
 			}
 			toCountIdx = -1;
@@ -103,7 +103,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private void addTimeoutRatioCount(boolean timedOut) {
 		if (toRatioEnabled) {
 			toRatioLock.lock();
-			if ((++toCountIdx) >= toCountMax)
+			if ((++toCountIdx) >= MAX_TOCOUNT)
 				toCountIdx = 0;
 			if (toCountArray[toCountIdx] > 0) {
 				toRatioNow -= toCountArray[toCountIdx];
@@ -567,7 +567,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 */
 	public void enableTimeoutRatio() {
 		toRatioEnabled = true;
-		toCountArray = new int[toCountMax];
+		toCountArray = new int[MAX_TOCOUNT];
 		resetTimeoutRatioCount();
 	}
 
