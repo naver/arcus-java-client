@@ -29,13 +29,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 	String ip;
 	int port;
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
-	/*
-	ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
-	*/
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		super(ip, port);
 		this.group = group;
 		this.master = master;
@@ -47,11 +41,9 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		return "Group(" + group + ") Address(" + ip + ":" + port + ") " + (master ? "MASTER" : "SLAVE");
 	}
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	public String getIPPort() {
 		return this.ip + ":" + this.port;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public String getGroupName() {
 		return group;
@@ -64,12 +56,10 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		return new ArcusReplNodeAddress(group, master, ip, port);
 	}
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	static ArcusReplNodeAddress createFake(String groupName) {
 		return create(groupName == null ? "invalid" : groupName,
 					  true, CacheManager.FAKE_SERVER_NODE);
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
 		List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
@@ -78,59 +68,14 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 			String[] temp = node.split("\\^");
 			String group = temp[0];
 			boolean master = temp[1].equals("M") ? true : false;
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			String ipport = temp[2];
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-			/*
-			String[] temp2 = temp[2].split("-");
-			String ipport = temp2[0];
-			*/
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			// We may throw null pointer exception if the string has
 			// an unexpected format.  Abort the whole method instead of
 			// trying to ignore malformed strings.
 			// Is this the right behavior?  FIXME
 
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-			/*
-			// Turn slave servers into fake ones.  We still create MemcachedNode's
-			// for groups without masters.  We don't want these to connect to actual
-			// slave servers.
-			if (!master)
-				ipport = CacheManager.FAKE_SERVER_NODE;
-
-			*/
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			ArcusReplNodeAddress a = ArcusReplNodeAddress.create(group, master, ipport);
-
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			addrs.add(a);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-			/*
-			// We want exactly one node per group in this version.
-			// If a node exists and the new one is the master, replace the old one
-			// with the new one.
-			for (int i = 0; i < addrs.size(); i++) {
-				if (((ArcusReplNodeAddress)addrs.get(i)).group.equals(group)) {
-					if (master) {
-						// The new node is the master.  Replace.
-						addrs.set(i, a);
-					} else {
-						// The new node is the slave.  Do not add.
-					}
-					// In any case, we've found a previous node with
-					// the same group name.  So do not append the new node.
-					a = null;
-					break;
-				}
-			}
-			// We've never seen this group before.  Append it to the list.
-			if (a != null) {
-				addrs.add((InetSocketAddress)a);
-			}
-			*/
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		}
 		return addrs;
 	}
@@ -140,7 +85,6 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 	static List<InetSocketAddress> getAddresses(String s) {
 		List<InetSocketAddress> list = null;
 
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 		try {
 			list = parseNodeNames(s);
 		} catch (Exception e) {
@@ -150,41 +94,15 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 			e.printStackTrace();
 			list = null;
 		}
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		if (s.equals(CacheManager.FAKE_SERVER_NODE)) {
-			// Special case the empty cache_list.
-			// CacheMonitor adds one FAKE_SERVER_NODE to children before calling this method.
-		} else {
-			try {
-				list = parseNodeNames(s);
-			} catch (Exception e) {
-				// May see an exception if nodes do not follow the replication naming convention
-				ArcusClient.arcusLogger.error("Exception caught while parsing node" +
-											" addresses. cache_list=" + s + "\n" + e);
-				e.printStackTrace();
-				list = null;
-			}
-		}
-		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		// Return at least one node in all cases.  Otherwise we may see unexpected null pointer
 		// exceptions throughout this client library...
 		if (list == null || list.size() == 0) {
 			list = new ArrayList<InetSocketAddress>(1);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			list.add((InetSocketAddress)ArcusReplNodeAddress.createFake(null));
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-			/*
-			list.add((InetSocketAddress)
-				 ArcusReplNodeAddress.create("invalid", false, CacheManager.FAKE_SERVER_NODE));
-			*/
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		}
 		return list;
 	}
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrsList (
 											List<InetSocketAddress> addrs) {
 
@@ -242,6 +160,5 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		}
 		return newAllGroups;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 }
 /* ENABLE_REPLICATION end */

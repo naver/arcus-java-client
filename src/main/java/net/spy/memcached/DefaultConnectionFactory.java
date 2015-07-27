@@ -149,10 +149,8 @@ public class DefaultConnectionFactory extends SpyObject
 	private final int readBufSize;
 	private final HashAlgorithm hashAlg;
 
-	/* ENABLE_REPLICATION start */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
+	/* ENABLE_REPLICATION if */
 	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	/**
@@ -422,7 +420,6 @@ public class DefaultConnectionFactory extends SpyObject
 	}
 	
 	/* ENABLE_REPLICATION start */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	/*
 	 * (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getReadPriority()
@@ -430,6 +427,5 @@ public class DefaultConnectionFactory extends SpyObject
 	public ReadPriority getReadPriority() {
 		return DEFAULT_READ_PRIORITY;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

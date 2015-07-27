@@ -196,11 +196,9 @@ public interface ConnectionFactory {
 	String getFrontCacheName();
 
 	/* ENABLE_REPLICATION start */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 	/**
 	 * get read priority on replica nodes
 	 */
 	ReadPriority getReadPriority();
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

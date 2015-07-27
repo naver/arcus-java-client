@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 /* ENABLE_REPLICATION start */
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 package net.spy.memcached;
 
 /**
@@ -41,5 +40,4 @@ public enum ReadPriority {
 	// for API
 	NONE
 }
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 /* ENABLE_REPLICATION end */

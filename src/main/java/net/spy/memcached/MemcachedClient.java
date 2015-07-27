@@ -1043,25 +1043,20 @@ public class MemcachedClient extends SpyThread
 			
 			tc_map.put(key, tc);
 			validateKey(key);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 			/* ENABLE_REPLICATION start */
 			boolean arcusReplEnabled = conn.getArcusReplEnabled();
 			final MemcachedNode primaryNode =  arcusReplEnabled
 					? ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, conn.getReplicaPick())
 					: locator.getPrimary(key);
-			/* ENABLE_REPLICATION else */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 			/*
 			final MemcachedNode primaryNode=locator.getPrimary(key);
 			*/
 			/* ENABLE_REPLICATION end */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			MemcachedNode node=null;
 			// FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
 			if(primaryNode.isActive()) {
 				node=primaryNode;
 			} else {
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP start */
 				/* ENABLE_REPLICATION start */
 				Iterator<MemcachedNode> iter = arcusReplEnabled
 						? ((ArcusReplKetamaNodeLocator)locator).getSequence(key, conn.getReplicaPick())
@@ -1073,7 +1068,6 @@ public class MemcachedClient extends SpyThread
 					}
 				}
 				/* ENABLE_REPLICATION else */
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 				/*
 				for(Iterator<MemcachedNode> i=locator.getSequence(key);
 					node == null && i.hasNext();) {
@@ -1084,7 +1078,6 @@ public class MemcachedClient extends SpyThread
 				}
 				*/
 				/* ENABLE_REPLICATION end */
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 				if(node == null) {
 					node=primaryNode;
 				}
