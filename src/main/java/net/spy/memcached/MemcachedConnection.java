@@ -240,7 +240,7 @@ public final class MemcachedConnection extends SpyObject {
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
 		List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
 		/* ENABLE_REPLICATION end */
 		
@@ -411,7 +411,7 @@ public final class MemcachedConnection extends SpyObject {
 			}
 		}
 		
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled && changeRoleGroups.size() > 0)
 			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
 		else
@@ -838,7 +838,7 @@ public final class MemcachedConnection extends SpyObject {
 	 */
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		MemcachedNode primary = null;
 		if (this.arcusReplEnabled) {
 			primary = ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, getReplicaPick(o));
@@ -856,7 +856,7 @@ public final class MemcachedConnection extends SpyObject {
 			o.cancel();
 		} else {
 			// Look for another node in sequence that is ready.
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			Iterator<MemcachedNode> iter = this.arcusReplEnabled 
 					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key, getReplicaPick(o))
 					: locator.getSequence(key);
@@ -894,7 +894,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 	}
 
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	private ReplicaPick getReplicaPick(final Operation o) {
 		if (o.isWriteOperation())
 			return ReplicaPick.MASTER; 
@@ -1051,7 +1051,7 @@ public final class MemcachedConnection extends SpyObject {
      */
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
-		/* ENABLE_REPLICATION start */
+		/* ENABLE_REPLICATION if */
 		MemcachedNode primary = null;
 		if (this.arcusReplEnabled) {
 			/* just used for arrange key */
@@ -1068,7 +1068,7 @@ public final class MemcachedConnection extends SpyObject {
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			Iterator<MemcachedNode> iter = this.arcusReplEnabled
 					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key,  getReplicaPick())
 					: locator.getSequence(key);

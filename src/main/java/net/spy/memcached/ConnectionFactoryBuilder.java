@@ -318,7 +318,7 @@ public class ConnectionFactoryBuilder {
 		return this;
 	}
 	
-	/* ENABLE_REPLICATION start */
+	/* ENABLE_REPLICATION if */
 	/**
 	 * Set read prioirty for choosing replica node to read data
 	 */
@@ -510,7 +510,7 @@ public class ConnectionFactoryBuilder {
 				return frontCacheName;
 			}
 
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			@Override
 			public ReadPriority getReadPriority() {
 				return readPriority;
