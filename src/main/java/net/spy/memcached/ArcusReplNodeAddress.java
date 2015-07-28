@@ -65,16 +65,21 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
 		for (String node : s.split(",")) {
-			String[] temp = node.split("\\^");
-			String group = temp[0];
-			boolean master = temp[1].equals("M") ? true : false;
-			String ipport = temp[2];
-			// We may throw null pointer exception if the string has
-			// an unexpected format.  Abort the whole method instead of
-			// trying to ignore malformed strings.
-			// Is this the right behavior?  FIXME
-
-			ArcusReplNodeAddress a = ArcusReplNodeAddress.create(group, master, ipport);
+			ArcusReplNodeAddress a = null;
+			if (node.equals(CacheManager.FAKE_SERVER_NODE)) {
+				a = ArcusReplNodeAddress.createFake(null);
+			} else {
+				String[] temp = node.split("\\^");
+				String group = temp[0];
+				boolean master = temp[1].equals("M") ? true : false;
+				String ipport = temp[2];
+				// We may throw null pointer exception if the string has
+				// an unexpected format.  Abort the whole method instead of
+				// trying to ignore malformed strings.
+				// Is this the right behavior?  FIXME
+	
+				a = ArcusReplNodeAddress.create(group, master, ipport);
+			}
 			addrs.add(a);
 		}
 		return addrs;
