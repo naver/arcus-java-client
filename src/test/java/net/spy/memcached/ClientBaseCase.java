@@ -218,7 +218,7 @@ public abstract class ClientBaseCase extends TestCase {
 					return inner.getFrontCacheName();
 				}
 
-				/* ENABLE_REPLICATION start */
+				/* ENABLE_REPLICATION if */
 				@Override
 				public ReadPriority getReadPriority() {
 					return inner.getReadPriority();

@@ -1043,7 +1043,7 @@ public class MemcachedClient extends SpyThread
 			
 			tc_map.put(key, tc);
 			validateKey(key);
-			/* ENABLE_REPLICATION start */
+			/* ENABLE_REPLICATION if */
 			boolean arcusReplEnabled = conn.getArcusReplEnabled();
 			final MemcachedNode primaryNode =  arcusReplEnabled
 					? ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, conn.getReplicaPick())
@@ -1058,7 +1058,7 @@ public class MemcachedClient extends SpyThread
 			if(primaryNode.isActive()) {
 				node=primaryNode;
 			} else {
-				/* ENABLE_REPLICATION start */
+				/* ENABLE_REPLICATION if */
 				Iterator<MemcachedNode> iter = arcusReplEnabled
 						? ((ArcusReplKetamaNodeLocator)locator).getSequence(key, conn.getReplicaPick())
 						: locator.getSequence(key);
