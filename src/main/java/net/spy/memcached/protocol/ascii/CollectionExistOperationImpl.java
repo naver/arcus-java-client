@@ -28,6 +28,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to check membership of an item in collection in a memcached server.
@@ -63,6 +64,7 @@ public class CollectionExistOperationImpl extends OperationImpl
 		this.subkey = subkey;
 		this.collectionExist = collectionExist;
 		this.data = collectionExist.getData();
+		setOperationType(OperationType.READ);
 	}
 
 	@Override

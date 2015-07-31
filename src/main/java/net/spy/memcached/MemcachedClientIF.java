@@ -39,15 +39,26 @@ public interface MemcachedClientIF {
 			Transcoder<T> tc);
 
 	<T> Future<CASResponse> asyncCAS(String key, long casId, T value,
-					Transcoder<T> tc);
+			Transcoder<T> tc);
 
 	Future<CASResponse> asyncCAS(String key, long casId, Object value);
 
-	<T> CASResponse cas(String key, long casId, T value,
-			Transcoder<T> tc) throws OperationTimeoutException;
+	<T> Future<CASResponse> asyncCAS(String key, long casId, int exp, T value,
+			Transcoder<T> tc);
+
+	Future<CASResponse> asyncCAS(String key, long casId, int exp, Object value);
+	
+	<T> CASResponse cas(String key, long casId, int exp, T value, Transcoder<T> tc)
+			throws OperationTimeoutException;
+
+	CASResponse cas(String key, long casId, int exp, Object value)
+			throws OperationTimeoutException;
+
+	<T> CASResponse cas(String key, long casId, T value, Transcoder<T> tc)
+			throws OperationTimeoutException;
 
 	CASResponse cas(String key, long casId, Object value)
-				throws OperationTimeoutException;
+			throws OperationTimeoutException;
 
 	<T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc);
 
@@ -123,9 +134,13 @@ public interface MemcachedClientIF {
 		throws OperationTimeoutException;
 
 	Future<Long> asyncIncr(String key, int by);
+	
+	Future<Long> asyncIncr(String key, int by, long def, int exp); 
 
 	Future<Long> asyncDecr(String key, int by);
 
+	Future<Long> asyncDecr(String key, int by, long def, int exp);
+	
 	long incr(String key, int by, long def)
 		throws OperationTimeoutException;
 

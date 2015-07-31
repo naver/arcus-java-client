@@ -27,6 +27,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to incr/decr item value from collection in a memcached server.
@@ -57,6 +58,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.subkey = subkey;
 		this.collectionMutate = collectionMutate;
+		setOperationType(OperationType.WRITE);
 	}
 
 	/**

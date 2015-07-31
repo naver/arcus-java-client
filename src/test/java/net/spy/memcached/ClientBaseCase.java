@@ -184,6 +184,11 @@ public abstract class ClientBaseCase extends TestCase {
 				}
 
 				@Override
+				public int getTimeoutRatioThreshold() {
+					return inner.getTimeoutRatioThreshold();
+				}
+
+				@Override
 				public int getMaxFrontCacheElements() {
 					return inner.getMaxFrontCacheElements();
 				}

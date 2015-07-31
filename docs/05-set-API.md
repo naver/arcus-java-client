@@ -356,7 +356,7 @@ Set에 여러 element를 한번에 삽입하는 함수는 두 가지가 있다.
 첫째, 하나의 key가 가리키는 set에 다수의 element를 삽입하는 함수이다.
 
 ```java
-CollectionFuture<Map<Integer, CollectionOperationStatus>>
+CollectionFuture <Map<Integer, CollectionOperationStatus>>
 asyncSopPipedInsertBulk(String key, List<Object> valueList, CollectionAttributes attributesForCreate)
 ```
 - key: 삽입 대상 set의 key 

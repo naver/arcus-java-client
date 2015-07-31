@@ -1210,9 +1210,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementValueType type, CollectionAttributes attributes) {
 		int flag = CollectionTranscoder.examineFlags(type);
 		boolean noreply = false;
-		CollectionCreate bTreeCreate = new SetCreate(flag,
+		CollectionCreate setCreate = new SetCreate(flag,
 				attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
-		return asyncCollectionCreate(key, bTreeCreate);
+		return asyncCollectionCreate(key, setCreate);
 	}
 
 	/*
@@ -1224,10 +1224,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementValueType type, CollectionAttributes attributes) {
 		int flag = CollectionTranscoder.examineFlags(type);
 		boolean noreply = false;
-		CollectionCreate bTreeCreate = new ListCreate(flag,
+		CollectionCreate listCreate = new ListCreate(flag,
 				attributes.getExpireTime(), attributes.getMaxCount(),
 				attributes.getOverflowAction(), attributes.getReadable(), noreply);
-		return asyncCollectionCreate(key, bTreeCreate);
+		return asyncCollectionCreate(key, listCreate);
 	}
 
 	/**

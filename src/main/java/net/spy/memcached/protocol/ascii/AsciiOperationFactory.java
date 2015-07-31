@@ -62,6 +62,7 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
+import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -195,7 +196,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 		return new CollectionGetOperationImpl(key, collectionGet, cb);
 	}
 	
-	public CollectionGetOperation collectionGet2(String key,
+	public ExtendedBTreeGetOperation collectionGet2(String key,
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
 		return new ExtendedBTreeGetOperationImpl(key, collectionGet, cb);
 	}
@@ -230,7 +231,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 
 	@Override
-	public CollectionStoreOperation collectionUpsert(String key, String subkey,
+	public CollectionUpsertOperation collectionUpsert(String key, String subkey,
 			CollectionStore<?> collectionStore, byte[] data,
 			OperationCallback cb) {
 		return new CollectionUpsertOperationImpl(key, subkey, collectionStore,

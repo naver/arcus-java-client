@@ -60,6 +60,7 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
+import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -292,7 +293,7 @@ public interface OperationFactory {
 	 * @param cb the callback that will contain the results
 	 * @return a new CollectionGetOperation
 	 */
-	CollectionGetOperation collectionGet2(String key, 
+	ExtendedBTreeGetOperation collectionGet2(String key, 
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb);
 	
 	/**
@@ -392,7 +393,7 @@ public interface OperationFactory {
 	 * @param cb the status callback
 	 * @return a new CollectionStoreOperation
 	 */
-	CollectionStoreOperation collectionUpsert(String key, String subkey, 
+	CollectionUpsertOperation collectionUpsert(String key, String subkey, 
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
 
 	/**

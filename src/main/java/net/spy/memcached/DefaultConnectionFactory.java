@@ -105,6 +105,11 @@ public class DefaultConnectionFactory extends SpyObject
      */
     public static final int DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD = 998;
     
+	/**
+	* Maximum timeout ratio for shutdown connection
+	*/
+	public static final int DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD = 0;
+
     /**
      * Maximum number of Front cache elements
      */
@@ -354,6 +359,13 @@ public class DefaultConnectionFactory extends SpyObject
 	 */
 	public int getTimeoutExceptionThreshold() {
 		return DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getTimeoutRatioThreshold()
+	 */
+	public int getTimeoutRatioThreshold() {
+		return DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
 	}
 	
 	/* (non-Javadoc)

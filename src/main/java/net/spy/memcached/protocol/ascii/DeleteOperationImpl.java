@@ -11,6 +11,7 @@ import net.spy.memcached.ops.DeleteOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to delete an item from the cache.
@@ -30,6 +31,7 @@ final class DeleteOperationImpl extends OperationImpl
 	public DeleteOperationImpl(String k, OperationCallback cb) {
 		super(cb);
 		key=k;
+		setOperationType(OperationType.WRITE);
 	}
 
 	@Override

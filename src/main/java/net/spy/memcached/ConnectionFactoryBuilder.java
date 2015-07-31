@@ -63,6 +63,7 @@ public class ConnectionFactoryBuilder {
 
 //	private int timeoutExceptionThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
 	private int timeoutExceptionThreshold = 10;
+	private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
 	
 	private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
 	private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
@@ -255,6 +256,18 @@ public class ConnectionFactoryBuilder {
 	}
 	
 	/**
+	 * Set the maximum timeout ratio threshold: 0(disabled, default), 1~99
+	 */
+	public ConnectionFactoryBuilder setTimeoutRatioThreshold(int to) {
+		assert (to >= 0 && to < 100) : "Timeout ratio threshold range is 0~99.";
+		if (to < 0 || to >= 100)
+			timeoutRatioThreshold = 0; // disable
+		else
+			timeoutRatioThreshold = to;
+		return this;
+	}
+
+	/**
 	 * Set the maximum number of front cache elements.
 	 */
 	public ConnectionFactoryBuilder setMaxFrontCacheElements(int to) {
@@ -428,6 +441,11 @@ public class ConnectionFactoryBuilder {
 				return timeoutExceptionThreshold;
 			}
 			
+			@Override
+			public int getTimeoutRatioThreshold() {
+				return timeoutRatioThreshold;
+			}
+
 			@Override
 			public int getMaxFrontCacheElements() {
 				return maxFrontCacheElements;

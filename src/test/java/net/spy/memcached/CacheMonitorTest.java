@@ -66,7 +66,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
 		cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
 		
 		// then
-		assertEquals(children, cacheMonitor.prevChildren);
+		assertEquals(children, ((CacheMonitorListener)listener).getPrevChildren());
 	}
 	
 	public void testProcessResult_emptyChildren() {
@@ -80,7 +80,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
 		cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
 		
 		// then
-		assertEquals(fakeChildren, cacheMonitor.prevChildren);
+		assertEquals(fakeChildren, ((CacheMonitorListener)listener).getPrevChildren());
 	}
 	
 	public void testProcessResult_otherEvents() {

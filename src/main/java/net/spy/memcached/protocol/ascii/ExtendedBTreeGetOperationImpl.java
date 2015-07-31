@@ -24,18 +24,18 @@ import java.util.Collections;
 import net.spy.memcached.collection.ExtendedBTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to retrieve collection data in a memcached server.
  */
 public class ExtendedBTreeGetOperationImpl extends OperationImpl 
-	implements CollectionGetOperation {
+	implements ExtendedBTreeGetOperation {
 
 	private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
@@ -78,6 +78,10 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionGet = collectionGet;
+		if (collectionGet.isDelete())
+			setOperationType(OperationType.WRITE);
+		else
+			setOperationType(OperationType.READ);
 	}
 	
 	/**

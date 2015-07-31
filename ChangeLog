@@ -1,3 +1,14 @@
+2015-07-31 [version 1.8.2]
+	* Change ZK_CONNECT_TIMEOUT from 5 to SESSION_TIMEOUT seconds.
+	* Decrease default operation timeout - 1000 => 700 ms.
+	* Add OperationType in all operation classes.
+	* Fix CASMutator expiration issue (SPY-69 patch)
+	* Cancel all WRITING operations in setupResend()
+	  if failure mode is cancel.
+	* Do not reset continous timeout when operation is cancelled.
+	* Add timeout ratio threshold
+	* Internal code optimization and code refactoring.
+
 2015-01-13 [version 1.8.1]
 	* Throw AdminConnectTimeoutException
 	  if connecting to arcus admin timed out.
