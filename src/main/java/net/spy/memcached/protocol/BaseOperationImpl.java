@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
@@ -47,6 +48,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 	private volatile MemcachedNode handlingNode = null;
 	
 	private OperationType opType = OperationType.UNDEFINED;
+	private APIType apiType = APIType.UNDEFINED;
 
 	public BaseOperationImpl() {
 		super();
@@ -180,5 +182,13 @@ public abstract class BaseOperationImpl extends SpyObject {
 	
 	public boolean isReadOperation() {
 		return this.opType == OperationType.READ;
+	}
+	
+	public APIType getAPIType() {
+		return this.apiType;
+	}
+	
+	public void setAPIType(APIType type) {
+		this.apiType = type;
 	}
 }

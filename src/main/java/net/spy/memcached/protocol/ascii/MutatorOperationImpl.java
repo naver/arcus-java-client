@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
@@ -55,6 +56,10 @@ final class MutatorOperationImpl extends OperationImpl
 		amount=amt;
 		def=d;
 		exp=e;
+		if (m == Mutator.incr)
+			setAPIType(APIType.INCR);
+		else if (m == Mutator.decr)
+			setAPIType(APIType.DECR);
 		setOperationType(OperationType.WRITE);
 	}
 

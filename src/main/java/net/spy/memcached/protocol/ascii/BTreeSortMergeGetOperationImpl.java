@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -73,6 +74,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 			OperationCallback cb) {
 		super(cb);
 		this.smGet = smGet;
+		setAPIType(APIType.BOP_SMGET);
 		setOperationType(OperationType.READ);
 	}
 	

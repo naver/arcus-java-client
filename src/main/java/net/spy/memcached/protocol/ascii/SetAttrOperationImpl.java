@@ -24,6 +24,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
@@ -57,6 +58,7 @@ class SetAttrOperationImpl extends OperationImpl
 		this.key = key;
 		// If no attributes given, set to default values
 		this.attrs = (attrs == null)? new CollectionAttributes() : attrs;
+		setAPIType(APIType.SETATTR);
 		setOperationType(OperationType.WRITE);
 	}
 

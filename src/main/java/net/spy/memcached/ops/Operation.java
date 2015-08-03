@@ -86,4 +86,6 @@ public interface Operation {
 	boolean isWriteOperation();
 
 	boolean isReadOperation();
+
+	APIType getAPIType();
 }

@@ -23,6 +23,7 @@ import java.util.List;
 
 import net.spy.memcached.collection.CollectionBulkStore;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionBulkStoreOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -75,6 +76,12 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 		this.key = keyList.get(0);
 		this.store = store;
 		this.cb = (Callback) cb;
+		if (this.store instanceof CollectionBulkStore.ListBulkStore)
+			setAPIType(APIType.LOP_INSERT);
+		else if (this.store instanceof CollectionBulkStore.SetBulkStore)
+			setAPIType(APIType.SOP_INSERT);
+		else if (this.store instanceof CollectionBulkStore.BTreeBulkStore)
+			setAPIType(APIType.BOP_INSERT); 
 		setOperationType(OperationType.WRITE);
 	}
 

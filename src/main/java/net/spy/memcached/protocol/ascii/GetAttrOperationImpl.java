@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.OperationState;
@@ -52,6 +53,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 		super(cb);
 		this.key = key;
 		this.cb = cb;
+		setAPIType(APIType.GETATTR);
 		setOperationType(OperationType.READ);
 	}
 

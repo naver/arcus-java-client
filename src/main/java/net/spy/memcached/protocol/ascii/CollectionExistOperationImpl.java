@@ -23,6 +23,8 @@ import java.util.Collections;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.SetExist;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionExistOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -64,6 +66,8 @@ public class CollectionExistOperationImpl extends OperationImpl
 		this.subkey = subkey;
 		this.collectionExist = collectionExist;
 		this.data = collectionExist.getData();
+		if (this.collectionExist instanceof SetExist)
+			setAPIType(APIType.SOP_EXIST);
 		setOperationType(OperationType.READ);
 	}
 

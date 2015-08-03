@@ -21,8 +21,12 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.ListGet;
+import net.spy.memcached.collection.SetGet;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -77,6 +81,12 @@ public class CollectionGetOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionGet = collectionGet;
+		if (this.collectionGet instanceof ListGet)
+			setAPIType(APIType.LOP_GET);
+		else if (this.collectionGet instanceof SetGet)
+			setAPIType(APIType.SOP_GET);
+		else if (this.collectionGet instanceof BTreeGet)
+			setAPIType(APIType.BOP_GET); 
 		if (collectionGet.isDelete())
 			setOperationType(OperationType.WRITE);
 		else

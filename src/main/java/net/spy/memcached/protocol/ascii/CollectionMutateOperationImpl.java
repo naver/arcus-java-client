@@ -20,10 +20,13 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.collection.BTreeMutate;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionMutateOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -58,6 +61,12 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.subkey = subkey;
 		this.collectionMutate = collectionMutate;
+		if (this.collectionMutate instanceof BTreeMutate) {
+			if (((BTreeMutate) this.collectionMutate).getMutator() == Mutator.incr)
+				setAPIType(APIType.BOP_INCR);
+			else
+				setAPIType(APIType.BOP_DECR);
+		}
 		setOperationType(OperationType.WRITE);
 	}
 

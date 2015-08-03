@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.DeleteOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
@@ -31,6 +32,7 @@ final class DeleteOperationImpl extends OperationImpl
 	public DeleteOperationImpl(String k, OperationCallback cb) {
 		super(cb);
 		key=k;
+		setAPIType(APIType.DELETE);
 		setOperationType(OperationType.WRITE);
 	}
 

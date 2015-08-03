@@ -25,6 +25,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeStoreAndGet;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeStoreAndGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -96,6 +97,10 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.get = get;
 		this.dataToStore = dataToStore;
+		if (get.getCmd() == BTreeStoreAndGet.Command.INSERT)
+			setAPIType(APIType.BOP_INSERT);
+		else if (get.getCmd() == BTreeStoreAndGet.Command.UPSERT)
+			setAPIType(APIType.BOP_UPSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
