@@ -157,7 +157,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 				 * Maybe! this group have slave and slave node
 				 * or slave node only
 				 */
-			 	ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+			 	ArcusClient.arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
 						+ "This group don't have master node. "
 						+ newGroupNodes);
 				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
