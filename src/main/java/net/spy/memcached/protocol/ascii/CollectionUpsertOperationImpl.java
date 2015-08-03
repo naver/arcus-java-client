@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionStore;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -73,6 +75,8 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 		this.subkey = subkey;
 		this.collectionStore = collectionStore;
 		this.data = data;
+		if (this.collectionStore instanceof BTreeUpsert)
+			setAPIType(APIType.BOP_UPSERT); 
 		setOperationType(OperationType.WRITE);
 	}
 

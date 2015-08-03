@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -72,6 +73,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		super(cb);
 		this.key = key;
 		this.get = get;
+		setAPIType(APIType.BOP_PWG);
 		setOperationType(OperationType.READ);
 	}
 

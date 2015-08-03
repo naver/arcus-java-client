@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.collection.CollectionPipedUpdate;
+import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -74,6 +76,8 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.update = update;
 		this.cb = (Callback) cb;
+		if (this.update instanceof BTreePipedUpdate)
+			setAPIType(APIType.BOP_UPDATE);
 		setOperationType(OperationType.WRITE);
 	}
 

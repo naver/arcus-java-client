@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -66,6 +67,8 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 		this.key = key;
 		this.setPipedExist = collectionExist;
 		this.cb = (Callback) cb;
+		if (this.setPipedExist instanceof SetPipedExist)
+			setAPIType(APIType.SOP_EXIST);
 		setOperationType(OperationType.READ);
 	}
 

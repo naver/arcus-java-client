@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -72,6 +73,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 	public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
 		super(cb);
 		this.getBulk = getBulk;
+		setAPIType(APIType.BOP_GET);
 		setOperationType(OperationType.READ);
 	}
 

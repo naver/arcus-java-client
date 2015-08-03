@@ -6,6 +6,7 @@ import java.util.Collections;
 
 import net.spy.memcached.CASResponse;
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CASOperation;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -42,6 +43,7 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
 		flags=f;
 		exp=e;
 		data=d;
+		setAPIType(APIType.CAS);
 		setOperationType(OperationType.WRITE);
 	}
 

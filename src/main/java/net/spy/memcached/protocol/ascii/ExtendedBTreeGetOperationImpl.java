@@ -24,6 +24,7 @@ import java.util.Collections;
 import net.spy.memcached.collection.ExtendedBTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -78,6 +79,8 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionGet = collectionGet;
+		if (this.collectionGet instanceof ExtendedBTreeGet)
+			setAPIType(APIType.BOP_GET); 
 		if (collectionGet.isDelete())
 			setOperationType(OperationType.WRITE);
 		else

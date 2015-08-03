@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -71,6 +73,8 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 		this.subkey = subkey;
 		this.collectionUpdate = collectionUpdate;
 		this.data = data;
+		if (this.collectionUpdate instanceof BTreeUpdate)
+			setAPIType(APIType.BOP_UPDATE); 
 		setOperationType(OperationType.WRITE);
 	}
 
