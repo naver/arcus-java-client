@@ -1,6 +1,6 @@
 ### Java Client Log Messages
 
-Java client에서 남기는 로그들과 그것들이 의미하는 바는 아래와 같다. 로그는 서비스에서 설정한 위치에 남게 된다. 로그 레벨 변경과 logger 설정은 오류: 참조 소스를 찾을 수 없습니다.의 오류: 참조 소스를 찾을 수 없습니다.을 참고하기 바란다.
+Java client에서 남기는 로그들과 그것들이 의미하는 바는 아래와 같다. 로그는 서비스에서 설정한 위치에 남게 된다. 로그 레벨 변경과 logger 설정은 [arcus client 설정](02-arcus-java-client.md#arcus-client-설정)을 참고하기 바란다.
 
 
 #### Arcus client가 정상적으로 초기화 되었을 때

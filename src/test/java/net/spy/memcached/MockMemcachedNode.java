@@ -65,7 +65,7 @@ public class MockMemcachedNode implements MemcachedNode {
 	public void copyInputQueue() {
 		// noop
 	}
-	public void setupResend() {
+	public void setupResend(boolean cancelWrite) {
 		// noop
 	}
 	public void fillWriteBuffer(boolean optimizeGets) {
@@ -134,6 +134,14 @@ public class MockMemcachedNode implements MemcachedNode {
 		// noop
 	}
 	
+	public void enableTimeoutRatio() {
+		// noop
+	}
+
+	public int getTimeoutRatioNow() {
+		return -1; // disabled
+	}
+
 	public boolean isFake() {
 		return false;
 	}

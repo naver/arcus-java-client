@@ -459,7 +459,22 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
 
   Timeout이 연속으로 발생할 경우 해당 Connection에 문제가 발생했다고 판단하여 Connection을 끊고 재접속을 시도한다.
   Arcus에서 사용하는 연속 Timeout 한계값은 10이다.
+
+- setTimeoutRatioThreshold(int to)
+
+  Client request가 어떤 이유로 오랫동안 처리되지 못하면, Arcus client는 continuous timeout 방법으로
+  이를 탐지하고 응용에게 빠른 실패 응답을 전달한다. 따라서, 응용은 실패한 request 성격에 따라
+  DB 조회할 지 아니면 Arcus에 재요청할 지를 결정하여 움직일 수 있다.
+
+  Client request가 오랫동안 처리되지 못하는 것이 아닌 그 처리 속도가 매우 느려진 경우에는
+  일부 request에 대해 operation timeout이 발생하지만 다른 일부 requests는 정상 처리될 수 있다.
+  이 경우, client request가 정상 처리되 않지만 continuous timeout이 발생하지 않을 수 있다.
+  이러한 상태를 탐지하기 위하여, 최근 100개 requests에 대해 timeout ratio를 계산하여 
+  특정 threshold 이상이면 현재 connection을 끊고 재접속을 시도하는 기능이다.
   
+  Timeout ratio threshold의 default 값은 0으로 disabled된 상태이며,
+  1 ~ 99 사이의 값을 주면 그 값으로 timeout ratio threshold가 설정되어 동작하게 된다.
+
 - setOpQueueMaxBlockTime(long t)
 
   Operation을 요청할 때 비동기식으로 Operation queue에 등록하여 작업을 요청하게 되어 있는데,

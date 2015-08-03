@@ -142,7 +142,7 @@ class MemcachedNodeROImpl implements MemcachedNode {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setupResend() {
+	public void setupResend(boolean cancelWrite) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -174,6 +174,14 @@ class MemcachedNodeROImpl implements MemcachedNode {
 		throw new UnsupportedOperationException();
 	}
 	
+	public void enableTimeoutRatio() {
+		throw new UnsupportedOperationException();
+	}
+
+	public int getTimeoutRatioNow() {
+		throw new UnsupportedOperationException();
+	}
+
 	public boolean isFake() {
 		throw new UnsupportedOperationException(); 
 	}

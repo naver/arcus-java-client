@@ -28,6 +28,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
@@ -62,15 +64,56 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
+	private boolean toRatioEnabled = false;
+	private int[] toCountArray;
+	private final static int MAX_TOCOUNT = 100;   /* to count array size */
+	private int toCountIdx;         /* to count array index */
+	private int toRatioMax;         /* maximum timeout ratio */
+	private int toRatioNow;         /* current timeout ratio */
+	private Lock toRatioLock = new ReentrantLock();
 
-	// # of operations added into inputQueue
-	private long addOpCount;
+	/* # of operations added into inputQueue as a hint.
+	 * If we need a correct count, AtomicLong object must be used.
+	 */
+	private volatile long addOpCount;
 
 	// fake node
 	private boolean isFake = false; 
 	
 	public boolean isFake() {
 		return isFake;
+	}
+
+	private void resetTimeoutRatioCount() {
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			for (int i=0; i < MAX_TOCOUNT; i++) {
+				toCountArray[i] = 0;
+			}
+			toCountIdx = -1;
+			toRatioMax = 0;
+			toRatioNow = 0;
+			toRatioLock.unlock();
+		}
+	}
+
+	private void addTimeoutRatioCount(boolean timedOut) {
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			if ((++toCountIdx) >= MAX_TOCOUNT)
+				toCountIdx = 0;
+			if (toCountArray[toCountIdx] > 0) {
+				toRatioNow -= toCountArray[toCountIdx];
+				toCountArray[toCountIdx] = 0;
+			}
+			if (timedOut) {
+				toCountArray[toCountIdx] = 1;
+				toRatioNow += 1;
+				if (toRatioNow > toRatioMax)
+					toRatioMax = toRatioNow;
+			}
+			toRatioLock.unlock();
+		}
 	}
 
 	public TCPMemcachedNodeImpl(SocketAddress sa, SocketChannel c,
@@ -129,11 +172,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#setupResend()
 	 */
-	public final void setupResend() {
+	public final void setupResend(boolean cancelWrite) {
 		// First, reset the current write op, or cancel it if we should
 		// be authenticating
 		Operation op=getCurrentWriteOp();
-		if(shouldAuth && op != null) {
+		if((cancelWrite || shouldAuth) && op != null) {
 		    op.cancel();
 		} else if(op != null) {
 			ByteBuffer buf=op.getBuffer();
@@ -154,7 +197,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			}
 		}
 
-		while(shouldAuth && hasWriteOp()) {
+		while((cancelWrite || shouldAuth) && hasWriteOp()) {
 			op=removeCurrentWriteOp();
 			getLogger().warn("Discarding partially completed op: %s", op);
 			op.cancel();
@@ -387,6 +430,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void reconnecting() {
 		reconnectAttempt++;
 		continuousTimeout.set(0);
+		resetTimeoutRatioCount();
 	}
 
 	/* (non-Javadoc)
@@ -395,6 +439,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void connected() {
 		reconnectAttempt=0;
 		continuousTimeout.set(0);
+		resetTimeoutRatioCount();
 	}
 
 	/* (non-Javadoc)
@@ -489,6 +534,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 * @see net.spy.memcached.MemcachedNode#setContinuousTimeout
 	 */
 	public void setContinuousTimeout(boolean timedOut) {
+		if (isActive()) {
+			addTimeoutRatioCount(timedOut);
+		}
 		if (timedOut && isActive()) {
 			continuousTimeout.incrementAndGet();
 		} else {
@@ -503,6 +551,27 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		return continuousTimeout.get();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#enableTimeoutRatio
+	 */
+	public void enableTimeoutRatio() {
+		toRatioEnabled = true;
+		toCountArray = new int[MAX_TOCOUNT];
+		resetTimeoutRatioCount();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#getTimeoutRatioNow
+	 */
+	public int getTimeoutRatioNow() {
+		int ratio = -1; // invalid
+		if (toRatioEnabled) {
+			toRatioLock.lock();
+			ratio = toRatioNow;
+			toRatioLock.unlock();
+		}
+		return ratio;
+	}
 
 	public final void fixupOps() {
 		// As the selection key can be changed at any point due to node
@@ -533,7 +602,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 				inputQueue.drainTo(reconnectBlocked);
 			}
 			assert(inputQueue.size() == 0);
-			setupResend();
+			setupResend(false);
 		} else {
 			authLatch = new CountDownLatch(0);
 		}
@@ -572,6 +641,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		sb.append(" #Wops=").append(getWriteQueueSize());
 		sb.append(" #Rops=").append(getReadQueueSize());
 		sb.append(" #CT=").append(getContinuousTimeout());
+		sb.append(" #TR=").append(getTimeoutRatioNow());
 		return sb.toString();
 	}
 }
