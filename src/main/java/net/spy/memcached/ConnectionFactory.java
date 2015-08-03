@@ -161,6 +161,11 @@ public interface ConnectionFactory {
 	int getTimeoutExceptionThreshold();
 	
 	/**
+	 * Maximum timeout ratio for shutdown connection
+	 */
+	int getTimeoutRatioThreshold();
+
+	/**
 	 * Set the maximum number of front cache elements.
 	 */
 	int getMaxFrontCacheElements();

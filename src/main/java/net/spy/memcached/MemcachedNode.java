@@ -46,8 +46,10 @@ public interface MemcachedNode {
 	/**
 	 * Clear the queue of currently processing operations by either cancelling
 	 * them or setting them up to be reapplied after a reconnect.
+	 *
+	 * @param cancelWrite if true, cancel all operations in write queue
 	 */
-	void setupResend();
+	void setupResend(boolean cancelWrite);
 
 	/**
 	 * Fill the write buffer with data from the next operations in the queue.
@@ -213,6 +215,10 @@ public interface MemcachedNode {
 	void setContinuousTimeout(boolean timedOut);
 
 	int getContinuousTimeout();
+
+	void enableTimeoutRatio();
+
+	int getTimeoutRatioNow();
 	
 	/**
 	 * Is this a fake node?
