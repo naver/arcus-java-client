@@ -22,9 +22,11 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -205,5 +207,13 @@ public interface ConnectionFactory {
 	 * get read priority on replica nodes
 	 */
 	ReadPriority getReadPriority();
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+	/**
+	 * get api read priority 
+	 * @return
+	 */
+	Map<APIType, ReadPriority> getAPIReadPriority();
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

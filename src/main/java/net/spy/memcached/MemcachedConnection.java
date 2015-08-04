@@ -907,23 +907,53 @@ public final class MemcachedConnection extends SpyObject {
 
 	/* ENABLE_REPLICATION if */
 	private ReplicaPick getReplicaPick(final Operation o) {
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		ReplicaPick pick = ReplicaPick.MASTER;
+		
+		if (o.isReadOperation()) {
+			ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
+			if (readPriority != null) {
+				if (readPriority == ReadPriority.SLAVE)
+					pick = ReplicaPick.SLAVE;
+				else if (readPriority == ReadPriority.RR)
+					pick = ReplicaPick.RR;
+			} else {
+				pick = getReplicaPick();
+			}
+		}
+
+		return pick;
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		if (o.isWriteOperation())
 			return ReplicaPick.MASTER; 
 		else
 			return getReplicaPick();
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	}
 	
 	public ReplicaPick getReplicaPick() {
 		ReadPriority readPriority = f.getReadPriority();
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		ReplicaPick pick = ReplicaPick.MASTER;
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		ReplicaPick pick = null;
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		
 		if (readPriority == ReadPriority.SLAVE)
 			pick = ReplicaPick.SLAVE;
 		else if (readPriority == ReadPriority.RR)
 			pick = ReplicaPick.RR;
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		/*
 		else
 			pick = ReplicaPick.MASTER;
-		
+
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		return pick;
 	}
 	/* ENABLE_REPLICATION end */
