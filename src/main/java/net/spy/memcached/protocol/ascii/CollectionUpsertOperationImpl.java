@@ -61,8 +61,6 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	private static final OperationStatus LENGTH_MISMATCH = new CollectionOperationStatus(
-			false, "LENGTH_MISMATCH", CollectionResponse.LENGTH_MISMATCH);
 
 	protected final String key;
 	protected final String subkey;
@@ -89,7 +87,7 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 		getCallback().receivedStatus(
 				matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
 						ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-						TYPE_MISMATCH, BKEY_MISMATCH, LENGTH_MISMATCH));
+						TYPE_MISMATCH, BKEY_MISMATCH));
 		transitionState(OperationState.COMPLETE);
 	}
 

@@ -2988,7 +2988,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				case OVERFLOWED:
 				case OUT_OF_RANGE:
 				case TYPE_MISMATCH:
-				case LENGTH_MISMATCH:
 				case BKEY_MISMATCH:
 					rv.set(false, cstatus);
 					if (getLogger().isDebugEnabled()) {

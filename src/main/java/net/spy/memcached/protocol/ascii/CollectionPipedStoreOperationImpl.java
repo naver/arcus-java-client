@@ -60,8 +60,6 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	private static final OperationStatus LENGTH_MISMATCH = new CollectionOperationStatus(
-			false, "LENGTH_MISMATCH", CollectionResponse.LENGTH_MISMATCH);
 
 	protected final String key;
 	protected final CollectionPipedStore<?> store;
@@ -109,7 +107,7 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 		} else {
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
 					NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-					TYPE_MISMATCH, BKEY_MISMATCH, LENGTH_MISMATCH);
+					TYPE_MISMATCH, BKEY_MISMATCH);
 			
 			if (!status.isSuccess()) {
 				cb.gotStatus(index, status);
