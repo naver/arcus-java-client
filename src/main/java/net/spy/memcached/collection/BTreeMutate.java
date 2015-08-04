@@ -22,6 +22,8 @@ public class BTreeMutate extends CollectionMutate {
 
 	private final String command;
 	
+	protected final Mutator m;
+
 	protected final int by;
 
 	public BTreeMutate(Mutator m, int by) {
@@ -31,6 +33,7 @@ public class BTreeMutate extends CollectionMutate {
 			command = "bop decr";
 		}
 		
+		this.m = m;
 		this.by = by;
 	}
 	
@@ -47,5 +50,9 @@ public class BTreeMutate extends CollectionMutate {
 
 	public String getCommand() {
 		return command;
+	}
+	
+	public Mutator getMutator() {
+		return this.m;
 	}
 }

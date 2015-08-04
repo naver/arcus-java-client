@@ -4,6 +4,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.ByteBuffer;
 
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
@@ -26,6 +27,7 @@ final class FlushOperationImpl extends OperationImpl
 	public FlushOperationImpl(int d, OperationCallback cb) {
 		super(cb);
 		delay=d;
+		setAPIType(APIType.FLUSH);
 		setOperationType(OperationType.WRITE);
 	}
 

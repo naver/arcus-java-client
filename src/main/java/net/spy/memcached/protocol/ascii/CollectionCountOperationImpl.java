@@ -20,8 +20,10 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionCountOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -57,6 +59,8 @@ public class CollectionCountOperationImpl extends OperationImpl implements
 		super(cb);
 		this.key = key;
 		this.collectionCount = collectionCount;
+		if (this.collectionCount instanceof BTreeCount)
+			setAPIType(APIType.BOP_COUNT);
 		setOperationType(OperationType.READ);
 	}
 

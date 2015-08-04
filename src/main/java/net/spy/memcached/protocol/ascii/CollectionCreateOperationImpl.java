@@ -21,8 +21,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.collection.BTreeCreate;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.ListCreate;
+import net.spy.memcached.collection.SetCreate;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -56,6 +60,12 @@ public class CollectionCreateOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionCreate = collectionCreate;
+		if (this.collectionCreate instanceof ListCreate)
+			setAPIType(APIType.LOP_CREATE);
+		else if (this.collectionCreate instanceof SetCreate)
+			setAPIType(APIType.SOP_CREATE);
+		else if (this.collectionCreate instanceof BTreeCreate)
+			setAPIType(APIType.BOP_CREATE);
 		setOperationType(OperationType.WRITE);
 	}
 

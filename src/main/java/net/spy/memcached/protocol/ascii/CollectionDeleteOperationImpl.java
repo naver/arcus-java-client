@@ -20,8 +20,12 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.collection.BTreeDelete;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.ListDelete;
+import net.spy.memcached.collection.SetDelete;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionDeleteOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -61,6 +65,12 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		super(cb);
 		this.key = key;
 		this.collectionDelete = collectionDelete;
+		if (this.collectionDelete instanceof ListDelete)
+			setAPIType(APIType.LOP_DELETE);
+		else if (this.collectionDelete instanceof SetDelete)
+			setAPIType(APIType.SOP_DELETE);
+		else if (this.collectionDelete instanceof BTreeDelete)
+			setAPIType(APIType.BOP_DELETE); 
 		setOperationType(OperationType.WRITE);
 	}
 	

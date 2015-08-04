@@ -4,6 +4,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.ByteBuffer;
 
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
@@ -21,6 +22,7 @@ final class VersionOperationImpl extends OperationImpl
 
 	public VersionOperationImpl(OperationCallback c) {
 		super(c);
+		setAPIType(APIType.VERSION);
 		setOperationType(OperationType.ETC);
 	}
 

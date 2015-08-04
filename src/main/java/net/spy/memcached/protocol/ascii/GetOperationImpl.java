@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.GetOperation;
 
 /**
@@ -17,10 +18,12 @@ class GetOperationImpl extends BaseGetOpImpl implements GetOperation {
 
 	public GetOperationImpl(String key, GetOperation.Callback c) {
 		super(CMD, c, Collections.singleton(key));
+		setAPIType(APIType.GET);
 	}
 
 	public GetOperationImpl(Collection<String> k, GetOperation.Callback c) {
 		super(CMD, c, new HashSet<String>(k));
+		setAPIType(APIType.GET);
 	}
 
 }
