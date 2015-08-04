@@ -86,9 +86,7 @@ public class ConnectionFactoryBuilder {
 	private boolean arcusReplEnabled = false;
 
 	private ReadPriority readPriority = ReadPriority.MASTER;
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public void setArcusReplEnabled(boolean b) {
 		arcusReplEnabled = b;
@@ -347,7 +345,6 @@ public class ConnectionFactoryBuilder {
 		readPriority = priority;
 		return this;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	public ConnectionFactoryBuilder setAPIReadPriority(APIType apiType, ReadPriority readPriority) {
 		OperationType type = apiType.getAPIOpType();
@@ -387,7 +384,6 @@ public class ConnectionFactoryBuilder {
 	public Map<APIType, ReadPriority> getAPIReadPriority() {
 		return this.apiReadPriorityList;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	/**
@@ -582,13 +578,11 @@ public class ConnectionFactoryBuilder {
 			public ReadPriority getReadPriority() {
 				return readPriority;
 			}
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 			
 			@Override
 			public Map<APIType, ReadPriority> getAPIReadPriority() {
 				return apiReadPriorityList;
 			}
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			/* ENABLE_REPLICATION end */
 		};
 	}

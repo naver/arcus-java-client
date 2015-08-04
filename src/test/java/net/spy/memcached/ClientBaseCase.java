@@ -230,13 +230,11 @@ public abstract class ClientBaseCase extends TestCase {
 				public ReadPriority getReadPriority() {
 					return inner.getReadPriority();
 				}
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 				
 				@Override
 				public Map<APIType, ReadPriority> getAPIReadPriority() {
 					return inner.getAPIReadPriority();
 				}
-				/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 				/* ENABLE_REPLICATION end */
 			};
 		}

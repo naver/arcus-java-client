@@ -36,12 +36,5 @@ public enum ReadPriority {
 	 * Read RR(Round-robin) pattern.
 	 */
 	RR, 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-	/*
-
-	// for API
-	NONE
-	*/
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 }
 /* ENABLE_REPLICATION end */

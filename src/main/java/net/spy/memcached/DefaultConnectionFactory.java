@@ -159,9 +159,7 @@ public class DefaultConnectionFactory extends SpyObject
 
 	/* ENABLE_REPLICATION if */
 	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<APIType, ReadPriority>();
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	/**
@@ -445,11 +443,9 @@ public class DefaultConnectionFactory extends SpyObject
 	public ReadPriority getReadPriority() {
 		return DEFAULT_READ_PRIORITY;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	
 	public Map<APIType, ReadPriority> getAPIReadPriority() {
 		return DEFAULT_API_READ_PRIORITY_LIST;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }
