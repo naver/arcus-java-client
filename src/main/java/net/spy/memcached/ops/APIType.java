@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* ENABLE_REPLICATION if */
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 package net.spy.memcached.ops;
 
 /* for Operation API String */
@@ -76,5 +74,3 @@ public enum APIType {
 		return this.apiOpType;
 	}
 }
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-/* ENABLE_REPLICATION end */
