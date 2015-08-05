@@ -19,5 +19,14 @@ public enum CASResponse {
 	 * different CAS value than expected.  In this case, the value must be
 	 * refetched and the CAS operation tried again.
 	 */
-	EXISTS
+	EXISTS,
+	/**
+	 * Status indicating the CAS operation was cancelled
+	 * by java client internal.
+	 */
+	CANCELED,
+	/**
+	 * Status indicating the undefined response was delivered from the cache.
+	 */
+	UNDEFINED
 }
