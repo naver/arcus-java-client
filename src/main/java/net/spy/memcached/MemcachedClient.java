@@ -477,10 +477,9 @@ public class MemcachedClient extends SpyThread
 						if(val instanceof CASOperationStatus) {
 							rv.set(((CASOperationStatus)val).getCASResponse());
 						} else if(val instanceof CancelledOperationStatus) {
-							// Cancelled, ignore and let it float up
+							rv.set(CASResponse.CANCELED);
 						} else {
-							throw new RuntimeException(
-								"Unhandled state: " + val);
+							rv.set(CASResponse.UNDEFINED);
 						}
 					}
 					public void complete() {

@@ -61,8 +61,6 @@ public class CollectionStoreOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	private static final OperationStatus LENGTH_MISMATCH = new CollectionOperationStatus(
-			false, "LENGTH_MISMATCH", CollectionResponse.LENGTH_MISMATCH);
 	
 	protected final String key;
 	protected final String subkey;	// e.g.) 0 or 0x00
@@ -91,7 +89,7 @@ public class CollectionStoreOperationImpl extends OperationImpl
 			: "Read ``" + line + "'' when in " + getState() + " state";
 		getCallback().receivedStatus(
 				matchStatus(line, STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS,
-						OVERFLOWED, OUT_OF_RANGE, TYPE_MISMATCH, LENGTH_MISMATCH, BKEY_MISMATCH));
+						OVERFLOWED, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH));
 		transitionState(OperationState.COMPLETE);
 	}
 
