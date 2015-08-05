@@ -36,8 +36,5 @@ public enum ReadPriority {
 	 * Read RR(Round-robin) pattern.
 	 */
 	RR, 
-
-	// for API
-	NONE
 }
 /* ENABLE_REPLICATION end */

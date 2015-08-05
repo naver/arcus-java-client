@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -227,6 +229,11 @@ public abstract class ClientBaseCase extends TestCase {
 				@Override
 				public ReadPriority getReadPriority() {
 					return inner.getReadPriority();
+				}
+				
+				@Override
+				public Map<APIType, ReadPriority> getAPIReadPriority() {
+					return inner.getAPIReadPriority();
 				}
 				/* ENABLE_REPLICATION end */
 			};

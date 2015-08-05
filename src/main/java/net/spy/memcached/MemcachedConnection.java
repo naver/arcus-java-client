@@ -907,23 +907,31 @@ public final class MemcachedConnection extends SpyObject {
 
 	/* ENABLE_REPLICATION if */
 	private ReplicaPick getReplicaPick(final Operation o) {
-		if (o.isWriteOperation())
-			return ReplicaPick.MASTER; 
-		else
-			return getReplicaPick();
+		ReplicaPick pick = ReplicaPick.MASTER;
+		
+		if (o.isReadOperation()) {
+			ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
+			if (readPriority != null) {
+				if (readPriority == ReadPriority.SLAVE)
+					pick = ReplicaPick.SLAVE;
+				else if (readPriority == ReadPriority.RR)
+					pick = ReplicaPick.RR;
+			} else {
+				pick = getReplicaPick();
+			}
+		}
+
+		return pick;
 	}
 	
 	public ReplicaPick getReplicaPick() {
 		ReadPriority readPriority = f.getReadPriority();
-		ReplicaPick pick = null;
+		ReplicaPick pick = ReplicaPick.MASTER;
 		
 		if (readPriority == ReadPriority.SLAVE)
 			pick = ReplicaPick.SLAVE;
 		else if (readPriority == ReadPriority.RR)
 			pick = ReplicaPick.RR;
-		else
-			pick = ReplicaPick.MASTER;
-		
 		return pick;
 	}
 	/* ENABLE_REPLICATION end */
