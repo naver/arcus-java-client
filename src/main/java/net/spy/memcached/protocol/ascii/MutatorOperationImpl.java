@@ -41,6 +41,8 @@ final class MutatorOperationImpl extends OperationImpl
 
 	private static final OperationStatus NOT_FOUND=
 		new OperationStatus(false, "NOT_FOUND");
+	private static final OperationStatus TYPE_MISMATCH=
+		new OperationStatus(false, "TYPE_MISMATCH");
 
 	private final Mutator mutator;
 	private final String key;
@@ -65,14 +67,14 @@ final class MutatorOperationImpl extends OperationImpl
 
 	@Override
 	public void handleLine(String line) {
-		getLogger().debug("BTreeGetResult:  %s", line);
-		OperationStatus found=null;
-		if(line.equals("NOT_FOUND")) {
-			found=NOT_FOUND;
-		} else {
-			found=new OperationStatus(true, line);
+		OperationStatus status=null;
+		try {
+			Long.valueOf(line);
+			getCallback().receivedStatus(new OperationStatus(true, line));
+		} catch (NumberFormatException e) {
+			status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
+			getCallback().receivedStatus(status);
 		}
-		getCallback().receivedStatus(found);
 		transitionState(OperationState.COMPLETE);
 	}
 
