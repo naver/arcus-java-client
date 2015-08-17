@@ -330,7 +330,7 @@ public final class MemcachedConnection extends SpyObject {
 						}
 					} else { /* Old group has both a master node and a slave node. */
 						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
-							if (newGroupAddrs.get(1) == oldGroup.getSlaveNode().getSocketAddress()) {
+							if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
 								/* The same master and slave nodes. Do nothing. */
 							} else {
 								/* Only old slave has changed to the new one. */
