@@ -82,6 +82,14 @@ public class Element<T> {
 	 */
 	public String getFlagByHex() {
 		// convert to hex based on its real byte array
+		if (eflag == null) {
+			return "";
+		}
+
+		if (eflag.length == 0) {
+			return "0";
+		}
+
 		return BTreeUtil.toHex(eflag);
 	}
 
