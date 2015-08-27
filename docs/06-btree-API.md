@@ -365,7 +365,8 @@ try {
     System.out.println(result);
     System.out.println(future.getOperationStatus().getResponse()); // (3)
 } catch (TimeoutException e) {
-    future.cancel(true);} catch (InterruptedException e) {
+    future.cancel(true);
+} catch (InterruptedException e) {
     future.cancel(true);
 } catch (ExecutionException e) {
     future.cancel(true);
@@ -989,14 +990,10 @@ try {
 
     if (!result.isEmpty()) { // (4)
         System.out.println("일부 item이 insert 실패 하였음.");
-        Iterator<Element<Object>> inputIterator = elements.iterator(); // (5)
-        int index = 0;
-
-        while (inputIterator.hasNext()) {
-            Element<Object> item = inputIterator.next();
-            System.out.print("실패한 아이템=" + item);
-            System.out.println(", 실패원인=" + result.get(index).getResponse()); // (6)
-            index++;
+        
+        for (Map.Entry<Integer, CollectionOperationStatus> entry : result.entrySet()) {
+            System.out.print("실패한 아이템=" + elements.get(entry.getKey()));
+            System.out.println(", 실패원인=" + entry.getValue().getResponse());
         }
     } else {
         System.out.println("모두 insert 성공함.");
