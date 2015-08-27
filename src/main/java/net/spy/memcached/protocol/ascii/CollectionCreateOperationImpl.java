@@ -48,7 +48,7 @@ public class CollectionCreateOperationImpl extends OperationImpl
 	private static final OperationStatus CREATED = new CollectionOperationStatus(
 			true, "CREATED", CollectionResponse.CREATED);
 	private static final OperationStatus EXISTS = new CollectionOperationStatus(
-			true, "EXISTS", CollectionResponse.EXISTS);
+			false, "EXISTS", CollectionResponse.EXISTS);
 	private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
 			false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 	
