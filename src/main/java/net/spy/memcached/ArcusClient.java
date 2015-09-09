@@ -2122,8 +2122,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					return null;
 				}
 
-				if (duplicatedTrimmed != null
-						|| (duplicated != null && trimmed != null))
+				if (duplicatedTrimmed == null && duplicated != null && trimmed != null)
+					duplicatedTrimmed = new OperationStatus(true, "DUPLICATED_TRIMMED");
+
+				if (duplicatedTrimmed != null)
 					return new CollectionOperationStatus(duplicatedTrimmed);
 				else if (duplicated != null)
 					return new CollectionOperationStatus(duplicated);
