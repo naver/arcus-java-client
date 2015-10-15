@@ -35,6 +35,7 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 	protected String range;
 	protected int offset = -1;
 	protected int count;
+	protected boolean unique;
 	protected Map<Integer, T> map;
 
 	protected boolean reverse;
@@ -49,12 +50,13 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 	private ElementFlagFilter eFlagFilter;
 	
 	public BTreeSMGetWithByteTypeBkey(List<String> keyList, byte[] from,
-			byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+			byte[] to, ElementFlagFilter eFlagFilter, int offset, int count, boolean unique) {
 		this.keyList = keyList;
 		this.range = BTreeUtil.toHex(from)  + ".." + BTreeUtil.toHex(to);
 		this.eFlagFilter = eFlagFilter;
 		this.offset = offset;
 		this.count = count;
+		this.unique = unique;
 		this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 	}
 	
@@ -104,6 +106,9 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 
 		b.append(" ").append(count);
 
+		if (unique)
+			b.append(" ").append("unique");
+		
 		str = b.toString();
 		return str;
 	}

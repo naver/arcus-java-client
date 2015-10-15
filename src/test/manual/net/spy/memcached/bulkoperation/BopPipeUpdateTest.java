@@ -189,7 +189,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
 				// System.out.println(element.getFlagByHex());
 				assertEquals("value" + i, element.getValue());
-				assertEquals(null, element.getFlagByHex());
+				assertEquals("", element.getFlagByHex());
 			}
 
 		} catch (Exception e) {

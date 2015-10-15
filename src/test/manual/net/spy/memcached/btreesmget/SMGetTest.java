@@ -18,6 +18,7 @@ package net.spy.memcached.btreesmget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -27,6 +28,7 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class SMGetTest extends BaseIntegrationTest {
 
@@ -439,7 +441,7 @@ public class SMGetTest extends BaseIntegrationTest {
 
 			Assert.assertEquals(500, map.size());
 
-			List<String> missed = future.getMissedKeyList();
+			Map<String, CollectionOperationStatus> missed = future.getMissedKeyList();
 			Assert.assertEquals(testSize / 2, missed.size());
 		} catch (Exception e) {
 			future.cancel(true);

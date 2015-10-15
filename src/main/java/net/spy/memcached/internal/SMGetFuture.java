@@ -17,7 +17,7 @@
 package net.spy.memcached.internal;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +74,9 @@ public abstract class SMGetFuture<T> implements Future<T> {
 		return rv || isCancelled();
 	}
 
-	public abstract List<String> getMissedKeyList();
+	public abstract Map<String, CollectionOperationStatus> getMissedKeyList();
 
+	public abstract T getTrimmedList();
+	
 	public abstract CollectionOperationStatus getOperationStatus();
 }

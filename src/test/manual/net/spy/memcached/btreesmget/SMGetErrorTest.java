@@ -202,8 +202,11 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 					.get(1000L, TimeUnit.SECONDS);
 
 			Assert.assertEquals(1, map.size());
+			/*
 			Assert.assertEquals("TRIMMED", future.getOperationStatus()
 					.getMessage());
+			*/
+			Assert.assertEquals(1, future.getTrimmedList().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -277,8 +280,8 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
 
-			Assert.assertEquals(0, map.size());
-			Assert.assertEquals("OUT_OF_RANGE", future.getOperationStatus()
+			Assert.assertEquals(9, map.size());
+			Assert.assertEquals("END", future.getOperationStatus()
 					.getMessage());
 		} catch (Exception e) {
 			future.cancel(true);
