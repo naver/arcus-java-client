@@ -17,12 +17,14 @@
 package net.spy.memcached.internal;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -76,7 +78,7 @@ public abstract class SMGetFuture<T> implements Future<T> {
 
 	public abstract Map<String, CollectionOperationStatus> getMissedKeyList();
 
-	public abstract T getTrimmedList();
+	public abstract List<SMGetTrimKey> getTrimmedKeyList();
 	
 	public abstract CollectionOperationStatus getOperationStatus();
 }

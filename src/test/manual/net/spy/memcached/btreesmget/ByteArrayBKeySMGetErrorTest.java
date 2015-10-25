@@ -183,7 +183,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 			Assert.assertEquals("TRIMMED", future.getOperationStatus()
 					.getMessage());
 			*/
-			Assert.assertEquals(1, future.getTrimmedList().size());
+			Assert.assertEquals(1, future.getTrimmedKeyList().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();

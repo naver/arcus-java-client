@@ -97,6 +97,7 @@ import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.ListGet;
 import net.spy.memcached.collection.ListStore;
 import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -1943,7 +1944,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final int totalResultElementCount = count + offset;
 		
 		final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
-		final List<SMGetElement<T>> mergedTrimmedList = Collections.synchronizedList(new ArrayList<SMGetElement<T>>());
+		final List<SMGetTrimKey> mergedTrimmedList = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 		
 		final ReentrantLock lock = new ReentrantLock();
 		
@@ -1958,6 +1959,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		for (BTreeSMGet<T> smGet : smGetList) {
 			Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
 				final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
+				final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
 
 				private void addTotalBkey(List<SMGetElement<T>> smgetresult) {
 					for (SMGetElement<T> each : smgetresult) {
@@ -1984,15 +1986,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					} else {
 						stopCollect.set(true);
 						mergedResult.clear();
+						mergedTrimmedList.clear();
 						failedOperationStatus.add(status);
 					}
 					if (status.isSuccess()) {
 						lock.lock();
 						try {
-							// merged result is empty, add all.
+							// SMGet list has one element, add all.
 							if (smGetList.size() == 1) {
-								addTotalBkey(eachResult);
+								// addTotalBkey(eachResult);
 								mergedResult.addAll(eachResult);
+								mergedTrimmedList.addAll(eachTrimmedResult);
 							} else {
 								// merged result is empty, add all.
 								if (mergedResult.size() == 0) {
@@ -2039,6 +2043,29 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 										}
 									}
 								}
+								
+								/* merged trimmed list is empty, add all. */
+								if (mergedTrimmedList.size() == 0) {
+									mergedTrimmedList.addAll(eachTrimmedResult);
+								} else {
+									/* do sort merge trimmed list */
+									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
+										boolean added = false;
+										
+										for (int i = 0; i < mergedTrimmedList.size(); i++) {
+											if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedList.get(i)))
+														  :  0 < eTrim.compareTo(mergedTrimmedList.get(i))) {
+												mergedTrimmedList.add(i, eTrim);
+												added = true;
+												break;
+											}
+										}
+										
+									 	if (!added) {
+											mergedTrimmedList.add(eTrim);
+										}
+									}
+								}
 							}
 						} finally {
 							lock.unlock();
@@ -2072,25 +2099,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				
 				@Override
 				public void gotTrimmedKey(String key, Object subkey) {
-					boolean added = false;
-					SMGetElement<T> element = null;
-					if (subkey instanceof Long)
-						element = new SMGetElement<T>(key, (Long)subkey, null);
-					else if (subkey instanceof byte[])
-						element = new SMGetElement<T>(key, (byte[])subkey, null);
+					if (stopCollect.get())
+						return;
 					
-					for (int i = 0; i < mergedTrimmedList.size(); i++) {
-						if ((reverse) ? (0 > element.compareTo(mergedTrimmedList.get(i)))
-									  :  0 < element.compareTo(mergedTrimmedList.get(i))) {
-							mergedTrimmedList.add(i, element);
-							added = true;
-							break;
-						}
-						
-					}
-					
-				 	if (!added) {
-						mergedTrimmedList.add(element);
+					if (subkey instanceof Long) {
+						eachTrimmedResult.add(new SMGetTrimKey(key, (Long)subkey));
+					} else if (subkey instanceof byte[]) {
+						eachTrimmedResult.add(new SMGetTrimKey(key, (byte[])subkey));
 					}
 				}
 			});
@@ -2138,23 +2153,27 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 			
 			@Override
-			public List<SMGetElement<T>> getTrimmedList() {
-				List<SMGetElement<T>> trimmedList = new ArrayList<SMGetElement<T>>();
-				
-				int lastIndex = (count + offset > mergedResult.size()) ? mergedResult.size() :
-																		 count + offset;
-				if (count + offset > lastIndex) {
+			public List<SMGetTrimKey> getTrimmedKeyList() {
+				List<SMGetTrimKey> trimmedList = new ArrayList<SMGetTrimKey>();
+				if (count + offset > mergedResult.size()) {
 					trimmedList.addAll(mergedTrimmedList);
 				} else {
-					SMGetElement<T> lastElement = mergedResult.get(lastIndex - 1);
-					for (SMGetElement<T> e : mergedTrimmedList) {
-						if ((reverse) ? (0 > e.compareTo(lastElement)) : 
-										 0 < e.compareTo(lastElement)) {
+					SMGetElement<T> lastElement = mergedResult.get(count + offset - 1);
+					SMGetTrimKey lastTrimKey;
+					if (lastElement.hasByteArrayBkey())
+						lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
+													   lastElement.getByteBkey());
+					else
+						lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
+													   lastElement.getBkey());
+					
+					for (SMGetTrimKey e : mergedTrimmedList) {
+						if ((reverse) ? (0 > e.compareTo(lastTrimKey)) : 
+										 0 < e.compareTo(lastTrimKey)) {
 							trimmedList.add(e);
 						}
 					}
 				}
-				
 				return trimmedList;
 			}
 			
