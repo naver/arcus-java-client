@@ -1819,13 +1819,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		if (keyList == null || keyList.isEmpty()) {
 			throw new IllegalArgumentException("Key list is empty.");
 		}
+		if (offset < 0) {
+			throw new IllegalArgumentException(
+					"Value of 'offset' must be 0(zero) or positive integer.");
+		}
 		if (count < 1) {
 			throw new IllegalArgumentException(
 					"Value of 'count' must be larger than 0.");
 		}
-		if (offset + count > MAX_SMGET_COUNT) {
+		if ((offset + count) > MAX_SMGET_COUNT) {
 			throw new IllegalArgumentException(
-					"Cannot value of 'offset + count' larger than " + MAX_SMGET_COUNT);
+					"Value of 'offset + count' cannot be larger than " + MAX_SMGET_COUNT);
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
@@ -3364,13 +3368,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		if (keyList == null || keyList.isEmpty()) {
 			throw new IllegalArgumentException("Key list is empty.");
 		}
+		if (offset < 0) {
+			throw new IllegalArgumentException(
+					"Value of 'offset' must be 0 or positive integer.");
+		}
 		if (count < 1) {
 			throw new IllegalArgumentException(
 					"Value of 'count' must be larger than 0.");
 		}
-		if (offset + count > MAX_SMGET_COUNT) {
+		if ((offset + count) > MAX_SMGET_COUNT) {
 			throw new IllegalArgumentException(
-					"Cannot value of 'offset + count' larger than " + MAX_SMGET_COUNT);
+					"Value of 'offset + count' cannot be larger than " + MAX_SMGET_COUNT);
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
