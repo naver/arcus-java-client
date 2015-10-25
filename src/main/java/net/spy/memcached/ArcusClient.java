@@ -1805,6 +1805,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+			int count, boolean unique) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, 0, count, unique);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, int, boolean)
 	 */
 	@Override
@@ -3347,6 +3358,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
 			int offset, int count) {
 		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, offset, count, false);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+			int count, boolean unique) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, 0, count, unique);
 	}
 	
 	/*

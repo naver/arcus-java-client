@@ -658,6 +658,14 @@ public class ArcusClientPool implements ArcusClientIF {
 	@Override
 	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
 			List<String> keyList, long from, long to,
+			ElementFlagFilter eFlagFilter, int count, boolean unique) {
+		return this.getClient().asyncBopSortMergeGet(keyList, from, to,
+				eFlagFilter, count, unique);
+	}
+
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, long from, long to,
 			ElementFlagFilter eFlagFilter, int offset, int count, boolean unique) {
 		return this.getClient().asyncBopSortMergeGet(keyList, from, to,
 				eFlagFilter, offset, count, unique);
@@ -838,6 +846,14 @@ public class ArcusClientPool implements ArcusClientIF {
 			ElementFlagFilter eFlagFilter, int offset, int count) {
 		return this.getClient().asyncBopSortMergeGet(keyList, from, to,
 				eFlagFilter, offset, count);
+	}
+
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, byte[] from, byte[] to,
+			ElementFlagFilter eFlagFilter, int count, boolean unique) {
+		return this.getClient().asyncBopSortMergeGet(keyList, from, to,
+				eFlagFilter, count, unique);
 	}
 
 	@Override
