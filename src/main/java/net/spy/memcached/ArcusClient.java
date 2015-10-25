@@ -282,17 +282,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
 		
 		if (hostPorts == null) {
-			throw new NullPointerException("Arcus admin address required");
+			throw new NullPointerException("Arcus admin address required.");
 		}
-
 		if (serviceCode == null) {
-			throw new NullPointerException("Service code required");
+			throw new NullPointerException("Service code required.");
 		}
-
 		if (hostPorts.isEmpty()) {
 			throw new IllegalArgumentException("Arcus admin address is empty.");
 		}
-
 		if (serviceCode.isEmpty()) {
 			throw new IllegalArgumentException("Service code is empty.");
 		}
@@ -808,12 +805,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		if (store.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-		
 		if (store.getItemCount() > CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedStore.MAX_PIPED_ITEM_COUNT + ".");
 		}
 		
@@ -868,12 +864,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		if (update.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-
 		if (update.getItemCount() > CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT + ".");
 		}
 
@@ -1820,16 +1815,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			throw new IllegalArgumentException("Key list is empty.");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException(
-					"Value of 'offset' must be 0(zero) or positive integer.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integer.");
 		}
 		if (count < 1) {
-			throw new IllegalArgumentException(
-					"Value of 'count' must be larger than 0.");
+			throw new IllegalArgumentException("Count must be larger than 0.");
 		}
 		if ((offset + count) > MAX_SMGET_COUNT) {
-			throw new IllegalArgumentException(
-					"Value of 'offset + count' cannot be larger than " + MAX_SMGET_COUNT);
+			throw new IllegalArgumentException("The sum of offset and count "
+			        + "must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
@@ -2655,10 +2648,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			final boolean reverse, final Transcoder<T> tc) {
 		// Check for invalid arguments (not to get CLIENT_ERROR)
 		if (get.getOrder() == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		if (get.getPosFrom() < 0 || get.getPosTo() < 0) {
-			throw new IllegalArgumentException("Positions should be 0 or positive integer");
+			throw new IllegalArgumentException("Position must be 0 or positive integer.");
 		}
 		
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -2738,7 +2731,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Integer> asyncBopFindPosition(String key, long longBKey,
 			BTreeOrder order) {
 		if (order == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		BTreeFindPosition get = new BTreeFindPosition(longBKey, order);
 		return asyncBopFindPosition(key, get);
@@ -2748,7 +2741,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Integer> asyncBopFindPosition(String key, byte[] byteArrayBKey,
 			BTreeOrder order) {
 		if (order == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		BTreeFindPosition get = new BTreeFindPosition(byteArrayBKey, order);
 		return asyncBopFindPosition(key, get);
@@ -2875,7 +2868,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
 			final String k, final BTreeFindPositionWithGet<T> get, final Transcoder<T> tc) {
 		if (get.getOrder() == null) {
-			throw new IllegalArgumentException("BTreeOrder must not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		if (get.getCount() < 0 || get.getCount() > 100) {
 			throw new IllegalArgumentException("Count must be a value between 0 and 100.");
@@ -3233,12 +3226,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		if (exist.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-
 		if (exist.getItemCount() > CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedStore.MAX_PIPED_ITEM_COUNT + ".");
 		}
 
@@ -3369,16 +3361,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			throw new IllegalArgumentException("Key list is empty.");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException(
-					"Value of 'offset' must be 0 or positive integer.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integer.");
 		}
 		if (count < 1) {
-			throw new IllegalArgumentException(
-					"Value of 'count' must be larger than 0.");
+			throw new IllegalArgumentException("Count must be larger than 0.");
 		}
 		if ((offset + count) > MAX_SMGET_COUNT) {
-			throw new IllegalArgumentException(
-					"Value of 'offset + count' cannot be larger than " + MAX_SMGET_COUNT);
+			throw new IllegalArgumentException("The sum of offset and count "
+			        + "must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
@@ -3781,16 +3771,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementFlagFilter eFlagFilter, int offset, int count,
 			Transcoder<T> tc) {
 		if (keyList == null) {
-			throw new IllegalArgumentException("key list is null.");
+			throw new IllegalArgumentException("Key list is null.");
 		}
 		if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-			throw new IllegalArgumentException("size of key list must be less than " + MAX_GETBULK_KEY_COUNT + ".");
-		}
-		if (count > MAX_GETBULK_ELEMENT_COUNT) {
-			throw new IllegalArgumentException("count must be less than " + MAX_GETBULK_ELEMENT_COUNT + ".");
+			throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException("offset can't be negative.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+		}
+		if (count > MAX_GETBULK_ELEMENT_COUNT) {
+			throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
 		}
 		
 		Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
@@ -3826,16 +3816,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementFlagFilter eFlagFilter, int offset, int count,
 			Transcoder<T> tc) {
 		if (keyList == null) {
-			throw new IllegalArgumentException("key list is null.");
+			throw new IllegalArgumentException("Key list is null.");
 		}
 		if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-			throw new IllegalArgumentException("size of key list must be less than " + MAX_GETBULK_KEY_COUNT + ".");
-		}
-		if (count > MAX_GETBULK_ELEMENT_COUNT) {
-			throw new IllegalArgumentException("count must be less than " + MAX_GETBULK_ELEMENT_COUNT + ".");
+			throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException("offset can't be negative.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+		}
+		if (count > MAX_GETBULK_ELEMENT_COUNT) {
+			throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
 		}
 		
 		Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
