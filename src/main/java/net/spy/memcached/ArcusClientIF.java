@@ -377,7 +377,7 @@ public interface ArcusClientIF {
 	 * @param bkey
 	 *            bkey
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param withDelete
 	 *            true to remove the returned item in the b+tree
 	 * @param dropIfEmpty
@@ -400,7 +400,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey
 	 * @param to the last bkey
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
@@ -417,7 +417,7 @@ public interface ArcusClientIF {
 	 * @param <T>
 	 * @param key key of a b+tree
 	 * @param bkey bkey
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param withDelete true to remove the returned item in the b+tree
 	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
 	 * @param tc a transcoder to decode returned values
@@ -439,7 +439,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey
 	 * @param to the last bkey
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
@@ -536,7 +536,7 @@ public interface ArcusClientIF {
 	 * 
 	 * @param key key of a b+tree
 	 * @param bkey bkey of an item to delete
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
@@ -549,7 +549,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey to delete
 	 * @param to the last bkey to delete
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param count number of returning values (0 to all)
 	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
@@ -563,7 +563,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey to delete
 	 * @param to the last bkey to delete
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param count number of returning values (0 to all)
 	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
@@ -577,7 +577,7 @@ public interface ArcusClientIF {
 	 * 
 	 * @param key key of a b+tree
 	 * @param bkey bkey to delete
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
@@ -641,7 +641,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            the last bkey
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @return a future that will hold the count of exists element
 	 */
 	public CollectionFuture<Integer> asyncBopGetItemCount(String key,
@@ -860,7 +860,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-base offset
 	 * @param count
@@ -882,7 +882,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param count
 	 *            number of returning values (0 to all)
 	 * @param unique
@@ -904,7 +904,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-base offset
 	 * @param count
@@ -1088,7 +1088,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey
 	 * @param to the last bkey
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
@@ -1111,7 +1111,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param from the first bkey
 	 * @param to the last bkey
-	 * @param eFlagFilter bkey filter
+	 * @param eFlagFilter element flag filter
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
@@ -1188,7 +1188,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            the last bkey
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @return a future that will hold the count of exists element
 	 */
 	public CollectionFuture<Integer> asyncBopGetItemCount(String key,
@@ -1305,7 +1305,7 @@ public interface ArcusClientIF {
 	 * @param bkey
 	 *            bkey of an element
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param withDelete
 	 *            true to remove the returned item in the b+tree
 	 * @param dropIfEmpty
@@ -1324,7 +1324,7 @@ public interface ArcusClientIF {
 	 * @param bkey
 	 *            bkey of an element
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param withDelete
 	 *            true to remove the returned item in the b+tree
 	 * @param dropIfEmpty
@@ -1349,7 +1349,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-base offset
 	 * @param count
@@ -1371,7 +1371,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param count
 	 *            number of returning values (0 to all)
 	 * @param unique
@@ -1393,7 +1393,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey index to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-base offset
 	 * @param count
@@ -1459,7 +1459,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-based offset (max = 50)
 	 * @param count
@@ -1480,7 +1480,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-based offset (max = 50)
 	 * @param count
@@ -1504,7 +1504,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-based offset (max = 50)
 	 * @param count
@@ -1525,7 +1525,7 @@ public interface ArcusClientIF {
 	 * @param to
 	 *            bkey to
 	 * @param eFlagFilter
-	 *            bkey filter
+	 *            element flag filter
 	 * @param offset
 	 *            0-based offset (max = 50)
 	 * @param count
