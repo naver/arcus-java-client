@@ -359,4 +359,82 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 	}
+
+	public void testInvalidArgumentException() {
+		// insert test data
+		try {
+			CollectionAttributes attr = new CollectionAttributes();
+
+			mc.delete(KEY_LIST.get(0)).get();
+			mc.delete(KEY_LIST.get(1)).get();
+
+			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr).get();
+			mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr).get();
+
+			mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
+			mc.asyncBopInsert(KEY_LIST.get(0), 2, null, "V", attr).get();
+
+			mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
+			mc.asyncBopInsert(KEY_LIST.get(1), 3, null, "V", attr).get();
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+
+		// sort merge get
+		SMGetFuture<List<SMGetElement<Object>>> future = null;
+		List<SMGetElement<Object>> map = null;
+
+		// offset < 0
+		try {
+			future = mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Offset must be 0 or positive integer.", e.getMessage());
+		}
+
+		// count == 0 
+		try {
+			future = mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Count must be larger than 0.", e.getMessage());
+		}
+
+		// offset + count > 1000
+		try {
+			future = mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
+		}
+
+		// duplicate keys
+		try {
+			future = mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Duplicate keys exist in key list.", e.getMessage());
+		}
+	}
 }

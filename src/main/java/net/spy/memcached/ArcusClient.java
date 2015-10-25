@@ -1860,11 +1860,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	private Map<String, List<String>> groupingKeys(List<String> keyList, int groupSize) {
 		Map<String, Integer> chunkCount = new HashMap<String, Integer>();
 		Map<String, List<String>> result = new HashMap<String, List<String>>();
+		Set<String> keySet = new HashSet<String>();
 
 		MemcachedConnection conn = getMemcachedConnection();
 
 		for (String k : keyList) {
 			validateKey(k);
+			if (!keySet.add(k)) {
+				throw new IllegalArgumentException("Duplicate keys exist in key list.");
+			}
 			String node = conn.findNodeByKey(k).getSocketAddress().toString();
 			int cc;
 			if (chunkCount.containsKey(node)) {
