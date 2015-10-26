@@ -315,7 +315,8 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 										NOT_FOUND, UNREADABLE, OUT_OF_RANGE));
 						} else {
 							((BTreeSortMergeGetOperation.Callback) getCallback())
-							.gotMissedKey(chunk[0], null);
+								.gotMissedKey(chunk[0], new CollectionOperationStatus(false,
+															"UNDEFINED", CollectionResponse.UNDEFINED));
 						}
 						count++;
 					} else {

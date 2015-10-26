@@ -76,9 +76,11 @@ public abstract class SMGetFuture<T> implements Future<T> {
 		return rv || isCancelled();
 	}
 
-	public abstract Map<String, CollectionOperationStatus> getMissedKeyList();
+	public abstract Map<String, CollectionOperationStatus> getMissedKeys();
 
-	public abstract List<SMGetTrimKey> getTrimmedKeyList();
+	public abstract List<String> getMissedKeyList();
+
+	public abstract List<SMGetTrimKey> getTrimmedKeys();
 	
 	public abstract CollectionOperationStatus getOperationStatus();
 }

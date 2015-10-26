@@ -478,7 +478,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 
 			Assert.assertEquals(50, map.size());
 
-			Map<String, CollectionOperationStatus> missed = future.getMissedKeyList();
+			Map<String, CollectionOperationStatus> missed = future.getMissedKeys();
 			Assert.assertEquals(testSize / 2, missed.size());
 		} catch (Exception e) {
 			future.cancel(true);

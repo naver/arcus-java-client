@@ -206,7 +206,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 			Assert.assertEquals("TRIMMED", future.getOperationStatus()
 					.getMessage());
 			*/
-			Assert.assertEquals(1, future.getTrimmedKeyList().size());
+			Assert.assertEquals(1, future.getTrimmedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();

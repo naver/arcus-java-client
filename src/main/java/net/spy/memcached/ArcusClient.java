@@ -1952,12 +1952,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch blatch = new CountDownLatch(smGetList.size());
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-		final Map<String, CollectionOperationStatus> missedKey = 
+		final Map<String, CollectionOperationStatus> missedKeys = 
 					Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
+		final List<String> missedKeyList = 
+					Collections.synchronizedList(new ArrayList<String>());
 		final int totalResultElementCount = count + offset;
 		
 		final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
-		final List<SMGetTrimKey> mergedTrimmedList = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
+		final List<SMGetTrimKey> mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 		
 		final ReentrantLock lock = new ReentrantLock();
 		
@@ -2002,7 +2004,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					} else {
 						stopCollect.set(true);
 						mergedResult.clear();
-						mergedTrimmedList.clear();
+						mergedTrimmedKeys.clear();
 						failedOperationStatus.add(status);
 					}
 					if (status.isSuccess()) {
@@ -2044,35 +2046,37 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 								}
 							}
 							
-							/* merged trimmed list is empty, add all. */
-							if (mergedTrimmedList.size() == 0) {
-								mergedTrimmedList.addAll(eachTrimmedResult);
-							} else {
-								/* do sort merge trimmed list */
-								int idx, pos = 0;
-								for (SMGetTrimKey eTrim : eachTrimmedResult) { 
-									for (idx = pos; idx < mergedTrimmedList.size(); idx++) {
-										if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedList.get(idx)))
-													  :  0 < eTrim.compareTo(mergedTrimmedList.get(idx))) {
-											break;
+							if (eachTrimmedResult.size() > 0) {
+								if (mergedTrimmedKeys.size() == 0) {
+									mergedTrimmedKeys.addAll(eachTrimmedResult);
+								} else {
+									/* do sort merge trimmed list */
+									int idx, pos = 0;
+									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
+										for (idx = pos; idx < mergedTrimmedKeys.size(); idx++) {
+											if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedKeys.get(idx)))
+														  :  0 < eTrim.compareTo(mergedTrimmedKeys.get(idx))) {
+												break;
+											}
 										}
+										
+									 	mergedTrimmedKeys.add(idx, eTrim);
+									 	pos = idx + 1;
 									}
-									
-								 	mergedTrimmedList.add(idx, eTrim);
-								 	pos = idx + 1;
 								}
 							}
 							
 							/* remove useless trimed keys */
-							if (processedSMGetCount.get() == 0 && count + offset <= mergedResult.size()) {
+							if (mergedTrimmedKeys.size() > 0 &&
+								processedSMGetCount.get() == 0 && count + offset <= mergedResult.size()) {
 								SMGetElement<T> lastElement = mergedResult.get(count + offset - 1);
 								SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
 																			lastElement.getBkeyByObject());
-								for (int idx = mergedTrimmedList.size() - 1; idx >= 0; idx--) {
-									SMGetTrimKey me = mergedTrimmedList.get(idx);
+								for (int idx = mergedTrimmedKeys.size() - 1; idx >= 0; idx--) {
+									SMGetTrimKey me = mergedTrimmedKeys.get(idx);
 									if ((reverse) ? (0 <= me.compareTo(lastTrimKey))
 												  :  0 >= me.compareTo(lastTrimKey)) {
-										mergedTrimmedList.remove(idx);
+										mergedTrimmedKeys.remove(idx);
 									} else {
 										break;
 									}
@@ -2105,7 +2109,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 				@Override
 				public void gotMissedKey(String key, OperationStatus cause) {
-					missedKey.put(key, new CollectionOperationStatus(cause));
+					if (cause.getMessage().equals("UNDEFINED"))
+						missedKeyList.add(key);
+					else
+						missedKeys.put(key, new CollectionOperationStatus(cause));
 				}
 				
 				@Override
@@ -2159,13 +2166,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
-			public Map<String, CollectionOperationStatus> getMissedKeyList() {
-				return missedKey;
+			public Map<String, CollectionOperationStatus> getMissedKeys() {
+				return missedKeys;
 			}
 			
 			@Override
-			public List<SMGetTrimKey> getTrimmedKeyList() {
-				return mergedTrimmedList;
+			public List<String> getMissedKeyList() {
+				return missedKeyList;
+			}
+			
+			@Override
+			public List<SMGetTrimKey> getTrimmedKeys() {
+				return mergedTrimmedKeys;
 			}
 			
 			@Override
