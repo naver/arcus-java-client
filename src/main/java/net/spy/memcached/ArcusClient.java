@@ -39,6 +39,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarFile;
@@ -1967,6 +1968,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final Set<Object> totalBkey = new TreeSet<Object>();
 		
 		final AtomicBoolean stopCollect = new AtomicBoolean(false);
+		/* if processedSMGetCount is 0, then all smget is done */
+		final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
 		
 		for (BTreeSMGet<T> smGet : smGetList) {
 			Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
@@ -1993,6 +1996,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				
 				@Override
 				public void receivedStatus(OperationStatus status) {
+					processedSMGetCount.decrementAndGet();
 					if (status.isSuccess()) {
 						resultOperationStatus.add(status);
 					} else {
@@ -2004,78 +2008,73 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (status.isSuccess()) {
 						lock.lock();
 						try {
-							// SMGet list has one element, add all.
-							if (smGetList.size() == 1) {
-								// addTotalBkey(eachResult);
-								mergedResult.addAll(eachResult);
-								mergedTrimmedList.addAll(eachTrimmedResult);
-							} else {
-								// merged result is empty, add all.
-								if (mergedResult.size() == 0) {
+							if (mergedResult.size() == 0) {
+								/* merged result is empty, add all */
+								if (smGetList.size() > 1) {
 									addTotalBkey(eachResult);
-									mergedResult.addAll(eachResult);
-								} else {
-									// remove trimmed area
-									if (TRIMMED.equals(status.getMessage())) {
-
+								}
+								mergedResult.addAll(eachResult);
+							} else {
+								/* do sort merge */
+								int idx, pos = 0;
+								for (SMGetElement<T> result : eachResult) {
+									for (idx = pos; idx < mergedResult.size(); idx++) {
+										if ((reverse) ? (0 > result.compareTo(mergedResult.get(idx)))
+													  : (0 < result.compareTo(mergedResult.get(idx))))
+											break;
 									}
-
-									// do sort merge
-									for (SMGetElement<T> result : eachResult) {
-										boolean added = false;
+									
+									if (idx < mergedResult.size() || idx < totalResultElementCount) {
 										boolean duplicated = false;
-
-										for (int i = 0; i < mergedResult.size(); i++) {
-											if (i > totalResultElementCount) {
-												added = true;
-												break;
-											}
-
-											if ((reverse) ? (0 > result.compareTo(mergedResult.get(i))) : 0 < result
-													.compareTo(mergedResult.get(i))) {
-												if (!addTotalBkey(result.getBkeyByObject())) {
-													resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-													duplicated = true;
-												}
-												
-												if (!unique || !duplicated)
-													mergedResult.add(i, result);
-												added = true;
-												break;
-											}
+										if (!addTotalBkey(result.getBkeyByObject())) {
+											resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
+											duplicated = true;
 										}
-
-									 	if (!added) {
-											if (!addTotalBkey(result.getBkeyByObject())) {
-												resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-												duplicated = true;
-											}
-											if (!unique || !duplicated)
-												mergedResult.add(result);
+										
+										if (!unique || !duplicated) {
+											mergedResult.add(idx, result);
+											if (mergedResult.size() > totalResultElementCount)
+												mergedResult.remove(totalResultElementCount);
+										}
+										pos = idx + 1;
+										if (pos >= totalResultElementCount) {
+											break; /* finish the sort merge */
 										}
 									}
 								}
-								
-								/* merged trimmed list is empty, add all. */
-								if (mergedTrimmedList.size() == 0) {
-									mergedTrimmedList.addAll(eachTrimmedResult);
-								} else {
-									/* do sort merge trimmed list */
-									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
-										boolean added = false;
-										
-										for (int i = 0; i < mergedTrimmedList.size(); i++) {
-											if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedList.get(i)))
-														  :  0 < eTrim.compareTo(mergedTrimmedList.get(i))) {
-												mergedTrimmedList.add(i, eTrim);
-												added = true;
-												break;
-											}
+							}
+							
+							/* merged trimmed list is empty, add all. */
+							if (mergedTrimmedList.size() == 0) {
+								mergedTrimmedList.addAll(eachTrimmedResult);
+							} else {
+								/* do sort merge trimmed list */
+								int idx, pos = 0;
+								for (SMGetTrimKey eTrim : eachTrimmedResult) { 
+									for (idx = pos; idx < mergedTrimmedList.size(); idx++) {
+										if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedList.get(idx)))
+													  :  0 < eTrim.compareTo(mergedTrimmedList.get(idx))) {
+											break;
 										}
-										
-									 	if (!added) {
-											mergedTrimmedList.add(eTrim);
-										}
+									}
+									
+								 	mergedTrimmedList.add(idx, eTrim);
+								 	pos = idx + 1;
+								}
+							}
+							
+							/* remove useless trimed keys */
+							if (processedSMGetCount.get() == 0 && count + offset <= mergedResult.size()) {
+								SMGetElement<T> lastElement = mergedResult.get(count + offset - 1);
+								SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
+																			lastElement.getBkeyByObject());
+								for (int idx = mergedTrimmedList.size() - 1; idx >= 0; idx--) {
+									SMGetTrimKey me = mergedTrimmedList.get(idx);
+									if ((reverse) ? (0 <= me.compareTo(lastTrimKey))
+												  :  0 >= me.compareTo(lastTrimKey)) {
+										mergedTrimmedList.remove(idx);
+									} else {
+										break;
 									}
 								}
 							}
@@ -2166,27 +2165,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			
 			@Override
 			public List<SMGetTrimKey> getTrimmedKeyList() {
-				List<SMGetTrimKey> trimmedList = new ArrayList<SMGetTrimKey>();
-				if (count + offset > mergedResult.size()) {
-					trimmedList.addAll(mergedTrimmedList);
-				} else {
-					SMGetElement<T> lastElement = mergedResult.get(count + offset - 1);
-					SMGetTrimKey lastTrimKey;
-					if (lastElement.hasByteArrayBkey())
-						lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
-													   lastElement.getByteBkey());
-					else
-						lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
-													   lastElement.getBkey());
-					
-					for (SMGetTrimKey e : mergedTrimmedList) {
-						if ((reverse) ? (0 > e.compareTo(lastTrimKey)) : 
-										 0 < e.compareTo(lastTrimKey)) {
-							trimmedList.add(e);
-						}
-					}
-				}
-				return trimmedList;
+				return mergedTrimmedList;
 			}
 			
 			@Override

@@ -23,16 +23,16 @@ public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
 	private long bkey;
 	private byte[] bytebkey;
 
-	public SMGetTrimKey(String key, long bkey) {
+	public SMGetTrimKey(String key, Object bkey) {
 		this.key = key;
-		this.bkey = bkey;
-		this.bytebkey = null;
-	}
-	
-	public SMGetTrimKey(String key, byte[] bkey) {
-		this.key = key;
-		this.bkey = -1;
-		this.bytebkey = bkey;
+		if (bkey instanceof byte[]) {
+			this.bytebkey = new ByteArrayBKey((byte[])bkey).getBytes();
+			this.bkey = -1;
+		} else {
+			this.bkey = (Long)bkey;
+			this.bytebkey = null;
+		}
+		
 	}
 	
 	@Override
