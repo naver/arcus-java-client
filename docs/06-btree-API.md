@@ -1142,35 +1142,37 @@ for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { //
 
 여러 b+tree들에 대해 sort-merge get을 수행하는 함수는 아래와 같다.
 여러 b+tree들로 부터 from부터 to까지의 bkey를 가지고 있으면서 eflag filter조건을 만족하는 element를 찾아
-sort merge하면서, offset위치부터 count개의 element를 조회한다. 
+sort merge하면서, count개의 element를 조회한다. 
 
 ```java
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count)
+asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count)
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count)
+asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count, boolean unique)
+SMGetFuture<List<SMGetElement<Object>>>
+asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count)
+SMGetFuture<List<SMGetElement<Object>>>
+asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count, boolean unique)
 ```
 
 - keyList: b+tree items의 key list
 - \<from, to\>: 조회 범위를 나타내는 bkey range 
 - eFlagFilter: eflag에 대한 filter 조건
   - eflag filter 조건을 지정하지 않으려면, ElementFlagFilter.DO_NOT_FILTER를 입력한다.
-- offset, count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 offset과 count 지정
-  - **제약 조건으로 offset과 count의 합은 1000이하이어야 한다.**
+- count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 count 지정
+  - **제약 조건으로 1000이하이어야 한다.**
   - 이는 sort-merge get 연산이 부담이 너무 크지 않은 연산으로 제한하기 위한 것이다.
+- unique: 중복된 bkey에 대해서 하나의 결과만을 조회하도록 지정하는 flag
 
 수행 결과는 future 객체를 통해 얻는다.
 
 future.get() | future.operationStatus().getResponse() | 설명 
 ------------ | -------------------------------------- | -------
-조회결과있음 | CollectionResponse.END                 | Element 조회, No duplicate bkey, 조회 범위에 b+tree trim 없음
-             | CollectionResponse.DUPLICATED          | Element 조회, Duplicate bkey 존재, 조회 범위에 b+tree trim 없음
-             | CollectionResponse.TRIMMED             | Element 조회, No duplicate bkey, 조회 범위에 b+tree trim 있음
-             | CollectionResponse.DUPLICATED_TRIMMED  | Element 조회, Duplicate bkey 존재, 조회 범위에 b+tree trim 있음
+조회결과있음 | CollectionResponse.END                 | Element 조회, No duplicate bkey
+             | CollectionResponse.DUPLICATED          | Element 조회, Duplicate bkey 존재
 null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
              | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
              | CollectionResponse.ATTR_MISMATCH       | sort-merge get에 참여한 b+tree의 속성이 서로 다름
-             |CollectionResponse.OUT_OF_RANGE         | 조회 시작 위치가 b+tree trim 영역에 있음
 
 
 B+tree element sort-merge 조회하는 예제는 아래와 같다.
@@ -1186,12 +1188,11 @@ List<String> keyList = new ArrayList<String>() {{
 long bkeyFrom = 0L; // (1)
 long bkeyTo = 100L;
 int queryCount = 10;
-int offset = 0;
 
 SMGetFuture<List<SMGetElement<Object>>> future = null;
 
 try {
-    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, offset, queryCount); // (2)
+    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount); // (2)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -1207,9 +1208,13 @@ try {
         System.out.println(element.getValue());
     }
 
-    List<String> missedKeyList = future.getMissedKeyList(); // (5)
-    for (String missedKey : missedKeyList) {
-        System.out.println(missedKey);
+    for (Map.Entry<String, CollectionOperationStatus> m : future.getMissedKeys().entrySet()) {  // (5)
+        System.out.print("Missed key : " + m.getKey());
+        System.out.println(", response : " + m.getValue().getResponse());
+    }
+    
+    for (SMGetTrimKey e : future.getTrimmedKeys()) { // (6)
+        System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
     }
 } catch (InterruptedException e) {
     future.cancel(true);
@@ -1228,10 +1233,13 @@ try {
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
 4. 조회된 값은 List\<SMGetElement\>형태로 반환된다. 이로부터 조회된 element를 조회할 수 있다.
    조회 결과에 동일한 bkey가 존재하면 key를 기준으로 정렬되어 반환된다.
-5. 조회할 때 지정한 key들 중에 cache miss된 key목록들과 unreadable상태의 key들은
-   future.getMissedKeyList()를 통해 조회할 수 있다.
-6. Sort merge get에 대한 자세한 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
- 
+5. 조회할 때 지정한 key들 중에 smget에 참여하지 key들은 future.getMissedKeyList()를 통해 Map 형태로 실패 원인과 함께 조회할 수 있다.
+   - 실패원인은 cache miss(NOT_FOUND), unreadable 상태(UNREADABLE), bkey 범위 조회를 만족하는 처음 bkey가 trim된 상태(OUT_OF_RANGE) 중 하나이다.
+   - 응용은 이들 키들에 대해서는 back-end storage인 DB에서 동일 조회 조건으로 elements를 검색하여 sort-merge 결과에 반영하여야 한다.
+6. bkey 조회 범위의 처음 bkey가 존재하지만 bkey 범위의 끝에 다다르기 전에 trim이 발생한 key와 trim 직전에 cache에 있는 마지막 bkey를 조회할 수 있다.
+   - 응용은 이들 키들에 대해 trim 직전 마지막 bkey 이후에 trim된 bkey들을 back-end storage인 DB에서 조회하여 sort-merge 결과에 반영하여야 한다.
+7. Sort merge get의 최종 수 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
+
 
 ### B+Tree Position 조회
 

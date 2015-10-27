@@ -464,7 +464,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			f.get();
 			fail("This should be an exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("BTreeOrder should not be null", e.getMessage());
+			assertEquals("BTreeOrder must not be null.", e.getMessage());
 		}
 
 		// Position < 0
@@ -472,7 +472,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			f = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, -1);
 			fail("This should be an exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Positions should be 0 or positive integer",
+			assertEquals("Position must be 0 or positive integer.",
 					e.getMessage());
 		}
 
@@ -480,7 +480,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			f = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, -1, 20);
 			fail("This should be an exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Positions should be 0 or positive integer",
+			assertEquals("Position must be 0 or positive integer.",
 					e.getMessage());
 		}
 
@@ -488,7 +488,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			f = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, 0, -1);
 			fail("This should be an exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Positions should be 0 or positive integer",
+			assertEquals("Position must be 0 or positive integer.",
 					e.getMessage());
 		}
 
@@ -496,7 +496,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 			f = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, -1, -1);
 			fail("This should be an exception");
 		} catch (IllegalArgumentException e) {
-			assertEquals("Positions should be 0 or positive integer",
+			assertEquals("Position must be 0 or positive integer.",
 					e.getMessage());
 		}
 	}

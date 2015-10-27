@@ -1,3 +1,20 @@
+2015-10-26 [version 1.9.0]
+	* Add API type on operation objects.
+	* Fix some mistakes in handling command pipeline response.
+	* Treat EXISTS response as failure when create a collection.
+	* Fix bug in getting null element flag by hexadecimal. 
+	* Return DUPLICATED_TRIMMED
+	  if smget response has both DUPLICATED and TRIMMED.
+	* New smget interface - refer to Changelog of arcus-memcached.
+	  - Continue smget even if some bkeys of a key are trimmed in bkey range.
+	    - Missed keys are returned with the cause.
+		  (NOT_FOUND, UNREADABLE, OUT_OF_RANGE).
+	    - Trimmed keys are returned with the last bkey before trim.
+	  - Support unique smget that remove duplicate bkeys as a option.
+	  - Internally enhanced sort-merge implementation.
+	* Throw exception if duplicate keys exist in multiple keys operation.
+	* Some minor bug fixes.
+
 2015-07-31 [version 1.8.2]
 	* Change ZK_CONNECT_TIMEOUT from 5 to SESSION_TIMEOUT seconds.
 	* Decrease default operation timeout - 1000 => 700 ms.

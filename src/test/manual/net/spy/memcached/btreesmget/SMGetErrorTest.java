@@ -202,8 +202,11 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 					.get(1000L, TimeUnit.SECONDS);
 
 			Assert.assertEquals(1, map.size());
+			/*
 			Assert.assertEquals("TRIMMED", future.getOperationStatus()
 					.getMessage());
+			*/
+			Assert.assertEquals(1, future.getTrimmedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -277,8 +280,8 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
 
-			Assert.assertEquals(0, map.size());
-			Assert.assertEquals("OUT_OF_RANGE", future.getOperationStatus()
+			Assert.assertEquals(9, map.size());
+			Assert.assertEquals("END", future.getOperationStatus()
 					.getMessage());
 		} catch (Exception e) {
 			future.cancel(true);
@@ -354,6 +357,96 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 			future.cancel(true);
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
+		}
+	}
+
+	public void testInvalidArgumentException() {
+		// insert test data
+		try {
+			CollectionAttributes attr = new CollectionAttributes();
+
+			mc.delete(KEY_LIST.get(0)).get();
+			mc.delete(KEY_LIST.get(1)).get();
+
+			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr).get();
+			mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr).get();
+
+			mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
+			mc.asyncBopInsert(KEY_LIST.get(0), 2, null, "V", attr).get();
+
+			mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
+			mc.asyncBopInsert(KEY_LIST.get(1), 3, null, "V", attr).get();
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+
+		// keylist is null
+		try {
+			mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Key list is empty.", e.getMessage());
+		}
+
+		// keylist is empty
+		try {
+			mc.asyncBopSortMergeGet(new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Key list is empty.", e.getMessage());
+		}
+
+		// offset < 0
+		try {
+			mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Offset must be 0 or positive integer.", e.getMessage());
+		}
+
+		// count == 0 
+		try {
+			mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Count must be larger than 0.", e.getMessage());
+		}
+
+		// offset + count > 1000
+		try {
+			mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
+		}
+
+		// duplicate keys
+		try {
+			mc.asyncBopSortMergeGet(new ArrayList<String>() {
+							{
+								add(KEY_LIST.get(0));
+								add(KEY_LIST.get(1));
+								add(KEY_LIST.get(1));
+							}
+						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+			fail("This should be an exception");
+		} catch (Exception e) {
+			assertEquals("Duplicate keys exist in key list.", e.getMessage());
 		}
 	}
 }
