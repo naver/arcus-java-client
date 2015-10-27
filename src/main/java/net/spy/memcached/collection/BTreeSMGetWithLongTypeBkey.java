@@ -35,6 +35,7 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 	protected String range;
 	protected int offset = -1;
 	protected int count;
+	protected boolean unique;
 	protected Map<Integer, T> map;
 
 	protected boolean reverse;
@@ -49,7 +50,7 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 	private ElementFlagFilter eFlagFilter;
 	
 	public BTreeSMGetWithLongTypeBkey(List<String> keyList, long from, long to,
-			ElementFlagFilter eFlagFilter, int offset, int count) {
+			ElementFlagFilter eFlagFilter, int offset, int count, boolean unique) {
 		this.keyList = keyList;
 		
 		this.range = String.valueOf(from)
@@ -58,6 +59,7 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 		this.eFlagFilter = eFlagFilter;
 		this.offset = offset;
 		this.count = count;
+		this.unique = unique;
 		this.reverse = (from > to);
 	}
 	
@@ -106,6 +108,9 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 			b.append(" ").append(offset);
 
 		b.append(" ").append(count);
+
+		if (unique)
+			b.append(" ").append("unique");
 
 		str = b.toString();
 		return str;

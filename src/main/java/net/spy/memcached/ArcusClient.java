@@ -39,6 +39,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarFile;
@@ -97,6 +98,7 @@ import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.ListGet;
 import net.spy.memcached.collection.ListStore;
 import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -281,17 +283,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
 		
 		if (hostPorts == null) {
-			throw new NullPointerException("Arcus admin address required");
+			throw new NullPointerException("Arcus admin address required.");
 		}
-
 		if (serviceCode == null) {
-			throw new NullPointerException("Service code required");
+			throw new NullPointerException("Service code required.");
 		}
-
 		if (hostPorts.isEmpty()) {
 			throw new IllegalArgumentException("Arcus admin address is empty.");
 		}
-
 		if (serviceCode.isEmpty()) {
 			throw new IllegalArgumentException("Service code is empty.");
 		}
@@ -807,12 +806,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		if (store.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-		
 		if (store.getItemCount() > CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedStore.MAX_PIPED_ITEM_COUNT + ".");
 		}
 		
@@ -867,12 +865,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		if (update.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-
 		if (update.getItemCount() > CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT + ".");
 		}
 
@@ -1802,17 +1799,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count) {
+			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+			int offset, int count) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, offset, count, false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+			int count, boolean unique) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, 0, count, unique);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+			int offset, int count, boolean unique) {
 		if (keyList == null || keyList.isEmpty()) {
 			throw new IllegalArgumentException("Key list is empty.");
 		}
-		if (count < 1) {
-			throw new IllegalArgumentException(
-					"Value of 'count' must be larger than 0.");
+		if (offset < 0) {
+			throw new IllegalArgumentException("Offset must be 0 or positive integer.");
 		}
-		if (offset + count > MAX_SMGET_COUNT) {
-			throw new IllegalArgumentException(
-					"Cannot value of 'offset + count' larger than " + MAX_SMGET_COUNT);
+		if (count < 1) {
+			throw new IllegalArgumentException("Count must be larger than 0.");
+		}
+		if ((offset + count) > MAX_SMGET_COUNT) {
+			throw new IllegalArgumentException("The sum of offset and count "
+			        + "must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
@@ -1820,13 +1842,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				arrangedKey.size());
 		for (List<String> v : arrangedKey.values()) {
 			if (arrangedKey.size() > 1) {
-				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, 0, offset + count));
+				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, 0, offset + count, unique));
 			}else {
-				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, offset, count));
+				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, offset, count, unique));
 			}
 		}
 		return smget(smGetList, offset, count, (from > to),
-				collectionTranscoder);
+				collectionTranscoder, unique);
 	}
 
 	/**
@@ -1839,11 +1861,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	private Map<String, List<String>> groupingKeys(List<String> keyList, int groupSize) {
 		Map<String, Integer> chunkCount = new HashMap<String, Integer>();
 		Map<String, List<String>> result = new HashMap<String, List<String>>();
+		Set<String> keySet = new HashSet<String>();
 
 		MemcachedConnection conn = getMemcachedConnection();
 
 		for (String k : keyList) {
 			validateKey(k);
+			if (!keySet.add(k)) {
+				throw new IllegalArgumentException("Duplicate keys exist in key list.");
+			}
 			String node = conn.findNodeByKey(k).getSocketAddress().toString();
 			int cc;
 			if (chunkCount.containsKey(node)) {
@@ -1917,7 +1943,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	private <T> SMGetFuture<List<SMGetElement<T>>> smget(
 			final List<BTreeSMGet<T>> smGetList, final int offset,
-			final int count, final boolean reverse, final Transcoder<T> tc) {
+			final int count, final boolean reverse, final Transcoder<T> tc, final boolean unique) {
 
 		final String END = "END";
 		final String TRIMMED = "TRIMMED";
@@ -1926,10 +1952,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch blatch = new CountDownLatch(smGetList.size());
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-		final List<String> missedKey = Collections.synchronizedList(new ArrayList<String>());
+		final Map<String, CollectionOperationStatus> missedKeys = 
+					Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
+		final List<String> missedKeyList = 
+					Collections.synchronizedList(new ArrayList<String>());
 		final int totalResultElementCount = count + offset;
 		
 		final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
+		final List<SMGetTrimKey> mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 		
 		final ReentrantLock lock = new ReentrantLock();
 		
@@ -1940,10 +1970,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final Set<Object> totalBkey = new TreeSet<Object>();
 		
 		final AtomicBoolean stopCollect = new AtomicBoolean(false);
+		/* if processedSMGetCount is 0, then all smget is done */
+		final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
 		
 		for (BTreeSMGet<T> smGet : smGetList) {
 			Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
 				final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
+				final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
 
 				private void addTotalBkey(List<SMGetElement<T>> smgetresult) {
 					for (SMGetElement<T> each : smgetresult) {
@@ -1965,58 +1998,87 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				
 				@Override
 				public void receivedStatus(OperationStatus status) {
+					processedSMGetCount.decrementAndGet();
 					if (status.isSuccess()) {
 						resultOperationStatus.add(status);
 					} else {
 						stopCollect.set(true);
 						mergedResult.clear();
+						mergedTrimmedKeys.clear();
 						failedOperationStatus.add(status);
 					}
 					if (status.isSuccess()) {
 						lock.lock();
 						try {
-							// merged result is empty, add all.
-							if (smGetList.size() == 1) {
-								addTotalBkey(eachResult);
+							if (mergedResult.size() == 0) {
+								/* merged result is empty, add all */
+								if (smGetList.size() > 1) {
+									addTotalBkey(eachResult);
+								}
 								mergedResult.addAll(eachResult);
 							} else {
-								// merged result is empty, add all.
-								if (mergedResult.size() == 0) {
-									addTotalBkey(eachResult);
-									mergedResult.addAll(eachResult);
-								} else {
-									// remove trimmed area
-									if (TRIMMED.equals(status.getMessage())) {
-
+								/* do sort merge */
+								int idx, pos = 0;
+								for (SMGetElement<T> result : eachResult) {
+									for (idx = pos; idx < mergedResult.size(); idx++) {
+										if ((reverse) ? (0 > result.compareTo(mergedResult.get(idx)))
+													  : (0 < result.compareTo(mergedResult.get(idx))))
+											break;
 									}
-
-									// do sort merge
-									for (SMGetElement<T> result : eachResult) {
-										boolean added = false;
-
-										for (int i = 0; i < mergedResult.size(); i++) {
-											if (i > totalResultElementCount) {
-												added = true;
-												break;
-											}
-
-											if ((reverse) ? (0 > result.compareTo(mergedResult.get(i))) : 0 < result
-													.compareTo(mergedResult.get(i))) {
-												if (!addTotalBkey(result.getBkeyByObject())) {
-													resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-												}
-												mergedResult.add(i, result);
-												added = true;
+									
+									if (idx < mergedResult.size() || idx < totalResultElementCount) {
+										boolean duplicated = false;
+										if (!addTotalBkey(result.getBkeyByObject())) {
+											resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
+											duplicated = true;
+										}
+										
+										if (!unique || !duplicated) {
+											mergedResult.add(idx, result);
+											if (mergedResult.size() > totalResultElementCount)
+												mergedResult.remove(totalResultElementCount);
+										}
+										pos = idx + 1;
+										if (pos >= totalResultElementCount) {
+											break; /* finish the sort merge */
+										}
+									}
+								}
+							}
+							
+							if (eachTrimmedResult.size() > 0) {
+								if (mergedTrimmedKeys.size() == 0) {
+									mergedTrimmedKeys.addAll(eachTrimmedResult);
+								} else {
+									/* do sort merge trimmed list */
+									int idx, pos = 0;
+									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
+										for (idx = pos; idx < mergedTrimmedKeys.size(); idx++) {
+											if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedKeys.get(idx)))
+														  :  0 < eTrim.compareTo(mergedTrimmedKeys.get(idx))) {
 												break;
 											}
 										}
-
-									 	if (!added) {
-											if (!addTotalBkey(result.getBkeyByObject())) {
-												resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-											}
-											mergedResult.add(result);
-										}
+										
+									 	mergedTrimmedKeys.add(idx, eTrim);
+									 	pos = idx + 1;
+									}
+								}
+							}
+							
+							/* remove useless trimed keys */
+							if (mergedTrimmedKeys.size() > 0 &&
+								processedSMGetCount.get() == 0 && count + offset <= mergedResult.size()) {
+								SMGetElement<T> lastElement = mergedResult.get(count + offset - 1);
+								SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
+																			lastElement.getBkeyByObject());
+								for (int idx = mergedTrimmedKeys.size() - 1; idx >= 0; idx--) {
+									SMGetTrimKey me = mergedTrimmedKeys.get(idx);
+									if ((reverse) ? (0 <= me.compareTo(lastTrimKey))
+												  :  0 >= me.compareTo(lastTrimKey)) {
+										mergedTrimmedKeys.remove(idx);
+									} else {
+										break;
 									}
 								}
 							}
@@ -2046,8 +2108,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				}
 
 				@Override
-				public void gotMissedKey(byte[] data) {
-					missedKey.add(new String(data));
+				public void gotMissedKey(String key, OperationStatus cause) {
+					if (cause.getMessage().equals("UNDEFINED"))
+						missedKeyList.add(key);
+					else
+						missedKeys.put(key, new CollectionOperationStatus(cause));
+				}
+				
+				@Override
+				public void gotTrimmedKey(String key, Object subkey) {
+					if (stopCollect.get())
+						return;
+					
+					if (subkey instanceof Long) {
+						eachTrimmedResult.add(new SMGetTrimKey(key, (Long)subkey));
+					} else if (subkey instanceof byte[]) {
+						eachTrimmedResult.add(new SMGetTrimKey(key, (byte[])subkey));
+					}
 				}
 			});
 			ops.add(op);
@@ -2089,8 +2166,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
+			public Map<String, CollectionOperationStatus> getMissedKeys() {
+				return missedKeys;
+			}
+			
+			@Override
 			public List<String> getMissedKeyList() {
-				return missedKey;
+				return missedKeyList;
+			}
+			
+			@Override
+			public List<SMGetTrimKey> getTrimmedKeys() {
+				return mergedTrimmedKeys;
 			}
 			
 			@Override
@@ -2122,8 +2209,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					return null;
 				}
 
-				if (duplicatedTrimmed != null
-						|| (duplicated != null && trimmed != null))
+				if (duplicatedTrimmed == null && duplicated != null && trimmed != null)
+					duplicatedTrimmed = new OperationStatus(true, "DUPLICATED_TRIMMED");
+
+				if (duplicatedTrimmed != null)
 					return new CollectionOperationStatus(duplicatedTrimmed);
 				else if (duplicated != null)
 					return new CollectionOperationStatus(duplicated);
@@ -2565,10 +2654,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			final boolean reverse, final Transcoder<T> tc) {
 		// Check for invalid arguments (not to get CLIENT_ERROR)
 		if (get.getOrder() == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		if (get.getPosFrom() < 0 || get.getPosTo() < 0) {
-			throw new IllegalArgumentException("Positions should be 0 or positive integer");
+			throw new IllegalArgumentException("Position must be 0 or positive integer.");
 		}
 		
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -2648,7 +2737,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Integer> asyncBopFindPosition(String key, long longBKey,
 			BTreeOrder order) {
 		if (order == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		BTreeFindPosition get = new BTreeFindPosition(longBKey, order);
 		return asyncBopFindPosition(key, get);
@@ -2658,7 +2747,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Integer> asyncBopFindPosition(String key, byte[] byteArrayBKey,
 			BTreeOrder order) {
 		if (order == null) {
-			throw new IllegalArgumentException("BTreeOrder should not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		BTreeFindPosition get = new BTreeFindPosition(byteArrayBKey, order);
 		return asyncBopFindPosition(key, get);
@@ -2785,7 +2874,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
 			final String k, final BTreeFindPositionWithGet<T> get, final Transcoder<T> tc) {
 		if (get.getOrder() == null) {
-			throw new IllegalArgumentException("BTreeOrder must not be null");
+			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}
 		if (get.getCount() < 0 || get.getCount() > 100) {
 			throw new IllegalArgumentException("Count must be a value between 0 and 100.");
@@ -3143,12 +3232,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		if (exist.getItemCount() == 0) {
 			throw new IllegalArgumentException(
-					"item count for piped operation cannot be 0.");
+					"The number of piped operations must be larger than 0.");
 		}
-
 		if (exist.getItemCount() > CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
 			throw new IllegalArgumentException(
-					"max item count for piped operation cannot be over "
+					"The number of piped operations must not exceed a maximum of "
 							+ CollectionPipedStore.MAX_PIPED_ITEM_COUNT + ".");
 		}
 
@@ -3262,17 +3350,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+			int offset, int count) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, offset, count, false);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+			int count, boolean unique) {
+		return asyncBopSortMergeGet(keyList, from, to, eFlagFilter, 0, count, unique);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int, boolean)
+	 */
+	@Override
+	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+			int offset, int count, boolean unique) {
 		if (keyList == null || keyList.isEmpty()) {
 			throw new IllegalArgumentException("Key list is empty.");
 		}
-		if (count < 1) {
-			throw new IllegalArgumentException(
-					"Value of 'count' must be larger than 0.");
+		if (offset < 0) {
+			throw new IllegalArgumentException("Offset must be 0 or positive integer.");
 		}
-		if (offset + count > MAX_SMGET_COUNT) {
-			throw new IllegalArgumentException(
-					"Cannot value of 'offset + count' larger than " + MAX_SMGET_COUNT);
+		if (count < 1) {
+			throw new IllegalArgumentException("Count must be larger than 0.");
+		}
+		if ((offset + count) > MAX_SMGET_COUNT) {
+			throw new IllegalArgumentException("The sum of offset and count "
+			        + "must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
 		}
 		
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
@@ -3280,14 +3393,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				arrangedKey.size());
 		for (List<String> v : arrangedKey.values()) {
 			if (arrangedKey.size() > 1) {
-				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, 0, offset + count));
+				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, 0, offset + count, unique));
 			}else {
-				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, offset, count));
+				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, offset, count, unique));
 			}
 		}
 		
 		return smget(smGetList, offset, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
-				collectionTranscoder);
+				collectionTranscoder, unique);
 	}
 	
 	/**
@@ -3675,16 +3788,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementFlagFilter eFlagFilter, int offset, int count,
 			Transcoder<T> tc) {
 		if (keyList == null) {
-			throw new IllegalArgumentException("key list is null.");
+			throw new IllegalArgumentException("Key list is null.");
 		}
 		if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-			throw new IllegalArgumentException("size of key list must be less than " + MAX_GETBULK_KEY_COUNT + ".");
-		}
-		if (count > MAX_GETBULK_ELEMENT_COUNT) {
-			throw new IllegalArgumentException("count must be less than " + MAX_GETBULK_ELEMENT_COUNT + ".");
+			throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException("offset can't be negative.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+		}
+		if (count > MAX_GETBULK_ELEMENT_COUNT) {
+			throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
 		}
 		
 		Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
@@ -3720,16 +3833,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			ElementFlagFilter eFlagFilter, int offset, int count,
 			Transcoder<T> tc) {
 		if (keyList == null) {
-			throw new IllegalArgumentException("key list is null.");
+			throw new IllegalArgumentException("Key list is null.");
 		}
 		if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-			throw new IllegalArgumentException("size of key list must be less than " + MAX_GETBULK_KEY_COUNT + ".");
-		}
-		if (count > MAX_GETBULK_ELEMENT_COUNT) {
-			throw new IllegalArgumentException("count must be less than " + MAX_GETBULK_ELEMENT_COUNT + ".");
+			throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
 		}
 		if (offset < 0) {
-			throw new IllegalArgumentException("offset can't be negative.");
+			throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+		}
+		if (count > MAX_GETBULK_ELEMENT_COUNT) {
+			throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
 		}
 		
 		Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
