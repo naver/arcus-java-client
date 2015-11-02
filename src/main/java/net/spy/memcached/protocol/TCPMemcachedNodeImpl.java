@@ -129,18 +129,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		assert wq != null : "No operation write queue";
 		assert iq != null : "No input queue";
 		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (sa instanceof ArcusReplNodeAddress) {
 			socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
 		} else {
 			socketAddress = sa;
 		}
 		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 		/*
 		socketAddress=sa;
 		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 		setChannel(c);
 		rbuf=ByteBuffer.allocate(bufSize);
