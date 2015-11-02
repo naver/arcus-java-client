@@ -36,6 +36,12 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 		this.ip = ip;
 		this.port = port;
 	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	
+	public ArcusReplNodeAddress(ArcusReplNodeAddress addr) {
+		this(addr.group, addr.master, addr.ip, addr.port);
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 
 	public String toString() {
 		return "Group(" + group + ") Address(" + ip + ":" + port + ") " + (master ? "MASTER" : "SLAVE");
