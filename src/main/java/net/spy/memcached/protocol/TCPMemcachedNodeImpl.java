@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
@@ -127,7 +128,17 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		assert rq != null : "No operation read queue";
 		assert wq != null : "No operation write queue";
 		assert iq != null : "No input queue";
+		/* ENABLE_REPLICATION if */
+		if (sa instanceof ArcusReplNodeAddress) {
+			socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
+		} else {
+			socketAddress = sa;
+		}
+		/* ENABLE_REPLICATION else */
+		/*
 		socketAddress=sa;
+		*/
+		/* ENABLE_REPLICATION end */
 		setChannel(c);
 		rbuf=ByteBuffer.allocate(bufSize);
 		wbuf=ByteBuffer.allocate(bufSize);
