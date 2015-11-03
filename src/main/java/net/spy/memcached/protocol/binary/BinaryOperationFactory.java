@@ -47,6 +47,7 @@ import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
+import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.BTreeStoreAndGetOperation;
 import net.spy.memcached.ops.BaseOperationFactory;
 import net.spy.memcached.ops.CASOperation;
@@ -259,6 +260,13 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 		"Flush by prefix operation is not supported in binary protocol yet.");
 	}
 
+	@Override
+	public BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
+			BTreeSortMergeGetOperationOld.Callback cb) {
+		throw new RuntimeException(
+		"B+ tree sort merge get operation is not supported in binary protocol yet.");
+	}
+	
 	@Override
 	public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
 			BTreeSortMergeGetOperation.Callback cb) {

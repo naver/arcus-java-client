@@ -32,6 +32,7 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
@@ -885,37 +886,13 @@ public interface ArcusClientIF {
 	 *            element flag filter
 	 * @param count
 	 *            number of returning values (0 to all)
-	 * @param unique
-	 *            return unique SMGetElement of bkey
+	 * @param smgetMode
+	 *            smgetMode
 	 * @return a future that will hold the return value list of the fetch.
 	 */
 	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
 			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
-			int count, boolean unique);
-
-	/**
-	 * Get elements that matched both filter and bkey range criteria from
-	 * multiple b+tree. The result is sorted by order of bkey.
-	 * 
-	 * @param keyList
-	 *            b+ tree key list
-	 * @param from
-	 *            bkey index from
-	 * @param to
-	 *            bkey index to
-	 * @param eFlagFilter
-	 *            element flag filter
-	 * @param offset
-	 *            0-base offset
-	 * @param count
-	 *            number of returning values (0 to all)
-	 * @param unique
-	 *            return unique SMGetElement of bkey
-	 * @return a future that will hold the return value list of the fetch.
-	 */
-	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-			List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
-			int offset, int count, boolean unique);
+			int count, SMGetMode smgetMode);
 	
 	/**
 	 * Update or insert an element.
@@ -1374,37 +1351,13 @@ public interface ArcusClientIF {
 	 *            element flag filter
 	 * @param count
 	 *            number of returning values (0 to all)
-	 * @param unique
-	 *            return unique SMGetElement of bkey
+	 * @param smgetMode
+	 *            smgetMode
 	 * @return a future that will hold the return value list of the fetch.
 	 */
 	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
 			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-			int count, boolean unique);
-	
-	/**
-	 * Get elements that matched both filter and bkey range criteria from
-	 * multiple b+tree. The result is sorted by order of bkey.
-	 * 
-	 * @param keyList
-	 *            b+ tree key list
-	 * @param from
-	 *            bkey index from
-	 * @param to
-	 *            bkey index to
-	 * @param eFlagFilter
-	 *            element flag filter
-	 * @param offset
-	 *            0-base offset
-	 * @param count
-	 *            number of returning values (0 to all)
-	 * @param unique
-	 *            return unique SMGetElement of bkey
-	 * @return a future that will hold the return value list of the fetch.
-	 */
-	public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-			List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-			int offset, int count, boolean unique);
+			int count, SMGetMode smgetMode);
 	
 	/**
 	 * Insert one item into multiple b+trees at once.
