@@ -25,6 +25,7 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetMode;
 
 public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
@@ -38,6 +39,9 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 	private final Object value = "valvalvalvalvalvalvalvalvalval";
 
 	public void testGetAll_1() {
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
+		
+		/* old SMGetIrregularEflagTest */
 		try {
 			mc.delete(key1).get();
 			mc.delete(key2).get();
@@ -64,6 +68,41 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 						}
 					}, new byte[] { 0 }, new byte[] { 10 },
 					ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
+
+			for (int i = 0; i < list.size(); i++) {
+				System.out.println(list.get(i));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail(e.getMessage());
+		}
+		
+		try {
+			mc.delete(key1).get();
+			mc.delete(key2).get();
+
+			mc.asyncBopInsert(key1, new byte[] { 0 }, eFlag, value + "0",
+					new CollectionAttributes()).get();
+			mc.asyncBopInsert(key1, new byte[] { 3 }, eFlag, value + "1",
+					new CollectionAttributes()).get();
+			mc.asyncBopInsert(key1, new byte[] { 2 }, eFlag, value + "2",
+					new CollectionAttributes()).get();
+
+			mc.asyncBopInsert(key2, new byte[] { 1 }, eFlag, value + "0",
+					new CollectionAttributes()).get();
+			mc.asyncBopInsert(key2, new byte[] { 5 }, null, value + "1",
+					new CollectionAttributes()).get();
+			mc.asyncBopInsert(key2, new byte[] { 4 }, eFlag, value + "2",
+					new CollectionAttributes()).get();
+
+			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
+					new ArrayList<String>() {
+						{
+							add(key1);
+							add(key2);
+						}
+					}, new byte[] { 0 }, new byte[] { 10 },
+					ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
 
 			for (int i = 0; i < list.size(); i++) {
 				System.out.println(list.get(i));
