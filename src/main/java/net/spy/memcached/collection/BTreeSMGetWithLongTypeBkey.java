@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.util.BTreeUtil;
+import net.spy.memcached.collection.SMGetMode;
 
 public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 
@@ -33,8 +34,8 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 	protected int lenKeys;
 
 	protected String range;
-	protected int offset = -1;
 	protected int count;
+	protected SMGetMode smgetMode;
 	protected boolean unique;
 	protected Map<Integer, T> map;
 
@@ -50,16 +51,15 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 	private ElementFlagFilter eFlagFilter;
 	
 	public BTreeSMGetWithLongTypeBkey(List<String> keyList, long from, long to,
-			ElementFlagFilter eFlagFilter, int offset, int count, boolean unique) {
+			ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
 		this.keyList = keyList;
 		
 		this.range = String.valueOf(from)
 				+ ((to > -1) ? ".." + String.valueOf(to) : "");
 		
 		this.eFlagFilter = eFlagFilter;
-		this.offset = offset;
 		this.count = count;
-		this.unique = unique;
+		this.smgetMode = smgetMode;
 		this.reverse = (from > to);
 	}
 	
@@ -103,14 +103,10 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 
 		if (eFlagFilter != null)
 			b.append(" ").append(eFlagFilter.toString());
-		
-		if (offset > 0)
-			b.append(" ").append(offset);
 
 		b.append(" ").append(count);
 
-		if (unique)
-			b.append(" ").append("unique");
+		b.append(" ").append(smgetMode.getMode());
 
 		str = b.toString();
 		return str;

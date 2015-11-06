@@ -47,6 +47,7 @@ import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
+import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.BTreeStoreAndGetOperation;
 import net.spy.memcached.ops.BaseOperationFactory;
 import net.spy.memcached.ops.CASOperation;
@@ -225,6 +226,11 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 		return new FlushByPrefixOperationImpl(prefix, delay, noreply, cb);
 	}
 
+	public BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
+			BTreeSortMergeGetOperationOld.Callback cb) {
+		return new BTreeSortMergeGetOperationOldImpl(smGet, cb);
+	}
+	
 	public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
 			BTreeSortMergeGetOperation.Callback cb) {
 		return new BTreeSortMergeGetOperationImpl(smGet, cb);

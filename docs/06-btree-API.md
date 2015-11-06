@@ -1146,13 +1146,9 @@ sort merge하면서, count개의 element를 조회한다.
 
 ```java
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count)
+asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode)
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count, boolean unique)
-SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count)
-SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count, boolean unique)
+asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode)
 ```
 
 - keyList: b+tree items의 key list
@@ -1162,7 +1158,7 @@ asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFi
 - count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 count 지정
   - **제약 조건으로 1000이하이어야 한다.**
   - 이는 sort-merge get 연산이 부담이 너무 크지 않은 연산으로 제한하기 위한 것이다.
-- unique: 중복된 bkey에 대해서 하나의 결과만을 조회하도록 지정하는 flag
+- smgetMode: smget에 대해서 mode를 지정하는 flag (unique / duplicate)
 
 수행 결과는 future 객체를 통해 얻는다.
 
@@ -1189,10 +1185,11 @@ long bkeyFrom = 0L; // (1)
 long bkeyTo = 100L;
 int queryCount = 10;
 
+SMGetMode smgetMode = SMGetMode.DUPLICATE;
 SMGetFuture<List<SMGetElement<Object>>> future = null;
 
 try {
-    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount); // (2)
+    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode); // (2)
 } catch (IllegalStateException e) {
     // handle exception
 }
