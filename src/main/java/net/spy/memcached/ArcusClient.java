@@ -2043,7 +2043,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 												break;
 											}
 
-											if ((reverse) ? (0 > result.compareTo(mergedResult.get(i))) : 0 < result
+											if ((reverse) ? (0 < result.compareTo(mergedResult.get(i))) : 0 > result
 													.compareTo(mergedResult.get(i))) {
 												if (!addTotalBkey(result.getBkeyByObject())) {
 													resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
@@ -2270,8 +2270,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 								int idx, pos = 0;
 								for (SMGetElement<T> result : eachResult) {
 									for (idx = pos; idx < mergedResult.size(); idx++) {
-										if ((reverse) ? (0 > result.compareTo(mergedResult.get(idx)))
-													  : (0 < result.compareTo(mergedResult.get(idx))))
+										if ((reverse) ? (0 < result.compareTo(mergedResult.get(idx)))
+													  : (0 > result.compareTo(mergedResult.get(idx))))
 											break;
 									}
 									
@@ -2306,8 +2306,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 									int idx, pos = 0;
 									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
 										for (idx = pos; idx < mergedTrimmedKeys.size(); idx++) {
-											if ((reverse) ? (0 > eTrim.compareTo(mergedTrimmedKeys.get(idx)))
-														  :  0 < eTrim.compareTo(mergedTrimmedKeys.get(idx))) {
+											if ((reverse) ? (0 < eTrim.compareTo(mergedTrimmedKeys.get(idx)))
+														  :  0 > eTrim.compareTo(mergedTrimmedKeys.get(idx))) {
 												break;
 											}
 										}
@@ -2326,8 +2326,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 																			lastElement.getBkeyByObject());
 								for (int idx = mergedTrimmedKeys.size() - 1; idx >= 0; idx--) {
 									SMGetTrimKey me = mergedTrimmedKeys.get(idx);
-									if ((reverse) ? (0 <= me.compareTo(lastTrimKey))
-												  :  0 >= me.compareTo(lastTrimKey)) {
+									if ((reverse) ? (0 >= me.compareTo(lastTrimKey))
+												  :  0 <= me.compareTo(lastTrimKey)) {
 										mergedTrimmedKeys.remove(idx);
 									} else {
 										break;
