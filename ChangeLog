@@ -1,3 +1,7 @@
+2015-11-09 [version 1.9.2]
+	* Fix a mistake in compareTo of SMGetElement and SMGetTrimKey.
+	* Fix a bug in sort-merge logic when unique bkeys are requested.
+
 2015-11-03 [version 1.9.1]
 	* Restore the old smget interface to ensure backward compatibility.
 	  So, both(the old one and the new one added since 1.9.0) smget

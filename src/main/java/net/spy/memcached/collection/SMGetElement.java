@@ -48,25 +48,20 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
 	@Override
 	public int compareTo(SMGetElement<T> param) {
-		// null is later than param.
-		if (key == null) {
-			return 1;
-		}
-
-		if (param == null || param.getKey() == null) {
-			return 0;
-		}
-
-		int compareKey = key.compareTo(param.getKey());
+		assert param != null;
 		
-		int compareBKey = ((bytebkey == null) ? (int) (param.getBkey() - bkey)
-				: BTreeUtil.compareByteArraysInLexOrder(param.getByteBkey(), bytebkey));
-
-		if (compareBKey != 0) {
-			return compareBKey;
-		} else {
-			return compareKey;
-		}
+		int comp;
+		/* compare bkey */
+		if (bytebkey == null)
+			comp = new Long(bkey).compareTo(param.getBkey());
+		else
+			comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+		
+		/* if bkey is equal, then compare key */
+		if (comp == 0)
+			comp = key.compareTo(param.getKey());
+		
+		return comp;
 	}
 
 	public String getKey() {
