@@ -154,6 +154,16 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 						+ newGroupNodes);
 				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
 			}
+			else if (newGroupNodes.size() == 2 &&
+					newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
+				/*
+				 * Two nodes are master
+				 */
+				ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+						+ "This group have two master node. "
+						+ newGroupNodes);
+				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
+			}
 			else if (!newGroupNodes.get(0).master) {
 				/*
 				 * Fake group (node) is always master...
