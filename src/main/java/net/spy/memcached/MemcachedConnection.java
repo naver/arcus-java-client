@@ -46,6 +46,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationException;
@@ -201,7 +202,7 @@ public final class MemcachedConnection extends SpyObject {
 						getLogger().info("%s has a ready op, handling IO", sk);
 						handleIO(sk);
 					} else {
-						lostConnection((MemcachedNode)sk.attachment());
+						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT);
 					}
 				}
 				assert emptySelects < EXCESSIVE_EMPTY
@@ -227,14 +228,14 @@ public final class MemcachedConnection extends SpyObject {
 				getLogger().warn(
 						"%s exceeded continuous timeout threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
-				lostConnection(mn);
+				lostConnection(mn, ReconnDelay.DEFAULT);
 			}
 			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
 			{
 				getLogger().warn(
 						"%s exceeded timeout ratio threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
-				lostConnection(mn);
+				lostConnection(mn, ReconnDelay.DEFAULT);
 			}
 		}
 
@@ -473,7 +474,7 @@ public final class MemcachedConnection extends SpyObject {
 					: "Not connected, and not wanting to connect";
 		} catch (SocketException e) {
 			getLogger().warn("new memcached socket error on initial connect");
-			queueReconnect(qa);
+			queueReconnect(qa, ReconnDelay.DEFAULT);
 		}
 		return qa;
 	}
@@ -538,7 +539,7 @@ public final class MemcachedConnection extends SpyObject {
 						}
 					} catch(IOException e) {
 						getLogger().warn("Exception handling write", e);
-						lostConnection(qa);
+						lostConnection(qa, ReconnDelay.DEFAULT);
 					}
 				}
 				qa.fixupOps();
@@ -574,8 +575,8 @@ public final class MemcachedConnection extends SpyObject {
 		}
 	}
 
-	private void lostConnection(MemcachedNode qa) {
-		queueReconnect(qa);
+	private void lostConnection(MemcachedNode qa, ReconnDelay type) {
+		queueReconnect(qa, type);
 		for(ConnectionObserver observer : connObservers) {
 			observer.connectionLost(qa.getSocketAddress());
 		}
@@ -615,20 +616,20 @@ public final class MemcachedConnection extends SpyObject {
 			if(!shutDown) {
 				getLogger().info("Closed channel and not shutting down.  "
 					+ "Queueing reconnect on %s", qa, e);
-				lostConnection(qa);
+				lostConnection(qa, ReconnDelay.DEFAULT);
 			}
 		} catch(ConnectException e) {
 			// Failures to establish a connection should attempt a reconnect
 			// without signaling the observers.
 			getLogger().info("Reconnecting due to failure to connect to %s",
 					qa, e);
-			queueReconnect(qa);
+			queueReconnect(qa, ReconnDelay.DEFAULT);
 		} catch (OperationException e) {
 			qa.setupForAuth(); // noop if !shouldAuth
 			getLogger().info("Reconnection due to exception " +
 				"handling a memcached operation on %s.  " +
 				"This may be due to an authentication failure.", qa, e);
-			lostConnection(qa);
+			lostConnection(qa, ReconnDelay.IMMEDIATE);
 		} catch(Exception e) {
 			// Any particular error processing an item should simply
 			// cause us to reconnect to the server.
@@ -638,7 +639,7 @@ public final class MemcachedConnection extends SpyObject {
 
 			qa.setupForAuth(); // noop if !shouldAuth
 			getLogger().info("Reconnecting due to exception on %s", qa, e);
-			lostConnection(qa);
+			lostConnection(qa, ReconnDelay.DEFAULT);
 		}
 		qa.fixupOps();
 	}
@@ -704,7 +705,7 @@ public final class MemcachedConnection extends SpyObject {
 		return sb.toString();
 	}
 
-	private void queueReconnect(MemcachedNode qa) {
+	private void queueReconnect(MemcachedNode qa, ReconnDelay type) {
 		if(!shutDown) {
 			getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
 					qa.getReconnectCount());
@@ -725,8 +726,17 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			qa.setChannel(null);
 
-			long delay = (long)Math.min(maxDelay,
-					Math.pow(2, qa.getReconnectCount())) * 1000;
+			long delay;
+			switch(type) {
+				case IMMEDIATE :
+					delay = 0;
+					break;
+				case DEFAULT :
+				default :
+					delay = (long)Math.min(maxDelay,
+							Math.pow(2, qa.getReconnectCount())) * 1000;
+					break;
+			}
 			long reconTime = System.currentTimeMillis() + delay;
 
 			// Avoid potential condition where two connections are scheduled
@@ -828,7 +838,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		// Requeue any fast-failed connects.
 		for(MemcachedNode n : rereQueue) {
-			queueReconnect(n);
+			queueReconnect(n, ReconnDelay.DEFAULT);
 		}
 	}
 
