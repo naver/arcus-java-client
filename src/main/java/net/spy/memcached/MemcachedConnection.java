@@ -791,6 +791,8 @@ public final class MemcachedConnection extends SpyObject {
 					getLogger().info("Reconnecting %s", qa);
 					ch=SocketChannel.open();
 					ch.configureBlocking(false);
+					ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
+					ch.socket().setReuseAddress(true);
 					int ops=0;
 					if(ch.connect(qa.getSocketAddress())) {
 						getLogger().info("Immediately reconnected to %s", qa);
