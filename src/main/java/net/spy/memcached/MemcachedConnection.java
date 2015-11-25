@@ -558,12 +558,14 @@ public final class MemcachedConnection extends SpyObject {
 			reconnectQueue.put(reconTime, qa);
 
 			// Need to do a little queue management.
-			qa.setupResend(failureMode == FailureMode.Cancel);
+			qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT);
 
-			if(failureMode == FailureMode.Redistribute) {
-				redistributeOperations(qa.destroyInputQueue());
-			} else if(failureMode == FailureMode.Cancel) {
-				cancelOperations(qa.destroyInputQueue());
+			if (type == ReconnDelay.DEFAULT) {
+				if(failureMode == FailureMode.Redistribute) {
+					redistributeOperations(qa.destroyInputQueue());
+				} else if(failureMode == FailureMode.Cancel) {
+					cancelOperations(qa.destroyInputQueue());
+				}
 			}
 		}
 	}
