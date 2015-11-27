@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -238,7 +239,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		String cmd = get.getCommand();
 		String args = get.stringify();
 
-		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + key.length()
+		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + KeyUtil.getKeyBytes(key).length
 				+ args.length() + 16);
 
 		setArguments(bb, cmd, key, args);

@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -84,7 +85,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
 	@Override
 	public void initialize() {
-		int size = CMD.length() + key.length() + 16;
+		int size = CMD.length() + KeyUtil.getKeyBytes(key).length + 16;
 		ByteBuffer bb = ByteBuffer.allocate(size);
 		setArguments(bb, CMD, key);
 		bb.flip();
