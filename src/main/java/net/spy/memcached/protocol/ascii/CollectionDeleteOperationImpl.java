@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeDelete;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionResponse;
@@ -91,8 +92,8 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		String args = collectionDelete.stringify();
 		byte[] data = collectionDelete.getData();
 		
-		ByteBuffer bb = ByteBuffer.allocate(key.length() +
-				cmd.length() + args.length() + data.length + 16);
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ cmd.length() + args.length() + data.length + 16);
 		
 		setArguments(bb, cmd, key, args);
 		

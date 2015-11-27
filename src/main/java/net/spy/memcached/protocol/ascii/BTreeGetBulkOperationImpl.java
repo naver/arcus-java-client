@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -227,7 +228,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 		String args = getBulk.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ getBulk.getCommaSeparatedKeys().length() + 16);
+				+ KeyUtil.getKeyBytes(getBulk.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 
