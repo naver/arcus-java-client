@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
@@ -222,8 +223,8 @@ public class CollectionGetOperationImpl extends OperationImpl
 	public void initialize() {
 		String cmd = collectionGet.getCommand();
 		String args = collectionGet.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(key.length() +
-				cmd.length() + args.length() + 16);
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ cmd.length() + args.length() + 16);
 		
 		setArguments(bb, cmd, key, args);
 		bb.flip();

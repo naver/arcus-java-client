@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -281,7 +282,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 		String args = smGet.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ smGet.getCommaSeparatedKeys().length() + 16);
+				+ KeyUtil.getKeyBytes(smGet.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 
