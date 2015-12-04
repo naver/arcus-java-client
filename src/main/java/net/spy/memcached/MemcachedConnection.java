@@ -248,6 +248,9 @@ public final class MemcachedConnection extends SpyObject {
 			attachNodes.add(attachMemcachedNode(sa));
 		}
 
+		// Update the hash.
+		locator.update(attachNodes, removeNodes);
+
 		// Remove unavailable nodes in the reconnect queue.
 		for (MemcachedNode node : removeNodes) {
 			getLogger().info("old memcached node removed %s", node);
@@ -257,10 +260,14 @@ public final class MemcachedConnection extends SpyObject {
 					break;
 				}
 			}
+			if (failureMode == FailureMode.Cancel) {
+				cancelOperations(node.destroyWriteQueue(false));
+				cancelOperations(node.destroyInputQueue());
+			} else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
+				redistributeOperations(node.destroyWriteQueue(true));
+				redistributeOperations(node.destroyInputQueue());
+			}
 		}
-		
-		// Update the hash.
-		locator.update(attachNodes, removeNodes);
 	}
 	
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {

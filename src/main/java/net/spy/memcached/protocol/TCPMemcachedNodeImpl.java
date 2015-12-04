@@ -170,6 +170,25 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	}
 
 	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#destroyWriteQueue()
+	 */
+	public Collection<Operation> destroyWriteQueue(boolean resend) {
+		Collection<Operation> rv=new ArrayList<Operation>();
+		writeQ.drainTo(rv);
+		if (resend) {
+			for (Operation o : rv) {
+				if (o.getState() == OperationState.WRITING && o.getBuffer() != null) {
+					o.getBuffer().reset(); // buffer offset reset
+				} else {
+					o.initialize(); // write completed or not yet initialized
+				}
+			}
+		}
+
+		return rv;
+	}
+
+	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#setupResend()
 	 */
 	public final void setupResend(boolean cancelWrite) {
