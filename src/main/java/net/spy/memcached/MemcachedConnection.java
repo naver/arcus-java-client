@@ -410,17 +410,6 @@ public final class MemcachedConnection extends SpyObject {
 		*/
 		/* ENABLE_REPLICATION end */
 
-		// Remove unavailable nodes in the reconnect queue.
-		for (MemcachedNode node : removeNodes) {
-			getLogger().info("old memcached node removed %s", node);
-			for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-				if (node.equals(each.getValue())) {
-					reconnectQueue.remove(each.getKey());
-					break;
-				}
-			}
-		}
-		
 		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled && changeRoleGroups.size() > 0)
 			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
@@ -432,6 +421,24 @@ public final class MemcachedConnection extends SpyObject {
 		locator.update(attachNodes, removeNodes);
 		*/
 		/* ENABLE_REPLICATION end */
+
+		// Remove unavailable nodes in the reconnect queue.
+		for (MemcachedNode node : removeNodes) {
+			getLogger().info("old memcached node removed %s", node);
+			for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
+				if (node.equals(each.getValue())) {
+					reconnectQueue.remove(each.getKey());
+					break;
+				}
+			}
+			if (failureMode == FailureMode.Cancel) {
+				cancelOperations(node.destroyWriteQueue(false));
+				cancelOperations(node.destroyInputQueue());
+			} else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
+				redistributeOperations(node.destroyWriteQueue(true));
+				redistributeOperations(node.destroyInputQueue());
+			}
+		}
 	}
 	
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
