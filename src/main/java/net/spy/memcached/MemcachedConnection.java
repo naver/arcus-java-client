@@ -380,6 +380,9 @@ public final class MemcachedConnection extends SpyObject {
 						attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
 				}
 			}
+
+			// Update the hash.
+			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
 		} else {
 			for (MemcachedNode node : locator.getAll()) {
 				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
@@ -392,6 +395,9 @@ public final class MemcachedConnection extends SpyObject {
 			for (SocketAddress sa : addrs) {
 				attachNodes.add(attachMemcachedNode(sa));
 			}
+
+			// Update the hash.
+			locator.update(attachNodes, removeNodes);
 		}
 		/* ENABLE_REPLICATION else */
 		/*
@@ -407,39 +413,29 @@ public final class MemcachedConnection extends SpyObject {
 		for (SocketAddress sa : addrs) {
 			attachNodes.add(attachMemcachedNode(sa));
 		}
-		*/
-		/* ENABLE_REPLICATION end */
 
-		/* ENABLE_REPLICATION if */
-		if (arcusReplEnabled && changeRoleGroups.size() > 0)
-			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
-		else {
-			locator.update(attachNodes, removeNodes);
-
-			// Remove unavailable nodes in the reconnect queue.
-			for (MemcachedNode node : removeNodes) {
-				getLogger().info("old memcached node removed %s", node);
-				for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-					if (node.equals(each.getValue())) {
-						reconnectQueue.remove(each.getKey());
-						break;
-					}
-				}
-				if (failureMode == FailureMode.Cancel) {
-					cancelOperations(node.destroyWriteQueue(false));
-					cancelOperations(node.destroyInputQueue());
-				} else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
-					redistributeOperations(node.destroyWriteQueue(true));
-					redistributeOperations(node.destroyInputQueue());
-				}
-			}
-		}
-		/* ENABLE_REPLICATION else */
-		/*
 		// Update the hash.
 		locator.update(attachNodes, removeNodes);
 		*/
 		/* ENABLE_REPLICATION end */
+
+        // Remove unavailable nodes in the reconnect queue.
+        for (MemcachedNode node : removeNodes) {
+            getLogger().info("old memcached node removed %s", node);
+            for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
+                if (node.equals(each.getValue())) {
+                    reconnectQueue.remove(each.getKey());
+                    break;
+                }
+            }
+            if (failureMode == FailureMode.Cancel) {
+                cancelOperations(node.destroyWriteQueue(false));
+                cancelOperations(node.destroyInputQueue());
+            } else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
+                redistributeOperations(node.destroyWriteQueue(true));
+                redistributeOperations(node.destroyInputQueue());
+            }
+        }
 	}
 	
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
