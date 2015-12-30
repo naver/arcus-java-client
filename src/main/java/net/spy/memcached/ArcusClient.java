@@ -988,7 +988,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -1028,7 +1028,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				}
 				if (isCancelled()) {
 					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+							op.getCancelCause()));
 				}
 
 				return mergedResult;
@@ -1771,7 +1771,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -1782,6 +1782,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				boolean rv = false;
 				for (Operation op : ops) {
 					rv |= op.isCancelled();
+					setOperation(op);
 				}
 				return rv;
 			}
@@ -2119,12 +2120,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
+					if (isCancelled()) {
+						throw new ExecutionException(new RuntimeException(
+								op.getCancelCause()));
+					}
 				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
-				}
-				
+
 				if (smGetList.size() == 1) 
 					return mergedResult;
 				
@@ -2413,13 +2414,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
+					if (isCancelled()) {
+						throw new ExecutionException(new RuntimeException(
+								op.getCancelCause()));
+					}
 				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
-				}
-				
-				if (smGetList.size() == 1) 
+
+				if (smGetList.size() == 1)
 					return mergedResult;
 				
 				return getSubList(mergedResult, 0, count);
@@ -3742,7 +3743,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 			    boolean rv = false;
 			    for (Operation op : ops) {
-			        op.cancel();
+			        op.cancel("by application.");
 			        rv |= op.getState() == OperationState.WRITING;
 			    }
 			    return rv;
@@ -3782,7 +3783,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				}
 				if (isCancelled()) {
 					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+							op.getCancelCause()));
 				}
 
 				return mergedResult;
@@ -3984,7 +3985,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -4023,7 +4024,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				}
 				if (isCancelled()) {
 					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+							op.getCancelCause()));
 				}
 
 				return failedResult;

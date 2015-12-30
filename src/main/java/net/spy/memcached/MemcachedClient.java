@@ -1641,7 +1641,7 @@ public class MemcachedClient extends SpyThread
 			public boolean cancel(boolean ign) {
 				boolean rv=false;
 				for(Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -1651,6 +1651,7 @@ public class MemcachedClient extends SpyThread
 				boolean rv=false;
 				for(Operation op : ops) {
 					rv |= op.isCancelled();
+					setOperation(op);
 				}
 				return rv;
 			}

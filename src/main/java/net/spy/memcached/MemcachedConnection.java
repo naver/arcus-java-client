@@ -185,7 +185,7 @@ public final class MemcachedConnection extends SpyObject {
 						getLogger().info("%s has a ready op, handling IO", sk);
 						handleIO(sk);
 					} else {
-						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT);
+						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT, "because too many empty selects");
 					}
 				}
 				assert emptySelects < EXCESSIVE_EMPTY
@@ -211,14 +211,14 @@ public final class MemcachedConnection extends SpyObject {
 				getLogger().warn(
 						"%s exceeded continuous timeout threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT);
+				lostConnection(mn, ReconnDelay.DEFAULT, "exceeded continuous timeout threshold");
 			}
 			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
 			{
 				getLogger().warn(
 						"%s exceeded timeout ratio threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT);
+				lostConnection(mn, ReconnDelay.DEFAULT, "exceded timeout ratio threshold");
 			}
 		}
 
@@ -260,12 +260,13 @@ public final class MemcachedConnection extends SpyObject {
 					break;
 				}
 			}
+			String cause = "node removed.";
 			if (failureMode == FailureMode.Cancel) {
-				cancelOperations(node.destroyWriteQueue(false));
-				cancelOperations(node.destroyInputQueue());
+				cancelOperations(node.destroyWriteQueue(false), cause);
+				cancelOperations(node.destroyInputQueue(), cause);
 			} else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
-				redistributeOperations(node.destroyWriteQueue(true));
-				redistributeOperations(node.destroyInputQueue());
+				redistributeOperations(node.destroyWriteQueue(true), cause);
+				redistributeOperations(node.destroyInputQueue(), cause);
 			}
 		}
 	}
@@ -299,7 +300,7 @@ public final class MemcachedConnection extends SpyObject {
 					: "Not connected, and not wanting to connect";
 		} catch (SocketException e) {
 			getLogger().warn("new memcached socket error on initial connect");
-			queueReconnect(qa, ReconnDelay.DEFAULT);
+			queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
 		}
 		return qa;
 	}
@@ -355,7 +356,7 @@ public final class MemcachedConnection extends SpyObject {
 						}
 					} catch(IOException e) {
 						getLogger().warn("Exception handling write", e);
-						lostConnection(qa, ReconnDelay.DEFAULT);
+						lostConnection(qa, ReconnDelay.DEFAULT, "exception handling write");
 					}
 				}
 				qa.fixupOps();
@@ -391,8 +392,8 @@ public final class MemcachedConnection extends SpyObject {
 		}
 	}
 
-	private void lostConnection(MemcachedNode qa, ReconnDelay type) {
-		queueReconnect(qa, type);
+	private void lostConnection(MemcachedNode qa, ReconnDelay type, String cause) {
+		queueReconnect(qa, type, cause);
 		for(ConnectionObserver observer : connObservers) {
 			observer.connectionLost(qa.getSocketAddress());
 		}
@@ -432,20 +433,20 @@ public final class MemcachedConnection extends SpyObject {
 			if(!shutDown) {
 				getLogger().info("Closed channel and not shutting down.  "
 					+ "Queueing reconnect on %s", qa, e);
-				lostConnection(qa, ReconnDelay.DEFAULT);
+				lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
 			}
 		} catch(ConnectException e) {
 			// Failures to establish a connection should attempt a reconnect
 			// without signaling the observers.
 			getLogger().info("Reconnecting due to failure to connect to %s",
 					qa, e);
-			queueReconnect(qa, ReconnDelay.DEFAULT);
+			queueReconnect(qa, ReconnDelay.DEFAULT, "failure to connect");
 		} catch (OperationException e) {
-			qa.setupForAuth(); // noop if !shouldAuth
+			qa.setupForAuth("due to authentication failure"); // noop if !shouldAuth
 			getLogger().info("Reconnection due to exception " +
 				"handling a memcached operation on %s.  " +
 				"This may be due to an authentication failure.", qa, e);
-			lostConnection(qa, ReconnDelay.IMMEDIATE);
+			lostConnection(qa, ReconnDelay.IMMEDIATE, "due to authentication failure");
 		} catch(Exception e) {
 			// Any particular error processing an item should simply
 			// cause us to reconnect to the server.
@@ -453,9 +454,9 @@ public final class MemcachedConnection extends SpyObject {
 			// One cause is just network oddness or servers
 			// restarting, which lead here with IOException
 
-			qa.setupForAuth(); // noop if !shouldAuth
+			qa.setupForAuth("due to exception"); // noop if !shouldAuth
 			getLogger().info("Reconnecting due to exception on %s", qa, e);
-			lostConnection(qa, ReconnDelay.DEFAULT);
+			lostConnection(qa, ReconnDelay.DEFAULT, "due to exception");
 		}
 		qa.fixupOps();
 	}
@@ -521,7 +522,7 @@ public final class MemcachedConnection extends SpyObject {
 		return sb.toString();
 	}
 
-	private void queueReconnect(MemcachedNode qa, ReconnDelay type) {
+	private void queueReconnect(MemcachedNode qa, ReconnDelay type, String cause) {
 		if(!shutDown) {
 			getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
 					qa.getReconnectCount());
@@ -565,25 +566,25 @@ public final class MemcachedConnection extends SpyObject {
 			reconnectQueue.put(reconTime, qa);
 
 			// Need to do a little queue management.
-			qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT);
+			qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT, cause);
 
 			if (type == ReconnDelay.DEFAULT) {
 				if(failureMode == FailureMode.Redistribute) {
-					redistributeOperations(qa.destroyInputQueue());
+					redistributeOperations(qa.destroyInputQueue(), cause);
 				} else if(failureMode == FailureMode.Cancel) {
-					cancelOperations(qa.destroyInputQueue());
+					cancelOperations(qa.destroyInputQueue(), cause);
 				}
 			}
 		}
 	}
 
-	private void cancelOperations(Collection<Operation> ops) {
+	private void cancelOperations(Collection<Operation> ops, String cause) {
 		for(Operation op : ops) {
-			op.cancel();
+			op.cancel(cause);
 		}
 	}
 
-	private void redistributeOperations(Collection<Operation> ops) {
+	private void redistributeOperations(Collection<Operation> ops, String cause) {
 		for(Operation op : ops) {
 			if(op instanceof KeyedOperation) {
 				KeyedOperation ko = (KeyedOperation)op;
@@ -598,7 +599,7 @@ public final class MemcachedConnection extends SpyObject {
 					: "Didn't add any new operations when redistributing";
 			} else {
 				// Cancel things that don't have definite targets.
-				op.cancel();
+				op.cancel(cause);
 			}
 		}
 	}
@@ -609,6 +610,7 @@ public final class MemcachedConnection extends SpyObject {
 			new IdentityHashMap<MemcachedNode, Boolean>();
 		final List<MemcachedNode> rereQueue=new ArrayList<MemcachedNode>();
 		SocketChannel ch = null;
+		String cause = null;
 		for(Iterator<MemcachedNode> i=
 				reconnectQueue.headMap(now).values().iterator(); i.hasNext();) {
 			final MemcachedNode qa=i.next();
@@ -656,7 +658,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		// Requeue any fast-failed connects.
 		for(MemcachedNode n : rereQueue) {
-			queueReconnect(n, ReconnDelay.DEFAULT);
+			queueReconnect(n, ReconnDelay.DEFAULT, "error on reconnect");
 		}
 	}
 
@@ -684,7 +686,7 @@ public final class MemcachedConnection extends SpyObject {
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
 			o.setHandlingNode(primary);
-			o.cancel();
+			o.cancel("node is not active");
 		} else {
 			// Look for another node in sequence that is ready.
 			for(Iterator<MemcachedNode> i=locator.getSequence(key);

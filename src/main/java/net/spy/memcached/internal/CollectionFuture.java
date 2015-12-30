@@ -57,7 +57,7 @@ public class CollectionFuture<T> implements Future<T> {
 
 	public boolean cancel(boolean ign) {
 		assert op != null : "No operation";
-		op.cancel();
+		op.cancel("by application.");
 		// This isn't exactly correct, but it's close enough.  If we're in
 		// a writing state, we *probably* haven't started.
 		return op.getState() == OperationState.WRITING;
@@ -87,7 +87,7 @@ public class CollectionFuture<T> implements Future<T> {
 			throw new ExecutionException(op.getException());
 		}
 		if(isCancelled()) {
-			throw new ExecutionException(new RuntimeException("Cancelled"));
+			throw new ExecutionException(new RuntimeException(op.getCancelCause()));
 		}
 
 		return objRef.get();
