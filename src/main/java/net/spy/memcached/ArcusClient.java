@@ -995,15 +995,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
-			public boolean isCancelled() {
-				for (Operation op : ops) {
-					if (op.isCancelled())
-						return true;
-				}
-				return false;
-			};
-
-			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
 					TimeUnit units) throws InterruptedException,
 					TimeoutException, ExecutionException {
@@ -1025,10 +1016,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							op.getCancelCause()));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return mergedResult;
@@ -2120,7 +2111,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-					if (isCancelled()) {
+
+					if (op.isCancelled()) {
 						throw new ExecutionException(new RuntimeException(
 								op.getCancelCause()));
 					}
@@ -2414,9 +2406,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-					if (isCancelled()) {
-						throw new ExecutionException(new RuntimeException(
-								op.getCancelCause()));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
 					}
 				}
 
@@ -3750,15 +3742,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 			
 			@Override
-			public boolean isCancelled() {
-				for (Operation op : ops) {
-					if (op.isCancelled())
-						return true;
-				}
-				return false;
-			};
-
-			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
 					TimeUnit units) throws InterruptedException,
 					TimeoutException, ExecutionException {
@@ -3780,10 +3763,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							op.getCancelCause()));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return mergedResult;
@@ -3992,15 +3975,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
-			public boolean isCancelled() {
-				for (Operation op : ops) {
-					if (op.isCancelled())
-						return true;
-				}
-				return false;
-			};
-
-			@Override
 			public Map<String, CollectionOperationStatus> get(long duration,
 					TimeUnit units) throws InterruptedException,
 					TimeoutException, ExecutionException {
@@ -4021,10 +3995,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							op.getCancelCause()));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return failedResult;
