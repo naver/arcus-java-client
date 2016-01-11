@@ -362,7 +362,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void addOp(Operation op) {
 		try {
 			if (!authLatch.await(1, TimeUnit.SECONDS)) {
-			    op.cancel("auth has taken more than one second to complete");
+			    op.cancel("authentication timeout");
 				getLogger().warn(
 					"Operation canceled because authentication " +
 					"or reconnection and authentication has " +

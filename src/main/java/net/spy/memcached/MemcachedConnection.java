@@ -185,7 +185,7 @@ public final class MemcachedConnection extends SpyObject {
 						getLogger().info("%s has a ready op, handling IO", sk);
 						handleIO(sk);
 					} else {
-						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT, "because too many empty selects");
+						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT, "too many empty selects");
 					}
 				}
 				assert emptySelects < EXCESSIVE_EMPTY
@@ -211,14 +211,14 @@ public final class MemcachedConnection extends SpyObject {
 				getLogger().warn(
 						"%s exceeded continuous timeout threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT, "exceeded continuous timeout threshold");
+				lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
 			}
 			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
 			{
 				getLogger().warn(
 						"%s exceeded timeout ratio threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT, "exceded timeout ratio threshold");
+				lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
 			}
 		}
 
@@ -442,11 +442,11 @@ public final class MemcachedConnection extends SpyObject {
 					qa, e);
 			queueReconnect(qa, ReconnDelay.DEFAULT, "failure to connect");
 		} catch (OperationException e) {
-			qa.setupForAuth("due to authentication failure"); // noop if !shouldAuth
+			qa.setupForAuth("authentication failure"); // noop if !shouldAuth
 			getLogger().info("Reconnection due to exception " +
 				"handling a memcached operation on %s.  " +
 				"This may be due to an authentication failure.", qa, e);
-			lostConnection(qa, ReconnDelay.IMMEDIATE, "due to authentication failure");
+			lostConnection(qa, ReconnDelay.IMMEDIATE, "authentication failure");
 		} catch(Exception e) {
 			// Any particular error processing an item should simply
 			// cause us to reconnect to the server.
@@ -456,7 +456,7 @@ public final class MemcachedConnection extends SpyObject {
 
 			qa.setupForAuth("due to exception"); // noop if !shouldAuth
 			getLogger().info("Reconnecting due to exception on %s", qa, e);
-			lostConnection(qa, ReconnDelay.DEFAULT, "due to exception");
+			lostConnection(qa, ReconnDelay.DEFAULT, "exception" + e);
 		}
 		qa.fixupOps();
 	}
@@ -686,7 +686,7 @@ public final class MemcachedConnection extends SpyObject {
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
 			o.setHandlingNode(primary);
-			o.cancel("node is not active");
+			o.cancel("inactive node");
 		} else {
 			// Look for another node in sequence that is ready.
 			for(Iterator<MemcachedNode> i=locator.getSequence(key);
