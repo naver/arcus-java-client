@@ -136,11 +136,10 @@ public class CacheManager extends SpyThread implements Watcher,
 				String path = getClientInfo();
 				if (path.isEmpty()) {
 					getLogger().fatal("Can't create the znode of client info (" + path + ")");
-					throw new InitializeClientException("Can't initialize Arcus client.");
-				}
-				
-				if (zk.exists(path, false) == null) {
-					zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+				} else {
+					if (zk.exists(path, false) == null) {
+						zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+					}
 				}
 			} catch (AdminConnectTimeoutException e) {
 				shutdownZooKeeperClient();
@@ -154,7 +153,7 @@ public class CacheManager extends SpyThread implements Watcher,
 				shutdownZooKeeperClient();
 				return;
 			} catch (Exception e) {
-				getLogger().fatal("Unexpected exception. contact to Arcus administrator");
+				getLogger().fatal("Unexpected exception. contact to Arcus administrator", e);
 
 				shutdownZooKeeperClient();
 				throw new InitializeClientException("Can't initialize Arcus client.", e);
@@ -183,8 +182,9 @@ public class CacheManager extends SpyThread implements Watcher,
 				 + simpleDateFormat.format(currentTime) + "_" 
 				 + zk.getSessionId();
 			
-		} catch (UnknownHostException e) {
-			return null;
+		} catch (Exception e) {
+			getLogger().fatal("Can't get client info.", e);
+			return "";
 		}
 		return path;
 	}
