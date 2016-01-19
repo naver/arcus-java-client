@@ -69,7 +69,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
 			if (op != null && op.hasErrored()) {
 				throw new ExecutionException(op.getException());
 			}
-			if (isCancelled()) {
+			if (op.isCancelled()) {
 				throw new ExecutionException(new RuntimeException(op.getCancelCause()));
 			}
 		}
