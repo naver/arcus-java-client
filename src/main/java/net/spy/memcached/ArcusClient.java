@@ -995,6 +995,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
+			public boolean isCancelled() {
+				for (Operation op : ops) {
+					if (op.isCancelled())
+						return true;
+				}
+				return false;
+			}
+
+			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
 					TimeUnit units) throws InterruptedException,
 					TimeoutException, ExecutionException {
@@ -1738,7 +1747,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				null);
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
-		CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
+		final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
 			public Operation newOp(final MemcachedNode n,
 					final CountDownLatch latch) {
 				Operation op = opFact.flush(prefix, delay, false,
@@ -1770,12 +1779,41 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 			@Override
 			public boolean isCancelled() {
-				boolean rv = false;
 				for (Operation op : ops) {
-					rv |= op.isCancelled();
-					setOperation(op);
+					if (op.isCancelled())
+						return true;
 				}
-				return rv;
+				return false;
+			}
+
+			@Override
+			public Boolean get(long duration, TimeUnit units)
+					throws InterruptedException, TimeoutException, ExecutionException {
+				if(!blatch.await(duration, units)) {
+					// whenever timeout occurs, continuous timeout counter will increase by 1.
+					for (Operation op : ops) {
+						MemcachedConnection.opTimedOut(op);
+					}
+					throw new CheckedOperationTimeoutException(
+							"Timed out waiting for operation. >" + duration, ops);
+				} else {
+					// continuous timeout counter will be reset
+					for (Operation op : ops) {
+						MemcachedConnection.opSucceeded(op);
+					}
+				}
+
+				for (Operation op : ops) {
+					if(op != null && op.hasErrored()) {
+						throw new ExecutionException(op.getException());
+					}
+
+					if(op != null && op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
+				}
+
+				return flushResult.get();
 			}
 
 			@Override
@@ -3742,6 +3780,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 			
 			@Override
+			public boolean isCancelled() {
+				for (Operation op : ops) {
+					if (op.isCancelled())
+						return true;
+				}
+				return false;
+			}
+
+			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
 					TimeUnit units) throws InterruptedException,
 					TimeoutException, ExecutionException {
@@ -3972,6 +4019,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
+			}
+
+			@Override
+			public boolean isCancelled() {
+				for (Operation op : ops) {
+					if (op.isCancelled())
+						return true;
+				}
+				return false;
 			}
 
 			@Override
