@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
+import java.util.List;
 
 import net.spy.memcached.ops.Operation;
 
@@ -197,4 +198,28 @@ class MemcachedNodeROImpl implements MemcachedNode {
 	public String getStatus() {
 		throw new UnsupportedOperationException();
 	}
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+	public void setReplicaGroup(MemcachedReplicaGroup g) {
+		throw new UnsupportedOperationException();
+	}
+
+	public MemcachedReplicaGroup getReplicaGroup() {
+		throw new UnsupportedOperationException();
+	}
+
+	public List<Operation> getAllOperations() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void addAllToInputQ(List<Operation> allOp, boolean self) {
+		throw new UnsupportedOperationException();
+	}
+
+	public int moveOperations(final MemcachedNode toNode) {
+		throw new UnsupportedOperationException();
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 }

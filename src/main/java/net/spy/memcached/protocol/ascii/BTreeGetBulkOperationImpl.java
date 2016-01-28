@@ -86,11 +86,17 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 			setReadType(OperationReadType.DATA);
 		} else {
 			OperationStatus status = matchStatus(line, END);
-			
+
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
-			
+
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}
@@ -109,7 +115,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				UNREADABLE);
 
 		getBulk.decodeKeyHeader(line);
-		
+
 		BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
 		cb.gotKey(chunk[1], (chunk.length > 3) ? Integer.valueOf(chunk[4]) : -1, status);
 	}
@@ -123,7 +129,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				// Handle spaces.
 				if (b == ' ') {
 					spaceCount++;
-					
+
 					String l = new String(byteBuffer.toByteArray());
 
 					if (l.startsWith("ELEMENT")) {
@@ -132,7 +138,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 								byteBuffer.write(b);
 								continue;
 							}
-	
+
 							getBulk.decodeItemHeader(l);
 							data = new byte[getBulk.getDataLength()];
 							byteBuffer.reset();
@@ -150,7 +156,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				// Finish the operation.
 				if (b == '\n') {
 					String line = byteBuffer.toString();
-					
+
 					if (line.startsWith("VALUE")) {
 						readKey(line);
 						byteBuffer.reset();

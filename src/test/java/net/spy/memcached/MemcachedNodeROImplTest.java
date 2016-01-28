@@ -26,10 +26,22 @@ public class MemcachedNodeROImplTest extends MockObjectTestCase {
 		assertSame(sa, node.getSocketAddress());
 		assertEquals(m.proxy().toString(), node.toString());
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		Set<String> acceptable = new HashSet<String>(Arrays.asList(
+				"toString", "getSocketAddress", "getBytesRemainingToWrite",
+				"getReconnectCount", "getReconnectAccumTime", "getSelectionOps", "hasReadOp",
+				"hasWriteOp", "isActive"));
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		Set<String> acceptable = new HashSet<String>(Arrays.asList(
 				"toString", "getSocketAddress", "getBytesRemainingToWrite",
 				"getReconnectCount", "getSelectionOps", "hasReadOp",
 				"hasWriteOp", "isActive"));
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 
 		for(Method meth : MemcachedNode.class.getMethods()) {
 			if(acceptable.contains(meth.getName())) {
@@ -52,11 +64,26 @@ public class MemcachedNodeROImplTest extends MockObjectTestCase {
 	private void fillArgs(Class<?>[] parameterTypes, Object[] args) {
 		int i=0;
 		for(Class<?> c : parameterTypes) {
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			if(c == Boolean.TYPE) {
+				args[i++] = false;
+			} else if (c == Long.TYPE) {
+				args[i++] = 0;
+			} else {
+				args[i++] = null;
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			if(c == Boolean.TYPE) {
 				args[i++] = false;
 			} else {
 				args[i++] = null;
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		}
 	}
 

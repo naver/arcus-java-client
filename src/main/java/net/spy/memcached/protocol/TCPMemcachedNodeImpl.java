@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -79,8 +81,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private volatile long addOpCount;
 
 	// fake node
-	private boolean isFake = false; 
-	
+	private boolean isFake = false;
+
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	private MemcachedReplicaGroup replicaGroup;
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 	public boolean isFake() {
 		return isFake;
 	}
@@ -637,7 +645,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			authLatch = new CountDownLatch(0);
 		}
 	}
-	
+
 	public final void shutdown() throws IOException {
 		if(channel != null) {
 			channel.close();
@@ -650,7 +658,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			getLogger().debug("Shut down channel %s", channel);
 		}
 	}
-	
+
 	public int getInputQueueSize() {
 		return inputQueue.size();
 	}
@@ -662,7 +670,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public int getReadQueueSize() {
 		return readQ.size();
 	}
-	
+
 	@Override
 	public String getStatus() {
 		StringBuilder sb = new StringBuilder();
@@ -674,4 +682,80 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		sb.append(" #TR=").append(getTimeoutRatioNow());
 		return sb.toString();
 	}
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+	public void setReplicaGroup(MemcachedReplicaGroup g) {
+		replicaGroup = g;
+	}
+
+	public MemcachedReplicaGroup getReplicaGroup() {
+		return replicaGroup;
+	}
+
+	public List<Operation> getAllOperations() {
+		List<Operation> allOp = new ArrayList<Operation>();
+
+		if (hasReadOp()) {
+			readQ.drainTo(allOp);
+		}
+
+		while (hasWriteOp()) {
+			/* large byte operation
+			 * may exist write queue & read queue
+			 */
+			Operation op = removeCurrentWriteOp();
+			if (!allOp.contains(op)) {
+				allOp.add(op);
+			} else {
+				getLogger().warn("Duplicate operation exist in " + this + " : " + op);
+			}
+		}
+
+		if (inputQueue.size() > 0) {
+			inputQueue.drainTo(allOp);
+		}
+
+		return allOp;
+	}
+
+	public void addAllToInputQ(List<Operation> allOp, boolean self) {
+		for (Operation op : allOp) {
+			if (!self)
+				getLogger().debug("input operation(" + op + " - " + op.getState() + ") at " + this);
+
+			if (op.getState() == OperationState.WRITING && op.getBuffer() != null) {
+				op.getBuffer().reset(); // buffer offset reset
+			} else {
+				op.initialize(); // write completed or not yet initialized
+			}
+
+			if (!self) {
+				op.resetState();
+				op.setHandlingNode(this);
+				op.setMoved(true);
+			} else {
+				op.resetState();
+			}
+		}
+		inputQueue.addAll(allOp);
+
+		if (self) {
+			getWbuf().clear();
+			getRbuf().clear();
+			toWrite=0;
+		}
+	}
+
+	public int moveOperations(final MemcachedNode toNode) {
+		List<Operation> allOp = getAllOperations();
+		if (allOp.size() > 0) {
+			toNode.addAllToInputQ(allOp, false);
+			getLogger().info("Total %d operations have been moved to %s", allOp.size(), toNode);
+		}
+
+		return allOp.size();
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 }

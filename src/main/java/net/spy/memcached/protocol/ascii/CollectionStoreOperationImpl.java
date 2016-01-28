@@ -44,7 +44,7 @@ public class CollectionStoreOperationImpl extends OperationImpl
 
 	private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
 			true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
 	private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -61,12 +61,12 @@ public class CollectionStoreOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	
+
 	protected final String key;
 	protected final String subkey;	// e.g.) 0 or 0x00
 	protected final CollectionStore<?> collectionStore;
 	protected final byte[] data;
-	
+
 	public CollectionStoreOperationImpl(String key, String subkey,
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb) {
 		super(cb);
@@ -79,7 +79,7 @@ public class CollectionStoreOperationImpl extends OperationImpl
 		else if (this.collectionStore instanceof SetStore)
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.collectionStore instanceof BTreeStore)
-			setAPIType(APIType.BOP_INSERT); 
+			setAPIType(APIType.BOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
@@ -87,10 +87,28 @@ public class CollectionStoreOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			getCallback().receivedStatus(
+					matchStatus(line, STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS,
+							OVERFLOWED, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH));
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		getCallback().receivedStatus(
 				matchStatus(line, STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS,
 						OVERFLOWED, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH));
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override
@@ -108,9 +126,9 @@ public class CollectionStoreOperationImpl extends OperationImpl
 		bb.put(CRLF);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -119,11 +137,11 @@ public class CollectionStoreOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(STORE_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public String getSubKey() {
 		return subkey;
 	}
@@ -135,5 +153,5 @@ public class CollectionStoreOperationImpl extends OperationImpl
 	public byte[] getData() {
 		return data;
 	}
-	
+
 }

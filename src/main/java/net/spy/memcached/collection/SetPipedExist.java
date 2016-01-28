@@ -38,6 +38,16 @@ public class SetPipedExist<T> extends CollectionObject {
 	private final Transcoder<T> tc;
 	private int itemCount;
 
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	protected int lastOpIndex = 0;
+
+	public void setLastOperatedIndex(int i) {
+		this.lastOpIndex = i;
+	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 	public List<T> getValues() {
 		return this.values;
 	}
@@ -57,7 +67,16 @@ public class SetPipedExist<T> extends CollectionObject {
 		int capacity = 0;
 
 		// decode values
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		Collection<byte[]> encodedList = new ArrayList<byte[]>(values.size());
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		CachedData cd = null;
 		for (T each : values) {
 			cd = tc.encode(each);
@@ -75,6 +94,20 @@ public class SetPipedExist<T> extends CollectionObject {
 		ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 		// create ascii operation string
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		int eSize = encodedList.size();
+		for (int i = this.lastOpIndex; i < eSize; i++) {
+			byte[] each = encodedList.get(i);
+
+			setArguments(bb, COMMAND, key, each.length,
+					(i < eSize - 1) ? PIPE : "");
+			bb.put(each);
+			bb.put(CRLF);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		Iterator<byte[]> iterator = encodedList.iterator();
 		while (iterator.hasNext()) {
 			byte[] each = iterator.next();
@@ -84,6 +117,9 @@ public class SetPipedExist<T> extends CollectionObject {
 			bb.put(each);
 			bb.put(CRLF);
 		}
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		// flip the buffer
 		bb.flip();
 

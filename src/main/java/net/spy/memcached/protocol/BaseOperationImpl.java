@@ -46,9 +46,14 @@ public abstract class BaseOperationImpl extends SpyObject {
 	private OperationException exception = null;
 	protected OperationCallback callback = null;
 	private volatile MemcachedNode handlingNode = null;
-	
+
 	private OperationType opType = OperationType.UNDEFINED;
 	private APIType apiType = APIType.UNDEFINED;
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	private boolean moved = false;
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 
 	public BaseOperationImpl() {
 		super();
@@ -96,6 +101,33 @@ public abstract class BaseOperationImpl extends SpyObject {
 	public final OperationState getState() {
 		return state;
 	}
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+	public final void resetState() {
+		transitionState(OperationState.WRITING);
+	}
+
+	public final void setMoved(boolean m) {
+		this.moved = m;
+	}
+
+	protected final void receivedMoveOperations(String cause) {
+		getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
+		transitionState(OperationState.MOVING);
+	}
+
+	protected final void checkMoved(String result) {
+		if (this.moved) {
+			if (result.equals("SWITCHOVER") || result.equals("REPL_SLAVE")) {
+				getLogger().error("Operation moved error : %s - %s at %s", this, result, getHandlingNode());
+			} else {
+				getLogger().debug("Operation move completed : %s - %s at %s", this, result, getHandlingNode());
+			}
+		}
+	}
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 
 	public final ByteBuffer getBuffer() {
 		return cmd;
@@ -175,19 +207,19 @@ public abstract class BaseOperationImpl extends SpyObject {
 	public void setOperationType(OperationType opType) {
 		this.opType = opType;
 	}
-	
+
 	public boolean isWriteOperation() {
 		return this.opType == OperationType.WRITE;
 	}
-	
+
 	public boolean isReadOperation() {
 		return this.opType == OperationType.READ;
 	}
-	
+
 	public APIType getAPIType() {
 		return this.apiType;
 	}
-	
+
 	public void setAPIType(APIType type) {
 		this.apiType = type;
 	}

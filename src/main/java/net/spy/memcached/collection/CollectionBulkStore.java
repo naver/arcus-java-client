@@ -17,7 +17,6 @@
 package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.List;
 
 import net.spy.memcached.CachedData;
@@ -39,6 +38,16 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 	protected CollectionAttributes attribute;
 
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	protected int lastOpIndex = 0;
+
+	public void setLastOperatedIndex(int i) {
+		this.lastOpIndex = i;
+	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 	public abstract ByteBuffer getAsciiCommand();
 
 	public abstract ByteBuffer getBinaryCommand();
@@ -96,6 +105,37 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int kSize = this.keyList.size();
+			for (int i = this.lastOpIndex; i < kSize; i++) {
+				String key = keyList.get(i);
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						bkey,
+						(eflag != null) ? eflag : "",
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < kSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Iterator<String> iterator = keyList.iterator();
 
 			while (iterator.hasNext()) {
@@ -123,6 +163,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 				bb.put(value);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 
 			// flip the buffer
 			bb.flip();
@@ -164,6 +207,35 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int kSize = this.keyList.size();
+			for (int i = this.lastOpIndex; i < kSize; i++) {
+				String key = keyList.get(i);
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < kSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Iterator<String> iterator = keyList.iterator();
 
 			while (iterator.hasNext()) {
@@ -189,6 +261,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 				bb.put(value);
 				bb.put(CRLF);
 			}
+			*/
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 			// flip the buffer
 			bb.flip();
 
@@ -232,6 +307,36 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int kSize = keyList.size();
+			for (int i = this.lastOpIndex; i < kSize; i++) {
+				String key = this.keyList.get(i);
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						index,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < kSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Iterator<String> iterator = keyList.iterator();
 
 			while (iterator.hasNext()) {
@@ -258,6 +363,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 				bb.put(value);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 
 			// flip the buffer
 			bb.flip();

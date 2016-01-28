@@ -19,7 +19,6 @@ package net.spy.memcached.collection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,16 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 
 	protected CollectionAttributes attribute;
 	
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	protected int lastOpIndex = 0;
+
+	public void setLastOperatedIndex(int i) {
+		this.lastOpIndex = i;
+	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 	public abstract ByteBuffer getAsciiCommand();
 	public abstract ByteBuffer getBinaryCommand();
 	
@@ -66,7 +75,16 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			int capacity = 0;
 
 			// decode values
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			List<byte[]> encodedList = new ArrayList<byte[]>(list.size());
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Collection<byte[]> encodedList = new ArrayList<byte[]>(list.size());
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			CachedData cd = null;
 			for (T each : list) {
 				cd = tc.encode(each);
@@ -84,6 +102,22 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int eSize = encodedList.size();
+			for (int i = this.lastOpIndex; i < eSize; i++) {
+				byte[] each = encodedList.get(i);
+				setArguments(bb, COMMAND, key, index, each.length,
+						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < eSize - 1) ? PIPE : "");
+				bb.put(each);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Iterator<byte[]> iterator = encodedList.iterator();
 			while (iterator.hasNext()) {
 				byte[] each = iterator.next();
@@ -95,6 +129,9 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 				bb.put(each);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 
 			// flip the buffer
 			bb.flip();
@@ -129,7 +166,16 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			int capacity = 0;
 
 			// decode values
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			List<byte[]> encodedList = new ArrayList<byte[]>(set.size());
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Collection<byte[]> encodedList = new ArrayList<byte[]>(set.size());
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			CachedData cd = null;
 			for (T each : set) {
 				cd = tc.encode(each);
@@ -147,6 +193,23 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int eSize = encodedList.size();
+			for (int i = this.lastOpIndex; i < eSize; i++) {
+				byte[] each = encodedList.get(i);
+
+				setArguments(bb, COMMAND, key, each.length,
+						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < eSize - 1) ? PIPE : "");
+				bb.put(each);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			Iterator<byte[]> iterator = encodedList.iterator();
 			while (iterator.hasNext()) {
 				byte[] each = iterator.next();
@@ -159,6 +222,9 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 				bb.put(each);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			// flip the buffer
 			bb.flip();
 			
@@ -212,6 +278,25 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int keySize = map.keySet().size();
+			List<Long> keyList = new ArrayList<Long>(map.keySet());
+			for (i = this.lastOpIndex; i < keySize; i++) {
+				Long bkey = keyList.get(i);
+				byte[] value = decodedList.get(i);
+
+				setArguments(bb, COMMAND, key, bkey, value.length,
+						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < keySize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			i = 0;
 			Iterator<Long> iterator = map.keySet().iterator();
 			while (iterator.hasNext()) {
@@ -226,6 +311,9 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 				bb.put(value);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 
 			// flip the buffer
 			bb.flip();
@@ -284,6 +372,45 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			int eSize = elements.size();
+			for (i = this.lastOpIndex; i < eSize; i++) {
+				Element<T> element = elements.get(i);
+				byte[] value = decodedList.get(i);
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						(element.isByteArraysBkey() ? element.getBkeyByHex()
+								: String.valueOf(element.getLongBkey())),
+						element.getFlagByHex(),
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction().toString()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable" : "" : "",
+						(i < eSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+			/* ENABLE_REPLICATION else */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
 			i = 0;
 			Iterator<Element<T>> iterator = elements.iterator();
 			while (iterator.hasNext()) {
@@ -319,6 +446,9 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 				bb.put(value);
 				bb.put(CRLF);
 			}
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 
 			// flip the buffer
 			bb.flip();

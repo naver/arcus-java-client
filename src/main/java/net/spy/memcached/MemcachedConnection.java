@@ -252,8 +252,11 @@ public final class MemcachedConnection extends SpyObject {
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 		/* ENABLE_REPLICATION if */
 		List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		List<MoveOperationTask> taskList = new ArrayList<MoveOperationTask>();
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		/* ENABLE_REPLICATION end */
-		
+
 		// Classify the incoming node list.
 		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {
@@ -295,23 +298,64 @@ public final class MemcachedConnection extends SpyObject {
 						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
 							/* The same master node. Do nothing. */
 						} else {
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							MemcachedNode newMasterNode;
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							/* The master of the group has changed to the new one. */
 							removeNodes.add(oldGroup.getMasterNode());
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+
+							/* move operation old master -> new master */
+							oldGroup.getMasterNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+							/*
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
-						} 
+							*/
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+						}
 					} else { /* Old group has both a master node and a slave node. */
 						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
 							/* The old slave has disappeared. */
 							removeNodes.add(oldGroup.getSlaveNode());
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+							/* move operation slave -> master */
+							oldGroup.getSlaveNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						} else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
 							/* The old slave has failovered to the master with new slave */
 							removeNodes.add(oldGroup.getMasterNode());
 							changeRoleGroups.add(oldGroup);
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+							/* move operation master -> slave */
+							oldGroup.getMasterNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						} else {
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							MemcachedNode newMasterNode;
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							/* All nodes of old group have gone away. And, new master has appeared. */
 							removeNodes.add(oldGroup.getMasterNode());
 							removeNodes.add(oldGroup.getSlaveNode());
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+
+							/* move operation old master -> new master */
+							oldGroup.getMasterNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+							/* move operation old slave -> new master */
+							oldGroup.getSlaveNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newMasterNode));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+							/*
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+							*/
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						}
 					}
 				} else { /* New group has both a master node and a slave node */
@@ -320,50 +364,148 @@ public final class MemcachedConnection extends SpyObject {
 							/* New slave node has appeared. */
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
 						} else if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							MemcachedNode newMasterNode;
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							/* Really rare case: old master => slave, A new master */
 							changeRoleGroups.add(oldGroup);
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+
+							/* move operation old master -> new master */
+							queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE);
+							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+							/*
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+							*/
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						} else {
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							MemcachedNode newMasterNode;
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							/* Old master has gone away. And, new group has appeared. */
 							removeNodes.add(oldGroup.getMasterNode());
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+							/*
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+							*/
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							/* move operation old master -> new master */
+							oldGroup.getMasterNode().setupResend(false);
+							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						}
 					} else { /* Old group has both a master node and a slave node. */
 						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
 							if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
 								/* The same master and slave nodes. Do nothing. */
 							} else {
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								MemcachedNode newSlaveNode;
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 								/* Only old slave has changed to the new one. */
 								removeNodes.add(oldGroup.getSlaveNode());
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								attachNodes.add(newSlaveNode = attachMemcachedNode(newGroupAddrs.get(1)));
+
+								/* move operation old slave -> new slave */
+								oldGroup.getSlaveNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+								/*
 								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+								 */
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							}
 						} else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
 							if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
 								/* Switchover */
 								changeRoleGroups.add(oldGroup);
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+								/* move operation master -> slave */
+								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE);
+								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else {
 								/* Failover. And, new slave has appeared */
 								removeNodes.add(oldGroup.getMasterNode());
 								changeRoleGroups.add(oldGroup);
 								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+								/* move operation old master -> old slave */
+								oldGroup.getMasterNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							}
 						} else {
 							/* A completely new master has appered. */
 							if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
 								/* Old slave disappeared. Old master has changed to the slave. */
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								MemcachedNode newMasterNode;
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 								removeNodes.add(oldGroup.getSlaveNode());
 								changeRoleGroups.add(oldGroup);
+								attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+								/* move operation old master -> new master */
+								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE);
+								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+
+								/* move operation old slave -> old master(slave) */
+								oldGroup.getSlaveNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								MemcachedNode newMasterNode;
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 								/* Only old master has disappeared. */
 								removeNodes.add(oldGroup.getMasterNode());
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+
+								/* move operation old master -> new master */
+								oldGroup.getMasterNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else {
-								/* Old groyp has completely changed to the new group. */
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								MemcachedNode newMasterNode;
+								MemcachedNode newSlaveNode;
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+								/* Old group has completely changed to the new group. */
 								removeNodes.add(oldGroup.getMasterNode());
 								removeNodes.add(oldGroup.getSlaveNode());
-								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+								attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+								attachNodes.add(newSlaveNode = attachMemcachedNode(newGroupAddrs.get(1)));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+								/* move operation old master -> new master */
+								oldGroup.getMasterNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+
+								/* move operation old slave -> new slave */
+								oldGroup.getSlaveNode().setupResend(false);
+								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							}
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+							/*
 							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+							*/
+							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						}
 					}
 				}
@@ -383,6 +525,8 @@ public final class MemcachedConnection extends SpyObject {
 
 			// Update the hash.
 			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
+			for (MoveOperationTask task : taskList)
+				task.moveOperations();
 		} else {
 			for (MemcachedNode node : locator.getAll()) {
 				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
@@ -438,6 +582,34 @@ public final class MemcachedConnection extends SpyObject {
         }
 	}
 	
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	private void switchoverMemcachedReplGroup(MemcachedNode node) {
+		MemcachedReplicaGroup group = node.getReplicaGroup();
+
+		/*  must keep the following execution order when switchover
+		 * - first moveOperations
+		 * - second, queueReconnect
+		 *
+		 * because moves all operations
+		 */
+		if (group.getMasterNode() != null && group.getSlaveNode() != null) {
+			if (((ArcusReplNodeAddress)node.getSocketAddress()).master) {
+				node.moveOperations(group.getSlaveNode());
+				addedQueue.offer(group.getSlaveNode());
+				((ArcusReplKetamaNodeLocator)locator).switchoverReplGroup(group);
+			} else {
+				node.moveOperations(group.getMasterNode());
+				addedQueue.offer(group.getMasterNode());
+			}
+			queueReconnect(node, ReconnDelay.IMMEDIATE);
+		} else {
+			getLogger().warn("Delay switchover because invalid group state : " + group);
+		}
+	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
 		SocketChannel ch = SocketChannel.open();
 		ch.configureBlocking(false);
@@ -682,7 +854,24 @@ public final class MemcachedConnection extends SpyObject {
 					: "Expected to pop " + currentOp + " got " + op;
 					currentOp=qa.getCurrentReadOp();
 				}
+				/* ENABLE_REPLICATION if */
+				/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+				else if (currentOp.getState() == OperationState.MOVING) {
+					break;
+				}
+				/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+				/* ENABLE_REPLICATION end */
 			}
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+			if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
+				rbuf.clear();
+				switchoverMemcachedReplGroup(qa);
+				break;
+			}
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			rbuf.clear();
 			read=channel.read(rbuf);
 		}
@@ -1136,5 +1325,20 @@ public final class MemcachedConnection extends SpyObject {
 	
 	public int getAddedQueueSize() {
 		return addedQueue.size();
+	}
+
+	private class MoveOperationTask {
+		MemcachedNode fromNode;
+		MemcachedNode toNode;
+
+		public MoveOperationTask(MemcachedNode from, MemcachedNode to) {
+			fromNode = from;
+			toNode = to;
+		}
+
+		public void moveOperations() {
+			if (fromNode.moveOperations(toNode) > 0)
+				addedQueue.offer(toNode);
+		}
 	}
 }

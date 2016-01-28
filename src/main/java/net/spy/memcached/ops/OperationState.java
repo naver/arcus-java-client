@@ -36,4 +36,12 @@ public enum OperationState {
 	 * State indicating this operation timed out without completing.
 	 */
 	TIMEDOUT
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	/**
+	 * State indicating this operation is moved point by switchover or failover
+	 */
+	, MOVING
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 }

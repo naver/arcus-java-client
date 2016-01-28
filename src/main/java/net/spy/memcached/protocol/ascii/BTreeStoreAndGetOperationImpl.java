@@ -37,7 +37,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		BTreeStoreAndGetOperation {
 
 	private static final int OVERHEAD = 32;
-	
+
 	private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
 	private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
@@ -73,9 +73,9 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 	private static final OperationStatus[] UPSERT_AND_GET_STATUS_ON_LINE = {
 			STORED, CREATED_STORED, REPLACED, NOT_FOUND, OVERFLOWED,
 			OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH };
-	
+
 	private static final OperationStatus[] STORE_AND_GET_ON_DATA = { TRIMMED };
-	
+
 	protected final String key;
 	protected final BTreeStoreAndGet<?> get;
 	protected final byte[] dataToStore;
@@ -88,7 +88,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 	protected int spaceCount = 0;
 
 	private Boolean hasEFlag = null;
-	
+
 	public BTreeStoreAndGetOperationImpl(String key, BTreeStoreAndGet<?> get,
 			byte[] dataToStore, OperationCallback cb) {
 		super(cb);
@@ -106,15 +106,27 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 	public BTreeStoreAndGet<?> getGet() {
 		return get;
 	}
-	
+
 	@Override
 	public void handleLine(String line) {
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("Got line %s", line);
 		}
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else if (line.startsWith("VALUE ")) {
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		// VALUE <flags> <count>\r\n
 		if (line.startsWith("VALUE ")) {
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
+			// VALUE <flags> <count>\r\n
 			String[] stuff = line.split(" ");
 			assert stuff.length == 3;
 			assert "VALUE".equals(stuff[0]);
@@ -143,6 +155,12 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}
@@ -165,7 +183,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 							hasEFlag = false;
 						}
 					}
-					
+
 					spaceCount++;
 
 					// Parse the value header.
@@ -198,13 +216,13 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -215,7 +233,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 		}
-		
+
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
@@ -224,16 +242,16 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			if (getLogger().isDebugEnabled()) {
 				getLogger().debug("Reading %d bytes", toRead);
 			}
-			
+
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;
 		}
-		
+
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
 			BTreeStoreAndGetOperation.Callback cb = (BTreeStoreAndGetOperation.Callback) getCallback();
 			cb.gotData(key, flags, get.getBkeyObject(), get.getElementFlag(), data);
-			
+
 			lookingFor = '\r';
 		}
 
@@ -262,7 +280,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			}
 		}
 	}
-	
+
 	@Override
 	public void initialize() {
 		String args = get.stringify();

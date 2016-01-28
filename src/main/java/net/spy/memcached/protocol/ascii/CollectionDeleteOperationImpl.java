@@ -42,7 +42,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 
 	private static final OperationStatus DELETE_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus DELETED = new CollectionOperationStatus(
 			true, "DELETED", CollectionResponse.DELETED);
 	private static final OperationStatus DELETED_DROPPED = new CollectionOperationStatus(
@@ -57,7 +57,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	
+
 	protected String key;
 	protected CollectionDelete<?> collectionDelete;
 
@@ -71,19 +71,38 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		else if (this.collectionDelete instanceof SetDelete)
 			setAPIType(APIType.SOP_DELETE);
 		else if (this.collectionDelete instanceof BTreeDelete)
-			setAPIType(APIType.BOP_DELETE); 
+			setAPIType(APIType.BOP_DELETE);
 		setOperationType(OperationType.WRITE);
 	}
-	
+
 	@Override
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 		: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
+					NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
+					BKEY_MISMATCH);
+			getCallback().receivedStatus(status);
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
 				NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
 				BKEY_MISMATCH);
 		getCallback().receivedStatus(status);
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override
@@ -91,12 +110,12 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		String cmd = collectionDelete.getCommand();
 		String args = collectionDelete.stringify();
 		byte[] data = collectionDelete.getData();
-		
+
 		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
 				+ cmd.length() + args.length() + data.length + 16);
-		
+
 		setArguments(bb, cmd, key, args);
-		
+
 		if ("sop delete".equals(cmd)) {
 			bb.put(data);
 			bb.put(CRLF);
@@ -104,12 +123,12 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 			bb.put(data);
 			bb.put(CRLF);
 		}
-		
+
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -118,7 +137,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(DELETE_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
@@ -126,5 +145,5 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 	public CollectionDelete<?> getDelete() {
 		return collectionDelete;
 	}
-	
+
 }
