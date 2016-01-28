@@ -69,10 +69,9 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
 			if (op != null && op.hasErrored()) {
 				throw new ExecutionException(op.getException());
 			}
-		}
-		
-		if (isCancelled()) {
-			throw new ExecutionException(new RuntimeException("Cancelled"));
+			if (op.isCancelled()) {
+				throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+			}
 		}
 
 		return result;
@@ -82,7 +81,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
 	public boolean cancel(boolean ign) {
 		boolean rv = false;
 		for (Operation op : ops) {
-			op.cancel();
+			op.cancel("by application.");
 			rv |= op.getState() == OperationState.WRITING;
 		}
 		return rv;

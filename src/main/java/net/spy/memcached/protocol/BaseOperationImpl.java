@@ -43,6 +43,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 	private OperationState state = OperationState.WRITING;
 	private ByteBuffer cmd = null;
 	private boolean cancelled = false;
+	private String cancelCause = null;
 	private OperationException exception = null;
 	protected OperationCallback callback = null;
 	private volatile MemcachedNode handlingNode = null;
@@ -80,10 +81,15 @@ public abstract class BaseOperationImpl extends SpyObject {
 		return exception;
 	}
 
-	public final void cancel() {
+	public final void cancel(String cause) {
 		cancelled=true;
+		cancelCause = "Cancelled (" + cause + ")";
 		wasCancelled();
 		callback.complete();
+	}
+
+	public final String getCancelCause() {
+		return cancelCause;
 	}
 
 	/**
@@ -139,7 +145,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 
 	protected void handleError(OperationErrorType eType, String line)
 		throws IOException {
-		getLogger().error("Error:  %s", line);
+		getLogger().error("Error:  %s by %s", line, this);
 		switch(eType) {
 			case GENERAL:
 				exception=new OperationException();
