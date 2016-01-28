@@ -67,6 +67,26 @@ final class MutatorOperationImpl extends OperationImpl
 
 	@Override
 	public void handleLine(String line) {
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			OperationStatus status=null;
+			try {
+				Long.valueOf(line);
+				getCallback().receivedStatus(new OperationStatus(true, line));
+			} catch (NumberFormatException e) {
+				status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
+				getCallback().receivedStatus(status);
+			}
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		OperationStatus status=null;
 		try {
 			Long.valueOf(line);
@@ -76,6 +96,9 @@ final class MutatorOperationImpl extends OperationImpl
 			getCallback().receivedStatus(status);
 		}
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

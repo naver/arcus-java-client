@@ -56,6 +56,12 @@ final class StatsOperationImpl extends OperationImpl
 		if(line.startsWith("END")) {
 			cb.receivedStatus(END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		} else {
 			String[] parts=line.split(" ", 3);
 			assert parts.length == 3;

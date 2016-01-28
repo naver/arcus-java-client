@@ -34,10 +34,21 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 			return false;		
 
 		if (this.group.equals(getGroupNameForNode(node))) {
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 			if (((ArcusReplNodeAddress)node.getSocketAddress()).master)
 				this.masterNode = node;
 			else
 				this.slaveNode = node;
+
+			node.setReplicaGroup(this);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+			/*
+			if (((ArcusReplNodeAddress)node.getSocketAddress()).master)
+				this.masterNode = node;
+			else
+				this.slaveNode = node;
+			*/
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			return true;
 		} else {
 			return false;
@@ -60,14 +71,15 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 	}
 
 	public boolean changeRole() {
+		/* role change */
 		MemcachedNode tmpNode = this.masterNode;
 
 		this.masterNode = this.slaveNode;
-		if (this.masterNode != null) /* previous slave node */
+		if (this.masterNode != null) // previous slave node
 			((ArcusReplNodeAddress)this.masterNode.getSocketAddress()).master = true;
 
 		this.slaveNode = tmpNode; 
-		if (this.slaveNode != null) /* previous master node */
+		if (this.slaveNode != null) // previous master node
 			((ArcusReplNodeAddress)this.slaveNode.getSocketAddress()).master = false;
 
 		return true;

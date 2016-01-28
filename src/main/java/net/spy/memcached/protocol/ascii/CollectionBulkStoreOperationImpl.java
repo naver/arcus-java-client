@@ -44,7 +44,7 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 			true, "END", CollectionResponse.END);
 	private static final OperationStatus FAILED_END = new CollectionOperationStatus(
 			false, "END", CollectionResponse.END);
-	
+
 	private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
 			true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
 	private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -65,11 +65,11 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	protected final String key;
 	protected final CollectionBulkStore<?> store;
 	protected final CollectionBulkStoreOperation.Callback cb;
-	
+
 	protected int count;
 	protected int index = 0;
 	protected boolean successAll = true;
-	
+
 	public CollectionBulkStoreOperationImpl(List<String> keyList,
 			CollectionBulkStore<?> store, OperationCallback cb) {
 		super(cb);
@@ -81,7 +81,7 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 		else if (this.store instanceof CollectionBulkStore.SetBulkStore)
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.store instanceof CollectionBulkStore.BTreeBulkStore)
-			setAPIType(APIType.BOP_INSERT); 
+			setAPIType(APIType.BOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
@@ -89,17 +89,35 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			this.store.setLastOperatedIndex(index);
+			receivedMoveOperations(line);
+		} else if (line.startsWith("END") || store.getItemCount() == 1) {
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		if (line.startsWith("END") || store.getItemCount() == 1) {
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);
-			
+
 			// TODO server should be fixed
 			line = line.replace("   ", " ");
 			line = line.replace("  ", " ");
-			
+
 			String[] stuff = line.split(" ");
 			assert "RESPONSE".equals(stuff[0]);
 			count = Integer.parseInt(stuff[1]);
@@ -107,12 +125,12 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
 					NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
 					TYPE_MISMATCH, BKEY_MISMATCH);
-			
+
 			if (!status.isSuccess()) {
 				cb.gotStatus(index, status);
 				successAll = false;
 			}
-			
+
 			index++;
 		}
 	}
@@ -121,9 +139,9 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	public void initialize() {
 		ByteBuffer buffer = store.getAsciiCommand();
 		setBuffer(buffer);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: \n" 
+			getLogger().debug("Request in ascii protocol: \n"
 					+ (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
 		}
 	}
@@ -132,7 +150,7 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(STORE_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
@@ -140,5 +158,5 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	public CollectionBulkStore<?> getStore() {
 		return store;
 	}
-	
+
 }

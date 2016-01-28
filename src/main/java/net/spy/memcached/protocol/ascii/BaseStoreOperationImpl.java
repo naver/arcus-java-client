@@ -55,8 +55,24 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			getCallback().receivedStatus(matchStatus(line, STORED));
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		getCallback().receivedStatus(matchStatus(line, STORED));
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override
@@ -71,9 +87,9 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
 		bb.put(CRLF);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}

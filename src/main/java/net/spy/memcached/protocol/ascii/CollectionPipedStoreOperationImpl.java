@@ -43,7 +43,7 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 			true, "END", CollectionResponse.END);
 	private static final OperationStatus FAILED_END = new CollectionOperationStatus(
 			false, "END", CollectionResponse.END);
-	
+
 	private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
 			true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
 	private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -64,11 +64,11 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 	protected final String key;
 	protected final CollectionPipedStore<?> store;
 	protected final CollectionPipedStoreOperation.Callback cb;
-	
+
 	protected int count;
 	protected int index = 0;
 	protected boolean successAll = true;
-	
+
 	public CollectionPipedStoreOperationImpl(String key,
 			CollectionPipedStore<?> store, OperationCallback cb) {
 		super(cb);
@@ -80,9 +80,9 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 		else if (this.store instanceof CollectionPipedStore.SetPipedStore)
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.store instanceof CollectionPipedStore.BTreePipedStore)
-			setAPIType(APIType.BOP_INSERT); 
+			setAPIType(APIType.BOP_INSERT);
 		else if (this.store instanceof CollectionPipedStore.ByteArraysBTreePipedStore)
-			setAPIType(APIType.BOP_INSERT); 
+			setAPIType(APIType.BOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
@@ -91,6 +91,16 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			this.store.setLastOperatedIndex(index);
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		if (store.getItemCount() == 1) {
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
 					NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
@@ -102,19 +112,31 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 				cb.receivedStatus(FAILED_END);
 			}
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 
 		if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);
-			
+
 			// TODO server should be fixed
 			line = line.replace("   ", " ");
 			line = line.replace("  ", " ");
-			
+
 			String[] stuff = line.split(" ");
 			assert "RESPONSE".equals(stuff[0]);
 			count = Integer.parseInt(stuff[1]);
@@ -122,7 +144,7 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
 					NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
 					TYPE_MISMATCH, BKEY_MISMATCH);
-			
+
 			if (!status.isSuccess()) {
 				cb.gotStatus(index, status);
 				successAll = false;
@@ -135,9 +157,9 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 	public void initialize() {
 		ByteBuffer buffer = store.getAsciiCommand();
 		setBuffer(buffer);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: \n" 
+			getLogger().debug("Request in ascii protocol: \n"
 					+ (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
 		}
 	}
@@ -146,7 +168,7 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(STORE_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
@@ -154,5 +176,5 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 	public CollectionPipedStore<?> getStore() {
 		return store;
 	}
-	
+
 }

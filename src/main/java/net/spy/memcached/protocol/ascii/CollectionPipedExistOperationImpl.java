@@ -83,12 +83,24 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 			cb.gotStatus(index, status);
 			cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 
 		if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
 			cb.receivedStatus((successAll) ? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);
 
@@ -102,11 +114,16 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 		} else {
 			OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
 					NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
-			
+
 			if (!status.isSuccess()) {
 				successAll = false;
 			}
 			cb.gotStatus(index, status);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			this.setPipedExist.setLastOperatedIndex(index);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			index++;
 		}
 	}

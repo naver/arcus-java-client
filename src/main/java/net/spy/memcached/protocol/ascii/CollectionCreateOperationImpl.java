@@ -44,18 +44,18 @@ public class CollectionCreateOperationImpl extends OperationImpl
 
 	private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus CREATED = new CollectionOperationStatus(
 			true, "CREATED", CollectionResponse.CREATED);
 	private static final OperationStatus EXISTS = new CollectionOperationStatus(
 			false, "EXISTS", CollectionResponse.EXISTS);
 	private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
 			false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
-	
+
 	protected final String key;
 	protected final CollectionCreate collectionCreate;
-	
-	public CollectionCreateOperationImpl(String key, 
+
+	public CollectionCreateOperationImpl(String key,
 			CollectionCreate collectionCreate, OperationCallback cb) {
 		super(cb);
 		this.key = key;
@@ -73,9 +73,26 @@ public class CollectionCreateOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			getCallback().receivedStatus(
+					matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		getCallback().receivedStatus(
 				matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override
@@ -87,9 +104,9 @@ public class CollectionCreateOperationImpl extends OperationImpl
 		setArguments(bb, collectionCreate.getCommand(), key, args);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replaceAll("\\r\\n", ""));
 		}
 	}
@@ -98,7 +115,7 @@ public class CollectionCreateOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(STORE_CANCELED);
 	}
-	
+
 	@Override
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);

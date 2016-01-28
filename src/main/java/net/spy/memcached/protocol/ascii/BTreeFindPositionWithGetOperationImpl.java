@@ -102,7 +102,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 			assert count > 0;
 			// position counter
 			pos = position - index;
-			posDiff = 1; 
+			posDiff = 1;
 
 			// start to read actual data
 			setReadType(OperationReadType.DATA);
@@ -114,6 +114,12 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		}
 	}
 
@@ -163,13 +169,13 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -180,7 +186,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 		}
-		
+
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
@@ -189,16 +195,16 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 			if (getLogger().isDebugEnabled()) {
 				getLogger().debug("Reading %d bytes", toRead);
 			}
-			
+
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;
 		}
-		
+
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
 			BTreeFindPositionWithGetOperation.Callback cb = (BTreeFindPositionWithGetOperation.Callback) getCallback();
 			cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
-			
+
 			// next position.
 			pos += posDiff;
 			lookingFor = '\r';
@@ -240,7 +246,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		setArguments(bb, cmd, key, args);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("Request in ascii protocol: " + (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
