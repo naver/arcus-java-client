@@ -34,7 +34,12 @@ public interface Operation {
 	/**
 	 * Cancel this operation.
 	 */
-	void cancel();
+	void cancel(String cause);
+
+	/**
+	 * Get the cause of cancel.
+	 */
+	String getCancelCause();
 
 	/**
 	 * Get the current state of this operation.
