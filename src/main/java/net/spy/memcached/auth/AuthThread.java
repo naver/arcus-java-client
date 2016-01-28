@@ -71,7 +71,7 @@ public class AuthThread extends SpyThread {
 				// lost or dropped due to bad auth
 				Thread.currentThread().interrupt();
 				if (op != null) {
-					op.cancel();
+					op.cancel("interruption to authentication" + e);
 				}
 				done.set(true); // If we were interrupted, tear down.
 			}

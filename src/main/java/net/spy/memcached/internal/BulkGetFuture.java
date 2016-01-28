@@ -71,7 +71,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
 		boolean rv = false;
 		for (Operation op : ops) {
 			rv |= op.getState() == OperationState.WRITING;
-			op.cancel();
+			op.cancel("by application.");
 		}
 		for (Future<T> v : rvMap.values()) {
 			v.cancel(ign);
@@ -145,7 +145,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
 		}
 		for (Operation op : ops) {
 			if (op.isCancelled()) {
-				throw new ExecutionException(new RuntimeException("Cancelled"));
+				throw new ExecutionException(new RuntimeException(op.getCancelCause()));
 			}
 			if (op.hasErrored()) {
 				throw new ExecutionException(op.getException());

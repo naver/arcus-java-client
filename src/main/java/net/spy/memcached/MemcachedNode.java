@@ -56,7 +56,7 @@ public interface MemcachedNode {
 	 *
 	 * @param cancelWrite if true, cancel all operations in write queue
 	 */
-	void setupResend(boolean cancelWrite);
+	void setupResend(boolean cancelWrite, String cause);
 
 	/**
 	 * Fill the write buffer with data from the next operations in the queue.
@@ -213,7 +213,7 @@ public interface MemcachedNode {
 	 * this may mean putting any queued operations on hold to get to
 	 * an auth complete state.
 	 */
-	void setupForAuth();
+	void setupForAuth(String cause);
 
 	/**
 	 * Count 'time out' exceptions to drop connections that fail perpetually
