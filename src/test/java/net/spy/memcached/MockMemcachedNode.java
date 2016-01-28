@@ -65,7 +65,7 @@ public class MockMemcachedNode implements MemcachedNode {
 	public void copyInputQueue() {
 		// noop
 	}
-	public void setupResend(boolean cancelWrite) {
+	public void setupResend(boolean cancelWrite, String cause) {
 		// noop
 	}
 	public void fillWriteBuffer(boolean optimizeGets) {
@@ -126,7 +126,7 @@ public class MockMemcachedNode implements MemcachedNode {
 		// noop
 	}
 
-	public void setupForAuth() {
+	public void setupForAuth(String cause) {
 		// noop
 	}
 

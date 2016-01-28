@@ -47,6 +47,7 @@ import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.BulkGetFuture;
+import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
@@ -1622,7 +1623,7 @@ public class MemcachedClient extends SpyThread
 			new AtomicReference<Boolean>(null);
 		final ConcurrentLinkedQueue<Operation> ops=
 			new ConcurrentLinkedQueue<Operation>();
-		CountDownLatch blatch = broadcastOp(new BroadcastOpFactory(){
+		final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory(){
 			public Operation newOp(final MemcachedNode n,
 					final CountDownLatch latch) {
 				Operation op=opFact.flush(delay, new OperationCallback(){
@@ -1641,19 +1642,51 @@ public class MemcachedClient extends SpyThread
 			public boolean cancel(boolean ign) {
 				boolean rv=false;
 				for(Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
 			}
+
 			@Override
 			public boolean isCancelled() {
-				boolean rv=false;
 				for(Operation op : ops) {
-					rv |= op.isCancelled();
+					if (op.isCancelled())
+						return true;
 				}
-				return rv;
+				return false;
 			}
+
+			@Override
+			public Boolean get(long duration, TimeUnit units)
+					throws InterruptedException, TimeoutException, ExecutionException {
+				if(!blatch.await(duration, units)) {
+					// whenever timeout occurs, continuous timeout counter will increase by 1.
+					for (Operation op : ops) {
+						MemcachedConnection.opTimedOut(op);
+					}
+					throw new CheckedOperationTimeoutException(
+							"Timed out waiting for operation. >" + duration, ops);
+				} else {
+					// continuous timeout counter will be reset
+					for (Operation op : ops) {
+						MemcachedConnection.opSucceeded(op);
+					}
+				}
+
+				for (Operation op : ops) {
+					if(op != null && op.hasErrored()) {
+						throw new ExecutionException(op.getException());
+					}
+
+					if(op != null && op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
+				}
+
+				return flushResult.get();
+			}
+
 			@Override
 			public boolean isDone() {
 				boolean rv=true;

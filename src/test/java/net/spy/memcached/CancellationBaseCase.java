@@ -34,7 +34,7 @@ public abstract class CancellationBaseCase extends ClientBaseCase {
 			fail("Expected cancellation, got " + o);
 		} catch (ExecutionException e) {
 			assertTrue(e.getCause() instanceof RuntimeException);
-			assertEquals("Cancelled", e.getCause().getMessage());
+			assertTrue(e.getCause().getMessage().contains("Cancelled"));
 		}
 	}
 
