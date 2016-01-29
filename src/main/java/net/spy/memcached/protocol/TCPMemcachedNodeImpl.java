@@ -149,7 +149,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		addOpCount=0;
 		this.opQueueMaxBlockTime = opQueueMaxBlockTime;
 		shouldAuth = waitForAuth;
-		setupForAuth();
+		setupForAuth("init authentication");
 
 		// is this a fake node?
 		if (sa instanceof InetSocketAddress) {
@@ -202,12 +202,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#setupResend()
 	 */
-	public final void setupResend(boolean cancelWrite) {
+	public final void setupResend(boolean cancelWrite, String cause) {
 		// First, reset the current write op, or cancel it if we should
 		// be authenticating
 		Operation op=getCurrentWriteOp();
 		if((cancelWrite || shouldAuth) && op != null) {
-		    op.cancel();
+		    op.cancel(cause);
 		} else if(op != null) {
 			ByteBuffer buf=op.getBuffer();
 			if(buf != null) {
@@ -223,14 +223,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			op=removeCurrentReadOp();
 			if (op != getCurrentWriteOp()) {
 				getLogger().warn("Discarding partially completed op: %s", op);
-				op.cancel();
+				op.cancel(cause);
 			}
 		}
 
 		while((cancelWrite || shouldAuth) && hasWriteOp()) {
 			op=removeCurrentWriteOp();
 			getLogger().warn("Discarding partially completed op: %s", op);
-			op.cancel();
+			op.cancel(cause);
 		}
 
 
@@ -373,7 +373,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void addOp(Operation op) {
 		try {
 			if (!authLatch.await(1, TimeUnit.SECONDS)) {
-			    op.cancel();
+			    op.cancel("authentication timeout");
 				getLogger().warn(
 					"Operation canceled because authentication " +
 					"or reconnection and authentication has " +
@@ -623,7 +623,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		authLatch.countDown();
 	}
 
-	public final void setupForAuth() {
+	public final void setupForAuth(String cause) {
 		if (shouldAuth) {
 			authLatch = new CountDownLatch(1);
 			if (inputQueue.size() > 0) {
@@ -632,7 +632,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 				inputQueue.drainTo(reconnectBlocked);
 			}
 			assert(inputQueue.size() == 0);
-			setupResend(false);
+			setupResend(false, cause);
 		} else {
 			authLatch = new CountDownLatch(0);
 		}

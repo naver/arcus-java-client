@@ -988,7 +988,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -1001,7 +1001,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						return true;
 				}
 				return false;
-			};
+			}
 
 			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
@@ -1025,10 +1025,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return mergedResult;
@@ -1747,7 +1747,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				null);
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
-		CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
+		final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
 			public Operation newOp(final MemcachedNode n,
 					final CountDownLatch latch) {
 				Operation op = opFact.flush(prefix, delay, false,
@@ -1771,7 +1771,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -1779,11 +1779,41 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 			@Override
 			public boolean isCancelled() {
-				boolean rv = false;
 				for (Operation op : ops) {
-					rv |= op.isCancelled();
+					if (op.isCancelled())
+						return true;
 				}
-				return rv;
+				return false;
+			}
+
+			@Override
+			public Boolean get(long duration, TimeUnit units)
+					throws InterruptedException, TimeoutException, ExecutionException {
+				if(!blatch.await(duration, units)) {
+					// whenever timeout occurs, continuous timeout counter will increase by 1.
+					for (Operation op : ops) {
+						MemcachedConnection.opTimedOut(op);
+					}
+					throw new CheckedOperationTimeoutException(
+							"Timed out waiting for operation. >" + duration, ops);
+				} else {
+					// continuous timeout counter will be reset
+					for (Operation op : ops) {
+						MemcachedConnection.opSucceeded(op);
+					}
+				}
+
+				for (Operation op : ops) {
+					if(op != null && op.hasErrored()) {
+						throw new ExecutionException(op.getException());
+					}
+
+					if(op != null && op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
+				}
+
+				return flushResult.get();
 			}
 
 			@Override
@@ -1855,11 +1885,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
 				arrangedKey.size());
 		for (List<String> v : arrangedKey.values()) {
-			if (arrangedKey.size() > 1) {
-				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
-			}else {
-				smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
-			}
+			smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
 		}
 		return smget(smGetList, count, (from > to),
 				collectionTranscoder, smgetMode);
@@ -2119,12 +2145,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(
+								op.getCancelCause()));
+					}
 				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
-				}
-				
+
 				if (smGetList.size() == 1) 
 					return mergedResult;
 				
@@ -2413,13 +2440,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
-				}
-				
-				if (smGetList.size() == 1) 
+
+				if (smGetList.size() == 1)
 					return mergedResult;
 				
 				return getSubList(mergedResult, 0, count);
@@ -3660,11 +3687,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
 				arrangedKey.size());
 		for (List<String> v : arrangedKey.values()) {
-			if (arrangedKey.size() > 1) {
-				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
-			}else {
-				smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
-			}
+			smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
 		}
 		
 		return smget(smGetList, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
@@ -3742,7 +3765,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 			    boolean rv = false;
 			    for (Operation op : ops) {
-			        op.cancel();
+			        op.cancel("by application.");
 			        rv |= op.getState() == OperationState.WRITING;
 			    }
 			    return rv;
@@ -3755,7 +3778,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						return true;
 				}
 				return false;
-			};
+			}
 
 			@Override
 			public Map<Integer, CollectionOperationStatus> get(long duration,
@@ -3779,10 +3802,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return mergedResult;
@@ -3984,7 +4007,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			public boolean cancel(boolean ign) {
 				boolean rv = false;
 				for (Operation op : ops) {
-					op.cancel();
+					op.cancel("by application.");
 					rv |= op.getState() == OperationState.WRITING;
 				}
 				return rv;
@@ -3997,7 +4020,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						return true;
 				}
 				return false;
-			};
+			}
 
 			@Override
 			public Map<String, CollectionOperationStatus> get(long duration,
@@ -4020,10 +4043,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					if (op != null && op.hasErrored()) {
 						throw new ExecutionException(op.getException());
 					}
-				}
-				if (isCancelled()) {
-					throw new ExecutionException(new RuntimeException(
-							"Cancelled"));
+
+					if (op.isCancelled()) {
+						throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+					}
 				}
 
 				return failedResult;

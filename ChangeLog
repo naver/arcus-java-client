@@ -1,13 +1,13 @@
-2015-11-09 [version 1.9.2]
+2015-11-09 [version 1.9.2] stable
 	* Fix a mistake in compareTo of SMGetElement and SMGetTrimKey.
 	* Fix a bug in sort-merge logic when unique bkeys are requested.
 
-2015-11-03 [version 1.9.1]
+2015-11-03 [version 1.9.1] unstable
 	* Restore the old smget interface to ensure backward compatibility.
 	  So, both(the old one and the new one added since 1.9.0) smget
 	  intefaces are supported.
 
-2015-10-26 [version 1.9.0]
+2015-10-26 [version 1.9.0] stable
 	* Add API type on operation objects.
 	* Fix some mistakes in handling command pipeline response.
 	* Treat EXISTS response as failure when create a collection.
@@ -24,7 +24,7 @@
 	* Throw exception if duplicate keys exist in multiple keys operation.
 	* Some minor bug fixes.
 
-2015-07-31 [version 1.8.2]
+2015-07-31 [version 1.8.2] stable
 	* Change ZK_CONNECT_TIMEOUT from 5 to SESSION_TIMEOUT seconds.
 	* Decrease default operation timeout - 1000 => 700 ms.
 	* Add OperationType in all operation classes.
@@ -35,12 +35,12 @@
 	* Add timeout ratio threshold
 	* Internal code optimization and code refactoring.
 
-2015-01-13 [version 1.8.1]
+2015-01-13 [version 1.8.1] stable
 	* Throw AdminConnectTimeoutException
 	  if connecting to arcus admin timed out.
 	* Increase ZK_CONNECT_TIMEOUT (2000 => 5000 ms)
 
-2014-12-30 [version 1.8.0]
+2014-12-30 [version 1.8.0] stable
 	* Add asyncBopFindPositionWithGet API.
 	* Optimize the performance in finding the memcached node for a key. 
 	* Add "# of operations added to memcached node"
