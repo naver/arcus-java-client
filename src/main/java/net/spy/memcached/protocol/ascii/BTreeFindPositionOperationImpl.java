@@ -118,7 +118,7 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
 		setArguments(bb, cmd, key, args);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug(
 					"Request in ascii protocol: "

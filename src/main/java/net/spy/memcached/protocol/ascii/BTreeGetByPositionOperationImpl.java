@@ -98,7 +98,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 				// position counter
 				pos = get.isReversed() ? get.getPosTo() + count - 1 : get.getPosFrom();
 				posDiff = get.isReversed() ? -1 : 1;
-				
+
 				// start to read actual data
 				setReadType(OperationReadType.DATA);
 			}
@@ -167,13 +167,13 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;

@@ -253,7 +253,7 @@ public final class MemcachedConnection extends SpyObject {
 		/* ENABLE_REPLICATION if */
 		List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
 		/* ENABLE_REPLICATION end */
-		
+
 		// Classify the incoming node list.
 		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {

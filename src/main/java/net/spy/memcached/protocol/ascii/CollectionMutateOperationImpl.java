@@ -75,7 +75,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	 * <result value>\r\n
 	 */
 	public void handleLine(String line) {
-				
+
 		OperationStatus status = null;
 
 		try {
@@ -119,7 +119,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public String getSubKey() {
 		return subkey;
 	}
