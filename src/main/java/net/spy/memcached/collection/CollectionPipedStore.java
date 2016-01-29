@@ -44,7 +44,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 	 * set next index of operation
 	 * that will be processed after when operation moved by switchover
 	 */
-	public void setNextOperatedIndex(int i) {
+	public void setNextOpIndex(int i) {
 		this.nextOpIndex = i;
 	}
 
