@@ -18,8 +18,6 @@ package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import net.spy.memcached.CachedData;
@@ -37,6 +35,16 @@ public class SetPipedExist<T> extends CollectionObject {
 	private final List<T> values;
 	private final Transcoder<T> tc;
 	private int itemCount;
+
+	protected int nextOpIndex = 0;
+
+	/**
+	 * set next index of operation
+	 * that will be processed after when operation moved by switchover
+	 */
+	public void setNextOperatedIndex(int i) {
+		this.nextOpIndex = i;
+	}
 
 	public List<T> getValues() {
 		return this.values;
@@ -57,7 +65,7 @@ public class SetPipedExist<T> extends CollectionObject {
 		int capacity = 0;
 
 		// decode values
-		Collection<byte[]> encodedList = new ArrayList<byte[]>(values.size());
+		List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
 		CachedData cd = null;
 		for (T each : values) {
 			cd = tc.encode(each);
@@ -75,12 +83,12 @@ public class SetPipedExist<T> extends CollectionObject {
 		ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 		// create ascii operation string
-		Iterator<byte[]> iterator = encodedList.iterator();
-		while (iterator.hasNext()) {
-			byte[] each = iterator.next();
+		int eSize = encodedList.size();
+		for (int i = this.nextOpIndex; i < eSize; i++) {
+			byte[] each = encodedList.get(i);
 
 			setArguments(bb, COMMAND, key, each.length,
-					(iterator.hasNext()) ? PIPE : "");
+					(i < eSize - 1) ? PIPE : "");
 			bb.put(each);
 			bb.put(CRLF);
 		}
