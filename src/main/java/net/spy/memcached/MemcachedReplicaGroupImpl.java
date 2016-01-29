@@ -60,14 +60,15 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 	}
 
 	public boolean changeRole() {
+		/* role change */
 		MemcachedNode tmpNode = this.masterNode;
 
 		this.masterNode = this.slaveNode;
-		if (this.masterNode != null) /* previous slave node */
+		if (this.masterNode != null) // previous slave node
 			((ArcusReplNodeAddress)this.masterNode.getSocketAddress()).master = true;
 
 		this.slaveNode = tmpNode; 
-		if (this.slaveNode != null) /* previous master node */
+		if (this.slaveNode != null) // previous master node
 			((ArcusReplNodeAddress)this.slaveNode.getSocketAddress()).master = false;
 
 		return true;
