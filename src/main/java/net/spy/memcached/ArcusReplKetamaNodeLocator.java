@@ -66,6 +66,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
 			if (mrg == null) {
 				mrg = new MemcachedReplicaGroupImpl(node);
+				getLogger().info("new memcached replica group added %s", mrg.getGroupName());
 				allGroups.put(mrg.getGroupName(), mrg);
 			}
 			else {
@@ -217,8 +218,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 					   Collection<MemcachedReplicaGroup> changeRoleGroups) {
 		/* We must keep the following execution order
 		 * - first, remove nodes.
-		 * - second, change replicaiton role.
-		 * - third, delete nodes 
+		 * - second, change role.
+		 * - third, add nodes
 		 */
 		lock.lock();
 		try {
@@ -238,7 +239,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 				}
 			}
 
-			// Change replicati role
+			// Change role
 			for (MemcachedReplicaGroup g : changeRoleGroups) {
 				g.changeRole();
 			}
@@ -250,6 +251,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 						allGroups.get(MemcachedReplicaGroup.getGroupNameForNode(node));
 				if (mrg == null) {
 					mrg = new MemcachedReplicaGroupImpl(node);
+					getLogger().info("new memcached replica group added %s", mrg.getGroupName());
 					allGroups.put(mrg.getGroupName(), mrg);
 					updateHash(mrg, false);
 				} else {
@@ -262,11 +264,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 			
 			for (Map.Entry<String, MemcachedReplicaGroup> entry : allGroups.entrySet()) {
 				MemcachedReplicaGroup group = entry.getValue();
-				if (group.isEmptyGroup())
+				if (group.isEmptyGroup()) {
 					toDeleteGroup.add(group);
+				}
 			}
 			
 			for (MemcachedReplicaGroup group : toDeleteGroup) {
+				getLogger().info("old memcached replica group removed %s", group.getGroupName());
 				allGroups.remove(group.getGroupName());
 				updateHash(group, true);
 			}
