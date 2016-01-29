@@ -44,7 +44,7 @@ public class CollectionStoreOperationImpl extends OperationImpl
 
 	private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
 			true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
 	private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -61,12 +61,12 @@ public class CollectionStoreOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	
+
 	protected final String key;
 	protected final String subkey;	// e.g.) 0 or 0x00
 	protected final CollectionStore<?> collectionStore;
 	protected final byte[] data;
-	
+
 	public CollectionStoreOperationImpl(String key, String subkey,
 			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb) {
 		super(cb);
@@ -79,7 +79,7 @@ public class CollectionStoreOperationImpl extends OperationImpl
 		else if (this.collectionStore instanceof SetStore)
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.collectionStore instanceof BTreeStore)
-			setAPIType(APIType.BOP_INSERT); 
+			setAPIType(APIType.BOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
@@ -108,9 +108,9 @@ public class CollectionStoreOperationImpl extends OperationImpl
 		bb.put(CRLF);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -119,11 +119,11 @@ public class CollectionStoreOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(STORE_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public String getSubKey() {
 		return subkey;
 	}
@@ -135,5 +135,5 @@ public class CollectionStoreOperationImpl extends OperationImpl
 	public byte[] getData() {
 		return data;
 	}
-	
+
 }

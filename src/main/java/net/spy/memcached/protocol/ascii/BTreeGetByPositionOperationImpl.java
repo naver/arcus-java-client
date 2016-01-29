@@ -98,7 +98,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 				// position counter
 				pos = get.isReversed() ? get.getPosTo() + count - 1 : get.getPosFrom();
 				posDiff = get.isReversed() ? -1 : 1;
-				
+
 				// start to read actual data
 				setReadType(OperationReadType.DATA);
 			}
@@ -167,13 +167,13 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -184,7 +184,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 		}
-		
+
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
@@ -193,16 +193,16 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 			if (getLogger().isDebugEnabled()) {
 				getLogger().debug("Reading %d bytes", toRead);
 			}
-			
+
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;
 		}
-		
+
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
 			BTreeGetByPositionOperation.Callback cb = (BTreeGetByPositionOperation.Callback) getCallback();
 			cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
-			
+
 			// next position.
 			pos += posDiff;
 			lookingFor = '\r';

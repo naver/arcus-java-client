@@ -626,7 +626,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			authLatch = new CountDownLatch(0);
 		}
 	}
-	
+
 	public final void shutdown() throws IOException {
 		if(channel != null) {
 			channel.close();
@@ -639,7 +639,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			getLogger().debug("Shut down channel %s", channel);
 		}
 	}
-	
+
 	public int getInputQueueSize() {
 		return inputQueue.size();
 	}
@@ -651,7 +651,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public int getReadQueueSize() {
 		return readQ.size();
 	}
-	
+
 	@Override
 	public String getStatus() {
 		StringBuilder sb = new StringBuilder();
