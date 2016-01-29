@@ -19,7 +19,6 @@ package net.spy.memcached.collection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +38,16 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 
 	protected CollectionAttributes attribute;
 	
+	protected int nextOpIndex = 0;
+
+	/**
+	 * set next index of operation
+	 * that will be processed after when operation moved by switchover
+	 */
+	public void setNextOpIndex(int i) {
+		this.nextOpIndex = i;
+	}
+
 	public abstract ByteBuffer getAsciiCommand();
 	public abstract ByteBuffer getBinaryCommand();
 	
@@ -66,7 +75,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			int capacity = 0;
 
 			// decode values
-			Collection<byte[]> encodedList = new ArrayList<byte[]>(list.size());
+			List<byte[]> encodedList = new ArrayList<byte[]>(list.size());
 			CachedData cd = null;
 			for (T each : list) {
 				cd = tc.encode(each);
@@ -84,14 +93,14 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			Iterator<byte[]> iterator = encodedList.iterator();
-			while (iterator.hasNext()) {
-				byte[] each = iterator.next();
+			int eSize = encodedList.size();
+			for (int i = this.nextOpIndex; i < eSize; i++) {
+				byte[] each = encodedList.get(i);
 				setArguments(bb, COMMAND, key, index, each.length,
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
 			}
@@ -129,7 +138,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			int capacity = 0;
 
 			// decode values
-			Collection<byte[]> encodedList = new ArrayList<byte[]>(set.size());
+			List<byte[]> encodedList = new ArrayList<byte[]>(set.size());
 			CachedData cd = null;
 			for (T each : set) {
 				cd = tc.encode(each);
@@ -147,15 +156,15 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			Iterator<byte[]> iterator = encodedList.iterator();
-			while (iterator.hasNext()) {
-				byte[] each = iterator.next();
-				
+			int eSize = encodedList.size();
+			for (int i = this.nextOpIndex; i < eSize; i++) {
+				byte[] each = encodedList.get(i);
+
 				setArguments(bb, COMMAND, key, each.length,
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
 			}
@@ -212,17 +221,17 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			i = 0;
-			Iterator<Long> iterator = map.keySet().iterator();
-			while (iterator.hasNext()) {
-				Long bkey = iterator.next();
-				byte[] value = decodedList.get(i++);
+			int keySize = map.keySet().size();
+			List<Long> keyList = new ArrayList<Long>(map.keySet());
+			for (i = this.nextOpIndex; i < keySize; i++) {
+				Long bkey = keyList.get(i);
+				byte[] value = decodedList.get(i);
 
 				setArguments(bb, COMMAND, key, bkey, value.length,
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < keySize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}
@@ -284,11 +293,10 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			i = 0;
-			Iterator<Element<T>> iterator = elements.iterator();
-			while (iterator.hasNext()) {
-				Element<T> element = iterator.next();
-				byte[] value = decodedList.get(i++);
+			int eSize = elements.size();
+			for (i = this.nextOpIndex; i < eSize; i++) {
+				Element<T> element = elements.get(i);
+				byte[] value = decodedList.get(i);
 
 				setArguments(
 						bb,
@@ -315,7 +323,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? (attribute != null && attribute
 								.getReadable() != null && !attribute.getReadable()) ?
 								"unreadable" : "" : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < eSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}

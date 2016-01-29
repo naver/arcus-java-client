@@ -17,7 +17,6 @@
 package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.List;
 
 import net.spy.memcached.CachedData;
@@ -38,6 +37,16 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 	protected int itemCount;
 
 	protected CollectionAttributes attribute;
+
+	protected int nextOpIndex = 0;
+
+	/**
+	 * set next index of operation
+	 * that will be processed after when operation moved by switchover
+	 */
+	public void setNextOpIndex(int i) {
+		this.nextOpIndex = i;
+	}
 
 	public abstract ByteBuffer getAsciiCommand();
 
@@ -96,10 +105,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			Iterator<String> iterator = keyList.iterator();
-
-			while (iterator.hasNext()) {
-				String key = iterator.next();
+			int kSize = this.keyList.size();
+			for (int i = this.nextOpIndex; i < kSize; i++) {
+				String key = keyList.get(i);
 				byte[] value = cachedData.getData();
 
 				setArguments(
@@ -119,7 +127,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}
@@ -164,10 +172,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			Iterator<String> iterator = keyList.iterator();
-
-			while (iterator.hasNext()) {
-				String key = iterator.next();
+			int kSize = this.keyList.size();
+			for (int i = this.nextOpIndex; i < kSize; i++) {
+				String key = keyList.get(i);
 				byte[] value = cachedData.getData();
 
 				setArguments(
@@ -185,7 +192,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}
@@ -232,10 +239,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			Iterator<String> iterator = keyList.iterator();
-
-			while (iterator.hasNext()) {
-				String key = iterator.next();
+			int kSize = keyList.size();
+			for (int i = this.nextOpIndex; i < kSize; i++) {
+				String key = this.keyList.get(i);
 				byte[] value = cachedData.getData();
 
 				setArguments(
@@ -254,7 +260,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}
