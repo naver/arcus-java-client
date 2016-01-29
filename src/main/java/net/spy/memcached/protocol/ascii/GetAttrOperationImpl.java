@@ -33,12 +33,12 @@ import net.spy.memcached.ops.OperationType;
  * Implementation of the gets operation.
  */
 class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
-	
+
 	private static final String CMD = "getattr";
-	
+
 	private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus END = new CollectionOperationStatus(
 			true, "END", CollectionResponse.END);
 	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
@@ -46,10 +46,10 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 	private static final OperationStatus ATTR_ERROR_NOT_FOUND = new CollectionOperationStatus(
 			false, "ATTR_ERROR not found",
 			CollectionResponse.ATTR_ERROR_NOT_FOUND);
-	
+
 	protected final String key;
 	protected final GetAttrOperation.Callback cb;
-	
+
 	public GetAttrOperationImpl(String key, GetAttrOperation.Callback cb) {
 		super(cb);
 		this.key = key;
@@ -90,9 +90,9 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 		setArguments(bb, CMD, key);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -101,7 +101,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 	protected void wasCancelled() {
 		getCallback().receivedStatus(ATTR_CANCELED);
 	}
-	
+
 	@Override
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
