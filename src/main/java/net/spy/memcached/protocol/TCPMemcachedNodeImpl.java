@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
@@ -127,7 +128,17 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		assert rq != null : "No operation read queue";
 		assert wq != null : "No operation write queue";
 		assert iq != null : "No input queue";
+		/* ENABLE_REPLICATION if */
+		if (sa instanceof ArcusReplNodeAddress) {
+			socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
+		} else {
+			socketAddress = sa;
+		}
+		/* ENABLE_REPLICATION else */
+		/*
 		socketAddress=sa;
+		*/
+		/* ENABLE_REPLICATION end */
 		setChannel(c);
 		rbuf=ByteBuffer.allocate(bufSize);
 		wbuf=ByteBuffer.allocate(bufSize);
@@ -166,6 +177,25 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public Collection<Operation> destroyInputQueue() {
 		Collection<Operation> rv=new ArrayList<Operation>();
 		inputQueue.drainTo(rv);
+		return rv;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.MemcachedNode#destroyWriteQueue()
+	 */
+	public Collection<Operation> destroyWriteQueue(boolean resend) {
+		Collection<Operation> rv=new ArrayList<Operation>();
+		writeQ.drainTo(rv);
+		if (resend) {
+			for (Operation o : rv) {
+				if (o.getState() == OperationState.WRITING && o.getBuffer() != null) {
+					o.getBuffer().reset(); // buffer offset reset
+				} else {
+					o.initialize(); // write completed or not yet initialized
+				}
+			}
+		}
+
 		return rv;
 	}
 
@@ -607,7 +637,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			authLatch = new CountDownLatch(0);
 		}
 	}
-	
+
 	public final void shutdown() throws IOException {
 		if(channel != null) {
 			channel.close();
@@ -620,7 +650,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 			getLogger().debug("Shut down channel %s", channel);
 		}
 	}
-	
+
 	public int getInputQueueSize() {
 		return inputQueue.size();
 	}
@@ -632,7 +662,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public int getReadQueueSize() {
 		return readQ.size();
 	}
-	
+
 	@Override
 	public String getStatus() {
 		StringBuilder sb = new StringBuilder();

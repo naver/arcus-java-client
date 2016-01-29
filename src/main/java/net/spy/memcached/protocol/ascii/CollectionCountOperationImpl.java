@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionResponse;
@@ -74,7 +75,7 @@ public class CollectionCountOperationImpl extends OperationImpl implements
 			String[] stuff = line.split("=");
 			assert "COUNT".equals(stuff[0]);
 			count = Integer.parseInt(stuff[1]);
-			
+
 			getCallback().receivedStatus(
 					new CollectionOperationStatus(new OperationStatus(true,
 							String.valueOf(count))));
@@ -91,8 +92,8 @@ public class CollectionCountOperationImpl extends OperationImpl implements
 	public void initialize() {
 		String cmd = collectionCount.getCommand();
 		String args = collectionCount.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(key.length() + cmd.length()
-				+ args.length() + 16);
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ cmd.length() + args.length() + 16);
 
 		setArguments(bb, cmd, key, args);
 		bb.flip();

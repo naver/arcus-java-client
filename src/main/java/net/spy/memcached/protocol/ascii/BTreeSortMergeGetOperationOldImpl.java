@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -69,7 +70,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 
 	protected int readState = 0; // 0 : value, 1 : missed keys
 	private int processedValueCount = 0;
-	
+
 	public BTreeSortMergeGetOperationOldImpl(BTreeSMGet<?> smGet,
 			OperationCallback cb) {
 		super(cb);
@@ -77,7 +78,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 		setAPIType(APIType.BOP_SMGET);
 		setOperationType(OperationType.READ);
 	}
-	
+
 	/**
 	 * VALUE <flag> <count>\r\n
 	 */
@@ -135,7 +136,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 
 				// Handle spaces.
 				if (b == ' ') {
-					
+
 					// Adjust space count if item header has a element flag.
 					String[] chunk = new String(byteBuffer.toByteArray())
 							.split(" ");
@@ -144,7 +145,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 							spaceCount--;
 						}
 					}
-					
+
 					spaceCount++;
 					if (smGet.headerReady(spaceCount)) {
 						smGet.decodeItemHeader(new String(byteBuffer
@@ -281,7 +282,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 		String args = smGet.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ smGet.getCommaSeparatedKeys().length() + 16);
+				+ KeyUtil.getKeyBytes(smGet.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 

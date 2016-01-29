@@ -22,7 +22,9 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.protocol.ascii.AsciiMemcachedNodeImpl;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
@@ -153,6 +156,11 @@ public class DefaultConnectionFactory extends SpyObject
 	private final int opQueueLen;
 	private final int readBufSize;
 	private final HashAlgorithm hashAlg;
+
+	/* ENABLE_REPLICATION if */
+	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
+	private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<APIType, ReadPriority>();
+	/* ENABLE_REPLICATION end */
 
 	/**
 	 * Construct a DefaultConnectionFactory with the given parameters.
@@ -426,4 +434,18 @@ public class DefaultConnectionFactory extends SpyObject
 	public String getFrontCacheName() {
 		return DEFAULT_FRONT_CACHE_NAME;
 	}
+	
+	/* ENABLE_REPLICATION if */
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getReadPriority()
+	 */
+	public ReadPriority getReadPriority() {
+		return DEFAULT_READ_PRIORITY;
+	}
+	
+	public Map<APIType, ReadPriority> getAPIReadPriority() {
+		return DEFAULT_API_READ_PRIORITY_LIST;
+	}
+	/* ENABLE_REPLICATION end */
 }

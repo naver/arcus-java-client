@@ -46,6 +46,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationException;
@@ -89,6 +90,10 @@ public final class MemcachedConnection extends SpyObject {
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
 	
+	/* ENABLE_REPLICATION if */
+	private boolean arcusReplEnabled;
+	/* ENABLE_REPLICATION end */
+
 	/**
 	 * Construct a memcached connection.
 	 *
@@ -119,6 +124,19 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		locator=f.createLocator(connections);
 	}
+
+	/* ENABLE_REPLICATION if */
+	// handleNodeManageQueue and updateConnections behave slightly differently
+	// depending on the Arcus version.  We could have created a subclass and overload
+	// those methods.  But, MemcachedConnection is a final class.
+	void setArcusReplEnabled(boolean b) {
+		arcusReplEnabled = b;
+	}
+
+	boolean getArcusReplEnabled() {
+		return arcusReplEnabled;
+	}
+	/* ENABLE_REPLICATION end */
 
 	private boolean selectorsMakeSense() {
 		for(MemcachedNode qa : locator.getAll()) {
@@ -184,7 +202,7 @@ public final class MemcachedConnection extends SpyObject {
 						getLogger().info("%s has a ready op, handling IO", sk);
 						handleIO(sk);
 					} else {
-						lostConnection((MemcachedNode)sk.attachment());
+						lostConnection((MemcachedNode)sk.attachment(), ReconnDelay.DEFAULT);
 					}
 				}
 				assert emptySelects < EXCESSIVE_EMPTY
@@ -210,14 +228,14 @@ public final class MemcachedConnection extends SpyObject {
 				getLogger().warn(
 						"%s exceeded continuous timeout threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
-				lostConnection(mn);
+				lostConnection(mn, ReconnDelay.DEFAULT);
 			}
 			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
 			{
 				getLogger().warn(
 						"%s exceeded timeout ratio threshold. >%s (%s)",
 						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
-				lostConnection(mn);
+				lostConnection(mn, ReconnDelay.DEFAULT);
 			}
 		}
 
@@ -232,8 +250,157 @@ public final class MemcachedConnection extends SpyObject {
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
 		List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
-		
+		/* ENABLE_REPLICATION if */
+		List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
+		/* ENABLE_REPLICATION end */
+
 		// Classify the incoming node list.
+		/* ENABLE_REPLICATION if */
+		if (arcusReplEnabled) {
+			Map<String, List<ArcusReplNodeAddress>> newAllGroups = 
+					ArcusReplNodeAddress.makeGroupAddrsList(addrs);
+			
+			Map<String, MemcachedReplicaGroup> oldAllGroups = 
+					((ArcusReplKetamaNodeLocator)locator).getAllGroups();
+			
+			for (Map.Entry<String, MemcachedReplicaGroup> entry : oldAllGroups.entrySet()) {
+				MemcachedReplicaGroup oldGroup = entry.getValue();
+				
+				List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
+				
+				ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
+				ArcusClient.arcusLogger.debug("Old group nodes : [" + entry.getValue() + "]");
+
+				if (newGroupAddrs == null) {
+					/* Old group nodes have disappered. Remove the old group nodes. */
+					removeNodes.add(oldGroup.getMasterNode());
+					if (oldGroup.getSlaveNode() != null)
+						removeNodes.add(oldGroup.getSlaveNode());
+					continue;
+				}
+				if (newGroupAddrs.size() == 0) {
+					/* New group is invalid, do nothing. */ 
+					newAllGroups.remove(entry.getKey());
+					continue;
+				}
+				
+				ArcusReplNodeAddress oldMasterAddr = oldGroup.getMasterNode() != null ?
+						(ArcusReplNodeAddress) oldGroup.getMasterNode().getSocketAddress() : null;
+				ArcusReplNodeAddress oldSlaveAddr = oldGroup.getSlaveNode() != null ? 
+						(ArcusReplNodeAddress) oldGroup.getSlaveNode().getSocketAddress() : null;
+				assert(oldMasterAddr != null);
+				
+				if (newGroupAddrs.size() == 1) { /* New group has only a master node. */
+					if (oldSlaveAddr == null) { /* Old group has only a master node. */
+						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							/* The same master node. Do nothing. */
+						} else {
+							/* The master of the group has changed to the new one. */
+							removeNodes.add(oldGroup.getMasterNode());
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+						} 
+					} else { /* Old group has both a master node and a slave node. */
+						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							/* The old slave has disappeared. */
+							removeNodes.add(oldGroup.getSlaveNode());
+						} else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
+							/* The old slave has failovered to the master with new slave */
+							removeNodes.add(oldGroup.getMasterNode());
+							changeRoleGroups.add(oldGroup);
+						} else {
+							/* All nodes of old group have gone away. And, new master has appeared. */
+							removeNodes.add(oldGroup.getMasterNode());
+							removeNodes.add(oldGroup.getSlaveNode());
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+						}
+					}
+				} else { /* New group has both a master node and a slave node */
+					if (oldSlaveAddr == null) { /* Old group has only a master node. */
+						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							/* New slave node has appeared. */
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+						} else if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							/* Really rare case: old master => slave, A new master */
+							changeRoleGroups.add(oldGroup);
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+						} else {
+							/* Old master has gone away. And, new group has appeared. */
+							removeNodes.add(oldGroup.getMasterNode());
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+						}
+					} else { /* Old group has both a master node and a slave node. */
+						if (newGroupAddrs.get(0).getIPPort().equals(oldMasterAddr.getIPPort())) {
+							if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
+								/* The same master and slave nodes. Do nothing. */
+							} else {
+								/* Only old slave has changed to the new one. */
+								removeNodes.add(oldGroup.getSlaveNode());
+								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+							}
+						} else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
+							if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
+								/* Switchover */
+								changeRoleGroups.add(oldGroup);
+							} else {
+								/* Failover. And, new slave has appeared */
+								removeNodes.add(oldGroup.getMasterNode());
+								changeRoleGroups.add(oldGroup);
+								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+							}
+						} else {
+							/* A completely new master has appered. */
+							if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
+								/* Old slave disappeared. Old master has changed to the slave. */
+								removeNodes.add(oldGroup.getSlaveNode());
+								changeRoleGroups.add(oldGroup);
+							} else if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
+								/* Only old master has disappeared. */
+								removeNodes.add(oldGroup.getMasterNode());
+							} else {
+								/* Old groyp has completely changed to the new group. */
+								removeNodes.add(oldGroup.getMasterNode());
+								removeNodes.add(oldGroup.getSlaveNode());
+								attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+							}
+							attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+						}
+					}
+				}
+				newAllGroups.remove(entry.getKey());
+			}
+			
+			for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+				List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
+				if (newGroupAddrs.size() == 0) { /* Incomplete group, now */
+					attachNodes.add(attachMemcachedNode(ArcusReplNodeAddress.createFake(entry.getKey())));
+				} else { /* Completely new group */
+					attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+					if (newGroupAddrs.size() > 1)
+						attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+				}
+			}
+
+			// Update the hash.
+			((ArcusReplKetamaNodeLocator)locator).update(attachNodes, removeNodes, changeRoleGroups);
+		} else {
+			for (MemcachedNode node : locator.getAll()) {
+				if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
+					addrs.remove((InetSocketAddress) node.getSocketAddress());
+				} else {
+					removeNodes.add(node);
+				}
+			}
+
+			for (SocketAddress sa : addrs) {
+				attachNodes.add(attachMemcachedNode(sa));
+			}
+
+			// Update the hash.
+			locator.update(attachNodes, removeNodes);
+		}
+		/* ENABLE_REPLICATION else */
+		/*
 		for (MemcachedNode node : locator.getAll()) {
 			if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
 				addrs.remove((InetSocketAddress) node.getSocketAddress());
@@ -241,25 +408,34 @@ public final class MemcachedConnection extends SpyObject {
 				removeNodes.add(node);
 			}
 		}
-		
+
 		// Make connections to the newly added nodes.
 		for (SocketAddress sa : addrs) {
 			attachNodes.add(attachMemcachedNode(sa));
 		}
 
-		// Remove unavailable nodes in the reconnect queue.
-		for (MemcachedNode node : removeNodes) {
-			getLogger().info("old memcached node removed %s", node);
-			for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-				if (node.equals(each.getValue())) {
-					reconnectQueue.remove(each.getKey());
-					break;
-				}
-			}
-		}
-		
 		// Update the hash.
 		locator.update(attachNodes, removeNodes);
+		*/
+		/* ENABLE_REPLICATION end */
+
+        // Remove unavailable nodes in the reconnect queue.
+        for (MemcachedNode node : removeNodes) {
+            getLogger().info("old memcached node removed %s", node);
+            for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
+                if (node.equals(each.getValue())) {
+                    reconnectQueue.remove(each.getKey());
+                    break;
+                }
+            }
+            if (failureMode == FailureMode.Cancel) {
+                cancelOperations(node.destroyWriteQueue(false));
+                cancelOperations(node.destroyInputQueue());
+            } else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
+                redistributeOperations(node.destroyWriteQueue(true));
+                redistributeOperations(node.destroyInputQueue());
+            }
+        }
 	}
 	
 	MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
@@ -273,6 +449,17 @@ public final class MemcachedConnection extends SpyObject {
 		int ops = 0;
 		ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
 		ch.socket().setReuseAddress(true);
+		/* ENABLE_REPLICATION if */
+		// Do not attempt to connect if this node is fake.
+		// Otherwise, we keep connecting to a non-existent listen address
+		// and keep failing/reconnecting.
+		if (qa.isFake()) {
+			// Locator assumes non-null selectionkey.  So add a dummy one...
+			qa.setSk(ch.register(selector, ops, qa));
+			getLogger().info("new fake memcached node added %s to connect queue", qa);
+			return qa;
+		}
+		/* ENABLE_REPLICATION end */
 		// Initially I had attempted to skirt this by queueing every
 		// connect, but it considerably slowed down start time.
 		try {
@@ -291,7 +478,7 @@ public final class MemcachedConnection extends SpyObject {
 					: "Not connected, and not wanting to connect";
 		} catch (SocketException e) {
 			getLogger().warn("new memcached socket error on initial connect");
-			queueReconnect(qa);
+			queueReconnect(qa, ReconnDelay.DEFAULT);
 		}
 		return qa;
 	}
@@ -310,7 +497,16 @@ public final class MemcachedConnection extends SpyObject {
 		String addrs = _nodeManageQueue.poll();
 		
 		// Update the memcached server group.
+		/* ENABLE_REPLICATION if */
+		if (arcusReplEnabled)
+			updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
+		else
+			updateConnections(AddrUtil.getAddresses(addrs));
+		/* ENABLE_REPLICATION else */
+		/*
 		updateConnections(AddrUtil.getAddresses(addrs));
+		*/
+		/* ENABLE_REPLICATION end */
 	}	
 	
 	// Handle any requests that have been made against the client.
@@ -347,7 +543,7 @@ public final class MemcachedConnection extends SpyObject {
 						}
 					} catch(IOException e) {
 						getLogger().warn("Exception handling write", e);
-						lostConnection(qa);
+						lostConnection(qa, ReconnDelay.DEFAULT);
 					}
 				}
 				qa.fixupOps();
@@ -383,8 +579,8 @@ public final class MemcachedConnection extends SpyObject {
 		}
 	}
 
-	private void lostConnection(MemcachedNode qa) {
-		queueReconnect(qa);
+	private void lostConnection(MemcachedNode qa, ReconnDelay type) {
+		queueReconnect(qa, type);
 		for(ConnectionObserver observer : connObservers) {
 			observer.connectionLost(qa.getSocketAddress());
 		}
@@ -424,20 +620,20 @@ public final class MemcachedConnection extends SpyObject {
 			if(!shutDown) {
 				getLogger().info("Closed channel and not shutting down.  "
 					+ "Queueing reconnect on %s", qa, e);
-				lostConnection(qa);
+				lostConnection(qa, ReconnDelay.DEFAULT);
 			}
 		} catch(ConnectException e) {
 			// Failures to establish a connection should attempt a reconnect
 			// without signaling the observers.
 			getLogger().info("Reconnecting due to failure to connect to %s",
 					qa, e);
-			queueReconnect(qa);
+			queueReconnect(qa, ReconnDelay.DEFAULT);
 		} catch (OperationException e) {
 			qa.setupForAuth(); // noop if !shouldAuth
 			getLogger().info("Reconnection due to exception " +
 				"handling a memcached operation on %s.  " +
 				"This may be due to an authentication failure.", qa, e);
-			lostConnection(qa);
+			lostConnection(qa, ReconnDelay.IMMEDIATE);
 		} catch(Exception e) {
 			// Any particular error processing an item should simply
 			// cause us to reconnect to the server.
@@ -447,7 +643,7 @@ public final class MemcachedConnection extends SpyObject {
 
 			qa.setupForAuth(); // noop if !shouldAuth
 			getLogger().info("Reconnecting due to exception on %s", qa, e);
-			lostConnection(qa);
+			lostConnection(qa, ReconnDelay.DEFAULT);
 		}
 		qa.fixupOps();
 	}
@@ -513,7 +709,7 @@ public final class MemcachedConnection extends SpyObject {
 		return sb.toString();
 	}
 
-	private void queueReconnect(MemcachedNode qa) {
+	private void queueReconnect(MemcachedNode qa, ReconnDelay type) {
 		if(!shutDown) {
 			getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
 					qa.getReconnectCount());
@@ -534,8 +730,17 @@ public final class MemcachedConnection extends SpyObject {
 			}
 			qa.setChannel(null);
 
-			long delay = (long)Math.min(maxDelay,
-					Math.pow(2, qa.getReconnectCount())) * 1000;
+			long delay;
+			switch(type) {
+				case IMMEDIATE :
+					delay = 0;
+					break;
+				case DEFAULT :
+				default :
+					delay = (long)Math.min(maxDelay,
+							Math.pow(2, qa.getReconnectCount())) * 1000;
+					break;
+			}
 			long reconTime = System.currentTimeMillis() + delay;
 
 			// Avoid potential condition where two connections are scheduled
@@ -548,12 +753,14 @@ public final class MemcachedConnection extends SpyObject {
 			reconnectQueue.put(reconTime, qa);
 
 			// Need to do a little queue management.
-			qa.setupResend(failureMode == FailureMode.Cancel);
+			qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT);
 
-			if(failureMode == FailureMode.Redistribute) {
-				redistributeOperations(qa.destroyInputQueue());
-			} else if(failureMode == FailureMode.Cancel) {
-				cancelOperations(qa.destroyInputQueue());
+			if (type == ReconnDelay.DEFAULT) {
+				if(failureMode == FailureMode.Redistribute) {
+					redistributeOperations(qa.destroyInputQueue());
+				} else if(failureMode == FailureMode.Cancel) {
+					cancelOperations(qa.destroyInputQueue());
+				}
 			}
 		}
 	}
@@ -600,6 +807,8 @@ public final class MemcachedConnection extends SpyObject {
 					getLogger().info("Reconnecting %s", qa);
 					ch=SocketChannel.open();
 					ch.configureBlocking(false);
+					ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
+					ch.socket().setReuseAddress(true);
 					int ops=0;
 					if(ch.connect(qa.getSocketAddress())) {
 						getLogger().info("Immediately reconnected to %s", qa);
@@ -635,7 +844,7 @@ public final class MemcachedConnection extends SpyObject {
 		}
 		// Requeue any fast-failed connects.
 		for(MemcachedNode n : rereQueue) {
-			queueReconnect(n);
+			queueReconnect(n, ReconnDelay.DEFAULT);
 		}
 	}
 
@@ -658,7 +867,17 @@ public final class MemcachedConnection extends SpyObject {
 	 */
 	public void addOperation(final String key, final Operation o) {
 		MemcachedNode placeIn=null;
+		/* ENABLE_REPLICATION if */
+		MemcachedNode primary = null;
+		if (this.arcusReplEnabled) {
+			primary = ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, getReplicaPick(o));
+		} else
+			primary = locator.getPrimary(key);
+		/* ENABLE_REPLICATION else */
+		/*
 		MemcachedNode primary = locator.getPrimary(key);
+		/*
+		/* ENABLE_REPLICATION end */
 		if(primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn=primary;
 		} else if(failureMode == FailureMode.Cancel) {
@@ -666,6 +885,18 @@ public final class MemcachedConnection extends SpyObject {
 			o.cancel();
 		} else {
 			// Look for another node in sequence that is ready.
+			/* ENABLE_REPLICATION if */
+			Iterator<MemcachedNode> iter = this.arcusReplEnabled 
+					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key, getReplicaPick(o))
+					: locator.getSequence(key);
+			for( ; placeIn == null && iter.hasNext(); ) {
+				MemcachedNode n=iter.next();
+				if(n.isActive()) {
+					placeIn=n;
+				}
+			}
+			/* ENABLE_REPLICATION else */
+			/*
 			for(Iterator<MemcachedNode> i=locator.getSequence(key);
 				placeIn == null && i.hasNext(); ) {
 				MemcachedNode n=i.next();
@@ -673,6 +904,8 @@ public final class MemcachedConnection extends SpyObject {
 					placeIn=n;
 				}
 			}
+			*/
+			/* ENABLE_REPLICATION end */
 			// If we didn't find an active node, queue it in the primary node
 			// and wait for it to come back online.
 			if(placeIn == null) {
@@ -689,6 +922,37 @@ public final class MemcachedConnection extends SpyObject {
 				+ key + " (and not immediately cancelled)";
 		}
 	}
+
+	/* ENABLE_REPLICATION if */
+	private ReplicaPick getReplicaPick(final Operation o) {
+		ReplicaPick pick = ReplicaPick.MASTER;
+		
+		if (o.isReadOperation()) {
+			ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
+			if (readPriority != null) {
+				if (readPriority == ReadPriority.SLAVE)
+					pick = ReplicaPick.SLAVE;
+				else if (readPriority == ReadPriority.RR)
+					pick = ReplicaPick.RR;
+			} else {
+				pick = getReplicaPick();
+			}
+		}
+
+		return pick;
+	}
+	
+	public ReplicaPick getReplicaPick() {
+		ReadPriority readPriority = f.getReadPriority();
+		ReplicaPick pick = ReplicaPick.MASTER;
+		
+		if (readPriority == ReadPriority.SLAVE)
+			pick = ReplicaPick.SLAVE;
+		else if (readPriority == ReadPriority.RR)
+			pick = ReplicaPick.RR;
+		return pick;
+	}
+	/* ENABLE_REPLICATION end */
 
 	public void insertOperation(final MemcachedNode node, final Operation o) {
 		o.setHandlingNode(node);
@@ -825,11 +1089,35 @@ public final class MemcachedConnection extends SpyObject {
      */
 	public MemcachedNode findNodeByKey(String key) {
 		MemcachedNode placeIn = null;
+		/* ENABLE_REPLICATION if */
+		MemcachedNode primary = null;
+		if (this.arcusReplEnabled) {
+			/* just used for arrange key */
+			primary = ((ArcusReplKetamaNodeLocator)locator).getPrimary(key, getReplicaPick());
+		} else
+			primary = locator.getPrimary(key);
+		/* ENABLE_REPLICATION else */
+		/*
 		MemcachedNode primary = locator.getPrimary(key);
+		/*
+		/* ENABLE_REPLICATION end */
+
 		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
 		} else {
+			/* ENABLE_REPLICATION if */
+			Iterator<MemcachedNode> iter = this.arcusReplEnabled
+					? ((ArcusReplKetamaNodeLocator)locator).getSequence(key,  getReplicaPick())
+					: locator.getSequence(key);
+			for ( ; placeIn == null	&& iter.hasNext(); ) {
+				MemcachedNode n = iter.next();
+				if (n.isActive()) {
+					placeIn = n;
+				}
+			}
+			/* ENABLE_REPLICATION else */
+			/*
 			for (Iterator<MemcachedNode> i = locator.getSequence(key); placeIn == null
 					&& i.hasNext();) {
 				MemcachedNode n = i.next();
@@ -837,6 +1125,8 @@ public final class MemcachedConnection extends SpyObject {
 					placeIn = n;
 				}
 			}
+			*/
+			/* ENABLE_REPLICATION end */
 			if (placeIn == null) {
 				placeIn = primary;
 			}

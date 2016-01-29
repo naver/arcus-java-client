@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeMutate;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionResponse;
@@ -74,7 +75,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	 * <result value>\r\n
 	 */
 	public void handleLine(String line) {
-				
+
 		OperationStatus status = null;
 
 		try {
@@ -94,7 +95,8 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	public void initialize() {
 		String cmd = collectionMutate.getCommand();
 		String args = collectionMutate.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(key.length() + subkey.length()
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ KeyUtil.getKeyBytes(subkey).length
 				+ cmd.length() + args.length() + 16);
 
 		setArguments(bb, cmd, key, subkey, args);
@@ -117,7 +119,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public String getSubKey() {
 		return subkey;
 	}

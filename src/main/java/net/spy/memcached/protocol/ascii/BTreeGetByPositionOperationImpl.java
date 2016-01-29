@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -97,7 +98,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 				// position counter
 				pos = get.isReversed() ? get.getPosTo() + count - 1 : get.getPosFrom();
 				posDiff = get.isReversed() ? -1 : 1;
-				
+
 				// start to read actual data
 				setReadType(OperationReadType.DATA);
 			}
@@ -166,13 +167,13 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -238,7 +239,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 		String cmd = get.getCommand();
 		String args = get.stringify();
 
-		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + key.length()
+		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + KeyUtil.getKeyBytes(key).length
 				+ args.length() + 16);
 
 		setArguments(bb, cmd, key, args);

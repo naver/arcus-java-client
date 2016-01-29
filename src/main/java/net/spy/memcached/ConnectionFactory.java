@@ -22,9 +22,11 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -199,4 +201,17 @@ public interface ConnectionFactory {
 	 * get front cache name
 	 */
 	String getFrontCacheName();
+
+	/* ENABLE_REPLICATION if */
+	/**
+	 * get read priority on replica nodes
+	 */
+	ReadPriority getReadPriority();
+
+	/**
+	 * get api read priority 
+	 * @return
+	 */
+	Map<APIType, ReadPriority> getAPIReadPriority();
+	/* ENABLE_REPLICATION end */
 }

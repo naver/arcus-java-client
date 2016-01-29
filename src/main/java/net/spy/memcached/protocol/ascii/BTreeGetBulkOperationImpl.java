@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -85,10 +86,10 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 			setReadType(OperationReadType.DATA);
 		} else {
 			OperationStatus status = matchStatus(line, END);
-			
+
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
-			
+
 			transitionState(OperationState.COMPLETE);
 			return;
 		}
@@ -108,7 +109,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				UNREADABLE);
 
 		getBulk.decodeKeyHeader(line);
-		
+
 		BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
 		cb.gotKey(chunk[1], (chunk.length > 3) ? Integer.valueOf(chunk[4]) : -1, status);
 	}
@@ -122,7 +123,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				// Handle spaces.
 				if (b == ' ') {
 					spaceCount++;
-					
+
 					String l = new String(byteBuffer.toByteArray());
 
 					if (l.startsWith("ELEMENT")) {
@@ -131,7 +132,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 								byteBuffer.write(b);
 								continue;
 							}
-	
+
 							getBulk.decodeItemHeader(l);
 							data = new byte[getBulk.getDataLength()];
 							byteBuffer.reset();
@@ -149,7 +150,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 				// Finish the operation.
 				if (b == '\n') {
 					String line = byteBuffer.toString();
-					
+
 					if (line.startsWith("VALUE")) {
 						readKey(line);
 						byteBuffer.reset();
@@ -227,7 +228,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 		String args = getBulk.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ getBulk.getCommaSeparatedKeys().length() + 16);
+				+ KeyUtil.getKeyBytes(getBulk.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 

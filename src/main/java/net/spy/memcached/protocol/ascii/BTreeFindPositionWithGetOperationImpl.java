@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
@@ -101,7 +102,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 			assert count > 0;
 			// position counter
 			pos = position - index;
-			posDiff = 1; 
+			posDiff = 1;
 
 			// start to read actual data
 			setReadType(OperationReadType.DATA);
@@ -162,13 +163,13 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 					data = null;
 					break;
 				}
-				
-				// Write to the result ByteBuffer 
+
+				// Write to the result ByteBuffer
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -179,7 +180,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 		}
-		
+
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
@@ -188,16 +189,16 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 			if (getLogger().isDebugEnabled()) {
 				getLogger().debug("Reading %d bytes", toRead);
 			}
-			
+
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;
 		}
-		
+
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
 			BTreeFindPositionWithGetOperation.Callback cb = (BTreeFindPositionWithGetOperation.Callback) getCallback();
 			cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
-			
+
 			// next position.
 			pos += posDiff;
 			lookingFor = '\r';
@@ -234,11 +235,12 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		String cmd = get.getCommand();
 		String args = get.stringify();
 
-		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + key.length() + args.length() + 16);
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ cmd.length() + args.length() + 16);
 		setArguments(bb, cmd, key, args);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
 			getLogger().debug("Request in ascii protocol: " + (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}

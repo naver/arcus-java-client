@@ -16,14 +16,20 @@
  */
 package net.spy.memcached;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationQueueFactory;
+import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.Transcoder;
@@ -76,6 +82,17 @@ public class ConnectionFactoryBuilder {
 	
 	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
+	/* ENABLE_REPLICATION if */
+	private boolean arcusReplEnabled = false;
+
+	private ReadPriority readPriority = ReadPriority.MASTER;
+	private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
+
+	public void setArcusReplEnabled(boolean b) {
+		arcusReplEnabled = b;
+	}
+	/* ENABLE_REPLICATION end */
+
 	/**
 	 * Set the operation queue factory.
 	 */
@@ -320,11 +337,70 @@ public class ConnectionFactoryBuilder {
 		return this;
 	}
 	
+	/* ENABLE_REPLICATION if */
+	/**
+	 * Set read prioirty for choosing replica node to read data
+	 */
+	public ConnectionFactoryBuilder setReadPriority(ReadPriority priority) {
+		readPriority = priority;
+		return this;
+	}
+
+	public ConnectionFactoryBuilder setAPIReadPriority(APIType apiType, ReadPriority readPriority) {
+		OperationType type = apiType.getAPIOpType();
+		
+		if (type == OperationType.READ || type == OperationType.RW) {
+			this.apiReadPriorityList.put(apiType, readPriority);
+		}
+		
+		return this;
+	}
+
+	public ConnectionFactoryBuilder setAPIReadPriority(Map<APIType, ReadPriority> apiList) {
+		this.apiReadPriorityList.clear();
+		
+		for (Map.Entry<APIType, ReadPriority> entry : apiList.entrySet()) {
+			OperationType type = entry.getKey().getAPIOpType();
+			if (type == OperationType.READ || type == OperationType.RW) {
+				this.apiReadPriorityList.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return this;
+	}
+	
+	public ConnectionFactoryBuilder clearAPIReadPirority() {
+		this.apiReadPriorityList.clear();
+		
+		return this;
+	}
+	
+	public ReadPriority getAPIReadPriority(APIType apiType) {
+		ReadPriority priority = this.apiReadPriorityList.get(apiType);
+		
+		return priority != null ? priority : ReadPriority.MASTER;
+	}
+	
+	public Map<APIType, ReadPriority> getAPIReadPriority() {
+		return this.apiReadPriorityList;
+	}
+	/* ENABLE_REPLICATION end */
+
 	/**
 	 * Get the ConnectionFactory set up with the provided parameters.
 	 */
 	public ConnectionFactory build() {
 		return new DefaultConnectionFactory() {
+
+			/* ENABLE_REPLICATION if */
+			@Override
+			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+				throws IOException {
+				MemcachedConnection c = super.createConnection(addrs);
+				c.setArcusReplEnabled(arcusReplEnabled);
+				return c;
+			}
+			/* ENABLE_REPLICATION end */
 
 			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
@@ -354,7 +430,23 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
+						/* ENABLE_REPLICATION if */
+						if (arcusReplEnabled) {
+							// Arcus repl cluster
+							// This locator uses ArcusReplKetamaNodeLocatorConfiguration
+							// which builds keys off the server's group name, not
+							// its ip:port.
+							return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
+						}
+						else {
+							// Arcus base cluster
+							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						}
+						/* ENABLE_REPLICATION else */
+						/*
 						return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						*/
+						/* ENABLE_REPLICATION end */
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);
 				}
@@ -480,6 +572,18 @@ public class ConnectionFactoryBuilder {
 			public String getFrontCacheName() {
 				return frontCacheName;
 			}
+
+			/* ENABLE_REPLICATION if */
+			@Override
+			public ReadPriority getReadPriority() {
+				return readPriority;
+			}
+			
+			@Override
+			public Map<APIType, ReadPriority> getAPIReadPriority() {
+				return apiReadPriorityList;
+			}
+			/* ENABLE_REPLICATION end */
 		};
 	}
 

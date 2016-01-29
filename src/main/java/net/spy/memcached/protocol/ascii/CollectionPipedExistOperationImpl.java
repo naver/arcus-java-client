@@ -102,7 +102,7 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 		} else {
 			OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
 					NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
-			
+
 			if (!status.isSuccess()) {
 				successAll = false;
 			}

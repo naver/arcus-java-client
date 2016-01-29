@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
@@ -37,13 +38,13 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to retrieve collection data in a memcached server.
  */
-public class CollectionGetOperationImpl extends OperationImpl 
+public class CollectionGetOperationImpl extends OperationImpl
 	implements CollectionGetOperation {
 
 	private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
 	private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);	
+			false, "collection canceled", CollectionResponse.CANCELED);
 
 	private static final OperationStatus END = new CollectionOperationStatus(
 			true, "END", CollectionResponse.END);
@@ -65,17 +66,17 @@ public class CollectionGetOperationImpl extends OperationImpl
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
-	
+
 	protected final String key;
 	protected final CollectionGet<?> collectionGet;
-	
+
 	protected int flags = 0;
 	protected int count = 0;
 	protected byte[] data = null;
 	protected int readOffset = 0;
 	protected byte lookingFor = '\0';
 	protected int spaceCount = 0;
-	
+
 	public CollectionGetOperationImpl(String key, CollectionGet<?> collectionGet,
 			OperationCallback cb) {
 		super(cb);
@@ -86,13 +87,13 @@ public class CollectionGetOperationImpl extends OperationImpl
 		else if (this.collectionGet instanceof SetGet)
 			setAPIType(APIType.SOP_GET);
 		else if (this.collectionGet instanceof BTreeGet)
-			setAPIType(APIType.BOP_GET); 
+			setAPIType(APIType.BOP_GET);
 		if (collectionGet.isDelete())
 			setOperationType(OperationType.WRITE);
 		else
 			setOperationType(OperationType.READ);
 	}
-	
+
 	/**
 	 * VALUE <flag> <count>\r\n
 	 */
@@ -100,13 +101,13 @@ public class CollectionGetOperationImpl extends OperationImpl
 		if (line.startsWith("VALUE ")) {
 			// Response header
 			getLogger().debug("Got line %s", line);
-			
+
 			String[] stuff = line.split(" ");
 			assert "VALUE".equals(stuff[0]);
-			
+
 			flags = Integer.parseInt(stuff[1]);
 			count = Integer.parseInt(stuff[2]);
-			
+
 			setReadType(OperationReadType.DATA);
 		} else {
 			OperationStatus status = matchStatus(line, END, TRIMMED, DELETED,
@@ -118,21 +119,21 @@ public class CollectionGetOperationImpl extends OperationImpl
 			return;
 		}
 	}
-	
+
 	@Override
 	public final void handleRead(ByteBuffer bb) {
 		// Decode a collection data header.
 		if (lookingFor == '\0' && data == null) {
 			for (int i=0; bb.remaining() > 0; i++) {
 				byte b = bb.get();
-				
+
 				// Handle spaces.
 				if (b == ' ') {
 					spaceCount++;
 					if (collectionGet.headerReady(spaceCount)) {
 						collectionGet.decodeItemHeader(new String(byteBuffer.toByteArray()));
 						byteBuffer.reset();
-						
+
 						if (collectionGet.headerReady(spaceCount)
 								&& collectionGet.eachRecordParseCompleted()) {
 //							if (collectionGet.getElementFlag() != null) {
@@ -145,7 +146,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 						}
 					}
 				}
-				
+
 				// Ready to finish.
 				if (b == '\r') {
 					continue;
@@ -157,19 +158,19 @@ public class CollectionGetOperationImpl extends OperationImpl
 							END, TRIMMED, DELETED, DELETED_DROPPED, NOT_FOUND,
 							NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
 							BKEY_MISMATCH, UNREADABLE);
- 
+
 					getLogger().debug("Get complete!");
 					getCallback().receivedStatus(status);
 					transitionState(OperationState.COMPLETE);
 					data = null;
 					break;
 				}
-				
+
 				byteBuffer.write(b);
 			}
 			return;
 		}
-		
+
 		// Read data
 		assert key != null;
 		assert data != null;
@@ -178,31 +179,31 @@ public class CollectionGetOperationImpl extends OperationImpl
 			: "readOffset is " + readOffset + " data.length is " + data.length;
 
 		getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
-		
+
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
 			toRead = Math.min(toRead, available);
-			
+
 			getLogger().debug("Reading %d bytes", toRead);
-			
+
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;
 		}
-		
+
 		if (lookingFor == '\0' && readOffset == data.length) {
 			CollectionGetOperation.Callback cb =
 				(CollectionGetOperation.Callback) getCallback();
 			cb.gotData(key, collectionGet.getSubkey(), flags, data);
 			lookingFor = '\r';
 		}
-		
+
 		if (lookingFor != '\0' && bb.hasRemaining()) {
 			do {
 				byte tmp = bb.get();
 				assert tmp == lookingFor : "Expecting " + lookingFor + ", got "
 					+ (char)tmp;
-				
+
 				switch (lookingFor) {
 				case '\r': lookingFor = '\n'; break;
 				case '\n': lookingFor = '\0'; break;
@@ -211,7 +212,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 						+ (char)lookingFor;
 				}
 			} while (lookingFor != '\0' && bb.hasRemaining());
-			
+
 			if (lookingFor == '\0') {
 				data = null;
 				readOffset = 0;
@@ -222,15 +223,15 @@ public class CollectionGetOperationImpl extends OperationImpl
 	public void initialize() {
 		String cmd = collectionGet.getCommand();
 		String args = collectionGet.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(key.length() +
-				cmd.length() + args.length() + 16);
-		
+		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+				+ cmd.length() + args.length() + 16);
+
 		setArguments(bb, cmd, key, args);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -239,7 +240,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(GET_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
