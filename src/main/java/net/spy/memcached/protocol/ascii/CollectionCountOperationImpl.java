@@ -75,7 +75,7 @@ public class CollectionCountOperationImpl extends OperationImpl implements
 			String[] stuff = line.split("=");
 			assert "COUNT".equals(stuff[0]);
 			count = Integer.parseInt(stuff[1]);
-			
+
 			getCallback().receivedStatus(
 					new CollectionOperationStatus(new OperationStatus(true,
 							String.valueOf(count))));

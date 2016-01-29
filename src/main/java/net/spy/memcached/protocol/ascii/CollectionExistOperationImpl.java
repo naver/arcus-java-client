@@ -42,7 +42,7 @@ public class CollectionExistOperationImpl extends OperationImpl
 
 	private static final OperationStatus EXIST_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
+
 	private static final OperationStatus EXIST = new CollectionOperationStatus(
 			true, "EXIST", CollectionResponse.EXIST);
 	private static final OperationStatus NOT_EXIST = new CollectionOperationStatus(
@@ -53,12 +53,12 @@ public class CollectionExistOperationImpl extends OperationImpl
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
-	
+
 	protected final String key;
 	protected final String subkey;
 	protected final CollectionExist<?> collectionExist;
 	protected final byte[] data;
-	
+
 	public CollectionExistOperationImpl(String key, String subkey,
 			CollectionExist<?> collectionExist, OperationCallback cb) {
 		super(cb);
@@ -94,9 +94,9 @@ public class CollectionExistOperationImpl extends OperationImpl
 		bb.put(CRLF);
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replaceAll("\\r\\n", ""));
 		}
 	}
@@ -105,11 +105,11 @@ public class CollectionExistOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(EXIST_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public String getSubKey() {
 		return subkey;
 	}
@@ -121,5 +121,5 @@ public class CollectionExistOperationImpl extends OperationImpl
 	public byte[] getData() {
 		return data;
 	}
-	
+
 }

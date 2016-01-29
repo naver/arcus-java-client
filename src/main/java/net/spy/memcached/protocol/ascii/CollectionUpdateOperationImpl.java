@@ -74,7 +74,7 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 		this.collectionUpdate = collectionUpdate;
 		this.data = data;
 		if (this.collectionUpdate instanceof BTreeUpdate)
-			setAPIType(APIType.BOP_UPDATE); 
+			setAPIType(APIType.BOP_UPDATE);
 		setOperationType(OperationType.WRITE);
 	}
 

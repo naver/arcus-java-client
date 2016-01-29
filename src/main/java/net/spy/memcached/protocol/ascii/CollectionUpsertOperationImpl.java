@@ -76,7 +76,7 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 		this.collectionStore = collectionStore;
 		this.data = data;
 		if (this.collectionStore instanceof BTreeUpsert)
-			setAPIType(APIType.BOP_UPSERT); 
+			setAPIType(APIType.BOP_UPSERT);
 		setOperationType(OperationType.WRITE);
 	}
 
