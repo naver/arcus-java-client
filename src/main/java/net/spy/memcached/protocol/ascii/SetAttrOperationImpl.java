@@ -36,23 +36,23 @@ class SetAttrOperationImpl extends OperationImpl
 		implements SetAttrOperation {
 
 	private static final int OVERHEAD = 64;
-	
+
 	private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
 			false, "collection canceled", CollectionResponse.CANCELED);
-	
-	private static final OperationStatus OK = 
+
+	private static final OperationStatus OK =
 		new CollectionOperationStatus(true, "OK", CollectionResponse.OK);
-	private static final OperationStatus NOT_FOUND = 
+	private static final OperationStatus NOT_FOUND =
 		new CollectionOperationStatus(false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus ATTR_ERROR_NOT_FOUND = 
+	private static final OperationStatus ATTR_ERROR_NOT_FOUND =
 		new CollectionOperationStatus(false, "ATTR_ERROR not found", CollectionResponse.ATTR_ERROR_NOT_FOUND);
-	private static final OperationStatus ATTR_ERROR_BAD_VALUE = 
+	private static final OperationStatus ATTR_ERROR_BAD_VALUE =
 		new CollectionOperationStatus(false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
-	
+
 	protected final String key;
 	protected final Attributes attrs;
 
-	public SetAttrOperationImpl(String key, Attributes attrs, 
+	public SetAttrOperationImpl(String key, Attributes attrs,
 			OperationCallback cb) {
 		super(cb);
 		this.key = key;
@@ -74,16 +74,16 @@ class SetAttrOperationImpl extends OperationImpl
 
 	@Override
 	public void initialize() {
-		ByteBuffer bb=ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length + 
+		ByteBuffer bb=ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length +
 			attrs.getLength() + OVERHEAD);
-		
+
 		setArguments(bb, "setattr", key, attrs);
-		
+
 		bb.flip();
 		setBuffer(bb);
-		
+
 		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: " 
+			getLogger().debug("Request in ascii protocol: "
 					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
 		}
 	}
@@ -92,11 +92,11 @@ class SetAttrOperationImpl extends OperationImpl
 	protected void wasCancelled() {
 		getCallback().receivedStatus(ATTR_CANCELED);
 	}
-	
+
 	public Collection<String> getKeys() {
 		return Collections.singleton(key);
 	}
-	
+
 	public Attributes getAttributes() {
 		return attrs;
 	}
