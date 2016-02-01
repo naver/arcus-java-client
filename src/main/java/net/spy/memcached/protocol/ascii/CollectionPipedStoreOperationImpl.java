@@ -91,6 +91,16 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			this.store.setNextOpIndex(index);
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		if (store.getItemCount() == 1) {
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
 					NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
@@ -102,12 +112,24 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 				cb.receivedStatus(FAILED_END);
 			}
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 
 		if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);
 

@@ -113,8 +113,20 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			getLogger().debug("Got line %s", line);
 		}
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else if (line.startsWith("VALUE ")) {
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		// VALUE <flags> <count>\r\n
 		if (line.startsWith("VALUE ")) {
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
+			// VALUE <flags> <count>\r\n
 			String[] stuff = line.split(" ");
 			assert stuff.length == 3;
 			assert "VALUE".equals(stuff[0]);
@@ -143,6 +155,12 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}

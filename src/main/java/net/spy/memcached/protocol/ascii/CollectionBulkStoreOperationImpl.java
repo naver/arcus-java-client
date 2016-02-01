@@ -89,9 +89,27 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			this.store.setNextOpIndex(index);
+			receivedMoveOperations(line);
+		} else if (line.startsWith("END") || store.getItemCount() == 1) {
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		if (line.startsWith("END") || store.getItemCount() == 1) {
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);

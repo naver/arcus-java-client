@@ -150,6 +150,13 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
 					}
 				}
 			}
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			if (getState() == OperationState.MOVING) {
+				break;
+			}
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 		}
 	}
 

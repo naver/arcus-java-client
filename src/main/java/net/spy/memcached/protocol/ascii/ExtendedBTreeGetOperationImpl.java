@@ -92,7 +92,18 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 	 * VALUE <flag> <count>\r\n
 	 */
 	public void handleLine(String line) {
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else if (line.startsWith("VALUE ")) {
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		if (line.startsWith("VALUE ")) {
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 			// Response header
 			getLogger().debug("Got line %s", line);
 
@@ -110,6 +121,12 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			// check switchovered operation for debug
+			checkMoved(line);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}

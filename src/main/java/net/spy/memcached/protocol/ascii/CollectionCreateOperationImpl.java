@@ -73,9 +73,26 @@ public class CollectionCreateOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		} else {
+			getCallback().receivedStatus(
+					matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
+			transitionState(OperationState.COMPLETE);
+			// check switchovered operation for debug
+			checkMoved(line);
+		}
+		/* ENABLE_REPLICATION else */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
+		/*
 		getCallback().receivedStatus(
 				matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
 		transitionState(OperationState.COMPLETE);
+		*/
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

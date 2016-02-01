@@ -281,6 +281,14 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 		}
 	}
 
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+	public void switchoverReplGroup(MemcachedReplicaGroup group) {
+		lock.lock();
+		group.changeRole();
+		lock.unlock();
+	}
+
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	private void updateHash(MemcachedReplicaGroup group, boolean remove) {
 		// Ketama does some special work with md5 where it reuses chunks.
 		for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
