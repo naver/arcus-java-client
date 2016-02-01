@@ -72,7 +72,7 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
 			rv=new OperationStatus(false, line);
 			/* ENABLE_REPLICATION if */
 			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-			getLogger().error("Don't expect operation status : %s", line);
+			getLogger().error("Unexpected operation status : %s", line);
 			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			/* ENABLE_REPLICATION end */
 		}
