@@ -62,8 +62,6 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
 		} else {
 			getCallback().receivedStatus(matchStatus(line, STORED));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

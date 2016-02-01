@@ -81,8 +81,6 @@ public class CollectionCreateOperationImpl extends OperationImpl
 			getCallback().receivedStatus(
 					matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

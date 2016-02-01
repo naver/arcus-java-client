@@ -59,8 +59,6 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
 			getCallback().receivedStatus(matchStatus(line,
 					STORED, NOT_FOUND, EXISTS));
 				transitionState(OperationState.COMPLETE);
-				// check switchovered operation for debug
-				checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

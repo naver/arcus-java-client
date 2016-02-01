@@ -79,12 +79,6 @@ public class CollectionExistOperationImpl extends OperationImpl
 				matchStatus(line, EXIST, NOT_EXIST, NOT_FOUND, NOT_FOUND,
 						TYPE_MISMATCH, UNREADABLE));
 		transitionState(OperationState.COMPLETE);
-		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-		// check switchovered operation for debug
-		checkMoved(line);
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

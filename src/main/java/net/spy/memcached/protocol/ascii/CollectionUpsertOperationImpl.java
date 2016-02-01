@@ -94,8 +94,6 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 							ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
 							TYPE_MISMATCH, BKEY_MISMATCH));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

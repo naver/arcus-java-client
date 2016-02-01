@@ -125,16 +125,6 @@ public abstract class BaseOperationImpl extends SpyObject {
 		getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
 		transitionState(OperationState.MOVING);
 	}
-
-	protected final void checkMoved(String result) {
-		if (this.moved) {
-			if (result.equals("SWITCHOVER") || result.equals("REPL_SLAVE")) {
-				getLogger().error("Operation moved error : %s - %s at %s", this, result, getHandlingNode());
-			} else {
-				getLogger().debug("Operation move completed : %s - %s at %s", this, result, getHandlingNode());
-			}
-		}
-	}
 	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
@@ -162,6 +152,12 @@ public abstract class BaseOperationImpl extends SpyObject {
 			cmd=null;
 		}
 		if(state == OperationState.COMPLETE) {
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			if (moved)
+				getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 			callback.complete();
 		}
 		if(state == OperationState.TIMEDOUT) {

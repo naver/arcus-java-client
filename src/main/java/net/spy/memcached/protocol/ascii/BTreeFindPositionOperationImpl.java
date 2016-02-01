@@ -105,12 +105,6 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
 		}
 
 		transitionState(OperationState.COMPLETE);
-		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-		// check switchovered operation for debug
-		checkMoved(line);
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

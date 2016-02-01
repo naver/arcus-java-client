@@ -92,8 +92,6 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 							NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
 							EFLAG_MISMATCH, SERVER_ERROR));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

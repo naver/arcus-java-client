@@ -104,12 +104,6 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 		/* ENABLE_REPLICATION end */
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
-			/* ENABLE_REPLICATION if */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-			// check switchovered operation for debug
-			checkMoved(line);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-			/* ENABLE_REPLICATION end */
 			return;
 		} else if (line.startsWith("RESPONSE ")) {
 			getLogger().debug("Got line %s", line);

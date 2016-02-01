@@ -121,12 +121,6 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
-			/* ENABLE_REPLICATION if */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-			// check switchovered operation for debug
-			checkMoved(line);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}

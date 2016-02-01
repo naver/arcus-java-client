@@ -81,8 +81,6 @@ final class MutatorOperationImpl extends OperationImpl
 				getCallback().receivedStatus(status);
 			}
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

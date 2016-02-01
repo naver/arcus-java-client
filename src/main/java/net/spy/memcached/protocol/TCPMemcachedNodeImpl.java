@@ -740,7 +740,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 		if (opCount > 0) {
 			toNode.addAllOpToInputQ(allOp);
-			getLogger().info("Total %d operations have been moved to %s", allOp.size(), toNode);
+			getLogger().info("Total %d operations have been moved to %s", opCount, toNode);
 		}
 
 		return opCount;

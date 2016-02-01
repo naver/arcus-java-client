@@ -75,8 +75,6 @@ class SetAttrOperationImpl extends OperationImpl
 					matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
 							ATTR_ERROR_BAD_VALUE));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */

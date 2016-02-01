@@ -32,12 +32,6 @@ final class VersionOperationImpl extends OperationImpl
 		getCallback().receivedStatus(
 				new OperationStatus(true, line.substring("VERSION ".length())));
 		transitionState(OperationState.COMPLETE);
-		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-		// check switchovered operation for debug
-		checkMoved(line);
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

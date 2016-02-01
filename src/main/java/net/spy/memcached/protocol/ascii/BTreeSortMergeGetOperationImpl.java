@@ -135,12 +135,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
-			/* ENABLE_REPLICATION if */
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-			// check switchovered operation for debug
-			checkMoved(line);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-			/* ENABLE_REPLICATION end */
 			return;
 		}
 	}
@@ -330,12 +324,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 						/* unexpected response */
 						getCallback().receivedStatus(status);
 						transitionState(OperationState.COMPLETE);
-						/* ENABLE_REPLICATION if */
-						/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-						// check switchovered operation for debug
-						checkMoved(byteBuffer.toString());
-						/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-						/* ENABLE_REPLICATION end */
 						return;
 					}
 					byteBuffer.reset();
@@ -382,12 +370,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 						/* unexpected response */
 						getCallback().receivedStatus(status);
 						transitionState(OperationState.COMPLETE);
-						/* ENABLE_REPLICATION if */
-						/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
-						// check switchovered operation for debug
-						checkMoved(byteBuffer.toString());
-						/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-						/* ENABLE_REPLICATION end */
 						return;
 					}
 					byteBuffer.reset();

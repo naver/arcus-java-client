@@ -58,8 +58,6 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
 		} else {
 			getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
 			transitionState(OperationState.COMPLETE);
-			// check switchovered operation for debug
-			checkMoved(line);
 		}
 		/* ENABLE_REPLICATION else */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
