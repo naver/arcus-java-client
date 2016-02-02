@@ -78,6 +78,15 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 
 		OperationStatus status = null;
 
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		try {
 			Long.valueOf(line);
 			getCallback().receivedStatus(new OperationStatus(true, line));

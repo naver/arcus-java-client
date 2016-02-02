@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.ops.Operation;
 
@@ -243,4 +244,16 @@ public interface MemcachedNode {
 	 * @return status string
 	 */
 	String getStatus();
+	/* ENABLE_REPLICATION if */
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+	void setReplicaGroup(MemcachedReplicaGroup g);
+
+	MemcachedReplicaGroup getReplicaGroup();
+
+	void addAllOpToInputQ(BlockingQueue<Operation> allOp);
+
+	int moveOperations(final MemcachedNode toNode);
+	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+	/* ENABLE_REPLICATION end */
 }

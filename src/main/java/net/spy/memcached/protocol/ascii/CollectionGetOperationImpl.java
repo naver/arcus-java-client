@@ -98,6 +98,15 @@ public class CollectionGetOperationImpl extends OperationImpl
 	 * VALUE <flag> <count>\r\n
 	 */
 	public void handleLine(String line) {
+		/* ENABLE_REPLICATION if */
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		if (line.startsWith("VALUE ")) {
 			// Response header
 			getLogger().debug("Got line %s", line);

@@ -107,6 +107,11 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 				successAll = false;
 			}
 			cb.gotStatus(index, status);
+			/* ENABLE_REPLICATION if */
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+			this.setPipedExist.setNextOpIndex(index);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+			/* ENABLE_REPLICATION end */
 			index++;
 		}
 	}
