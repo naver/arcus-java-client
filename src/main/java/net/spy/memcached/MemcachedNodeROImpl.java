@@ -199,7 +199,6 @@ class MemcachedNodeROImpl implements MemcachedNode {
 		throw new UnsupportedOperationException();
 	}
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	public void setReplicaGroup(MemcachedReplicaGroup g) {
 		throw new UnsupportedOperationException();
@@ -216,6 +215,5 @@ class MemcachedNodeROImpl implements MemcachedNode {
 	public int moveOperations(final MemcachedNode toNode) {
 		throw new UnsupportedOperationException();
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

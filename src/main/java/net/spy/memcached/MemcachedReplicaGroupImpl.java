@@ -38,10 +38,8 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 				this.masterNode = node;
 			else
 				this.slaveNode = node;
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 			node.setReplicaGroup(this);
-			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			return true;
 		} else {
 			return false;

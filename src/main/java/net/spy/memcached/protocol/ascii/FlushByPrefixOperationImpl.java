@@ -52,13 +52,11 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
 	public void handleLine(String line) {
 		getLogger().debug("Flush completed successfully");
 		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
 			return;
 		}
 
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
 		transitionState(OperationState.COMPLETE);

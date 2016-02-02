@@ -92,14 +92,12 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 			: "Read ``" + line + "'' when in " + getState() + " state";
 
 		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			this.store.setNextOpIndex(index);
 			receivedMoveOperations(line);
 			return;
 		}
 
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 		if (store.getItemCount() == 1) {
 			OperationStatus status = matchStatus(line, STORED, CREATED_STORED,

@@ -83,13 +83,11 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 		assert getState() == OperationState.READING : "Read ``" + line
 				+ "'' when in " + getState() + " state";
 		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
 			return;
 		}
 
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(
 				matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,

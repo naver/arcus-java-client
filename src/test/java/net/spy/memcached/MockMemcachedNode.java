@@ -160,7 +160,6 @@ public class MockMemcachedNode implements MemcachedNode {
 		return "MOCK_STATE";
 	}
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	@Override
 	public void setReplicaGroup(MemcachedReplicaGroup g) {
@@ -183,6 +182,5 @@ public class MockMemcachedNode implements MemcachedNode {
 		// noop
 		return 0;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

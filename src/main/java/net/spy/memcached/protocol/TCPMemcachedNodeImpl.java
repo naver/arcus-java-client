@@ -84,10 +84,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private boolean isFake = false;
 
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	private MemcachedReplicaGroup replicaGroup;
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 	public boolean isFake() {
 		return isFake;
@@ -683,7 +681,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		return sb.toString();
 	}
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	public void setReplicaGroup(MemcachedReplicaGroup g) {
 		replicaGroup = g;
@@ -745,6 +742,5 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 		return opCount;
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

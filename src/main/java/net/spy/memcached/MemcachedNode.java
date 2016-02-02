@@ -245,7 +245,6 @@ public interface MemcachedNode {
 	 */
 	String getStatus();
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	void setReplicaGroup(MemcachedReplicaGroup g);
 
@@ -254,6 +253,5 @@ public interface MemcachedNode {
 	void addAllOpToInputQ(BlockingQueue<Operation> allOp);
 
 	int moveOperations(final MemcachedNode toNode);
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 }

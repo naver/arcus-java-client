@@ -19,13 +19,7 @@ package net.spy.memcached;
 
 import net.spy.memcached.compat.SpyObject;
 
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 public abstract class MemcachedReplicaGroup extends SpyObject {
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-/*
-public abstract class MemcachedReplicaGroup {
-*/
-/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	protected final String group;
 	protected MemcachedNode masterNode;
 	protected MemcachedNode slaveNode;
