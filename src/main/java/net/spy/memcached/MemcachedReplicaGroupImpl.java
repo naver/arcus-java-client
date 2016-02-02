@@ -31,13 +31,17 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 	
 	public boolean setMemcachedNode(final MemcachedNode node) {
 		if (node == null)
-			return false;		
+			return false;
 
 		if (this.group.equals(getGroupNameForNode(node))) {
 			if (((ArcusReplNodeAddress)node.getSocketAddress()).master)
 				this.masterNode = node;
 			else
 				this.slaveNode = node;
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
+
+			node.setReplicaGroup(this);
+			/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 			return true;
 		} else {
 			return false;
