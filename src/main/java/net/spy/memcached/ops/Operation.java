@@ -47,7 +47,6 @@ public interface Operation {
 	OperationState getState();
 
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	/**
 	 * reset operation state to WRITING
 	 */
@@ -55,7 +54,6 @@ public interface Operation {
 
 	void setMoved(boolean s);
 
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 	/**
 	 * Get the write buffer for this operation.

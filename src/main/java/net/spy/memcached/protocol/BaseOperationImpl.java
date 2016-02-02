@@ -51,9 +51,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 	private OperationType opType = OperationType.UNDEFINED;
 	private APIType apiType = APIType.UNDEFINED;
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 	private boolean moved = false;
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	public BaseOperationImpl() {
@@ -108,7 +106,6 @@ public abstract class BaseOperationImpl extends SpyObject {
 		return state;
 	}
 	/* ENABLE_REPLICATION if */
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 	/**
 	 * reset operation state to WRITING
@@ -125,7 +122,6 @@ public abstract class BaseOperationImpl extends SpyObject {
 		getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
 		transitionState(OperationState.MOVING);
 	}
-	/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 	/* ENABLE_REPLICATION end */
 
 	public final ByteBuffer getBuffer() {
@@ -153,10 +149,8 @@ public abstract class BaseOperationImpl extends SpyObject {
 		}
 		if(state == OperationState.COMPLETE) {
 		/* ENABLE_REPLICATION if */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 			if (moved)
 				getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
 			callback.complete();
 		}
