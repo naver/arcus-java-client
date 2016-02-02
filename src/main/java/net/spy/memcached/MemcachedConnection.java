@@ -610,7 +610,6 @@ public final class MemcachedConnection extends SpyObject {
 			new IdentityHashMap<MemcachedNode, Boolean>();
 		final List<MemcachedNode> rereQueue=new ArrayList<MemcachedNode>();
 		SocketChannel ch = null;
-		String cause = null;
 		for(Iterator<MemcachedNode> i=
 				reconnectQueue.headMap(now).values().iterator(); i.hasNext();) {
 			final MemcachedNode qa=i.next();
