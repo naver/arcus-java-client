@@ -94,14 +94,12 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			this.store.setNextOpIndex(index);
 			receivedMoveOperations(line);
-		} else if (line.startsWith("END") || store.getItemCount() == 1) {
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		if (line.startsWith("END") || store.getItemCount() == 1) {
-		*/
+			return;
+		}
+
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
+		if (line.startsWith("END") || store.getItemCount() == 1) {
 			cb.receivedStatus((successAll)? END : FAILED_END);
 			transitionState(OperationState.COMPLETE);
 			return;

@@ -77,27 +77,16 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 	public void handleLine(String line) {
 
 		OperationStatus status = null;
+
 		/* ENABLE_REPLICATION if */
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else {
-			try {
-				Long.valueOf(line);
-				getCallback().receivedStatus(new OperationStatus(true, line));
-			} catch (NumberFormatException e) {
-				status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH,
-						UNREADABLE, NOT_FOUND_ELEMENT);
-
-				getLogger().debug(status);
-				getCallback().receivedStatus(status);
-			}
-
-			transitionState(OperationState.COMPLETE);
+			return;
 		}
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		try {
 			Long.valueOf(line);
 			getCallback().receivedStatus(new OperationStatus(true, line));
@@ -110,9 +99,6 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 		}
 
 		transitionState(OperationState.COMPLETE);
-		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	public void initialize() {

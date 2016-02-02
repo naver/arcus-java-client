@@ -96,14 +96,12 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else if (line.startsWith("VALUE ")) {
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		if (line.startsWith("VALUE ")) {
-		*/
+			return;
+		}
+
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
+		if (line.startsWith("VALUE ")) {
 			// Response header
 			getLogger().debug("Got line %s", line);
 

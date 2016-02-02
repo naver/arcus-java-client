@@ -83,24 +83,16 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else {
-			OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
-					NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
-					BKEY_MISMATCH);
-			getCallback().receivedStatus(status);
-			transitionState(OperationState.COMPLETE);
+			return;
 		}
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
 				NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
 				BKEY_MISMATCH);
 		getCallback().receivedStatus(status);
 		transitionState(OperationState.COMPLETE);
-		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

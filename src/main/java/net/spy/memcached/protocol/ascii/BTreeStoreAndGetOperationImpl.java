@@ -117,16 +117,13 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else if (line.startsWith("VALUE ")) {
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		// VALUE <flags> <count>\r\n
-		if (line.startsWith("VALUE ")) {
-		*/
+			return;
+		}
+
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
-			// VALUE <flags> <count>\r\n
+		// VALUE <flags> <count>\r\n
+		if (line.startsWith("VALUE ")) {
 			String[] stuff = line.split(" ");
 			assert stuff.length == 3;
 			assert "VALUE".equals(stuff[0]);

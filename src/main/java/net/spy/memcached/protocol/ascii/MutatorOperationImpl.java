@@ -71,20 +71,10 @@ final class MutatorOperationImpl extends OperationImpl
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else {
-			OperationStatus status=null;
-			try {
-				Long.valueOf(line);
-				getCallback().receivedStatus(new OperationStatus(true, line));
-			} catch (NumberFormatException e) {
-				status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
-				getCallback().receivedStatus(status);
-			}
-			transitionState(OperationState.COMPLETE);
 		}
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
+
+		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
+		/* ENABLE_REPLICATION end */
 		OperationStatus status=null;
 		try {
 			Long.valueOf(line);
@@ -94,9 +84,6 @@ final class MutatorOperationImpl extends OperationImpl
 			getCallback().receivedStatus(status);
 		}
 		transitionState(OperationState.COMPLETE);
-		*/
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
-		/* ENABLE_REPLICATION end */
 	}
 
 	@Override

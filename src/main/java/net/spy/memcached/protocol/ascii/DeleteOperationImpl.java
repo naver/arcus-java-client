@@ -43,18 +43,13 @@ final class DeleteOperationImpl extends OperationImpl
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
 			receivedMoveOperations(line);
-		} else {
-			getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
-			transitionState(OperationState.COMPLETE);
+			return;
 		}
-		/* ENABLE_REPLICATION else */
-		/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
-		/*
-		getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
-		transitionState(OperationState.COMPLETE);
-		*/
+
 		/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 		/* ENABLE_REPLICATION end */
+		getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
+		transitionState(OperationState.COMPLETE);
 	}
 
 	@Override

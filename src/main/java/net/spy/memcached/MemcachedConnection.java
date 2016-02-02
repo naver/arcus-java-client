@@ -305,7 +305,7 @@ public final class MemcachedConnection extends SpyObject {
 							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
 							/* move operation old master -> new master */
-							oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 							/*
@@ -320,7 +320,7 @@ public final class MemcachedConnection extends SpyObject {
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 							/* move operation slave -> master */
-							oldGroup.getSlaveNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getSlaveNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						} else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
@@ -330,7 +330,7 @@ public final class MemcachedConnection extends SpyObject {
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 							/* move operation master -> slave */
-							oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						} else {
@@ -344,10 +344,10 @@ public final class MemcachedConnection extends SpyObject {
 							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
 							/* move operation old master -> new master */
-							oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 							/* move operation old slave -> new master */
-							oldGroup.getSlaveNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getSlaveNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newMasterNode));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 							/*
@@ -371,7 +371,7 @@ public final class MemcachedConnection extends SpyObject {
 							attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
 							/* move operation old master -> new master */
-							queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "To move operations except read state.");
+							queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 							/*
@@ -395,7 +395,7 @@ public final class MemcachedConnection extends SpyObject {
 
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 							/* move operation old master -> new master */
-							oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+							oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 							taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 							/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 						}
@@ -413,7 +413,7 @@ public final class MemcachedConnection extends SpyObject {
 								attachNodes.add(newSlaveNode = attachMemcachedNode(newGroupAddrs.get(1)));
 
 								/* move operation old slave -> new slave */
-								oldGroup.getSlaveNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getSlaveNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP else */
 								/*
@@ -428,7 +428,7 @@ public final class MemcachedConnection extends SpyObject {
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 								/* move operation master -> slave */
-								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "To move operations except read state.");
+								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else {
@@ -439,7 +439,7 @@ public final class MemcachedConnection extends SpyObject {
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 								/* move operation old master -> old slave */
-								oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							}
@@ -456,11 +456,11 @@ public final class MemcachedConnection extends SpyObject {
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 								/* move operation old master -> new master */
-								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "To move operations except read state.");
+								queueReconnect(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
 								/* move operation old slave -> old master(slave) */
-								oldGroup.getSlaveNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getSlaveNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
@@ -473,7 +473,7 @@ public final class MemcachedConnection extends SpyObject {
 								attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
 								/* move operation old master -> new master */
-								oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							} else {
@@ -491,11 +491,11 @@ public final class MemcachedConnection extends SpyObject {
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP if */
 
 								/* move operation old master -> new master */
-								oldGroup.getMasterNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getMasterNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
 								/* move operation old slave -> new slave */
-								oldGroup.getSlaveNode().setupResend(false, "To move operations except read state.");
+								oldGroup.getSlaveNode().setupResend(false, "Discarded all pending reading state operation to move operations.");
 								taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
 								/* WHCHOI83_MEMCACHED_REPLICA_GROUP end */
 							}
@@ -603,7 +603,7 @@ public final class MemcachedConnection extends SpyObject {
 				node.moveOperations(group.getMasterNode());
 				addedQueue.offer(group.getMasterNode());
 			}
-			queueReconnect(node, ReconnDelay.IMMEDIATE, "To move operations except read state.");
+			queueReconnect(node, ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations.");
 		} else {
 			getLogger().warn("Delay switchover because invalid group state : " + group);
 		}
