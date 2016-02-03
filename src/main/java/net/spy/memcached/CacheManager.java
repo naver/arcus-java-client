@@ -95,7 +95,7 @@ public class CacheManager extends SpyThread implements Watcher,
 	public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
 
 	/* ENABLE_REPLICATION if */
-	private boolean arcusReplEnabled = false;
+	private final boolean arcusReplEnabled;
 	/* ENABLE_REPLICATION end */
 
 	public CacheManager(String hostPort, String serviceCode,
@@ -108,6 +108,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		this.clientInitLatch = clientInitLatch;
 		this.poolSize = poolSize;
 		this.waitTimeForConnect = waitTimeForConnect;
+		this.arcusReplEnabled = cfb.getArcusReplEnabled();
 
 		initZooKeeperClient();
 
@@ -122,7 +123,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	private void initZooKeeperClient() {
 		try {
 			getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
-			
+
+			String cacheListZPath;
 			zkInitLatch = new CountDownLatch(1);
 			zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
 
@@ -142,17 +144,12 @@ public class CacheManager extends SpyThread implements Watcher,
 				/* ENABLE_REPLICATION if */
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
-				if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-					arcusReplEnabled = true;
-					cfb.setArcusReplEnabled(true);
-					getLogger().info("Connecting to Arcus repl cluster");
-				}
-				else if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-					arcusReplEnabled = false;
-					cfb.setArcusReplEnabled(false);
-				}
-				else {
-					getLogger().fatal("Service code not found. (" + serviceCode + ")");
+				cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH :
+													ARCUS_BASE_CACHE_LIST_ZPATH;
+				if (zk.exists(cacheListZPath + serviceCode, false) != null) {
+					getLogger().info("Connecting to Arcus %scluster", arcusReplEnabled ? "replication " : "");
+				} else {
+					getLogger().fatal("Arcus %s cluster not found for %s service.", arcusReplEnabled ? "replication " : "", serviceCode);
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* ENABLE_REPLICATION else */
@@ -192,8 +189,6 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION if */
-			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH
-                                                     : ARCUS_BASE_CACHE_LIST_ZPATH;
 			cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			/*
