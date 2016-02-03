@@ -122,7 +122,10 @@ public class CacheManager extends SpyThread implements Watcher,
 	private void initZooKeeperClient() {
 		try {
 			getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
-			
+			/* CONFIGURE_REPLICATION if */
+
+			String cacheListZPath;
+			/* CONFIGURE_REPLICATION end */
 			zkInitLatch = new CountDownLatch(1);
 			zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
 
@@ -142,6 +145,18 @@ public class CacheManager extends SpyThread implements Watcher,
 				/* ENABLE_REPLICATION if */
 				// Check /arcus_repl/cache_list/{svc} first
 				// If it exists, the service code belongs to a repl cluster
+				/* CONFIGURE_REPLICATION if */
+				arcusReplEnabled = cfb.getArcusReplEnabled();
+				cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH :
+													ARCUS_BASE_CACHE_LIST_ZPATH;
+				if (zk.exists(cacheListZPath + serviceCode, false) != null) {
+					getLogger().info("Connecting to Arcus %scluster", arcusReplEnabled ? "replication " : "");
+				} else {
+					getLogger().fatal("Service code for Arcus %s cluster not found.", serviceCode);
+					throw new NotExistsServiceCodeException(serviceCode);
+				}
+				/* CONFIGURE_REPLICATION else */
+				/*
 				if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
 					arcusReplEnabled = true;
 					cfb.setArcusReplEnabled(true);
@@ -155,6 +170,8 @@ public class CacheManager extends SpyThread implements Watcher,
 					getLogger().fatal("Service code not found. (" + serviceCode + ")");
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
+				*/
+				/* CONFIGURE_REPLICATION end */
 				/* ENABLE_REPLICATION else */
 				/*
 				if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) == null) {
@@ -192,8 +209,12 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 
 			/* ENABLE_REPLICATION if */
+			/* CONFIGURE_REPLICATION if */
+			/*
 			String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH
                                                      : ARCUS_BASE_CACHE_LIST_ZPATH;
+			*/
+			/* CONFIGURE_REPLICATION end */
 			cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
 			/* ENABLE_REPLICATION else */
 			/*
