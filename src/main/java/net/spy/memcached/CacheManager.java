@@ -152,7 +152,7 @@ public class CacheManager extends SpyThread implements Watcher,
 				if (zk.exists(cacheListZPath + serviceCode, false) != null) {
 					getLogger().info("Connecting to Arcus %scluster", arcusReplEnabled ? "replication " : "");
 				} else {
-					getLogger().fatal("Service code not found. (" + serviceCode + ")");
+					getLogger().fatal("Service code for Arcus %s cluster not found.", serviceCode);
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* CONFIGURE_REPLICATION else */
