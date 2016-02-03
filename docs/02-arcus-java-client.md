@@ -246,38 +246,44 @@ ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 
 Arcus client 사용 시에 ArcusClient 자체 logger(DefaultLogger), log4j, JDK logger 등
 3가지 종류의 Logger를 사용할 수 있다.
-Logger 지정이 없으면 ArcusClient는 DefaultLogger를 기본으로 사용하며,
-이 logger는 매우 많은 로그를 출력하는 특징이 있다.
+사용할 logger를 지정하지 않으면 ArcusClient는 DefaultLogger를 기본으로 사용하며,
+DefaultLogger는 INFO level 이상의 로그를 stderr (System.err) 로 출력한다. (변경 불가)
 
-log4j를 사용하여 ArcusClient 로그를 관리하려면, 다음의 옵션을 WAS나 자바 프로세스 옵션에 추가하면 된다. 
-단, log4j 라이브러리가 클래스 패스에 있어야 오류가 발생하지 않는다.
-log4j 설정 파일은 [log4j 설정 방법](http://logging.apache.org/log4j/1.2/manual.html)을 확인하기 바란다. 
-
+log4j를 사용하여 ArcusClient 로그를 관리하려면, 아래 옵션을 WAS나 자바 프로세스 옵션에 추가하여
+JVM 구동시 System property를 지정한다. (log4j 라이브러리가 클래스 패스에 있어야 오류가 발생하지 않는다.)
 ```
 -Dnet.spy.log.LoggerImpl=net.spy.memcached.compat.log.Log4JLogger
 ```
-
-또한, ArcusClient, ArcusClientPool을 사용하기 전에 System property를 설정해야 한다.
+또는, 소스 코드에서 ArcusClient / ArcusClientPool을 사용하기 전에 직접 System property를 설정하여 사용할 수 있다. (programmatic configuration)
 
 ```java
 System.setProperty(“net.spy.log.LoggerImpl”, “net.spy.memcached.compat.log.Log4JLogger”);
+...
 ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 ```
+Arcus Java client에서는 Log를 기록할 때 Class의 이름(```clazz.getName()```)을 기준으로 Logger를 구분하여 사용하며,
+class의 이름과 정확히 일치하는 로거가 없다면 logger tree 상의 상위 logger 를 사용한다.
 
-응용을 디버깅을 해야 할 때 Arcus client에서 Arcus server로 전송하는 ascii protocol 문자열이 궁금할 때가 있다.
-Arcus Java Client에서 Arcus server로 전송하는 protocol을 로그로 살펴보려면 아래와 같이 logger를 설정하면 된다.
-
-아래 예제는 Log4j를 Arcus Java client의 logger로 사용할 때의 예제이다.
-예제에 나열된 logger를 모두 설정하면 요청(get, set 등..)별로 모든 로그가 남게 되니
-필요한 요청에 해당하는 logger만 설정하면 편리하다.
+아래의 예제는 ```root``` logger 의 level을 ```WARN```으로 설정하여 WARN level 이상의 로그는 항상 기록하고, ```net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl``` class의 로그만 DEBUG level 이상의 로그를 기록하도록 한 예제이다.
+```xml
+<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
+  <level value="DEBUG" />
+  <appender-ref ref="console" />
+</logger>
+<root>
+  <level value="WARN" />
+  <appender-ref ref="console" />
+</root>
+```
+Application을 디버깅해야 할 때 Arcus client에서 Arcus server로 전송하는 ascii protocol 문자열이 궁금할 때가 있다. Arcus Java Client에서 Arcus server로 전송하는 protocol을 로그로 살펴보려면 아래와 같이 logger를 설정하면 된다.
+예제에 나열된 logger를 모두 설정하면 요청(get, set 등..)별로 모든 로그가 남게 되니 필요한 요청에 해당하는 logger만 설정하면 편리하다.
 Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](https://github.com/naver/arcus-memcached/blob/master/doc/arcus-ascii-protocol.md) 문서를 참고하기 바란다.
-
 ```xml
 <!-- collection update -->
 <logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
+  <level value="DEBUG" />
+  <appender-ref ref="console" />
 </logger>
 
 <!-- collection piped exist -->
@@ -328,6 +334,8 @@ Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](
 <appender-ref ref="console" />
 </logger>
 ```
+
+기타 log4j의 자세한 설정 방법은 [log4j 설정 방법](http://logging.apache.org/log4j/1.2/manual.html)을 확인하기 바란다. 
 
 ##### Transparent Front Cache 사용
 
