@@ -88,9 +88,20 @@ public class ConnectionFactoryBuilder {
 	private ReadPriority readPriority = ReadPriority.MASTER;
 	private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
 
-	public void setArcusReplEnabled(boolean b) {
-		arcusReplEnabled = b;
+	/* CONFIGURE_REPLICATION if */
+	/**
+	 * use ARCUS replication
+	 * @param enable
+	 */
+	public ConnectionFactoryBuilder setArcusReplEnabled(boolean enable) {
+		arcusReplEnabled = enable;
+		return this;
 	}
+
+	public boolean getArcusReplEnabled() {
+		return arcusReplEnabled;
+	}
+	/* CONFIGURE_REPLICATION end */
 	/* ENABLE_REPLICATION end */
 
 	/**
