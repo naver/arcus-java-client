@@ -1,3 +1,12 @@
+2016-02-04 [version 1.9.3]
+	* Add cancel message to detect the cancel cause.
+	* More correct error handling in getting/creating the client_info znode.
+	* Fix a bug in getting socket address after DNS reverse lookup.
+	* Cancel all operations given on the memcached node that leave from cluster.
+	* Calculate the length of key string after translate it to byte array.
+	* Add immediate reconnect for OperationException (delay=0).
+	* Apply SPY-162 patch that "Also respect nagle setting on reconnect".
+
 2015-11-09 [version 1.9.2] stable
 	* Fix a mistake in compareTo of SMGetElement and SMGetTrimKey.
 	* Fix a bug in sort-merge logic when unique bkeys are requested.
