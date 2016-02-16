@@ -29,7 +29,9 @@ public class Element<T> {
 	private final T value;
 	private final byte[] eflag;
 	private final ElementFlagUpdate elementFlagUpdate;
+	private final String field;
 
+	private final boolean isBtreeMode;
 	private final boolean isByteArraysBkey;
 	
 	/**
@@ -46,6 +48,8 @@ public class Element<T> {
 		this.eflag = eflag;
 		this.isByteArraysBkey = true;
 		this.elementFlagUpdate = null;
+		this.field = null;
+		this.isBtreeMode = true;
 	}
 	
 	public Element(long bkey, T value, byte[] eflag) {
@@ -55,6 +59,8 @@ public class Element<T> {
 		this.eflag = eflag;
 		this.isByteArraysBkey = false;
 		this.elementFlagUpdate = null;
+		this.field = null;
+		this.isBtreeMode = true;
 	}
 
 	public Element(byte[] bkey, T value, ElementFlagUpdate elementFlagUpdate) {
@@ -64,6 +70,8 @@ public class Element<T> {
 		this.eflag = null;
 		this.isByteArraysBkey = true;
 		this.elementFlagUpdate = elementFlagUpdate;
+		this.field = null;
+		this.isBtreeMode = true;
 	}
 
 	public Element(long bkey, T value, ElementFlagUpdate elementFlagUpdate) {
@@ -73,8 +81,22 @@ public class Element<T> {
 		this.eflag = null;
 		this.isByteArraysBkey = false;
 		this.elementFlagUpdate = elementFlagUpdate;
+		this.field = null;
+		this.isBtreeMode = true;
 	}
 
+	public Element(String field, T value) {
+		this.field = field;
+		this.value = value;
+
+		this.bkey = null;
+		this.longBkey = null;
+		this.eflag = null;
+		this.isByteArraysBkey = false;
+		this.elementFlagUpdate = null;
+		this.isBtreeMode = false;
+
+	}
 	/**
 	 * get value of element flag by hex.
 	 * 
@@ -145,20 +167,32 @@ public class Element<T> {
 	public ElementFlagUpdate getElementFlagUpdate() {
 		return elementFlagUpdate;
 	}
-	
+
+	/**
+	 * get field in map op.
+	 * @return field
+	 */
+	public String getField() { return field; }
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ \"");
-		if (isByteArraysBkey) {
-			sb.append(getBkeyByHex());
+		if (isBtreeMode) {
+			if (isByteArraysBkey) {
+				sb.append(getBkeyByHex());
+			} else {
+				sb.append(getLongBkey());
+			}
 		} else {
-			sb.append(getLongBkey());
+			sb.append(getField());
 		}
 		sb.append("\" : { ");
-		
-		sb.append(" \"eflag\" : \"").append(BTreeUtil.toHex(eflag)).append("\"");
-		sb.append(",");
+
+		if (isBtreeMode) {
+			sb.append(" \"eflag\" : \"").append(BTreeUtil.toHex(eflag)).append("\"");
+			sb.append(",");
+		}
 		sb.append(" \"value\" : \"").append(value.toString()).append("\"");
 		sb.append(" }");
 		

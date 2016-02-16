@@ -36,7 +36,11 @@ public enum CollectionType {
 	/**
 	 * B+ tree collection
 	 */
-	btree("b+tree")
+	btree("b+tree"),
+	/**
+	 * Map collection
+	 */
+	map("map")
 	;
 	
 	String stringValue;

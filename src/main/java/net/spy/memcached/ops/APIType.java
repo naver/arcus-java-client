@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.ops;
 
+import javax.crypto.spec.OAEPParameterSpec;
+
 /* for Operation API String */
 public enum APIType {
 	// KV API Type
@@ -52,7 +54,14 @@ public enum APIType {
 	BOP_GBP(OperationType.READ),
 	BOP_PWG(OperationType.READ),
 	BOP_DELETE(OperationType.WRITE),
-	
+
+	// Map API Type
+	MOP_CREATE(OperationType.WRITE),
+	MOP_INSERT(OperationType.WRITE),
+	MOP_UPDATE(OperationType.WRITE),
+	MOP_DELETE(OperationType.WRITE),
+	MOP_GET(OperationType.RW),
+
 	// Attribute API Type
 	SETATTR(OperationType.WRITE), GETATTR(OperationType.READ),
 	

@@ -19,7 +19,7 @@ package net.spy.memcached.collection;
 public class ListDelete<T> extends CollectionDelete<T> {
 
 	private static final String command = "lop delete";
-	
+
 	public ListDelete(int index, boolean noreply) {
 		this.range = String.valueOf(index);
 		this.noreply = noreply;
@@ -29,7 +29,7 @@ public class ListDelete<T> extends CollectionDelete<T> {
 		this(index, noreply);
 		this.dropIfEmpty = dropIfEmpty;
 	}
-	
+
 	public ListDelete(int from, int to, boolean noreply) {
 		this.range = String.valueOf(from) + ".." + String.valueOf(to);
 		this.noreply = noreply;
@@ -39,27 +39,28 @@ public class ListDelete<T> extends CollectionDelete<T> {
 		this(from, to, noreply);
 		this.dropIfEmpty = dropIfEmpty;
 	}
-	
+
 	public String stringify() {
 		if (str != null) return str;
-		
+
 		StringBuilder b = new StringBuilder();
 		b.append(range);
-		
+
 		if (dropIfEmpty) {
 			b.append(" drop");
 		}
-		
+
 		if (noreply) {
 			b.append(" noreply");
 		}
-		
+
 		str = b.toString();
 		return str;
 	}
-	
+
 	public String getCommand() {
 		return command;
 	}
 
 }
+

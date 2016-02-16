@@ -26,6 +26,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.ListStore;
 import net.spy.memcached.collection.SetStore;
+import net.spy.memcached.collection.MapStore;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionStoreOperation;
@@ -80,6 +81,8 @@ public class CollectionStoreOperationImpl extends OperationImpl
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.collectionStore instanceof BTreeStore)
 			setAPIType(APIType.BOP_INSERT);
+		else if (this.collectionStore instanceof MapStore)
+			setAPIType(APIType.MOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 

@@ -17,6 +17,7 @@
 package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.List;
 
 import net.spy.memcached.CachedData;
@@ -128,6 +129,76 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
 						(i < kSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+	public static class MapBulkStore<T> extends CollectionBulkStore<T> {
+
+		private static final String COMMAND = "mop insert";
+		private final String field;
+
+		public MapBulkStore(List<String> keyList, T field, T value,
+							 CollectionAttributes attr, Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.field = String.valueOf(field);
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// estimate the buffer capacity
+			int eachExtraSize = String.valueOf(field).length()
+					+ cachedData.getData().length + 64;
+			for (String eachKey : keyList) {
+				capacity += KeyUtil.getKeyBytes(eachKey).length;
+			}
+			capacity += eachExtraSize * keyList.size();
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			Iterator<String> iterator = keyList.iterator();
+
+			while (iterator.hasNext()) {
+				String key = iterator.next();
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						field,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(iterator.hasNext()) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}
