@@ -199,7 +199,44 @@ public interface ArcusClientIF {
 	 */
 	public abstract Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
 			List<String> keyList, long bkey, byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
-	
+
+	/**
+	 * Insert one item into multiple map at once.
+	 *
+	 * @param keyList
+	 *            key list of map
+	 * @param field
+	 *            field of map.
+	 * @param value
+	 * 			  value of map
+	 * @param attributesForCreate
+	 *            create a b+tree with this attributes, if given key is not
+	 *            exists.
+	 * @param tc
+	 *            transcoder to encode value
+	 * @return a future indicating success
+	 */
+	public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, T field, T value, CollectionAttributes attributesForCreate,
+			Transcoder<T> tc);
+
+	/**
+	 * Insert one item into multiple map at once.
+	 *
+	 * @param keyList
+	 *            key list of map
+	 * @param field
+	 *            field of map.
+	 * @param value
+	 * 			  value of map
+	 * @param attributesForCreate
+	 *            create a b+tree with this attributes, if given key is not
+	 *            exists.
+	 * @return a future indicating success
+	 */
+	public abstract Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, Object field, Object value, CollectionAttributes attributesForCreate);
+
 	/**
 	 * Insert a value into each list
 	 *  
@@ -343,6 +380,20 @@ public interface ArcusClientIF {
 			ElementValueType valueType, CollectionAttributes attributes);
 
 	/**
+	 * Create an empty map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param type
+	 *            element data type of the map
+	 * @param attributes
+	 *            attributes of the map
+	 * @return a future indicating success, false if there was a key
+	 */
+	public CollectionFuture<Boolean> asyncMopCreate(String key,
+			ElementValueType type, CollectionAttributes attributes);
+
+	/**
 	 * Create an empty set
 	 * 
 	 * @param key
@@ -451,6 +502,65 @@ public interface ArcusClientIF {
 	public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
 			long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+
+	/**
+	 * Retrieves an item on given fieldList in the map.
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param fieldList
+	 *            fieldList
+	 * @param withDelete
+	 *            true to remove the returned item in the b+tree
+	 * @param dropIfEmpty
+	 *            false to remove the key when all elements are removed. true b+
+	 *            tree will remain empty even if all the elements are removed
+	 * @return a future that will hold the return value map of the fetch.
+	 */
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			List<Object> fieldList, boolean withDelete, boolean dropIfEmpty);
+
+	/**
+	 * Retrieves count all items in given fieldList
+	 * The returned map from the future should be sorted by the given range.
+	 *
+	 * @param key key of a map
+	 * @param count number of returning values (all)
+	 * @param withDelete true to remove the returned item in the map
+	 * @param dropIfEmpty false to remove the key when all elements are removed. true map will remain empty even if all the elements are removed
+	 * @return a future that will hold the return value map of the fetch
+	 */
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			int count, boolean withDelete, boolean dropIfEmpty);
+
+	/**
+	 * Retrieves an item on given fieldList in the map
+	 *
+	 * @param <T>
+	 * @param key key of a map
+	 * @param fieldList fieldList
+	 * @param withDelete true to remove the returned item in the b+tree
+	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param tc a transcoder to decode returned values
+	 * @return a future that will hold the return value map of the fetch.
+	 */
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+		    List<T> fieldList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+
+	/**
+	 * Retrieves count of all items in given fieldList(0)
+	 * The returned map from the future should be sorted by the given range.
+	 *
+	 * @param <T>
+	 * @param key key of a map
+	 * @param count number of returning values (all)
+	 * @param withDelete true to remove the returned item in the b+tree
+	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param tc a transcoder to decode returned values
+	 * @return a future that will hold the return value map of the fetch
+	 */
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+		    int count, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
 
 	/**
 	 * Retrieves an item on given index in the list.
@@ -584,7 +694,29 @@ public interface ArcusClientIF {
 	 */
 	public CollectionFuture<Boolean> asyncBopDelete(String key,
 			byte[] bkey, ElementFlagFilter eFlagFilter, boolean dropIfEmpty);
-	
+
+	/**
+	 * Deletes an item on given index in the map.
+	 *
+	 * @param key key of a list
+	 * @param count all field, element delete(all == 0)
+	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @return whether or not the operation was performed
+	 */
+	public CollectionFuture<Boolean> asyncMopDelete(String key, int count,
+			boolean dropIfEmpty);
+
+	/**
+	 * Deletes items on given index range(fieldList) in the map.
+	 *
+	 * @param key key of a list
+	 * @param fieldList field list to delete
+	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @return whether or not the operation was performed
+	 */
+	public CollectionFuture<Boolean> asyncMopDelete(String key, List<Object> fieldList,
+			boolean dropIfEmpty);
+
 	/**
 	 * Deletes an item on given index in the list.
 	 *  
@@ -668,6 +800,23 @@ public interface ArcusClientIF {
 			byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
 
 	/**
+	 * Inserts an item into the map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param field
+	 *            key of a map node
+	 * @param value
+	 *            a value to insert into the map
+	 * @param attributesForCreate
+	 *            attributes of the key
+	 * @return a future indicating success, false if there was no key and
+	 *         attributesForCreate is null
+	 */
+	public CollectionFuture<Boolean> asyncMopInsert(String key, Object field,
+			Object value, CollectionAttributes attributesForCreate);
+
+	/**
 	 * Insert a value into each list
 	 *  
 	 * <pre>
@@ -714,6 +863,22 @@ public interface ArcusClientIF {
 			Transcoder<T> tc);
 
 	/**
+	 * Inserts an item into the b+tree.
+	 *
+	 * @param <T>
+	 * @param key key of a map
+	 * @param field key of a map node
+	 * @param value a value to insert into the map
+	 * @param attributesForCreate attributes of the key
+	 * @param tc a trancoder to encode the value
+	 * @return a future indicating success, false if there was no key
+	 *         and attributesForCreate parameter is null.
+	 */
+	public <T> CollectionFuture<Boolean> asyncMopInsert(String key, T field,
+			T value, CollectionAttributes attributesForCreate,
+			Transcoder<T> tc);
+
+	/**
 	 * Insert a value into each list
 	 *  
 	 * <pre>
@@ -756,6 +921,17 @@ public interface ArcusClientIF {
 			String key, Map<Long, Object> elements, CollectionAttributes attributesForCreate);
 
 	/**
+	 * Insert values into a map
+	 *
+	 * @param key a key list of map
+	 * @param elements field and value list of map
+	 * @param attributesForCreate attributes of the key
+	 * @return a future that will indicate the failure list of each operation
+	 */
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<Object, Object> elements, CollectionAttributes attributesForCreate);
+
+	/**
 	 * Insert values into a list
 	 * 
 	 * <pre>
@@ -796,6 +972,20 @@ public interface ArcusClientIF {
 	 */
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
 			String key, Map<Long, T> elements, CollectionAttributes attributesForCreate,
+			Transcoder<T> tc);
+
+	/**
+	 * Insert values into a map
+	 *
+	 * @param <T>
+	 * @param key a key list of map
+	 * @param elements field and value list of map
+	 * @param attributesForCreate attributes of the key
+	 * @param tc transcoder to encode value
+	 * @return a future that will indicate the failure list of each operation
+	 */
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<T, T> elements, CollectionAttributes attributesForCreate,
 			Transcoder<T> tc);
 
 	/**
@@ -983,6 +1173,38 @@ public interface ArcusClientIF {
 			ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc);
 
 	/**
+	 * Update an element from the map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param field
+	 *            key of a map element
+	 * @param value
+	 *            new value of element.
+	 *            do not update the value if this argument is null.
+	 * @return a future indicating success
+	 */
+	public CollectionFuture<Boolean> asyncMopUpdate (String key, String field,
+            Object value);
+
+	/**
+	 * Update an element from the map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param field
+	 *            key of a map element
+	 * @param value
+	 *            new value of element.
+	 *            do not update the value if this argument is null.
+	 * @param tc
+	 *            a transcoder to encode the value of element
+	 * @return a future indicating success
+	 */
+	public <T> CollectionFuture<Boolean> asyncMopUpdate (String key, String field,
+			 T value, Transcoder<T> tc);
+
+	/**
 	 * Update elements from the b+tree
 	 *
 	 * @param key
@@ -1006,6 +1228,32 @@ public interface ArcusClientIF {
 	 * @return a future indicating success
 	 */
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
+			String key, List<Element<T>> elements, Transcoder<T> tc);
+
+	/**
+	 * Update elements from the map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param elements
+	 *            list of map elements
+	 * @return a future indicating success
+	 */
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
+			String key, List<Element<Object>> elements);
+
+	/**
+	 * Update elements from the map
+	 *
+	 * @param key
+	 *            key of a map
+	 * @param elements
+	 *            list of map elements
+	 * @param tc
+	 *            a transcoder to encode the value of element
+	 * @return a future indicating success
+	 */
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
 			String key, List<Element<T>> elements, Transcoder<T> tc);
 
 	/**

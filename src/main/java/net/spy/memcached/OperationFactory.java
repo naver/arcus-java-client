@@ -35,6 +35,7 @@ import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionGet;
+import net.spy.memcached.collection.CollectionMapGet;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedUpdate;
@@ -55,6 +56,7 @@ import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionDeleteOperation;
 import net.spy.memcached.ops.CollectionExistOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
+import net.spy.memcached.ops.CollectionMapGetOperation;
 import net.spy.memcached.ops.CollectionMutateOperation;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
 import net.spy.memcached.ops.CollectionPipedStoreOperation;
@@ -296,7 +298,18 @@ public interface OperationFactory {
 	 */
 	ExtendedBTreeGetOperation collectionGet2(String key, 
 			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb);
-	
+
+	/**
+	 * Get operation for collection items (map items).
+	 *
+	 * @param key collection(map) item's key
+	 * @param collectionGet operation parameters (element keys and so on)
+	 * @param cb the callback that will contain the results
+	 * @return a new CollectionGetOperation
+	 */
+	CollectionMapGetOperation collectionMapGet(String key,
+			CollectionMapGet<?> collectionGet, CollectionMapGetOperation.Callback cb);
+
 	/**
 	 * Delete operation for collection items.
 	 * 

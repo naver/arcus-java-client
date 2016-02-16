@@ -30,6 +30,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 	protected void setUp() throws Exception {
 		super.setUp();
 		mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true);
+		mc.asyncMopDelete(key, 0, true);
 	}
 
 	public void testAfterSuccess() throws Exception {
@@ -44,6 +45,21 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		// assertNull(status);
 
 		// After operation completion (SUCCESS)
+		Boolean success = future.get(1000, TimeUnit.MILLISECONDS);
+		status = future.getOperationStatus();
+
+		assertTrue(success);
+		assertNotNull(status);
+		assertTrue(status.isSuccess());
+		assertEquals("CREATED_STORED", status.getMessage());
+	}
+
+	public void testAfterSuccessForMap() throws Exception {
+		/* Map future test */
+		CollectionFuture<Boolean> future;
+		OperationStatus status;
+
+		future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "field", "hello", new CollectionAttributes());
 		Boolean success = future.get(1000, TimeUnit.MILLISECONDS);
 		status = future.getOperationStatus();
 
@@ -75,6 +91,28 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		assertEquals("NOT_FOUND", status.getMessage());
 	}
 
+	public void testAfterFailureForMap() throws Exception {
+		CollectionFuture<Map<String, Object>> future;
+		OperationStatus status;
+
+		future = (CollectionFuture<Map<String, Object>>) mc.asyncMopGet(
+				key, 0, false, false);
+
+		// OperationStatus should be null before operation completion
+		// status = future.getOperationStatus();
+		// assertNull(status);
+
+		// After operation completion (FAILURE)
+		Map<String, Object> result = future.get(1000,
+				TimeUnit.MILLISECONDS);
+		status = future.getOperationStatus();
+
+		assertNull(result);
+		assertNotNull(status);
+		assertFalse(status.isSuccess());
+		assertEquals("NOT_FOUND", status.getMessage());
+	}
+
 	public void testTimeout() throws Exception {
 		CollectionFuture<Boolean> future;
 		OperationStatus status;
@@ -93,4 +131,20 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		// assertNull(status);
 	}
 
+	public void testTimeoutForMap() throws Exception {
+		CollectionFuture<Boolean> future;
+		OperationStatus status;
+
+		future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "field", "hello", new CollectionAttributes());
+
+		try {
+			future.get(1, TimeUnit.NANOSECONDS);
+		} catch (Exception e) {
+			future.cancel(true);
+		}
+
+		status = future.getOperationStatus();
+
+		// assertNull(status);
+	}
 }

@@ -17,10 +17,7 @@
 package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
@@ -52,14 +49,14 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 	public abstract ByteBuffer getBinaryCommand();
 	
 	/**
-	 * 
+	 *
 	 */
 	public static class ListPipedStore<T> extends CollectionPipedStore<T> {
-		
+
 		private static final String COMMAND = "lop insert";
 		private Collection<T> list;
 		private int index;
-		
+
 		public ListPipedStore(String key, int index, Collection<T> list,
 				boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
 			this.key = key;
@@ -70,7 +67,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			this.tc = tc;
 			this.itemCount = list.size();
 		}
-		
+
 		public ByteBuffer getAsciiCommand() {
 			int capacity = 0;
 
@@ -81,7 +78,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 				cd = tc.encode(each);
 				encodedList.add(cd.getData());
 			}
-			
+
 			// estimate the buffer capacity
 			for (byte[] each : encodedList) {
 				capacity += KeyUtil.getKeyBytes(key).length;
@@ -338,7 +335,75 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			throw new RuntimeException("not supported in binary protocol yet.");
 		}
 	}
-	
+
+	/**
+	 *
+	 */
+	public static class MapPipedStore<T> extends CollectionPipedStore<T> {
+
+		private static final String COMMAND = "mop insert";
+		private Map<T, T> map;
+
+		public MapPipedStore(String key, Map<T, T> map,
+							  boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+			this.key = key;
+			this.map = map;
+			this.createKeyIfNotExists = createKeyIfNotExists;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = map.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// decode values
+			List<byte[]> decodedList = new ArrayList<byte[]>(map.size());
+			CachedData cd = null;
+			for (T each : map.values()) {
+				cd = tc.encode(each);
+				decodedList.add(cd.getData());
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			for (T eachField : map.keySet()) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(String.valueOf(eachField)).length;
+				capacity += decodedList.get(i++).length;
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			i = 0;
+			Iterator<T> iterator = map.keySet().iterator();
+			while (iterator.hasNext()) {
+				String field = String.valueOf(iterator.next());
+				byte[] value = decodedList.get(i++);
+
+				setArguments(bb, COMMAND, key, field, value.length,
+						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(iterator.hasNext()) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
 	public String getKey() {
 		return key;
 	}

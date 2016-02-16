@@ -162,6 +162,83 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 		}
 	}
 
+	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
+
+		private static final String COMMAND = "mop update";
+		private List<Element<T>> elements;
+
+		public MapPipedUpdate(String key, List<Element<T>> elements,
+								Transcoder<T> tc) {
+			this.key = key;
+			this.elements = elements;
+			this.tc = tc;
+			this.itemCount = elements.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// decode parameters
+			List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
+			CachedData cd = null;
+			for (Element<T> each : elements) {
+				if (each.getValue() != null) {
+					cd = tc.encode(each.getValue());
+					decodedList.add(cd.getData());
+				} else {
+					decodedList.add(null);
+				}
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			byte[] value;
+			StringBuilder b;
+
+			for (Element<T> each : elements) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(String.valueOf(each.getField())).length;
+				if (decodedList.get(i) != null) {
+					capacity += decodedList.get(i++).length;
+				}
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			i = 0;
+
+			Iterator<Element<T>> iterator = elements.iterator();
+			while (iterator.hasNext()) {
+				Element<T> element = iterator.next();
+				value = decodedList.get(i++);
+				b = new StringBuilder();
+
+				setArguments(bb, COMMAND, key,
+						String.valueOf(element.getField()),
+						b.toString(), (value == null ? -1 : value.length),
+						(iterator.hasNext()) ? PIPE : "");
+				if (value != null) {
+					if (value.length > 0) {
+						bb.put(value);
+					}
+					bb.put(CRLF);
+				}
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
 	public String getKey() {
 		return key;
 	}
