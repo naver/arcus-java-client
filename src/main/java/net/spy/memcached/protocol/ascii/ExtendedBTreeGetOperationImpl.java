@@ -66,7 +66,7 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
 	protected final String key;
-	protected final CollectionGet<?> collectionGet;
+	protected final CollectionGet collectionGet;
 
 	protected int flags = 0;
 	protected int count = 0;
@@ -75,7 +75,7 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 	protected byte lookingFor = '\0';
 	protected int spaceCount = 0;
 
-	public ExtendedBTreeGetOperationImpl(String key, CollectionGet<?> collectionGet,
+	public ExtendedBTreeGetOperationImpl(String key, CollectionGet collectionGet,
 			OperationCallback cb) {
 		super(cb);
 		this.key = key;
@@ -240,7 +240,7 @@ public class ExtendedBTreeGetOperationImpl extends OperationImpl
 		return Collections.singleton(key);
 	}
 
-	public CollectionGet<?> getGet() {
+	public CollectionGet getGet() {
 		return collectionGet;
 	}
 }

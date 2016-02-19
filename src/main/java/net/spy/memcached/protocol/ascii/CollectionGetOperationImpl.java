@@ -68,7 +68,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
 	protected final String key;
-	protected final CollectionGet<?> collectionGet;
+	protected final CollectionGet collectionGet;
 
 	protected int flags = 0;
 	protected int count = 0;
@@ -77,7 +77,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 	protected byte lookingFor = '\0';
 	protected int spaceCount = 0;
 
-	public CollectionGetOperationImpl(String key, CollectionGet<?> collectionGet,
+	public CollectionGetOperationImpl(String key, CollectionGet collectionGet,
 			OperationCallback cb) {
 		super(cb);
 		this.key = key;
@@ -245,7 +245,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 		return Collections.singleton(key);
 	}
 
-	public CollectionGet<?> getGet() {
+	public CollectionGet getGet() {
 		return collectionGet;
 	}
 

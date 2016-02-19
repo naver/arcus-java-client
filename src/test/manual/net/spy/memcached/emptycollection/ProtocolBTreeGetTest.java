@@ -29,32 +29,32 @@ public class ProtocolBTreeGetTest extends TestCase {
 		// default setting : dropIfEmpty = true
 
 		Assert.assertEquals("10 drop",
-				(new BTreeGet<Object>(bkey, true)).stringify());
+				(new BTreeGet(bkey, true)).stringify());
 		Assert.assertEquals("10",
-				(new BTreeGet<Object>(bkey, false)).stringify());
+				(new BTreeGet(bkey, false)).stringify());
 
-		Assert.assertEquals("10 drop", (new BTreeGet<Object>(bkey, true, true,
+		Assert.assertEquals("10 drop", (new BTreeGet(bkey, true, true,
 				ElementFlagFilter.DO_NOT_FILTER)).stringify());
-		Assert.assertEquals("10 delete", (new BTreeGet<Object>(bkey, true,
+		Assert.assertEquals("10 delete", (new BTreeGet(bkey, true,
 				false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-		Assert.assertEquals("10", (new BTreeGet<Object>(bkey, false, true,
+		Assert.assertEquals("10", (new BTreeGet(bkey, false, true,
 				ElementFlagFilter.DO_NOT_FILTER)).stringify());
-		Assert.assertEquals("10", (new BTreeGet<Object>(bkey, false, false,
+		Assert.assertEquals("10", (new BTreeGet(bkey, false, false,
 				ElementFlagFilter.DO_NOT_FILTER)).stringify());
 
-		Assert.assertEquals("10..20 1 1 drop", (new BTreeGet<Object>(10, 20, 1,
+		Assert.assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
 				1, true)).stringify());
-		Assert.assertEquals("10..20 1 1", (new BTreeGet<Object>(10, 20, 1, 1,
+		Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
 				false)).stringify());
 
-		Assert.assertEquals("10..20 1 1 delete", (new BTreeGet<Object>(10, 20,
+		Assert.assertEquals("10..20 1 1 delete", (new BTreeGet(10, 20,
 				1, 1, true, false, ElementFlagFilter.DO_NOT_FILTER))
 				.stringify());
-		Assert.assertEquals("10..20 1 1 drop", (new BTreeGet<Object>(10, 20, 1,
+		Assert.assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
 				1, true, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-		Assert.assertEquals("10..20 1 1", (new BTreeGet<Object>(10, 20, 1, 1,
+		Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
 				false, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-		Assert.assertEquals("10..20 1 1", (new BTreeGet<Object>(10, 20, 1, 1,
+		Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
 				false, false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
 	}
 }

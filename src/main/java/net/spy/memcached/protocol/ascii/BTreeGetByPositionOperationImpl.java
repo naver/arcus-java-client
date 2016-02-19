@@ -52,7 +52,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 			false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
 
 	protected final String key;
-	protected final BTreeGetByPosition<?> get;
+	protected final BTreeGetByPosition get;
 
 	protected int flags = 0;
 	protected int count = 0;
@@ -66,7 +66,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 	private Boolean hasEFlag = null;
 
 	public BTreeGetByPositionOperationImpl(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+			BTreeGetByPosition get, OperationCallback cb) {
 		super(cb);
 		this.key = key;
 		this.get = get;
@@ -75,7 +75,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 	}
 
 	@Override
-	public BTreeGetByPosition<?> getGet() {
+	public BTreeGetByPosition getGet() {
 		return get;
 	}
 

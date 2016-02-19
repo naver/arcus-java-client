@@ -23,7 +23,7 @@ import net.spy.memcached.collection.CollectionGet;
  */
 public interface ExtendedBTreeGetOperation extends KeyedOperation {
 
-	CollectionGet<?> getGet();
+	CollectionGet getGet();
 	
 	interface Callback extends OperationCallback {
 		void gotData(String key, byte[] subkey, byte[] elementFlag, int flags, byte[] data);

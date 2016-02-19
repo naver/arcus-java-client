@@ -219,14 +219,14 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 	}
 	
 	public CollectionGetOperation collectionGet(String key,
-			CollectionGet<?> collectionGet,
+			CollectionGet collectionGet,
 			net.spy.memcached.ops.CollectionGetOperation.Callback cb) {
 		throw new RuntimeException(
 			"CollectionGetOperation is not supported in binary protocol yet.");
 	}
 
 	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
+			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb) {
 		throw new RuntimeException(
 				"CollectionGetOperation is not supported in binary protocol yet.");
 	}
@@ -328,7 +328,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeGetByPositionOperation bopGetByPosition(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+			BTreeGetByPosition get, OperationCallback cb) {
 		throw new RuntimeException(
 				"BTree get by position operation is not supported in binary protocol yet.");
 	}
@@ -342,7 +342,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+			BTreeFindPositionWithGet get, OperationCallback cb) {
 		throw new RuntimeException(
 				"BTree find position with get operation is not supported in binary protocol yet.");
 	}

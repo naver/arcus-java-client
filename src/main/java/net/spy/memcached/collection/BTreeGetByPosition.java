@@ -26,7 +26,7 @@ import net.spy.memcached.util.BTreeUtil;
  * <bkey> [<eflag>] <bytes> <data>\r\n
  * END\r\n (CLIENT_ERROR, NOT_FOUND, UNREADABLE, TYPE_MISMATCH, NOT_FOUND_ELEMENT)
  */
-public class BTreeGetByPosition<T> extends CollectionGet<T> {
+public class BTreeGetByPosition extends CollectionGet {
 
 	public static final int HEADER_EFLAG_POSITION = 1; // 0-based
 	

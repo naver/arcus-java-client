@@ -16,18 +16,15 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.Map;
-
 import net.spy.memcached.util.BTreeUtil;
 
-public class BTreeGet<T> extends CollectionGet<T> {
+public class BTreeGet extends CollectionGet {
 
 	private static final String command = "bop get";
 	
 	protected String range;
 	protected int offset = -1;
 	protected int count = -1;
-	protected Map<Integer, T> map;
 
 	protected ElementFlagFilter elementFlagFilter;
 	
@@ -89,10 +86,6 @@ public class BTreeGet<T> extends CollectionGet<T> {
 		this.count = count;
 	}
 	
-	public Map<Integer, T> getMap() {
-		return map;
-	}
-
 	public String stringify() {
 		if (str != null) return str;
 		
