@@ -385,7 +385,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			List<T> keyList = new ArrayList<T>(map.keySet());
 			for(i = this.nextOpIndex; i < keySize; i++) {
 				String field = String.valueOf(keyList.get(i));
-				byte[] value = decodedList.get(i++);
+				byte[] value = decodedList.get(i);
 
 				setArguments(bb, COMMAND, key, field, value.length,
 						(createKeyIfNotExists) ? "create" : "",
