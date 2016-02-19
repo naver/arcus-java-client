@@ -26,8 +26,6 @@ public class ExtendedBTreeGet extends CollectionGet {
 	protected int offset = -1;
 	protected int count = -1;
 
-	protected byte[] subkey;
-	
 	protected ElementFlagFilter elementFlagFilter;
 	
 	public ExtendedBTreeGet(byte[] from, byte[] to, int offset,
@@ -60,10 +58,6 @@ public class ExtendedBTreeGet extends CollectionGet {
 
 	public void setCount(int count) {
 		this.count = count;
-	}
-	
-	public byte[] getLongSubkey() {
-		return subkey;
 	}
 	
 	public String stringify() {

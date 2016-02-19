@@ -17,8 +17,7 @@ public enum OperationType {
 	 * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert)
 	 * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
 	 * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
-	 * ExtendedBTreeGetOperationImpl (asyncBopGet) is WRITE, when withDelete is true
-	 * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk) 
+	 * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
 	 * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
 	 * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
 	 * CollectionUpsertOperationImpl (asyncBopUpsert)
@@ -34,7 +33,6 @@ public enum OperationType {
 	 * GetOperationImpl (asyncGet / asyncGetBulk)
 	 * GetsOperationImpl (asyncGets)
 	 * CollectionGetOperationImpl (asynBopGet / asyncLopGet / asyncSopGet) is READ, when withDelete is false.
-	 * ExtendedBTreeGetOperationImpl (asyncBopGet) is READ, when withDelete is false.
 	 * CollectionExistOperationImpl (asyncSopExist)
 	 * CollectionPipedExistOperationImpl (asyncSopPipedExistBulk)
 	 * CollectionCountOperationImpl (asyncBopGetItemCount)
@@ -98,8 +96,7 @@ public enum OperationType {
        │   ├── CollectionExistOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionExistOperationImpl.java-extends[OperationImpl]-implements[CollectionExistOperation]
        │   ├── CollectionGetOperation.java-Interface-extends[KeyedOperation]
-       │   │   ├── CollectionGetOperationImpl.java-extends[OperationImpl]-implements[CollectionGetOperation]
-       │   │   └── ExtendedBTreeGetOperationImpl.java-extends[OperationImpl]-implements[CollectionGetOperation]
+       │   │   └── CollectionGetOperationImpl.java-extends[OperationImpl]-implements[CollectionGetOperation]
        │   ├── CollectionMutateOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionMutateOperationImpl.java-extends[OperationImpl]-implements[CollectionMutateOperation]
        │   ├── CollectionPipedExistOperation.java-Interface-extends[KeyedOperation]
@@ -118,7 +115,6 @@ public enum OperationType {
        │   │   └── ConcatenationOperationImpl.java-extends[BaseStoreOperationImpl]-implements[ConcatenationOperation]
        │   ├── DeleteOperation.java-Interface-extends[KeyedOperation]
        │   │   └── DeleteOperationImpl.java-extends[OperationImpl]-implements[DeleteOperation]
-       │   ├── ExtendedBTreeGetOperation.java-Interface-extends[KeyedOperation]
        │   ├── GetAttrOperation.java-Interface-extends[KeyedOperation]
        │   │   └── GetAttrOperationImpl.java-extends[OperationImpl]-implements[GetAttrOperation]
        │   │       └── OptimizedGetImpl.java-extends[GetOperationImpl]

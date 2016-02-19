@@ -93,9 +93,9 @@ public class MultibyteKeyTest {
                 }
                 @Override
                 public void decodeItemHeader(String itemHeader) {}
-            }, new CollectionGetOperation.Callback() {
+            }, new CollectionGetOperation.Callback<Long>() {
                 @Override
-                public void gotData(String key, long subkey, int flags, byte[] data) {}
+                public void gotData(String key, Long subkey, int flags, byte[] data) {}
                 @Override
                 public void receivedStatus(OperationStatus status) {}
                 @Override
@@ -328,11 +328,11 @@ public class MultibyteKeyTest {
         byte[] from = new byte[] {0, 0};
         byte[] to = new byte[] {10, 10};
         try {
-            opFact.collectionGet2(MULTIBYTE_KEY,
+            opFact.collectionGet(MULTIBYTE_KEY,
                     new ExtendedBTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
-                    new ExtendedBTreeGetOperation.Callback() {
+                    new CollectionGetOperation.Callback<byte[]>() {
                         @Override
-                        public void gotData(String key, byte[] subkey, byte[] elementFlag, int flags, byte[] data) {}
+                        public void gotData(String key, byte[] subkey, int flags, byte[] data) {}
                         @Override
                         public void receivedStatus(OperationStatus status) {}
                         @Override

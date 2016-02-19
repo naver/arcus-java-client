@@ -238,12 +238,6 @@ public class HelloArcus {
 		<appender-ref ref="console" />
 	</logger>
 
-	<!-- b+tree get (using byte arrays bkey) -->
-	<logger name="net.spy.memcached.protocol.ascii.ExtendedBTreeGetOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-
 	<!-- collection get -->
 	<logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" additivity="false">
 		<level value="DEBUG" />

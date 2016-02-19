@@ -22,11 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
-import net.spy.memcached.collection.BTreeGet;
-import net.spy.memcached.collection.CollectionGet;
-import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.collection.ListGet;
-import net.spy.memcached.collection.SetGet;
+import net.spy.memcached.collection.*;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
