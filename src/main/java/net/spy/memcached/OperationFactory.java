@@ -65,7 +65,6 @@ import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
@@ -286,17 +285,6 @@ public interface OperationFactory {
 	CollectionGetOperation collectionGet(String key, 
 			CollectionGet collectionGet, CollectionGetOperation.Callback cb);
 
-	/**
-	 * Get operation for collection items (b+tree items).
-	 *
-	 * @param key collection(b+tree) item's key
-	 * @param collectionGet operation parameters (element keys and so on)
-	 * @param cb the callback that will contain the results
-	 * @return a new CollectionGetOperation
-	 */
-	ExtendedBTreeGetOperation collectionGet2(String key, 
-			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb);
-	
 	/**
 	 * Delete operation for collection items.
 	 * 

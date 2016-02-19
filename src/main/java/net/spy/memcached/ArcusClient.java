@@ -94,7 +94,6 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
-import net.spy.memcached.collection.ExtendedBTreeGet;
 import net.spy.memcached.collection.ListCreate;
 import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.ListGet;
@@ -129,7 +128,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
 import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.Operation;
@@ -484,7 +482,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				latch, operationTimeout);
 
 		Operation op = opFact.collectionGet(k, collectionGet,
-				new CollectionGetOperation.Callback() {
+				new CollectionGetOperation.Callback<Object>() {
 					List<T> list = new ArrayList<T>();
 
 					public void receivedStatus(OperationStatus status) {
@@ -540,7 +538,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					public void complete() {
 						latch.countDown();
 					}
-					public void gotData(String key, long subkey, int flags,
+					public void gotData(String key, Object subkey, int flags,
 							byte[] data) {
 						assert key.equals(k) : "Wrong key returned";
 						list.add(tc.decode(new CachedData(flags, data, tc
@@ -588,7 +586,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				operationTimeout);
 
 		Operation op = opFact.collectionGet(k, collectionGet,
-				new CollectionGetOperation.Callback() {
+				new CollectionGetOperation.Callback<Object>() {
 					Set<T> set = new HashSet<T>();
 
 					public void receivedStatus(OperationStatus status) {
@@ -640,7 +638,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						latch.countDown();
 					}
 
-					public void gotData(String key, long subkey, int flags,
+					public void gotData(String key, Object subkey, int flags,
 							byte[] data) {
 						assert key.equals(k) : "Wrong key returned";
 						set.add(tc.decode(new CachedData(flags, data, tc
@@ -669,7 +667,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final CollectionFuture<Map<Long, Element<T>>> rv = new CollectionFuture<Map<Long, Element<T>>>(
 				latch, operationTimeout);
 		Operation op = opFact.collectionGet(k, collectionGet,
-				new CollectionGetOperation.Callback() {
+				new CollectionGetOperation.Callback<Long>() {
 					TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
 							(reverse) ? Collections.reverseOrder() : null);
 
@@ -719,7 +717,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					public void complete() {
 						latch.countDown();
 					}
-					public void gotData(String key, long subkey, int flags,
+					public void gotData(String key, Long subkey, int flags,
 							byte[] data) {
 						assert key.equals(k) : "Wrong key returned";
 						map.put(subkey,
@@ -2769,7 +2767,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey,
+		BTreeGet get = new BTreeGet(bkey, bkey,
 				0, 1, withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, collectionTranscoder);
 	}
@@ -2782,7 +2780,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey, 0, 1,
+		BTreeGet get = new BTreeGet(bkey, bkey, 0, 1,
 				withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, tc);
 	}
@@ -2795,7 +2793,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(String key,
 			byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to,
+		BTreeGet get = new BTreeGet(from, to,
 				offset, count, withDelete, dropIfEmpty, eFlagFilter);
 
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
@@ -2812,7 +2810,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty,
 			Transcoder<T> tc) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to, offset,
+		BTreeGet get = new BTreeGet(from, to, offset,
 				count, withDelete, dropIfEmpty, eFlagFilter);
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 		return asyncBopExtendedGet(key, get, reverse, tc);
@@ -2835,8 +2833,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final CollectionFuture<Map<ByteArrayBKey, Element<T>>> rv = new CollectionFuture<Map<ByteArrayBKey, Element<T>>>(
 				latch, operationTimeout);
 
-		Operation op = opFact.collectionGet2(k, collectionGet,
-				new ExtendedBTreeGetOperation.Callback() {
+		Operation op = opFact.collectionGet(k, collectionGet,
+				new CollectionGetOperation.Callback<byte[]>() {
 					TreeMap<ByteArrayBKey, Element<T>> map = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
 							(reverse) ? Collections.reverseOrder() : null);
 
@@ -2882,11 +2880,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					}
 
 					public void gotData(String key, byte[] subkey,
-							byte[] elementFlag, int flags, byte[] data) {
+							int flags, byte[] data) {
 						assert key.equals(k) : "Wrong key returned";
 						Element<T> element = new Element<T>(subkey, tc
 								.decode(new CachedData(flags, data, tc
-										.getMaxSize())), elementFlag);
+										.getMaxSize())), collectionGet.getElementFlag());
 						map.put(new ByteArrayBKey(subkey), element);
 					}
 				});
