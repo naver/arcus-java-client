@@ -45,14 +45,78 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import net.spy.memcached.collection.*;
+import net.spy.memcached.collection.Attributes;
+import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.BTreeCount;
+import net.spy.memcached.collection.BTreeCreate;
+import net.spy.memcached.collection.BTreeDelete;
+import net.spy.memcached.collection.BTreeElement;
+import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
+import net.spy.memcached.collection.BTreeGet;
+import net.spy.memcached.collection.BTreeGetBulk;
+import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
+import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
+import net.spy.memcached.collection.BTreeGetByPosition;
+import net.spy.memcached.collection.BTreeGetResult;
+import net.spy.memcached.collection.BTreeMutate;
+import net.spy.memcached.collection.BTreeOrder;
+import net.spy.memcached.collection.BTreeSMGet;
+import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
+import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkeyOld;
+import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
+import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkeyOld;
+import net.spy.memcached.collection.BTreeStore;
+import net.spy.memcached.collection.BTreeStoreAndGet;
+import net.spy.memcached.collection.BTreeUpdate;
+import net.spy.memcached.collection.BTreeUpsert;
+import net.spy.memcached.collection.ByteArrayBKey;
+import net.spy.memcached.collection.ByteArrayTreeMap;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionBulkStore;
+import net.spy.memcached.collection.CollectionCount;
+import net.spy.memcached.collection.CollectionCreate;
+import net.spy.memcached.collection.CollectionDelete;
+import net.spy.memcached.collection.CollectionExist;
+import net.spy.memcached.collection.CollectionGet;
+import net.spy.memcached.collection.CollectionMapGet;
+import net.spy.memcached.collection.CollectionMutate;
+import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.BTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ByteArraysBTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ListPipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.SetPipedStore;
+import net.spy.memcached.collection.CollectionPipedStore.MapPipedStore;
+import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
-import net.spy.memcached.collection.CollectionPipedStore.MapPipedStore;
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.CollectionStore;
+import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.ElementFlagUpdate;
+import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.collection.ExtendedBTreeGet;
+import net.spy.memcached.collection.ListCreate;
+import net.spy.memcached.collection.ListDelete;
+import net.spy.memcached.collection.ListGet;
+import net.spy.memcached.collection.ListStore;
+import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetTrimKey;
+import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.SetCreate;
+import net.spy.memcached.collection.SetDelete;
+import net.spy.memcached.collection.SetExist;
+import net.spy.memcached.collection.SetGet;
+import net.spy.memcached.collection.SetPipedExist;
+import net.spy.memcached.collection.SetStore;
+import net.spy.memcached.collection.MapCreate;
+import net.spy.memcached.collection.MapDelete;
+import net.spy.memcached.collection.MapGet;
+import net.spy.memcached.collection.MapStore;
+import net.spy.memcached.collection.MapUpdate;
+import net.spy.memcached.collection.MapField;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
@@ -2941,21 +3005,21 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<Object>> elements) {
-		return asyncMopPipedUpdateBulk(key, elements, collectionTranscoder);
+			String key, List<MapField<Object>> mapFields) {
+		return asyncMopPipedUpdateBulk(key, mapFields, collectionTranscoder);
 	}
 
 	@Override
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<T>> elements, Transcoder<T> tc) {
+			String key, List<MapField<T>> mapFields, Transcoder<T> tc) {
 
-		if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
+		if (mapFields.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
 			CollectionPipedUpdate<T> collectionPipedUpdate = new MapPipedUpdate<T>(
-					key, elements, tc);
+					key, mapFields, tc);
 			return asyncCollectionPipedUpdate(key, collectionPipedUpdate);
 		} else {
-			PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
-					elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
+			PartitionedList<MapField<T>> list = new PartitionedList<MapField<T>>(
+					mapFields, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
 			List<CollectionPipedUpdate<T>> collectionPipedUpdateList = new ArrayList<CollectionPipedUpdate<T>>(
 					list.size());

@@ -16,8 +16,6 @@
  */
 package net.spy.memcached.ops;
 
-import javax.crypto.spec.OAEPParameterSpec;
-
 /* for Operation API String */
 public enum APIType {
 	// KV API Type

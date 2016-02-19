@@ -11,73 +11,73 @@
 		<level value="INFO" />
 		<appender-ref ref="console" />
 	</logger>
-	
+
 	<logger name="net.spy.memcached.ArcusClient" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="console" />
 	</logger>
 
-<!-- uncomment below to debug
-	<logger name="net.spy.memcached.protocol.ascii.BTreeGetBulkOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionPipedStoreOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.BTreeSortMergeGetOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionDeleteOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.CollectionPipedExistOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.MemcachedConnection" additivity="false">
-		<level value="ERROR" />
-		<appender-ref ref="console" />
-	</logger>
-	<logger name="net.spy.memcached.protocol.ascii.StoreOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
+	<!-- uncomment below to debug
+        <logger name="net.spy.memcached.protocol.ascii.BTreeGetBulkOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionPipedStoreOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.BTreeSortMergeGetOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionDeleteOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionPipedExistOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.MemcachedConnection" additivity="false">
+            <level value="ERROR" />
+            <appender-ref ref="console" />
+        </logger>
+        <logger name="net.spy.memcached.protocol.ascii.StoreOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
 
-	<logger name="net.spy.memcached.protocol.ascii.ExtendedBTreeGetOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
+        <logger name="net.spy.memcached.protocol.ascii.ExtendedBTreeGetOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
 
-	<logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
+        <logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
 
-	<logger name="net.spy.memcached.protocol.ascii.CollectionCountOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
--->
+        <logger name="net.spy.memcached.protocol.ascii.CollectionCountOperationImpl" additivity="false">
+            <level value="DEBUG" />
+            <appender-ref ref="console" />
+        </logger>
+     -->
 	<root>
 		<level value="WARN" />
 		<appender-ref ref="console" />

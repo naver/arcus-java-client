@@ -31,6 +31,7 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.collection.MapField;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
@@ -1235,26 +1236,26 @@ public interface ArcusClientIF {
 	 *
 	 * @param key
 	 *            key of a map
-	 * @param elements
-	 *            list of map elements
+	 * @param mapFields
+	 *            list of map field
 	 * @return a future indicating success
 	 */
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<Object>> elements);
+			String key, List<MapField<Object>> mapFields);
 
 	/**
 	 * Update elements from the map
 	 *
 	 * @param key
 	 *            key of a map
-	 * @param elements
-	 *            list of map elements
+	 * @param mapFields
+	 *            list of map field
 	 * @param tc
 	 *            a transcoder to encode the value of element
 	 * @return a future indicating success
 	 */
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<T>> elements, Transcoder<T> tc);
+			String key, List<MapField<T>> mapFields, Transcoder<T> tc);
 
 	/**
 	 * Insert an item into the b+tree

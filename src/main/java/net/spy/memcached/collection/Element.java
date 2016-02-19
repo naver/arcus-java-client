@@ -20,7 +20,7 @@ import net.spy.memcached.util.BTreeUtil;
 
 /**
  * Collection element
- * 
+ *
  * @param <T>
  */
 public class Element<T> {
@@ -29,14 +29,12 @@ public class Element<T> {
 	private final T value;
 	private final byte[] eflag;
 	private final ElementFlagUpdate elementFlagUpdate;
-	private final String field;
 
-	private final boolean isBtreeMode;
 	private final boolean isByteArraysBkey;
-	
+
 	/**
-	 * Create an element 
-	 * 
+	 * Create an element
+	 *
 	 * @param bkey key of element
 	 * @param value value of element
 	 * @param eflag flag of element (minimun length is 1. maximum length is 31)
@@ -48,10 +46,8 @@ public class Element<T> {
 		this.eflag = eflag;
 		this.isByteArraysBkey = true;
 		this.elementFlagUpdate = null;
-		this.field = null;
-		this.isBtreeMode = true;
 	}
-	
+
 	public Element(long bkey, T value, byte[] eflag) {
 		this.bkey = null;
 		this.longBkey = bkey;
@@ -59,8 +55,6 @@ public class Element<T> {
 		this.eflag = eflag;
 		this.isByteArraysBkey = false;
 		this.elementFlagUpdate = null;
-		this.field = null;
-		this.isBtreeMode = true;
 	}
 
 	public Element(byte[] bkey, T value, ElementFlagUpdate elementFlagUpdate) {
@@ -70,8 +64,6 @@ public class Element<T> {
 		this.eflag = null;
 		this.isByteArraysBkey = true;
 		this.elementFlagUpdate = elementFlagUpdate;
-		this.field = null;
-		this.isBtreeMode = true;
 	}
 
 	public Element(long bkey, T value, ElementFlagUpdate elementFlagUpdate) {
@@ -81,25 +73,11 @@ public class Element<T> {
 		this.eflag = null;
 		this.isByteArraysBkey = false;
 		this.elementFlagUpdate = elementFlagUpdate;
-		this.field = null;
-		this.isBtreeMode = true;
 	}
 
-	public Element(String field, T value) {
-		this.field = field;
-		this.value = value;
-
-		this.bkey = null;
-		this.longBkey = null;
-		this.eflag = null;
-		this.isByteArraysBkey = false;
-		this.elementFlagUpdate = null;
-		this.isBtreeMode = false;
-
-	}
 	/**
 	 * get value of element flag by hex.
-	 * 
+	 *
 	 * @return element flag by hex (e.g. 0x01)
 	 */
 	public String getFlagByHex() {
@@ -117,16 +95,16 @@ public class Element<T> {
 
 	/**
 	 * get bkey
-	 * 
+	 *
 	 * @return bkey by hex (e.g. 0x01)
 	 */
 	public String getBkeyByHex() {
 		return BTreeUtil.toHex(bkey);
 	}
-	
+
 	/**
 	 * get bkey
-	 * 
+	 *
 	 * @return bkey by byte[]
 	 */
 	public byte[] getByteArrayBkey() {
@@ -135,7 +113,7 @@ public class Element<T> {
 
 	/**
 	 * get bkey
-	 * 
+	 *
 	 * @return bkey (-1 if not available)
 	 */
 	public long getLongBkey() {
@@ -144,7 +122,7 @@ public class Element<T> {
 
 	/**
 	 * get value
-	 * 
+	 *
 	 * @return value
 	 */
 	public T getValue() {
@@ -153,7 +131,7 @@ public class Element<T> {
 
 	/**
 	 * get flag
-	 * 
+	 *
 	 * @return element flag
 	 */
 	public byte[] getFlag() {
@@ -168,35 +146,23 @@ public class Element<T> {
 		return elementFlagUpdate;
 	}
 
-	/**
-	 * get field in map op.
-	 * @return field
-	 */
-	public String getField() { return field; }
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ \"");
-		if (isBtreeMode) {
-			if (isByteArraysBkey) {
-				sb.append(getBkeyByHex());
-			} else {
-				sb.append(getLongBkey());
-			}
+		if (isByteArraysBkey) {
+			sb.append(getBkeyByHex());
 		} else {
-			sb.append(getField());
+			sb.append(getLongBkey());
 		}
 		sb.append("\" : { ");
 
-		if (isBtreeMode) {
-			sb.append(" \"eflag\" : \"").append(BTreeUtil.toHex(eflag)).append("\"");
-			sb.append(",");
-		}
+		sb.append(" \"eflag\" : \"").append(BTreeUtil.toHex(eflag)).append("\"");
+		sb.append(",");
 		sb.append(" \"value\" : \"").append(value.toString()).append("\"");
 		sb.append(" }");
-		
+
 		return sb.toString();
 	}
-	
+
 }

@@ -165,23 +165,23 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
 
 		private static final String COMMAND = "mop update";
-		private List<Element<T>> elements;
+		private List<MapField<T>> mapFields;
 
-		public MapPipedUpdate(String key, List<Element<T>> elements,
+		public MapPipedUpdate(String key, List<MapField<T>> mapFields,
 								Transcoder<T> tc) {
 			this.key = key;
-			this.elements = elements;
+			this.mapFields = mapFields;
 			this.tc = tc;
-			this.itemCount = elements.size();
+			this.itemCount = mapFields.size();
 		}
 
 		public ByteBuffer getAsciiCommand() {
 			int capacity = 0;
 
 			// decode parameters
-			List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
+			List<byte[]> decodedList = new ArrayList<byte[]>(mapFields.size());
 			CachedData cd = null;
-			for (Element<T> each : elements) {
+			for (MapField<T> each : mapFields) {
 				if (each.getValue() != null) {
 					cd = tc.encode(each.getValue());
 					decodedList.add(cd.getData());
@@ -195,7 +195,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			byte[] value;
 			StringBuilder b;
 
-			for (Element<T> each : elements) {
+			for (MapField<T> each : mapFields) {
 				capacity += KeyUtil.getKeyBytes(key).length;
 				capacity += KeyUtil.getKeyBytes(String.valueOf(each.getField())).length;
 				if (decodedList.get(i) != null) {
@@ -210,14 +210,14 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			// create ascii operation string
 			i = 0;
 
-			Iterator<Element<T>> iterator = elements.iterator();
+			Iterator<MapField<T>> iterator = mapFields.iterator();
 			while (iterator.hasNext()) {
-				Element<T> element = iterator.next();
+				MapField<T> mapField = iterator.next();
 				value = decodedList.get(i++);
 				b = new StringBuilder();
 
 				setArguments(bb, COMMAND, key,
-						String.valueOf(element.getField()),
+						String.valueOf(mapField.getField()),
 						b.toString(), (value == null ? -1 : value.length),
 						(iterator.hasNext()) ? PIPE : "");
 				if (value != null) {

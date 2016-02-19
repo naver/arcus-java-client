@@ -39,6 +39,7 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.MapField;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -892,14 +893,14 @@ public class ArcusClientPool implements ArcusClientIF {
 
 	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<Object>> elements) {
-		return this.getClient().asyncMopPipedUpdateBulk(key, elements);
+			String key, List<MapField<Object>> mapFields) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, mapFields);
 	}
 
 	@Override
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<Element<T>> elements, Transcoder<T> tc) {
-		return this.getClient().asyncMopPipedUpdateBulk(key, elements, tc);
+			String key, List<MapField<T>> mapFields, Transcoder<T> tc) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, mapFields, tc);
 	}
 
 	@Override

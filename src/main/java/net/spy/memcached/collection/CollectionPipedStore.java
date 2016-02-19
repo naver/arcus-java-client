@@ -17,7 +17,10 @@
 package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
@@ -378,17 +381,22 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			i = 0;
-			Iterator<T> iterator = map.keySet().iterator();
-			while (iterator.hasNext()) {
-				String field = String.valueOf(iterator.next());
+			int keySize = map.keySet().size();
+			List<T> keyList = new ArrayList<T>(map.keySet());
+			for(i = this.nextOpIndex; i < keySize; i++) {
+				String field = String.valueOf(keyList.get(i));
 				byte[] value = decodedList.get(i++);
 
 				setArguments(bb, COMMAND, key, field, value.length,
-						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
-						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-						(iterator.hasNext()) ? PIPE : "");
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getExpireTime() != null) ? attribute.
+								getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getMaxCount() != null) ? attribute.
+								getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < keySize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
 			}

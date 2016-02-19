@@ -9,10 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
-import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.CollectionOverflowAction;
-import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.*;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -20,7 +17,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
 
     private String key = "MopBulkAPITest33";
     Map<Object, Object> elements = new HashMap<Object, Object>();
-    List<Element<Object>> updateElem = new ArrayList<Element<Object>>();
+    List<MapField<Object>> updateMap = new ArrayList<MapField<Object>>();
 
 
     private int getValueCount() {
@@ -32,10 +29,10 @@ public class MopBulkAPITest extends BaseIntegrationTest {
         for (long i = 0; i < getValueCount(); i++) {
             elements.put("field" + String.valueOf(i),
                         "value" + String.valueOf(i));
-            Element<Object> temp =
-                    new Element<Object>("field" + String.valueOf(i),
+            MapField<Object> temp =
+                    new MapField<Object>("field" + String.valueOf(i),
                                     "newvalue" + String.valueOf(i));
-            updateElem.add(temp);
+            updateMap.add(temp);
         }
     }
 
@@ -136,7 +133,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
                     TimeUnit.MILLISECONDS);
 
             CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-                    .asyncMopPipedUpdateBulk(key, updateElem);
+                    .asyncMopPipedUpdateBulk(key, updateMap);
 
             Map<Integer, CollectionOperationStatus> map2 = future2.get(10000,
                     TimeUnit.MILLISECONDS);
