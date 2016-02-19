@@ -193,12 +193,12 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 
 	public CollectionGetOperation collectionGet(String key,
-			CollectionGet<?> collectionGet, CollectionGetOperation.Callback cb) {
+			CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
 		return new CollectionGetOperationImpl(key, collectionGet, cb);
 	}
 	
 	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
+			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb) {
 		return new ExtendedBTreeGetOperationImpl(key, collectionGet, cb);
 	}
 
@@ -285,7 +285,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeGetByPositionOperation bopGetByPosition(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+			BTreeGetByPosition get, OperationCallback cb) {
 		return new BTreeGetByPositionOperationImpl(key, get, cb);
 	}
 
@@ -297,7 +297,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+			BTreeFindPositionWithGet get, OperationCallback cb) {
 		return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
 	}
 

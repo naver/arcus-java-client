@@ -82,7 +82,7 @@ public class MultibyteKeyTest {
     @Test
     public void collectionGetOperationImplTest() {
         try {
-            opFact.collectionGet(MULTIBYTE_KEY, new CollectionGet<Integer>() {
+            opFact.collectionGet(MULTIBYTE_KEY, new CollectionGet() {
                 @Override
                 public String stringify() {
                     return "collectionGetString";
@@ -129,7 +129,7 @@ public class MultibyteKeyTest {
     public void BTreeFindPositionWithGetOperationImplTest() {
         try {
             opFact.bopFindPositionWithGet(MULTIBYTE_KEY,
-                    new BTreeFindPositionWithGet<Object>(1L, BTreeOrder.ASC, 0),
+                    new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
                     genericCallback).initialize();
         } catch (java.nio.BufferOverflowException e) {
             Assert.fail();
@@ -329,7 +329,7 @@ public class MultibyteKeyTest {
         byte[] to = new byte[] {10, 10};
         try {
             opFact.collectionGet2(MULTIBYTE_KEY,
-                    new ExtendedBTreeGet<Integer>(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
+                    new ExtendedBTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
                     new ExtendedBTreeGetOperation.Callback() {
                         @Override
                         public void gotData(String key, byte[] subkey, byte[] elementFlag, int flags, byte[] data) {}
@@ -420,7 +420,7 @@ public class MultibyteKeyTest {
     public void BTreeGetByPositionOperationImplTest() {
         try {
             opFact.bopGetByPosition(MULTIBYTE_KEY,
-                    new BTreeGetByPosition<Object>(BTreeOrder.ASC, 0),
+                    new BTreeGetByPosition(BTreeOrder.ASC, 0),
                     new BTreeGetByPositionOperation.Callback() {
                         @Override
                         public void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data) {}

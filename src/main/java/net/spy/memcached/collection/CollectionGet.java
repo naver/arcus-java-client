@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionGet<T> {
+public abstract class CollectionGet {
 
 	protected boolean delete = false;
 	protected boolean dropIfEmpty = true;

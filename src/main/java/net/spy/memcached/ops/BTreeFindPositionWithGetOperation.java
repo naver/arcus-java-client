@@ -21,7 +21,7 @@ import net.spy.memcached.collection.BTreeFindPositionWithGet;
 
 public interface BTreeFindPositionWithGetOperation extends KeyedOperation {
 
-	BTreeFindPositionWithGet<?> getGet();
+	BTreeFindPositionWithGet getGet();
 	
 	interface Callback extends OperationCallback {
 		void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data);

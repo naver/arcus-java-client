@@ -478,7 +478,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the fetched value
 	 */
 	private <T> CollectionFuture<List<T>> asyncLopGet(final String k,
-			final CollectionGet<T> collectionGet, final Transcoder<T> tc) {
+			final CollectionGet collectionGet, final Transcoder<T> tc) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final CollectionFuture<List<T>> rv = new CollectionFuture<List<T>>(
 				latch, operationTimeout);
@@ -582,7 +582,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the fetched value
 	 */
 	private <T> CollectionFuture<Set<T>> asyncSopGet(final String k,
-			final CollectionGet<T> collectionGet, final Transcoder<T> tc) {
+			final CollectionGet collectionGet, final Transcoder<T> tc) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final CollectionFuture<Set<T>> rv = new CollectionFuture<Set<T>>(latch,
 				operationTimeout);
@@ -663,7 +663,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the map of fetched elements and their keys
 	 */
 	private <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(
-			final String k, final CollectionGet<T> collectionGet,
+			final String k, final CollectionGet collectionGet,
 			final boolean reverse, final Transcoder<T> tc) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final CollectionFuture<Map<Long, Element<T>>> rv = new CollectionFuture<Map<Long, Element<T>>>(
@@ -1287,7 +1287,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
 			long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty) {
-		BTreeGet<Object> get = new BTreeGet<Object>(bkey, withDelete, dropIfEmpty, eFlagFilter);
+		BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopGet(key, get, false, collectionTranscoder);
 	}
 
@@ -1299,7 +1299,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
 			long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
 			boolean withDelete, boolean dropIfEmpty) {
-		BTreeGet<Object> get = new BTreeGet<Object>(from, to, offset, count,
+		BTreeGet get = new BTreeGet(from, to, offset, count,
 				withDelete, dropIfEmpty, eFlagFilter);
 		boolean reverse = from > to;
 		return asyncBopGet(key, get, reverse, collectionTranscoder);
@@ -1312,7 +1312,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
 			long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		BTreeGet<T> get = new BTreeGet<T>(bkey, withDelete, dropIfEmpty, eFlagFilter);
+		BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopGet(key, get, false, tc);
 	}
 
@@ -1324,7 +1324,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
 			long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		BTreeGet<T> get = new BTreeGet<T>(from, to, offset, count, withDelete,
+		BTreeGet get = new BTreeGet(from, to, offset, count, withDelete,
 				dropIfEmpty, eFlagFilter);
 		boolean reverse = from > to;
 		return asyncBopGet(key, get, reverse, tc);
@@ -1337,7 +1337,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
 			boolean withDelete, boolean dropIfEmpty) {
-		ListGet<Object> get = new ListGet<Object>(index, withDelete, dropIfEmpty);
+		ListGet get = new ListGet(index, withDelete, dropIfEmpty);
 		return asyncLopGet(key, get, collectionTranscoder);
 	}
 
@@ -1348,7 +1348,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
 			int to, boolean withDelete, boolean dropIfEmpty) {
-		ListGet<Object> get = new ListGet<Object>(from, to, withDelete, dropIfEmpty);
+		ListGet get = new ListGet(from, to, withDelete, dropIfEmpty);
 		return asyncLopGet(key, get, collectionTranscoder);
 	}
 
@@ -1359,7 +1359,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		ListGet<T> get = new ListGet<T>(index, withDelete, dropIfEmpty);
+		ListGet get = new ListGet(index, withDelete, dropIfEmpty);
 		return asyncLopGet(key, get, tc);
 	}
 
@@ -1370,7 +1370,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from,
 			int to, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		ListGet<T> get = new ListGet<T>(from, to, withDelete, dropIfEmpty);
+		ListGet get = new ListGet(from, to, withDelete, dropIfEmpty);
 		return asyncLopGet(key, get, tc);
 	}
 
@@ -1381,7 +1381,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
 			boolean withDelete, boolean dropIfEmpty) {
-		SetGet<Object> get = new SetGet<Object>(count, withDelete, dropIfEmpty);
+		SetGet get = new SetGet(count, withDelete, dropIfEmpty);
 		return asyncSopGet(key, get, collectionTranscoder);
 	}
 
@@ -1392,7 +1392,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		SetGet<T> get = new SetGet<T>(count, withDelete, dropIfEmpty);
+		SetGet get = new SetGet(count, withDelete, dropIfEmpty);
 		return asyncSopGet(key, get, tc);
 	}
 
@@ -2769,7 +2769,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet<Object> get = new ExtendedBTreeGet<Object>(bkey, bkey,
+		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey,
 				0, 1, withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, collectionTranscoder);
 	}
@@ -2782,7 +2782,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		ExtendedBTreeGet<T> get = new ExtendedBTreeGet<T>(bkey, bkey, 0, 1,
+		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey, 0, 1,
 				withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, tc);
 	}
@@ -2795,7 +2795,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(String key,
 			byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet<Object> get = new ExtendedBTreeGet<Object>(from, to,
+		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to,
 				offset, count, withDelete, dropIfEmpty, eFlagFilter);
 
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
@@ -2812,7 +2812,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty,
 			Transcoder<T> tc) {
-		ExtendedBTreeGet<T> get = new ExtendedBTreeGet<T>(from, to, offset,
+		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to, offset,
 				count, withDelete, dropIfEmpty, eFlagFilter);
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 		return asyncBopExtendedGet(key, get, reverse, tc);
@@ -2828,7 +2828,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the map of the fetched element and its byte-array bkey
 	 */
 	private <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopExtendedGet(
-			final String k, final CollectionGet<T> collectionGet,
+			final String k, final CollectionGet collectionGet,
 			final boolean reverse, final Transcoder<T> tc) {
 
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -2898,7 +2898,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopGetByPosition(
 			String key, BTreeOrder order, int pos) {
-		BTreeGetByPosition<Object> get = new BTreeGetByPosition<Object>(order, pos);
+		BTreeGetByPosition get = new BTreeGetByPosition(order, pos);
 		boolean reverse = false;
 		return asyncBopGetByPosition(key, get, reverse, collectionTranscoder);
 	}
@@ -2906,7 +2906,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
 			String key, BTreeOrder order, int pos, Transcoder<T> tc) {
-		BTreeGetByPosition<T> get = new BTreeGetByPosition<T>(order, pos);
+		BTreeGetByPosition get = new BTreeGetByPosition(order, pos);
 		boolean reverse = false;
 		return asyncBopGetByPosition(key, get, reverse, tc);
 	}
@@ -2914,7 +2914,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopGetByPosition(
 			String key, BTreeOrder order, int from, int to) {
-		BTreeGetByPosition<Object> get = new BTreeGetByPosition<Object>(order, from, to);
+		BTreeGetByPosition get = new BTreeGetByPosition(order, from, to);
 		boolean reverse = from > to;
 		return asyncBopGetByPosition(key, get, reverse, collectionTranscoder);
 	}
@@ -2922,7 +2922,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
 			String key, BTreeOrder order, int from, int to, Transcoder<T> tc) {
-		BTreeGetByPosition<T> get = new BTreeGetByPosition<T>(order, from, to);
+		BTreeGetByPosition get = new BTreeGetByPosition(order, from, to);
 		boolean reverse = from > to;
 		return asyncBopGetByPosition(key, get, reverse, tc);
 	}
@@ -2937,7 +2937,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the map of the fetched element and its position
 	 */
 	private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
-			final String k, final BTreeGetByPosition<T> get,
+			final String k, final BTreeGetByPosition get,
 			final boolean reverse, final Transcoder<T> tc) {
 		// Check for invalid arguments (not to get CLIENT_ERROR)
 		if (get.getOrder() == null) {
@@ -3124,28 +3124,28 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
 			String key, long longBKey, BTreeOrder order, int count) {
-		BTreeFindPositionWithGet<Object> get = new BTreeFindPositionWithGet<Object>(longBKey, order, count);
+		BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(longBKey, order, count);
 		return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
 	}
 	
 	@Override
 	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
 			String key, long longBKey, BTreeOrder order, int count, Transcoder<T> tc) {
-		BTreeFindPositionWithGet<T> get = new BTreeFindPositionWithGet<T>(longBKey, order, count);
+		BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(longBKey, order, count);
 		return asyncBopFindPositionWithGet(key, get, tc);
 	}
 	
 	@Override
 	public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
 			String key, byte[] byteArrayBKey, BTreeOrder order, int count) {
-		BTreeFindPositionWithGet<Object> get = new BTreeFindPositionWithGet<Object>(byteArrayBKey, order, count);
+		BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(byteArrayBKey, order, count);
 		return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
 	}
 
 	@Override
 	public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
 			String key, byte[] byteArrayBKey, BTreeOrder order, int count, Transcoder<T> tc) {
-		BTreeFindPositionWithGet<T> get = new BTreeFindPositionWithGet<T>(byteArrayBKey, order, count);
+		BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(byteArrayBKey, order, count);
 		return asyncBopFindPositionWithGet(key, get, tc);
 	}
 
@@ -3159,7 +3159,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @return future holding the element's position
 	 */
 	private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
-			final String k, final BTreeFindPositionWithGet<T> get, final Transcoder<T> tc) {
+			final String k, final BTreeFindPositionWithGet get, final Transcoder<T> tc) {
 		if (get.getOrder() == null) {
 			throw new IllegalArgumentException("BTreeOrder must not be null.");
 		}

@@ -284,7 +284,7 @@ public interface OperationFactory {
 	 * @return a new CollectionGetOperation
 	 */
 	CollectionGetOperation collectionGet(String key, 
-			CollectionGet<?> collectionGet, CollectionGetOperation.Callback cb);
+			CollectionGet collectionGet, CollectionGetOperation.Callback cb);
 
 	/**
 	 * Get operation for collection items (b+tree items).
@@ -295,7 +295,7 @@ public interface OperationFactory {
 	 * @return a new CollectionGetOperation
 	 */
 	ExtendedBTreeGetOperation collectionGet2(String key, 
-			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb);
+			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb);
 	
 	/**
 	 * Delete operation for collection items.
@@ -481,7 +481,7 @@ public interface OperationFactory {
 	 * @param cb the callback that will contain the results
 	 * @return a new BTreeGetByPositionOperation
 	 */
-	BTreeGetByPositionOperation bopGetByPosition(String key, BTreeGetByPosition<?> get, OperationCallback cb);
+	BTreeGetByPositionOperation bopGetByPosition(String key, BTreeGetByPosition get, OperationCallback cb);
 
 	/**
 	 * Find-position operation for b+tree items. 
@@ -501,7 +501,7 @@ public interface OperationFactory {
 	 * @param cb the callback that will contain the results
 	 * @return a new BTreeFindPositionWithGetOperation
 	 */
-	BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key, BTreeFindPositionWithGet<?> get, OperationCallback cb);
+	BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key, BTreeFindPositionWithGet get, OperationCallback cb);
 
 	/**
 	 * Insert/upsert and get the trimmed element for b+tree items.
