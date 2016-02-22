@@ -65,6 +65,18 @@ public class BTreeGet extends CollectionGet {
 		this.dropIfEmpty = dropIfEmpty;
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
 	}
+
+	public BTreeGet(byte[] from, byte[] to, int offset,
+													int count, boolean delete, boolean dropIfEmpty,
+													ElementFlagFilter elementFlagFilter) {
+		this.headerCount = 2;
+		this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+		this.offset = offset;
+		this.count = count;
+		this.delete = delete;
+		this.dropIfEmpty = dropIfEmpty;
+		this.elementFlagFilter = elementFlagFilter;
+	}
 	
 	public ElementFlagFilter getElementFlagFilter() {
 		return elementFlagFilter;
@@ -131,15 +143,19 @@ public class BTreeGet extends CollectionGet {
 		String[] splited = itemHeader.split(" ");
 
 		if (headerParseStep == 1) {
+      if (splited[0].startsWith("0x")) {
+        this.subkey = BTreeUtil.hexStringToByteArrays(splited[0].substring(2));
+      } else {
+        this.subkey = Long.parseLong(splited[0]);
+      }
+
 			// found element flag.
 			if (splited[1].startsWith("0x")) {
 				this.elementFlagExists = true;
-				this.subkey = Long.parseLong(splited[0]);
 				this.elementFlag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
 //				this.headerCount++;
 				headerParseStep = 2;
 			} else {
-				this.subkey = Long.parseLong(splited[0]);
 				this.dataLength = Integer.parseInt(splited[1]);
 			}
 		} else {

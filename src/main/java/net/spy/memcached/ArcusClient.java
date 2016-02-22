@@ -94,7 +94,6 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
-import net.spy.memcached.collection.ExtendedBTreeGet;
 import net.spy.memcached.collection.ListCreate;
 import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.ListGet;
@@ -2768,7 +2767,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey,
+		BTreeGet get = new BTreeGet(bkey, bkey,
 				0, 1, withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, collectionTranscoder);
 	}
@@ -2781,7 +2780,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
 			String key, byte[] bkey, ElementFlagFilter eFlagFilter,
 			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(bkey, bkey, 0, 1,
+		BTreeGet get = new BTreeGet(bkey, bkey, 0, 1,
 				withDelete, dropIfEmpty, eFlagFilter);
 		return asyncBopExtendedGet(key, get, false, tc);
 	}
@@ -2794,7 +2793,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(String key,
 			byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to,
+		BTreeGet get = new BTreeGet(from, to,
 				offset, count, withDelete, dropIfEmpty, eFlagFilter);
 
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
@@ -2811,7 +2810,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
 			int count, boolean withDelete, boolean dropIfEmpty,
 			Transcoder<T> tc) {
-		ExtendedBTreeGet get = new ExtendedBTreeGet(from, to, offset,
+		BTreeGet get = new BTreeGet(from, to, offset,
 				count, withDelete, dropIfEmpty, eFlagFilter);
 		boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 		return asyncBopExtendedGet(key, get, reverse, tc);
