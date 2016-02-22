@@ -18,6 +18,7 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.util.BTreeUtil;
 
+@Deprecated
 public class ExtendedBTreeGet extends CollectionGet {
 
 	private static final String command = "bop get";

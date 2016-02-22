@@ -329,7 +329,7 @@ public class MultibyteKeyTest {
         byte[] to = new byte[] {10, 10};
         try {
             opFact.collectionGet(MULTIBYTE_KEY,
-                    new ExtendedBTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
+                    new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
                     new CollectionGetOperation.Callback<byte[]>() {
                         @Override
                         public void gotData(String key, byte[] subkey, int flags, byte[] data) {}
