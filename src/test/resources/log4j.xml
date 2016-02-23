@@ -63,11 +63,6 @@
 		<appender-ref ref="console" />
 	</logger>
 
-	<logger name="net.spy.memcached.protocol.ascii.ExtendedBTreeGetOperationImpl" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="console" />
-	</logger>
-
 	<logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="console" />

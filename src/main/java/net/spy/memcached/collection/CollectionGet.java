@@ -16,14 +16,14 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionGet {
+public abstract class CollectionGet<K> {
 
 	protected boolean delete = false;
 	protected boolean dropIfEmpty = true;
 
 	protected String str;
 	protected int headerCount;
-	protected long subkey;
+	protected K subkey;
 	protected int dataLength;
 
 	protected byte[] elementFlag;
@@ -36,7 +36,7 @@ public abstract class CollectionGet {
 		this.delete = delete;
 	}
 
-	public long getSubkey() {
+	public K getSubkey() {
 		return subkey;
 	}
 

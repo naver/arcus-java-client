@@ -67,7 +67,6 @@ import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
@@ -195,11 +194,6 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	public CollectionGetOperation collectionGet(String key,
 			CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
 		return new CollectionGetOperationImpl(key, collectionGet, cb);
-	}
-	
-	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb) {
-		return new ExtendedBTreeGetOperationImpl(key, collectionGet, cb);
 	}
 
 	public CollectionDeleteOperation collectionDelete(String key,

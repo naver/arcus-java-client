@@ -67,7 +67,6 @@ import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
@@ -225,12 +224,6 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 			"CollectionGetOperation is not supported in binary protocol yet.");
 	}
 
-	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet collectionGet, ExtendedBTreeGetOperation.Callback cb) {
-		throw new RuntimeException(
-				"CollectionGetOperation is not supported in binary protocol yet.");
-	}
-	
 	public CollectionDeleteOperation collectionDelete(String key,
 			CollectionDelete<?> collectionDelete, OperationCallback cb) {
 		throw new RuntimeException(
