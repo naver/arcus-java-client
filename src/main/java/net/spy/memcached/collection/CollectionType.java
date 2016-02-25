@@ -39,6 +39,10 @@ public enum CollectionType {
 	 */
 	set("set", EnumSet.of(CollectionOverflowAction.error)),
 	/**
+	 * Map collection
+	 */
+	map("map", EnumSet.of(CollectionOverflowAction.error)),
+	/**
 	 * B+ tree collection
 	 */
 	btree("b+tree", EnumSet.of(CollectionOverflowAction.error,

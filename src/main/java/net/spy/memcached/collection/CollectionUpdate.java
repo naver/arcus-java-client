@@ -42,6 +42,16 @@ public abstract class CollectionUpdate<T> {
 		this.noreply = noreply;
 	}
 
+	public CollectionUpdate(T newValue, boolean noreply) {
+		if (newValue == null) {
+			throw new IllegalArgumentException(
+					"newValue must not be null.");
+		}
+
+		this.newValue = newValue;
+		this.noreply = noreply;
+	}
+
 	public String stringify() {
 		if (str != null)
 			return str;

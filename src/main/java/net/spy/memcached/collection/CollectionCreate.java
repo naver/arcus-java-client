@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.IllegalFormatCodePointException;
+
 public abstract class CollectionCreate {
 	protected int flags;
 	protected int expTime;
@@ -36,6 +38,9 @@ public abstract class CollectionCreate {
 			} else if ((this instanceof ListCreate) &&
 					!CollectionType.list.isAvailableOverflowAction(overflowAction)) {
 				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+			} else if ((this instanceof MapCreate) &&
+					!CollectionType.map.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in" + CollectionType.map + ".");
 			} else if ((this instanceof BTreeCreate) &&
 					!CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
 				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");

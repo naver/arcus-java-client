@@ -40,6 +40,9 @@ public abstract class CollectionStore<T> {
 				if ((this instanceof SetStore) &&
 						!CollectionType.set.isAvailableOverflowAction(overflowAction)) {
 					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+				} else if ((this instanceof MapStore) &&
+						!CollectionType.map.isAvailableOverflowAction(overflowAction)) {
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
 				} else if ((this instanceof ListStore) &&
 						!CollectionType.list.isAvailableOverflowAction(overflowAction)) {
 					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");

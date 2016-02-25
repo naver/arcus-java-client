@@ -39,6 +39,7 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.MapElement;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -374,6 +375,22 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public <T> Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, String mkey, T value,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		return this.getClient().asyncMopInsertBulk(keyList, mkey, value,
+				attributesForCreate, tc);
+	}
+
+	@Override
+	public Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, String mkey, Object value,
+			CollectionAttributes attributesForCreate) {
+		return this.getClient().asyncMopInsertBulk(keyList, mkey, value,
+				attributesForCreate);
+	}
+
+	@Override
 	public <T> Future<Map<String, CollectionOperationStatus>> asyncLopInsertBulk(
 			List<String> keyList, int index, T value,
 			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
@@ -414,6 +431,12 @@ public class ArcusClientPool implements ArcusClientIF {
 	public CollectionFuture<Boolean> asyncBopCreate(String key,
 			ElementValueType valueType, CollectionAttributes attributes) {
 		return this.getClient().asyncBopCreate(key, valueType, attributes);
+	}
+
+	@Override
+	public CollectionFuture<Boolean> asyncMopCreate(String key,
+			ElementValueType type, CollectionAttributes attributes) {
+		return this.getClient().asyncMopCreate(key, type, attributes);
 	}
 
 	@Override
@@ -458,6 +481,42 @@ public class ArcusClientPool implements ArcusClientIF {
 			int count, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
 		return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
 				count, withDelete, dropIfEmpty, tc);
+	}
+
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
+		return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty);
+	}
+
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			boolean withDelete, boolean dropIfEmpty) {
+		return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty);
+	}
+
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			String mkey, boolean withDelete, boolean dropIfEmpty) {
+		return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty, tc);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty, tc);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty, tc);
 	}
 
 	@Override
@@ -518,6 +577,18 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Boolean> asyncMopDelete(String key,
+			boolean dropIfEmpty) {
+		return this.getClient().asyncMopDelete(key, dropIfEmpty);
+	}
+
+	@Override
+	public CollectionFuture<Boolean> asyncMopDelete(String key, String mkey,
+			boolean dropIfEmpty) {
+		return this.getClient().asyncMopDelete(key, mkey, dropIfEmpty);
+	}
+
+	@Override
 	public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
 			boolean dropIfEmpty) {
 		return this.getClient().asyncLopDelete(key, index, dropIfEmpty);
@@ -556,6 +627,13 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
+			Object value, CollectionAttributes attributesForCreate) {
+		return this.getClient().asyncMopInsert(key, mkey, value,
+				attributesForCreate);
+	}
+
+	@Override
 	public CollectionFuture<Boolean> asyncLopInsert(String key, int index,
 			Object value, CollectionAttributes attributesForCreate) {
 		return this.getClient().asyncLopInsert(key, index, value,
@@ -574,6 +652,14 @@ public class ArcusClientPool implements ArcusClientIF {
 			Transcoder<T> tc) {
 		return this.getClient().asyncBopInsert(key, bkey, eFlag, value,
 				attributesForCreate);
+	}
+
+	@Override
+	public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
+			T value, CollectionAttributes attributesForCreate,
+			Transcoder<T> tc) {
+		return this.getClient().asyncMopInsert(key, mkey, value,
+				attributesForCreate, tc);
 	}
 
 	@Override
@@ -599,6 +685,14 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<String, Object> elements,
+			CollectionAttributes attributesForCreate) {
+		return this.getClient().asyncMopPipedInsertBulk(key, elements,
+				attributesForCreate);
+	}
+
+	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncLopPipedInsertBulk(
 			String key, int index, List<Object> valueList,
 			CollectionAttributes attributesForCreate) {
@@ -619,6 +713,14 @@ public class ArcusClientPool implements ArcusClientIF {
 			String key, Map<Long, T> elements,
 			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 		return this.getClient().asyncBopPipedInsertBulk(key, elements,
+				attributesForCreate, tc);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<String, T> elements,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		return this.getClient().asyncMopPipedInsertBulk(key, elements,
 				attributesForCreate, tc);
 	}
 
@@ -778,6 +880,18 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
+			Object value) {
+		return this.getClient().asyncMopUpdate(key, mkey, value);
+	}
+
+	@Override
+	public <T> CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
+			T value, Transcoder<T> tc) {
+		return this.getClient().asyncMopUpdate(key, mkey, value, tc);
+	}
+
+	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
 			String key, List<Element<Object>> elements) {
 		return this.getClient().asyncBopPipedUpdateBulk(key, elements);
@@ -790,6 +904,18 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
+			String key, List<MapElement<Object>> mapElements) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, mapElements);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
+			String key, List<MapElement<T>> mapElements, Transcoder<T> tc) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, mapElements, tc);
+	}
+
+	@Override
 	public CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(
 			String key, List<Object> values) {
 		return this.getClient().asyncSopPipedExistBulk(key, values);
@@ -799,6 +925,22 @@ public class ArcusClientPool implements ArcusClientIF {
 	public <T> CollectionFuture<Map<T, Boolean>> asyncSopPipedExistBulk(
 			String key, List<T> values, Transcoder<T> tc) {
 		return this.getClient().asyncSopPipedExistBulk(key, values, tc);
+	}
+
+	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, List<MapElement<Object>> mapElements,
+			CollectionAttributes attributesForCreate) {
+		return this.getClient().asyncMopPipedInsertBulk(key, mapElements,
+				attributesForCreate);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, List<MapElement<T>> mapElements,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		return this.getClient().asyncMopPipedInsertBulk(key, mapElements,
+				attributesForCreate, tc);
 	}
 
 	@Override

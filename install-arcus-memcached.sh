@@ -12,6 +12,14 @@ else
   echo "Using cached arcus installation"
 fi
 
+# checkout develop in arcus-memcached
+cd $HOME/arcus/server
+git checkout develop
+./config/autorun.sh
+./configure --prefix=$HOME/arcus --enable-zk-integration --with-libevent=$HOME/arcus --with-zookeeper=$HOME/arcus
+make
+make install
+
 rm -rf $HOME/arcus/zookeeper/data
 cp $CWD/mvnTestConf.json $HOME/arcus/scripts/conf/
 cd $HOME/arcus/scripts &&
