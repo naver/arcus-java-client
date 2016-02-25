@@ -83,6 +83,8 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
 			setAPIType(APIType.BOP_INSERT);
 		else if (this.store instanceof CollectionPipedStore.ByteArraysBTreePipedStore)
 			setAPIType(APIType.BOP_INSERT);
+		else if (this.store instanceof CollectionPipedStore.MapPipedStore)
+			setAPIType(APIType.MOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 

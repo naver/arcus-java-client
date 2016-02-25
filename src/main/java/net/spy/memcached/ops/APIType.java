@@ -38,7 +38,14 @@ public enum APIType {
 	SOP_DELETE(OperationType.WRITE),
 	SOP_EXIST(OperationType.READ),
 	SOP_GET(OperationType.RW),
-	
+
+	// Map API Type
+	MOP_CREATE(OperationType.WRITE),
+	MOP_INSERT(OperationType.WRITE),
+	MOP_UPDATE(OperationType.WRITE),
+	MOP_DELETE(OperationType.WRITE),
+	MOP_GET(OperationType.RW),
+
 	// B+Tree API Type
 	BOP_CREATE(OperationType.WRITE),
 	BOP_INSERT(OperationType.WRITE),

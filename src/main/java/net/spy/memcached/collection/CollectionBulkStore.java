@@ -143,6 +143,75 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 		}
 	}
 
+	public static class MapBulkStore<T> extends CollectionBulkStore<T> {
+
+		private static final String COMMAND = "mop insert";
+		private final String mkey;
+
+		public MapBulkStore(List<String> keyList, String mkey, T value,
+		                    CollectionAttributes attr, Transcoder<T> tc) {
+			this.keyList = keyList;
+			this.mkey = mkey;
+			this.value = value;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = keyList.size();
+			this.createKeyIfNotExists = (attr != null);
+			this.cachedData = tc.encode(value);
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// estimate the buffer capacity
+			int eachExtraSize = KeyUtil.getKeyBytes(mkey).length
+					+ cachedData.getData().length + 64;
+			for (String eachKey : keyList) {
+				capacity += KeyUtil.getKeyBytes(eachKey).length;
+			}
+			capacity += eachExtraSize * keyList.size();
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			int kSize = this.keyList.size();
+			for (int i = this.nextOpIndex; i < kSize; i++) {
+				String key = keyList.get(i);
+				byte[] value = cachedData.getData();
+
+				setArguments(
+						bb,
+						COMMAND,
+						key,
+						mkey,
+						value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cachedData.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getExpireTime() != null) ? attribute
+								.getExpireTime()
+								: CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getMaxCount() != null) ? attribute
+								.getMaxCount()
+								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < kSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
 	public static class SetBulkStore<T> extends CollectionBulkStore<T> {
 
 		private static final String COMMAND = "sop insert";

@@ -338,7 +338,152 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			throw new RuntimeException("not supported in binary protocol yet.");
 		}
 	}
-	
+
+	/**
+	 *
+	 */
+	public static class MapPipedStore<T> extends CollectionPipedStore<T> {
+
+		private static final String COMMAND = "mop insert";
+		private Map<String, T> map;
+
+		public MapPipedStore(String key, Map<String, T> map,
+		                     boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+			this.key = key;
+			this.map = map;
+			this.createKeyIfNotExists = createKeyIfNotExists;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = map.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// decode values
+			List<byte[]> encodedList = new ArrayList<byte[]>(map.size());
+			CachedData cd = null;
+			for (T each : map.values()) {
+				cd = tc.encode(each);
+				encodedList.add(cd.getData());
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			for (String eachMkey : map.keySet()) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(eachMkey).length;
+				capacity += encodedList.get(i++).length;
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			int keySize = map.keySet().size();
+			List<String> keyList = new ArrayList<String>(map.keySet());
+			for(i = this.nextOpIndex; i < keySize; i++) {
+				String mkey = keyList.get(i);
+				byte[] value = encodedList.get(i);
+
+				setArguments(bb, COMMAND, key, mkey, value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getExpireTime() != null) ? attribute.
+								getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getMaxCount() != null) ? attribute.
+								getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < keySize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+	/**
+	 *
+	 */
+	public static class MapElementsPipedStore<T> extends CollectionPipedStore<T> {
+
+		private static final String COMMAND = "mop insert";
+		private List<MapElement<T>> mapElements;
+
+		public MapElementsPipedStore(String key, List<MapElement<T>> mapElements,
+		                     boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+			this.key = key;
+			this.mapElements = mapElements;
+			this.createKeyIfNotExists = createKeyIfNotExists;
+			this.attribute = attr;
+			this.tc = tc;
+			this.itemCount = mapElements.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// decode values
+			List<byte[]> encodedList = new ArrayList<byte[]>(mapElements.size());
+			CachedData cd = null;
+			for (MapElement<T> each : mapElements) {
+				cd = tc.encode(each.getValue());
+				encodedList.add(cd.getData());
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			for (MapElement<T> eachMkey : mapElements) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(eachMkey.getMkey()).length;
+				capacity += encodedList.get(i++).length;
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			int fSize = mapElements.size();
+			for(i = this.nextOpIndex; i < fSize; i++) {
+				MapElement<T> mapMkey = mapElements.get(i);
+				byte[] value = encodedList.get(i);
+
+				setArguments(bb, COMMAND, key, mapMkey.getMkey(), value.length,
+						(createKeyIfNotExists) ? "create" : "",
+						(createKeyIfNotExists) ? cd.getFlags() : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getExpireTime() != null) ? attribute.
+								getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.
+								getMaxCount() != null) ? attribute.
+								getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(i < fSize - 1) ? PIPE : "");
+				bb.put(value);
+				bb.put(CRLF);
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
 	public String getKey() {
 		return key;
 	}
