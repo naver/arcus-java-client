@@ -294,7 +294,7 @@ public interface OperationFactory {
 	 * @return a new CollectionDeleteOperation
 	 */
 	CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb);
+			CollectionDelete collectionDelete, OperationCallback cb);
 
 	/**
 	 * Existence operation for collection items. 

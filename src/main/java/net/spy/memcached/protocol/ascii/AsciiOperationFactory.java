@@ -197,7 +197,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 
 	public CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
 	}
 	

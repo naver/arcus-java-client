@@ -225,7 +225,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 	}
 
 	public CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		throw new RuntimeException(
 			"CollectionDeleteOperation is not supported in binary protocol yet.");
 	}

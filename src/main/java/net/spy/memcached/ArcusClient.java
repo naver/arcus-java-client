@@ -1053,8 +1053,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @param collectionDelete  operation parameters (element index/key, value, and so on)
 	 * @return future holding the success/failure of the operation
 	 */
-	private <T> CollectionFuture<Boolean> asyncCollectionDelete(
-			final String key, final CollectionDelete<T> collectionDelete) {
+	private CollectionFuture<Boolean> asyncCollectionDelete(
+			final String key, final CollectionDelete collectionDelete) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
 				latch, operationTimeout);
@@ -1402,7 +1402,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
 			ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
-		BTreeDelete<Object> delete = new BTreeDelete<Object>(bkey, false,
+		BTreeDelete delete = new BTreeDelete(bkey, false,
 				dropIfEmpty, eFlagFilter);
 		return asyncCollectionDelete(key, delete);
 	}
@@ -1414,7 +1414,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
 			long to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
-		BTreeDelete<Object> delete = new BTreeDelete<Object>(from, to, count,
+		BTreeDelete delete = new BTreeDelete(from, to, count,
 				false, dropIfEmpty, eFlagFilter);
 		return asyncCollectionDelete(key, delete);
 	}
@@ -1426,7 +1426,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
 			boolean dropIfEmpty) {
-		ListDelete<Object> delete = new ListDelete<Object>(index, false,
+		ListDelete delete = new ListDelete(index, false,
 				dropIfEmpty);
 		return asyncCollectionDelete(key, delete);
 	}
@@ -1438,7 +1438,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncLopDelete(String key, int from,
 			int to, boolean dropIfEmpty) {
-		ListDelete<Object> delete = new ListDelete<Object>(from, to, false,
+		ListDelete delete = new ListDelete(from, to, false,
 				dropIfEmpty);
 		return asyncCollectionDelete(key, delete);
 	}
@@ -3428,7 +3428,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] from,
 			byte[] to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
-		BTreeDelete<Object> delete = new BTreeDelete<Object>(from, to, count,
+		BTreeDelete delete = new BTreeDelete(from, to, count,
 				false, dropIfEmpty, eFlagFilter);
 		return asyncCollectionDelete(key, delete);
 	}
@@ -3440,7 +3440,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncBopDelete(String key,
 			byte[] bkey, ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
-		BTreeDelete<Object> delete = new BTreeDelete<Object>(bkey, false,
+		BTreeDelete delete = new BTreeDelete(bkey, false,
 				dropIfEmpty, eFlagFilter);
 		return asyncCollectionDelete(key, delete);
 	}

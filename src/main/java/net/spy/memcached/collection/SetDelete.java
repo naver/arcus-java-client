@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection;
 
-public class SetDelete<T> extends CollectionDelete<T> {
+public class SetDelete<T> extends CollectionDelete {
 
 	private static final String command = "sop delete";
 	

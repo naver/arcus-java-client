@@ -59,10 +59,10 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
 	protected String key;
-	protected CollectionDelete<?> collectionDelete;
+	protected CollectionDelete collectionDelete;
 
 	public CollectionDeleteOperationImpl(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		super(cb);
 		this.key = key;
 		this.collectionDelete = collectionDelete;
@@ -123,7 +123,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		return Collections.singleton(key);
 	}
 
-	public CollectionDelete<?> getDelete() {
+	public CollectionDelete getDelete() {
 		return collectionDelete;
 	}
 
