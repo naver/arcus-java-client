@@ -23,7 +23,7 @@ public abstract class CollectionGet<K> {
 
 	protected String str;
 	protected int headerCount;
-	protected K subkey;
+	protected String subkey;
 	protected int dataLength;
 
 	protected byte[] elementFlag;
@@ -36,7 +36,7 @@ public abstract class CollectionGet<K> {
 		this.delete = delete;
 	}
 
-	public K getSubkey() {
+	public String getSubkey() {
 		return subkey;
 	}
 
