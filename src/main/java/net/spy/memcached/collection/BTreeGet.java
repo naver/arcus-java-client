@@ -21,8 +21,7 @@ import net.spy.memcached.util.BTreeUtil;
 public class BTreeGet extends CollectionGet {
 
 	private static final String command = "bop get";
-	private final BKeyType bkeyType;
-	
+
 	protected String range;
 	protected int offset = -1;
 	protected int count = -1;
@@ -33,7 +32,6 @@ public class BTreeGet extends CollectionGet {
 		this.headerCount = 2;
 		this.range = String.valueOf(bkey);
 		this.delete = delete;
-		bkeyType = BKeyType.LONG_BKEY;
 	}
 	
 	public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
@@ -48,7 +46,6 @@ public class BTreeGet extends CollectionGet {
 		this.offset = offset;
 		this.count = count;
 		this.delete = delete;
-		bkeyType = BKeyType.LONG_BKEY;
 	}
 
 	public BTreeGet(long from, long to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
@@ -65,7 +62,6 @@ public class BTreeGet extends CollectionGet {
 		this.delete = delete;
 		this.dropIfEmpty = dropIfEmpty;
 		this.elementFlagFilter = elementFlagFilter;
-		bkeyType = BKeyType.BYTE_BKEY;
 	}
 
 	public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty, ElementMultiFlagsFilter elementMultiFlagsFilter) {
@@ -146,13 +142,10 @@ public class BTreeGet extends CollectionGet {
 
 		if (headerParseStep == 1) {
 			// found bkey
-			switch (bkeyType) {
-				case LONG_BKEY:
-					this.subkey = Long.parseLong(splited[0]);
-					break;
-				case BYTE_BKEY:
-					this.subkey = BTreeUtil.hexStringToByteArrays(splited[0].substring(2));
-					break;
+			if (splited[0].startsWith("0x")) {
+				this.subkey = splited[0].substring(2);
+			} else {
+				this.subkey = splited[0];
 			}
 
 			// found element flag.
@@ -168,10 +161,5 @@ public class BTreeGet extends CollectionGet {
 			this.headerParseStep = 1;
 			this.dataLength = Integer.parseInt(splited[1]);
 		}
-	}
-
-	private enum BKeyType {
-		LONG_BKEY,
-		BYTE_BKEY
 	}
 }
