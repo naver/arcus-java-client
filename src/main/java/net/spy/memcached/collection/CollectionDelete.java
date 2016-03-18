@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionDelete<T> {
+public abstract class CollectionDelete {
 
 	protected String range;
 	protected boolean noreply;

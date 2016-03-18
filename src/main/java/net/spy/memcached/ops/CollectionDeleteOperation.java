@@ -23,6 +23,6 @@ import net.spy.memcached.collection.CollectionDelete;
  */
 public interface CollectionDeleteOperation extends KeyedOperation {
 
-	CollectionDelete<?> getDelete();
+	CollectionDelete getDelete();
 	
 }
