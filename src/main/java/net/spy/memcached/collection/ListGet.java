@@ -23,8 +23,6 @@ public class ListGet extends CollectionGet {
 	
 	private static final String command = "lop get";
 	
-	protected String range;
-
 	public ListGet(int index, boolean delete) {
 		this.headerCount = 1;
 		this.range = String.valueOf(index);
