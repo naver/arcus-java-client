@@ -21,6 +21,7 @@ public abstract class CollectionGet<K> {
 	protected boolean delete = false;
 	protected boolean dropIfEmpty = true;
 
+	protected String range;
 	protected String str;
 	protected int headerCount;
 	protected String subkey;

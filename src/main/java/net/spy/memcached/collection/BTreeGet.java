@@ -22,7 +22,6 @@ public class BTreeGet extends CollectionGet {
 
 	private static final String command = "bop get";
 
-	protected String range;
 	protected int offset = -1;
 	protected int count = -1;
 
