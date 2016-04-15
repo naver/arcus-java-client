@@ -124,3 +124,10 @@ Future<Boolean> delete(String key)
 
 - 주어진 key를 가진 item을 cache에서 삭제한다.
  
+그리고, 한번의 API 호출로 다수의 key-value items을 delete하는 bulk API를 제공한다.
+
+```java
+Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key)
+```
+
+- 다수의 key-value item을 한번에 delete한다.
