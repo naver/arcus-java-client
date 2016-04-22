@@ -358,12 +358,6 @@ public class ArcusClientPool implements ArcusClientIF {
 	}
 
 	@Override
-	public <T> Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
-			List<String> key, Transcoder<T> tc) {
-		return this.getClient().asyncDeleteBulk(key, tc);
-	}
-
-	@Override
 	public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
 			List<String> key) {
 		return this.getClient().asyncDeleteBulk(key);

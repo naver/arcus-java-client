@@ -1174,20 +1174,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o, int exp) {
 		return asyncSetBulk(o, exp, transcoder);
 	}
-	/* (non-Javadoc)
-	 * @see net.spy.memcached.ArcusClient#asyncDeleteBulk(java.util.List, net.spy.memcached.transcoders.Transcoder)
-	 */
-	@Override
-	public <T> Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key, Transcoder<T> tc) {
-		return bulkService.deleteBulk(key, tc, new ArcusClient[] { this });
-	}
 
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClient#asyncDeleteBulk(java.util.List)
 	 */
 	@Override
 	public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key) {
-		return asyncDeleteBulk(key, transcoder);
+		return bulkService.deleteBulk(key, new ArcusClient[] { this });
 	}
 
 	/*

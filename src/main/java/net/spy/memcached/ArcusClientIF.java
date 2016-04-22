@@ -168,24 +168,9 @@ public interface ArcusClientIF {
 	 *	keys.add("KEY1");
 	 *	keys.add("KEY2");
 	 *
-	 *	// Get customized transcoder
-	 *	Transcoder myTranscoder = getTranscoder();
-	 *
 	 *	// Delete a value (async) on each keys for one hour using multiple memcached client.
-	 *	c.asyncDeleteBulk(keys, transcoder);
+	 *	c.asyncDeleteBulk(keys);
 	 *	</pre>
-	 *
-	 * @param <T>
-	 * @param key the key list which this object should be deleted
-	 * @param tc the transcoder to serialize and unserialize the value
-	 * @return a future that will hold the list of failed
-	 *
-	 */
-	public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
-			List<String> key, Transcoder<T> tc);
-
-	/**
-	 * Delete an object in the cache on each key using specified memcached client
 	 *
 	 * @param key the key list which this object should be deleted
 	 * @return a future that will hold the list of failed

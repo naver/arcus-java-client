@@ -79,10 +79,9 @@ class BulkService extends SpyObject {
 	}
 
 	<T> Future<Map<String, CollectionOperationStatus>> deleteBulk(
-			List<String> keys, Transcoder<T> transcoder,
-			ArcusClient[] client) {
-		BulkDeleteWorker<T> w = new BulkDeleteWorker<T>(keys, transcoder, client,
-				singleOpTimeout);
+			List<String> keys, ArcusClient[] client) {
+		assert !executor.isShutdown() : "Pool has already shut down.";
+		BulkDeleteWorker<T> w = new BulkDeleteWorker<T>(keys, client, singleOpTimeout);
 		BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
 				w);
 		executor.submit(task);
@@ -293,9 +292,8 @@ class BulkService extends SpyObject {
 	private static class BulkDeleteWorker<T> extends BulkWorker<T> {
 		private final List<String> keys;
 
-		public BulkDeleteWorker(List<String> keys, Transcoder<T> transcoder,
-								ArcusClient[] clientList, long timeout) {
-			super(keys.size(), timeout, transcoder, clientList);
+		public BulkDeleteWorker(List<String> keys, ArcusClient[] clientList, long timeout) {
+			super(keys.size(), timeout, null, clientList);
 			this.keys = keys;
 		}
 
@@ -323,7 +321,7 @@ class BulkService extends SpyObject {
 		}
 
 		@Override
-		public boolean isDataExists()  {
+		public boolean isDataExists() {
 			return (keys != null && keys.size() > 0);
 		}
 	}
