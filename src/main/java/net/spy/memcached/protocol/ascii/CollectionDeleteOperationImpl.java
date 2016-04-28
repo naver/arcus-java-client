@@ -93,14 +93,11 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		byte[] data = collectionDelete.getData();
 
 		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-				+ cmd.length() + args.length() + data.length + 16);
+				+ cmd.length() + args.length() + ((null != data)? data.length : 0) + 16);
 
 		setArguments(bb, cmd, key, args);
 
-		if ("sop delete".equals(cmd)) {
-			bb.put(data);
-			bb.put(CRLF);
-		} else if (data.length > 0) {
+		if (null != data) {
 			bb.put(data);
 			bb.put(CRLF);
 		}
