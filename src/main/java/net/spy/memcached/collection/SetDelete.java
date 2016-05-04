@@ -29,6 +29,7 @@ public class SetDelete<T> extends CollectionDelete {
 	public SetDelete(T value, boolean noreply, Transcoder tc) {
 		this.value = value;
 		this.noreply = noreply;
+		this.tc = tc;
 		this.additionalArgs = tc.encode(value).getData();
 	}
 

@@ -556,8 +556,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Boolean> asyncSopExist(String key, T value,
 			Transcoder<T> tc) {
-		SetExist<T> exist = new SetExist<T>();
-		exist.setValue(value);
+		SetExist<T> exist = new SetExist<T>(value, tc);
 		return asyncCollectionExist(key, "", exist, tc);
 	}
 
@@ -566,8 +565,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public CollectionFuture<Boolean> asyncSopExist(String key, Object value) {
-		SetExist<Object> exist = new SetExist<Object>();
-		exist.setValue(value);
+		SetExist<Object> exist = new SetExist<Object>(value, collectionTranscoder);
 		return asyncCollectionExist(key, "", exist, collectionTranscoder);
 	}
 
@@ -1102,13 +1100,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	private <T> CollectionFuture<Boolean> asyncCollectionExist(
 			final String key, final String subkey,
-			final CollectionExist<T> collectionExist, Transcoder<T> tc) {
+			final CollectionExist collectionExist, Transcoder<T> tc) {
 		final CountDownLatch latch = new CountDownLatch(1);
 		final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
 				latch, operationTimeout);
-		CachedData cd = tc.encode(collectionExist.getValue());
-		collectionExist.setData(cd.getData());
-
 		Operation op = opFact.collectionExist(key, subkey, collectionExist,
 				new OperationCallback() {
 					public void receivedStatus(OperationStatus status) {

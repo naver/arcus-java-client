@@ -306,7 +306,7 @@ public interface OperationFactory {
 	 * @return a new CollectionExistOperation
 	 */
 	CollectionExistOperation collectionExist(String key, String subkey, 
-			CollectionExist<?> collectionExist, OperationCallback cb); 
+			CollectionExist collectionExist, OperationCallback cb);
 	
 	/**
 	 * Clone an operation.
