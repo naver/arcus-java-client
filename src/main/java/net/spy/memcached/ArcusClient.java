@@ -1451,8 +1451,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Boolean> asyncSopDelete(String key, Object value,
 			boolean dropIfEmpty) {
 		SetDelete<Object> delete = new SetDelete<Object>(value, false,
-				dropIfEmpty);
-		delete.setData(collectionTranscoder.encode(value).getData());
+				dropIfEmpty, collectionTranscoder);
 		return asyncCollectionDelete(key, delete);
 	}
 
@@ -1463,8 +1462,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Boolean> asyncSopDelete(String key, T value,
 			boolean dropIfEmpty, Transcoder<T> tc) {
-		SetDelete<Object> delete = new SetDelete<Object>(value, false, dropIfEmpty);
-		delete.setData(tc.encode(value).getData());
+		SetDelete<T> delete = new SetDelete<T>(value, false, dropIfEmpty, tc);
 		return asyncCollectionDelete(key, delete);
 	}
 

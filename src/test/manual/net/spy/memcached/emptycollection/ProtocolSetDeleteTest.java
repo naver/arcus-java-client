@@ -19,34 +19,32 @@ package net.spy.memcached.emptycollection;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import net.spy.memcached.collection.SetDelete;
+import net.spy.memcached.transcoders.CollectionTranscoder;
+import net.spy.memcached.transcoders.Transcoder;
 
 public class ProtocolSetDeleteTest extends TestCase {
 
-	public void testStringfy() {
+	public void testObjectfy() {
 		// default setting : dropIfEmpty = true
+		Object value = "value";
+		Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
-		SetDelete<String> del = new SetDelete<String>("value", false);
-		del.setData("value".getBytes());
+		SetDelete<Object> del = new SetDelete<Object>("value", false, testTranscoder);
 		Assert.assertEquals("5 drop", del.stringify());
 
-		del = new SetDelete<String>("value", false, false);
-		del.setData("value".getBytes());
+		del = new SetDelete<Object>("value", false, false, testTranscoder);
 		Assert.assertEquals("5", del.stringify());
 
-		del = new SetDelete<String>("value", false, true);
-		del.setData("value".getBytes());
+		del = new SetDelete<Object>("value", false, true, testTranscoder);
 		Assert.assertEquals("5 drop", del.stringify());
 
-		del = new SetDelete<String>("value", true);
-		del.setData("value".getBytes());
+		del = new SetDelete<Object>("value", true, testTranscoder);
 		Assert.assertEquals("5 drop noreply", del.stringify());
 
-		del = new SetDelete<String>("value", true, false);
-		del.setData("value".getBytes());
+		del = new SetDelete<Object>("value", true, false, testTranscoder);
 		Assert.assertEquals("5 noreply", del.stringify());
 
-		del = new SetDelete<String>("value", true, true);
-		del.setData("value".getBytes());
+		del = new SetDelete<Object>("value", true, true, testTranscoder);
 		Assert.assertEquals("5 drop noreply", del.stringify());
 	}
 }
