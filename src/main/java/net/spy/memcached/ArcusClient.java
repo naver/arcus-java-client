@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -1180,7 +1181,21 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key) {
+		if (key == null) {
+			throw new IllegalArgumentException("Key list is null.");
+		}
 		return bulkService.deleteBulk(key, new ArcusClient[] { this });
+	}
+
+	/* (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClient#asyncDeleteBulk(java.util.String)
+	 */
+	@Override
+	public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key) {
+		if (key == null) {
+			throw new IllegalArgumentException("Key list is null.");
+		}
+		return bulkService.deleteBulk(Arrays.asList(key), new ArcusClient[] { this });
 	}
 
 	/*

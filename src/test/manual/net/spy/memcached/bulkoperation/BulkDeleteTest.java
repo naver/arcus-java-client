@@ -21,11 +21,11 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 
 public class BulkDeleteTest extends BaseIntegrationTest {
 
@@ -37,11 +37,17 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         try {
             // DELETE null key
             try {
-                mc.asyncDeleteBulk(null);
-            } catch (NullPointerException e) {
-
+                List<String> keys = null;
+                mc.asyncDeleteBulk(keys);
             } catch (Exception e) {
-                Assert.fail();
+                assertEquals("Key list is null.", e.getMessage());
+            }
+
+            try {
+                String[] keys = null;
+                mc.asyncDeleteBulk(keys);
+            } catch (Exception e) {
+                assertEquals("Key list is null.", e.getMessage());
             }
 
             for (int keySize = 0; keySize < TEST_COUNT; keySize++) {

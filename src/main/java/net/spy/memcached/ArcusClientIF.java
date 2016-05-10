@@ -180,6 +180,16 @@ public interface ArcusClientIF {
 			List<String> key);
 
 	/**
+	 * Delete an object in the cache on each key.
+	 *
+	 * @param key one or more keys to delete
+	 * @return a future that will hold the list of failed
+	 *
+	 */
+	public abstract Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+			String... key);
+
+	/**
 	 * Insert one item into multiple b+trees at once.
 	 * 
 	 * @param keyList
