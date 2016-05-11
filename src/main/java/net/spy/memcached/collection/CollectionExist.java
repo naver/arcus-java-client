@@ -16,44 +16,11 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionExist<T> {
+public abstract class CollectionExist {
 
-	protected T value;
-	protected byte[] data;
-	
 	protected String str;
-	
-	public CollectionExist() { }
-	
-	public CollectionExist(T value, byte[] data) {
-		this.value = value;
-		this.data = data;
-	}
-	
-	public void setValue(T value) {
-		this.value = value;
-	}
-	
-	public T getValue() {
-		return value;
-	}
-	
-	public byte[] getData() {
-		return data;
-	}
-	
-	public void setData(byte[] data) {
-		this.data = data;
-	}
 
-	public String stringify() {
-		return "";
-	}
-	
-	public String toString() {
-		return (str != null)? str : stringify();
-	}
-	
+	public abstract byte[] getAdditionalArgs();
+	public abstract String stringify();
 	public abstract String getCommand();
-	
 }

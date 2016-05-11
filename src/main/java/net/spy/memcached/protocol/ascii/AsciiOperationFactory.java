@@ -202,7 +202,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 	
 	public CollectionExistOperation collectionExist(String key, String subkey,
-			CollectionExist<?> collectionExist, OperationCallback cb) {
+			CollectionExist collectionExist, OperationCallback cb) {
 		return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
 	}
 

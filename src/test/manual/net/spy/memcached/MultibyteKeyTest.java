@@ -137,10 +137,10 @@ public class MultibyteKeyTest {
     }
 
     @Test
-    public void CollectionExistOperationImplTest() {
+    public void SetExistOperationImplTest() {
         try {
             opFact.collectionExist(MULTIBYTE_KEY, "",
-                    new CollectionExist<Integer>(new Random().nextInt(), testData) {
+                    new SetExist<Integer>(new Random().nextInt(), new CollectionTranscoder()) {
                         @Override
                         public String getCommand() {
                             return "CollectionExistCommand";

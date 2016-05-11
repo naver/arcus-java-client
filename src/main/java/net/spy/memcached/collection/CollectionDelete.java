@@ -23,7 +23,6 @@ public abstract class CollectionDelete {
 	protected boolean dropIfEmpty = true;
 	
 	protected String str;
-	protected byte[] data = { };
 
 	public String getRange() {
 		return range;
@@ -41,14 +40,8 @@ public abstract class CollectionDelete {
 		this.noreply = noreply;
 	}
 
-	public byte[] getData() {
-		return data;
-	}
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
-
+	public abstract byte[] getAdditionalArgs();
 	public abstract String stringify();
 	public abstract String getCommand();
 

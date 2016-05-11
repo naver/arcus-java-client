@@ -40,6 +40,11 @@ public class ListDelete extends CollectionDelete {
 		this.dropIfEmpty = dropIfEmpty;
 	}
 	
+	@Override
+	public byte[] getAdditionalArgs() {
+		return null;
+	}
+
 	public String stringify() {
 		if (str != null) return str;
 		

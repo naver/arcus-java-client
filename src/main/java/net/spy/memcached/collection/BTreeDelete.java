@@ -101,6 +101,11 @@ public class BTreeDelete extends CollectionDelete {
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
 	}
 
+	@Override
+	public byte[] getAdditionalArgs() {
+		return null;
+	}
+
 	public String stringify() {
 		if (str != null) return str;
 		

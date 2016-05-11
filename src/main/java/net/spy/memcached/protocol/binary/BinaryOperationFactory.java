@@ -231,7 +231,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 	}
 
 	public CollectionExistOperation collectionExist(String key, String subkey,
-			CollectionExist<?> collectionExist, OperationCallback cb) {
+			CollectionExist collectionExist, OperationCallback cb) {
 		throw new RuntimeException(
 			"CollectionExistOperation is not supported in binary protocol yet.");
 	}

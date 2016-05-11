@@ -16,14 +16,29 @@
  */
 package net.spy.memcached.collection;
 
-public class SetExist<T> extends CollectionExist<T> {
+import net.spy.memcached.transcoders.Transcoder;
+
+public class SetExist<T> extends CollectionExist {
 
 	private static final String command = "sop exist";
-	
-	public SetExist() { }
 
-	public SetExist(T value, byte[] data) {
-		super(value, data);
+	protected T value;
+	protected byte[] additionalArgs;
+	protected Transcoder<T> tc;
+	
+	public SetExist(T value, Transcoder tc) {
+		this.value = value;
+		this.tc = tc;
+		this.additionalArgs = tc.encode(value).getData();
+	}
+
+	@Override
+	public byte[] getAdditionalArgs() {
+		return additionalArgs;
+	}
+
+	public String stringify() {
+		return String.valueOf(additionalArgs.length);
 	}
 
 	public String getCommand() {
