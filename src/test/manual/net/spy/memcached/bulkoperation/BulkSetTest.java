@@ -35,6 +35,13 @@ public class BulkSetTest extends BaseIntegrationTest {
 		int TEST_COUNT = 3;
 
 		try {
+			// SET null key
+			try {
+				mc.asyncSetBulk(null, 60);
+			} catch (Exception e) {
+				assertEquals("Map is null.", e.getMessage());
+			}
+
 			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
 
 				// generate key
@@ -98,10 +105,8 @@ public class BulkSetTest extends BaseIntegrationTest {
 			// SET null key
 			try {
 				mc.asyncSetBulk(null, 60, value);
-			} catch (NullPointerException e) {
-
 			} catch (Exception e) {
-				Assert.fail();
+				assertEquals("Key list is null.", e.getMessage());
 			}
 
 			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
@@ -191,10 +196,8 @@ public class BulkSetTest extends BaseIntegrationTest {
 			// SET null key
 			try {
 				mc.asyncSetBulk(null, 60, value);
-			} catch (NullPointerException e) {
-
 			} catch (Exception e) {
-				Assert.fail();
+				assertEquals("Key list is null.", e.getMessage());
 			}
 
 			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
