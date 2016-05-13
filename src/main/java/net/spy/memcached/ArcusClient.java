@@ -1148,6 +1148,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, T o, Transcoder<T> tc) {
+		if (key == null) {
+			throw new IllegalArgumentException("Key list is null.");
+		}
 		return bulkService.setBulk(key, exp, o, tc, new ArcusClient[] { this });
 	}
 
@@ -1167,6 +1170,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 */
 	@Override
 	public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, T> o, int exp, Transcoder<T> tc) {
+		if (o == null) {
+			throw new IllegalArgumentException("Map is null.");
+		}
 		return bulkService.setBulk(o, exp, tc, new ArcusClient[] { this });
 	}
 
