@@ -57,6 +57,9 @@ class BulkService extends SpyObject {
 	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
 			List<String> keys, int exp, T value, Transcoder<T> transcoder,
 			ArcusClient[] client) {
+		if (keys == null) {
+			throw new IllegalArgumentException("Key list is null.");
+		}
 		assert !executor.isShutdown() : "Pool has already shut down.";
 		BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
 				client, singleOpTimeout);
@@ -69,6 +72,9 @@ class BulkService extends SpyObject {
 	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
 			Map<String, T> o, int exp, Transcoder<T> transcoder,
 			ArcusClient[] client) {
+		if (o == null) {
+			throw new IllegalArgumentException("Map is null.");
+		}
 		assert !executor.isShutdown() : "Pool has already shut down.";
 		BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder, client,
 				singleOpTimeout);
