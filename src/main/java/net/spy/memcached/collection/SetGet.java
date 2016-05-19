@@ -40,7 +40,12 @@ public class SetGet extends CollectionGet {
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
+
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
+
 	public String stringify() {
 		if (str != null) return str;
 		

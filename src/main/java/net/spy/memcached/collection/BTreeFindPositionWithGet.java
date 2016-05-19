@@ -99,6 +99,11 @@ public class BTreeFindPositionWithGet extends CollectionGet {
 		return spaceCount == 2;
 	}
 
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
+
 	/*
 	 * VALUE <position> <flags> <count> <index>\r\n
 	 * <bkey> [<eflag>] <bytes> <data>\r\n

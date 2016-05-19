@@ -85,6 +85,11 @@ public class BTreeGetByPosition extends CollectionGet {
 		return spaceCount == 2;
 	}
 
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
+
 	private static final int BKEY = 0;
 	private static final int EFLAG_OR_BYTES = 1;
 	private static final int BYTES = 2;

@@ -87,6 +87,11 @@ public class MultibyteKeyTest {
                 public String stringify() {
                     return "collectionGetString";
                 }
+
+                @Override
+                public byte[] getAddtionalArgs() {
+                    return null;
+                }
                 @Override
                 public String getCommand() {
                     return "collectionGetCommand";
