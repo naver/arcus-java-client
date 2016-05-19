@@ -53,6 +53,11 @@ public class ListGet extends CollectionGet {
 		this.range = range;
 	}
 
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
+
 	public String stringify() {
 		if (str != null) return str;
 		

@@ -223,10 +223,17 @@ public class CollectionGetOperationImpl extends OperationImpl
 	public void initialize() {
 		String cmd = collectionGet.getCommand();
 		String args = collectionGet.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-				+ cmd.length() + args.length() + 16);
+		byte[] additionalArgs = collectionGet.getAddtionalArgs();
+
+		ByteBuffer bb = ByteBuffer.allocate(
+						KeyUtil.getKeyBytes(key).length + cmd.length() + args.length() +
+										(additionalArgs == null ? 0 : additionalArgs.length) + 16);
 
 		setArguments(bb, cmd, key, args);
+		if(additionalArgs != null) {
+			setArguments(bb, additionalArgs);
+		}
+
 		bb.flip();
 		setBuffer(bb);
 

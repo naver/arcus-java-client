@@ -64,7 +64,8 @@ public abstract class CollectionGet<K> {
 	public boolean eachRecordParseCompleted() {
 		return true;
 	}
-	
+
+	public abstract byte[] getAddtionalArgs();
 	public abstract String stringify();
 	public abstract String getCommand();
 	public abstract void decodeItemHeader(String itemHeader);

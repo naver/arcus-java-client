@@ -130,6 +130,11 @@ public class BTreeGet extends CollectionGet {
 			return true;
 		}
 	}
+
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
 	
 	@Override
 	public boolean headerReady(int spaceCount) {
