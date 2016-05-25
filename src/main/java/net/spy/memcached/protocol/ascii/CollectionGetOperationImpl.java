@@ -231,7 +231,8 @@ public class CollectionGetOperationImpl extends OperationImpl
 
 		setArguments(bb, cmd, key, args);
 		if(additionalArgs != null) {
-			setArguments(bb, additionalArgs);
+			bb.put(additionalArgs);
+			bb.put(CRLF);
 		}
 
 		bb.flip();
