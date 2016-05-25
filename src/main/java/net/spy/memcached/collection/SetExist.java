@@ -26,7 +26,7 @@ public class SetExist<T> extends CollectionExist {
 	protected byte[] additionalArgs;
 	protected Transcoder<T> tc;
 	
-	public SetExist(T value, Transcoder tc) {
+	public SetExist(T value, Transcoder<T> tc) {
 		this.value = value;
 		this.tc = tc;
 		this.additionalArgs = tc.encode(value).getData();

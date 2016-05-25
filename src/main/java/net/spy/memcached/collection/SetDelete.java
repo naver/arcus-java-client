@@ -26,7 +26,7 @@ public class SetDelete<T> extends CollectionDelete {
 	protected byte[] additionalArgs;
 	protected Transcoder<T> tc;
 	
-	public SetDelete(T value, boolean noreply, Transcoder tc) {
+	public SetDelete(T value, boolean noreply, Transcoder<T> tc) {
 		this.value = value;
 		this.noreply = noreply;
 		this.tc = tc;
