@@ -14,9 +14,7 @@ import net.spy.memcached.transcoders.Transcoder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.annotation.ExceptionProxy;
 
-import java.security.Key;
 import java.util.*;
 
 /**
