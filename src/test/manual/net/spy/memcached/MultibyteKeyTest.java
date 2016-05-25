@@ -10,6 +10,7 @@ import net.spy.memcached.ops.*;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
+import net.spy.memcached.transcoders.Transcoder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -144,8 +145,9 @@ public class MultibyteKeyTest {
     @Test
     public void SetExistOperationImplTest() {
         try {
+            Transcoder<Object> tc = new CollectionTranscoder();
             opFact.collectionExist(MULTIBYTE_KEY, "",
-                    new SetExist<Integer>(new Random().nextInt(), new CollectionTranscoder()) {
+                    new SetExist<Object>(new Random().nextInt(), tc) {
                         @Override
                         public String getCommand() {
                             return "CollectionExistCommand";
