@@ -44,9 +44,8 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testNotFound() throws Exception {
-		CollectionFuture<Map<Long, Element<Object>>> future = (CollectionFuture<Map<Long, Element<Object>>>) mc
-				.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, false,
-						false);
+		CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
+						key, 0, ElementFlagFilter.DO_NOT_FILTER, false,	false);
 		assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -55,13 +54,11 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testNotFoundElement() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		CollectionFuture<Map<Long, Element<Object>>> future2 = (CollectionFuture<Map<Long, Element<Object>>>) mc
-				.asyncBopGet(key, 1, ElementFlagFilter.DO_NOT_FILTER, false,
-						false);
+		CollectionFuture<Map<Long, Element<Object>>> future2 = mc.asyncBopGet(
+						key, 1, ElementFlagFilter.DO_NOT_FILTER, false,	false);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
@@ -70,8 +67,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testCreatedStored() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -80,12 +76,10 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testStored() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 1, null, 1,
-				new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 1, null, 1,	new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -94,16 +88,14 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testOutOfRange() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 1, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 1, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(key,
-				new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim)).get(1000,
-				TimeUnit.MILLISECONDS));
+		assertTrue(mc.asyncSetAttr(
+						key,	new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim))
+						.get(1000,TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 2, null,
-				"bbbb", new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 2, null, "bbbb", new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -112,16 +104,13 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testOverflowed() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(key,
-				new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
+		assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 1, null,
-				"aaa", new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 1, null, "aaa", new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -131,13 +120,11 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testElementExists() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// insert an item with same bkey
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 0, null,
-				"bbbb", new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 0, null, "bbbb", new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -147,13 +134,11 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedDropped() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// delete
-		future = (CollectionFuture<Boolean>) mc.asyncBopDelete(key, 0,
-				ElementFlagFilter.DO_NOT_FILTER, true);
+		future = mc.asyncBopDelete(key, 0, ElementFlagFilter.DO_NOT_FILTER, true);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -163,18 +148,15 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeleted() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// insert
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 1, null,
-				"bbbb", null);
+		future = mc.asyncBopInsert(key, 1, null, "bbbb", null);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// delete
-		future = (CollectionFuture<Boolean>) mc.asyncBopDelete(key, 0,
-				ElementFlagFilter.DO_NOT_FILTER, false);
+		future = mc.asyncBopDelete(key, 0, ElementFlagFilter.DO_NOT_FILTER, false);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -184,14 +166,12 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedDroppedAfterRetrieval() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// get
-		CollectionFuture<Map<Long, Element<Object>>> future2 = (CollectionFuture<Map<Long, Element<Object>>>) mc
-				.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, true,
-						true);
+		CollectionFuture<Map<Long, Element<Object>>> future2 = mc.asyncBopGet(
+						key, 0, ElementFlagFilter.DO_NOT_FILTER, true, true);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
@@ -201,19 +181,16 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedAfterRetrieval() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// insert
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 1, null,
-				"bbbb", null);
+		future = mc.asyncBopInsert(key, 1, null, "bbbb", null);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// get
-		CollectionFuture<Map<Long, Element<Object>>> future2 = (CollectionFuture<Map<Long, Element<Object>>>) mc
-				.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, true,
-						true);
+		CollectionFuture<Map<Long, Element<Object>>> future2 = mc.asyncBopGet(
+						key, 0, ElementFlagFilter.DO_NOT_FILTER, true, true);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
