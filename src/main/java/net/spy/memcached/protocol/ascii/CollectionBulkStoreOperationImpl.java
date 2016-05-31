@@ -82,6 +82,8 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 			setAPIType(APIType.SOP_INSERT);
 		else if (this.store instanceof CollectionBulkStore.BTreeBulkStore)
 			setAPIType(APIType.BOP_INSERT);
+		else if (this.store instanceof CollectionBulkStore.MapBulkStore)
+			setAPIType(APIType.MOP_INSERT);
 		setOperationType(OperationType.WRITE);
 	}
 

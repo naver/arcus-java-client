@@ -85,8 +85,10 @@ import net.spy.memcached.collection.CollectionPipedStore.BTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ByteArraysBTreePipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.ListPipedStore;
 import net.spy.memcached.collection.CollectionPipedStore.SetPipedStore;
+import net.spy.memcached.collection.CollectionPipedStore.MapPipedStore;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
+import net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
@@ -101,6 +103,12 @@ import net.spy.memcached.collection.ListStore;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.MapCreate;
+import net.spy.memcached.collection.MapDelete;
+import net.spy.memcached.collection.MapGet;
+import net.spy.memcached.collection.MapStore;
+import net.spy.memcached.collection.MapUpdate;
+import net.spy.memcached.collection.MapElement;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -730,7 +738,82 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		addOp(k, op);
 		return rv;
 	}
-	
+
+	/**
+	 * Generic get operation for map items. Public methods for b+tree items call this method.
+	 *
+	 * @param k  map item's key
+	 * @param collectionGet  operation parameters (element keys and so on)
+	 * @param tc  transcoder to serialize and unserialize value
+	 * @return future holding the map of fetched elements and their keys
+	 */
+	private <T> CollectionFuture<Map<String, T>> asyncMopGet(
+			final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
+		final CountDownLatch latch = new CountDownLatch(1);
+		final CollectionFuture<Map<String, T>> rv = new CollectionFuture<Map<String, T>>(
+				latch, operationTimeout);
+		Operation op = opFact.collectionGet(k, collectionGet,
+				new CollectionGetOperation.Callback() {
+					HashMap<String, T> map = new HashMap<String, T>();
+
+					public void receivedStatus(OperationStatus status) {
+						CollectionOperationStatus cstatus;
+						if (status instanceof CollectionOperationStatus) {
+							cstatus = (CollectionOperationStatus) status;
+						} else {
+							getLogger().warn("Unhandled state: " + status);
+							cstatus = new CollectionOperationStatus(status);
+						}
+						if (cstatus.isSuccess()) {
+							rv.set(map, cstatus);
+							return;
+						}
+						switch (cstatus.getResponse()) {
+							case NOT_FOUND:
+								rv.set(null, cstatus);
+								if (getLogger().isDebugEnabled()) {
+									getLogger().debug("Key(%s) not found : %s", k,
+											cstatus);
+								}
+								break;
+							case NOT_FOUND_ELEMENT:
+								rv.set(map, cstatus);
+								if (getLogger().isDebugEnabled()) {
+									getLogger().debug("Element(%s) not found : %s",
+											k, cstatus);
+								}
+								break;
+							case UNREADABLE:
+								rv.set(null, cstatus);
+								if (getLogger().isDebugEnabled()) {
+									getLogger().debug("Element(%s) is not readable : %s",
+											k, cstatus);
+								}
+								break;
+							default:
+								rv.set(null, cstatus);
+								if (getLogger().isDebugEnabled()) {
+									getLogger().debug("Key(%s) Unknown response : %s",
+											k, cstatus);
+								}
+								break;
+						}
+					}
+					public void complete() {
+						latch.countDown();
+					}
+					public void gotData(String key, String subkey, int flags,
+							byte[] data) {
+						assert key.equals(k) : "Wrong key returned";
+						map.put(subkey, tc.decode(new CachedData(flags, data, tc
+								.getMaxSize())));
+					}
+				});
+		rv.setOperation(op);
+		addOp(k, op);
+		return rv;
+	}
+
 	/**
 	 * Generic store operation for collection items. Public methods for collection items call this method.
 	 *
@@ -1208,6 +1291,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopCreate(java.lang.String, net.spy.memcached.collection.CollectionAttributes)
+	 */
+	@Override
+	public CollectionFuture<Boolean> asyncMopCreate(String key,
+			ElementValueType type, CollectionAttributes attributes) {
+		int flag = CollectionTranscoder.examineFlags(type);
+		boolean noreply = false;
+		CollectionCreate mapCreate = new MapCreate(flag,
+				attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
+		return asyncCollectionCreate(key, mapCreate);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncSopCreate(java.lang.String, net.spy.memcached.collection.CollectionAttributes)
 	 */
 	@Override
@@ -1338,6 +1435,89 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, boolean, boolean)
+	 */
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			boolean withDelete, boolean dropIfEmpty) {
+		List<String> mkeyList = new ArrayList<String>();
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, collectionTranscoder);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.lang.String, boolean, boolean)
+	 */
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			String mkey, boolean withDelete, boolean dropIfEmpty) {
+		if (mkey == null) {
+			throw new IllegalArgumentException("mkey is null");
+		}
+		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, collectionTranscoder);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.util.List, boolean, boolean)
+	 */
+	@Override
+	public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
+			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
+		if (mkeyList == null) {
+			throw new IllegalArgumentException("mkeyList is null");
+		}
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, collectionTranscoder);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		List<String> mkeyList = new ArrayList<String>();
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, tc);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.lang.String, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		if (mkey == null) {
+			throw new IllegalArgumentException("mkey is null");
+		}
+		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, tc);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.util.List, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+		if (mkeyList == null) {
+			throw new IllegalArgumentException("mkeyList is null");
+		}
+		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
+		return asyncMopGet(key, get, tc);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncLopGet(java.lang.String, int, boolean, boolean)
 	 */
 	@Override
@@ -1423,6 +1603,50 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			long to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
 		BTreeDelete delete = new BTreeDelete(from, to, count,
 				false, dropIfEmpty, eFlagFilter);
+		return asyncCollectionDelete(key, delete);
+	}
+
+	/*
+	 * (non-Javadoc)
+    * @see net.spy.memcached.ArcusClientIF#asyncMopDelete(java.lang.String, boolean)
+    */
+	@Override
+	public CollectionFuture<Boolean> asyncMopDelete(String key,
+			boolean dropIfEmpty) {
+		List<String> mkeyList = new ArrayList<String>();
+		MapDelete delete = new MapDelete(mkeyList, false,
+				dropIfEmpty);
+		return asyncCollectionDelete(key, delete);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopDelete(java.lang.String, java.lang.String, boolean)
+	 */
+	@Override
+	public CollectionFuture<Boolean> asyncMopDelete(String key, String mkey,
+			boolean dropIfEmpty) {
+		if (mkey == null) {
+			throw new IllegalArgumentException("mkey is null");
+		}
+		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
+		MapDelete delete = new MapDelete(mkeyList, false,
+				dropIfEmpty);
+		return asyncCollectionDelete(key, delete);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopDelete(java.lang.String, java.lang.List, boolean)
+	 */
+	@Override
+	public CollectionFuture<Boolean> asyncMopDelete(String key, List<String> mkeyList,
+			boolean dropIfEmpty) {
+		if (mkeyList == null) {
+			throw new IllegalArgumentException("mkey list is null");
+		}
+		MapDelete delete = new MapDelete(mkeyList, false,
+				dropIfEmpty);
 		return asyncCollectionDelete(key, delete);
 	}
 
@@ -1547,6 +1771,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				collectionTranscoder);
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopInsert(java.lang.String, java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
+	 */
+	@Override
+	public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
+			Object value, CollectionAttributes attributesForCreate) {
+		MapStore<Object> mapStore = new MapStore<Object>(value,
+				(attributesForCreate != null), null, attributesForCreate);
+		return asyncCollectionStore(key, mkey, mapStore,
+				collectionTranscoder);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncLopInsert(java.lang.String, int, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
@@ -1586,6 +1824,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopInsert(java.lang.String, java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String  mkey,
+			T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		MapStore<T> mapStore = new MapStore<T>(value,
+				(attributesForCreate != null), null, attributesForCreate);
+		return asyncCollectionStore(key, mkey, mapStore, tc);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncLopInsert(java.lang.String, int, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
 	 */
 	@Override
@@ -1620,6 +1870,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				collectionTranscoder);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes)
+	 */
+	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<String, Object> elements,
+			CollectionAttributes attributesForCreate) {
+		return asyncMopPipedInsertBulk(key, elements, attributesForCreate,
+				collectionTranscoder);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -1671,6 +1932,33 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, Map<String, T> elements,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		if (elements.size() <= CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
+			MapPipedStore<T> store = new MapPipedStore<T>(key, elements,
+					(attributesForCreate != null), attributesForCreate, tc);
+			return asyncCollectionPipedStore(key, store);
+		} else {
+			List<CollectionPipedStore<T>> storeList = new ArrayList<CollectionPipedStore<T>>();
+
+			PartitionedMap<String, T> list = new PartitionedMap<String, T>(
+					elements, CollectionPipedStore.MAX_PIPED_ITEM_COUNT);
+
+			for (int i = 0; i < list.size(); i++) {
+				storeList
+						.add(new MapPipedStore<T>(key, list.get(i),
+								(attributesForCreate != null),
+								attributesForCreate, tc));
+			}
+			return asyncCollectionPipedStore(key, storeList);
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -2642,6 +2930,31 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				collectionUpdate, tc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String, java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
+			Object value) {
+		MapUpdate<Object> collectionUpdate = new MapUpdate<Object>(
+				value, false);
+		return asyncCollectionUpdate(key, String.valueOf(mkey),
+				collectionUpdate, collectionTranscoder);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String, java.lang.String, java.lang.Objeat, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
+			T value, Transcoder<T> tc) {
+		MapUpdate<T> collectionUpdate = new MapUpdate<T>(value, false);
+		return asyncCollectionUpdate(key, String.valueOf(mkey),
+				collectionUpdate, tc);
+	}
+
 	/**
 	 * Generic update operation for collection items. Public methods for collection items call this method.
 	 *
@@ -2730,6 +3043,43 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 			for (int i = 0; i < list.size(); i++) {
 				collectionPipedUpdateList.add(new BTreePipedUpdate<T>(key, list
+						.get(i), tc));
+			}
+
+			return asyncCollectionPipedUpdate(key, collectionPipedUpdateList);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String,
+	 * net.spy.memcached.collection.MapElement,
+	 * net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
+			String key, List<MapElement<Object>> mapElements) {
+		return asyncMopPipedUpdateBulk(key, mapElements, collectionTranscoder);
+	}
+
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
+			String key, List<MapElement<T>> mapElements, Transcoder<T> tc) {
+
+		if (mapElements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
+			CollectionPipedUpdate<T> collectionPipedUpdate = new MapPipedUpdate<T>(
+					key, mapElements, tc);
+			return asyncCollectionPipedUpdate(key, collectionPipedUpdate);
+		} else {
+			PartitionedList<MapElement<T>> list = new PartitionedList<MapElement<T>>(
+					mapElements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
+
+			List<CollectionPipedUpdate<T>> collectionPipedUpdateList = new ArrayList<CollectionPipedUpdate<T>>(
+					list.size());
+
+			for (int i = 0; i < list.size(); i++) {
+				collectionPipedUpdateList.add(new MapPipedUpdate<T>(key, list
 						.get(i), tc));
 			}
 
@@ -3596,6 +3946,48 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
+	 */
+	@Override
+	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, List<MapElement<Object>> mapElements,
+			CollectionAttributes attributesForCreate) {
+		return asyncMopPipedInsertBulk(key, mapElements, attributesForCreate,
+				collectionTranscoder);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
+			String key, List<MapElement<T>> mapElements,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		if (mapElements.size() <= CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
+			CollectionPipedStore<T> store = new CollectionPipedStore.MapElementsPipedStore<T>(
+					key, mapElements, (attributesForCreate != null),
+					attributesForCreate, tc);
+			return asyncCollectionPipedStore(key, store);
+		} else {
+			PartitionedList<MapElement<T>> list = new PartitionedList<MapElement<T>>(
+					mapElements, CollectionPipedStore.MAX_PIPED_ITEM_COUNT);
+
+			List<CollectionPipedStore<T>> storeList = new ArrayList<CollectionPipedStore<T>>(
+					list.size());
+
+			for (int i = 0; i < list.size(); i++) {
+				storeList.add(new CollectionPipedStore.MapElementsPipedStore<T>(key,
+						list.get(i), (attributesForCreate != null),
+						attributesForCreate, tc));
+			}
+
+			return asyncCollectionPipedStore(key, storeList);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ArcusClientIF#asyncBopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
 	 */
 	@Override
@@ -3885,6 +4277,41 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		for (List<String> eachKeyList : arrangedKey.values()) {
 			storeList.add(new CollectionBulkStore.BTreeBulkStore<T>(
 					eachKeyList, bkey, eFlag, value, attributesForCreate, tc));
+		}
+
+		return asyncCollectionInsertBulk2(storeList);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopInsertBulk(java.util.List, java.lang.String, java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
+	 */
+	@Override
+	public Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, String mkey, Object value,
+			CollectionAttributes attributesForCreate) {
+
+		return asyncMopInsertBulk(keyList, mkey, value,
+				attributesForCreate, collectionTranscoder);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ArcusClientIF#asyncMopInsertBulk(java.util.List, java.lang.String, java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
+	 */
+	@Override
+	public <T> Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
+			List<String> keyList, String mkey, T value,
+			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+		Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+
+		List<CollectionBulkStore<T>> storeList = new ArrayList<CollectionBulkStore<T>>(
+				arrangedKey.size());
+
+		for (List<String> eachKeyList : arrangedKey.values()) {
+			storeList.add(new CollectionBulkStore.MapBulkStore<T>(
+					eachKeyList, mkey, value, attributesForCreate, tc));
 		}
 
 		return asyncCollectionInsertBulk2(storeList);

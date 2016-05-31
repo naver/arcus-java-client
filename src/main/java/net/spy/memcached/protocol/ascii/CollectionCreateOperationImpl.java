@@ -26,6 +26,7 @@ import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ListCreate;
 import net.spy.memcached.collection.SetCreate;
+import net.spy.memcached.collection.MapCreate;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -66,6 +67,8 @@ public class CollectionCreateOperationImpl extends OperationImpl
 			setAPIType(APIType.SOP_CREATE);
 		else if (this.collectionCreate instanceof BTreeCreate)
 			setAPIType(APIType.BOP_CREATE);
+		else if (this.collectionCreate instanceof MapCreate)
+			setAPIType(APIType.MOP_CREATE);
 		setOperationType(OperationType.WRITE);
 	}
 

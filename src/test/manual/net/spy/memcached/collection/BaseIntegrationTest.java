@@ -148,6 +148,14 @@ public class BaseIntegrationTest extends TestCase {
 		}
 	}
 
+	protected void addToMap(String key, Object[] items) throws Exception {
+		for (int i = 0; i < items.length; i++) {
+			assertTrue(mc.asyncMopInsert(key, String.valueOf(i), items[i],
+					new CollectionAttributes())
+					.get(1000, TimeUnit.MILLISECONDS));
+		}
+	}
+
 	protected void deleteList(String key, int size) throws Exception {
 		mc.asyncLopDelete(key, 0, size, true).get(1000, TimeUnit.MILLISECONDS);
 	}
@@ -163,5 +171,9 @@ public class BaseIntegrationTest extends TestCase {
 			mc.asyncBopDelete(key, i, ElementFlagFilter.DO_NOT_FILTER, true)
 					.get(1000, TimeUnit.MILLISECONDS);
 		}
+	}
+
+	protected void deleteMap(String key) throws Exception {
+		mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
 	}
 }

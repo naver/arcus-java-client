@@ -162,6 +162,84 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 		}
 	}
 
+
+	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
+
+		private static final String COMMAND = "mop update";
+		private List<MapElement<T>> mapElements;
+
+		public MapPipedUpdate(String key, List<MapElement<T>> mapElements,
+		                      Transcoder<T> tc) {
+			this.key = key;
+			this.mapElements = mapElements;
+			this.tc = tc;
+			this.itemCount = mapElements.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// decode parameters
+			List<byte[]> encodedList = new ArrayList<byte[]>(mapElements.size());
+			CachedData cd = null;
+			for (MapElement<T> each : mapElements) {
+				if (each.getValue() != null) {
+					cd = tc.encode(each.getValue());
+					encodedList.add(cd.getData());
+				} else {
+					encodedList.add(null);
+				}
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			byte[] value;
+			StringBuilder b;
+
+			for (MapElement<T> each : mapElements) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(each.getMkey()).length;
+				if (encodedList.get(i) != null) {
+					capacity += encodedList.get(i++).length;
+				}
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			i = 0;
+
+			Iterator<MapElement<T>> iterator = mapElements.iterator();
+			while (iterator.hasNext()) {
+				MapElement<T> mapElement = iterator.next();
+				value = encodedList.get(i++);
+				b = new StringBuilder();
+
+				setArguments(bb, COMMAND, key,
+						String.valueOf(mapElement.getMkey()),
+						b.toString(), (value == null ? -1 : value.length),
+						(iterator.hasNext()) ? PIPE : "");
+				if (value != null) {
+					if (value.length > 0) {
+						bb.put(value);
+					}
+					bb.put(CRLF);
+				}
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
 	public String getKey() {
 		return key;
 	}

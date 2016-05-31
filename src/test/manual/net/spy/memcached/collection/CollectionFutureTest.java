@@ -92,5 +92,4 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 
 		// assertNull(status);
 	}
-
 }
