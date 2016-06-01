@@ -87,7 +87,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
 				new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncLopInsert(key, 1, 1,	new CollectionAttributes());
+		future = mc.asyncLopInsert(key, 1, 1, new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -103,10 +103,10 @@ public class LopServerMessageTest extends BaseIntegrationTest {
 				new CollectionAttributes(null, 2L, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncLopInsert(key, 0, 1,	new CollectionAttributes());
+		future = mc.asyncLopInsert(key, 0, 1, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncLopInsert(key, 0, 1,	new CollectionAttributes());
+		future = mc.asyncLopInsert(key, 0, 1, new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();

@@ -45,7 +45,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 
 	public void testNotFound() throws Exception {
 		CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
-						key, 0, ElementFlagFilter.DO_NOT_FILTER, false,	false);
+						key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
 		assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -58,7 +58,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		CollectionFuture<Map<Long, Element<Object>>> future2 = mc.asyncBopGet(
-						key, 1, ElementFlagFilter.DO_NOT_FILTER, false,	false);
+						key, 1, ElementFlagFilter.DO_NOT_FILTER, false, false);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
@@ -79,7 +79,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 0, null, 0, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncBopInsert(key, 1, null, 1,	new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 1, null, 1, new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -91,8 +91,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 		CollectionFuture<Boolean> future = mc.asyncBopInsert(key, 1, null, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(
-						key,	new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim))
+		assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.largest_trim))
 						.get(1000,TimeUnit.MILLISECONDS));
 
 		future = mc.asyncBopInsert(key, 2, null, "bbbb", new CollectionAttributes());
@@ -170,8 +169,8 @@ public class BopServerMessageTest extends BaseIntegrationTest {
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// get
-		CollectionFuture<Map<Long, Element<Object>>> future2 = mc.asyncBopGet(
-						key, 0, ElementFlagFilter.DO_NOT_FILTER, true, true);
+		CollectionFuture<Map<Long, Element<Object>>> future2 =
+						mc.asyncBopGet( key, 0, ElementFlagFilter.DO_NOT_FILTER, true, true);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
