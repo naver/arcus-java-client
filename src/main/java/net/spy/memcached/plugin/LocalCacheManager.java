@@ -65,7 +65,6 @@ public class LocalCacheManager {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T get(String key, Transcoder<T> tc) {
 		if (cache == null) {
 			return null;
@@ -73,11 +72,16 @@ public class LocalCacheManager {
 		
 		try {
 			Element element = cache.get(key);
-			return element == null ? null : (T) element.getObjectValue();
+			if(null != element) {
+				@SuppressWarnings("unchecked") T ret = (T) element.getObjectValue();
+				return ret;
+			}
 		} catch (Exception e) {
 			logger.info("failed to get from the local cache : %s", e.getMessage());
 			return null;
 		}
+
+		return null;
 	}
 	
 	public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {

@@ -241,12 +241,11 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
 		assertTrue(Arrays.equals(testData, bytes));
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> T assertOne(Class<T> class1,
-			Collection<Operation> ops) {
+	private <T> T assertOne(Class<T> class1, Collection<Operation> ops) {
 		assertEquals(1, ops.size());
-		Operation op = ops.iterator().next();
-		return (T) op;
+
+		@SuppressWarnings("unchecked") T op = (T) ops.iterator().next();
+		return op;
 	}
 
 	protected <T> T cloneOne(Class<T> c, KeyedOperation t) {
