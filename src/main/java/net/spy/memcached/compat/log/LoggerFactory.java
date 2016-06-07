@@ -105,14 +105,13 @@ public final class LoggerFactory extends Object {
 	}
 
 	// Find the appropriate constructor
-	@SuppressWarnings("unchecked")
 	private void getConstructor() {
 		Class<? extends Logger> c=DefaultLogger.class;
 		String className=System.getProperty("net.spy.log.LoggerImpl");
 
 		if(className!=null) {
 			try {
-				c=(Class<? extends Logger>) Class.forName(className);
+				c= Class.forName(className).asSubclass(Logger.class);
 			} catch(NoClassDefFoundError e) {
 				System.err.println("Warning:  " + className
 					+ " not found while initializing"
