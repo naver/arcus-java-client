@@ -64,6 +64,16 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public BTreeBulkStore(List<String> keyList, long bkey, byte[] eflag,
 				T value, CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					overflowAction != CollectionOverflowAction.error &&
+					overflowAction != CollectionOverflowAction.smallest_trim &&
+					overflowAction != CollectionOverflowAction.smallest_silent_trim &&
+					overflowAction != CollectionOverflowAction.largest_trim &&
+					overflowAction != CollectionOverflowAction.largest_silent_trim)
+					throw new IllegalArgumentException(overflowAction + " is not available overflow action in bop.");
+			}
 			this.keyList = keyList;
 			this.bkey = String.valueOf(bkey);
 			this.eflag = BTreeUtil.toHex(eflag);
@@ -78,6 +88,16 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 		public BTreeBulkStore(List<String> keyList, byte[] bkey,
 				byte[] eflag, T value, CollectionAttributes attr,
 				Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					overflowAction != CollectionOverflowAction.error &&
+					overflowAction != CollectionOverflowAction.smallest_trim &&
+					overflowAction != CollectionOverflowAction.smallest_silent_trim &&
+					overflowAction != CollectionOverflowAction.largest_trim &&
+					overflowAction != CollectionOverflowAction.largest_silent_trim)
+					throw new IllegalArgumentException(overflowAction + " is not available overflow action in bop.");
+			}
 			this.keyList = keyList;
 			this.bkey = BTreeUtil.toHex(bkey);
 			this.eflag = BTreeUtil.toHex(eflag);
@@ -149,6 +169,12 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public SetBulkStore(List<String> keyList, T value,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					overflowAction != CollectionOverflowAction.error)
+					throw new IllegalArgumentException(overflowAction + " is not available overflow action in sop.");
+			}
 			this.keyList = keyList;
 			this.value = value;
 			this.attribute = attr;
@@ -214,6 +240,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public ListBulkStore(List<String> keyList, int index, T value,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					overflowAction != CollectionOverflowAction.error &&
+					overflowAction != CollectionOverflowAction.head_trim &&
+					overflowAction != CollectionOverflowAction.tail_trim)
+					throw new IllegalArgumentException(overflowAction + " is not available overflow action in lop.");
+			}
 			this.keyList = keyList;
 			this.index = index;
 			this.value = value;

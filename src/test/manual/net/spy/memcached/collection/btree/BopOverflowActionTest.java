@@ -16,21 +16,28 @@
  */
 package net.spy.memcached.collection.btree;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.ElementValueType;
 
 public class BopOverflowActionTest extends BaseIntegrationTest {
 
 	private String key = "BopGetBoundaryTest";
+	private List<String> keyList = new ArrayList<String>();
 
 	protected void setUp() {
+		keyList.add(key);
 		try {
 			super.setUp();
 			mc.delete(key);
@@ -242,4 +249,89 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 				1000, TimeUnit.MILLISECONDS);
 	}
 
+	public void testBopGet_notAvailableOverflowAction() {
+		CollectionAttributes attributesForCreate = new CollectionAttributes();
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.head_trim);
+			mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.tail_trim);
+			mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+ 		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
 }

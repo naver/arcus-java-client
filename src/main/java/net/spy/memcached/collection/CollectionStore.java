@@ -34,6 +34,19 @@ public abstract class CollectionStore<T> {
 	public CollectionStore() { }
 
 	public CollectionStore(T value, byte[] elementFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+		if (attr != null) {
+			CollectionOverflowAction overflowAction = attr.getOverflowAction();
+			if ((overflowAction == CollectionOverflowAction.head_trim ||
+				overflowAction == CollectionOverflowAction.tail_trim) && !(this instanceof ListStore)) {
+				throw new IllegalArgumentException(overflowAction + " is available overflow action in only lop.");
+			} else if ((overflowAction == CollectionOverflowAction.smallest_trim ||
+				overflowAction == CollectionOverflowAction.smallest_silent_trim ||
+				overflowAction == CollectionOverflowAction.largest_trim ||
+				overflowAction == CollectionOverflowAction.largest_silent_trim) &&
+				(!(this instanceof BTreeStore) && !(this instanceof BTreeUpsert) && !(this instanceof  BTreeStoreAndGet))) {
+				throw new IllegalArgumentException(overflowAction + " is available overflow action in only bop.");
+			}
+		}
 		if (elementFlag != null && elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
 			throw new IllegalArgumentException("Length of elementFlag must be less than " + ElementFlagFilter.MAX_EFLAG_LENGTH);
 		}

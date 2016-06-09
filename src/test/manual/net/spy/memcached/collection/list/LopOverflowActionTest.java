@@ -16,18 +16,24 @@
  */
 package net.spy.memcached.collection.list;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
+import net.spy.memcached.collection.ElementValueType;
 
 public class LopOverflowActionTest extends BaseIntegrationTest {
 
 	private String key = "LopOverflowActionTest";
+	private List<String> keyList = new ArrayList<String>();
 
 	protected void setUp() {
+		keyList.add(key);
 		try {
 			super.setUp();
 			mc.delete(key).get();
@@ -214,4 +220,171 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		mc.asyncLopDelete(key, 0, true).get(1000, TimeUnit.MILLISECONDS);
 	}
 
+	public void testLopGet_notAvailableOverflowAction() {
+		CollectionAttributes attributesForCreate = new CollectionAttributes();
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_trim);
+			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncLopInsert(key, 0, "0", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_silent_trim);
+			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_trim);
+			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// create
+		try {
+			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_silent_trim);
+			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// insert
+		try {
+			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// pipe insert
+		try {
+			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		// bulk insert
+		try {
+			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+		} catch (IllegalArgumentException e) {
+			// test success
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
 }
