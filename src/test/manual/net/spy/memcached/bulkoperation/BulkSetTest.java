@@ -28,8 +28,31 @@ import java.util.concurrent.TimeoutException;
 import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.transcoders.CollectionTranscoder;
 
 public class BulkSetTest extends BaseIntegrationTest {
+
+	public void testZeroSizedKeys() {
+		try {
+			mc.asyncSetBulk(new ArrayList<String>(0), 60, "value");
+			Assert.fail();
+		} catch (IllegalArgumentException e) {
+			// should get here.
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		try {
+			mc.asyncSetBulk(new ArrayList<String>(0), 60, new Object(), new CollectionTranscoder());
+			Assert.fail();
+		} catch (IllegalArgumentException e) {
+			// should get here.
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
 
 	public void testInsertAndGet2() {
 		int TEST_COUNT = 3;
@@ -109,7 +132,7 @@ public class BulkSetTest extends BaseIntegrationTest {
 				assertEquals("Key list is null.", e.getMessage());
 			}
 
-			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
+			for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
 				// generate key
 				String[] keys = new String[keySize];
 				for (int i = 0; i < keys.length; i++) {
@@ -200,7 +223,7 @@ public class BulkSetTest extends BaseIntegrationTest {
 				assertEquals("Key list is null.", e.getMessage());
 			}
 
-			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
+			for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
 				// generate key
 				String[] keys = new String[keySize];
 				for (int i = 0; i < keys.length; i++) {
