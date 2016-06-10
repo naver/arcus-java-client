@@ -227,6 +227,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_trim);
 			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -237,6 +238,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncLopInsert(key, 0, "0", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -247,6 +249,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -257,6 +260,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -268,6 +272,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_silent_trim);
 			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -278,6 +283,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -288,6 +294,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -298,6 +305,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -309,6 +317,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_trim);
 			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -319,6 +328,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -329,6 +339,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -339,6 +350,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -350,6 +362,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_silent_trim);
 			mc.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -360,6 +373,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncLopInsert(key, 0, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -370,6 +384,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -380,6 +395,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncLopInsertBulk(keyList, 0, "0", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {

@@ -114,6 +114,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.head_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -124,6 +125,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -134,6 +136,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -145,6 +148,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.tail_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -155,6 +159,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -165,6 +170,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -176,6 +182,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -186,6 +193,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -196,6 +204,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -207,6 +216,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_silent_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -217,6 +227,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -227,6 +238,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -238,6 +250,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -248,6 +261,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -258,6 +272,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -269,6 +284,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_silent_trim);
 			mc.asyncSopInsert(key, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -279,6 +295,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -289,6 +306,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncSopInsertBulk(keyList, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {

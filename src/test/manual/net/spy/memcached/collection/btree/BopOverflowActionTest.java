@@ -256,6 +256,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.head_trim);
 			mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -266,6 +267,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -276,6 +278,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -286,6 +289,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -297,6 +301,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		try {
 			attributesForCreate.setOverflowAction(CollectionOverflowAction.tail_trim);
 			mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
+			Assert.fail();
  		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -307,6 +312,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// insert
 		try {
 			mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -317,6 +323,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// pipe insert
 		try {
 			mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
@@ -327,6 +334,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 		// bulk insert
 		try {
 			mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
+			Assert.fail();
 		} catch (IllegalArgumentException e) {
 			// test success
 		} catch (Exception e) {
