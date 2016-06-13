@@ -55,8 +55,8 @@ public class CacheManager extends SpyThread implements Watcher,
 	private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
 	private static final String ARCUS_REPL_CLIENT_INFO_ZPATH = "/arcus_repl/client_list/";
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	private static final int ZK_SESSION_TIMEOUT = 15000;
 	
 	private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
@@ -96,8 +96,8 @@ public class CacheManager extends SpyThread implements Watcher,
 
 	/* ENABLE_REPLICATION if */
 	private final boolean arcusReplEnabled;
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	public CacheManager(String hostPort, String serviceCode,
 			ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
 			int waitTimeForConnect) {
@@ -108,7 +108,9 @@ public class CacheManager extends SpyThread implements Watcher,
 		this.clientInitLatch = clientInitLatch;
 		this.poolSize = poolSize;
 		this.waitTimeForConnect = waitTimeForConnect;
+		/* ENABLE_REPLICATION if */
 		this.arcusReplEnabled = cfb.getArcusReplEnabled();
+		/* ENABLE_REPLICATION end */
 
 		initZooKeeperClient();
 
@@ -123,8 +125,10 @@ public class CacheManager extends SpyThread implements Watcher,
 	private void initZooKeeperClient() {
 		try {
 			getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
-
+			
+			/* ENABLE_REPLICATION if */
 			String cacheListZPath;
+			/* ENABLE_REPLICATION end */
 			zkInitLatch = new CountDownLatch(1);
 			zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
 
@@ -159,8 +163,8 @@ public class CacheManager extends SpyThread implements Watcher,
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				*/
-				/* ENABLE_REPLICATION end */
 
+				/* ENABLE_REPLICATION end */
 
 				String path = getClientInfo();
 				if (path.isEmpty()) {
@@ -206,8 +210,9 @@ public class CacheManager extends SpyThread implements Watcher,
 		try {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			Date currentTime = new Date();
+			
 			// create the ephemeral znode 
- 			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
+			// "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 			/* ENABLE_REPLICATION if */
 			if (arcusReplEnabled) {
 				path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
@@ -335,8 +340,8 @@ public class CacheManager extends SpyThread implements Watcher,
 		// Arcus repl cluster
 		// Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
 		// by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
-		/* ENABLE_REPLICATION end */
 
+		/* ENABLE_REPLICATION end */
 		String addrs = "";
 		for (int i = 0; i < children.size(); i++) {
 			String[] temp = children.get(i).split("-");
@@ -406,6 +411,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		}
 		/* ENABLE_REPLICATION else */
 		/*
+
 		List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
 		int addrCount = socketList.size();
 		*/
