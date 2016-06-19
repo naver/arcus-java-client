@@ -160,8 +160,8 @@ public class DefaultConnectionFactory extends SpyObject
 	/* ENABLE_REPLICATION if */
 	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
 	private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<APIType, ReadPriority>();
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Construct a DefaultConnectionFactory with the given parameters.
 	 *
@@ -434,8 +434,8 @@ public class DefaultConnectionFactory extends SpyObject
 	public String getFrontCacheName() {
 		return DEFAULT_FRONT_CACHE_NAME;
 	}
-	
 	/* ENABLE_REPLICATION if */
+
 	/*
 	 * (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getReadPriority()

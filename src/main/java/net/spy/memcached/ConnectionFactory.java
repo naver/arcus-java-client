@@ -201,8 +201,8 @@ public interface ConnectionFactory {
 	 * get front cache name
 	 */
 	String getFrontCacheName();
-
 	/* ENABLE_REPLICATION if */
+
 	/**
 	 * get read priority on replica nodes
 	 */

@@ -81,8 +81,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private volatile long addOpCount;
 
 	// fake node
-	private boolean isFake = false;
-
+	private boolean isFake = false; 
+	
 	/* ENABLE_REPLICATION if */
 	private MemcachedReplicaGroup replicaGroup;
 

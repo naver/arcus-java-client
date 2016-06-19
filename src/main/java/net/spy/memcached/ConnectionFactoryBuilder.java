@@ -100,8 +100,8 @@ public class ConnectionFactoryBuilder {
 	public boolean getArcusReplEnabled() {
 		return arcusReplEnabled;
 	}
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Set the operation queue factory.
 	 */
@@ -393,8 +393,8 @@ public class ConnectionFactoryBuilder {
 	public Map<APIType, ReadPriority> getAPIReadPriority() {
 		return this.apiReadPriorityList;
 	}
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Get the ConnectionFactory set up with the provided parameters.
 	 */
@@ -409,8 +409,8 @@ public class ConnectionFactoryBuilder {
 				c.setArcusReplEnabled(arcusReplEnabled);
 				return c;
 			}
-			/* ENABLE_REPLICATION end */
 
+			/* ENABLE_REPLICATION end */
 			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
 				return opQueueFactory == null ?
@@ -581,8 +581,8 @@ public class ConnectionFactoryBuilder {
 			public String getFrontCacheName() {
 				return frontCacheName;
 			}
-
 			/* ENABLE_REPLICATION if */
+
 			@Override
 			public ReadPriority getReadPriority() {
 				return readPriority;

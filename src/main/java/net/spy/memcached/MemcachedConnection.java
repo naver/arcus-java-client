@@ -92,8 +92,8 @@ public final class MemcachedConnection extends SpyObject {
 	
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled;
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Construct a memcached connection.
 	 *
@@ -136,8 +136,8 @@ public final class MemcachedConnection extends SpyObject {
 	boolean getArcusReplEnabled() {
 		return arcusReplEnabled;
 	}
-	/* ENABLE_REPLICATION end */
 
+	/* ENABLE_REPLICATION end */
 	private boolean selectorsMakeSense() {
 		for(MemcachedNode qa : locator.getAll()) {
 			if(qa.getSk() != null && qa.getSk().isValid()) {
@@ -250,7 +250,7 @@ public final class MemcachedConnection extends SpyObject {
 	public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
 		List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
 		List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
-
+		
 		// Classify the incoming node list.
 		/* ENABLE_REPLICATION if */
 		if (arcusReplEnabled) {
@@ -479,7 +479,7 @@ public final class MemcachedConnection extends SpyObject {
 				removeNodes.add(node);
 			}
 		}
-
+		
 		// Make connections to the newly added nodes.
 		for (SocketAddress sa : addrs) {
 			attachNodes.add(attachMemcachedNode(sa));
@@ -1211,8 +1211,8 @@ public final class MemcachedConnection extends SpyObject {
 		/*
 		MemcachedNode primary = locator.getPrimary(key);
 		/*
-		/* ENABLE_REPLICATION end */
 
+		/* ENABLE_REPLICATION end */
 		// FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
 		if (primary.isActive() || failureMode == FailureMode.Retry) {
 			placeIn = primary;
