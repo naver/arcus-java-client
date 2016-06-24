@@ -196,6 +196,21 @@ public abstract class ClientBaseCase extends TestCase {
 				}
 
 				@Override
+				public String getFrontCacheName() {
+					return inner.getFrontCacheName();
+				}
+
+				@Override
+				public boolean getFrontCacheCopyOnRead() {
+					return inner.getFrontCacheCopyOnRead();
+				}
+
+				@Override
+				public boolean getFrontCacheCopyOnWrite() {
+					return inner.getFrontCacheCopyOnWrite();
+				}
+
+				@Override
 				public int getFrontCacheExpireTime() {
 					return inner.getFrontCacheExpireTime();
 				}
@@ -220,10 +235,6 @@ public abstract class ClientBaseCase extends TestCase {
 					return inner.getDefaultMaxSMGetKeyChunkSize();
 				}
 				
-				@Override
-				public String getFrontCacheName() {
-					return inner.getFrontCacheName();
-				}
 				/* ENABLE_REPLICATION if */
 
 				@Override

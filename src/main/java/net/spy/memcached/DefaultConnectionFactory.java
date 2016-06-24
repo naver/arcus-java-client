@@ -123,6 +123,21 @@ public class DefaultConnectionFactory extends SpyObject
      */
     public static final int DEFAULT_FRONTCACHE_EXPIRETIME = 5;
 
+	/**
+	 * Default front cache name
+	 */
+	private static final String DEFAULT_FRONT_CACHE_NAME = "ArcusFrontCache" + new Object().hashCode();
+
+	/**
+	 * Default copyOnRead : false
+	 */
+	public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_READ = false;
+
+	/**
+	 * Default copyOnWrite : false
+	 */
+	public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_WRITE = false;
+
     /**
      * Default bulk service thread count
      */
@@ -147,11 +162,6 @@ public class DefaultConnectionFactory extends SpyObject
      * Max smget key chunk size per request
      */
     public static final int DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE = 500;
-    
-    /**
-     * Default front cache name
-     */
-	private static final String DEFAULT_FRONT_CACHE_NAME = "ArcusFrontCache" + new Object().hashCode();
     
 	private final int opQueueLen;
 	private final int readBufSize;
@@ -392,6 +402,33 @@ public class DefaultConnectionFactory extends SpyObject
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheName()
+	 */
+	@Override
+	public String getFrontCacheName() {
+		return DEFAULT_FRONT_CACHE_NAME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnRead()
+	 */
+	@Override
+	public boolean getFrontCacheCopyOnRead() {
+		return DEFAULT_FRONT_CACHE_COPY_ON_READ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnWrite()
+	 */
+	@Override
+	public boolean getFrontCacheCopyOnWrite() {
+		return DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getBulkServiceThreadCount()
 	 */
 	@Override
@@ -424,15 +461,6 @@ public class DefaultConnectionFactory extends SpyObject
 	@Override
 	public int getDefaultMaxSMGetKeyChunkSize() { 
 		return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheName()
-	 */
-	@Override
-	public String getFrontCacheName() {
-		return DEFAULT_FRONT_CACHE_NAME;
 	}
 	/* ENABLE_REPLICATION if */
 

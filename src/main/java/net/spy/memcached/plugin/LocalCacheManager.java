@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.PersistenceConfiguration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -52,11 +54,20 @@ public class LocalCacheManager {
 		this.cache = CacheManager.getInstance().getCache(name);
 	}
 	
-	public LocalCacheManager(String name, int max, int exptime) {
+	public LocalCacheManager(String name, int max, int exptime, boolean copyOnRead, boolean copyOnWrite) {
 		this.cache = CacheManager.getInstance().getCache(name);
 		if (cache == null) {
-			this.cache = new Cache(name, max, MemoryStoreEvictionPolicy.LRU,
-					false, "", false, exptime, exptime, false, 60, null);
+			CacheConfiguration config =
+							new CacheConfiguration(name, max)
+							.copyOnRead(copyOnRead)
+							.copyOnWrite(copyOnWrite)
+							.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
+							.eternal(false)
+							.timeToLiveSeconds(exptime)
+							.timeToIdleSeconds(exptime)
+							.diskExpiryThreadIntervalSeconds(60)
+							.persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.NONE));
+			this.cache = new Cache(config, null, null);
 			CacheManager.getInstance().addCache(cache);
 			
 			if (logger.isInfoEnabled()) {

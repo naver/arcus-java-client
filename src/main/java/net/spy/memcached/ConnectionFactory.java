@@ -176,7 +176,22 @@ public interface ConnectionFactory {
 	 * Set front cache's expire time.
 	 */
 	int getFrontCacheExpireTime();
-	
+
+	/**
+	 * get front cache name
+	 */
+	String getFrontCacheName();
+
+	/**
+	 * get copyOnRead property for front cache
+	 */
+	boolean getFrontCacheCopyOnRead();
+
+	/**
+	 * get copyOnWrite property for front cache
+	 */
+	boolean getFrontCacheCopyOnWrite();
+
 	/**
 	 * Bulk service thread count 
 	 */
@@ -196,11 +211,6 @@ public interface ConnectionFactory {
 	 * get max smget key chunk size
 	 */
 	int getDefaultMaxSMGetKeyChunkSize();
-	
-	/**
-	 * get front cache name
-	 */
-	String getFrontCacheName();
 	/* ENABLE_REPLICATION if */
 
 	/**
