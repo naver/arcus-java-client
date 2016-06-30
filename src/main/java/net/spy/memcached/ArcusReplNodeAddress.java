@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ArcusReplNodeAddress extends InetSocketAddress {
+
+	private static final long serialVersionUID = -1555690881482453720L;
 	boolean master;
 	String group;
 	String ip;
