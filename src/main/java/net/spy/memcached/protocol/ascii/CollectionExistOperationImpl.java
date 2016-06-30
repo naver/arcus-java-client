@@ -56,16 +56,14 @@ public class CollectionExistOperationImpl extends OperationImpl
 
 	protected final String key;
 	protected final String subkey;
-	protected final CollectionExist<?> collectionExist;
-	protected final byte[] data;
+	protected final CollectionExist collectionExist;
 
 	public CollectionExistOperationImpl(String key, String subkey,
-			CollectionExist<?> collectionExist, OperationCallback cb) {
+			CollectionExist collectionExist, OperationCallback cb) {
 		super(cb);
 		this.key = key;
 		this.subkey = subkey;
 		this.collectionExist = collectionExist;
-		this.data = collectionExist.getData();
 		if (this.collectionExist instanceof SetExist)
 			setAPIType(APIType.SOP_EXIST);
 		setOperationType(OperationType.READ);
@@ -84,14 +82,20 @@ public class CollectionExistOperationImpl extends OperationImpl
 	@Override
 	public void initialize() {
 		String args = collectionExist.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(data.length
+		byte[] additionalArgs = collectionExist.getAdditionalArgs();
+		ByteBuffer bb = ByteBuffer.allocate(null == additionalArgs ? 0 : additionalArgs.length +
 				+ KeyUtil.getKeyBytes(key).length
 				+ KeyUtil.getKeyBytes(subkey).length
 				+ args.length()
 				+ OVERHEAD);
-		setArguments(bb, collectionExist.getCommand(), key, subkey, data.length, args);
-		bb.put(data);
-		bb.put(CRLF);
+		setArguments(bb, collectionExist.getCommand(), key, subkey,
+						null == additionalArgs ? 0 : additionalArgs.length, args);
+
+		if (null != additionalArgs) {
+			bb.put(additionalArgs);
+			bb.put(CRLF);
+		}
+
 		bb.flip();
 		setBuffer(bb);
 
@@ -114,12 +118,7 @@ public class CollectionExistOperationImpl extends OperationImpl
 		return subkey;
 	}
 
-	public CollectionExist<?> getExist() {
+	public CollectionExist getExist() {
 		return collectionExist;
 	}
-
-	public byte[] getData() {
-		return data;
-	}
-
 }

@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.util.BTreeUtil;
 
-public class BTreeDelete<T> extends CollectionDelete<T> {
+public class BTreeDelete extends CollectionDelete {
 
 	private static final String command = "bop delete";
 	protected int count = -1;
@@ -99,6 +99,11 @@ public class BTreeDelete<T> extends CollectionDelete<T> {
 		this.dropIfEmpty = dropIfEmpty;
 		this.noreply = noreply;
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
+	}
+
+	@Override
+	public byte[] getAdditionalArgs() {
+		return null;
 	}
 
 	public String stringify() {

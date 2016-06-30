@@ -16,20 +16,25 @@
  */
 package net.spy.memcached.collection;
 
-public class SetDelete<T> extends CollectionDelete<T> {
+import net.spy.memcached.transcoders.Transcoder;
+
+public class SetDelete<T> extends CollectionDelete {
 
 	private static final String command = "sop delete";
 	
 	protected T value;
-	protected byte[] data;
+	protected byte[] additionalArgs;
+	protected Transcoder<T> tc;
 	
-	public SetDelete(T value, boolean noreply) {
+	public SetDelete(T value, boolean noreply, Transcoder<T> tc) {
 		this.value = value;
 		this.noreply = noreply;
+		this.tc = tc;
+		this.additionalArgs = tc.encode(value).getData();
 	}
 
-	public SetDelete(T value, boolean noreply, boolean dropIfEmpty) {
-		this(value, noreply);
+	public SetDelete(T value, boolean noreply, boolean dropIfEmpty, Transcoder<T> tc) {
+		this(value, noreply, tc);
 		this.dropIfEmpty = dropIfEmpty;
 	}
 	
@@ -41,17 +46,13 @@ public class SetDelete<T> extends CollectionDelete<T> {
 		this.value = value;
 	}
 	
-	public byte[] getData() {
-		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data = data;
+	public byte[] getAdditionalArgs() {
+		return additionalArgs;
 	}
 
 	public String stringify() {
 		StringBuilder b = new StringBuilder();
-		b.append(data.length);
+		b.append(additionalArgs.length);
 		
 		if (dropIfEmpty) {
 			b.append(" drop");

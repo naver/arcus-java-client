@@ -27,31 +27,31 @@ public class ProtocolListGetTest extends TestCase {
 	public void testStringfy() {
 		// default setting : dropIfEmpty = true
 		Assert.assertEquals("10 drop",
-				(new ListGet<Object>(index, true)).stringify());
+				(new ListGet(index, true)).stringify());
 		Assert.assertEquals("10",
-				(new ListGet<Object>(index, false)).stringify());
+				(new ListGet(index, false)).stringify());
 
 		Assert.assertEquals("10 drop",
-				(new ListGet<Object>(index, true, true)).stringify());
-		Assert.assertEquals("10 delete", (new ListGet<Object>(index, true,
+				(new ListGet(index, true, true)).stringify());
+		Assert.assertEquals("10 delete", (new ListGet(index, true,
 				false)).stringify());
 		Assert.assertEquals("10",
-				(new ListGet<Object>(index, false, true)).stringify());
+				(new ListGet(index, false, true)).stringify());
 		Assert.assertEquals("10",
-				(new ListGet<Object>(index, false, false)).stringify());
+				(new ListGet(index, false, false)).stringify());
 
 		Assert.assertEquals("10..20 drop",
-				(new ListGet<Object>(10, 20, true)).stringify());
+				(new ListGet(10, 20, true)).stringify());
 		Assert.assertEquals("10..20",
-				(new ListGet<Object>(10, 20, false)).stringify());
+				(new ListGet(10, 20, false)).stringify());
 
-		Assert.assertEquals("10..20 delete", (new ListGet<Object>(10, 20, true,
+		Assert.assertEquals("10..20 delete", (new ListGet(10, 20, true,
 				false)).stringify());
-		Assert.assertEquals("10..20 drop", (new ListGet<Object>(10, 20, true,
+		Assert.assertEquals("10..20 drop", (new ListGet(10, 20, true,
 				true)).stringify());
 		Assert.assertEquals("10..20",
-				(new ListGet<Object>(10, 20, false, true)).stringify());
+				(new ListGet(10, 20, false, true)).stringify());
 		Assert.assertEquals("10..20",
-				(new ListGet<Object>(10, 20, false, false)).stringify());
+				(new ListGet(10, 20, false, false)).stringify());
 	}
 }

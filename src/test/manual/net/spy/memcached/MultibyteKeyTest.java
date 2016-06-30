@@ -10,12 +10,11 @@ import net.spy.memcached.ops.*;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
+import net.spy.memcached.transcoders.Transcoder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.annotation.ExceptionProxy;
 
-import java.security.Key;
 import java.util.*;
 
 /**
@@ -82,10 +81,15 @@ public class MultibyteKeyTest {
     @Test
     public void collectionGetOperationImplTest() {
         try {
-            opFact.collectionGet(MULTIBYTE_KEY, new CollectionGet<Integer>() {
+            opFact.collectionGet(MULTIBYTE_KEY, new CollectionGet() {
                 @Override
                 public String stringify() {
                     return "collectionGetString";
+                }
+
+                @Override
+                public byte[] getAddtionalArgs() {
+                    return null;
                 }
                 @Override
                 public String getCommand() {
@@ -95,7 +99,7 @@ public class MultibyteKeyTest {
                 public void decodeItemHeader(String itemHeader) {}
             }, new CollectionGetOperation.Callback() {
                 @Override
-                public void gotData(String key, long subkey, int flags, byte[] data) {}
+                public void gotData(String key, String subkey, int flags, byte[] data) {}
                 @Override
                 public void receivedStatus(OperationStatus status) {}
                 @Override
@@ -129,7 +133,7 @@ public class MultibyteKeyTest {
     public void BTreeFindPositionWithGetOperationImplTest() {
         try {
             opFact.bopFindPositionWithGet(MULTIBYTE_KEY,
-                    new BTreeFindPositionWithGet<Object>(1L, BTreeOrder.ASC, 0),
+                    new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
                     genericCallback).initialize();
         } catch (java.nio.BufferOverflowException e) {
             Assert.fail();
@@ -137,10 +141,11 @@ public class MultibyteKeyTest {
     }
 
     @Test
-    public void CollectionExistOperationImplTest() {
+    public void SetExistOperationImplTest() {
         try {
+            Transcoder<Object> tc = new CollectionTranscoder();
             opFact.collectionExist(MULTIBYTE_KEY, "",
-                    new CollectionExist<Integer>(new Random().nextInt(), testData) {
+                    new SetExist<Object>(new Random().nextInt(), tc) {
                         @Override
                         public String getCommand() {
                             return "CollectionExistCommand";
@@ -328,11 +333,11 @@ public class MultibyteKeyTest {
         byte[] from = new byte[] {0, 0};
         byte[] to = new byte[] {10, 10};
         try {
-            opFact.collectionGet2(MULTIBYTE_KEY,
-                    new ExtendedBTreeGet<Integer>(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
-                    new ExtendedBTreeGetOperation.Callback() {
+            opFact.collectionGet(MULTIBYTE_KEY,
+                    new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
+                    new CollectionGetOperation.Callback() {
                         @Override
-                        public void gotData(String key, byte[] subkey, byte[] elementFlag, int flags, byte[] data) {}
+                        public void gotData(String key, String subkey, int flags, byte[] data) {}
                         @Override
                         public void receivedStatus(OperationStatus status) {}
                         @Override
@@ -347,7 +352,7 @@ public class MultibyteKeyTest {
     public void CollectionDeleteOperationImplTest() {
         try {
             opFact.collectionDelete(MULTIBYTE_KEY,
-                    new BTreeDelete<Object>(1L, false),
+                    new BTreeDelete(1L, false),
                     new OperationCallback() {
                         @Override
                         public void receivedStatus(OperationStatus status) {}
@@ -420,7 +425,7 @@ public class MultibyteKeyTest {
     public void BTreeGetByPositionOperationImplTest() {
         try {
             opFact.bopGetByPosition(MULTIBYTE_KEY,
-                    new BTreeGetByPosition<Object>(BTreeOrder.ASC, 0),
+                    new BTreeGetByPosition(BTreeOrder.ASC, 0),
                     new BTreeGetByPositionOperation.Callback() {
                         @Override
                         public void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data) {}

@@ -16,14 +16,11 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.Set;
-
-public class SetGet<T> extends CollectionGet<T> {
+public class SetGet extends CollectionGet {
 
 	private static final String command = "sop get";
 	
 	protected int count;
-	protected Set<T> set;
 
 	public SetGet(int count, boolean delete) {
 		this.headerCount = 1;
@@ -43,9 +40,10 @@ public class SetGet<T> extends CollectionGet<T> {
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
-	public void setSet(Set<T> set) {
-		this.set = set;
+
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
 	}
 
 	public String stringify() {

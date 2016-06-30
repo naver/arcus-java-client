@@ -25,6 +25,6 @@ public interface CollectionExistOperation extends KeyedOperation {
 
 	String getSubKey();
 
-	CollectionExist<?> getExist();
+	CollectionExist getExist();
 
 }

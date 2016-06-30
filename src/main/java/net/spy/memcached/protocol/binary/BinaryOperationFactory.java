@@ -67,7 +67,6 @@ import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
@@ -219,26 +218,20 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 	}
 	
 	public CollectionGetOperation collectionGet(String key,
-			CollectionGet<?> collectionGet,
+			CollectionGet collectionGet,
 			net.spy.memcached.ops.CollectionGetOperation.Callback cb) {
 		throw new RuntimeException(
 			"CollectionGetOperation is not supported in binary protocol yet.");
 	}
 
-	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
-		throw new RuntimeException(
-				"CollectionGetOperation is not supported in binary protocol yet.");
-	}
-	
 	public CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		throw new RuntimeException(
 			"CollectionDeleteOperation is not supported in binary protocol yet.");
 	}
 
 	public CollectionExistOperation collectionExist(String key, String subkey,
-			CollectionExist<?> collectionExist, OperationCallback cb) {
+			CollectionExist collectionExist, OperationCallback cb) {
 		throw new RuntimeException(
 			"CollectionExistOperation is not supported in binary protocol yet.");
 	}
@@ -328,7 +321,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeGetByPositionOperation bopGetByPosition(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+			BTreeGetByPosition get, OperationCallback cb) {
 		throw new RuntimeException(
 				"BTree get by position operation is not supported in binary protocol yet.");
 	}
@@ -342,7 +335,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+			BTreeFindPositionWithGet get, OperationCallback cb) {
 		throw new RuntimeException(
 				"BTree find position with get operation is not supported in binary protocol yet.");
 	}

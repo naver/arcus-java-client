@@ -16,18 +16,14 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.Map;
-
 import net.spy.memcached.util.BTreeUtil;
 
-public class BTreeGet<T> extends CollectionGet<T> {
+public class BTreeGet extends CollectionGet {
 
 	private static final String command = "bop get";
-	
-	protected String range;
+
 	protected int offset = -1;
 	protected int count = -1;
-	protected Map<Integer, T> map;
 
 	protected ElementFlagFilter elementFlagFilter;
 	
@@ -53,6 +49,16 @@ public class BTreeGet<T> extends CollectionGet<T> {
 
 	public BTreeGet(long from, long to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
 		this(from, to, offset, count, delete);
+		this.dropIfEmpty = dropIfEmpty;
+		this.elementFlagFilter = elementFlagFilter;
+	}
+
+	public BTreeGet(byte[] from, byte[] to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
+		this.headerCount = 2;
+		this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+		this.offset = offset;
+		this.count = count;
+		this.delete = delete;
 		this.dropIfEmpty = dropIfEmpty;
 		this.elementFlagFilter = elementFlagFilter;
 	}
@@ -89,10 +95,6 @@ public class BTreeGet<T> extends CollectionGet<T> {
 		this.count = count;
 	}
 	
-	public Map<Integer, T> getMap() {
-		return map;
-	}
-
 	public String stringify() {
 		if (str != null) return str;
 		
@@ -128,6 +130,11 @@ public class BTreeGet<T> extends CollectionGet<T> {
 			return true;
 		}
 	}
+
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
+	}
 	
 	@Override
 	public boolean headerReady(int spaceCount) {
@@ -138,15 +145,20 @@ public class BTreeGet<T> extends CollectionGet<T> {
 		String[] splited = itemHeader.split(" ");
 
 		if (headerParseStep == 1) {
+			// found bkey
+			if (splited[0].startsWith("0x")) {
+				this.subkey = splited[0].substring(2);
+			} else {
+				this.subkey = splited[0];
+			}
+
 			// found element flag.
 			if (splited[1].startsWith("0x")) {
 				this.elementFlagExists = true;
-				this.subkey = Long.parseLong(splited[0]);
 				this.elementFlag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
 //				this.headerCount++;
 				headerParseStep = 2;
 			} else {
-				this.subkey = Long.parseLong(splited[0]);
 				this.dataLength = Integer.parseInt(splited[1]);
 			}
 		} else {

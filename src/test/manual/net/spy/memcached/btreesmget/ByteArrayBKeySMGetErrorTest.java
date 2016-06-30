@@ -233,7 +233,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, (SMGetMode) smgetMode);
+						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
@@ -300,7 +300,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 		
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, (SMGetMode) smgetMode);
+						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);

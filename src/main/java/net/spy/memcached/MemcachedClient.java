@@ -1096,7 +1096,6 @@ public class MemcachedClient extends SpyThread
 		final Collection<Operation> ops=new ArrayList<Operation>(chunks.size());
 
 		GetOperation.Callback cb=new GetOperation.Callback() {
-				@SuppressWarnings("synthetic-access")
 				public void receivedStatus(OperationStatus status) {
 					if(!status.isSuccess()) {
 						getLogger().warn("Unsuccessful get:  %s", status);
@@ -1322,7 +1321,6 @@ public class MemcachedClient extends SpyThread
 					public void gotStat(String name, String val) {
 						rv.get(sa).put(name, val);
 					}
-					@SuppressWarnings("synthetic-access") // getLogger()
 					public void receivedStatus(OperationStatus status) {
 						if(!status.isSuccess()) {
 							getLogger().warn("Unsuccessful stat fetch:	%s",

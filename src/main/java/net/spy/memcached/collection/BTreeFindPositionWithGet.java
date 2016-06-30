@@ -36,7 +36,7 @@ import net.spy.memcached.util.BTreeUtil;
  * - CLIENT_ERROR
  * - SERVER_ERROR
  */
-public class BTreeFindPositionWithGet<T> extends CollectionGet<T> {
+public class BTreeFindPositionWithGet extends CollectionGet {
 
 	public static final int HEADER_EFLAG_POSITION = 1; // 0-based
 
@@ -97,6 +97,11 @@ public class BTreeFindPositionWithGet<T> extends CollectionGet<T> {
 	@Override
 	public boolean headerReady(int spaceCount) {
 		return spaceCount == 2;
+	}
+
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
 	}
 
 	/*

@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection;
 
-public class ListDelete<T> extends CollectionDelete<T> {
+public class ListDelete extends CollectionDelete {
 
 	private static final String command = "lop delete";
 	
@@ -40,6 +40,11 @@ public class ListDelete<T> extends CollectionDelete<T> {
 		this.dropIfEmpty = dropIfEmpty;
 	}
 	
+	@Override
+	public byte[] getAdditionalArgs() {
+		return null;
+	}
+
 	public String stringify() {
 		if (str != null) return str;
 		

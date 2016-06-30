@@ -33,7 +33,7 @@ public class BopMutateTest extends BaseIntegrationTest {
 		try {
 			super.setUp();
 			mc.delete(key);
-		} catch (Exception e) {
+		} catch (Exception ignored) {
 		}
 	}
 
@@ -42,20 +42,20 @@ public class BopMutateTest extends BaseIntegrationTest {
 		addToBTree(key, items9);
 
 		// incr 2
-		assertTrue(mc.asyncBopIncr(key, 1L, (int) 2)
+		assertTrue(mc.asyncBopIncr(key, 1L, 2)
 				.get(1000, TimeUnit.MILLISECONDS).equals(4L));
 		// incr 10
-		assertTrue(mc.asyncBopIncr(key, 1L, (int) 10)
+		assertTrue(mc.asyncBopIncr(key, 1L, 10)
 				.get(1000, TimeUnit.MILLISECONDS).equals(14L));
 
 		// decr 1
-		assertTrue(mc.asyncBopDecr(key, 1L, (int) 1)
+		assertTrue(mc.asyncBopDecr(key, 1L, 1)
 				.get(1000, TimeUnit.MILLISECONDS).equals(13L));
 		// decr 11
-		assertTrue(mc.asyncBopDecr(key, 1L, (int) 11)
+		assertTrue(mc.asyncBopDecr(key, 1L, 11)
 				.get(1000, TimeUnit.MILLISECONDS).equals(2L));
 		// decr 4
-		assertTrue(mc.asyncBopDecr(key, 1L, (int) 4)
+		assertTrue(mc.asyncBopDecr(key, 1L, 4)
 				.get(1000, TimeUnit.MILLISECONDS).equals(0L));
 	}
 
@@ -64,7 +64,7 @@ public class BopMutateTest extends BaseIntegrationTest {
 		addToBTree(key, items9);
 
 		// decr 10
-		assertTrue(mc.asyncBopDecr(key, 1L, (int) 10)
+		assertTrue(mc.asyncBopDecr(key, 1L, 10)
 				.get(1000, TimeUnit.MILLISECONDS).equals(0L));
 	}
 
@@ -73,13 +73,13 @@ public class BopMutateTest extends BaseIntegrationTest {
 		addToBTree(key, items9);
 
 		// not exists the key
-		CollectionFuture<Long> future = mc.asyncBopIncr("aaaaa", 0L, (int) 2);
+		CollectionFuture<Long> future = mc.asyncBopIncr("aaaaa", 0L, 2);
 		Long result = future.get(1000, TimeUnit.MILLISECONDS);
 		CollectionResponse response = future.getOperationStatus().getResponse();
 		assertTrue(response.toString() == "NOT_FOUND");
 
 		// not exists the bkey
-		CollectionFuture<Long> future2 = mc.asyncBopIncr(key, 10L, (int) 2);
+		CollectionFuture<Long> future2 = mc.asyncBopIncr(key, 10L, 2);
 		Long result2 = future2.get(1000, TimeUnit.MILLISECONDS);
 		CollectionResponse response2 = future2.getOperationStatus()
 				.getResponse();
@@ -92,7 +92,7 @@ public class BopMutateTest extends BaseIntegrationTest {
 
 		try {
 			// incr string value
-			CollectionFuture<Long> future3 = mc.asyncBopIncr(key, 9L, (int) 2);
+			CollectionFuture<Long> future3 = mc.asyncBopIncr(key, 9L, 2);
 			Long result3 = future3.get(1000, TimeUnit.MILLISECONDS);
 			CollectionResponse response3 = future3.getOperationStatus()
 					.getResponse();

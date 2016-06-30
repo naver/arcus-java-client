@@ -67,7 +67,6 @@ import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
-import net.spy.memcached.ops.ExtendedBTreeGetOperation;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
@@ -193,22 +192,17 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 	}
 
 	public CollectionGetOperation collectionGet(String key,
-			CollectionGet<?> collectionGet, CollectionGetOperation.Callback cb) {
+			CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
 		return new CollectionGetOperationImpl(key, collectionGet, cb);
-	}
-	
-	public ExtendedBTreeGetOperation collectionGet2(String key,
-			CollectionGet<?> collectionGet, ExtendedBTreeGetOperation.Callback cb) {
-		return new ExtendedBTreeGetOperationImpl(key, collectionGet, cb);
 	}
 
 	public CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
 	}
 	
 	public CollectionExistOperation collectionExist(String key, String subkey,
-			CollectionExist<?> collectionExist, OperationCallback cb) {
+			CollectionExist collectionExist, OperationCallback cb) {
 		return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
 	}
 
@@ -285,7 +279,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeGetByPositionOperation bopGetByPosition(String key,
-			BTreeGetByPosition<?> get, OperationCallback cb) {
+			BTreeGetByPosition get, OperationCallback cb) {
 		return new BTreeGetByPositionOperationImpl(key, get, cb);
 	}
 
@@ -297,7 +291,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
 	@Override
 	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-			BTreeFindPositionWithGet<?> get, OperationCallback cb) {
+			BTreeFindPositionWithGet get, OperationCallback cb) {
 		return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
 	}
 

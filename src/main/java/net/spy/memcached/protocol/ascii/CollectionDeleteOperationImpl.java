@@ -59,10 +59,10 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
 	protected String key;
-	protected CollectionDelete<?> collectionDelete;
+	protected CollectionDelete collectionDelete;
 
 	public CollectionDeleteOperationImpl(String key,
-			CollectionDelete<?> collectionDelete, OperationCallback cb) {
+			CollectionDelete collectionDelete, OperationCallback cb) {
 		super(cb);
 		this.key = key;
 		this.collectionDelete = collectionDelete;
@@ -97,18 +97,16 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 	public void initialize() {
 		String cmd = collectionDelete.getCommand();
 		String args = collectionDelete.stringify();
-		byte[] data = collectionDelete.getData();
+		byte[] additionalArgs = collectionDelete.getAdditionalArgs();
 
 		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-				+ cmd.length() + args.length() + data.length + 16);
+						+ cmd.length() + args.length() +
+						((null == additionalArgs)? 0 : additionalArgs.length) + 16);
 
 		setArguments(bb, cmd, key, args);
 
-		if ("sop delete".equals(cmd)) {
-			bb.put(data);
-			bb.put(CRLF);
-		} else if (data.length > 0) {
-			bb.put(data);
+		if (null != additionalArgs) {
+			bb.put(additionalArgs);
 			bb.put(CRLF);
 		}
 
@@ -130,7 +128,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 		return Collections.singleton(key);
 	}
 
-	public CollectionDelete<?> getDelete() {
+	public CollectionDelete getDelete() {
 		return collectionDelete;
 	}
 

@@ -8,6 +8,7 @@ import java.io.IOException;
  */
 public final class OperationException extends IOException {
 
+	private static final long serialVersionUID = 2457625388445818437L;
 	private final OperationErrorType type;
 
 	/**

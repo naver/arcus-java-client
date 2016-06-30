@@ -16,14 +16,13 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionDelete<T> {
+public abstract class CollectionDelete {
 
 	protected String range;
 	protected boolean noreply;
 	protected boolean dropIfEmpty = true;
 	
 	protected String str;
-	protected byte[] data = { };
 
 	public String getRange() {
 		return range;
@@ -41,14 +40,8 @@ public abstract class CollectionDelete<T> {
 		this.noreply = noreply;
 	}
 
-	public byte[] getData() {
-		return data;
-	}
 
-	public void setData(byte[] data) {
-		this.data = data;
-	}
-
+	public abstract byte[] getAdditionalArgs();
 	public abstract String stringify();
 	public abstract String getCommand();
 

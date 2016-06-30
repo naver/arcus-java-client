@@ -36,8 +36,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		CollectionFuture<Boolean> future;
 		OperationStatus status;
 
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 0, null,
-				"hello", new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 0, null, "hello", new CollectionAttributes());
 
 		// OperationStatus should be null before operation completion
 		// status = future.getOperationStatus();
@@ -57,16 +56,14 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		CollectionFuture<Map<Long, Element<Object>>> future;
 		OperationStatus status;
 
-		future = (CollectionFuture<Map<Long, Element<Object>>>) mc.asyncBopGet(
-				key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
+		future = mc.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
 
 		// OperationStatus should be null before operation completion
 		// status = future.getOperationStatus();
 		// assertNull(status);
 
 		// After operation completion (FAILURE)
-		Map<Long, Element<Object>> result = future.get(1000,
-				TimeUnit.MILLISECONDS);
+		Map<Long, Element<Object>> result = future.get(1000, TimeUnit.MILLISECONDS);
 		status = future.getOperationStatus();
 
 		assertNull(result);
@@ -79,8 +76,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		CollectionFuture<Boolean> future;
 		OperationStatus status;
 
-		future = (CollectionFuture<Boolean>) mc.asyncBopInsert(key, 0, null,
-				"hello", new CollectionAttributes());
+		future = mc.asyncBopInsert(key, 0, null, "hello", new CollectionAttributes());
 
 		try {
 			future.get(1, TimeUnit.NANOSECONDS);

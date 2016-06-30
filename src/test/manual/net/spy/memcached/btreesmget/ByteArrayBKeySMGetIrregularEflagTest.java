@@ -40,6 +40,9 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
 	public void testGetAll_1() {
 		SMGetMode smgetMode = SMGetMode.UNIQUE;
+		ArrayList<String> testKeyList = new ArrayList<String>();
+		testKeyList.add(key1);
+		testKeyList.add(key2);
 		
 		/* old SMGetIrregularEflagTest */
 		try {
@@ -61,13 +64,8 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 					new CollectionAttributes()).get();
 
 			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
-					new ArrayList<String>() {
-						{
-							add(key1);
-							add(key2);
-						}
-					}, new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
+							testKeyList, new byte[] { 0 }, new byte[] { 10 },
+							ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
 
 			for (int i = 0; i < list.size(); i++) {
 				System.out.println(list.get(i));
@@ -96,13 +94,8 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 					new CollectionAttributes()).get();
 
 			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
-					new ArrayList<String>() {
-						{
-							add(key1);
-							add(key2);
-						}
-					}, new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
+							testKeyList, new byte[] { 0 }, new byte[] { 10 },
+							ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
 
 			for (int i = 0; i < list.size(); i++) {
 				System.out.println(list.get(i));

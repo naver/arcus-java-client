@@ -16,12 +16,19 @@
  */
 package net.spy.memcached;
 
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.internal.BasicThreadFactory;
+import net.spy.memcached.internal.CollectionFuture;
+import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.transcoders.Transcoder;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -30,14 +37,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.compat.SpyObject;
-import net.spy.memcached.internal.BasicThreadFactory;
-import net.spy.memcached.internal.CollectionFuture;
-import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.transcoders.Transcoder;
 
 class BulkService extends SpyObject {
 
@@ -55,8 +54,11 @@ class BulkService extends SpyObject {
 	}
 
 	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
-			List<String> keys, int exp, T value, Transcoder<T> transcoder,
-			ArcusClient[] client) {
+					List<String> keys, int exp, T value, Transcoder<T> transcoder,
+					ArcusClient[] client) {
+		if (keys == null) {
+			throw new IllegalArgumentException("Key list is null.");
+		}
 		assert !executor.isShutdown() : "Pool has already shut down.";
 		BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
 				client, singleOpTimeout);
@@ -69,6 +71,9 @@ class BulkService extends SpyObject {
 	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
 			Map<String, T> o, int exp, Transcoder<T> transcoder,
 			ArcusClient[] client) {
+		if (o == null) {
+			throw new IllegalArgumentException("Map is null.");
+		}
 		assert !executor.isShutdown() : "Pool has already shut down.";
 		BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder, client,
 				singleOpTimeout);
@@ -117,15 +122,17 @@ class BulkService extends SpyObject {
 		protected final int fromIndex;
 		protected final int toIndex;
 
-		public BulkWorker(int keySize, long timeout, Transcoder<T> tc,
-				ArcusClient[] clientList) {
-			this.future = new ArrayList<Future<Boolean>>(keySize);
+		public BulkWorker(Collection keys, long timeout, ArcusClient[] clientList) {
+			if(keys.size() < 1) {
+				throw new IllegalArgumentException("Keys size must be greater than 0");
+			}
+			this.future = new ArrayList<Future<Boolean>>(keys.size());
 			this.operationTimeout = timeout;
 			this.clientList = getOptimalClients(clientList);
 			this.errorList = new HashMap<String, CollectionOperationStatus>();
 
 			fromIndex = 0;
-			toIndex = keySize - 1;
+			toIndex = keys.size() - 1;
 			totalCount = toIndex - fromIndex + 1;
 		}
 
@@ -173,13 +180,7 @@ class BulkService extends SpyObject {
 
 		public abstract void awaitProcessResult(int index);
 
-		public abstract boolean isDataExists();
-
 		public Map<String, CollectionOperationStatus> call() throws Exception {
-			if (!isDataExists()) {
-				return errorList;
-			}
-
 			for (int pos = fromIndex; isRunnable() && pos <= toIndex; pos++) {
 				if ((pos - fromIndex) > 0
 						&& (pos - fromIndex) % DEFAULT_LOOP_LIMIT == 0) {
@@ -222,7 +223,7 @@ class BulkService extends SpyObject {
 		public BulkSetWorker(List<String> keys, int exp, T value,
 				Transcoder<T> transcoder, ArcusClient[] clientList,
 				long timeout) {
-			super(keys.size(), timeout, transcoder, clientList);
+			super(keys, timeout, clientList);
 			this.keys = keys;
 			this.exp = exp;
 			this.cos = new ArrayList<CachedData>();
@@ -233,7 +234,7 @@ class BulkService extends SpyObject {
 		public BulkSetWorker(Map<String, T> o, int exp,
 				Transcoder<T> transcoder, ArcusClient[] clientList, long timeout) {
 
-			super(o.keySet().size(), timeout, transcoder, clientList);
+			super(o.keySet(), timeout, clientList);
 
 			this.keys = new ArrayList<String>(o.keySet());
 			this.exp = exp;
@@ -268,11 +269,6 @@ class BulkService extends SpyObject {
 				errorList.put(keys.get(index), new CollectionOperationStatus(
 						false, e.getMessage(), CollectionResponse.EXCEPTION));
 			}
-		}
-
-		@Override
-		public boolean isDataExists() {
-			return (keys != null && keys.size() > 0);
 		}
 	}
 }

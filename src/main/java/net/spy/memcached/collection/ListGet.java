@@ -16,18 +16,13 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.List;
-
-public class ListGet<T> extends CollectionGet<T> {
+public class ListGet extends CollectionGet {
 
 	public static final int FIRST = 0;
 	public static final int LAST = -1;
 	
 	private static final String command = "lop get";
 	
-	protected String range;
-	protected List<T> list;
-
 	public ListGet(int index, boolean delete) {
 		this.headerCount = 1;
 		this.range = String.valueOf(index);
@@ -58,8 +53,9 @@ public class ListGet<T> extends CollectionGet<T> {
 		this.range = range;
 	}
 
-	public List<T> getList() {
-		return list;
+	@Override
+	public byte[] getAddtionalArgs() {
+		return null;
 	}
 
 	public String stringify() {

@@ -28,17 +28,17 @@ public class ProtocolSetGetTest extends TestCase {
 		// default setting : dropIfEmpty = true
 
 		Assert.assertEquals("10 drop",
-				(new SetGet<Object>(count, true)).stringify());
+				(new SetGet(count, true)).stringify());
 		Assert.assertEquals("10",
-				(new SetGet<Object>(count, false)).stringify());
+				(new SetGet(count, false)).stringify());
 
 		Assert.assertEquals("10 drop",
-				(new SetGet<Object>(count, true, true)).stringify());
+				(new SetGet(count, true, true)).stringify());
 		Assert.assertEquals("10 delete",
-				(new SetGet<Object>(count, true, false)).stringify());
+				(new SetGet(count, true, false)).stringify());
 		Assert.assertEquals("10",
-				(new SetGet<Object>(count, false, true)).stringify());
+				(new SetGet(count, false, true)).stringify());
 		Assert.assertEquals("10",
-				(new SetGet<Object>(count, false, false)).stringify());
+				(new SetGet(count, false, false)).stringify());
 	}
 }

@@ -254,7 +254,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 		
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, (SMGetMode) smgetMode);
+						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
@@ -347,7 +347,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 		
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, (SMGetMode) smgetMode);
+						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
@@ -433,15 +433,14 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
 		// sort merge get
 		SMGetMode smgetMode = SMGetMode.UNIQUE;
+
+		ArrayList<String> testKeyList = new ArrayList<String>();
+		testKeyList.add(KEY_LIST.get(0));
+		testKeyList.add(KEY_LIST.get(1));
 		
 		/* old SMGetErrorTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(new ArrayList<String>() {
-					{
-						add(KEY_LIST.get(0));
-						add(KEY_LIST.get(1));
-					}
-				}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+				.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
 		try {
 			List<SMGetElement<Object>> map = oldFuture
 					.get(1000L, TimeUnit.SECONDS);
@@ -454,12 +453,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 		}
 		
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(new ArrayList<String>() {
-					{
-						add(KEY_LIST.get(0));
-						add(KEY_LIST.get(1));
-					}
-				}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+				.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
@@ -473,6 +467,10 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 	}
 
 	public void testInvalidArgumentException() {
+		ArrayList<String> testKeyList = new ArrayList<String>();
+		testKeyList.add(KEY_LIST.get(0));
+		testKeyList.add(KEY_LIST.get(1));
+
 		// insert test data
 		try {
 			CollectionAttributes attr = new CollectionAttributes();
@@ -510,12 +508,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
 		// offset < 0
 		try {
-			mc.asyncBopSortMergeGet(new ArrayList<String>() {
-							{
-								add(KEY_LIST.get(0));
-								add(KEY_LIST.get(1));
-							}
-						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
 			fail("This should be an exception");
 		} catch (Exception e) {
 			assertEquals("Offset must be 0 or positive integer.", e.getMessage());
@@ -523,12 +516,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
 		// count == 0 
 		try {
-			mc.asyncBopSortMergeGet(new ArrayList<String>() {
-							{
-								add(KEY_LIST.get(0));
-								add(KEY_LIST.get(1));
-							}
-						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
+			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
 			fail("This should be an exception");
 		} catch (Exception e) {
 			assertEquals("Count must be larger than 0.", e.getMessage());
@@ -536,12 +524,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
 		// offset + count > 1000
 		try {
-			mc.asyncBopSortMergeGet(new ArrayList<String>() {
-							{
-								add(KEY_LIST.get(0));
-								add(KEY_LIST.get(1));
-							}
-						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
+			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
 			fail("This should be an exception");
 		} catch (Exception e) {
 			assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
@@ -549,13 +532,9 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
 		// duplicate keys
 		try {
-			mc.asyncBopSortMergeGet(new ArrayList<String>() {
-							{
-								add(KEY_LIST.get(0));
-								add(KEY_LIST.get(1));
-								add(KEY_LIST.get(1));
-							}
-						}, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+			// add duplicate key to testKeyList
+			testKeyList.add(KEY_LIST.get(1));
+			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
 			fail("This should be an exception");
 		} catch (Exception e) {
 			assertEquals("Duplicate keys exist in key list.", e.getMessage());

@@ -42,8 +42,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testNotFound() throws Exception {
-		CollectionFuture<Set<Object>> future = (CollectionFuture<Set<Object>>) mc
-				.asyncSopGet(key, 1, false, false);
+		CollectionFuture<Set<Object>> future = mc.asyncSopGet(key, 1, false, false);
 		assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -52,8 +51,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testCreatedStored() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -62,12 +60,10 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testStored() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncSopInsert(key, "bbbb",
-				new CollectionAttributes());
+		future = mc.asyncSopInsert(key, "bbbb",	new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -76,15 +72,13 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testOverflowed() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
 				.get(1000, TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncSopInsert(key, "bbbb",
-				new CollectionAttributes());
+		future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -93,12 +87,10 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 	}
 
 	public void testElementExists() throws Exception {
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = (CollectionFuture<Boolean>) mc.asyncSopInsert(key, "aaa",
-				new CollectionAttributes());
+		future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -108,13 +100,11 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedDropped() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// delete
-		future = (CollectionFuture<Boolean>) mc
-				.asyncSopDelete(key, "aaa", true);
+		future = mc.asyncSopDelete(key, "aaa", true);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -124,18 +114,15 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeleted() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// insert
-		future = (CollectionFuture<Boolean>) mc.asyncSopInsert(key, "bbbb",
-				new CollectionAttributes());
+		future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// delete
-		future = (CollectionFuture<Boolean>) mc.asyncSopDelete(key, "aaa",
-				false);
+		future = mc.asyncSopDelete(key, "aaa", false);
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future.getOperationStatus();
@@ -145,13 +132,11 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedDroppedAfterRetrieval() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// get
-		CollectionFuture<Set<Object>> future2 = (CollectionFuture<Set<Object>>) mc
-				.asyncSopGet(key, 1, true, true);
+		CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, true);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();
@@ -161,18 +146,15 @@ public class SopServerMessageTest extends BaseIntegrationTest {
 
 	public void testDeletedAfterRetrieval() throws Exception {
 		// create
-		CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
-				.asyncSopInsert(key, "aaa", new CollectionAttributes());
+		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// insert
-		future = (CollectionFuture<Boolean>) mc.asyncSopInsert(key, "bbbb",
-				new CollectionAttributes());
+		future = mc.asyncSopInsert(key, "bbbb",	new CollectionAttributes());
 		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
 		// get
-		CollectionFuture<Set<Object>> future2 = (CollectionFuture<Set<Object>>) mc
-				.asyncSopGet(key, 1, true, false);
+		CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, false);
 		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
 		OperationStatus status = future2.getOperationStatus();

@@ -241,7 +241,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 		CollectionAttributes attrs = new CollectionAttributes();
 		attrs.setReadable(false);
 		for (long i = 0; i < 100; i++) {
-			mc.asyncBopInsert(key, (long)i, null, "val", attrs).get();
+			mc.asyncBopInsert(key, i, null, "val", attrs).get();
 		}
 
 		// set a test key
