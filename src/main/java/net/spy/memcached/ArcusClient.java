@@ -4264,7 +4264,21 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
 			int by) {
 		CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by);
-		return asyncCollectionMutate(key,BTreeUtil.toHex(subkey), collectionMutate);
+		return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+	}
+
+	@Override
+	public CollectionFuture<Long> asyncBopIncr(String key, long subkey,
+			int by, long initial, byte[] eFlag) {
+		CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by, initial, eFlag);
+		return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
+	}
+
+	@Override
+	public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
+			int by, long initial, byte[] eFlag) {
+		CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by, initial, eFlag);
+		return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
 	}
 
 	@Override
@@ -4278,9 +4292,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
 			int by) {
 		CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by);
-		return asyncCollectionMutate(key,BTreeUtil.toHex(subkey), collectionMutate);
+		return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
 	}
-	
+
+	@Override
+	public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
+			int by, long initial, byte[] eFlag) {
+		CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by, initial, eFlag);
+		return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
+	}
+
+	@Override
+	public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
+			int by, long initial, byte[] eFlag) {
+		CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by, initial, eFlag);
+		return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+	}
+
 	/**
 	 * Generic increment/decrement operation for b+tree items. Public methods call this method.
 	 *

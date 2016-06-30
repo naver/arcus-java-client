@@ -43,14 +43,18 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 			false, "collection canceled", CollectionResponse.CANCELED);
 	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
 			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+	private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
+			false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
 	private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
 			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
 	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
 			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
 			false, "UNREADABLE", CollectionResponse.UNREADABLE);
-	private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
-			false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
+	private static final OperationStatus OVERFLOWED = new CollectionOperationStatus(
+			false, "OVERFLOWED", CollectionResponse.OVERFLOWED);
+	private static final OperationStatus OUT_OF_RANGE = new CollectionOperationStatus(
+			false, "OUT_OF_RANGE", CollectionResponse.OUT_OF_RANGE);
 
 	protected final String key;
 	protected final String subkey;
@@ -82,8 +86,8 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 			Long.valueOf(line);
 			getCallback().receivedStatus(new OperationStatus(true, line));
 		} catch (NumberFormatException e) {
-			status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH,
-					UNREADABLE, NOT_FOUND_ELEMENT);
+			status = matchStatus(line, NOT_FOUND, NOT_FOUND_ELEMENT, TYPE_MISMATCH, BKEY_MISMATCH,
+					UNREADABLE, OVERFLOWED, OUT_OF_RANGE);
 
 			getLogger().debug(status);
 			getCallback().receivedStatus(status);
