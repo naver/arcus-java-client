@@ -86,10 +86,6 @@ public class Element<T> {
 			return "";
 		}
 
-		if (eflag.length == 0) {
-			return "0";
-		}
-
 		return BTreeUtil.toHex(eflag);
 	}
 
