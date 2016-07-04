@@ -719,7 +719,7 @@ null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key�
              | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
              | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
-B+tree element 값을 증가시키는 예저는 다음과 같다.
+B+tree element 값을 증가시키는 예제는 다음과 같다.
 
 ```java
 String key = "Prefix:BTree";
@@ -857,7 +857,7 @@ future.get() | future.operationStatus().getResponse() | 설명
              | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태
 null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
              | CollectionResponse.NOT_FOUND_ELEMENT   | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음
-             | CollectionResponse.OUT_OF_RANGE        | 조회된 elemenr가 없음, 조회 범위에 b+tree trim 영역 있음
+             | CollectionResponse.OUT_OF_RANGE        | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
              | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
              | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
              | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
