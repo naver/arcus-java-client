@@ -34,8 +34,11 @@ public abstract class CollectionStore<T> {
 	public CollectionStore() { }
 
 	public CollectionStore(T value, byte[] elementFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-		if (elementFlag != null && elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
-			throw new IllegalArgumentException("Length of elementFlag must be less than " + ElementFlagFilter.MAX_EFLAG_LENGTH);
+		if (elementFlag != null) {
+			if (elementFlag.length < 1 || elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
+				throw new IllegalArgumentException("Length of elementFlag must be between 1 and "
+						+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
+			}
 		}
 
 		this.value = value;
@@ -91,11 +94,6 @@ public abstract class CollectionStore<T> {
 		if (elementFlag == null) {
 			return "";
 		}
-
-		if (elementFlag.length == 0) {
-			return "0";
-		}
-		
 		return BTreeUtil.toHex(elementFlag);
 	}
 	
