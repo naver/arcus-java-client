@@ -17,6 +17,7 @@
 package net.spy.memcached.collection;
 
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeMutate extends CollectionMutate {
 
@@ -26,15 +27,47 @@ public class BTreeMutate extends CollectionMutate {
 
 	protected final int by;
 
+	protected long initial = -1;
+
+	protected byte[] elementFlag;
+
 	public BTreeMutate(Mutator m, int by) {
+		if (by <= 0) {
+			throw new IllegalArgumentException("by must be positive value.");
+		}
+
 		if (Mutator.incr == m) {
 			command = "bop incr";
 		} else {
 			command = "bop decr";
 		}
-		
+
 		this.m = m;
 		this.by = by;
+	}
+
+	public BTreeMutate(Mutator m, int by, long initial, byte[] eFlag) {
+		if (by <= 0) {
+			throw new IllegalArgumentException("by must be positive value.");
+		}
+		if (initial < 0) {
+			throw new IllegalArgumentException("initial must be 0 or positive value.");
+		}
+		if (eFlag != null && (eFlag.length < 1 || eFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH)) {
+			throw new IllegalArgumentException(
+					"length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + "." );
+		}
+
+		if (Mutator.incr == m) {
+			command = "bop incr";
+		} else {
+			command = "bop decr";
+		}
+
+		this.m = m;
+		this.by = by;
+		this.initial = initial;
+		this.elementFlag = eFlag;
 	}
 	
 	public String stringify() {
@@ -43,7 +76,10 @@ public class BTreeMutate extends CollectionMutate {
 
 		StringBuilder b = new StringBuilder();
 		b.append(by);
-		
+
+		if (initial > 0) b.append(" ").append(initial);
+		if (elementFlag != null) b.append(" ").append(getElementFlagByHex());
+
 		str = b.toString();
 		return str;
 	}
@@ -54,5 +90,9 @@ public class BTreeMutate extends CollectionMutate {
 	
 	public Mutator getMutator() {
 		return this.m;
+	}
+
+	public String getElementFlagByHex() {
+		return BTreeUtil.toHex(elementFlag);
 	}
 }
