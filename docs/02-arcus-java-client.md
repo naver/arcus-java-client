@@ -344,25 +344,33 @@ Front cache를 이용하려면 Remote Cache에서 Hit가 되었을 경우 별도
 ![Alt Text](images/java_client_ehcache.png)
 
 
-따라서 Transparent하게 즉, 라이브러리에서 알아서 Front Cache를 활성화하여 JVM에서 일정 시간 Item을 보관해 줄 수 있다면 편리하면서도 보다 빠른 응용을 개발할 수 있을 것이다. Arcus에는 Ehcache라는 Local cache 플러그인이 추가되어 복잡한 프로그램 작업 없이 바로 Front cache를 사용할 수 있도록 되어 있다. 설정해야 하는 옵션도 단 2개 뿐이다.
-그러니까 사용자는 단 2개의 옵션만 설정하면 2번과 3번 작업을 라이브러리가 알아서 모두 처리해 준다는 뜻이 된다.
+따라서 Transparent하게 즉, 라이브러리에서 알아서 Front Cache를 활성화하여 JVM에서 일정 시간 Item을 보관해 줄 수 있다면 편리하면서도 보다 빠른 응용을 개발할 수 있을 것이다. Arcus에는 Ehcache라는 Local cache 플러그인이 추가되어 복잡한 프로그램 작업 없이 바로 Front cache를 사용할 수 있도록 되어 있다. 사용자는 간단한 옵션만 설정하면 2번과 3번 작업은 라이브러리 내에서 자동으로 수행한다.
 
 다음은 Front cache를 사용을 위한 메소드로 ConnectionFactoryBuilder 클래스를 생성할 때 적용한다.
 
-- setMaxFrontCacheElements(int to)
+- `setMaxFrontCacheElements(int to)` (Required)
 
   여기에 적용되는 값은 Front Cache에서 사용할 최대 Item수를 의미한다.
   기본값은 0인데, 0이면 Front Cache를 사용하지 않는다는 뜻이다.
   따라서 Front Cache를 사용하기 위해서는 반드시 양의 정수값을 지정해야 한다.
   만약 최대 Item 수를 초과하면 LRU 알고리즘을 통해 가장 사용되지 않는 Item을 제거하고 새로운 Item을 등록하게 된다.
 
-- setFrontCacheExpireTime(int to)
+- `setFrontCacheExpireTime(int to)` (Optional, default 5)
 
   Front Cache item의 expire time이다.
   Front cache는 item별 expire time을 설정하지 않고, 등록된 모든 item에 동일한 expire time이 적용된다.
   기본값은 5이며 단위는 second이다.
   설정하지 않는다면 기본값을 그대로 사용한다면 등록된 지 5초가 지나면 자동으로 사라지게 된다. 
 
+- `setFrontCacheCopyOnRead(boolean copyOnRead)` (Optional, default false)
+  
+  Front Cache 에서 Copy Cache 기능의 copy on read 옵션을 활성화시키기 위한 설정이며, 기본값은 false 이다.
+
+- `setFrontCacheCopyOnWrite(boolean copyOnWrite)` (Optional, default false)
+
+  Front Cache 에서 Copy Cache 기능의 copy on write 옵션을 활성화시키기 위한 설정이며, 기본값은 false 이다.
+
+  EhCache 의 Copy Cache 기능에 대해서는 다음 [문서](http://www.ehcache.org/documentation/2.8/get-started/getting-started.html)를 참조 바람.
 
 Front cache 사용 상의 주의 사항은 다음과 같다.
 
@@ -372,13 +380,18 @@ Front cache 사용 상의 주의 사항은 다음과 같다.
   설정해야 한다.
 
 아래는 Front cache를 사용하기 위한 코드이다.
-setMaxFrontCacheElements와 setFrontCAcheExpireTime만 설정하면 Front Cache가 활성화된다.
+setMaxFrontCacheElements만 0보다 큰 값으로 설정하면 Front Cache가 활성화된다. (setFrontCacheExpireTime 도 사용 용도에 맞도록 명시적인 값을 설정해 주는 것을 추천함)
 
 ```java
 ConnectionFactoryBuilder factory = new ConnectionFactoryBuilder();
 
+/* Required to use transparent front cache */
 factory.setMaxFrontCacheElements(10000);
+
+/* Optional settings */
 factory.setFrontCacheExpireTime(5);
+factory.setFrontCacheCopyOnRead(true);
+factory.setFrontCacheCopyOnRead(true);
 
 ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
 ```
