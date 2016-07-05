@@ -73,14 +73,15 @@ public class ConnectionFactoryBuilder {
 	
 	private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
 	private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
-	
+	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
+	private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
+	private boolean frontCacheCopyOnWrite = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+
 	private int bulkServiceThreadCount = DefaultConnectionFactory.DEFAULT_BULKSERVICE_THREAD_COUNT;
 	private int bulkServiceLoopLimit = DefaultConnectionFactory.DEFAULT_BULKSERVICE_LOOP_LIMIT;
 	private long bulkServiceSingleOpTimeout = DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
 	
 	private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
-	
-	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
 	
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
@@ -312,6 +313,22 @@ public class ConnectionFactoryBuilder {
 	}
 	
 	/**
+	 * Set front cache copyOnRead property
+	 */
+	public ConnectionFactoryBuilder setFrontCacheCopyOnRead(boolean copyOnRead) {
+		frontCacheCopyOnRead = copyOnRead;
+		return this;
+	}
+
+	/**
+	 * Set front cache copyOnWrite property
+	 */
+	public ConnectionFactoryBuilder setFrontCacheCopyOnWrite(boolean copyOnWrite) {
+		frontCacheCopyOnWrite = copyOnWrite;
+		return this;
+	}
+
+	/**
 	 * Set bulk service default thread count 
 	 */
 	public ConnectionFactoryBuilder setBulkServiceThreadCount(int to) {
@@ -345,7 +362,7 @@ public class ConnectionFactoryBuilder {
 		maxSMGetChunkSize = size;
 		return this;
 	}
-	
+
 	/* ENABLE_REPLICATION if */
 	/**
 	 * Set read prioirty for choosing replica node to read data
@@ -558,6 +575,21 @@ public class ConnectionFactoryBuilder {
 			}
 
 			@Override
+			public String getFrontCacheName() {
+				return frontCacheName;
+			}
+
+			@Override
+			public boolean getFrontCacheCopyOnRead() {
+				return frontCacheCopyOnRead;
+			}
+
+			@Override
+			public boolean getFrontCacheCopyOnWrite() {
+				return frontCacheCopyOnWrite;
+			}
+
+			@Override
 			public int getBulkServiceThreadCount() {
 				return bulkServiceThreadCount;
 			}
@@ -575,11 +607,6 @@ public class ConnectionFactoryBuilder {
 			@Override
 			public int getDefaultMaxSMGetKeyChunkSize() {
 				return maxSMGetChunkSize;
-			}
-			
-			@Override
-			public String getFrontCacheName() {
-				return frontCacheName;
 			}
 			/* ENABLE_REPLICATION if */
 
