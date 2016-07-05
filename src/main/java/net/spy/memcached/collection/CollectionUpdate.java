@@ -26,24 +26,19 @@ public abstract class CollectionUpdate<T> {
 
 	public CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
 
-		if (newValue == null) {
-			if (eflagUpdate == null || eflagUpdate.getElementFlag() == null) {
+		if (eflagUpdate == null) {
+			if (newValue == null) {
 				throw new IllegalArgumentException(
 						"One of the newValue or elementFlag must not be null.");
 			}
-		}
-		this.newValue = newValue;
-
-		if (eflagUpdate == null || eflagUpdate.getElementFlag() == null) {
-			this.eflagUpdate = null;
 		} else {		
 			if (eflagUpdate.getElementFlag().length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
 				throw new IllegalArgumentException("length of element flag cannot exceed "
 						+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
 			}
-			this.eflagUpdate = eflagUpdate;
 		}
-
+		this.newValue = newValue;
+		this.eflagUpdate = eflagUpdate;
 		this.noreply = noreply;
 	}
 
