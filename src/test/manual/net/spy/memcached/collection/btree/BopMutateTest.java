@@ -67,22 +67,22 @@ public class BopMutateTest extends BaseIntegrationTest {
 		addToBTree(key, items9);
 
 		// incr 2, initial value 4L, etag
-		assertTrue(mc.asyncBopIncr(key, 10L, (int) 2, 4L, new byte[] { 0 })
+		assertTrue(mc.asyncBopIncr(key, 10L, 2, 4L, new byte[] { 0 })
 				.get(1000, TimeUnit.MILLISECONDS).equals(4L));
 		// incr 10
-		assertTrue(mc.asyncBopIncr(key, 10L, (int) 10, 6L, new byte[] { 1 })
+		assertTrue(mc.asyncBopIncr(key, 10L, 10, 6L, new byte[] { 1 })
 				.get(1000, TimeUnit.MILLISECONDS).equals(14L));
 
 		// decr 1, initial value 8L
-		assertTrue(mc.asyncBopDecr(key, 11L, (int) 1, 8L, null)
+		assertTrue(mc.asyncBopDecr(key, 11L, 1, 8L, null)
 				.get(1000, TimeUnit.MILLISECONDS).equals(8L));
 		// decr 2
-		assertTrue(mc.asyncBopDecr(key, 11L, (int) 2, 10L, null)
+		assertTrue(mc.asyncBopDecr(key, 11L, 2, 10L, null)
 				.get(1000, TimeUnit.MILLISECONDS).equals(6L));
 
 		// eFlag length 0
 		try {
-			assertTrue(mc.asyncBopIncr(key, 12L, (int) 2, 6L, new byte[] { })
+			assertTrue(mc.asyncBopIncr(key, 12L, 2, 6L, new byte[] { })
 					.get(1000, TimeUnit.MILLISECONDS).equals(6L));
 		} catch (Exception e) {
 			assertEquals("length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + "." , e.getMessage());
