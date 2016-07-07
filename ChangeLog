@@ -1,3 +1,17 @@
+2016-07-07 [version 1.9.4]
+	* [Feature] bop incr/decr with initial value.
+	* [Feature] CopyOnRead / CopyOnWrite to ARCUS front cache.
+	* [Feature] Support replication.
+	  - It can co-work with replication enabled cache cluster.
+	* [Fix] Several minor mistakes in using elementFlag.
+	* [Fix] Added null key checking logic to aysncSetBulk.
+	* [Fix] Added arguments check logic to BulkWorker and its subclasses.
+	* [Other] Remove compile warnings completely.
+	* [Other] Followings are modified to get additional arguments.
+	   - CollectionDelete, CollectionExist, SetExit
+	   - CollecitionGet and its subclasses
+	* [Other] Extensice code refactoring
+
 2016-02-04 [version 1.9.3]
 	* Add cancel message to detect the cancel cause.
 	* More correct error handling in getting/creating the client_info znode.
