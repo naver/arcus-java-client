@@ -84,11 +84,6 @@
 					<debug>true</debug>
 					<optimize>true</optimize>
 					<encoding>utf-8</encoding>
-					<showWarnings>true</showWarnings>
-					<compilerArgs>
-						<arg>-Werror</arg>
-						<arg>-Xlint:all</arg>
-					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>
