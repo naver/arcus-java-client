@@ -46,9 +46,9 @@ public class ElementFlagUpdate {
 		if (elementFlag == null) {
 			throw new IllegalArgumentException("element flag may not null.");
 		}
-		if (elementFlag.length < 1 || elementFlag.length > 31) {
-			throw new IllegalArgumentException(
-					"length of element flag must be between 1 and 31");
+		if (elementFlag.length < 1 || elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
+			throw new IllegalArgumentException("length of element flag must be between 1 and "
+					+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
 		}
 		this.elementFlag = elementFlag;
 		this.elementFlagOffset = -1;
@@ -77,9 +77,9 @@ public class ElementFlagUpdate {
 		if (elementFlag == null) {
 			throw new IllegalArgumentException("element flag may not null.");
 		}
-		if (elementFlag.length < 1 || elementFlag.length > 31) {
-			throw new IllegalArgumentException(
-					"length of element flag must be between 1 and 31");
+		if (elementFlag.length < 1 || elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
+			throw new IllegalArgumentException("length of element flag must be between 1 and "
+					+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
 		}
 		this.elementFlagOffset = elementFlagOffset;
 		this.bitOp = bitOp;
@@ -104,6 +104,9 @@ public class ElementFlagUpdate {
 	 * @return element flag by hex (e.g. 0x01)
 	 */
 	public String getElementFlagByHex() {
+		if (elementFlag.length == 0) {
+			return "0"; // special meaning: remove eflag
+		}
 		// convert to hex based on its real byte array
 		return BTreeUtil.toHex(elementFlag);
 	}

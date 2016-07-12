@@ -84,6 +84,13 @@ public class CollectionUpsertOperationImpl extends OperationImpl implements
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING : "Read ``" + line
 				+ "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(
 				matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
 						ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,

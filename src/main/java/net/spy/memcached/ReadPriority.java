@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.ops;
+/* ENABLE_REPLICATION if */
+package net.spy.memcached;
 
 /**
- * State of this operation.
+ * Read priority for read operation
  */
-public enum OperationState {
+public enum ReadPriority {
+
 	/**
-	 * State indicating this operation is writing data to the server.
+	 * Read on Master
 	 */
-	WRITING,
+	MASTER,
+
 	/**
-	 * State indicating this operation is reading data from the server.
+	 * Read on Slave
 	 */
-	READING,
+	SLAVE,
+
 	/**
-	 * State indicating this operation is complete.
+	 * Read RR(Round-robin) pattern.
 	 */
-	COMPLETE,
-	/**
-	 * State indicating this operation timed out without completing.
-	 */
-	TIMEDOUT
-	/* ENABLE_REPLICATION if */
-	/**
-	 * State indicating this operation will be moved by switchover or failover
-	 */
-	, MOVING
-	/* ENABLE_REPLICATION end */
+	RR, 
 }
+/* ENABLE_REPLICATION end */

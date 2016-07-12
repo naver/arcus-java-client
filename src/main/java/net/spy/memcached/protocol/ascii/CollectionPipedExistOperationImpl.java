@@ -107,6 +107,9 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
 				successAll = false;
 			}
 			cb.gotStatus(index, status);
+			/* ENABLE_REPLICATION if */
+			this.setPipedExist.setNextOpIndex(index);
+			/* ENABLE_REPLICATION end */
 			index++;
 		}
 	}

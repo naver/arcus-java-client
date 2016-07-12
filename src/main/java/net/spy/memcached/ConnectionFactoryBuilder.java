@@ -16,14 +16,20 @@
  */
 package net.spy.memcached;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationQueueFactory;
+import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.Transcoder;
@@ -67,15 +73,36 @@ public class ConnectionFactoryBuilder {
 	
 	private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
 	private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
-	
+	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
+	private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
+	private boolean frontCacheCopyOnWrite = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+
 	private int bulkServiceThreadCount = DefaultConnectionFactory.DEFAULT_BULKSERVICE_THREAD_COUNT;
 	private int bulkServiceLoopLimit = DefaultConnectionFactory.DEFAULT_BULKSERVICE_LOOP_LIMIT;
 	private long bulkServiceSingleOpTimeout = DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
 	
 	private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
 	
-	private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
-	
+	/* ENABLE_REPLICATION if */
+	private boolean arcusReplEnabled = false;
+
+	private ReadPriority readPriority = ReadPriority.MASTER;
+	private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
+
+	/**
+	 * use ARCUS replication
+	 * @param enable
+	 */
+	public ConnectionFactoryBuilder setArcusReplEnabled(boolean enable) {
+		arcusReplEnabled = enable;
+		return this;
+	}
+
+	public boolean getArcusReplEnabled() {
+		return arcusReplEnabled;
+	}
+
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Set the operation queue factory.
 	 */
@@ -286,6 +313,22 @@ public class ConnectionFactoryBuilder {
 	}
 	
 	/**
+	 * Set front cache copyOnRead property
+	 */
+	public ConnectionFactoryBuilder setFrontCacheCopyOnRead(boolean copyOnRead) {
+		frontCacheCopyOnRead = copyOnRead;
+		return this;
+	}
+
+	/**
+	 * Set front cache copyOnWrite property
+	 */
+	public ConnectionFactoryBuilder setFrontCacheCopyOnWrite(boolean copyOnWrite) {
+		frontCacheCopyOnWrite = copyOnWrite;
+		return this;
+	}
+
+	/**
 	 * Set bulk service default thread count 
 	 */
 	public ConnectionFactoryBuilder setBulkServiceThreadCount(int to) {
@@ -319,13 +362,72 @@ public class ConnectionFactoryBuilder {
 		maxSMGetChunkSize = size;
 		return this;
 	}
+
+	/* ENABLE_REPLICATION if */
+	/**
+	 * Set read prioirty for choosing replica node to read data
+	 */
+	public ConnectionFactoryBuilder setReadPriority(ReadPriority priority) {
+		readPriority = priority;
+		return this;
+	}
+
+	public ConnectionFactoryBuilder setAPIReadPriority(APIType apiType, ReadPriority readPriority) {
+		OperationType type = apiType.getAPIOpType();
+		
+		if (type == OperationType.READ || type == OperationType.RW) {
+			this.apiReadPriorityList.put(apiType, readPriority);
+		}
+		
+		return this;
+	}
+
+	public ConnectionFactoryBuilder setAPIReadPriority(Map<APIType, ReadPriority> apiList) {
+		this.apiReadPriorityList.clear();
+		
+		for (Map.Entry<APIType, ReadPriority> entry : apiList.entrySet()) {
+			OperationType type = entry.getKey().getAPIOpType();
+			if (type == OperationType.READ || type == OperationType.RW) {
+				this.apiReadPriorityList.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return this;
+	}
 	
+	public ConnectionFactoryBuilder clearAPIReadPirority() {
+		this.apiReadPriorityList.clear();
+		
+		return this;
+	}
+	
+	public ReadPriority getAPIReadPriority(APIType apiType) {
+		ReadPriority priority = this.apiReadPriorityList.get(apiType);
+		
+		return priority != null ? priority : ReadPriority.MASTER;
+	}
+	
+	public Map<APIType, ReadPriority> getAPIReadPriority() {
+		return this.apiReadPriorityList;
+	}
+
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Get the ConnectionFactory set up with the provided parameters.
 	 */
 	public ConnectionFactory build() {
 		return new DefaultConnectionFactory() {
 
+			/* ENABLE_REPLICATION if */
+			@Override
+			public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+				throws IOException {
+				MemcachedConnection c = super.createConnection(addrs);
+				c.setArcusReplEnabled(arcusReplEnabled);
+				return c;
+			}
+
+			/* ENABLE_REPLICATION end */
 			@Override
 			public BlockingQueue<Operation> createOperationQueue() {
 				return opQueueFactory == null ?
@@ -354,7 +456,23 @@ public class ConnectionFactoryBuilder {
 					case CONSISTENT:
 						return new KetamaNodeLocator(nodes, getHashAlg());
 					case ARCUSCONSISTENT:
+						/* ENABLE_REPLICATION if */
+						if (arcusReplEnabled) {
+							// Arcus repl cluster
+							// This locator uses ArcusReplKetamaNodeLocatorConfiguration
+							// which builds keys off the server's group name, not
+							// its ip:port.
+							return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
+						}
+						else {
+							// Arcus base cluster
+							return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						}
+						/* ENABLE_REPLICATION else */
+						/*
 						return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+						*/
+						/* ENABLE_REPLICATION end */
 					default: throw new IllegalStateException(
 							"Unhandled locator type: " + locator);
 				}
@@ -457,6 +575,21 @@ public class ConnectionFactoryBuilder {
 			}
 
 			@Override
+			public String getFrontCacheName() {
+				return frontCacheName;
+			}
+
+			@Override
+			public boolean getFrontCacheCopyOnRead() {
+				return frontCacheCopyOnRead;
+			}
+
+			@Override
+			public boolean getFrontCacheCopyOnWrite() {
+				return frontCacheCopyOnWrite;
+			}
+
+			@Override
 			public int getBulkServiceThreadCount() {
 				return bulkServiceThreadCount;
 			}
@@ -475,11 +608,18 @@ public class ConnectionFactoryBuilder {
 			public int getDefaultMaxSMGetKeyChunkSize() {
 				return maxSMGetChunkSize;
 			}
+			/* ENABLE_REPLICATION if */
+
+			@Override
+			public ReadPriority getReadPriority() {
+				return readPriority;
+			}
 			
 			@Override
-			public String getFrontCacheName() {
-				return frontCacheName;
+			public Map<APIType, ReadPriority> getAPIReadPriority() {
+				return apiReadPriorityList;
 			}
+			/* ENABLE_REPLICATION end */
 		};
 	}
 

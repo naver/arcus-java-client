@@ -703,11 +703,21 @@ CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by)
 
 CollectionFuture<Long> asyncBopIncr(String key, Byte[] bkey, int by)
 CollectionFuture<Long> asyncBopDecr(String key, Byte[] bkey, int by)
+
+CollectionFuture<Long> asyncBopIncr(String key, long subkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopDecr(String key, long subkey, int by, long initial, byte[] eFlag);
+
+CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by, long initial, byte[] eFlag);
 ```
 
 - key: b+tree item의 key
 - bkey: 대상 element의 bkey
-- by: 증감시킬 값 (감소시킬 값이 element 값보다 크면, 0으로 설정한다.)
+- by: 증감시킬 값 (1 이상의 값이어야 한다. 만약 감소시킬 값이 element 값보다 크면, 감소 후의 결과값은 0으로 저장된다)
+
+아래 값들은 대상 element가 존재하지 않을 때 새롭게 삽입되는 값들이다. (optional)
+- initial: 삽입할 element의 value (0 이상의 값[64bit unsigned integer]이어야 한다)
+- eFlag: 삽입할 element의 eflag(element flag)
 
 수행 결과는 future 객체를 통해 얻는다.
 
@@ -715,11 +725,14 @@ future.get() | future.operationStatus().getResponse() | 설명
 ------------ | -------------------------------------- | ---------
 element 값   |                                        | 증감 정상 수행
 null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
+             | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 bkey를 가진 element가 없음
              | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
              | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
              | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+             | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
+             | CollectionResponse.OUT_OF_RANGE        | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
 
-B+tree element 값을 증가시키는 예저는 다음과 같다.
+B+tree element 값을 증가시키는 예제는 다음과 같다.
 
 ```java
 String key = "Prefix:BTree";
@@ -857,7 +870,7 @@ future.get() | future.operationStatus().getResponse() | 설명
              | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태
 null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
              | CollectionResponse.NOT_FOUND_ELEMENT   | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음
-             | CollectionResponse.OUT_OF_RANGE        | 조회된 elemenr가 없음, 조회 범위에 b+tree trim 영역 있음
+             | CollectionResponse.OUT_OF_RANGE        | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
              | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
              | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
              | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)

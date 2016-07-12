@@ -46,6 +46,15 @@ public interface Operation {
 	 */
 	OperationState getState();
 
+	/* ENABLE_REPLICATION if */
+	/**
+	 * reset operation state to WRITING
+	 */
+	void resetState();
+
+	void setMoved(boolean s);
+
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Get the write buffer for this operation.
 	 */

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.navercorp.arcus</groupId>
 	<artifactId>arcus-java-client</artifactId>
-	<version>1.9.3</version>
+	<version>1.9.4</version>
 	<name>Arcus Java Client</name>
 	<description>Java client for Arcus memcached</description>
 	<packaging>jar</packaging>
@@ -84,11 +84,6 @@
 					<debug>true</debug>
 					<optimize>true</optimize>
 					<encoding>utf-8</encoding>
-					<showWarnings>true</showWarnings>
-					<compilerArgs>
-						<arg>-Werror</arg>
-						<arg>-Xlint:all</arg>
-					</compilerArgs>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -24,6 +24,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionUpdateOperation;
@@ -82,6 +83,13 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING : "Read ``" + line
 				+ "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(
 				matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,
 						NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
@@ -93,16 +101,26 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 	public void initialize() {
 		String args = collectionUpdate.stringify();
 
+		StringBuilder b = new StringBuilder();
+		ElementFlagUpdate eflagUpdate = collectionUpdate.getElementFlagUpdate();
+		if (eflagUpdate != null) {
+			if (eflagUpdate.getElementFlagOffset() > -1 && eflagUpdate.getBitOp() != null) {
+				b.append(eflagUpdate.getElementFlagOffset()).append(" ");
+				b.append(eflagUpdate.getBitOp()).append(" ");
+			}
+			b.append(eflagUpdate.getElementFlagByHex());
+		}
+		String eflagStr = b.toString();
+
 		ByteBuffer bb = ByteBuffer
 				.allocate(((data != null) ? data.length : 0)
 						+ KeyUtil.getKeyBytes(key).length
 						+ KeyUtil.getKeyBytes(subkey).length
-						+ KeyUtil.getKeyBytes(collectionUpdate
-								.getElementFlagByHex()).length + args.length()
+						+ eflagStr.length() + args.length()
 						+ OVERHEAD);
 
-		setArguments(bb, collectionUpdate.getCommand(), key, subkey, args,
-				((data != null) ? data.length : "-1"));
+		setArguments(bb, collectionUpdate.getCommand(), key, subkey,
+				 eflagStr, (data != null ? data.length : "-1"), args);
 
 		if (data != null) {
 			bb.put(data);

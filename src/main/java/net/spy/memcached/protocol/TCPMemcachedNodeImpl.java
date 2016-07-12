@@ -26,13 +26,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -80,6 +83,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	// fake node
 	private boolean isFake = false; 
 	
+	/* ENABLE_REPLICATION if */
+	private MemcachedReplicaGroup replicaGroup;
+
+	/* ENABLE_REPLICATION end */
 	public boolean isFake() {
 		return isFake;
 	}
@@ -127,7 +134,17 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		assert rq != null : "No operation read queue";
 		assert wq != null : "No operation write queue";
 		assert iq != null : "No input queue";
+		/* ENABLE_REPLICATION if */
+		if (sa instanceof ArcusReplNodeAddress) {
+			socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
+		} else {
+			socketAddress = sa;
+		}
+		/* ENABLE_REPLICATION else */
+		/*
 		socketAddress=sa;
+		*/
+		/* ENABLE_REPLICATION end */
 		setChannel(c);
 		rbuf=ByteBuffer.allocate(bufSize);
 		wbuf=ByteBuffer.allocate(bufSize);
@@ -663,4 +680,67 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		sb.append(" #TR=").append(getTimeoutRatioNow());
 		return sb.toString();
 	}
+	/* ENABLE_REPLICATION if */
+
+	public void setReplicaGroup(MemcachedReplicaGroup g) {
+		replicaGroup = g;
+	}
+
+	public MemcachedReplicaGroup getReplicaGroup() {
+		return replicaGroup;
+	}
+
+	private BlockingQueue<Operation> getAllOperations() {
+		BlockingQueue<Operation> allOp = new LinkedBlockingQueue<Operation>();
+
+		if (hasReadOp()) {
+			readQ.drainTo(allOp);
+		}
+
+		while (hasWriteOp()) {
+			/* large byte operation
+			 * may exist write queue & read queue
+			 */
+			Operation op = removeCurrentWriteOp();
+			if (!allOp.contains(op)) {
+				allOp.add(op);
+			} else {
+				getLogger().warn("Duplicate operation exist in " + this + " : " + op);
+			}
+		}
+
+		if (inputQueue.size() > 0) {
+			inputQueue.drainTo(allOp);
+		}
+
+		return allOp;
+	}
+
+	public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+		for (Operation op : allOp) {
+			if (op.getState() == OperationState.WRITING && op.getBuffer() != null) {
+				op.getBuffer().reset(); // buffer offset reset
+			} else {
+				op.initialize(); // write completed or not yet initialized
+				op.resetState(); // reset operation state
+			}
+			op.setHandlingNode(this);
+			op.setMoved(true);
+		}
+		addOpCount += allOp.size();
+		allOp.drainTo(inputQueue);
+	}
+
+	public int moveOperations(final MemcachedNode toNode) {
+		BlockingQueue<Operation> allOp = getAllOperations();
+		int opCount = allOp.size();
+
+		if (opCount > 0) {
+			toNode.addAllOpToInputQ(allOp);
+			getLogger().info("Total %d operations have been moved to %s", opCount, toNode);
+		}
+
+		return opCount;
+	}
+	/* ENABLE_REPLICATION end */
 }

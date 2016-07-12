@@ -113,6 +113,13 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 			getLogger().debug("Got line %s", line);
 		}
 
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		// VALUE <flags> <count>\r\n
 		if (line.startsWith("VALUE ")) {
 			String[] stuff = line.split(" ");

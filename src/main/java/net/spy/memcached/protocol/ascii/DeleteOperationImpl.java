@@ -39,6 +39,13 @@ final class DeleteOperationImpl extends OperationImpl
 	@Override
 	public void handleLine(String line) {
 		getLogger().debug("Delete of %s returned %s", key, line);
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
 		transitionState(OperationState.COMPLETE);
 	}

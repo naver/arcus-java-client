@@ -104,11 +104,6 @@ public abstract class CollectionStore<T> {
 		if (elementFlag == null) {
 			return "";
 		}
-
-		if (elementFlag.length == 0) {
-			return "0";
-		}
-		
 		return BTreeUtil.toHex(elementFlag);
 	}
 	

@@ -70,6 +70,9 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
 		}
 		if(rv == null) {
 			rv=new OperationStatus(false, line);
+			/* ENABLE_REPLICATION if */
+			getLogger().error("Unexpected operation status : %s", line);
+			/* ENABLE_REPLICATION end */
 		}
 		return rv;
 	}
@@ -150,6 +153,11 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
 					}
 				}
 			}
+			/* ENABLE_REPLICATION if */
+			if (getState() == OperationState.MOVING) {
+				break;
+			}
+			/* ENABLE_REPLICATION end */
 		}
 	}
 

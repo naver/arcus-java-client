@@ -73,6 +73,13 @@ public class CollectionCreateOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(
 				matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
 		transitionState(OperationState.COMPLETE);

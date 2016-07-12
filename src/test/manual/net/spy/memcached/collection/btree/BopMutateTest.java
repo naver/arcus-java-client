@@ -16,10 +16,13 @@
  */
 package net.spy.memcached.collection.btree;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionFuture;
 
 public class BopMutateTest extends BaseIntegrationTest {
@@ -57,6 +60,42 @@ public class BopMutateTest extends BaseIntegrationTest {
 		// decr 4
 		assertTrue(mc.asyncBopDecr(key, 1L, 4)
 				.get(1000, TimeUnit.MILLISECONDS).equals(0L));
+	}
+
+	public void testBopIncrDecr_InitialValue() throws Exception {
+		// Create a list and add it 9 items
+		addToBTree(key, items9);
+
+		// incr 2, initial value 4L, etag
+		assertTrue(mc.asyncBopIncr(key, 10L, 2, 4L, new byte[] { 0 })
+				.get(1000, TimeUnit.MILLISECONDS).equals(4L));
+		// incr 10
+		assertTrue(mc.asyncBopIncr(key, 10L, 10, 6L, new byte[] { 1 })
+				.get(1000, TimeUnit.MILLISECONDS).equals(14L));
+
+		// decr 1, initial value 8L
+		assertTrue(mc.asyncBopDecr(key, 11L, 1, 8L, null)
+				.get(1000, TimeUnit.MILLISECONDS).equals(8L));
+		// decr 2
+		assertTrue(mc.asyncBopDecr(key, 11L, 2, 10L, null)
+				.get(1000, TimeUnit.MILLISECONDS).equals(6L));
+
+		// eFlag length 0
+		try {
+			assertTrue(mc.asyncBopIncr(key, 12L, 2, 6L, new byte[] { })
+					.get(1000, TimeUnit.MILLISECONDS).equals(6L));
+		} catch (Exception e) {
+			assertEquals("length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + "." , e.getMessage());
+		}
+
+		ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal,
+				new byte[] { 0 });
+		filter.setBitOperand(ElementFlagFilter.BitWiseOperands.AND, new byte[] { 0 });
+
+		Map<Long, Element<Object>> map = mc.asyncBopGet(key, 10L, filter,
+				false, false).get();
+
+		assertEquals(map.get(10L).getValue(), "14");
 	}
 
 	public void testBopIncrDecr_Minus() throws Exception {

@@ -86,6 +86,13 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
 		assert getState() == OperationState.READING : "Read ``" + line
 				+ "'' when in " + getState() + " state";
 
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+			return;
+		}
+
+		/* ENABLE_REPLICATION end */
 		if (update.getItemCount() == 1) {
 			OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
 					NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,

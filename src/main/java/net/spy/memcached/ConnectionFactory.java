@@ -22,9 +22,11 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -174,7 +176,22 @@ public interface ConnectionFactory {
 	 * Set front cache's expire time.
 	 */
 	int getFrontCacheExpireTime();
-	
+
+	/**
+	 * get front cache name
+	 */
+	String getFrontCacheName();
+
+	/**
+	 * get copyOnRead property for front cache
+	 */
+	boolean getFrontCacheCopyOnRead();
+
+	/**
+	 * get copyOnWrite property for front cache
+	 */
+	boolean getFrontCacheCopyOnWrite();
+
 	/**
 	 * Bulk service thread count 
 	 */
@@ -194,9 +211,17 @@ public interface ConnectionFactory {
 	 * get max smget key chunk size
 	 */
 	int getDefaultMaxSMGetKeyChunkSize();
-	
+	/* ENABLE_REPLICATION if */
+
 	/**
-	 * get front cache name
+	 * get read priority on replica nodes
 	 */
-	String getFrontCacheName();
+	ReadPriority getReadPriority();
+
+	/**
+	 * get api read priority 
+	 * @return
+	 */
+	Map<APIType, ReadPriority> getAPIReadPriority();
+	/* ENABLE_REPLICATION end */
 }

@@ -24,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
 import junit.framework.TestCase;
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -194,6 +196,21 @@ public abstract class ClientBaseCase extends TestCase {
 				}
 
 				@Override
+				public String getFrontCacheName() {
+					return inner.getFrontCacheName();
+				}
+
+				@Override
+				public boolean getFrontCacheCopyOnRead() {
+					return inner.getFrontCacheCopyOnRead();
+				}
+
+				@Override
+				public boolean getFrontCacheCopyOnWrite() {
+					return inner.getFrontCacheCopyOnWrite();
+				}
+
+				@Override
 				public int getFrontCacheExpireTime() {
 					return inner.getFrontCacheExpireTime();
 				}
@@ -218,10 +235,18 @@ public abstract class ClientBaseCase extends TestCase {
 					return inner.getDefaultMaxSMGetKeyChunkSize();
 				}
 				
+				/* ENABLE_REPLICATION if */
+
 				@Override
-				public String getFrontCacheName() {
-					return inner.getFrontCacheName();
+				public ReadPriority getReadPriority() {
+					return inner.getReadPriority();
 				}
+				
+				@Override
+				public Map<APIType, ReadPriority> getAPIReadPriority() {
+					return inner.getAPIReadPriority();
+				}
+				/* ENABLE_REPLICATION end */
 			};
 		}
 

@@ -16,49 +16,29 @@
  */
 package net.spy.memcached.collection;
 
-import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
-import net.spy.memcached.util.BTreeUtil;
-
 public abstract class CollectionUpdate<T> {
 
-	protected boolean createKeyIfNotExists = false;
 	protected int flags = 0;
 	protected T newValue;
+	protected ElementFlagUpdate eflagUpdate;
 	protected boolean noreply = false;
-
-	protected int flagOffset = -1;
-	protected BitWiseOperands bitOp;
-	protected byte[] elementFlag;
-
 	protected String str;
 
-	public CollectionUpdate() {
-	}
+	public CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
 
-	public CollectionUpdate(T newValue, ElementFlagUpdate elementFlagUpdate, boolean noreply) {
-		if (elementFlagUpdate == null) {
-			this.newValue = newValue;
-			this.flagOffset = -1;
-			this.bitOp = null;
-			this.elementFlag = null;
-		} else {
-			if (newValue == null && elementFlagUpdate.getElementFlag() == null) {
+		if (eflagUpdate == null) {
+			if (newValue == null) {
 				throw new IllegalArgumentException(
 						"One of the newValue or elementFlag must not be null.");
 			}
-
-			if (elementFlagUpdate.getElementFlag().length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
-				throw new IllegalArgumentException(
-						"length of element flag cannot exceed "
-								+ ElementFlagFilter.MAX_EFLAG_LENGTH);
+		} else {		
+			if (eflagUpdate.getElementFlag().length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
+				throw new IllegalArgumentException("length of element flag cannot exceed "
+						+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
 			}
-
-			this.newValue = newValue;
-			this.flagOffset = elementFlagUpdate.getElementFlagOffset();
-			this.bitOp = elementFlagUpdate.getBitOp();
-			this.elementFlag = elementFlagUpdate.getElementFlag();
 		}
-
+		this.newValue = newValue;
+		this.eflagUpdate = eflagUpdate;
 		this.noreply = noreply;
 	}
 
@@ -68,40 +48,12 @@ public abstract class CollectionUpdate<T> {
 
 		StringBuilder b = new StringBuilder();
 
-		if (flagOffset > -1 && bitOp != null && elementFlag != null) {
-			b.append(flagOffset).append(" ").append(bitOp).append(" ");
-		}
-
-		if (elementFlag != null) {
-			b.append(getElementFlagByHex());
-		}
-
 		if (noreply) {
 			b.append((b.length() <= 0) ? "" : " ").append("noreply");
 		}
 
 		str = b.toString();
 		return str;
-	}
-
-	public String getElementFlagByHex() {
-		if (elementFlag == null) {
-			return "";
-		}
-
-		if (elementFlag.length == 0) {
-			return "0";
-		}
-		
-		return BTreeUtil.toHex(elementFlag);
-	}
-
-	public boolean iscreateKeyIfNotExists() {
-		return createKeyIfNotExists;
-	}
-
-	public void setcreateKeyIfNotExists(boolean createKeyIfNotExists) {
-		this.createKeyIfNotExists = createKeyIfNotExists;
 	}
 
 	public int getFlags() {
@@ -120,16 +72,20 @@ public abstract class CollectionUpdate<T> {
 		this.newValue = newValue;
 	}
 
+	public ElementFlagUpdate getElementFlagUpdate() {
+		return eflagUpdate;
+	}
+
+	public void setElementFlagUpdate(ElementFlagUpdate eflagUpdate) {
+		this.eflagUpdate = eflagUpdate;
+	}
+
 	public boolean isNoreply() {
 		return noreply;
 	}
 
 	public void setNoreply(boolean noreply) {
 		this.noreply = noreply;
-	}
-
-	public void setElementFlag(byte[] elementFlag) {
-		this.elementFlag = elementFlag;
 	}
 
 	public String toString() {

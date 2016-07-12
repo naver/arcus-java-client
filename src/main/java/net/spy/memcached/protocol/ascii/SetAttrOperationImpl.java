@@ -66,6 +66,12 @@ class SetAttrOperationImpl extends OperationImpl
 	public void handleLine(String line) {
 		assert getState() == OperationState.READING
 			: "Read ``" + line + "'' when in " + getState() + " state";
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		}
+
+		/* ENABLE_REPLICATION end */
 		getCallback().receivedStatus(
 				matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
 						ATTR_ERROR_BAD_VALUE));

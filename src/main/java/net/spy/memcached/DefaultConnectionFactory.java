@@ -22,7 +22,9 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.protocol.ascii.AsciiMemcachedNodeImpl;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
@@ -120,6 +123,21 @@ public class DefaultConnectionFactory extends SpyObject
      */
     public static final int DEFAULT_FRONTCACHE_EXPIRETIME = 5;
 
+	/**
+	 * Default front cache name
+	 */
+	private static final String DEFAULT_FRONT_CACHE_NAME = "ArcusFrontCache" + new Object().hashCode();
+
+	/**
+	 * Default copyOnRead : false
+	 */
+	public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_READ = false;
+
+	/**
+	 * Default copyOnWrite : false
+	 */
+	public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_WRITE = false;
+
     /**
      * Default bulk service thread count
      */
@@ -145,15 +163,15 @@ public class DefaultConnectionFactory extends SpyObject
      */
     public static final int DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE = 500;
     
-    /**
-     * Default front cache name
-     */
-	private static final String DEFAULT_FRONT_CACHE_NAME = "ArcusFrontCache" + new Object().hashCode();
-    
 	private final int opQueueLen;
 	private final int readBufSize;
 	private final HashAlgorithm hashAlg;
 
+	/* ENABLE_REPLICATION if */
+	public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
+	private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<APIType, ReadPriority>();
+
+	/* ENABLE_REPLICATION end */
 	/**
 	 * Construct a DefaultConnectionFactory with the given parameters.
 	 *
@@ -384,6 +402,33 @@ public class DefaultConnectionFactory extends SpyObject
 
 	/*
 	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheName()
+	 */
+	@Override
+	public String getFrontCacheName() {
+		return DEFAULT_FRONT_CACHE_NAME;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnRead()
+	 */
+	@Override
+	public boolean getFrontCacheCopyOnRead() {
+		return DEFAULT_FRONT_CACHE_COPY_ON_READ;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnWrite()
+	 */
+	@Override
+	public boolean getFrontCacheCopyOnWrite() {
+		return DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see net.spy.memcached.ConnectionFactory#getBulkServiceThreadCount()
 	 */
 	@Override
@@ -417,13 +462,18 @@ public class DefaultConnectionFactory extends SpyObject
 	public int getDefaultMaxSMGetKeyChunkSize() { 
 		return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
 	}
-	
+	/* ENABLE_REPLICATION if */
+
 	/*
 	 * (non-Javadoc)
-	 * @see net.spy.memcached.ConnectionFactory#getFrontCacheName()
+	 * @see net.spy.memcached.ConnectionFactory#getReadPriority()
 	 */
-	@Override
-	public String getFrontCacheName() {
-		return DEFAULT_FRONT_CACHE_NAME;
+	public ReadPriority getReadPriority() {
+		return DEFAULT_READ_PRIORITY;
 	}
+	
+	public Map<APIType, ReadPriority> getAPIReadPriority() {
+		return DEFAULT_API_READ_PRIORITY_LIST;
+	}
+	/* ENABLE_REPLICATION end */
 }

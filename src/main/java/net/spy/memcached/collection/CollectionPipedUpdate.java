@@ -69,26 +69,18 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
 			// estimate the buffer capacity
 			int i = 0;
-			ElementFlagUpdate elementFlagUpdate;
-			byte[] elementFlag;
-			int flagOffset;
-			BitWiseOperands bitOp;
+			ElementFlagUpdate eflagUpdate;
 			byte[] value;
 			StringBuilder b;
 
 			for (Element<T> each : elements) {
-				elementFlagUpdate = each.getElementFlagUpdate();
-				if (elementFlagUpdate != null) {
+				eflagUpdate = each.getElementFlagUpdate();
+				if (eflagUpdate != null) {
 					// eflag
-					elementFlag = elementFlagUpdate.getElementFlag();
-					if (elementFlag != null) {
-						capacity += KeyUtil.getKeyBytes(elementFlagUpdate
-								.getElementFlagByHex()).length;
-
-						// fwhere bitwop
-						if (elementFlagUpdate.getElementFlagOffset() > -1) {
-							capacity += 6;
-						}
+					capacity += KeyUtil.getKeyBytes(eflagUpdate.getElementFlagByHex()).length;
+					// fwhere bitwop
+					if (eflagUpdate.getElementFlagOffset() > -1) {
+						capacity += 6;
 					}
 				}
 
@@ -111,31 +103,18 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			while (iterator.hasNext()) {
 				Element<T> element = iterator.next();
 
-				flagOffset = -1;
-				bitOp = null;
-				elementFlag = null;
 				value = decodedList.get(i++);
-				elementFlagUpdate = element.getElementFlagUpdate();
+				eflagUpdate = element.getElementFlagUpdate();
 				b = new StringBuilder();
 
 				// has element eflag update
-				if (elementFlagUpdate != null) {
-					elementFlag = elementFlagUpdate.getElementFlag();
-					if (elementFlag != null) {
-						if (elementFlag.length > 0) {
-							// use fwhere bitop
-							flagOffset = elementFlagUpdate.getElementFlagOffset();
-							bitOp = elementFlagUpdate.getBitOp();
-							if (flagOffset > -1 && bitOp != null) {
-								b.append(flagOffset).append(" ").append(bitOp)
-										.append(" ");
-							}
-
-							b.append(elementFlagUpdate.getElementFlagByHex());
-						} else {
-							b.append("0");
-						}
+				if (eflagUpdate != null) {
+					// use fwhere bitop
+					if (eflagUpdate.getElementFlagOffset() > -1 && eflagUpdate.getBitOp() != null) {
+						b.append(eflagUpdate.getElementFlagOffset()).append(" ");
+						b.append(eflagUpdate.getBitOp()).append(" ");
 					}
+					b.append(eflagUpdate.getElementFlagByHex());
 				}
 
 				setArguments(bb, COMMAND, key,

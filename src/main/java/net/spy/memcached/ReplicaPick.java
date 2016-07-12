@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.ops;
+/* ENABLE_REPLICATION if */
+package net.spy.memcached;
 
 /**
- * State of this operation.
+ * Which replica node should we pick ?
  */
-public enum OperationState {
+enum ReplicaPick {
+
 	/**
-	 * State indicating this operation is writing data to the server.
+	 * Pick Master node.
 	 */
-	WRITING,
+	MASTER,
+
 	/**
-	 * State indicating this operation is reading data from the server.
+	 * Pick Slave node.
 	 */
-	READING,
+	SLAVE,
+
 	/**
-	 * State indicating this operation is complete.
+	 * Pick any node RR(Round-robin) pattern.
 	 */
-	COMPLETE,
-	/**
-	 * State indicating this operation timed out without completing.
-	 */
-	TIMEDOUT
-	/* ENABLE_REPLICATION if */
-	/**
-	 * State indicating this operation will be moved by switchover or failover
-	 */
-	, MOVING
-	/* ENABLE_REPLICATION end */
+	RR
 }
+/* ENABLE_REPLICATION end */

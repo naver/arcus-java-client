@@ -67,6 +67,12 @@ final class MutatorOperationImpl extends OperationImpl
 
 	@Override
 	public void handleLine(String line) {
+		/* ENABLE_REPLICATION if */
+		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+			receivedMoveOperations(line);
+		}
+
+		/* ENABLE_REPLICATION end */
 		OperationStatus status=null;
 		try {
 			Long.valueOf(line);
