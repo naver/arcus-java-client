@@ -16,6 +16,9 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * Supported collection types.
  */
@@ -24,24 +27,32 @@ public enum CollectionType {
 	/**
 	 * Key-value
 	 */
-	kv("kv"),
+	kv("kv", null),
 	/**
 	 * List collection
 	 */
-	list("list"),
+	list("list", EnumSet.of(CollectionOverflowAction.error,
+							CollectionOverflowAction.head_trim,
+							CollectionOverflowAction.tail_trim)),
 	/**
 	 * Set collection
 	 */
-	set("set"),
+	set("set", EnumSet.of(CollectionOverflowAction.error)),
 	/**
 	 * B+ tree collection
 	 */
-	btree("b+tree")
+	btree("b+tree", EnumSet.of(CollectionOverflowAction.error,
+								CollectionOverflowAction.smallest_silent_trim,
+								CollectionOverflowAction.smallest_trim,
+								CollectionOverflowAction.largest_silent_trim,
+								CollectionOverflowAction.largest_trim)),
 	;
-	
+
+	private Set<CollectionOverflowAction> availableOverflowAction;
 	String stringValue;
-	CollectionType(String stringValue) {
+	CollectionType(String stringValue, Set<CollectionOverflowAction> available) {
 		this.stringValue = stringValue;
+		this.availableOverflowAction = available;
 	}
 	
 	public String getStringValue() {
@@ -56,5 +67,8 @@ public enum CollectionType {
 		}
 		return null;
 	}
-	
+
+	public boolean isAvailableOverflowAction(CollectionOverflowAction overflowAction) {
+		return availableOverflowAction.contains(overflowAction);
+	}
 }

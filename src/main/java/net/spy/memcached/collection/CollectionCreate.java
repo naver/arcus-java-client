@@ -29,14 +29,17 @@ public abstract class CollectionCreate {
 	public CollectionCreate() { }
 
 	public CollectionCreate(int flags, Integer expTime, Long maxCount, CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
-		if ((overflowAction == CollectionOverflowAction.head_trim ||
-			overflowAction == CollectionOverflowAction.tail_trim) && !(this instanceof ListCreate)) {
-			throw new IllegalArgumentException(overflowAction + " is available overflow action in only lop.");
-		} else if ((overflowAction == CollectionOverflowAction.smallest_trim ||
-					overflowAction == CollectionOverflowAction.smallest_silent_trim ||
-					overflowAction == CollectionOverflowAction.largest_trim ||
-					overflowAction == CollectionOverflowAction.largest_silent_trim) && !(this instanceof BTreeCreate)) {
-			throw new IllegalArgumentException(overflowAction + " is available overflow action in only bop.");
+		if (overflowAction != null) {
+			if ((this instanceof SetCreate) &&
+					!CollectionType.set.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+			} else if ((this instanceof ListCreate) &&
+					!CollectionType.list.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+			} else if ((this instanceof BTreeCreate) &&
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
 		}
 		this.flags = flags;
 		this.expTime = (null == expTime) ? CollectionAttributes.DEFAULT_EXPIRETIME : expTime;

@@ -65,10 +65,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			if (createKeyIfNotExists) {
 				CollectionOverflowAction overflowAction = attr.getOverflowAction();
 				if (overflowAction != null &&
-					overflowAction != CollectionOverflowAction.error &&
-					overflowAction != CollectionOverflowAction.head_trim &&
-					overflowAction != CollectionOverflowAction.tail_trim)
-					throw new IllegalArgumentException(overflowAction + " is not available overflow action in lop.");
+					!CollectionType.list.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
 			}
 			this.key = key;
 			this.index = index;
@@ -137,8 +135,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			if (createKeyIfNotExists) {
 				CollectionOverflowAction overflowAction = attr.getOverflowAction();
 				if (overflowAction != null &&
-					overflowAction != CollectionOverflowAction.error)
-					throw new IllegalArgumentException(overflowAction + " is not available overflow action in sop.");
+					!CollectionType.set.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
 			}
 			this.key = key;
 			this.set = set;
@@ -206,12 +204,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			if (createKeyIfNotExists) {
 				CollectionOverflowAction overflowAction = attr.getOverflowAction();
 				if (overflowAction != null &&
-					overflowAction != CollectionOverflowAction.error &&
-					overflowAction != CollectionOverflowAction.smallest_trim &&
-					overflowAction != CollectionOverflowAction.smallest_silent_trim &&
-					overflowAction != CollectionOverflowAction.largest_trim &&
-					overflowAction != CollectionOverflowAction.largest_silent_trim)
-					throw new IllegalArgumentException(overflowAction + " is not available overflow action in bop.");
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
 			}
 			this.key = key;
 			this.map = map;
@@ -286,12 +280,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 			if (createKeyIfNotExists) {
 				CollectionOverflowAction overflowAction = attr.getOverflowAction();
 				if (overflowAction != null &&
-					overflowAction != CollectionOverflowAction.error &&
-					overflowAction != CollectionOverflowAction.smallest_trim &&
-					overflowAction != CollectionOverflowAction.smallest_silent_trim &&
-					overflowAction != CollectionOverflowAction.largest_trim &&
-					overflowAction != CollectionOverflowAction.largest_silent_trim)
-					throw new IllegalArgumentException(overflowAction + " is not available overflow action in bop.");
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
 			}
 			this.key = key;
 			this.elements = elements;
