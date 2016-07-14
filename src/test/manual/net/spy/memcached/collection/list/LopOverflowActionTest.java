@@ -16,18 +16,24 @@
  */
 package net.spy.memcached.collection.list;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
+import net.spy.memcached.collection.ElementValueType;
 
 public class LopOverflowActionTest extends BaseIntegrationTest {
 
 	private String key = "LopOverflowActionTest";
+	private List<String> keyList = new ArrayList<String>();
 
 	protected void setUp() {
+		keyList.add(key);
 		try {
 			super.setUp();
 			mc.delete(key).get();
