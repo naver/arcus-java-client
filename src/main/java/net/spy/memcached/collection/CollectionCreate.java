@@ -29,6 +29,18 @@ public abstract class CollectionCreate {
 	public CollectionCreate() { }
 
 	public CollectionCreate(int flags, Integer expTime, Long maxCount, CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
+		if (overflowAction != null) {
+			if ((this instanceof SetCreate) &&
+					!CollectionType.set.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+			} else if ((this instanceof ListCreate) &&
+					!CollectionType.list.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+			} else if ((this instanceof BTreeCreate) &&
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
+				throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
+		}
 		this.flags = flags;
 		this.expTime = (null == expTime) ? CollectionAttributes.DEFAULT_EXPIRETIME : expTime;
 		this.maxCount = (null == maxCount) ? CollectionAttributes.DEFAULT_MAXCOUNT : maxCount;
