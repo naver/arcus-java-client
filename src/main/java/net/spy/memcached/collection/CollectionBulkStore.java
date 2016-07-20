@@ -137,6 +137,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
@@ -207,6 +215,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
@@ -280,6 +296,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
