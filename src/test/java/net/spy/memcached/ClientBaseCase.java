@@ -282,7 +282,7 @@ public abstract class ClientBaseCase extends TestCase {
 		if (USE_ZK) {
 			openFromZK(new CFB(cf));
 		} else {
-			openDirect(new CFB(cf));
+			openDirect(cf);
 		}
 	}
 
@@ -290,8 +290,8 @@ public abstract class ClientBaseCase extends TestCase {
 		client = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
 	}
 
-	protected void openDirect(CFB cfb) throws Exception {
-		client = new ArcusClient(cfb.build(), AddrUtil.getAddresses(ARCUS_HOST));
+	protected void openDirect(ConnectionFactory cf) throws Exception {
+		client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
 	}
 
 	protected Collection<String> stringify(Collection<?> c) {

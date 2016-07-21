@@ -56,19 +56,12 @@ public class ObserverTest extends ClientBaseCase {
 		};
 
 		// Get a new client
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder() {
+		initClient(new DefaultConnectionFactory() {
 			@Override
-			public ConnectionFactory build() {
-				return new DefaultConnectionFactory() {
-					@Override
-					public Collection<ConnectionObserver> getInitialObservers() {
-						return Collections.singleton(obs);
-					}
-				};
+			public Collection<ConnectionObserver> getInitialObservers() {
+				return Collections.singleton(obs);
 			}
-		};
-
-		client = new ArcusClient(cfb.build(), AddrUtil.getAddresses(ARCUS_HOST));
+		});
 
 		assertTrue("Didn't detect connection",
 						latch.await(2, TimeUnit.SECONDS));
