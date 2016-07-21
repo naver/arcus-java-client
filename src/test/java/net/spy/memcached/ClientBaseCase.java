@@ -79,6 +79,10 @@ public abstract class ClientBaseCase extends TestCase {
 		@Override
 		public ConnectionFactory build() {
 			return new ConnectionFactory() {
+				/*
+				 * CAUTION! Never override this createConnection() method, or your code could not
+				 * work as you expected. See https://github.com/jam2in/arcus-java-client/issue/4
+				 */
 				@Override
 				public MemcachedConnection createConnection(
 						List<InetSocketAddress> addrs) throws IOException {
