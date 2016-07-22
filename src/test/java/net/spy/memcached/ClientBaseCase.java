@@ -70,6 +70,7 @@ public abstract class ClientBaseCase extends TestCase {
 	private static class CFB extends ConnectionFactoryBuilder {
 
 		private final ConnectionFactory inner;
+		private Collection<ConnectionObserver> observers = Collections.emptyList();
 
 		public CFB(ConnectionFactory cf) {
 			this.inner = cf;
@@ -78,10 +79,15 @@ public abstract class ClientBaseCase extends TestCase {
 		@Override
 		public ConnectionFactory build() {
 			return new ConnectionFactory() {
+				/*
+				 * CAUTION! Never override this createConnection() method, or your code could not
+				 * work as you expected. See https://github.com/jam2in/arcus-java-client/issue/4
+				 */
 				@Override
 				public MemcachedConnection createConnection(
 						List<InetSocketAddress> addrs) throws IOException {
-					return inner.createConnection(addrs);
+					return new MemcachedConnection(getReadBufSize(), this, addrs,
+									getInitialObservers(), getFailureMode(), getOperationFactory());
 				}
 
 				@Override
@@ -137,7 +143,7 @@ public abstract class ClientBaseCase extends TestCase {
 
 				@Override
 				public Collection<ConnectionObserver> getInitialObservers() {
-					return inner.getInitialObservers();
+					return observers;
 				}
 
 				@Override
@@ -253,6 +259,7 @@ public abstract class ClientBaseCase extends TestCase {
 		@Override
 		public ConnectionFactoryBuilder setInitialObservers(
 				Collection<ConnectionObserver> obs) {
+			this.observers = obs;
 			return this;
 		}
 	}
@@ -275,7 +282,7 @@ public abstract class ClientBaseCase extends TestCase {
 		if (USE_ZK) {
 			openFromZK(new CFB(cf));
 		} else {
-			openDirect(new CFB(cf));
+			openDirect(cf);
 		}
 	}
 
@@ -283,28 +290,8 @@ public abstract class ClientBaseCase extends TestCase {
 		client = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
 	}
 
-	protected void openDirect(CFB cfb) throws Exception {
-		final CountDownLatch latch = new CountDownLatch(
-				ARCUS_HOST.split(",").length);
-
-		final ConnectionObserver obs = new ConnectionObserver() {
-			@Override
-			public void connectionEstablished(SocketAddress sa,
-					int reconnectCount) {
-				latch.countDown();
-			}
-
-			@Override
-			public void connectionLost(SocketAddress sa) {
-				assert false : "Connection is failed.";
-			}
-
-		};
-		cfb.setInitialObservers(Collections.singleton(obs));
-
-		client = new ArcusClient(cfb.build(), AddrUtil.getAddresses(ARCUS_HOST));
-//		latch.await();
-		Thread.sleep(1000L);
+	protected void openDirect(ConnectionFactory cf) throws Exception {
+		client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
 	}
 
 	protected Collection<String> stringify(Collection<?> c) {
