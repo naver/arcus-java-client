@@ -106,6 +106,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
@@ -176,6 +178,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
@@ -249,6 +253,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < keySize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
