@@ -93,34 +93,6 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		String key = "testTimeout";
-		int valueCount = mc.getMaxPipedItemCount();
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = "MyValue" + i;
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
-							new CollectionAttributes());
-			try {
-				future.get(1L, TimeUnit.NANOSECONDS);
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail(e.getMessage());
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
-
 	public void testInsertAndGetSingleClient() {
 		String key = "testInsertAndGetSingleClient";
 		String prefix = "MyValue";
@@ -177,37 +149,6 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 			for (Object v : valueList) {
 				mc.asyncSopDelete(key, v, true).get();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
-	public void testTimeoutUsingSingleClient() {
-		String key = "testTimeoutUsingSingleClient";
-		int valueCount = mc.getMaxPipedItemCount();
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = "MyValue" + i;
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						1L, TimeUnit.NANOSECONDS);
-				Assert.assertTrue(errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail();
-			}
-			Assert.fail();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
