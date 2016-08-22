@@ -181,35 +181,6 @@ public class BulkSetTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		int keySize = 100000;
-
-		String[] keys = new String[keySize];
-		for (int i = 0; i < keys.length; i++) {
-			keys[i] = "MyKey" + i;
-		}
-
-		String value = "MyValue";
-
-		try {
-			Future<Map<String, CollectionOperationStatus>> future = mc
-					.asyncSetBulk(Arrays.asList(keys), 60, value);
-
-			try {
-				future.get(1000L, TimeUnit.MILLISECONDS);
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
-
 	public void testInsertAndGetUsingSingleClient() {
 		String value = "MyValue";
 
@@ -265,36 +236,6 @@ public class BulkSetTest extends BaseIntegrationTest {
 				for (String key : keys) {
 					mc.delete(key);
 				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
-	public void testTimeoutUsingSingleClient() {
-		int keySize = 100000;
-
-		String[] keys = new String[keySize];
-		for (int i = 0; i < keys.length; i++) {
-			keys[i] = "MyKey" + i;
-		}
-
-		String value = "MyValue";
-
-		try {
-			Future<Map<String, CollectionOperationStatus>> future = mc
-					.asyncSetBulk(Arrays.asList(keys), 60, value);
-
-			try {
-				future.get(1000L, TimeUnit.MILLISECONDS);
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

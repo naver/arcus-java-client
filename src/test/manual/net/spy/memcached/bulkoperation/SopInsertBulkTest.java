@@ -93,38 +93,6 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		String value = "MyValue";
-		int keySize = 100000;
-		String[] keys = new String[keySize];
-		for (int i = 0; i < keys.length; i++) {
-			keys[i] = KEY + i;
-		}
-
-		try {
-			long s = 0;
-			// SET
-			s = System.currentTimeMillis();
-			Future<Map<String, CollectionOperationStatus>> future = mc
-					.asyncSopInsertBulk(Arrays.asList(keys), value,
-							new CollectionAttributes());
-
-			try {
-				future.get(1L, TimeUnit.MILLISECONDS);
-
-				// System.out.println(System.currentTimeMillis() - s);
-
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail("ERROR");
-		}
-	}
-
 	public void testErrorCount() {
 		String value = "MyValue";
 		int keySize = 1200;
