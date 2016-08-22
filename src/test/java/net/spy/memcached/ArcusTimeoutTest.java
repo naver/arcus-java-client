@@ -342,4 +342,39 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     flushFuture.get(1L, TimeUnit.MILLISECONDS);
     flushFuture.cancel(true);
   }
+
+  @Test(expected = TimeoutException.class)
+  public void testMopInsertBulkMultipleTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String key = "MyMopKey";
+    String value = "MyValue";
+
+    int mkeySize = mc.getMaxPipedItemCount();
+    Map<String, Object> mkeys = new TreeMap<String, Object>();
+    for (int i = 0; i < mkeySize; i++) {
+      mkeys.put(String.valueOf(i), value);
+    }
+
+    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncMopPipedInsertBulk(
+            key, mkeys, new CollectionAttributes());
+    future.get(1L, TimeUnit.NANOSECONDS);
+    future.cancel(true);
+  }
+
+  public void testMopInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String key = "MyMopKey";
+    String value = "MyValue";
+    int keySize = 250000;
+
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyMopKey" + i;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncMopInsertBulk(
+            Arrays.asList(keys), key, value, new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
 }

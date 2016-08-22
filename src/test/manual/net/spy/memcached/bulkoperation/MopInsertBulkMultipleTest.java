@@ -88,41 +88,6 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		String key = "MyMopKey";
-		String value = "MyValue";
-
-		int mkeySize = mc.getMaxPipedItemCount();
-		Map<String, Object> mkeys = new TreeMap<String, Object>();
-		for (int i = 0; i < mkeySize; i++) {
-			mkeys.put(String.valueOf(i), value);
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, mkeys,
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						1L, TimeUnit.NANOSECONDS);
-
-				Assert.assertTrue("Error list is not empty." + errorList,
-						errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail();
-			}
-			Assert.fail();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
 	public void testInsertAndGetUsingSingleClient() {
 		String key = "MyMopKey333";
 		String value = "MyValue";
@@ -175,41 +140,6 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 			for (Entry<String, Object> entry : mkeys.entrySet()) {
 				mc.asyncMopDelete(key, entry.getKey(), true).get();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
-	public void testTimeoutUsingSingleClient() {
-		String key = "MyMopKey";
-		String value = "MyValue";
-
-		int mkeySize = mc.getMaxPipedItemCount();
-		Map<String, Object> mkeys = new TreeMap<String, Object>();
-		for (int i = 0; i < mkeySize; i++) {
-			mkeys.put(String.valueOf(i), value);
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, mkeys,
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						1L, TimeUnit.NANOSECONDS);
-
-				Assert.assertTrue("Error list is not empty." + errorList,
-						errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail();
-			}
-			Assert.fail();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
