@@ -74,38 +74,161 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
   }
 
   @Test(expected = TimeoutException.class)
-  public void testByteArrayBKeyOldSMGetTimeout()
+  public void testCollectionFutureTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    ArrayList<String> keyList;
-    keyList = new ArrayList<String>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(KEY + i);
+    CollectionFuture<Boolean> future;
+
+    future = mc.asyncBopInsert(KEY, 0, null, "hello", new CollectionAttributes());
+    future.get(1, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testBulkSetTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    // recreate arcus client with BulkServiceThreadCount 6
+    try {
+      tearDown();
+      mc = new ArcusClient(new DefaultConnectionFactory() {
+        @Override
+        public int getBulkServiceThreadCount() {
+          return 6;
+        }
+      }, AddrUtil.getAddresses("127.0.0.1:64213"));
+    } catch (Exception e) {
+      fail(e.getMessage());
     }
 
-    byte[] from = new byte[] { (byte) 0 };
-    byte[] to = new byte[] { (byte) 1000 };
+    int keySize = 100000;
 
-    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyKey" + i;
+    }
+
+    String value = "MyValue";
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
+            Arrays.asList(keys), 60, value);
     future.get(1L, TimeUnit.MILLISECONDS);
     future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
-  public void testByteArrayBKeySMGetTimeout()
+  public void testBulkSetTimeoutUsingSingleThread()
           throws InterruptedException, ExecutionException, TimeoutException {
-    List<String> keyList = new ArrayList<String>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(KEY + i);
+    int keySize = 100000;
+
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyKey" + i;
     }
 
-    byte[] from = new byte[] { (byte) 0 };
-    byte[] to = new byte[] { (byte) 1000 };
+    String value = "MyValue";
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
+            Arrays.asList(keys), 60, value);
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
 
-    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+  @Test(expected = TimeoutException.class)
+  public void testSopPipedInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String key = "testTimeout";
+    int valueCount = mc.getMaxPipedItemCount();
+    Object[] valueList = new Object[valueCount];
+    for (int i = 0; i < valueList.length; i++) {
+      valueList[i] = "MyValue" + i;
+    }
+
+    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncSopPipedInsertBulk(
+            key, Arrays.asList(valueList), new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testSopInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String value = "MyValue";
+    int keySize = 100000;
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = KEY + i;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSopInsertBulk(
+            Arrays.asList(keys), value, new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testLopPipedInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    int valueCount = 500;
+    Object[] valueList = new Object[valueCount];
+    for (int i = 0; i < valueList.length; i++) {
+      valueList[i] = "MyValue";
+    }
+
+    // SET
+    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncLopPipedInsertBulk(
+            KEY, 0, Arrays.asList(valueList), new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testLopInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String value = "MyValue";
+    int keySize = 250000;
+
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyLopKey" + i;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncLopInsertBulk(
+            Arrays.asList(keys), 0, value, new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testBopPipedInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String key = "MyBopKey";
+    String value = "MyValue";
+
+    int bkeySize = mc.getMaxPipedItemCount();
+    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    for (int i = 0; i < bkeySize; i++) {
+      bkeys.put((long) i, value);
+    }
+
+    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncBopPipedInsertBulk(
+            key, bkeys, new CollectionAttributes());
+    future.get(1L, TimeUnit.MILLISECONDS);
+    future.cancel(true);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testBopInsertBulkTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    String value = "MyValue";
+    long bkey = Long.MAX_VALUE;
+
+    int keySize = 10000;
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      String key = "MyBopKey" + i;
+      keys[i] = key;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncBopInsertBulk(
+            Arrays.asList(keys), bkey, new byte[]{0,0,1,1}, value, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
     future.cancel(true);
   }
@@ -141,197 +264,39 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
   }
 
   @Test(expected = TimeoutException.class)
-  public void testBopInsertBulkMultipleTimeout()
+  public void testByteArrayBKeyOldSMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    String key = "MyBopKey";
-    String value = "MyValue";
-
-    int bkeySize = mc.getMaxPipedItemCount();
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
-    for (int i = 0; i < bkeySize; i++) {
-      bkeys.put((long) i, value);
+    ArrayList<String> keyList;
+    keyList = new ArrayList<String>();
+    for (int i = 0; i < 1000; i++) {
+      keyList.add(KEY + i);
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncBopPipedInsertBulk(
-            key, bkeys, new CollectionAttributes());
+    byte[] from = new byte[] { (byte) 0 };
+    byte[] to = new byte[] { (byte) 1000 };
+
+    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
+            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
     future.get(1L, TimeUnit.MILLISECONDS);
     future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
-  public void testBopPipedInsertBulkTimeoutUsingSingleClient()
+  public void testByteArrayBKeySMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    String key = "MyBopKey";
-    String value = "MyValue";
-
-    int bkeySize = mc.getMaxPipedItemCount();
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
-    for (int i = 0; i < bkeySize; i++) {
-      bkeys.put((long) i, value);
+    List<String> keyList = new ArrayList<String>();
+    for (int i = 0; i < 1000; i++) {
+      keyList.add(KEY + i);
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncBopPipedInsertBulk(
-            key, bkeys, new CollectionAttributes());
-    future.get(1L, TimeUnit.NANOSECONDS);
-    future.cancel(true);
-  }
+    byte[] from = new byte[] { (byte) 0 };
+    byte[] to = new byte[] { (byte) 1000 };
 
-  @Test(expected = TimeoutException.class)
-  public void testBopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    String value = "MyValue";
-    long bkey = Long.MAX_VALUE;
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
 
-    int keySize = 10000;
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      String key = "MyBopKey" + i;
-      keys[i] = key;
-    }
-
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncBopInsertBulk(
-            Arrays.asList(keys), bkey, new byte[]{0,0,1,1}, value, new CollectionAttributes());
+    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
+            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testBulkSetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    // recreate arcus client with BulkServiceThreadCount 6
-    try {
-      tearDown();
-      mc = new ArcusClient(new DefaultConnectionFactory() {
-        @Override
-        public int getBulkServiceThreadCount() {
-          return 6;
-        }
-      }, AddrUtil.getAddresses("127.0.0.1:64213"));
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
-    int keySize = 100000;
-
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyKey" + i;
-    }
-
-    String value = "MyValue";
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, value);
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testBulkSetTimeoutUsingSingleClient()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    // no need to recreate client, default BulkServiceThreadCount is 1
-    int keySize = 100000;
-
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyKey" + i;
-    }
-
-    String value = "MyValue";
-
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, value);
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testLopInsertBulkMultipleValueTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    int valueCount = 500;
-    Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "MyValue";
-    }
-
-    // SET
-    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncLopPipedInsertBulk(
-            KEY, 0, Arrays.asList(valueList), new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testLopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    String value = "MyValue";
-    int keySize = 250000;
-
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyLopKey" + i;
-    }
-
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncLopInsertBulk(
-            Arrays.asList(keys), 0, value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testSopInsertBulkMultipleValueTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    String key = "testTimeout";
-    int valueCount = mc.getMaxPipedItemCount();
-    Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "MyValue" + i;
-    }
-
-    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncSopPipedInsertBulk(
-            key, Arrays.asList(valueList), new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testSopPipedInsertBulkTimeoutUsingSingleClient()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    String key = "testTimeoutUsingSingleClient";
-    int valueCount = mc.getMaxPipedItemCount();
-    Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "MyValue" + i;
-    }
-
-    Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncSopPipedInsertBulk(
-            key, Arrays.asList(valueList), new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testSopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    String value = "MyValue";
-    int keySize = 100000;
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = KEY + i;
-    }
-
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSopInsertBulk(
-            Arrays.asList(keys), value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
-  }
-
-  @Test(expected = TimeoutException.class)
-  public void testCollectionFutureTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
-    CollectionFuture<Boolean> future;
-
-    future = mc.asyncBopInsert(KEY, 0, null, "hello", new CollectionAttributes());
-    future.get(1, TimeUnit.MILLISECONDS);
     future.cancel(true);
   }
 
