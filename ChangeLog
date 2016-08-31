@@ -1,4 +1,13 @@
-2016-07-08 [version 1.9.4]
+2016-08-31 [version 1.9.5]
+	* [Fix] Add overflowAction availability check logic to collection APIs.
+	* [Fix] Add overflowAction / readable options to collection store APIs.
+	* [Fix] Remove unnecessary log messages.
+	* [Fix] Refactor unit tests.
+	* [Doc] Fix wrong comments about dropIfEmpty options in ArcusClientIf.
+	* [Other] Update maven surefire plugin version to 2.19.
+	* [Other] Apply CI tool (Travis-CI).
+
+2016-07-08 [version 1.9.4] stable (but, verbose messages)
 	* [Feature] bop incr/decr with initial value.
 	* [Feature] CopyOnRead / CopyOnWrite to ARCUS front cache.
 	* [Feature] Support replication.
@@ -11,7 +20,7 @@
 	   - CollecitionGet and its subclasses
 	* [Other] Extensice code refactoring
 
-2016-02-04 [version 1.9.3] stable
+2016-02-04 [version 1.9.3] stable (but, verbose messages)
 	* Add cancel message to detect the cancel cause.
 	* More correct error handling in getting/creating the client_info znode.
 	* Fix a bug in getting socket address after DNS reverse lookup.

@@ -18,20 +18,32 @@ package net.spy.memcached;
 
 import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 
+import static org.junit.Assume.assumeTrue;
+
+@RunWith(JUnit4ClassRunner.class)
 public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
 
+	@Before
 	@Override
-	protected void setUp() throws Exception {
+	public void setUp() throws Exception {
 		// This test assumes we use ZK
+		assumeTrue(USE_ZK);
 		openFromZK();
 	}
 
+	@After
 	@Override
-	protected void tearDown() throws Exception {
+	public void tearDown() throws Exception {
 		super.tearDown();
 	}
 
+	@Test
 	public void testCreateSingleClient() {
 		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 		cfb.setFrontCacheExpireTime(10);
@@ -40,6 +52,7 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
 		ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
 	}
 
+	@Test
 	public void testCreatePool() {
 		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 		cfb.setFrontCacheExpireTime(10);
@@ -48,6 +61,7 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
 		ArcusClient.createArcusClientPool(ZK_HOST, ZK_SERVICE_ID, cfb, 4);
 	}
 
+	@Test
 	public void testKV() {
 		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 		cfb.setFrontCacheExpireTime(10);

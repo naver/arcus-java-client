@@ -1,0 +1,17 @@
+language: java
+
+cache:
+  directories:
+  - $HOME/arcus 
+  - $HOME/.m2
+
+before_install:
+  - sudo apt-get install -qq build-essential autoconf automake libtool libcppunit-dev python-setuptools python-dev ant
+  - bash install-arcus-memcached.sh
+
+script:
+  - mvn test -DUSE_ZK=false && mvn test -DUSE_ZK=true
+
+notifications:
+  email:
+    - wooseok.son@jam2in.com
