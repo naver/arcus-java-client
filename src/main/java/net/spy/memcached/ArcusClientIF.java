@@ -382,7 +382,7 @@ public interface ArcusClientIF {
 	 * @param withDelete
 	 *            true to remove the returned item in the b+tree
 	 * @param dropIfEmpty
-	 *            false to remove the key when all elements are removed. true b+
+	 *            true to remove the key when all elements are removed. false b+
 	 *            tree will remain empty even if all the elements are removed
 	 * @return a future that will hold the return value map of the fetch.
 	 */
@@ -405,7 +405,7 @@ public interface ArcusClientIF {
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @return a future that will hold the return value map of the fetch
 	 */
 	public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
@@ -420,7 +420,7 @@ public interface ArcusClientIF {
 	 * @param bkey bkey
 	 * @param eFlagFilter element flag filter
 	 * @param withDelete true to remove the returned item in the b+tree
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @param tc a transcoder to decode returned values
 	 * @return a future that will hold the return value map of the fetch.
 	 */
@@ -444,7 +444,7 @@ public interface ArcusClientIF {
 	 * @param offset 0-based offset
 	 * @param count number of returning values (0 to all)
 	 * @param withDelete true to remove the returned item in the b+tree
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @param tc a transcoder to decode returned values
 	 * @return a future that will hold the return value map of the fetch
 	 */
@@ -458,7 +458,7 @@ public interface ArcusClientIF {
 	 * @param key key of a list
 	 * @param index list index
 	 * @param withDelete true to remove the returned item in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @return a future that will hold the return value list of the fetch
 	 */
 	public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
@@ -471,7 +471,7 @@ public interface ArcusClientIF {
 	 * @param from the first index to delete
 	 * @param to the last index to delete
 	 * @param withDelete true to remove the returned items in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @return a future that will hold the return value list of the fetch
 	 */
 	public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
@@ -484,7 +484,7 @@ public interface ArcusClientIF {
 	 * @param key key of a list
 	 * @param index list index
 	 * @param withDelete true to remove the returned item in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @param tc a tranacoder to decode returned value
 	 * @return a future that will hold the return value list of the fetch
 	 */
@@ -499,7 +499,7 @@ public interface ArcusClientIF {
 	 * @param from the first index to delete
 	 * @param to the last index to delete
 	 * @param withDelete true to remove the returned items in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @param tc a transcoder to decode the returned values
 	 * @return a future that will hold the return value list of the fetch
 	 */
@@ -509,10 +509,10 @@ public interface ArcusClientIF {
 	/**
 	 * Retrieves count number of random items in the set.
 	 * 
-	 * @param key key of a list
+	 * @param key key of a set
 	 * @param count number of items to fetch
-	 * @param withDelete true to remove the returned item in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param withDelete true to remove the returned item in the set
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
 	 * @return a future that will hold the return value set of the fetch
 	 */
 	public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
@@ -522,10 +522,10 @@ public interface ArcusClientIF {
 	 * Retrieves count number of random items in the set.
 	 * 
 	 * @param <T>
-	 * @param key key of a list
+	 * @param key key of a set
 	 * @param count number of items to fetch
-	 * @param withDelete true to remove the returned item in the list
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param withDelete true to remove the returned item in the set
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
 	 * @param tc a tranacoder to decode returned value
 	 * @return a future that will hold the return value set of the fetch
 	 */
@@ -538,7 +538,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param bkey bkey of an item to delete
 	 * @param eFlagFilter element flag filter
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
@@ -552,7 +552,7 @@ public interface ArcusClientIF {
 	 * @param to the last bkey to delete
 	 * @param eFlagFilter element flag filter
 	 * @param count number of returning values (0 to all)
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
@@ -566,7 +566,7 @@ public interface ArcusClientIF {
 	 * @param to the last bkey to delete
 	 * @param eFlagFilter element flag filter
 	 * @param count number of returning values (0 to all)
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncBopDelete(String key,
@@ -579,7 +579,7 @@ public interface ArcusClientIF {
 	 * @param key key of a b+tree
 	 * @param bkey bkey to delete
 	 * @param eFlagFilter element flag filter
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncBopDelete(String key,
@@ -590,7 +590,7 @@ public interface ArcusClientIF {
 	 *  
 	 * @param key key of a list
 	 * @param index list index
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
@@ -602,7 +602,7 @@ public interface ArcusClientIF {
 	 * @param key key of a list
 	 * @param from the first index to delete
 	 * @param to the last index to delete 
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncLopDelete(String key, int from,
@@ -613,7 +613,7 @@ public interface ArcusClientIF {
 	 * 
 	 * @param key key of a set
 	 * @param value value of an item
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
 	 * @return whether or not the operation was performed
 	 */
 	public CollectionFuture<Boolean> asyncSopDelete(String key, Object value,
@@ -625,7 +625,7 @@ public interface ArcusClientIF {
 	 * @param <T>
 	 * @param key key of a set
 	 * @param value value of an item
-	 * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+	 * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
 	 * @param tc a transcoder to encode the value
 	 * @return whether or not the operation was performed
 	 */

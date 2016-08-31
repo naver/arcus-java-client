@@ -62,6 +62,12 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 		
 		public ListPipedStore(String key, int index, Collection<T> list,
 				boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+			if (createKeyIfNotExists) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					!CollectionType.list.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+			}
 			this.key = key;
 			this.index = index;
 			this.list = list;
@@ -100,6 +106,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
@@ -126,6 +134,12 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 
 		public SetPipedStore(String key, Collection<T> set, boolean createKeyIfNotExists,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (createKeyIfNotExists) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					!CollectionType.set.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+			}
 			this.key = key;
 			this.set = set;
 			this.createKeyIfNotExists = createKeyIfNotExists;
@@ -164,6 +178,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < eSize - 1) ? PIPE : "");
 				bb.put(each);
 				bb.put(CRLF);
@@ -189,6 +205,12 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 
 		public BTreePipedStore(String key, Map<Long, T> map, boolean createKeyIfNotExists,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (createKeyIfNotExists) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
 			this.key = key;
 			this.map = map;
 			this.createKeyIfNotExists = createKeyIfNotExists;
@@ -231,6 +253,8 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 						(createKeyIfNotExists) ? "create" : "", (createKeyIfNotExists) ? cd.getFlags() : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getExpireTime() != null) ? attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
 						(createKeyIfNotExists) ? (attribute != null && attribute.getMaxCount() != null) ? attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getOverflowAction() != null) ? attribute.getOverflowAction() : "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ? "unreadable" : "" : "",
 						(i < keySize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
@@ -259,6 +283,12 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
 		public ByteArraysBTreePipedStore(String key, List<Element<T>> elements,
 				boolean createKeyIfNotExists, CollectionAttributes attr,
 				Transcoder<T> tc) {
+			if (createKeyIfNotExists) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null &&
+					!CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
 			this.key = key;
 			this.elements = elements;
 			this.createKeyIfNotExists = createKeyIfNotExists;

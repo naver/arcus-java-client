@@ -64,6 +64,11 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public BTreeBulkStore(List<String> keyList, long bkey, byte[] eflag,
 				T value, CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
 			this.keyList = keyList;
 			this.bkey = String.valueOf(bkey);
 			this.eflag = BTreeUtil.toHex(eflag);
@@ -78,6 +83,11 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 		public BTreeBulkStore(List<String> keyList, byte[] bkey,
 				byte[] eflag, T value, CollectionAttributes attr,
 				Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+			}
 			this.keyList = keyList;
 			this.bkey = BTreeUtil.toHex(bkey);
 			this.eflag = BTreeUtil.toHex(eflag);
@@ -127,6 +137,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
@@ -149,6 +167,11 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public SetBulkStore(List<String> keyList, T value,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null && !CollectionType.set.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+			}
 			this.keyList = keyList;
 			this.value = value;
 			this.attribute = attr;
@@ -192,6 +215,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
@@ -214,6 +245,11 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
 		public ListBulkStore(List<String> keyList, int index, T value,
 				CollectionAttributes attr, Transcoder<T> tc) {
+			if (attr != null) {
+				CollectionOverflowAction overflowAction = attr.getOverflowAction();
+				if (overflowAction != null && !CollectionType.list.isAvailableOverflowAction(overflowAction))
+					throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+			}
 			this.keyList = keyList;
 			this.index = index;
 			this.value = value;
@@ -260,6 +296,14 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 								.getMaxCount() != null) ? attribute
 								.getMaxCount()
 								: CollectionAttributes.DEFAULT_MAXCOUNT : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getOverflowAction() != null) ? attribute
+								.getOverflowAction()
+								: "" : "",
+						(createKeyIfNotExists) ? (attribute != null && attribute
+								.getReadable() != null && !attribute.getReadable()) ?
+								"unreadable"
+								: "" : "",
 						(i < kSize - 1) ? PIPE : "");
 				bb.put(value);
 				bb.put(CRLF);
