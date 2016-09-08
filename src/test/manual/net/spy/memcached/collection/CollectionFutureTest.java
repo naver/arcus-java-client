@@ -71,22 +71,4 @@ public class CollectionFutureTest extends BaseIntegrationTest {
 		assertFalse(status.isSuccess());
 		assertEquals("NOT_FOUND", status.getMessage());
 	}
-
-	public void testTimeout() throws Exception {
-		CollectionFuture<Boolean> future;
-		OperationStatus status;
-
-		future = mc.asyncBopInsert(key, 0, null, "hello", new CollectionAttributes());
-
-		try {
-			future.get(1, TimeUnit.NANOSECONDS);
-		} catch (Exception e) {
-			future.cancel(true);
-		}
-
-		status = future.getOperationStatus();
-
-		// assertNull(status);
-	}
-
 }

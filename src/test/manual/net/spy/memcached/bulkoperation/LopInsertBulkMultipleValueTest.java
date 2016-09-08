@@ -100,34 +100,6 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		int valueCount = 500;
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = "MyValue";
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncLopPipedInsertBulk(key, 0, Arrays.asList(valueList),
-							new CollectionAttributes());
-			try {
-				future.get(1L, TimeUnit.NANOSECONDS);
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail(e.getMessage());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
-
 	public void testInsertAndGetUsingSingleClient() {
 		String value = "MyValue";
 
@@ -180,34 +152,6 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
 			// REMOVE
 			mc.asyncLopDelete(key, 0, 4000, true).get();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
-	public void testTimeoutUsingSingleClient() {
-		int valueCount = 500;
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = "MyValue";
-		}
-
-		try {
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncLopPipedInsertBulk(key, 0, Arrays.asList(valueList),
-							new CollectionAttributes());
-			try {
-				future.get(1L, TimeUnit.NANOSECONDS);
-				Assert.fail("There is no timeout.");
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				return;
-			} catch (Exception e) {
-				future.cancel(true);
-				Assert.fail();
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();

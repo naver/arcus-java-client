@@ -103,37 +103,4 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 	}
-
-	public void testTimeout() {
-		OperationFuture<Boolean> flushFuture = null;
-		try {
-			for (int i = 0; i < 100; i++) {
-				for (int prefix2 = 0; prefix2 < 10; prefix2++) {
-					Boolean setResult = mc.set(
-							PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i,
-							60, VALUE).get();
-					assertTrue(setResult);
-					Object object = mc.asyncGet(
-							PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i)
-							.get();
-					assertEquals(VALUE, object);
-				}
-			}
-
-			flushFuture = mc.flush("prefix");
-
-			Boolean flushResult = flushFuture.get(1L, TimeUnit.NANOSECONDS);
-
-			assertTrue(flushResult);
-
-			fail("There's no timeout.");
-		} catch (TimeoutException e) {
-			if (flushFuture != null)
-				flushFuture.cancel(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
-
 }
