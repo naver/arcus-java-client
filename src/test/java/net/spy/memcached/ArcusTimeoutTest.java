@@ -16,11 +16,16 @@
  */
 package net.spy.memcached;
 
-import net.spy.memcached.collection.*;
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
+
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -61,7 +66,7 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
       public FailureMode getFailureMode() {
         return FailureMode.Retry;
       }
-    }, AddrUtil.getAddresses("127.0.0.1:64213"));
+    }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
   }
 
   @After
@@ -80,7 +85,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
 
     future = mc.asyncBopInsert(KEY, 0, null, "hello", new CollectionAttributes());
     future.get(1, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -94,7 +98,7 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
         public int getBulkServiceThreadCount() {
           return 6;
         }
-      }, AddrUtil.getAddresses("127.0.0.1:64213"));
+      }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -110,7 +114,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, value);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -128,7 +131,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, value);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -144,7 +146,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncSopPipedInsertBulk(
             key, Arrays.asList(valueList), new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -160,7 +161,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSopInsertBulk(
             Arrays.asList(keys), value, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -176,7 +176,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncLopPipedInsertBulk(
             KEY, 0, Arrays.asList(valueList), new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -193,7 +192,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncLopInsertBulk(
             Arrays.asList(keys), 0, value, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -211,7 +209,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncBopPipedInsertBulk(
             key, bkeys, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -230,7 +227,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncBopInsertBulk(
             Arrays.asList(keys), bkey, new byte[]{0,0,1,1}, value, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -244,7 +240,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -260,7 +255,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -278,7 +272,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -297,7 +290,6 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
     future.get(1L, TimeUnit.MILLISECONDS);
-    future.cancel(true);
   }
 
   @Test(expected = TimeoutException.class)
@@ -305,6 +297,5 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
           throws InterruptedException, ExecutionException, TimeoutException {
     OperationFuture<Boolean> flushFuture = mc.flush("prefix");
     flushFuture.get(1L, TimeUnit.MILLISECONDS);
-    flushFuture.cancel(true);
   }
 }
