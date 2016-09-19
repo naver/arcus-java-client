@@ -95,67 +95,6 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testInsertAndGetUsingSingleClient() {
-		String key = "MyBopKey333";
-		String value = "MyValue";
-
-		int bkeySize = 500;
-		Map<Long, Object> bkeys = new TreeMap<Long, Object>();
-		for (int i = 0; i < bkeySize; i++) {
-			bkeys.put((long) i, value);
-		}
-
-		try {
-			// REMOVE
-			mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
-					true);
-
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncBopPipedInsertBulk(key, bkeys,
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						20000L, TimeUnit.MILLISECONDS);
-
-				Assert.assertTrue("Error list is not empty.",
-						errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				e.printStackTrace();
-			}
-
-			// GET
-			int errorCount = 0;
-			for (Entry<Long, Object> entry : bkeys.entrySet()) {
-				Future<Map<Long, Element<Object>>> f = mc.asyncBopGet(key,
-						entry.getKey(), ElementFlagFilter.DO_NOT_FILTER, false,
-						false);
-				Map<Long, Element<Object>> map = null;
-				try {
-					map = f.get();
-				} catch (Exception e) {
-					f.cancel(true);
-					e.printStackTrace();
-				}
-				Object value2 = map.entrySet().iterator().next().getValue()
-						.getValue();
-				if (!value.equals(value2)) {
-					errorCount++;
-				}
-			}
-			Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
-
-			// REMOVE
-			for (Entry<Long, Object> entry : bkeys.entrySet()) {
-				mc.asyncBopDelete(key, entry.getKey(),
-						ElementFlagFilter.DO_NOT_FILTER, true).get();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
 
 	public void testErrorCount() {
 		String key = "MyBopKeyErrorCount";
