@@ -16,8 +16,6 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.IllegalFormatCodePointException;
-
 public abstract class CollectionCreate {
 	protected int flags;
 	protected int expTime;

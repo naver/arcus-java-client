@@ -108,7 +108,6 @@ import net.spy.memcached.collection.MapDelete;
 import net.spy.memcached.collection.MapGet;
 import net.spy.memcached.collection.MapStore;
 import net.spy.memcached.collection.MapUpdate;
-import net.spy.memcached.collection.MapElement;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -3039,25 +3038,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * (non-Javadoc)
 	 *
 	 * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String,
-	 * net.spy.memcached.collection.MapElement, net.spy.memcached.transcoders.Transcoder)
+	 * java.util.Map, net.spy.memcached.transcoders.Transcoder)
 	 */
 	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<MapElement<Object>> mapElements) {
-		return asyncMopPipedUpdateBulk(key, mapElements, collectionTranscoder);
+			String key, Map<String, Object> elements) {
+		return asyncMopPipedUpdateBulk(key, elements, collectionTranscoder);
 	}
 
 	@Override
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<MapElement<T>> mapElements, Transcoder<T> tc) {
+			String key, Map<String, T> elements, Transcoder<T> tc) {
 
-		if (mapElements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
+		if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
 			CollectionPipedUpdate<T> collectionPipedUpdate = new MapPipedUpdate<T>(
-					key, mapElements, tc);
+					key, elements, tc);
 			return asyncCollectionPipedUpdate(key, collectionPipedUpdate);
 		} else {
-			PartitionedList<MapElement<T>> list = new PartitionedList<MapElement<T>>(
-					mapElements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
+			PartitionedMap<String, T> list = new PartitionedMap<String, T>(
+					elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
 			List<CollectionPipedUpdate<T>> collectionPipedUpdateList = new ArrayList<CollectionPipedUpdate<T>>(
 					list.size());
@@ -3926,48 +3925,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		rv.setOperation(op);
 		addOp(key, op);
 		return rv;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
-	 */
-	@Override
-	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
-			String key, List<MapElement<Object>> mapElements,
-			CollectionAttributes attributesForCreate) {
-		return asyncMopPipedInsertBulk(key, mapElements, attributesForCreate,
-				collectionTranscoder);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-	 */
-	@Override
-	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
-			String key, List<MapElement<T>> mapElements,
-			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
-		if (mapElements.size() <= CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
-			CollectionPipedStore<T> store = new CollectionPipedStore.MapElementsPipedStore<T>(
-					key, mapElements, (attributesForCreate != null),
-					attributesForCreate, tc);
-			return asyncCollectionPipedStore(key, store);
-		} else {
-			PartitionedList<MapElement<T>> list = new PartitionedList<MapElement<T>>(
-					mapElements, CollectionPipedStore.MAX_PIPED_ITEM_COUNT);
-
-			List<CollectionPipedStore<T>> storeList = new ArrayList<CollectionPipedStore<T>>(
-					list.size());
-
-			for (int i = 0; i < list.size(); i++) {
-				storeList.add(new CollectionPipedStore.MapElementsPipedStore<T>(key,
-						list.get(i), (attributesForCreate != null),
-						attributesForCreate, tc));
-			}
-
-			return asyncCollectionPipedStore(key, storeList);
-		}
 	}
 
 	/*

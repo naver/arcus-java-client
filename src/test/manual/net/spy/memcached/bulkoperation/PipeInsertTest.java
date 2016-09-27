@@ -58,8 +58,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 		}
 
 		try {
-			long start = System.currentTimeMillis();
-
 			CollectionAttributes attr = new CollectionAttributes();
 
 			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -67,8 +65,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
 			Map<Integer, CollectionOperationStatus> map = future.get(5000L,
 					TimeUnit.MILLISECONDS);
-
-			// System.out.println(System.currentTimeMillis() - start + "ms");
 
 			Assert.assertTrue(map.isEmpty());
 
@@ -160,8 +156,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 		}
 
 		try {
-			long start = System.currentTimeMillis();
-
 			CollectionAttributes attr = new CollectionAttributes();
 
 			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -169,8 +163,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
 			Map<Integer, CollectionOperationStatus> map = future.get(5000L,
 					TimeUnit.MILLISECONDS);
-
-			// System.out.println(System.currentTimeMillis() - start + "ms");
 
 			Assert.assertEquals(1000, map.size());
 

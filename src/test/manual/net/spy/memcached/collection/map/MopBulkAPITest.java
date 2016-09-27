@@ -20,14 +20,11 @@ import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
-import net.spy.memcached.collection.MapElement;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +32,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
 
 	private String key = "MopBulkAPITest33";
 	Map<String, Object> elements = new HashMap<String, Object>();
-	List<MapElement<Object>> updateMap = new ArrayList<MapElement<Object>>();
+	Map<String, Object> updateMap = new HashMap<String, Object>();
 
 
 	private int getValueCount() {
@@ -47,10 +44,8 @@ public class MopBulkAPITest extends BaseIntegrationTest {
 		for (long i = 0; i < getValueCount(); i++) {
 			elements.put("mkey" + String.valueOf(i),
 						"value" + String.valueOf(i));
-			MapElement<Object> temp =
-					new MapElement<Object>("mkey" + String.valueOf(i),
-									"newvalue" + String.valueOf(i));
-			updateMap.add(temp);
+			updateMap.put("mkey" + String.valueOf(i),
+						"newvalue" + String.valueOf(i));
 		}
 	}
 

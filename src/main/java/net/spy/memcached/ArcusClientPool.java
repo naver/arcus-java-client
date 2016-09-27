@@ -39,7 +39,6 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
-import net.spy.memcached.collection.MapElement;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -905,14 +904,14 @@ public class ArcusClientPool implements ArcusClientIF {
 
 	@Override
 	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<MapElement<Object>> mapElements) {
-		return this.getClient().asyncMopPipedUpdateBulk(key, mapElements);
+			String key, Map<String, Object> elements) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, elements);
 	}
 
 	@Override
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
-			String key, List<MapElement<T>> mapElements, Transcoder<T> tc) {
-		return this.getClient().asyncMopPipedUpdateBulk(key, mapElements, tc);
+			String key, Map<String, T> elements, Transcoder<T> tc) {
+		return this.getClient().asyncMopPipedUpdateBulk(key, elements, tc);
 	}
 
 	@Override
@@ -925,22 +924,6 @@ public class ArcusClientPool implements ArcusClientIF {
 	public <T> CollectionFuture<Map<T, Boolean>> asyncSopPipedExistBulk(
 			String key, List<T> values, Transcoder<T> tc) {
 		return this.getClient().asyncSopPipedExistBulk(key, values, tc);
-	}
-
-	@Override
-	public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
-			String key, List<MapElement<Object>> mapElements,
-			CollectionAttributes attributesForCreate) {
-		return this.getClient().asyncMopPipedInsertBulk(key, mapElements,
-				attributesForCreate);
-	}
-
-	@Override
-	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
-			String key, List<MapElement<T>> mapElements,
-			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
-		return this.getClient().asyncMopPipedInsertBulk(key, mapElements,
-				attributesForCreate, tc);
 	}
 
 	@Override

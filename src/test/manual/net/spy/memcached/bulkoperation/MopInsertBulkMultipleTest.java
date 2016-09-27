@@ -34,10 +34,10 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 		String key = "MyMopKey32";
 		String value = "MyValue";
 
-		int mkeySize = 500;
-		Map<String, Object> mkeys = new TreeMap<String, Object>();
-		for (int i = 0; i < mkeySize; i++) {
-			mkeys.put(String.valueOf(i), value);
+		int elementSize = 500;
+		Map<String, Object> elements = new TreeMap<String, Object>();
+		for (int i = 0; i < elementSize; i++) {
+			elements.put(String.valueOf(i), value);
 		}
 
 		try {
@@ -46,7 +46,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
 			// SET
 			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, mkeys,
+					.asyncMopPipedInsertBulk(key, elements,
 							new CollectionAttributes());
 			try {
 				Map<Integer, CollectionOperationStatus> errorList = future.get(
@@ -61,7 +61,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
 			// GET
 			int errorCount = 0;
-			for (Entry<String, Object> entry : mkeys.entrySet()) {
+			for (Entry<String, Object> entry : elements.entrySet()) {
 				Future<Map<String, Object>> f = mc.asyncMopGet(key,
 						entry.getKey(), false, false);
 				Map<String, Object> map = null;
@@ -79,65 +79,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 			Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
 
 			// REMOVE
-			for (Entry<String, Object> entry : mkeys.entrySet()) {
-				mc.asyncMopDelete(key, entry.getKey(), true).get();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
-
-	public void testInsertAndGetUsingSingleClient() {
-		String key = "MyMopKey333";
-		String value = "MyValue";
-
-		int mkeySize = 500;
-		Map<String, Object> mkeys = new TreeMap<String, Object>();
-		for (int i = 0; i < mkeySize; i++) {
-			mkeys.put(String.valueOf(i), value);
-		}
-
-		try {
-			// REMOVE
-			mc.asyncMopDelete(key, true);
-
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, mkeys,
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						20000L, TimeUnit.MILLISECONDS);
-
-				Assert.assertTrue("Error list is not empty.",
-						errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				e.printStackTrace();
-			}
-
-			// GET
-			int errorCount = 0;
-			for (Entry<String, Object> entry : mkeys.entrySet()) {
-				Future<Map<String, Object>> f = mc.asyncMopGet(key,
-						entry.getKey(), false, false);
-				Map<String, Object> map = null;
-				try {
-					map = f.get();
-				} catch (Exception e) {
-					f.cancel(true);
-					e.printStackTrace();
-				}
-				Object value2 = map.entrySet().iterator().next().getValue();
-				if (!value.equals(value2)) {
-					errorCount++;
-				}
-			}
-			Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
-
-			// REMOVE
-			for (Entry<String, Object> entry : mkeys.entrySet()) {
+			for (Entry<String, Object> entry : elements.entrySet()) {
 				mc.asyncMopDelete(key, entry.getKey(), true).get();
 			}
 		} catch (Exception e) {
@@ -150,10 +92,10 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 		String key = "MyMopKeyErrorCount";
 		String value = "MyValue";
 
-		int mkeySize = 1200;
-		Map<String, Object> mkeys = new TreeMap<String, Object>();
-		for (int i = 0; i < mkeySize; i++) {
-			mkeys.put(String.valueOf(i), value);
+		int elementSize = 1200;
+		Map<String, Object> elements = new TreeMap<String, Object>();
+		for (int i = 0; i < elementSize; i++) {
+			elements.put(String.valueOf(i), value);
 		}
 
 		try {
@@ -161,11 +103,11 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
 			// SET
 			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, mkeys, null);
+					.asyncMopPipedInsertBulk(key, elements, null);
 
 			Map<Integer, CollectionOperationStatus> map = future.get(2000L,
 					TimeUnit.MILLISECONDS);
-			assertEquals(mkeySize, map.size());
+			assertEquals(elementSize, map.size());
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
@@ -34,6 +35,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 	protected String key;
 	protected Transcoder<T> tc;
 	protected int itemCount;
+	protected int nextOpIndex = 0;
 
 	public abstract ByteBuffer getAsciiCommand();
 
@@ -145,29 +147,25 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
 
 		private static final String COMMAND = "mop update";
-		private List<MapElement<T>> mapElements;
+		private Map<String, T> elements;
 
-		public MapPipedUpdate(String key, List<MapElement<T>> mapElements,
+		public MapPipedUpdate(String key, Map<String, T> elements,
 		                      Transcoder<T> tc) {
 			this.key = key;
-			this.mapElements = mapElements;
+			this.elements = elements;
 			this.tc = tc;
-			this.itemCount = mapElements.size();
+			this.itemCount = elements.size();
 		}
 
 		public ByteBuffer getAsciiCommand() {
 			int capacity = 0;
 
-			// decode parameters
-			List<byte[]> encodedList = new ArrayList<byte[]>(mapElements.size());
+			// encode parameters
+			List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
 			CachedData cd = null;
-			for (MapElement<T> each : mapElements) {
-				if (each.getValue() != null) {
-					cd = tc.encode(each.getValue());
-					encodedList.add(cd.getData());
-				} else {
-					encodedList.add(null);
-				}
+			for (T each : elements.values()) {
+				cd = tc.encode(each);
+				encodedList.add(cd.getData());
 			}
 
 			// estimate the buffer capacity
@@ -175,12 +173,10 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			byte[] value;
 			StringBuilder b;
 
-			for (MapElement<T> each : mapElements) {
+			for (String eachMkey : elements.keySet()) {
 				capacity += KeyUtil.getKeyBytes(key).length;
-				capacity += KeyUtil.getKeyBytes(each.getMkey()).length;
-				if (encodedList.get(i) != null) {
-					capacity += encodedList.get(i++).length;
-				}
+				capacity += KeyUtil.getKeyBytes(eachMkey).length;
+				capacity += encodedList.get(i++).length;
 				capacity += 64;
 			}
 
@@ -188,18 +184,16 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
 			// create ascii operation string
-			i = 0;
-
-			Iterator<MapElement<T>> iterator = mapElements.iterator();
-			while (iterator.hasNext()) {
-				MapElement<T> mapElement = iterator.next();
-				value = encodedList.get(i++);
+			int mkeySize = elements.keySet().size();
+			List<String> keyList = new ArrayList<String>(elements.keySet());
+			for (i = this.nextOpIndex; i < mkeySize; i++) {
+				String mkey = keyList.get(i);
+				value = encodedList.get(i);
 				b = new StringBuilder();
 
-				setArguments(bb, COMMAND, key,
-						String.valueOf(mapElement.getMkey()),
+				setArguments(bb, COMMAND, key, mkey,
 						b.toString(), (value == null ? -1 : value.length),
-						(iterator.hasNext()) ? PIPE : "");
+						(i < mkeySize - 1) ? PIPE : "");
 				if (value != null) {
 					if (value.length > 0) {
 						bb.put(value);

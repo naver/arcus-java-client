@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 import java.util.List;
 
-public class MapDelete extends CollectionDelete{
+public class MapDelete extends CollectionDelete {
 	private static final String command = "mop delete";
 
 	protected List<String> mkeyList;
