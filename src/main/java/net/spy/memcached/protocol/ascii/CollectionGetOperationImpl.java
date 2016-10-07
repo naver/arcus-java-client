@@ -27,6 +27,7 @@ import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ListGet;
 import net.spy.memcached.collection.SetGet;
+import net.spy.memcached.collection.MapGet;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -86,6 +87,8 @@ public class CollectionGetOperationImpl extends OperationImpl
 			setAPIType(APIType.LOP_GET);
 		else if (this.collectionGet instanceof SetGet)
 			setAPIType(APIType.SOP_GET);
+		else if (this.collectionGet instanceof MapGet)
+			setAPIType(APIType.MOP_GET);
 		else if (this.collectionGet instanceof BTreeGet)
 			setAPIType(APIType.BOP_GET);
 		if (collectionGet.isDelete())

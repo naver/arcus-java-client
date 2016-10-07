@@ -26,6 +26,7 @@ import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.SetDelete;
+import net.spy.memcached.collection.MapDelete;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionDeleteOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -70,6 +71,8 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 			setAPIType(APIType.LOP_DELETE);
 		else if (this.collectionDelete instanceof SetDelete)
 			setAPIType(APIType.SOP_DELETE);
+		else if (this.collectionDelete instanceof MapDelete)
+			setAPIType(APIType.MOP_DELETE);
 		else if (this.collectionDelete instanceof BTreeDelete)
 			setAPIType(APIType.BOP_DELETE);
 		setOperationType(OperationType.WRITE);

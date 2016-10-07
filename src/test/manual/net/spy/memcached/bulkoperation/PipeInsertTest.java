@@ -58,8 +58,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 		}
 
 		try {
-			long start = System.currentTimeMillis();
-
 			CollectionAttributes attr = new CollectionAttributes();
 
 			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -67,8 +65,6 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
 			Map<Integer, CollectionOperationStatus> map = future.get(5000L,
 					TimeUnit.MILLISECONDS);
-
-			// System.out.println(System.currentTimeMillis() - start + "ms");
 
 			Assert.assertTrue(map.isEmpty());
 
@@ -144,6 +140,36 @@ public class PipeInsertTest extends BaseIntegrationTest {
 					.get();
 
 			Assert.assertEquals(4000, list.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail(e.getMessage());
+		}
+	}
+
+	public void testMopPipeInsert() {
+		int elementCount = 5000;
+
+		Map<String, Object> elements = new TreeMap<String, Object>();
+
+		for (int i = 0; i < elementCount; i++) {
+			elements.put(String.valueOf(i), "value" + i);
+		}
+
+		try {
+			CollectionAttributes attr = new CollectionAttributes();
+
+			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+					.asyncMopPipedInsertBulk(KEY, elements, attr);
+
+			Map<Integer, CollectionOperationStatus> map = future.get(5000L,
+					TimeUnit.MILLISECONDS);
+
+			Assert.assertEquals(1000, map.size());
+
+			Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
+					.get();
+
+			Assert.assertEquals(4000, rmap.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
