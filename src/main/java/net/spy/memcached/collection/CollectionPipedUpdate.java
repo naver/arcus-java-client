@@ -98,14 +98,10 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			// allocate the buffer
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-			// create ascii operation string
-			i = 0;
-
-			Iterator<Element<T>> iterator = elements.iterator();
-			while (iterator.hasNext()) {
-				Element<T> element = iterator.next();
-
-				value = decodedList.get(i++);
+			int eSize = elements.size();
+			for (i = this.nextOpIndex; i < eSize; i++) {
+				Element<T> element = elements.get(i);
+				value = decodedList.get(i);
 				eflagUpdate = element.getElementFlagUpdate();
 				b = new StringBuilder();
 
@@ -123,7 +119,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 						(element.isByteArraysBkey() ? element.getBkeyByHex()
 								: String.valueOf(element.getLongBkey())),
 						b.toString(), (value == null ? -1 : value.length),
-						(iterator.hasNext()) ? PIPE : "");
+						(i < eSize - 1) ? PIPE : "");
 				if (value != null) {
 					if (value.length > 0) {
 						bb.put(value);
