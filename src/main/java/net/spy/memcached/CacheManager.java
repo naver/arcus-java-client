@@ -264,7 +264,6 @@ public class CacheManager extends SpyThread implements Watcher,
 				getLogger().warn("Session expired. Trying to reconnect to the Arcus admin." + getInfo());
 				if (cacheMonitor != null)
 					cacheMonitor.shutdown();
-				closing();
 				break;
 			}
 		}
