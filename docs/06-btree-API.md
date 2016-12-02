@@ -199,7 +199,7 @@ Integer count = future.get();
 3. 일치 여부 판단을 위한 값 0x0104 등록
 
 ElementMultiFlagsFilter로 최대 100개 compare value를 지정할 수 있으며,
-asyncBopGet, asyncBopCount, asyncBopDelete 에서만 사용이 가능하다.
+asyncBopGet, asyncBopCount, asyncBopDelete, asyncBopSortMergeGet 에서만 사용이 가능하다.
 
 ### Element Flag Update 객체
 
