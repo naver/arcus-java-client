@@ -87,27 +87,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * Processes every events from the ZooKeeper.
 	 */
 	public void process(WatchedEvent event) {
-		if (event.getType() == Event.EventType.None) {
-			// Processes session events
-			switch (event.getState()) {
-			case SyncConnected:
-				getLogger().warn("Reconnected to the Arcus admin. " + getInfo());
-				return;
-			case Disconnected:
-				getLogger().warn("Disconnected from the Arcus admin. Trying to reconnect. " + getInfo());
-				return;
-			case Expired:
-				// If the session was expired, just shutdown this client to be re-initiated.
-				getLogger().warn("Session expired. Trying to reconnect to the Arcus admin." + getInfo());
-				shutdown();
-				return;
-			}
-		} else {
-			// Set a new watch on the znode when there are any changes in it.
-			if (event.getType() == Event.EventType.NodeChildrenChanged) {
-				asyncGetCacheList();
-			}
-		}
+		if (event.getType() == Event.EventType.NodeChildrenChanged)
+			asyncGetCacheList();
 	}
 
 	/**
@@ -149,7 +130,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
 			getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
 		}
 		
-		zk.getChildren(cacheListZPath + serviceCode, true, this, null);
+		zk.getChildren(cacheListZPath + serviceCode, this, this, null);
 	}
 
 	/**
