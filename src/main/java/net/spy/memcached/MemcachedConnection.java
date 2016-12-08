@@ -30,6 +30,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -221,22 +222,30 @@ public final class MemcachedConnection extends SpyObject {
 		}
 
 		// see if any connections blew up with large number of timeouts
-		for(SelectionKey sk : selector.keys()) {
-			MemcachedNode mn = (MemcachedNode)sk.attachment();
-			if (mn.getContinuousTimeout() > timeoutExceptionThreshold)
-			{
-				getLogger().warn(
-						"%s exceeded continuous timeout threshold. >%s (%s)",
-						mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
+		boolean stillCheckingTimeouts = true;
+		while (stillCheckingTimeouts) {
+		try {
+			for(SelectionKey sk : selector.keys()) {
+				MemcachedNode mn = (MemcachedNode)sk.attachment();
+				if (mn.getContinuousTimeout() > timeoutExceptionThreshold)
+				{
+					getLogger().warn(
+							"%s exceeded continuous timeout threshold. >%s (%s)",
+							mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
+					lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
+				}
+				else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
+				{
+					getLogger().warn(
+							"%s exceeded timeout ratio threshold. >%s (%s)",
+							mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
+					lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
+				}
 			}
-			else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold)
-			{
-				getLogger().warn(
-						"%s exceeded timeout ratio threshold. >%s (%s)",
-						mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
-				lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
-			}
+		} catch (ConcurrentModificationException e) {
+				getLogger().warn("Retrying selector keys after "
+				+ "ConcurrentModificationException caught", e);
+			continue;
 		}
 
 		// Deal with the memcached server group that's been added by CacheManager.  
