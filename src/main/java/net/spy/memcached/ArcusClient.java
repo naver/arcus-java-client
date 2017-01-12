@@ -4106,7 +4106,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 					.getValue(), from, to, eFlagFilter, offset, count));
 		}
 
-		return btreeGetBulk(getBulkList, offset, count, (to > from), tc);
+		return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
 	}
 
 	/*
@@ -4186,9 +4186,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				
 				@Override
 				public void gotKey(String key, int elementCount, OperationStatus status) {
-					result.put(key, new BTreeGetResult<Long, T>(
-						(elementCount > 0) ? new TreeMap<Long, BTreeElement<Long, T>>() : null,
-						new CollectionOperationStatus(status)));
+					TreeMap<Long, BTreeElement<Long, T>> tree = null;
+					if (elementCount > 0) {
+						tree = new TreeMap<Long, BTreeElement<Long, T>>(
+								(reverse) ? Collections.reverseOrder() : null);
+					}
+					result.put(key, new BTreeGetResult<Long, T>(tree, new CollectionOperationStatus(status)));
 				}
 				
 				@Override
