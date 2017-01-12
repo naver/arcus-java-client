@@ -1,3 +1,6 @@
+2016-12-09 [version 1.9.6]
+	* [Fix] Fix bopGetBulk deserialization bug.
+
 2016-08-31 [version 1.9.5]
 	* [Fix] Add overflowAction availability check logic to collection APIs.
 	* [Fix] Add overflowAction / readable options to collection store APIs.

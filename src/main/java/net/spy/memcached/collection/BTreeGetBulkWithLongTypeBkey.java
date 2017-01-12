@@ -51,5 +51,8 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
 	public void decodeKeyHeader(String keyHeader) {
 		String[] splited = keyHeader.split(" ");
 		this.key = splited[1];
+		if (splited.length == 5) {
+			this.flag = Integer.valueOf(splited[3]);
+		}
 	}
 }
