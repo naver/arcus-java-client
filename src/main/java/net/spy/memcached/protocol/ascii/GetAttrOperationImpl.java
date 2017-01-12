@@ -60,9 +60,6 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
 	@Override
 	public void handleLine(String line) {
-		OperationStatus status = matchStatus(line, END, NOT_FOUND,
-				ATTR_ERROR_NOT_FOUND);
-
 		if (line.startsWith("ATTR ")) {
 			getLogger().debug("Got line %s", line);
 
@@ -72,12 +69,12 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 			assert stuff[0].equals("ATTR");
 
 			cb.gotAttribute(key, stuff[1]);
-		} else if (status.isSuccess()) {
-			getLogger().debug(status);
-			getCallback().receivedStatus(status);
-			transitionState(OperationState.COMPLETE);
 		} else {
-			getLogger().debug(status);
+			OperationStatus status = matchStatus(line, END, NOT_FOUND,
+					ATTR_ERROR_NOT_FOUND);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug(status);
+			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
 		}

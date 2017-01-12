@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
@@ -34,6 +35,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 	protected String key;
 	protected Transcoder<T> tc;
 	protected int itemCount;
+	protected int nextOpIndex = 0;
 
 	public abstract ByteBuffer getAsciiCommand();
 
@@ -96,14 +98,10 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 			// allocate the buffer
 			ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-			// create ascii operation string
-			i = 0;
-
-			Iterator<Element<T>> iterator = elements.iterator();
-			while (iterator.hasNext()) {
-				Element<T> element = iterator.next();
-
-				value = decodedList.get(i++);
+			int eSize = elements.size();
+			for (i = this.nextOpIndex; i < eSize; i++) {
+				Element<T> element = elements.get(i);
+				value = decodedList.get(i);
 				eflagUpdate = element.getElementFlagUpdate();
 				b = new StringBuilder();
 
@@ -121,7 +119,77 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 						(element.isByteArraysBkey() ? element.getBkeyByHex()
 								: String.valueOf(element.getLongBkey())),
 						b.toString(), (value == null ? -1 : value.length),
-						(iterator.hasNext()) ? PIPE : "");
+						(i < eSize - 1) ? PIPE : "");
+				if (value != null) {
+					if (value.length > 0) {
+						bb.put(value);
+					}
+					bb.put(CRLF);
+				}
+			}
+
+			// flip the buffer
+			bb.flip();
+
+			return bb;
+		}
+
+		public ByteBuffer getBinaryCommand() {
+			throw new RuntimeException("not supported in binary protocol yet.");
+		}
+	}
+
+
+	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
+
+		private static final String COMMAND = "mop update";
+		private Map<String, T> elements;
+
+		public MapPipedUpdate(String key, Map<String, T> elements,
+		                      Transcoder<T> tc) {
+			this.key = key;
+			this.elements = elements;
+			this.tc = tc;
+			this.itemCount = elements.size();
+		}
+
+		public ByteBuffer getAsciiCommand() {
+			int capacity = 0;
+
+			// encode parameters
+			List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
+			CachedData cd = null;
+			for (T each : elements.values()) {
+				cd = tc.encode(each);
+				encodedList.add(cd.getData());
+			}
+
+			// estimate the buffer capacity
+			int i = 0;
+			byte[] value;
+			StringBuilder b;
+
+			for (String eachMkey : elements.keySet()) {
+				capacity += KeyUtil.getKeyBytes(key).length;
+				capacity += KeyUtil.getKeyBytes(eachMkey).length;
+				capacity += encodedList.get(i++).length;
+				capacity += 64;
+			}
+
+			// allocate the buffer
+			ByteBuffer bb = ByteBuffer.allocate(capacity);
+
+			// create ascii operation string
+			int mkeySize = elements.keySet().size();
+			List<String> keyList = new ArrayList<String>(elements.keySet());
+			for (i = this.nextOpIndex; i < mkeySize; i++) {
+				String mkey = keyList.get(i);
+				value = encodedList.get(i);
+				b = new StringBuilder();
+
+				setArguments(bb, COMMAND, key, mkey,
+						b.toString(), (value == null ? -1 : value.length),
+						(i < mkeySize - 1) ? PIPE : "");
 				if (value != null) {
 					if (value.length > 0) {
 						bb.put(value);

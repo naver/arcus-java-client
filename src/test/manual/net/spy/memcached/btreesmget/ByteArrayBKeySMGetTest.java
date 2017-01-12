@@ -530,62 +530,6 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 		}
 	}
 
-	public void testTimeout() {
-		try {
-			keyList = new ArrayList<String>();
-			for (int i = 0; i < 1000; i++) {
-				mc.delete(KEY + i).get();
-				keyList.add(KEY + i);
-			}
-
-			for (int i = 0; i < 500; i++) {
-				mc.asyncBopInsert(KEY + i, new byte[] { (byte) i }, null,
-						"VALUE" + i, new CollectionAttributes()).get();
-			}
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-
-		byte[] from = new byte[] { (byte) 0 };
-		byte[] to = new byte[] { (byte) 1000 };
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-
-		/* old SMGetTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(keyList, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 500);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1L,
-					TimeUnit.MILLISECONDS);
-
-			fail("Timeout is not tested.");
-		} catch (TimeoutException e) {
-			oldFuture.cancel(true);
-			return;
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			fail(e.getMessage());
-		}
-		fail("There's no timeout.");
-
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(keyList, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1L,
-					TimeUnit.MILLISECONDS);
-
-			fail("Timeout is not tested.");
-		} catch (TimeoutException e) {
-			future.cancel(true);
-			return;
-		} catch (Exception e) {
-			future.cancel(true);
-			fail(e.getMessage());
-		}
-		fail("There's no timeout.");
-	}
-
 	public void testPerformanceGet1000KeysWithoutOffset() {
 		try {
 			keyList = new ArrayList<String>();

@@ -69,6 +69,7 @@ Arcus cache는 simple key-value item 외에 다양한 collection item 유형을 
 - collection item
   - list item - 데이터들의 linked list을 가지는 item
   - set item - 유일한 데이터들의 집합을 가지는 item
+  - map item - \<mkey, value\>쌍으로 구성된 데이터 집합을 가지는 item
   - b+tree item - b+tree key 기반으로 정렬된 데이터 집합을 가지는 item
 
 ### Expiration, Eviction, and Sticky Item

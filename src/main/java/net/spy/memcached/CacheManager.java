@@ -248,16 +248,24 @@ public class CacheManager extends SpyThread implements Watcher,
 			switch (event.getState()) {
 			case SyncConnected:
 				getLogger().info("Connected to Arcus admin. (%s@%s)", serviceCode, hostPort);
-				zkInitLatch.countDown();
+				if (cacheMonitor != null) {
+					getLogger().warn("Reconnected to the Arcus admin. " + getInfo());
+				} else {
+					zkInitLatch.countDown();
+					getLogger().debug("cm is null, servicecode : %s, state:%s, type:%s",
+									serviceCode, event.getState(), event.getType());
+				}
+				break;
+			case Disconnected:
+				getLogger().warn("Disconnected from the Arcus admin. Trying to reconnect. " + getInfo());
+				break;
+			case Expired:
+				// If the session was expired, just shutdown this client to be re-initiated.
+				getLogger().warn("Session expired. Trying to reconnect to the Arcus admin." + getInfo());
+				if (cacheMonitor != null)
+					cacheMonitor.shutdown();
+				break;
 			}
-		}
-		
-		if (cacheMonitor != null) {
-			cacheMonitor.process(event);
-		} else {
-			getLogger().debug(
-					"cm is null, servicecode : %s, state:%s, type:%s",
-					serviceCode, event.getState(), event.getType());
 		}
 	}
 
@@ -366,6 +374,14 @@ public class CacheManager extends SpyThread implements Watcher,
 	
 	public List<String> getPrevChildren() {
 		return this.prevChildren;
+	}
+	
+	private String getInfo() {
+		String zkSessionId = null;
+		if (zk != null) {
+			zkSessionId = "0x" + Long.toHexString(zk.getSessionId());
+		}
+		return "[serviceCode=" + serviceCode + ", adminSessionId=" + zkSessionId + "]";
 	}
 
 	/**
