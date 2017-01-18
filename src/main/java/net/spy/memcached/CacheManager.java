@@ -146,14 +146,20 @@ public class CacheManager extends SpyThread implements Watcher,
 				}
 				
 				/* ENABLE_REPLICATION if */
-				// Check /arcus_repl/cache_list/{svc} first
-				// If it exists, the service code belongs to a repl cluster
 				cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH :
 													ARCUS_BASE_CACHE_LIST_ZPATH;
 				if (zk.exists(cacheListZPath + serviceCode, false) != null) {
 					getLogger().info("Connecting to Arcus %scluster", arcusReplEnabled ? "replication " : "");
 				} else {
-					getLogger().fatal("Arcus %s cluster not found for %s service.", arcusReplEnabled ? "replication " : "", serviceCode);
+					cacheListZPath = arcusReplEnabled ? ARCUS_BASE_CACHE_LIST_ZPATH :
+														ARCUS_REPL_CACHE_LIST_ZPATH;
+					if (zk.exists(cacheListZPath + serviceCode, false) != null) {
+						getLogger().fatal("To use an ARCUS cluster named \"%s\"," +
+										" you must %senable replication with ConnectionFactoryBuilder.",
+										serviceCode, arcusReplEnabled ? "not " : "");
+					} else {
+						getLogger().fatal("An ARCUS cluster named \"%s\" does not exist.", serviceCode);
+					}
 					throw new NotExistsServiceCodeException(serviceCode);
 				}
 				/* ENABLE_REPLICATION else */
