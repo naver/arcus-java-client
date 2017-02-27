@@ -1,7 +1,14 @@
-2016-12-09 [version 1.9.6]
+2017-02-27 [version 1.9.7]
+    * [Fix] Fix bopGetBulk reverse scan bug.
+	* [Feature] Deprecate repl setting methods of cfb.
+	   - Replication cloud is internally determined by checking
+	     ZK directories for the given service code.
+	   - The service code must be unique in each ZK ensemble.
+
+2016-12-09 [version 1.9.6] stable
 	* [Fix] Fix bopGetBulk deserialization bug.
 
-2016-08-31 [version 1.9.5]
+2016-08-31 [version 1.9.5] stable
 	* [Fix] Add overflowAction availability check logic to collection APIs.
 	* [Fix] Add overflowAction / readable options to collection store APIs.
 	* [Fix] Remove unnecessary log messages.
