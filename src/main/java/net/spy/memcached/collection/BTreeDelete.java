@@ -58,7 +58,6 @@ public class BTreeDelete extends CollectionDelete {
 		this.range = BTreeUtil.toHex(bkey);
 		this.noreply = noreply;
 		this.dropIfEmpty = dropIfEmpty;
-		this.noreply = noreply;
 		this.elementFlagFilter = elementFlagFilter;
 	}
 	
@@ -67,7 +66,6 @@ public class BTreeDelete extends CollectionDelete {
 		this.count = count;
 		this.noreply = noreply;
 		this.dropIfEmpty = dropIfEmpty;
-		this.noreply = noreply;
 		this.elementFlagFilter = elementFlagFilter;
 	}
 
@@ -80,7 +78,6 @@ public class BTreeDelete extends CollectionDelete {
 	public BTreeDelete(long from, long to, int count, boolean noreply, boolean dropIfEmpty, ElementMultiFlagsFilter elementMultiFlagsFilter) {
 		this(from, to, count, noreply);
 		this.dropIfEmpty = dropIfEmpty;
-		this.noreply = noreply;
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
 	}
 
@@ -88,7 +85,6 @@ public class BTreeDelete extends CollectionDelete {
 		this.range = BTreeUtil.toHex(bkey);
 		this.noreply = noreply;
 		this.dropIfEmpty = dropIfEmpty;
-		this.noreply = noreply;
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
 	}
 
@@ -97,7 +93,6 @@ public class BTreeDelete extends CollectionDelete {
 		this.count = count;
 		this.noreply = noreply;
 		this.dropIfEmpty = dropIfEmpty;
-		this.noreply = noreply;
 		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
 	}
 
