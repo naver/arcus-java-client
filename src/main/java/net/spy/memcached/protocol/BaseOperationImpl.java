@@ -185,8 +185,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 					cmd.get(bytes);
 
 					String[] cmdLines = new String(bytes).split("\r\n");
-					getLogger().error("Bad command: %s",
-							cmdLines.length > 0 ? cmdLines[0] : "No CRLF");
+					getLogger().error("Bad command: %s", cmdLines[0]);
 				}
 				exception=new OperationException(eType, line);
 				break;
