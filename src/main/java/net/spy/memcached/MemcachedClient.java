@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.Callable;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
@@ -1034,9 +1035,13 @@ public class MemcachedClient extends SpyThread
 			// FIXME This should be refactored...
 			// And the original front-cache implementations are really weird :-( 
 			if (localCacheManager != null) {
-				T cachedData = localCacheManager.get(key, tc);
+				final T cachedData = localCacheManager.get(key, tc);
 				if (cachedData != null) {
-					m.put(key, localCacheManager.asyncPreFetch(key, tc));
+					m.put(key, new LocalCacheManager.Task<T>(new Callable<T>() {
+						public T call() throws Exception {
+							return cachedData;
+						}
+					}));
 					continue;
 				}
 			}

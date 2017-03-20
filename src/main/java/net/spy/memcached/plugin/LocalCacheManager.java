@@ -84,6 +84,9 @@ public class LocalCacheManager {
 		try {
 			Element element = cache.get(key);
 			if(null != element) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("ArcusFrontCache: local cache hit for %s", key);
+				}
 				@SuppressWarnings("unchecked") T ret = (T) element.getObjectValue();
 				return ret;
 			}
@@ -103,21 +106,15 @@ public class LocalCacheManager {
 		});
 		return task;
 	}
-	
-	public <T> Future<T> asyncPreFetch(final String key, final Transcoder<T> tc) {
-		Task<T> task = new Task<T>(new Callable<T>() {
-			// pre-fetch the locally cached data.
-			T v = get(key, tc);
-			
-			public T call() throws Exception {
-				return v;
-			}
-		});
-		return task;
-	}
-	
+
 	public Element getElement(String key) {
-		return cache.get(key);
+		Element element = cache.get(key);
+		if (logger.isDebugEnabled()) {
+			if (null != element) {
+				logger.debug("ArcusFrontCache: local cache hit for %s", key);
+			}
+		}
+		return element;
 	}
 	
 	public <T> boolean put(String k, T v) {
