@@ -3,7 +3,7 @@
 	* [Fix] Add local cache hit debug log message
 
 2017-02-27 [version 1.9.7] stable
-    * [Fix] Fix bopGetBulk reverse scan bug.
+	* [Fix] Fix bopGetBulk reverse scan bug.
 	* [Feature] Deprecate repl setting methods of cfb.
 	   - Replication cloud is internally determined by checking
 	     ZK directories for the given service code.
