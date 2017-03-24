@@ -179,6 +179,14 @@ public abstract class BaseOperationImpl extends SpyObject {
 				exception=new OperationException(eType, line);
 				break;
 			case CLIENT:
+				if (line.contains("bad command line format")) {
+					initialize();
+					byte[] bytes = new byte[cmd.remaining()];
+					cmd.get(bytes);
+
+					String[] cmdLines = new String(bytes).split("\r\n");
+					getLogger().error("Bad command: %s", cmdLines[0]);
+				}
 				exception=new OperationException(eType, line);
 				break;
 			default: assert false;
