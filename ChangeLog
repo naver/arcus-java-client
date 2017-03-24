@@ -1,3 +1,11 @@
+2017-03-24 [version 1.10.0]
+	* [Feature] Add a map collection type.
+	* [Cleanup] Separate CacheMonitor ZK watcher from CacheManager.
+	* [Cleanup] Refactor method call of updateConnection to task execution.
+	* [Cleanup] Combine timeout tests into a single test.
+	* [Cleanup] Remove duplicate test codes.
+	* [Test] Add unit tests for SMGet with ElementMultiFlagsFilter.
+
 2017-03-24 [version 1.9.8]
 	* [Fix] Add bad command log message
 	* [Fix] Add local cache hit debug log message
