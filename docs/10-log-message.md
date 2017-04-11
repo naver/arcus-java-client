@@ -113,7 +113,7 @@ net.spy.memcached.internal.CheckedOperationTimeoutException: Timed out waiting f
 
 | 메세지 | 설명 |
 | ------ | ---- |
-| Timed out waiting for operation. > 300 | Timeout 값이 300ms로 지정되어있고 요청의 결과를 받기까지300ms이상 걸려서 timeout되었다.|
+| Timed out waiting for operation. > 300 MILLISECONDS| Timeout 값이 300ms로 지정되어있고 요청의 결과를 받기까지300ms이상 걸려서 timeout되었다.|
 | Failing node: /127.0.0.1:11211 | 해당 요청은 127.0.0.1:11211 에서 수행한다. |
 | [WRITING]	| 해당 요청은 socket write를 위해 대기 중이다. |
 | [READING]	| 해당 요청은 서버로 전달되었고 결과가 돌아오기를 기다리거나, 결과 값을 읽어 들이는 중이다. |
