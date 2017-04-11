@@ -91,7 +91,9 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 	 */
 	public void handleLine(String line) {
 		// Response header
-		getLogger().debug("Got line %s", line);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Got line %s", line);
+		}
 
 		if (line.startsWith("VALUE ") ||
 			line.startsWith("ELEMENTS ")) {
@@ -132,7 +134,9 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 			OperationStatus status = matchStatus(line, END, TRIMMED,
 					DUPLICATED, DUPLICATED_TRIMMED, OUT_OF_RANGE,
 					ATTR_MISMATCH, TYPE_MISMATCH, BKEY_MISMATCH);
-			getLogger().debug(status);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug(status);
+			}
 			getCallback().receivedStatus(status);
 			transitionState(OperationState.COMPLETE);
 			return;
@@ -227,16 +231,20 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 		// This will be the case, because we'll clear them when it's not.
 		assert readOffset <= data.length : "readOffset is " + readOffset
 				+ " data.length is " + data.length;
-
-		getLogger()
-				.debug("readOffset: %d, length: %d", readOffset, data.length);
+		
+		if (getLogger().isDebugEnabled()) {
+			getLogger()
+					.debug("readOffset: %d, length: %d", readOffset, data.length);
+		}
 
 		if (lookingFor == '\0') {
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
 			toRead = Math.min(toRead, available);
-
-			getLogger().debug("Reading %d bytes", toRead);
+			
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Reading %d bytes", toRead);
+			}
 
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;

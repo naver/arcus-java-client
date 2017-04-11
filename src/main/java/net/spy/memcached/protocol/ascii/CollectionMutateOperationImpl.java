@@ -95,8 +95,10 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 		} catch (NumberFormatException e) {
 			status = matchStatus(line, NOT_FOUND, NOT_FOUND_ELEMENT, TYPE_MISMATCH, BKEY_MISMATCH,
 					UNREADABLE, OVERFLOWED, OUT_OF_RANGE);
-
-			getLogger().debug(status);
+			
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug(status);
+			}
 			getCallback().receivedStatus(status);
 		}
 

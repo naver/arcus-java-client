@@ -146,7 +146,9 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
 			CloseUtil.close(bos);
 		}
 		byte[] rv=bos.toByteArray();
-		getLogger().debug("Compressed %d bytes to %d", in.length, rv.length);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Compressed %d bytes to %d", in.length, rv.length);
+		}
 		return rv;
 	}
 

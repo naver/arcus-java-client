@@ -1366,7 +1366,9 @@ public class MemcachedClient extends SpyThread
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Interrupted", e);
 		}
-		getLogger().debug("Mutation returned %s", rv);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Mutation returned %s", rv);
+		}
 		return rv.get();
 	}
 
@@ -1767,7 +1769,9 @@ public class MemcachedClient extends SpyThread
 		if(shuttingDown) {
 			// There are a couple types of errors that occur during the
 			// shutdown sequence that are considered OK.  Log at debug.
-			getLogger().debug("Exception occurred during shutdown", e);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Exception occurred during shutdown", e);
+			}
 		} else {
 			getLogger().warn("Problem handling memcached IO", e);
 		}

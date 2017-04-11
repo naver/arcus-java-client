@@ -95,7 +95,9 @@ abstract class OperationImpl extends BaseOperationImpl {
 			int toRead=MIN_RECV_PACKET - headerOffset;
 			int available=b.remaining();
 			toRead=Math.min(toRead, available);
-			getLogger().debug("Reading %d header bytes", toRead);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Reading %d header bytes", toRead);
+			}
 			b.get(header, headerOffset, toRead);
 			headerOffset+=toRead;
 
@@ -124,7 +126,9 @@ abstract class OperationImpl extends BaseOperationImpl {
 			int toRead=payload.length - payloadOffset;
 			int available=b.remaining();
 			toRead=Math.min(toRead, available);
-			getLogger().debug("Reading %d payload bytes", toRead);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Reading %d payload bytes", toRead);
+			}
 			b.get(payload, payloadOffset, toRead);
 			payloadOffset+=toRead;
 
@@ -134,8 +138,10 @@ abstract class OperationImpl extends BaseOperationImpl {
 			}
 		} else {
 			// Haven't read enough to make up a payload.  Must read more.
-			getLogger().debug("Only read %d of the %d needed to fill a header",
-				headerOffset, MIN_RECV_PACKET);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Only read %d of the %d needed to fill a header",
+						headerOffset, MIN_RECV_PACKET);
+			}
 		}
 
 	}

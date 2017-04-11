@@ -99,7 +99,9 @@ public abstract class BaseOperationImpl extends SpyObject {
 	 * This is called on each subclass whenever an operation was cancelled.
 	 */
 	protected void wasCancelled() {
-		getLogger().debug("was cancelled.");
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("was cancelled.");
+		}
 	}
 
 	public final OperationState getState() {
@@ -141,7 +143,9 @@ public abstract class BaseOperationImpl extends SpyObject {
 	 * Transition the state of this operation to the given state.
 	 */
 	protected final void transitionState(OperationState newState) {
-		getLogger().debug("Transitioned state from %s to %s", state, newState);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Transitioned state from %s to %s", state, newState);
+		}
 		state=newState;
 		// Discard our buffer when we no longer need it.
 		if(state != OperationState.WRITING) {
@@ -149,8 +153,11 @@ public abstract class BaseOperationImpl extends SpyObject {
 		}
 		if(state == OperationState.COMPLETE) {
 		/* ENABLE_REPLICATION if */
-			if (moved)
-				getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
+			if (moved) {
+				if (getLogger().isDebugEnabled()) {
+					getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
+				}
+			}
 		/* ENABLE_REPLICATION end */
 			callback.complete();
 		}
