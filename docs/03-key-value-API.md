@@ -118,9 +118,19 @@ Future<Long> asyncDecr(String key, int by, long def, int exp)
 
 ### Key-Value Item 삭제
 
+하나의 key에 대한 item을 삭제하는 API와
+여러 key들의 item들을 한번에 삭제하는 bulk API를 제공한다.
+
 ```java
 Future<Boolean> delete(String key)
 ```
 
 - 주어진 key를 가진 item을 cache에서 삭제한다.
- 
+
+```java
+Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key)
+Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key)
+```
+
+- 다수의 key-value item을 한번에 delete한다.
+- 다수 key들은 String 유형의 List이거나 String 유형의 나열된 key 목록일 수 있다.

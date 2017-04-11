@@ -83,6 +83,16 @@ class BulkService extends SpyObject {
 		return task;
 	}
 
+	<T> Future<Map<String, CollectionOperationStatus>> deleteBulk(
+			List<String> keys, ArcusClient[] client) {
+		assert !executor.isShutdown() : "Pool has already shut down.";
+		BulkDeleteWorker<T> w = new BulkDeleteWorker<T>(keys, client, singleOpTimeout);
+		BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
+				w);
+		executor.submit(task);
+		return task;
+	}
+	
 	void shutdown() {
 		try {
 			executor.shutdown();
@@ -269,6 +279,46 @@ class BulkService extends SpyObject {
 				errorList.put(keys.get(index), new CollectionOperationStatus(
 						false, e.getMessage(), CollectionResponse.EXCEPTION));
 			}
+		}
+	}
+
+	/**
+	 * Bulk delete operation worker
+	 */
+	private static class BulkDeleteWorker<T> extends BulkWorker<T> {
+		private final List<String> keys;
+
+		public BulkDeleteWorker(List<String> keys, ArcusClient[] clientList, long timeout) {
+			super(keys.size(), timeout, null, clientList);
+			this.keys = keys;
+		}
+
+		@Override
+		public Future<Boolean> processItem(int index) {
+			return clientList[index % clientList.length].delete(keys.get(index));
+		}
+
+		@Override
+		public void awaitProcessResult(int index) {
+			try {
+				boolean success = future.get(index).get(operationTimeout,
+						TimeUnit.MILLISECONDS);
+				if (!success) {
+					errorList.put(
+							keys.get(index),
+							new CollectionOperationStatus(false, String
+									.valueOf(success), CollectionResponse.END));
+				}
+			} catch (Exception e) {
+				future.get(index).cancel(true);
+				errorList.put(keys.get(index), new CollectionOperationStatus(
+						false, e.getMessage(), CollectionResponse.EXCEPTION));
+			}
+		}
+
+		@Override
+		public boolean isDataExists() {
+			return (keys != null && keys.size() > 0);
 		}
 	}
 }
