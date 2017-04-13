@@ -66,7 +66,7 @@ public class OperationFuture<T> implements Future<T> {
 			return get(timeout, TimeUnit.MILLISECONDS);
 		} catch (TimeoutException e) {
 			throw new RuntimeException(
-				"Timed out waiting for operation. >" + timeout, e);
+				"Timed out waiting for operation. >" + timeout + " " + TimeUnit.MILLISECONDS, e);
 		}
 	}
 
@@ -76,7 +76,7 @@ public class OperationFuture<T> implements Future<T> {
 			// whenever timeout occurs, continuous timeout counter will increase by 1.
 			MemcachedConnection.opTimedOut(op);
 			throw new CheckedOperationTimeoutException(
-					"Timed out waiting for operation. >" + duration, op);
+					"Timed out waiting for operation. >" + duration + " " + units, op);
 		} else {
 			// continuous timeout counter will be reset
 		    MemcachedConnection.opSucceeded(op);

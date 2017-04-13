@@ -1692,7 +1692,7 @@ public class MemcachedClient extends SpyThread
 						MemcachedConnection.opTimedOut(op);
 					}
 					throw new CheckedOperationTimeoutException(
-							"Timed out waiting for operation. >" + duration, ops);
+							"Timed out waiting for operation. >" + duration + " " + units, ops);
 				} else {
 					// continuous timeout counter will be reset
 					for (Operation op : ops) {
