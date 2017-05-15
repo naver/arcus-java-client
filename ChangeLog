@@ -1,3 +1,8 @@
+2017-05-15 [version 1.10.1-SNAPSHOT]
+	* [Fix] Add the missed response handling in asyncBopExtendedGet.
+	   - Add default handling for error response such as OUT_OF_RANGE.
+	* [Enhance] Add the time unit in operation timeout messages.
+
 2017-03-24 [version 1.10.0]
 	* [Feature] Add a map collection type.
 	* [Cleanup] Separate CacheMonitor ZK watcher from CacheManager.
