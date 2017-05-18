@@ -61,7 +61,9 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 	@Override
 	public void handleLine(String line) {
 		if (line.startsWith("ATTR ")) {
-			getLogger().debug("Got line %s", line);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Got line %s", line);
+			}
 
 			String[] stuff = line.split(" ");
 

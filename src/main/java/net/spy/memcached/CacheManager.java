@@ -252,8 +252,10 @@ public class CacheManager extends SpyThread implements Watcher,
 					getLogger().warn("Reconnected to the Arcus admin. " + getInfo());
 				} else {
 					zkInitLatch.countDown();
-					getLogger().debug("cm is null, servicecode : %s, state:%s, type:%s",
-									serviceCode, event.getState(), event.getType());
+					if (getLogger().isDebugEnabled()) {
+						getLogger().debug("cm is null, servicecode : %s, state:%s, type:%s",
+								serviceCode, event.getState(), event.getType());
+					}
 				}
 				break;
 			case Disconnected:

@@ -163,7 +163,9 @@ public final class MemcachedConnection extends SpyObject {
 				}
 			}
 		}
-		getLogger().debug("Checked the selectors.");
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Checked the selectors.");
+		}
 		return true;
 	}
 
@@ -178,7 +180,9 @@ public final class MemcachedConnection extends SpyObject {
 		// Deal with all of the stuff that's been added, but may not be marked
 		// writable.
 		handleInputQueue();
-		getLogger().debug("Done dealing with queue.");
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Done dealing with queue.");
+		}
 
 		long delay=0;
 		if(!reconnectQueue.isEmpty()) {
@@ -186,14 +190,18 @@ public final class MemcachedConnection extends SpyObject {
 			long then=reconnectQueue.firstKey();
 			delay=Math.max(then-now, 1);
 		}
-		getLogger().debug("Selecting with delay of %sms", delay);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Selecting with delay of %sms", delay);
+		}
 		assert selectorsMakeSense() : "Selectors don't make sense.";
 		int selected=selector.select(delay);
 		Set<SelectionKey> selectedKeys=selector.selectedKeys();
 
 		if(selectedKeys.isEmpty() && !shutDown) {
-			getLogger().debug("No selectors ready, interrupted: "
-					+ Thread.interrupted());
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("No selectors ready, interrupted: "
+						+ Thread.interrupted());
+			}
 			if(++emptySelects > DOUBLE_CHECK_EMPTY) {
 				for(SelectionKey sk : selector.keys()) {
 					getLogger().info("%s has %s, interested in %s",
@@ -209,8 +217,10 @@ public final class MemcachedConnection extends SpyObject {
 					: "Too many empty selects";
 			}
 		} else {
-			getLogger().debug("Selected %d, selected %d keys",
-					selected, selectedKeys.size());
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Selected %d, selected %d keys",
+						selected, selectedKeys.size());
+			}
 			emptySelects=0;
 
 			for(SelectionKey sk : selectedKeys) {
@@ -268,8 +278,10 @@ public final class MemcachedConnection extends SpyObject {
 				
 				List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
 				
-				ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
-				ArcusClient.arcusLogger.debug("Old group nodes : [" + entry.getValue() + "]");
+				if (getLogger().isDebugEnabled()) {
+					ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
+					ArcusClient.arcusLogger.debug("Old group nodes : [" + entry.getValue() + "]");
+				}
 
 				if (newGroupAddrs == null) {
 					/* Old group nodes have disappered. Remove the old group nodes. */
@@ -642,7 +654,9 @@ public final class MemcachedConnection extends SpyObject {
 				if(qa.isActive()) {
 					if(qa.getCurrentWriteOp() != null) {
 						readyForIO=true;
-						getLogger().debug("Handling queued write %s", qa);
+						if (getLogger().isDebugEnabled()) {
+							getLogger().debug("Handling queued write %s", qa);
+						}
 					}
 				} else {
 					toAdd.add(qa);
@@ -703,10 +717,12 @@ public final class MemcachedConnection extends SpyObject {
 	private void handleIO(SelectionKey sk) {
 		MemcachedNode qa=(MemcachedNode)sk.attachment();
 		try {
-			getLogger().debug(
-					"Handling IO for:  %s (r=%s, w=%s, c=%s, op=%s)",
-					sk, sk.isReadable(), sk.isWritable(),
-					sk.isConnectable(), sk.attachment());
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug(
+						"Handling IO for:  %s (r=%s, w=%s, c=%s, op=%s)",
+						sk, sk.isReadable(), sk.isWritable(),
+						sk.isConnectable(), sk.attachment());
+			}
 			if(sk.isConnectable()) {
 				getLogger().info("Connection state changed for %s", sk);
 				final SocketChannel channel=qa.getChannel();

@@ -79,7 +79,9 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 	}
 
 	public void handleLine(String line) {
-		getLogger().debug("Got line %s", line);
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("Got line %s", line);
+		}
 
 		if (line.startsWith("VALUE ")) {
 			readKey(line);

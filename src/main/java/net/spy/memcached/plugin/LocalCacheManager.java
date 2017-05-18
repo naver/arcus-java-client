@@ -111,7 +111,9 @@ public class LocalCacheManager {
 		Element element = cache.get(key);
 		if (logger.isDebugEnabled()) {
 			if (null != element) {
-				logger.debug("ArcusFrontCache: local cache hit for %s", key);
+				if (logger.isDebugEnabled()) {
+					logger.debug("ArcusFrontCache: local cache hit for %s", key);
+				}
 			}
 		}
 		return element;

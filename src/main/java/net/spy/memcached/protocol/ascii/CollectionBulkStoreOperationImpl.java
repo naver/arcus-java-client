@@ -104,7 +104,9 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 			transitionState(OperationState.COMPLETE);
 			return;
 		} else if (line.startsWith("RESPONSE ")) {
-			getLogger().debug("Got line %s", line);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Got line %s", line);
+			}
 
 			// TODO server should be fixed
 			line = line.replace("   ", " ");

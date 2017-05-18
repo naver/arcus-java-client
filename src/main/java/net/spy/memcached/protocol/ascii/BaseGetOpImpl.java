@@ -45,12 +45,16 @@ abstract class BaseGetOpImpl extends OperationImpl {
 	@Override
 	public final void handleLine(String line) {
 		if(line.equals("END")) {
-			getLogger().debug("Get complete!");
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Get complete!");
+			}
 			getCallback().receivedStatus(END);
 			transitionState(OperationState.COMPLETE);
 			data=null;
 		} else if(line.startsWith("VALUE ")) {
-			getLogger().debug("Got line %s", line);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Got line %s", line);
+			}
 			String[] stuff=line.split(" ");
 			assert stuff[0].equals("VALUE");
 			currentKey=stuff[1];
@@ -60,7 +64,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
 				casValue=Long.parseLong(stuff[4]);
 			}
 			readOffset=0;
-			getLogger().debug("Set read type to data");
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Set read type to data");
+			}
 			setReadType(OperationReadType.DATA);
 		} else {
 			assert false : "Unknown line type: " + line;
@@ -74,15 +80,19 @@ abstract class BaseGetOpImpl extends OperationImpl {
 		// This will be the case, because we'll clear them when it's not.
 		assert readOffset <= data.length
 			: "readOffset is " + readOffset + " data.length is " + data.length;
-
-		getLogger().debug("readOffset: %d, length: %d",
-				readOffset, data.length);
+		
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug("readOffset: %d, length: %d",
+					readOffset, data.length);
+		}
 		// If we're not looking for termination, we're still looking for data
 		if(lookingFor == '\0') {
 			int toRead=data.length - readOffset;
 			int available=b.remaining();
 			toRead=Math.min(toRead, available);
-			getLogger().debug("Reading %d bytes", toRead);
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Reading %d bytes", toRead);
+			}
 			b.get(data, readOffset, toRead);
 			readOffset+=toRead;
 		}
@@ -121,7 +131,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
 				data=null;
 				readOffset=0;
 				currentFlags=0;
-				getLogger().debug("Setting read type back to line.");
+				if (getLogger().isDebugEnabled()) {
+					getLogger().debug("Setting read type back to line.");
+				}
 				setReadType(OperationReadType.LINE);
 			}
 		}

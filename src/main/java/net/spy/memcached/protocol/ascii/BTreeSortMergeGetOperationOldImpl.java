@@ -205,8 +205,10 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 			int toRead = data.length - readOffset;
 			int available = bb.remaining();
 			toRead = Math.min(toRead, available);
-
-			getLogger().debug("Reading %d bytes", toRead);
+			
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug("Reading %d bytes", toRead);
+			}
 
 			bb.get(data, readOffset, toRead);
 			readOffset += toRead;

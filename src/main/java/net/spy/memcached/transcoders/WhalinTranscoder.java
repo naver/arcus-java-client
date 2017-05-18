@@ -158,8 +158,10 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
 		if(b.length > compressionThreshold) {
 			byte[] compressed=compress(b);
 			if(compressed.length < b.length) {
-				getLogger().debug("Compressed %s from %d to %d",
-						o.getClass().getName(), b.length, compressed.length);
+				if (getLogger().isDebugEnabled()) {
+					getLogger().debug("Compressed %s from %d to %d",
+							o.getClass().getName(), b.length, compressed.length);
+				}
 				b=compressed;
 				flags |= COMPRESSED;
 			} else {
