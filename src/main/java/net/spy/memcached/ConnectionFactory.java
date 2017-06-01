@@ -211,6 +211,11 @@ public interface ConnectionFactory {
 	 * get max smget key chunk size
 	 */
 	int getDefaultMaxSMGetKeyChunkSize();
+
+	/**
+	 * get delimiter
+	 */
+	byte getDelimiter();
 	/* ENABLE_REPLICATION if */
 
 	/**

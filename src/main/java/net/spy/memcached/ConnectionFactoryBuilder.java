@@ -82,6 +82,7 @@ public class ConnectionFactoryBuilder {
 	private long bulkServiceSingleOpTimeout = DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
 	
 	private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
+	private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
 	
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled = false;
@@ -375,6 +376,14 @@ public class ConnectionFactoryBuilder {
 		return this;
 	}
 
+	/**
+	 * Set delimiter to separate key and prefix
+	 */
+	public ConnectionFactoryBuilder setDelimiter(byte to) {
+	    delimiter = to;
+	    return this;
+	}
+
 	/* ENABLE_REPLICATION if */
 	/**
 	 * Set read prioirty for choosing replica node to read data
@@ -619,6 +628,11 @@ public class ConnectionFactoryBuilder {
 			@Override
 			public int getDefaultMaxSMGetKeyChunkSize() {
 				return maxSMGetChunkSize;
+			}
+
+			@Override
+			public byte getDelimiter() {
+				return delimiter;
 			}
 			/* ENABLE_REPLICATION if */
 

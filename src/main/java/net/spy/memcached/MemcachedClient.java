@@ -137,6 +137,8 @@ public class MemcachedClient extends SpyThread
 
 	final AuthDescriptor authDescriptor;
 
+	private final byte delimiter;
+
 	private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
 
 	/**
@@ -194,6 +196,7 @@ public class MemcachedClient extends SpyThread
 		if(authDescriptor != null) {
 			addObserver(this);
 		}
+		delimiter = cf.getDelimiter();
 		setName("Memcached IO over " + conn);
 		setDaemon(cf.isDaemon());
 		start();
@@ -260,6 +263,8 @@ public class MemcachedClient extends SpyThread
 	}
 
 	protected void validateKey(String key) {
+		boolean hasPrefix = false;
+
 		byte[] keyBytes=KeyUtil.getKeyBytes(key);
 		if(keyBytes.length > MAX_KEY_LENGTH) {
 			throw new IllegalArgumentException("Key is too long (maxlen = "
@@ -274,6 +279,25 @@ public class MemcachedClient extends SpyThread
 			if(b == ' ' || b == '\n' || b == '\r' || b == 0) {
 				throw new IllegalArgumentException(
 					"Key contains invalid characters:  ``" + key + "''");
+			}
+			if(b == delimiter)
+				hasPrefix = true;
+		}
+
+		// Validate the prefix
+		if(hasPrefix) {
+			if(keyBytes[0] == '-') {
+				throw new IllegalArgumentException(
+					"Key contains invalid prefix: ``" + key + "''");
+			}
+			for(byte b : keyBytes) {
+				if(b == delimiter) break;
+				if(!(('a' <= b && b <= 'z') || ('A' <= b && b <= 'Z') ||
+					('0' <= b && b <= '9') ||
+					(b == '_') || (b == '-') || (b == '+') || (b == '.'))) {
+					throw new IllegalArgumentException(
+						"Key contains invalid prefix: ``" + key + "''");
+				}
 			}
 		}
 	}
