@@ -162,6 +162,11 @@ public class DefaultConnectionFactory extends SpyObject
      * Max smget key chunk size per request
      */
     public static final int DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE = 500;
+
+    /**
+     * The default delimiter that separates the key and prefix
+     */
+    public static final byte DEFAULT_DELIMITER = ':';
     
 	private final int opQueueLen;
 	private final int readBufSize;
@@ -462,6 +467,16 @@ public class DefaultConnectionFactory extends SpyObject
 	public int getDefaultMaxSMGetKeyChunkSize() { 
 		return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see net.spy.memcached.ConnectionFactory#getDelimiter()
+	 */
+	@Override
+	public byte getDelimiter() {
+	    return DEFAULT_DELIMITER;
+	}
+
 	/* ENABLE_REPLICATION if */
 
 	/*

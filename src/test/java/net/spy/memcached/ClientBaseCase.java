@@ -239,7 +239,12 @@ public abstract class ClientBaseCase extends TestCase {
 				public int getDefaultMaxSMGetKeyChunkSize() {
 					return inner.getDefaultMaxSMGetKeyChunkSize();
 				}
-				
+
+				@Override
+				public byte getDelimiter() {
+					return inner.getDelimiter();
+				}
+
 				/* ENABLE_REPLICATION if */
 
 				@Override
