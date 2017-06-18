@@ -45,7 +45,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 
 #### pom.xml
 
-프로젝트가 생성되면 Arcus 클라이언트를 pom.xml에서 참조하도록 변경합니다.
+프로젝트가 생성되면 pom.xml에서 Arcus 클라이언트를 참조하도록 변경합니다.
 
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -273,7 +273,7 @@ public class HelloArcus {
 #### 테스트
 
 위 예제는 127.0.0.1:2181 에 ZooKeeper 가 작동하고 있고 memcached 서버가 구동하고 있다고 가정합니다.
-아직 준비 않되어 있다면 다음 페이지 Running Test Cases 를 따라 준비합니다.
+아직 준비가 안 되어 있다면, 다음 페이지 Running Test Cases 를 따라 준비합니다.
 
 https://github.com/naver/arcus-java-client/blob/master/README.md
 
