@@ -1048,24 +1048,24 @@ public class ArcusClientPool implements ArcusClientIF {
 
 	@Override
 	public CollectionFuture<Long> asyncBopDecr(String key, long subkey, int by) {
-		return this.getClient().asyncBopIncr(key, subkey, by);
+		return this.getClient().asyncBopDecr(key, subkey, by);
 	}
 
 	@Override
 	public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by) {
-		return this.getClient().asyncBopIncr(key, subkey, by);
+		return this.getClient().asyncBopDecr(key, subkey, by);
 	}
 
 	@Override
 	public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
 			int by, long initial, byte[] eFlag) {
-		return this.getClient().asyncBopIncr(key, subkey, by, initial, eFlag);
+		return this.getClient().asyncBopDecr(key, subkey, by, initial, eFlag);
 	}
 
 	@Override
 	public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
 			int by, long initial, byte[] eFlag) {
-		return this.getClient().asyncBopIncr(key, subkey, by, initial, eFlag);
+		return this.getClient().asyncBopDecr(key, subkey, by, initial, eFlag);
 	}
 
 	@Override
