@@ -5,8 +5,8 @@ Item attributes의 기본 설명은 [Arcus cache server의 item attributes 부�
 
 Item attributes를 변경하거나 조회하는 함수들을 설명한다.
 
-- [Attribute 변경](07-attribute-API.md#attribute-%EB%B3%80%EA%B2%BD)
-- [Attribute 조회](07-attribute-API.md#attribute-%EC%A1%B0%ED%9A%8C)
+- [Attribute 변경](08-attribute-API.md#attribute-%EB%B3%80%EA%B2%BD)
+- [Attribute 조회](08-attribute-API.md#attribute-%EC%A1%B0%ED%9A%8C)
 
 
 ### Attribute 변경
