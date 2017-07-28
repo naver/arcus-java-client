@@ -433,7 +433,7 @@ public class CacheManager extends SpyThread implements Watcher,
 		*/
 		/* ENABLE_REPLICATION end */
 
-		final CountDownLatch latch = new CountDownLatch(addrCount);
+		final CountDownLatch latch = new CountDownLatch(addrCount * poolSize);
 		final ConnectionObserver observer = new ConnectionObserver() {
 
 			@Override
@@ -451,7 +451,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
 		int _awaitTime = 0;
 		if (waitTimeForConnect == 0)
-			_awaitTime = 50 * addrCount;
+			_awaitTime = 50 * addrCount * poolSize;
 		else
 			_awaitTime = waitTimeForConnect;
 
