@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.util.BTreeUtil;
+import net.spy.memcached.collection.SMGetMode;
 
 public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 
@@ -28,7 +29,7 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 	protected String str;
 
 	protected List<String> keyList;
-	private String spaceSeparatedKeys;
+	private String commaSeparatedKeys;
 	
 	protected int lenKeys;
 
@@ -59,9 +60,9 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 		this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 	}
 	
-	public String getSpaceSeparatedKeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
+	public String getCommaSeparatedKeys() {
+		if (commaSeparatedKeys != null) {
+			return commaSeparatedKeys;
 		}
 		
 		StringBuilder sb = new StringBuilder();
@@ -69,11 +70,11 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 		for (int i = 0; i < numkeys; i++) {
 			sb.append(keyList.get(i));
 			if ((i + 1) < numkeys) {
-				sb.append(" ");
+				sb.append(",");
 			}
 		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
+		commaSeparatedKeys = sb.toString();
+		return commaSeparatedKeys;
 	}
 	
 	public String getRepresentKey() {
@@ -93,7 +94,7 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 
 		StringBuilder b = new StringBuilder();
 
-		b.append(getSpaceSeparatedKeys().length());
+		b.append(getCommaSeparatedKeys().length());
 		b.append(" ").append(keyList.size());
 		b.append(" ").append(range);
 		

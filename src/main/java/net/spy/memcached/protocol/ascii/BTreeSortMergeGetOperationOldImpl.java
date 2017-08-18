@@ -282,11 +282,11 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 		String args = smGet.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ KeyUtil.getKeyBytes(smGet.getSpaceSeparatedKeys()).length + 16);
+				+ KeyUtil.getKeyBytes(smGet.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 
-		setArguments(bb, smGet.getSpaceSeparatedKeys());
+		setArguments(bb, smGet.getCommaSeparatedKeys());
 
 		bb.flip();
 		setBuffer(bb);

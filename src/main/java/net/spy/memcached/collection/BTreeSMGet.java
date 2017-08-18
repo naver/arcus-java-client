@@ -22,7 +22,7 @@ public interface BTreeSMGet<T> {
 
 	public int headerCount = 4;
 	
-	public String getSpaceSeparatedKeys();
+	public String getCommaSeparatedKeys();
 
 	public String getRepresentKey();
 

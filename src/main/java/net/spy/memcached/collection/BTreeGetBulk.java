@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface BTreeGetBulk<T> {
 	
-	public String getSpaceSeparatedKeys();
+	public String getCommaSeparatedKeys();
 
 	public String getRepresentKey();
 

@@ -28,7 +28,7 @@ public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
 	protected String str;
 
 	protected List<String> keyList;
-	private String spaceSeparatedKeys;
+	private String commaSeparatedKeys;
 	
 	protected int lenKeys;
 
@@ -61,9 +61,9 @@ public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
 		this.reverse = (from > to);
 	}
 	
-	public String getSpaceSeparatedKeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
+	public String getCommaSeparatedKeys() {
+		if (commaSeparatedKeys != null) {
+			return commaSeparatedKeys;
 		}
 		
 		StringBuilder sb = new StringBuilder();
@@ -71,11 +71,11 @@ public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
 		for (int i = 0; i < numkeys; i++) {
 			sb.append(keyList.get(i));
 			if ((i + 1) < numkeys) {
-				sb.append(" ");
+				sb.append(",");
 			}
 		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
+		commaSeparatedKeys = sb.toString();
+		return commaSeparatedKeys;
 	}
 	
 	public String getRepresentKey() {
@@ -95,7 +95,7 @@ public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
 
 		StringBuilder b = new StringBuilder();
 
-		b.append(getSpaceSeparatedKeys().length());
+		b.append(getCommaSeparatedKeys().length());
 		b.append(" ").append(keyList.size());
 		b.append(" ").append(range);
 

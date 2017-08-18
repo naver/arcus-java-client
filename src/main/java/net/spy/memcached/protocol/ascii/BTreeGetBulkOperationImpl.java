@@ -228,11 +228,11 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 		String args = getBulk.stringify();
 
 		ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
-				+ KeyUtil.getKeyBytes(getBulk.getSpaceSeparatedKeys()).length + 16);
+				+ KeyUtil.getKeyBytes(getBulk.getCommaSeparatedKeys()).length + 16);
 
 		setArguments(bb, cmd, args);
 
-		setArguments(bb, getBulk.getSpaceSeparatedKeys());
+		setArguments(bb, getBulk.getCommaSeparatedKeys());
 
 		bb.flip();
 		setBuffer(bb);
