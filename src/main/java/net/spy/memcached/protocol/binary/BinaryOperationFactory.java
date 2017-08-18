@@ -89,6 +89,7 @@ import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
 
+
 /**
  * Factory for binary operations.
  */
@@ -114,6 +115,17 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 	public GetsOperation gets(String key, GetsOperation.Callback cb) {
 		return new GetOperationImpl(key, cb);
 	}
+
+	public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
+		throw new RuntimeException(
+				"mget is not supported in binary protocol yet.");
+	}
+
+	public GetsOperation mgets(String key, GetsOperation.Callback cb) {
+		throw new RuntimeException(
+				"mgets is not supported in binary protocol yet.");
+	}
+
 
 	public MutatorOperation mutate(Mutator m, String key, int by,
 			long def, int exp, OperationCallback cb) {

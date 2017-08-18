@@ -167,6 +167,33 @@ public class ArcusClientPool implements ArcusClientIF {
 		return this.getClient().asyncGets(key);
 	}
 
+	public <T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys,
+													   Iterator<Transcoder<T>> tcs) {
+		return this.getClient().asyncMGet(keys, tcs);
+	}
+
+	public <T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys,
+													   Transcoder<T> tc) {
+		return this.getClient().asyncMGet(keys, tc);
+	}
+
+	public BulkFuture<Map<String, Object>> asyncMGet(Collection<String> keys) {
+		return this.getClient().asyncMGet(keys);
+	}
+
+	public <T> BulkFuture<Map<String, T>> asyncMGet(Transcoder<T> tc,
+													   String... keys) {
+		return this.getClient().asyncMGet(tc, keys);
+	}
+
+	public <T> Future<CASValue<T>> asyncMGets(String key, Transcoder<T> tc) {
+		return this.getClient().asyncMGets(key, tc);
+	}
+
+	public Future<CASValue<Object>> asyncMGets(String key) {
+		return this.getClient().asyncMGets(key);
+	}
+
 	public <T> CASValue<T> gets(String key, Transcoder<T> tc)
 			throws OperationTimeoutException {
 		return this.getClient().gets(key, tc);
