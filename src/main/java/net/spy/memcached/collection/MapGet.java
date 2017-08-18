@@ -24,7 +24,7 @@ public class MapGet extends CollectionGet {
 
 	protected List<String> mkeyList;
 	protected byte[] data;
-	private String commaSeparatedKeys;
+	private String spaceSeparatedKeys;
 	protected byte[] additionalArgs;
 
 	public MapGet(List<String> mkeyList, boolean delete) {
@@ -34,7 +34,7 @@ public class MapGet extends CollectionGet {
 		if (mkeyList.size() == 0) {
 			this.additionalArgs = null;
 		} else {
-			this.additionalArgs = getCommaSeparatedMkeys().getBytes();
+			this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
 		}
 	}
 
@@ -43,9 +43,9 @@ public class MapGet extends CollectionGet {
 		this.dropIfEmpty = dropIfEmpty;
 	}
 
-	public String getCommaSeparatedMkeys() {
-		if (commaSeparatedKeys != null) {
-			return commaSeparatedKeys;
+	public String getSpaceSeparatedMkeys() {
+		if (spaceSeparatedKeys != null) {
+			return spaceSeparatedKeys;
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -53,11 +53,11 @@ public class MapGet extends CollectionGet {
 		for (int i = 0; i < numkeys; i++) {
 			sb.append(mkeyList.get(i));
 			if ((i + 1) < numkeys) {
-				sb.append(",");
+				sb.append(" ");
 			}
 		}
-		commaSeparatedKeys = sb.toString();
-		return commaSeparatedKeys;
+		spaceSeparatedKeys = sb.toString();
+		return spaceSeparatedKeys;
 	}
 
 	@Override
