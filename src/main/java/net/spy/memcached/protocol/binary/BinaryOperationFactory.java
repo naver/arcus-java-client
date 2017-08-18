@@ -115,6 +115,11 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 		return new GetOperationImpl(key, cb);
 	}
 
+	public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
+		throw new RuntimeException(
+				"mget is not supported in binary protocol yet.");
+	}
+
 	public MutatorOperation mutate(Mutator m, String key, int by,
 			long def, int exp, OperationCallback cb) {
 		return new MutatorOperationImpl(m, key, by, def, exp, cb);
