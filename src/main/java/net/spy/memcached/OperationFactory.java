@@ -133,6 +133,7 @@ public interface OperationFactory {
 	 */
 	GetsOperation gets(String key, GetsOperation.Callback callback);
 
+
 	/**
 	 * Create a get operation.
 	 *

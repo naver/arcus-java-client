@@ -88,10 +88,9 @@ Future<Map<String,Object>> asyncMGet(Collection<String> keys)
 Future<Map<String,Object>> asyncMGet(String... keys)
 ```
 
-- 다수 key들에 저장된 value를 Map<String, Object) 형태로 반환한다.
+- 다수 key들에 저장된 value를 Map<String, Object> 형태로 반환한다.
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
-- asyncGetBulk는 Command와 Key List를 한 줄에 입력하는 방식이고 asyncMGet은 Command와 Key List를 분리하여 두 줄로 입력하는 방식이다.
-- 현재 asyncMGet에 최적화되어 있다.
+- 다수 key들을 조회하는 API는 asyncMGet에 최적화되어 있다.
 
 
 ### Key-Value Item 값의 증감

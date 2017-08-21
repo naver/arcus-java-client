@@ -171,8 +171,7 @@ public class ArcusClientPool implements ArcusClientIF {
 		return this.getClient().asyncMGet(keys, tcs);
 	}
 
-	public <T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys,
-													   Transcoder<T> tc) {
+	public <T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys, Transcoder<T> tc) {
 		return this.getClient().asyncMGet(keys, tc);
 	}
 
@@ -180,8 +179,7 @@ public class ArcusClientPool implements ArcusClientIF {
 		return this.getClient().asyncMGet(keys);
 	}
 
-	public <T> BulkFuture<Map<String, T>> asyncMGet(Transcoder<T> tc,
-													   String... keys) {
+	public <T> BulkFuture<Map<String, T>> asyncMGet(Transcoder<T> tc, String... keys) {
 		return this.getClient().asyncMGet(tc, keys);
 	}
 

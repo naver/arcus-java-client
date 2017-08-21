@@ -1,5 +1,3 @@
-// Copyright (c) 2006  Dustin Sallings <dustin@spy.net>
-
 package net.spy.memcached.protocol.ascii;
 
 import net.spy.memcached.ops.APIType;
