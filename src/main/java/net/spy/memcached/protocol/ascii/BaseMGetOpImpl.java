@@ -134,10 +134,29 @@ abstract class BaseMGetOpImpl extends OperationImpl {
 		int numKeys = keys.size();
 		int lenKeys;
 
+		String keysString = generateKeysString();
+		byte[] keysLine = keysString.getBytes();
+		lenKeys = keysLine.length;
+
+		// make command line
+		String commandString = cmd + ' ' + String.valueOf(lenKeys) + ' ' + String.valueOf(numKeys) + new String(RN_BYTES);
+		byte[] commandLine = commandString.getBytes();
+
+		size += commandLine.length;
+		size += lenKeys;
+
+		ByteBuffer b=ByteBuffer.allocate(size);
+		b.put(commandLine);
+		b.put(keysLine);
+		b.flip();
+		setBuffer(b);
+	}
+
+	private String generateKeysString() {
 		StringBuilder keyString = new StringBuilder();
 		Iterator<String> iterator = keys.iterator();
 
-		// make 2nd command line
+		// make keys line
 		while(true) {
 			keyString.append(iterator.next());
 			if(iterator.hasNext()) {
@@ -147,21 +166,8 @@ abstract class BaseMGetOpImpl extends OperationImpl {
 				break;
 			}
 		}
-		byte[] secondLine = keyString.toString().getBytes();
-		lenKeys = secondLine.length;
 
-		//make 1st command line
-		String commandString = cmd + ' ' + String.valueOf(lenKeys) + ' ' + String.valueOf(numKeys) + new String(RN_BYTES);
-		byte[] firstLine = commandString.getBytes();
-
-		size += firstLine.length;
-		size += lenKeys;
-
-		ByteBuffer b=ByteBuffer.allocate(size);
-		b.put(firstLine);
-		b.put(secondLine);
-		b.flip();
-		setBuffer(b);
+		return keyString.toString();
 	}
 
 	@Override

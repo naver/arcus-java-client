@@ -1349,37 +1349,6 @@ public class MemcachedClient extends SpyThread
 		return asyncMGet(Arrays.asList(keys), transcoder);
 	}
 
-	public <T> Future<CASValue<T>> asyncMGets(final String key,
-											 final Transcoder<T> tc) {
-
-		final CountDownLatch latch=new CountDownLatch(1);
-		final OperationFuture<CASValue<T>> rv=
-				new OperationFuture<CASValue<T>>(latch, operationTimeout);
-
-		Operation op=opFact.mgets(key,
-				new GetsOperation.Callback() {
-					private CASValue<T> val=null;
-					public void receivedStatus(OperationStatus status) {
-						rv.set(val);
-					}
-					public void gotData(String k, int flags, long cas, byte[] data) {
-						assert key.equals(k) : "Wrong key returned";
-						assert cas > 0 : "CAS was less than zero:  " + cas;
-						val=new CASValue<T>(cas, tc.decode(
-								new CachedData(flags, data, tc.getMaxSize())));
-					}
-					public void complete() {
-						latch.countDown();
-					}});
-		rv.setOperation(op);
-		addOp(key, op);
-		return rv;
-	}
-
-	public Future<CASValue<Object>> asyncMGets(final String key) {
-		return asyncMGets(key, transcoder);
-	}
-
 	/**
 	 * Get the values for multiple keys from the cache.
 	 *
