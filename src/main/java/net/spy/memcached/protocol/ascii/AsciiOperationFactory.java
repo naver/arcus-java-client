@@ -112,6 +112,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 		 return new GetsOperationImpl(key, cb);
 	}
 
+	public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
+		return new MGetOperationImpl(keys, cb);
+	}
+
 	public MutatorOperation mutate(Mutator m, String key, int by,
 			long def, int exp, OperationCallback cb) {
 		return new MutatorOperationImpl(m, key, by, def, exp, cb);
