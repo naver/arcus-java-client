@@ -2,6 +2,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.Iterator;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.GetOperation;
@@ -17,7 +18,7 @@ import net.spy.memcached.ops.OperationType;
 abstract class BaseGetOpImpl extends OperationImpl {
 
 	private static final OperationStatus END = new OperationStatus(true, "END");
-	private static final byte[] RN_BYTES = "\r\n".getBytes();
+	private static final String RN_BYTES = "\r\n";
 	private final String cmd;
 	private final Collection<String> keys;
 	private String currentKey = null;
@@ -129,22 +130,69 @@ abstract class BaseGetOpImpl extends OperationImpl {
 
 	@Override
 	public final void initialize() {
-		// Figure out the length of the request
-		int size=6; // Enough for gets\r\n
-		Collection<byte[]> keyBytes=KeyUtil.getKeyBytes(keys);
-		for(byte[] k : keyBytes) {
-			size+=k.length;
-			size++;
+		int size;
+		StringBuilder commandBuilder = new StringBuilder();
+		byte[] commandLine;
+		ByteBuffer b;
+
+		String keysString = generateKeysString();
+
+		if(cmd.equals("get") || cmd.equals("gets")) {
+			// make command string, for example,
+			// "get <keys...>\r\n"
+			commandBuilder.append(cmd);
+			commandBuilder.append(' ');
+			commandBuilder.append(keysString);
+
+			commandLine = commandBuilder.toString().getBytes();
+			size = commandLine.length;
+
+			b = ByteBuffer.allocate(size);
+			b.put(commandLine);
+			b.flip();
+			setBuffer(b);
+		} else {
+			assert cmd.equals("mget") : "Unknown Command " + cmd;
+
+			int lenKeys = keysString.getBytes().length;
+			int numKeys = keys.size();
+
+			// make command string, for example,
+			// "mget <lenKeys> <numkeys>\r\n<keys>\r\n"
+			commandBuilder.append(cmd);
+			commandBuilder.append(' ');
+			commandBuilder.append(String.valueOf(lenKeys));
+			commandBuilder.append(' ');
+			commandBuilder.append(String.valueOf(numKeys));
+			commandBuilder.append(RN_BYTES);
+			commandBuilder.append(keysString);
+
+			commandLine = commandBuilder.toString().getBytes();
+			size = commandLine.length;
+
+			b = ByteBuffer.allocate(size);
+			b.put(commandLine);
+			b.flip();
+			setBuffer(b);
 		}
-		ByteBuffer b=ByteBuffer.allocate(size);
-		b.put(cmd.getBytes());
-		for(byte[] k : keyBytes) {
-			b.put((byte)' ');
-			b.put(k);
+	}
+
+	private String generateKeysString() {
+		StringBuilder keyString = new StringBuilder();
+		Iterator<String> iterator = keys.iterator();
+
+		// make keys line
+		while(true) {
+			keyString.append(iterator.next());
+			if(iterator.hasNext()) {
+				keyString.append(' ');
+			} else {
+				keyString.append(RN_BYTES);
+				break;
+			}
 		}
-		b.put(RN_BYTES);
-		b.flip();
-		setBuffer(b);
+
+		return keyString.toString();
 	}
 
 	@Override
