@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -64,6 +65,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private boolean shouldAuth=false;
 	private CountDownLatch authLatch;
 	private ArrayList<Operation> reconnectBlocked;
+	private String version=null;
+	private boolean enabledMGetOp=false;
 
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
@@ -543,6 +546,38 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final SelectionKey getSk() {
 		return sk;
 	}
+
+	/* (non-javadoc)
+	 * @see net.spy.memcached.MemcachedNode#setVersion(java.lang.String)
+	 */
+	public final void setVersion(String vr) {
+		version = vr;
+		setEnableMGetOp();
+	}
+
+	/* (non-javadoc)
+	 * @see net.spy.memcached.MemcachedNode#getVersion()
+	 */
+	public final String getVersion() { return version; }
+
+	/* (non-javadoc)
+	 * @see net.spy.memcached.MemcachedNode#setEnableMGetOp(java.lang.Boolean)
+	 */
+	private final void setEnableMGetOp() {
+		StringTokenizer tokens = new StringTokenizer(version,".");
+		String makedVersion = tokens.nextToken()+"."+tokens.nextToken();
+		double versionStandard = Double.parseDouble(makedVersion);
+		if (version.contains("E")) {
+			enabledMGetOp = versionStandard >= 0.7;
+		} else {
+			enabledMGetOp = versionStandard >= 1.11;
+		}
+	}
+
+	/* (non-javadoc)
+	 * @see net.spy.memcached.MemcachedNode#enabledMGetOp()
+	 */
+	public final boolean enabledMGetOp() { return enabledMGetOp; }
 
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#getBytesRemainingInBuffer()

@@ -105,16 +105,6 @@ public interface MemcachedClientIF {
 
 	BulkFuture<Map<String, Object>> asyncGetBulk(String... keys);
 
-	<T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys, Iterator<Transcoder<T>> tcs);
-
-	<T> BulkFuture<Map<String, T>> asyncMGet(Collection<String> keys, Transcoder<T> tc);
-
-	BulkFuture<Map<String, Object>> asyncMGet(Collection<String> keys);
-
-	<T> BulkFuture<Map<String, T>> asyncMGet(Transcoder<T> tc, String... keys);
-
-	BulkFuture<Map<String, Object>> asyncMGet(String... keys);
-
 	<T> Map<String, T> getBulk(Collection<String> keys, Transcoder<T> tc)
 		throws OperationTimeoutException;
 

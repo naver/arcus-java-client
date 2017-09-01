@@ -143,6 +143,12 @@ class MemcachedNodeROImpl implements MemcachedNode {
 		throw new UnsupportedOperationException();
 	}
 
+	public void setVersion(String vr) { throw new UnsupportedOperationException(); }
+
+	public String getVersion() { throw new UnsupportedOperationException(); }
+
+	public boolean enabledMGetOp() { throw new UnsupportedOperationException(); }
+
 	public void setupResend(boolean cancelWrite, String cause) {
 		throw new UnsupportedOperationException();
 	}
