@@ -18,7 +18,7 @@ import net.spy.memcached.ops.OperationType;
 abstract class BaseGetOpImpl extends OperationImpl {
 
 	private static final OperationStatus END = new OperationStatus(true, "END");
-	private static final String RN_BYTES = "\r\n";
+	private static final String RN_STRING = "\r\n";
 	private final String cmd;
 	private final Collection<String> keys;
 	private String currentKey = null;
@@ -143,14 +143,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
 			commandBuilder.append(cmd);
 			commandBuilder.append(' ');
 			commandBuilder.append(keysString);
-
-			commandLine = commandBuilder.toString().getBytes();
-			size = commandLine.length;
-
-			b = ByteBuffer.allocate(size);
-			b.put(commandLine);
-			b.flip();
-			setBuffer(b);
+			commandBuilder.append(RN_STRING);
 		} else {
 			assert cmd.equals("mget") : "Unknown Command " + cmd;
 
@@ -164,17 +157,18 @@ abstract class BaseGetOpImpl extends OperationImpl {
 			commandBuilder.append(String.valueOf(lenKeys));
 			commandBuilder.append(' ');
 			commandBuilder.append(String.valueOf(numKeys));
-			commandBuilder.append(RN_BYTES);
+			commandBuilder.append(RN_STRING);
 			commandBuilder.append(keysString);
-
-			commandLine = commandBuilder.toString().getBytes();
-			size = commandLine.length;
-
-			b = ByteBuffer.allocate(size);
-			b.put(commandLine);
-			b.flip();
-			setBuffer(b);
+			commandBuilder.append(RN_STRING);
 		}
+
+		commandLine = commandBuilder.toString().getBytes();
+		size = commandLine.length;
+
+		b = ByteBuffer.allocate(size);
+		b.put(commandLine);
+		b.flip();
+		setBuffer(b);
 	}
 
 	private String generateKeysString() {
@@ -187,7 +181,6 @@ abstract class BaseGetOpImpl extends OperationImpl {
 			if(iterator.hasNext()) {
 				keyString.append(' ');
 			} else {
-				keyString.append(RN_BYTES);
 				break;
 			}
 		}
