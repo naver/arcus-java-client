@@ -43,6 +43,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -51,6 +52,8 @@ import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
+import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationStatus;
 
 /**
  * Connection to a cluster of memcached servers.
@@ -89,7 +92,8 @@ public final class MemcachedConnection extends SpyObject {
 
 	private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
 	private final ConnectionFactory f;
-	
+	private Map<SocketAddress, String> versions = new ConcurrentHashMap<SocketAddress, String>();
+
 	/* ENABLE_REPLICATION if */
 	private boolean arcusReplEnabled;
 
@@ -592,9 +596,30 @@ public final class MemcachedConnection extends SpyObject {
 			getLogger().warn("new memcached socket error on initial connect");
 			queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
 		}
+		prepareVersionInfo(qa, sa);
 		return qa;
 	}
-	
+
+	private void prepareVersionInfo(final MemcachedNode node, final SocketAddress sa) {
+		Operation op=opFact.version(new OperationCallback() {
+			@Override
+			public void receivedStatus(OperationStatus status) {versions.put(sa, status.getMessage());}
+			@Override
+			public void complete() {setVersionInfo(node);}
+		});
+		addOperation(node,op);
+	}
+
+	private void setVersionInfo(MemcachedNode node) {
+		if (node.getVersion() == null) {
+			if (versions.containsKey(node.getSocketAddress())) {
+				node.setVersion(versions.remove(node.getSocketAddress()));
+			} else {
+				prepareVersionInfo(node, node.getSocketAddress());
+			}
+		}
+	}
+
 	public void putMemcachedQueue(String addrs) {
 		_nodeManageQueue.offer(addrs);
 	}	

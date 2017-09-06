@@ -109,6 +109,11 @@ public class MockMemcachedNode implements MemcachedNode {
 		// noop
 	}
 	public SelectionKey getSk() {return null;}
+	public void setVersion(String vr) {
+		// noop
+	}
+	public String getVersion() {return null;}
+	public boolean enabledMGetOp() {return false;}
 	public int getBytesRemainingToWrite() {return 0;}
 	public int writeSome() throws IOException {return 0;}
 	public void fixupOps() {

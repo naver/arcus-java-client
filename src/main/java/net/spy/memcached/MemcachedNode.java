@@ -185,6 +185,21 @@ public interface MemcachedNode {
 	SelectionKey getSk();
 
 	/**
+	 * Set the version information for this node.
+	 */
+	void setVersion(String vr);
+
+	/**
+	 * Get the version information from this node.
+	 */
+	String getVersion();
+
+	/**
+	 * Check the enable MGet operation.
+	 */
+	boolean enabledMGetOp();
+
+	/**
 	 * Get the number of bytes remaining to write.
 	 */
 	int getBytesRemainingToWrite();
