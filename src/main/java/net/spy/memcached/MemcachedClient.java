@@ -139,6 +139,8 @@ public class MemcachedClient extends SpyThread
 
 	private final byte delimiter;
 
+	private static final int GET_BULK_CHUNK_SIZE = 200;
+
 	private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
 
 	/**
@@ -1048,8 +1050,10 @@ public class MemcachedClient extends SpyThread
 		final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
 
 		// Break the gets down into groups by key
-		final Map<MemcachedNode, Collection<String>> chunks
-			=new HashMap<MemcachedNode, Collection<String>>();
+		final Map<MemcachedNode, List<Collection<String>>> chunks
+			=new HashMap<MemcachedNode, List<Collection<String>>>();
+		final Map<MemcachedNode, Integer> chunkCount
+			=new HashMap<MemcachedNode, Integer>();
 		final NodeLocator locator=conn.getLocator();
 		Iterator<String> key_iter=keys.iterator();
 		while (key_iter.hasNext() && tc_iter.hasNext()) {
@@ -1113,16 +1117,31 @@ public class MemcachedClient extends SpyThread
 				}
 			}
 			assert node != null : "Didn't find a node for " + key;
-			Collection<String> ks=chunks.get(node);
-			if(ks == null) {
-				ks=new ArrayList<String>();
-				chunks.put(node, ks);
+			List<Collection<String>> lks=chunks.get(node);
+			if(lks == null) {
+				lks=new ArrayList<Collection<String>>();
+				Collection<String> ts=new ArrayList<String>();
+				lks.add(0, ts);
+				chunks.put(node, lks);
+				chunkCount.put(node, 0);
 			}
+			if(lks.get(chunkCount.get(node)).size() >= GET_BULK_CHUNK_SIZE) {
+				int count=chunkCount.get(node)+1;
+				Collection<String> ts=new ArrayList<String>();
+				lks.add(count, ts);
+				chunkCount.put(node, count);
+			}
+			Collection<String> ks=lks.get(chunkCount.get(node));
 			ks.add(key);
 		}
 
-		final CountDownLatch latch=new CountDownLatch(chunks.size());
-		final Collection<Operation> ops=new ArrayList<Operation>(chunks.size());
+		int chunk_size = 0;
+		for(Map.Entry<MemcachedNode, Integer> counts
+				: chunkCount.entrySet()) {
+			chunk_size += counts.getValue()+1;
+		}
+		final CountDownLatch latch=new CountDownLatch(chunk_size);
+		final Collection<Operation> ops=new ArrayList<Operation>(chunk_size);
 
 		GetOperation.Callback cb=new GetOperation.Callback() {
 				public void receivedStatus(OperationStatus status) {
@@ -1142,20 +1161,17 @@ public class MemcachedClient extends SpyThread
 
 		// Now that we know how many servers it breaks down into, and the latch
 		// is all set up, convert all of these strings collections to operations
-		final Map<MemcachedNode, Operation> mops=
-			new HashMap<MemcachedNode, Operation>();
-
-		for(Map.Entry<MemcachedNode, Collection<String>> me
+		checkState();
+		for(Map.Entry<MemcachedNode, List<Collection<String>>> me
 				: chunks.entrySet()) {
 			MemcachedNode node = me.getKey();
-			Operation op = node.enabledMGetOp() ?
-					opFact.mget(me.getValue(), cb) : opFact.get(me.getValue(), cb);
-			mops.put(node, op);
-			ops.add(op);
+			for(int i=0; i <= chunkCount.get(node); i++) {
+				Operation op=node.enabledMGetOp() ?
+						opFact.mget(me.getValue().get(i), cb) : opFact.get(me.getValue().get(i), cb);
+				conn.addOperation(node, op);
+				ops.add(op);
+			}
 		}
-		assert mops.size() == chunks.size();
-		checkState();
-		conn.addOperations(mops);
 		return new BulkGetFuture<T>(m, ops, latch, localCacheManager);
 	}
 
