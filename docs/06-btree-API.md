@@ -1382,5 +1382,80 @@ public void testLongBKeyMultiple() throws Exception {
 
 ### B+Tree Position과 Element 동시 조회
 
-나중에 기술
+B+tree의 검색 조건으로 특정 엘리먼트의 위치(position) 를 기준으로 주변(앞/뒤 position) 엘리먼트들을 조회 할 수 있다.  여기서 위치란 B+tree안에서 bkey를 통해 일렬로 정렬되어 있는 각 엘리먼트의 인덱스를 뜻하며, 0부터 count-1까지 순서대로 매겨진다. 순서에 대한 기준으로 오름차순(ASC)과 내림차순(DESC)이 지원된다.
 
+B+tree에서 bkey에 해당하는 position을 기준으로 count만큼의 element를 주어진 order에 따라서 조회하는 함수는 아래와 같다.
+```java
+CollectionFuture<Map<Integer, Element<Object>>>
+asyncBopFindPositionWithGet(String key, long longBKey, BTreeOrder order, int count)
+CollectionFuture<Map<Integer, Element<Object>>>
+asyncBopFindPositionWithGet(String key, byte[] byteArrayBKey, BTreeOrder order, int count)
+```
+
+- key: b+tree item의 key
+- longBKey: 조회할 element의 bkey(b+tree bkey)
+- order: longBKey에 해당하는 element의 위치(position) 기준으로 결과를 담을 순서를 정의한다. (오름차순: BTreeOrder.ASC, 내림차순: BTreeOrder.DESC)
+- count: longBKey에 해당하는 element의 위치(position) 기준으로 조회할 주변(앞/뒤 position) element 개수를 지정
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.get() | future.operationStatus().getResponse() | 설명
+------------ | -------------------------------------- | ---------
+True         | CollectionResponse.END                 | Element를 성공적으로 조회
+False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
+             | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
+             | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
+             | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
+             | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+
+B+tree에서 position과 element 동시 조회 예제이다.
+```java
+String key = "BopFindPositionWithGetTest";
+
+public void testLongBKey() throws Exception {
+        long longBkey, resultBkey;
+        int  totCount = 100;
+        int  pwgCount = 10;
+        int  rstCount;
+        int  position, i;
+
+        // totCount개의 테스트 데이터를 insert한다.
+        CollectionAttributes attrs = new CollectionAttributes();
+        for (i = 0; i < totCount; i++) {
+                longBkey = (long)i;
+                arcusClient.asyncBopInsert(key, longBkey, null, "val", attrs).get();
+        }
+
+        for (i = 0; i < totCount; i++) {
+                // longBkey를 bkey로 가지는 element의 position을 기준으로 주변(앞/뒤 position) element들을 pwgCount만큼 조회
+                longBkey = (long)i;
+                CollectionFuture<Map<Integer, Element<Object>>> f = arcusClient
+                                .asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, pwgCount);
+                Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+
+                if (i >= pwgCount && i < (totCount-pwgCount)) {
+                        rstCount = pwgCount + 1 + pwgCount;
+                } else {
+                        if (i < pwgCount)
+                        rstCount = i + 1 + pwgCount;
+                        else
+                        rstCount = pwgCount + 1 + ((totCount-1)-i);
+                }
+                assertEquals(rstCount, result.size());
+                assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+
+                if (i < pwgCount) {
+                        position = 0;
+                } else {
+                        position = i - pwgCount;
+                }
+                resultBkey = position;
+                for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+                        assertEquals("invalid position", position, each.getKey().intValue());
+                        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
+                        assertEquals("invalid value", "val", each.getValue().getValue());
+                        position++; resultBkey++;
+                }
+        }
+}
+```
