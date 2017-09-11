@@ -18,7 +18,7 @@ public interface MemcachedClientIF {
 	/**
 	 * Maximum supported key length.
 	 */
-	int MAX_KEY_LENGTH = 250;
+	int MAX_KEY_LENGTH = 32000;
 
 	Collection<SocketAddress> getAvailableServers();
 
