@@ -186,7 +186,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 	public void testInvalidKey2() throws Exception {
 		try {
 			StringBuilder longKey=new StringBuilder();
-			for(int i=0; i<251; i++) {
+			for(int i=0; i<320001; i++) {
 				longKey.append("a");
 			}
 			client.get(longKey.toString());
