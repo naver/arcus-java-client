@@ -26,6 +26,7 @@ import net.spy.memcached.util.BTreeUtil;
 public class Element<T> {
 	private final byte[] bkey;
 	private final Long longBkey;
+	private final int resultPosition;
 	private final T value;
 	private final byte[] eflag;
 	private final ElementFlagUpdate elementFlagUpdate;
@@ -42,15 +43,37 @@ public class Element<T> {
 	public Element(byte[] bkey, T value, byte[] eflag) {
 		this.bkey = bkey;
 		this.longBkey = null;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = true;
 		this.elementFlagUpdate = null;
 	}
-	
+
 	public Element(long bkey, T value, byte[] eflag) {
 		this.bkey = null;
 		this.longBkey = bkey;
+		this.resultPosition = -1;
+		this.value = value;
+		this.eflag = eflag;
+		this.isByteArraysBkey = false;
+		this.elementFlagUpdate = null;
+	}
+
+	public Element(byte[] bkey, int resPosition, T value, byte[] eflag) {
+		this.bkey = bkey;
+		this.longBkey = null;
+		this.resultPosition = resPosition;
+		this.value = value;
+		this.eflag = eflag;
+		this.isByteArraysBkey = true;
+		this.elementFlagUpdate = null;
+	}
+
+	public Element(long bkey, int resPosition, T value, byte[] eflag) {
+		this.bkey = null;
+		this.longBkey = bkey;
+		this.resultPosition = resPosition;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = false;
@@ -60,6 +83,7 @@ public class Element<T> {
 	public Element(byte[] bkey, T value, ElementFlagUpdate elementFlagUpdate) {
 		this.bkey = bkey;
 		this.longBkey = null;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = null;
 		this.isByteArraysBkey = true;
@@ -69,6 +93,7 @@ public class Element<T> {
 	public Element(long bkey, T value, ElementFlagUpdate elementFlagUpdate) {
 		this.bkey = null;
 		this.longBkey = bkey;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = null;
 		this.isByteArraysBkey = false;
@@ -114,6 +139,16 @@ public class Element<T> {
 	 */
 	public long getLongBkey() {
 		return (longBkey == null)? -1 : longBkey;
+	}
+
+	/**
+	 * get resultPosition
+	 *
+	 * @return resultPosition (-1 if not available)
+	 * position in result set, not btree position
+	 */
+	public long getResultPosition() {
+		return resultPosition;
 	}
 
 	/**
