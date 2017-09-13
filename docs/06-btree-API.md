@@ -1417,7 +1417,10 @@ public void testLongBKey() throws Exception {
         int  totCount = 100;
         int  pwgCount = 10;
         int  rstCount;
-        int  position, i;
+        // bopPosition : 실제 btree내에서 지정된 position
+        int  bopPosition, i;
+        // resPosition : 결과 집합인 result 내에서 새로 구성된 position
+        int  resPosition
 
         // totCount개의 테스트 데이터를 insert한다.
         CollectionAttributes attrs = new CollectionAttributes();
@@ -1445,16 +1448,19 @@ public void testLongBKey() throws Exception {
                 assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
                 if (i < pwgCount) {
-                        position = 0;
+                        bopPosition = 0;
                 } else {
-                        position = i - pwgCount;
+                        bopPosition = i - pwgCount;
                 }
-                resultBkey = position;
+
+                resPosition = 0;
+                resultBkey = bopPosition;
                 for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-                        assertEquals("invalid position", position, each.getKey().intValue());
+                        assertEquals("invalid bop position", bopPosition, each.getKey().intValue());
+				        assertEquals("invalid position in result set", resPosition, each.getValue().getResPosition());
                         assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
                         assertEquals("invalid value", "val", each.getValue().getValue());
-                        position++; resultBkey++;
+                        bopPosition++; resPosition++; resultBkey++;
                 }
         }
 }

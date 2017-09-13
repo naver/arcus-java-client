@@ -48,7 +48,8 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 		int  totCount = 100;
 		int  pwgCount = 10; 
 		int  rstCount;
-		int  position, i;
+		int  bopPosition, i;
+		int  resPosition;
 
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (i = 0; i < totCount; i++) {
@@ -74,16 +75,18 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
 			if (i < pwgCount) {
-				position = 0;
+				bopPosition = 0;
 			} else {
-				position = i - pwgCount;
+				bopPosition = i - pwgCount;
 			}
-			resultBkey = position;  
+			resPosition = 0;
+			resultBkey = bopPosition;
 			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
+				assertEquals("invalid bop position", bopPosition, each.getKey().intValue());
+				assertEquals("invalid position in result set", resPosition, each.getValue().getResPosition());
 				assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
 				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; resultBkey++;
+				bopPosition++; resPosition++; resultBkey++;
 			}
 		}
 	}
@@ -93,7 +96,8 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 		int  totCount = 100;
 		int  pwgCount = 10;
 		int  rstCount;
-		int  position, i;
+		int  bopPosition, i;
+		int  resPosition;
 
 		CollectionAttributes attrs = new CollectionAttributes();
 		for (i = 0; i < totCount; i++) {
@@ -119,16 +123,18 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
 			if (i > ((totCount-1)-pwgCount)) {
-				position = 0;
+				bopPosition = 0;
 			} else {
-				position = ((totCount-1)-pwgCount-i);
+				bopPosition = ((totCount-1)-pwgCount-i);
 			}
-			resultBkey = (totCount-1) - position;
+			resPosition = 0;
+			resultBkey = (totCount-1) - bopPosition;
 			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
+				assertEquals("invalid position", bopPosition, each.getKey().intValue());
+				assertEquals("invalid position in result set", resPosition, each.getValue().getResPosition());
 				assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
 				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; resultBkey--;
+				bopPosition++; resPosition++; resultBkey--;
 			}
 		}
 	}
@@ -138,7 +144,8 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 		int  totCount = 100;
 		int  pwgCount = 10; 
 		int  rstCount;
-		int  position, i, bkey;
+		int  bopPosition, i, bkey;
+		int  resPosition;
 
 		byteBkey = new byte[1];
 		resultBkey = new byte[1];
@@ -167,17 +174,19 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
 			if (i < pwgCount) {
-				position = 0;
+				bopPosition = 0;
 			} else {
-				position = i - pwgCount;
+				bopPosition = i - pwgCount;
 			}
-			bkey = position;
+			resPosition = 0;
+			bkey = bopPosition;
 			resultBkey[0] = (byte)bkey;
 			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
+				assertEquals("invalid bop position", bopPosition, each.getKey().intValue());
+				assertEquals("invalid position in result set", resPosition, each.getValue().getResPosition());
 				assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
 				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; bkey++;
+				bopPosition++; resPosition++; bkey++;
 				resultBkey[0] = (byte)bkey;
 			}
 		}
@@ -188,7 +197,8 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 		int  totCount = 100;
 		int  pwgCount = 10; 
 		int  rstCount;
-		int  position, i, bkey;
+		int  bopPosition, i, bkey;
+		int  resPosition;
        
 		byteBkey = new byte[1];
 		resultBkey = new byte[1];
@@ -217,17 +227,19 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
 			if (i > ((totCount-1)-pwgCount)) {
-				position = 0;
+				bopPosition = 0;
 			} else {
-				position = ((totCount-1)-pwgCount-i);
+				bopPosition = ((totCount-1)-pwgCount-i);
 			}
-			bkey = (totCount-1) - position;
+			resPosition = 0;
+			bkey = (totCount-1) - bopPosition;
 			resultBkey[0] = (byte)bkey;
 			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
+				assertEquals("invalid position", bopPosition, each.getKey().intValue());
+				assertEquals("invalid position in result set", resPosition, each.getValue().getResPosition());
 				assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
 				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; bkey--;
+				bopPosition++; resPosition++; bkey--;
 				resultBkey[0] = (byte)bkey;
 			}
 		}

@@ -60,7 +60,8 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 	protected int flags = 0;
 	protected int count = 0;
 	protected int index = 0;
-	protected int pos = 0;
+	protected int bopPos = 0;
+	protected int resPos = 0;
 	protected int posDiff = 0;
 	protected byte[] data = null;
 	protected int readOffset = 0;
@@ -101,7 +102,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 
 			assert count > 0;
 			// position counter
-			pos = position - index;
+			bopPos = position - index;
 			posDiff = 1;
 
 			// start to read actual data
@@ -197,10 +198,11 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 		if (lookingFor == '\0' && readOffset == data.length) {
 			// put an element data.
 			BTreeFindPositionWithGetOperation.Callback cb = (BTreeFindPositionWithGetOperation.Callback) getCallback();
-			cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
+			cb.gotData(key, flags, bopPos, resPos, get.getBkey(), get.getEflag(), data);
 
 			// next position.
-			pos += posDiff;
+			bopPos += posDiff;
+			resPos += posDiff;
 			lookingFor = '\r';
 		}
 
