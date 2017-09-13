@@ -3573,11 +3573,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 				latch.countDown();
 			}
 			
-			public void gotData(String key, int flags, int bopPos, int resPos, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+			public void gotData(String key, int flags, int btreePos, int resultPos, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
 				assert key.equals(k) : "Wrong key returned";
-				Element<T> element = makeBTreeElement(key, flags, bkeyObject, resPos, eflag, data, tc);
+				Element<T> element = makeBTreeElement(key, flags, bkeyObject, resultPos, eflag, data, tc);
 				if (element != null) {
-					map.put(bopPos, element);
+					map.put(btreePos, element);
 				}
 			}
 		});
@@ -3740,23 +3740,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	 * @param key  b+tree item's key
 	 * @param flags  item flags, used when creating the item (see createKeyIfNotExists)
 	 * @param bkey  element key
-	 * @param resPos element position(position in result set, not bop position)
+	 * @param resultPos element position(position in result set, not bop position)
 	 * @param eflag  element flags
 	 * @param value  element value
 	 * @param tc  transcoder to serialize and unserialize value
 	 * @return element object containing all the parameters and transcoded value
 	 */
 	private <T> Element<T> makeBTreeElement(String key, int flags,
-			BKeyObject bkey, int resPos, byte[] eflag, byte[] data, Transcoder<T> tc) {
+			BKeyObject bkey, int resultPos, byte[] eflag, byte[] data, Transcoder<T> tc) {
 		Element<T> element = null;
 		T value = tc.decode(new CachedData(flags, data, tc.getMaxSize()));
 
 		switch (bkey.getType()) {
 		case LONG:
-			element = new Element<T>(bkey.getLongBKey(), resPos, value, eflag);
+			element = new Element<T>(bkey.getLongBKey(), resultPos, value, eflag);
 			break;
 		case BYTEARRAY:
-			element = new Element<T>(bkey.getByteArrayBKeyRaw(), resPos, value, eflag);
+			element = new Element<T>(bkey.getByteArrayBKeyRaw(), resultPos, value, eflag);
 			break;
 		default:
 			getLogger().error(

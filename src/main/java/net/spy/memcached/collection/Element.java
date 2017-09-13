@@ -26,7 +26,7 @@ import net.spy.memcached.util.BTreeUtil;
 public class Element<T> {
 	private final byte[] bkey;
 	private final Long longBkey;
-	private final int resPosition;
+	private final int resultPosition;
 	private final T value;
 	private final byte[] eflag;
 	private final ElementFlagUpdate elementFlagUpdate;
@@ -43,7 +43,7 @@ public class Element<T> {
 	public Element(byte[] bkey, T value, byte[] eflag) {
 		this.bkey = bkey;
 		this.longBkey = null;
-		this.resPosition = -1;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = true;
@@ -53,7 +53,7 @@ public class Element<T> {
 	public Element(long bkey, T value, byte[] eflag) {
 		this.bkey = null;
 		this.longBkey = bkey;
-		this.resPosition = -1;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = false;
@@ -63,7 +63,7 @@ public class Element<T> {
 	public Element(byte[] bkey, int resPosition, T value, byte[] eflag) {
 		this.bkey = bkey;
 		this.longBkey = null;
-		this.resPosition = resPosition;
+		this.resultPosition = resPosition;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = true;
@@ -73,7 +73,7 @@ public class Element<T> {
 	public Element(long bkey, int resPosition, T value, byte[] eflag) {
 		this.bkey = null;
 		this.longBkey = bkey;
-		this.resPosition = resPosition;
+		this.resultPosition = resPosition;
 		this.value = value;
 		this.eflag = eflag;
 		this.isByteArraysBkey = false;
@@ -83,7 +83,7 @@ public class Element<T> {
 	public Element(byte[] bkey, T value, ElementFlagUpdate elementFlagUpdate) {
 		this.bkey = bkey;
 		this.longBkey = null;
-		this.resPosition = -1;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = null;
 		this.isByteArraysBkey = true;
@@ -93,7 +93,7 @@ public class Element<T> {
 	public Element(long bkey, T value, ElementFlagUpdate elementFlagUpdate) {
 		this.bkey = null;
 		this.longBkey = bkey;
-		this.resPosition = -1;
+		this.resultPosition = -1;
 		this.value = value;
 		this.eflag = null;
 		this.isByteArraysBkey = false;
@@ -142,13 +142,13 @@ public class Element<T> {
 	}
 
 	/**
-	 * get resPosition
+	 * get resultPosition
 	 *
-	 * @return resPosition (-1 if not available)
-	 * position in result set, not bop position
+	 * @return resultPosition (-1 if not available)
+	 * position in result set, not btree position
 	 */
-	public long getResPosition() {
-		return resPosition;
+	public long getResultPosition() {
+		return resultPosition;
 	}
 
 	/**
