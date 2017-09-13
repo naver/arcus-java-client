@@ -196,7 +196,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	static final int MAX_GETBULK_KEY_COUNT = 200;
 	static final int MAX_GETBULK_ELEMENT_COUNT = 50;
 	static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
-	
+	private static final int MAX_MKEY_LENGTH = 250;
+
 	private CacheManager cacheManager;
 
 	public void setCacheManager(CacheManager cacheManager) {
@@ -391,6 +392,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		dead = true;
 		if (bulkService != null) {
 			bulkService.shutdown();
+		}
+	}
+
+	private void validateMKey(String mkey) {
+		byte[] keyBytes = KeyUtil.getKeyBytes(mkey);
+		if (keyBytes.length > MAX_MKEY_LENGTH) {
+			throw new IllegalArgumentException("MKey is too long (maxlen = "
+					+ MAX_MKEY_LENGTH + ")");
+		}
+		if (keyBytes.length == 0) {
+			throw new IllegalArgumentException(
+					"MKey must contain at least one character.");
+		}
+		// Validate the mkey
+		for (byte b : keyBytes) {
+			if (b == ' ' || b == '\n' || b == '\r' || b == 0) {
+				throw new IllegalArgumentException(
+						"MKey contains invalid characters:  ``" + mkey + "''");
+			}
 		}
 	}
 
@@ -1455,6 +1475,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		if (mkey == null) {
 			throw new IllegalArgumentException("mkey is null");
 		}
+		validateMKey(mkey);
 		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
 		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
 		return asyncMopGet(key, get, collectionTranscoder);
@@ -1469,6 +1490,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
 		if (mkeyList == null) {
 			throw new IllegalArgumentException("mkeyList is null");
+		}
+		for (int i=0; i < mkeyList.size(); i++) {
+			validateMKey(mkeyList.get(i));
 		}
 		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
 		return asyncMopGet(key, get, collectionTranscoder);
@@ -1496,6 +1520,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		if (mkey == null) {
 			throw new IllegalArgumentException("mkey is null");
 		}
+		validateMKey(mkey);
 		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
 		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
 		return asyncMopGet(key, get, tc);
@@ -1510,6 +1535,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
 		if (mkeyList == null) {
 			throw new IllegalArgumentException("mkeyList is null");
+		}
+		for (int i=0; i < mkeyList.size(); i++) {
+			validateMKey(mkeyList.get(i));
 		}
 		MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
 		return asyncMopGet(key, get, tc);
@@ -1628,6 +1656,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		if (mkey == null) {
 			throw new IllegalArgumentException("mkey is null");
 		}
+		validateMKey(mkey);
 		List<String> mkeyList = new ArrayList<String>(1); mkeyList.add(mkey);
 		MapDelete delete = new MapDelete(mkeyList, false,
 				dropIfEmpty);
@@ -1763,6 +1792,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
 			Object value, CollectionAttributes attributesForCreate) {
+		validateMKey(mkey);
 		MapStore<Object> mapStore = new MapStore<Object>(value,
 				(attributesForCreate != null), null, attributesForCreate);
 		return asyncCollectionStore(key, mkey, mapStore,
@@ -1813,6 +1843,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String  mkey,
 			T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		validateMKey(mkey);
 		MapStore<T> mapStore = new MapStore<T>(value,
 				(attributesForCreate != null), null, attributesForCreate);
 		return asyncCollectionStore(key, mkey, mapStore, tc);
@@ -1924,13 +1955,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
 			String key, Map<String, T> elements,
 			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+		for(Map.Entry<String, T> checkMKey
+				: elements.entrySet()) {
+			validateMKey(checkMKey.getKey());
+		}
 		if (elements.size() <= CollectionPipedStore.MAX_PIPED_ITEM_COUNT) {
 			MapPipedStore<T> store = new MapPipedStore<T>(key, elements,
 					(attributesForCreate != null), attributesForCreate, tc);
 			return asyncCollectionPipedStore(key, store);
 		} else {
 			List<CollectionPipedStore<T>> storeList = new ArrayList<CollectionPipedStore<T>>();
-
 			PartitionedMap<String, T> list = new PartitionedMap<String, T>(
 					elements, CollectionPipedStore.MAX_PIPED_ITEM_COUNT);
 
@@ -2921,6 +2955,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
 			Object value) {
+		validateMKey(mkey);
 		MapUpdate<Object> collectionUpdate = new MapUpdate<Object>(
 				value, false);
 		return asyncCollectionUpdate(key, String.valueOf(mkey),
@@ -2934,6 +2969,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	@Override
 	public <T> CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
 			T value, Transcoder<T> tc) {
+		validateMKey(mkey);
 		MapUpdate<T> collectionUpdate = new MapUpdate<T>(value, false);
 		return asyncCollectionUpdate(key, String.valueOf(mkey),
 				collectionUpdate, tc);
@@ -3050,6 +3086,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 	public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
 			String key, Map<String, T> elements, Transcoder<T> tc) {
 
+		for(Map.Entry<String, T> checkMKey
+				: elements.entrySet()) {
+			validateMKey(checkMKey.getKey());
+		}
 		if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
 			CollectionPipedUpdate<T> collectionPipedUpdate = new MapPipedUpdate<T>(
 					key, elements, tc);
@@ -4252,6 +4292,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			List<String> keyList, String mkey, T value,
 			CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
+		validateMKey(mkey);
 		Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
 
 		List<CollectionBulkStore<T>> storeList = new ArrayList<CollectionBulkStore<T>>(
