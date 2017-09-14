@@ -1401,12 +1401,23 @@ asyncBopFindPositionWithGet(String key, byte[] byteArrayBKey, BTreeOrder order, 
 
 future.get() | future.operationStatus().getResponse() | 설명
 ------------ | -------------------------------------- | ---------
-True         | CollectionResponse.END                 | Element를 성공적으로 조회
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-             | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
-             | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-             | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-             | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+not null     | CollectionResponse.END                 | Element를 성공적으로 조회
+null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
+null         | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
+null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null         | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+
+결과로 반환된 result(Map<Integer, Element<Object>>) 객체에서 다음과 같은 정보를 확인할 수 있다
+
+result 객체의 Method                | 자료형              | 설명
+----------------------------------|-------------------|---------------
+getKey()                          | integer           | btree내의 position
+getValue().getValue()             | Object            | element의 값
+getValue().getByteArrayBkey()     | byte[]            | element bkey 값(byte[])
+getValue().getLongBkey()          | long              | element bkey 값(long)
+getValue().isByteArrayBkey()      | boolean           | element bkey 값 byte array 여부
+getValue().getFlag()              | byte[]            | element flag 값(byte[])
 
 B+tree에서 position과 element 동시 조회 예제이다.
 ```java
