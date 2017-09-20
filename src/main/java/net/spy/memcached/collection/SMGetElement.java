@@ -64,6 +64,23 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 		return comp;
 	}
 
+	public int compareBkeyTo(SMGetElement<T> param) {
+		assert param != null;
+
+		/* compare bkey */
+		if (bytebkey == null)
+			return new Long(bkey).compareTo(param.getBkey());
+		else
+			return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+	}
+
+	public int compareKeyTo(SMGetElement<T> param) {
+		assert param != null;
+
+		/* compare key */
+		return key.compareTo(param.getKey());
+	}
+
 	public String getKey() {
 		return key;
 	}
