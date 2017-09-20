@@ -2556,7 +2556,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		final Set<Object> totalBkey = new TreeSet<Object>();
 		
 		final AtomicBoolean stopCollect = new AtomicBoolean(false);
-		/* if processedSMGetCount is 0, then all smget is done */
+		// if processedSMGetCount is 0, then all smget is done.
 		final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
 		
 		for (BTreeSMGet<T> smGet : smGetList) {
@@ -2597,13 +2597,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						lock.lock();
 						try {
 							if (mergedResult.size() == 0) {
-								/* merged result is empty, add all */
+								// merged result is empty, add all.
 								if (smGetList.size() > 1) {
 									addTotalBkey(eachResult);
 								}
 								mergedResult.addAll(eachResult);
 							} else {
-								/* do sort merge */
+								// do sort merge
 								boolean duplicated;
 								int idx, pos = 0;
 								for (SMGetElement<T> result : eachResult) {
@@ -2614,14 +2614,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 									}
 									
 									if (idx >= totalResultElementCount) {
-										/* At this point, following conditions are met.
-										 *   - mergedResult.size() == totalResultElementCount &&
-										 *   - The current <bkey, key> of eachResult is
-										 *     behind of the last <bkey, key> of mergedResult.
-										 * Then, all the next <bkey, key> elements of eachResult are
-										 * definitely behind of the last <bkey, bkey> of mergedResult.
-										 * So, stop the current sort-merge.
-										 */
+										// At this point, following conditions are met.
+										//   - mergedResult.size() == totalResultElementCount &&
+										//   - The current <bkey, key> of eachResult is
+										//     behind of the last <bkey, key> of mergedResult.
+										// Then, all the next <bkey, key> elements of eachResult are
+										// definitely behind of the last <bkey, bkey> of mergedResult.
+										// So, stop the current sort-merge.
 										break;
 									}
 									
@@ -2663,7 +2662,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 								}
 							}
 							
-							/* remove useless trimed keys */
+							// remove useless trimed keys
 							if (mergedTrimmedKeys.size() > 0 &&
 								processedSMGetCount.get() == 0 && count <= mergedResult.size()) {
 								SMGetElement<T> lastElement = mergedResult.get(count - 1);
