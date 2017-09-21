@@ -59,6 +59,16 @@ public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
 		return comp;
 	}
 
+	public int compareBkeyTo(SMGetTrimKey param) {
+		assert param != null;
+		
+		/* compare bkey */
+		if (bytebkey == null)
+			return new Long(bkey).compareTo(param.getBkey());
+		else
+			return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+	}
+
 	public String getKey() {
 		return key;
 	}

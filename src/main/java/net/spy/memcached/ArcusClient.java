@@ -2438,6 +2438,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 							mergedResult.addAll(eachResult);
 							mergedTrim.set(isTrimmed);
 						} else {
+							boolean addAll = true;
 							int pos = 0;
 							for (SMGetElement<T> result : eachResult) {
 								for ( ; pos < mergedResult.size(); pos++) {
@@ -2446,26 +2447,30 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 										break;
 								}
 								if (pos >= totalResultElementCount) {
-									break;
+									addAll = false; break;
 								}
 								if (pos >= mergedResult.size() && mergedTrim.get() &&
 									result.compareBkeyTo(mergedResult.get(pos-1)) != 0) {
-									break;
+									addAll = false; break;
 								}
 								mergedResult.add(pos, result);
 								if (mergedResult.size() > totalResultElementCount) {
-									SMGetElement<T> removed = mergedResult.remove(totalResultElementCount);
-									if (mergedTrim.get() &&
-										removed.compareBkeyTo(mergedResult.get(totalResultElementCount-1)) != 0)
-										mergedTrim.set(false);
+									mergedResult.remove(totalResultElementCount);
 								}
 								pos += 1;
 							}
-							if (pos < mergedResult.size() && isTrimmed) {
+							if (isTrimmed && addAll) {
 								while (pos < mergedResult.size()) {
-									mergedResult.remove(pos);
+									if (mergedResult.get(pos).compareBkeyTo(mergedResult.get(pos-1)) == 0) {
+										pos += 1;
+									} else {
+										mergedResult.remove(pos);
+									}
 								}
 								mergedTrim.set(true);
+							}
+							if (mergedResult.size() >= totalResultElementCount) {
+ 								mergedTrim.set(false);
 							}
 						}
 
@@ -2801,28 +2806,30 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 							mergedResult.addAll(eachResult);
 						} else {
 							// do sort merge
-							boolean isDuplicated;
+							boolean duplicated;
 							int comp, pos = 0;
 							for (SMGetElement<T> result : eachResult) {
-								isDuplicated = false;
+								duplicated = false;
 								for ( ; pos < mergedResult.size(); pos++) {
 									// compare b+tree key
 									comp = result.compareBkeyTo(mergedResult.get(pos));
 									if ((reverse) ? (0 < comp) : (0 > comp)) {
 										break;
 									}
-									isDuplicated = true;
-									// compare key string
-									comp = result.compareKeyTo(mergedResult.get(pos));
-									if ((reverse) ? (0 < comp) : (0 > comp)) {
-										if (smgetMode == SMGetMode.UNIQUE) {
-											mergedResult.remove(pos); // remove dup bkey
-											isDuplicated = false;
+									if (comp == 0) { // compare key string
+										comp = result.compareKeyTo(mergedResult.get(pos));
+										if ((reverse) ? (0 < comp) : (0 > comp)) {
+											if (smgetMode == SMGetMode.UNIQUE)
+												mergedResult.remove(pos); // remove dup bkey
+											break;
+										} else {
+											if (smgetMode == SMGetMode.UNIQUE) {
+												duplicated = true; break;
+											}
 										}
-										break;
 									}
 								}
-								if (smgetMode == SMGetMode.UNIQUE && isDuplicated) {
+								if (duplicated) { // UNIQUE
 									continue;
 								}
 								if (pos >= totalResultElementCount) {
@@ -2866,14 +2873,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 						if (processedSMGetCount.get() == 0)
 						{
 							if (mergedTrimmedKeys.size() > 0 && count <= mergedResult.size()) {
-								/* remove useless trimed keys */
-								SMGetElement<T> lastElement = mergedResult.get(count-1);
+								// remove trimed keys whose bkeys are behind of the last element.
+								SMGetElement<T> lastElement = mergedResult.get(mergedResult.size()-1);
 								SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
 								                                            lastElement.getBkeyByObject());
 								for (int i = mergedTrimmedKeys.size()-1; i >= 0; i--) {
 									SMGetTrimKey me = mergedTrimmedKeys.get(i);
-									if ((reverse) ? (0 >= me.compareTo(lastTrimKey))
-									              : (0 <= me.compareTo(lastTrimKey))) {
+									if ((reverse) ? (0 >= me.compareBkeyTo(lastTrimKey))
+									              : (0 <= me.compareBkeyTo(lastTrimKey))) {
 										mergedTrimmedKeys.remove(i);
 									} else {
 										break;
