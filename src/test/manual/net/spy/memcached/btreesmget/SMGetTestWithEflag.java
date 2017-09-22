@@ -96,7 +96,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			Assert.assertTrue(map.isEmpty());
 			Assert.assertEquals(future.getMissedKeyList().toString(), 10,
-					future.getMissedKeyList().size());
+					future.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -215,9 +215,9 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.assertTrue(future.getMissedKeyList().isEmpty());
 
 			for (int i = 0; i < map.size(); i++) {
-				Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-				Assert.assertEquals(i + 1, map.get(i).getBkey());
-				Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+				Assert.assertEquals(keyList.get(i), map.get(i).getKey());
+				Assert.assertEquals(i, map.get(i).getBkey());
+				Assert.assertEquals("VALUE" + i, map.get(i).getValue());
 			}
 		} catch (Exception e) {
 			future.cancel(true);
@@ -272,13 +272,13 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
 
-			Assert.assertEquals(9, map.size());
+			Assert.assertEquals(10, map.size());
 			Assert.assertTrue(future.getMissedKeyList().isEmpty());
 
 			for (int i = 0; i < map.size(); i++) {
-				Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-				Assert.assertEquals(i + 1, map.get(i).getBkey());
-				Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+				Assert.assertEquals(keyList.get(i), map.get(i).getKey());
+				Assert.assertEquals(i, map.get(i).getBkey());
+				Assert.assertEquals("VALUE" + i, map.get(i).getValue());
 			}
 		} catch (Exception e) {
 			future.cancel(true);
@@ -333,13 +333,13 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			List<SMGetElement<Object>> map = future
 					.get(1000L, TimeUnit.SECONDS);
 
-			Assert.assertEquals(8, map.size());
+			Assert.assertEquals(9, map.size());
 			Assert.assertTrue(future.getMissedKeyList().isEmpty());
 
 			for (int i = 0; i < map.size(); i++) {
-				Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-				Assert.assertEquals(i + 1, map.get(i).getBkey());
-				Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+				Assert.assertEquals(keyList.get(i), map.get(i).getKey());
+				Assert.assertEquals(i, map.get(i).getBkey());
+				Assert.assertEquals("VALUE" + i, map.get(i).getValue());
 			}
 		} catch (Exception e) {
 			future.cancel(true);
@@ -443,7 +443,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			assertEquals(5, map.size());
 
 			assertEquals(future.getMissedKeyList().toString(), 5, future
-					.getMissedKeyList().size());
+					.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -497,7 +497,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			assertEquals(5, map.size());
 
 			assertEquals(future.getMissedKeyList().toString(), 5, future
-					.getMissedKeyList().size());
+					.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();

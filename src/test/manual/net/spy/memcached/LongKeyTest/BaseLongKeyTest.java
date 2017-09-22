@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class BaseLongKeyTest extends BaseIntegrationTest {
 
@@ -144,7 +145,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
 		// Btree Collection BulkGet
 		CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
 				.asyncBopGetBulk(keys, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-		Map<String, BTreeGetResult<Long, Object>> results = f.get();
+		Map<String, BTreeGetResult<Long, Object>> results = f.get(3000L, TimeUnit.MILLISECONDS);
 		assertEquals(keySize, results.size());
 
 		// Delete Key
@@ -167,7 +168,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
 		try {
 			List<SMGetElement<Object>> map = oldFuture
-					.get();
+					.get(3000L, TimeUnit.MILLISECONDS);
 
 			Assert.assertEquals(10, map.size());
 			Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
@@ -188,7 +189,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
 		try {
 			List<SMGetElement<Object>> map = future
-					.get();
+					.get(3000L, TimeUnit.MILLISECONDS);
 
 			Assert.assertEquals(10, map.size());
 			Assert.assertTrue(future.getMissedKeyList().isEmpty());
