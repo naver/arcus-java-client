@@ -636,7 +636,7 @@ public class SMGetTest extends BaseIntegrationTest {
 			}
 			for (int i = 0; i < testSize; i++) {
 				mc.asyncBopInsert(KEY + i, i, ByteBuffer.allocate(4).putInt(i).array(), "VALUE" + i,
-								new CollectionAttributes()).get();
+								new CollectionAttributes()).get(1000L, TimeUnit.MILLISECONDS);
 			}
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -694,7 +694,7 @@ public class SMGetTest extends BaseIntegrationTest {
 			for (int i = 0; i < testSize; i++) {
 				mc.asyncBopInsert(KEY + i, ByteBuffer.allocate(4).putInt(i).array(),
 								ByteBuffer.allocate(4).putInt(i).array(), "VALUE" + i,
-								new CollectionAttributes()).get();
+								new CollectionAttributes()).get(1000L, TimeUnit.MILLISECONDS);
 			}
 		} catch (Exception e) {
 			fail(e.getMessage());
