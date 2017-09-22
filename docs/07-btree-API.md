@@ -13,37 +13,37 @@ B+tree item 구조와 기본 특징은 **[Arcus Server Ascii Protocol 문서의 
 
 B+tree item 연산의 설명에 앞서, b+tree 조회 및 변경에 사용하는 객체들을 설명한다.
 
-- [Bkey(B+Tree Key)와 EFlag(Element Flag)](06-btree-API.md#bkeybtree-key%EC%99%80-eflagelement-flag)
-- [Element Flag Filter 객체](06-btree-API.md#element-flag-filter-%EA%B0%9D%EC%B2%B4)
-- [Element Flag Update 객체](06-btree-API.md#element-flag-update-%EA%B0%9D%EC%B2%B4)
+- [Bkey(B+Tree Key)와 EFlag(Element Flag)](07-btree-API.md#bkeybtree-key%EC%99%80-eflagelement-flag)
+- [Element Flag Filter 객체](07-btree-API.md#element-flag-filter-%EA%B0%9D%EC%B2%B4)
+- [Element Flag Update 객체](07-btree-API.md#element-flag-update-%EA%B0%9D%EC%B2%B4)
 
 
 B+tree item에 대해 수행가능한 기본 연산은 다음과 같다.
 
-- [B+Tree Item 생성](06-btree-API.md#btree-item-%EC%83%9D%EC%84%B1) (B+tree item 삭제는 key-value item 삭제 함수로 수행한다)
-- [B+Tree Element 삽입](06-btree-API.md#btree-element-%EC%82%BD%EC%9E%85)
-- [B+Tree Element Upsert](06-btree-API.md#btree-element-upsert)
-- [B+Tree Element 변경](06-btree-API.md#btree-element-%EB%B3%80%EA%B2%BD)
-- [B+Tree Element 삭제](06-btree-API.md#btree-element-%EC%82%AD%EC%A0%9C)
-- [B+Tree Element 값의 증감](06-btree-API.md#btree-element-%EA%B0%92%EC%9D%98-%EC%A6%9D%EA%B0%90)
-- [B+Tree Element 개수 계산](06-btree-API.md#btree-element-%EA%B0%9C%EC%88%98-%EA%B3%84%EC%82%B0)
-- [B+Tree Element 조회](06-btree-API.md#btree-element-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Item 생성](07-btree-API.md#btree-item-%EC%83%9D%EC%84%B1) (B+tree item 삭제는 key-value item 삭제 함수로 수행한다)
+- [B+Tree Element 삽입](07-btree-API.md#btree-element-%EC%82%BD%EC%9E%85)
+- [B+Tree Element Upsert](07-btree-API.md#btree-element-upsert)
+- [B+Tree Element 변경](07-btree-API.md#btree-element-%EB%B3%80%EA%B2%BD)
+- [B+Tree Element 삭제](07-btree-API.md#btree-element-%EC%82%AD%EC%A0%9C)
+- [B+Tree Element 값의 증감](07-btree-API.md#btree-element-%EA%B0%92%EC%9D%98-%EC%A6%9D%EA%B0%90)
+- [B+Tree Element 개수 계산](07-btree-API.md#btree-element-%EA%B0%9C%EC%88%98-%EA%B3%84%EC%82%B0)
+- [B+Tree Element 조회](07-btree-API.md#btree-element-%EC%A1%B0%ED%9A%8C)
 
 여러 b+tree element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
 
-- [B+Tree Element 일괄 삽입](06-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EC%82%BD%EC%9E%85)
-- [B+Tree Element 일괄 변경](06-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EB%B3%80%EA%B2%BD)
-- [B+Tree Element 일괄 조회](06-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Element 일괄 삽입](07-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EC%82%BD%EC%9E%85)
+- [B+Tree Element 일괄 변경](07-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EB%B3%80%EA%B2%BD)
+- [B+Tree Element 일괄 조회](07-btree-API.md#btree-element-%EC%9D%BC%EA%B4%84-%EC%A1%B0%ED%9A%8C)
 
 여러 b+tree element들에 대해 sort-merge 조회 연산은 다음과 같다.
 
-- [B+Tree Element Sort-Merge 조회](06-btree-API.md#btree-element-sort-merge-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Element Sort-Merge 조회](07-btree-API.md#btree-element-sort-merge-%EC%A1%B0%ED%9A%8C)
 
 B+tree position 관련 연산들은 다음과 같다.
 
-- [B+Tree Position 조회](06-btree-API.md#btree-position-%EC%A1%B0%ED%9A%8C)
-- [B+Tree Position 기반의 Element 조회](06-btree-API.md#btree-position-%EA%B8%B0%EB%B0%98%EC%9D%98-element-%EC%A1%B0%ED%9A%8C)
-- [B+Tree Position과 Element 동시 조회](06-btree-API.md#btree-position%EA%B3%BC-element-%EB%8F%99%EC%8B%9C-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Position 조회](07-btree-API.md#btree-position-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Position 기반의 Element 조회](07-btree-API.md#btree-position-%EA%B8%B0%EB%B0%98%EC%9D%98-element-%EC%A1%B0%ED%9A%8C)
+- [B+Tree Position과 Element 동시 조회](07-btree-API.md#btree-position%EA%B3%BC-element-%EB%8F%99%EC%8B%9C-%EC%A1%B0%ED%9A%8C)
 
 
 ### BKey(B+Tree Key)와 EFlag(Element Flag)
