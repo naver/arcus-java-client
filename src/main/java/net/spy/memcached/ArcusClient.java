@@ -2316,10 +2316,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		final List<OperationStatus> failedOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
-		/*** OLD CODE ****
-		final Set<Object> totalBkey = new TreeSet<Object>();
-		******************/
-
 		// if processedSMGetCount is 0, then all smget is done.
 		final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
 		final AtomicBoolean mergedTrim = new AtomicBoolean(false);
@@ -2328,91 +2324,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		for (BTreeSMGet<T> smGet : smGetList) {
 			Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperationOld.Callback() {
 				final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
-
-				/*** OLD CODE ****
-				private void addTotalBkey(List<SMGetElement<T>> smgetresult) {
-					for (SMGetElement<T> each : smgetresult) {
-						if (each.getBkeyByObject() instanceof byte[]) {
-							totalBkey.add(new ByteArrayBKey((byte[]) each.getBkeyByObject()));
-						} else {
-							totalBkey.add(each.getBkeyByObject());
-						}
-					}
-				}
-				
-				private boolean addTotalBkey(Object bkey) {
-					if (bkey instanceof byte[]) {
-						return totalBkey.add(new ByteArrayBKey((byte[])bkey));
-					} else {
-						return totalBkey.add(bkey);
-					}
-				}
-				
-				@Override
-				public void receivedStatus(OperationStatus status) {
-					if (status.isSuccess()) {
-						resultOperationStatus.add(status);
-					} else {
-						stopCollect.set(true);
-						mergedResult.clear();
-						failedOperationStatus.add(status);
-					}
-					if (status.isSuccess()) {
-						lock.lock();
-						try {
-							// merged result is empty, add all.
-							if (smGetList.size() == 1) {
-								addTotalBkey(eachResult);
-								mergedResult.addAll(eachResult);
-							} else {
-								// merged result is empty, add all.
-								if (mergedResult.size() == 0) {
-									addTotalBkey(eachResult);
-									mergedResult.addAll(eachResult);
-								} else {
-									// remove trimmed area
-									if (TRIMMED.equals(status.getMessage())) {
-
-									}
-
-									// do sort merge
-									for (SMGetElement<T> result : eachResult) {
-										boolean added = false;
-
-										for (int i = 0; i < mergedResult.size(); i++) {
-											if (i > totalResultElementCount) {
-												added = true;
-												break;
-											}
-
-											if ((reverse) ? (0 < result.compareTo(mergedResult.get(i))) : 0 > result
-													.compareTo(mergedResult.get(i))) {
-												if (!addTotalBkey(result.getBkeyByObject())) {
-													resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-												}
-												mergedResult.add(i, result);
-												added = true;
-												break;
-											}
-										}
-
-									 	if (!added) {
-											if (!addTotalBkey(result.getBkeyByObject())) {
-												resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-											}
-											mergedResult.add(result);
-										}
-									}
-								}
-							}
-						} finally {
-							lock.unlock();
-						}
-					} else {
-						getLogger().warn("SMGetFailed. status=%s", status);
-					}
-				}
-				******************/
 
 				@Override
 				public void receivedStatus(OperationStatus status) {
@@ -2579,46 +2490,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			@Override
 			public CollectionOperationStatus getOperationStatus() {
 				if (failedOperationStatus.size() > 0) {
-					return new CollectionOperationStatus(
-							failedOperationStatus.get(0));
+					return new CollectionOperationStatus(failedOperationStatus.get(0));
 				}
 				return new CollectionOperationStatus(resultOperationStatus.get(0));
-
-				/*** OLD CODE ****
-				OperationStatus end = null;
-				OperationStatus duplicated = null;
-				OperationStatus trimmed = null;
-				OperationStatus duplicatedTrimmed = null;
-
-				for (OperationStatus status : resultOperationStatus) {
-					if (END.equals(status.getMessage()))
-						end = status;
-					else if (DUPLICATED.equals(status.getMessage()))
-						duplicated = status;
-					else if (TRIMMED.equals(status.getMessage()))
-						trimmed = status;
-					else if (DUPLICATED_TRIMMED.equals(status.getMessage()))
-						duplicatedTrimmed = status;
-				}
-
-				if (end == null && duplicated == null && trimmed == null
-						&& duplicatedTrimmed == null) {
-					getLogger().warn("[sort merge get] invalid result status.");
-					return null;
-				}
-
-				if (duplicatedTrimmed == null && duplicated != null && trimmed != null)
-					duplicatedTrimmed = new OperationStatus(true, "DUPLICATED_TRIMMED");
-
-				if (duplicatedTrimmed != null)
-					return new CollectionOperationStatus(duplicatedTrimmed);
-				else if (duplicated != null)
-					return new CollectionOperationStatus(duplicated);
-				else if (trimmed != null)
-					return new CollectionOperationStatus(trimmed);
-				else
-					return new CollectionOperationStatus(end);
-				******************/
 			}
 		};
 	}
@@ -2649,10 +2523,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 		final List<OperationStatus> failedOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
-		/*** OLD CODE ****
-		final Set<Object> totalBkey = new TreeSet<Object>();
-		******************/
-		
 		final AtomicBoolean stopCollect = new AtomicBoolean(false);
 		// if processedSMGetCount is 0, then all smget is done.
 		final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
@@ -2661,130 +2531,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
 				final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
 				final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
-
-				/*** OLD CODE ****
-				private void addTotalBkey(List<SMGetElement<T>> smgetresult) {
-					for (SMGetElement<T> each : smgetresult) {
-						if (each.getBkeyByObject() instanceof byte[]) {
-							totalBkey.add(new ByteArrayBKey((byte[]) each.getBkeyByObject()));
-						} else {
-							totalBkey.add(each.getBkeyByObject());
-						}
-					}
-				}
-				
-				private boolean addTotalBkey(Object bkey) {
-					if (bkey instanceof byte[]) {
-						return totalBkey.add(new ByteArrayBKey((byte[])bkey));
-					} else {
-						return totalBkey.add(bkey);
-					}
-				}
-				
-				@Override
-				public void receivedStatus(OperationStatus status) {
-					processedSMGetCount.decrementAndGet();
-					if (status.isSuccess()) {
-						resultOperationStatus.add(status);
-					} else {
-						stopCollect.set(true);
-						mergedResult.clear();
-						mergedTrimmedKeys.clear();
-						failedOperationStatus.add(status);
-					}
-					if (status.isSuccess()) {
-						lock.lock();
-						try {
-							if (mergedResult.size() == 0) {
-								// merged result is empty, add all.
-								if (smGetList.size() > 1) {
-									addTotalBkey(eachResult);
-								}
-								mergedResult.addAll(eachResult);
-							} else {
-								// do sort merge
-								boolean duplicated;
-								int idx, pos = 0;
-								for (SMGetElement<T> result : eachResult) {
-									for (idx = pos; idx < mergedResult.size(); idx++) {
-										if ((reverse) ? (0 < result.compareTo(mergedResult.get(idx)))
-													  : (0 > result.compareTo(mergedResult.get(idx))))
-											break;
-									}
-									
-									if (idx >= totalResultElementCount) {
-										// At this point, following conditions are met.
-										//   - mergedResult.size() == totalResultElementCount &&
-										//   - The current <bkey, key> of eachResult is
-										//     behind of the last <bkey, key> of mergedResult.
-										// Then, all the next <bkey, key> elements of eachResult are
-										// definitely behind of the last <bkey, bkey> of mergedResult.
-										// So, stop the current sort-merge.
-										break;
-									}
-									
-									if (!addTotalBkey(result.getBkeyByObject())) {
-										resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-										duplicated = true;
-									} else {
-										duplicated = false;
-									}
-									
-									if (smgetMode != SMGetMode.UNIQUE || !duplicated) {
-										mergedResult.add(idx, result);
-										if (mergedResult.size() > totalResultElementCount)
-											mergedResult.remove(totalResultElementCount);
-										pos = idx + 1;
-									} else {
-										pos = idx;
-									}
-								}
-							}
-							
-							if (eachTrimmedResult.size() > 0) {
-								if (mergedTrimmedKeys.size() == 0) {
-									mergedTrimmedKeys.addAll(eachTrimmedResult);
-								} else {
-									// do sort merge trimmed list
-									int idx, pos = 0;
-									for (SMGetTrimKey eTrim : eachTrimmedResult) { 
-										for (idx = pos; idx < mergedTrimmedKeys.size(); idx++) {
-											if ((reverse) ? (0 < eTrim.compareTo(mergedTrimmedKeys.get(idx)))
-														  :  0 > eTrim.compareTo(mergedTrimmedKeys.get(idx))) {
-												break;
-											}
-										}
-										
-									 	mergedTrimmedKeys.add(idx, eTrim);
-									 	pos = idx + 1;
-									}
-								}
-							}
-							
-							// remove useless trimed keys
-							if (mergedTrimmedKeys.size() > 0 &&
-								processedSMGetCount.get() == 0 && count <= mergedResult.size()) {
-								SMGetElement<T> lastElement = mergedResult.get(count - 1);
-								SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
-																			lastElement.getBkeyByObject());
-								for (int idx = mergedTrimmedKeys.size() - 1; idx >= 0; idx--) {
-									SMGetTrimKey me = mergedTrimmedKeys.get(idx);
-									if ((reverse) ? (0 >= me.compareTo(lastTrimKey))
-												  :  0 <= me.compareTo(lastTrimKey)) {
-										mergedTrimmedKeys.remove(idx);
-									} else {
-										break;
-									}
-								}
-							}
-						} finally {
-							lock.unlock();
-						}
-					} else {
-						getLogger().warn("SMGetFailed. status=%s", status);
-					}
-				}
-				******************/
 
 				@Override
 				public void receivedStatus(OperationStatus status) {
@@ -3000,46 +2746,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			@Override
 			public CollectionOperationStatus getOperationStatus() {
 				if (failedOperationStatus.size() > 0) {
-					return new CollectionOperationStatus(
-							failedOperationStatus.get(0));
+					return new CollectionOperationStatus(failedOperationStatus.get(0));
 				}
 				return new CollectionOperationStatus(resultOperationStatus.get(0));
-
-				/*** OLD CODE ****
-				OperationStatus end = null;
-				OperationStatus duplicated = null;
-				OperationStatus trimmed = null;
-				OperationStatus duplicatedTrimmed = null;
-
-				for (OperationStatus status : resultOperationStatus) {
-					if (END.equals(status.getMessage()))
-						end = status;
-					else if (DUPLICATED.equals(status.getMessage()))
-						duplicated = status;
-					else if (TRIMMED.equals(status.getMessage()))
-						trimmed = status;
-					else if (DUPLICATED_TRIMMED.equals(status.getMessage()))
-						duplicatedTrimmed = status;
-				}
-
-				if (end == null && duplicated == null && trimmed == null
-						&& duplicatedTrimmed == null) {
-					getLogger().warn("[sort merge get] invalid result status.");
-					return null;
-				}
-
-				if (duplicatedTrimmed == null && duplicated != null && trimmed != null)
-					duplicatedTrimmed = new OperationStatus(true, "DUPLICATED_TRIMMED");
-
-				if (duplicatedTrimmed != null)
-					return new CollectionOperationStatus(duplicatedTrimmed);
-				else if (duplicated != null)
-					return new CollectionOperationStatus(duplicated);
-				else if (trimmed != null)
-					return new CollectionOperationStatus(trimmed);
-				else
-					return new CollectionOperationStatus(end);
-				******************/
 			}
 		};
 	}
