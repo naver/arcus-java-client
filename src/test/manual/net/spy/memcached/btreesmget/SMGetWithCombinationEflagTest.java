@@ -31,7 +31,7 @@ import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
+public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 
 	private final String KEY = this.getClass().getSimpleName();
 	List<String> keyList = null;
@@ -68,7 +68,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 1, 2,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
@@ -116,7 +116,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
@@ -176,7 +176,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 1, 10);
@@ -236,7 +236,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 1, 10);
@@ -296,7 +296,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 1, 10);
@@ -356,7 +356,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
@@ -405,7 +405,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
@@ -454,7 +454,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
@@ -509,7 +509,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 
 		long start = System.currentTimeMillis();
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 1000,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 500);
@@ -562,7 +562,7 @@ public class SMGetTestWithCombinationEflag extends BaseIntegrationTest {
 
 		long start = System.currentTimeMillis();
 		
-		/* old  SMGetTestWithCombinationEflag */
+		/* old  SMGetWithCombinationEflagTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, testSize,
 						ElementFlagFilter.DO_NOT_FILTER, 0, 500);
