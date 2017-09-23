@@ -141,9 +141,6 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		// sort merge get
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old SMGetErrorTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(KEY_LIST, new byte[] { (byte) 0 },
@@ -162,6 +159,8 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		// sort merge get
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, new byte[] { (byte) 0 },
 						new byte[] { (byte) 15 },
@@ -212,7 +211,6 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 		byte[] from = new byte[] { (byte) 20 };
 		byte[] to = new byte[] { (byte) 10 };
 		long count = 100;
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		
 		/* old SMGetErrorTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
@@ -231,6 +229,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
 						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
@@ -279,7 +278,6 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 		byte[] from = new byte[] { (byte) 10 };
 		byte[] to = new byte[] { (byte) 0 };
 		long count = 100;
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
 
 		/* old SMGetErrorTest */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
@@ -298,6 +296,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(KEY_LIST, from, to,
 						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);

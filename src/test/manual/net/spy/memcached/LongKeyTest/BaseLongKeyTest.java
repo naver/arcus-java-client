@@ -191,7 +191,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
 					.get();
 
 			Assert.assertEquals(10, map.size());
-			Assert.assertTrue(future.getMissedKeyList().isEmpty());
+			Assert.assertTrue(future.getMissedKeys().isEmpty());
 
 			for (int i = 0; i < map.size(); i++) {
 				Assert.assertEquals(keys.get(i), map.get(i).getKey());

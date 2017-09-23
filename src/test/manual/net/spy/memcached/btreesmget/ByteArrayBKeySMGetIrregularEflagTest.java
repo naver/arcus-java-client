@@ -39,7 +39,6 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 	private final Object value = "valvalvalvalvalvalvalvalvalval";
 
 	public void testGetAll_1() {
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		ArrayList<String> testKeyList = new ArrayList<String>();
 		testKeyList.add(key1);
 		testKeyList.add(key2);
@@ -93,6 +92,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 			mc.asyncBopInsert(key2, new byte[] { 4 }, eFlag, value + "2",
 					new CollectionAttributes()).get();
 
+			SMGetMode smgetMode = SMGetMode.UNIQUE;
 			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
 							testKeyList, new byte[] { 0 }, new byte[] { 10 },
 							ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();

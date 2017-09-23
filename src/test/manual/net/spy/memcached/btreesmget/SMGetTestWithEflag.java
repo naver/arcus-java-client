@@ -68,8 +68,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 1, 2,
@@ -80,13 +78,14 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			Assert.assertTrue(map.isEmpty());
 			Assert.assertEquals(oldFuture.getMissedKeyList().toString(), 10,
-					oldFuture.getMissedKeyList().size());
+			                    oldFuture.getMissedKeyList().size());
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 1, 2,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -96,7 +95,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			Assert.assertTrue(map.isEmpty());
 			Assert.assertEquals(future.getMissedKeys().toString(), 10,
-					future.getMissedKeys().size());
+			                    future.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -119,8 +118,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
@@ -143,6 +140,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -180,8 +178,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
@@ -204,6 +200,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -241,8 +238,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
@@ -265,6 +260,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -302,8 +298,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
@@ -326,6 +320,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -363,8 +358,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
@@ -381,6 +374,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 		
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -413,8 +407,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
@@ -425,14 +417,15 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(oldFuture.getMissedKeyList().toString(), 5, oldFuture
-					.getMissedKeyList().size());
+			assertEquals(oldFuture.getMissedKeyList().toString(), 5,
+			             oldFuture.getMissedKeyList().size());
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 10,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -442,8 +435,8 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(future.getMissedKeys().toString(), 5, future
-					.getMissedKeys().size());
+			assertEquals(future.getMissedKeys().toString(), 5,
+			             future.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -467,8 +460,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
@@ -479,14 +470,15 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(oldFuture.getMissedKeyList().toString(), 5, oldFuture
-					.getMissedKeyList().size());
+			assertEquals(oldFuture.getMissedKeyList().toString(), 5,
+			             oldFuture.getMissedKeyList().size());
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 10, 0,
 						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
@@ -496,8 +488,8 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(future.getMissedKeys().toString(), 5, future
-					.getMissedKeys().size());
+			assertEquals(future.getMissedKeys().toString(), 5,
+			             future.getMissedKeys().size());
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -525,8 +517,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 		}
 
 		long start = System.currentTimeMillis();
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
 				.asyncBopSortMergeGet(keyList, 0, 1000,
@@ -544,6 +534,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, 1000,
 						ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
@@ -582,7 +573,6 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 		}
 
 		long start = System.currentTimeMillis();
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		
 		/* old  SMGetTestWithEflag */
 		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
@@ -604,6 +594,7 @@ public class SMGetTestWithEflag extends BaseIntegrationTest {
 			Assert.fail(e.getMessage());
 		}
 
+		SMGetMode smgetMode = SMGetMode.UNIQUE;
 		SMGetFuture<List<SMGetElement<Object>>> future = mc
 				.asyncBopSortMergeGet(keyList, 0, testSize,
 						ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
