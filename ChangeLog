@@ -1,3 +1,12 @@
+2017-09-23 [version 1.11.0]
+	* [Feature] Support long key. MAX_KEY_LENGTH(250 => 32000).
+	* [Fix]     Fix the trimmed/duplicated bugs of bop smget.
+	* [Enhance] Use space separated keys instead of comma separated keys.
+	* [Enhance] Use new mget command of arcus-memcached in asyncGetBulk().
+	   - Choose the old get command or the new mget command
+	     after checking the version of the connected arcus-memcached server.
+	* [Enhance] Divide the getBulk operation by N(=200) keys per node.
+
 2017-07-28 [version 1.10.1]
 	* [Fix] Fix connection latch count calculation mistake.
 	* [Fix] Fix the asyncBopDecr mistake of ArcusClientPool.
