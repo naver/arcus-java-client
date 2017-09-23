@@ -2302,10 +2302,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch blatch = new CountDownLatch(smGetList.size());
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
+		final List<String> missedKeyList = Collections.synchronizedList(new ArrayList<String>());
 		final Map<String, CollectionOperationStatus> missedKeys = 
 				Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
 		final List<SMGetTrimKey> mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
-		final List<String> missedKey = Collections.synchronizedList(new ArrayList<String>());
 		final int totalResultElementCount = count + offset;
 		
 		final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
@@ -2517,7 +2517,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 				@Override
 				public void gotMissedKey(byte[] data) {
-					missedKey.add(new String(data));
+					missedKeyList.add(new String(data));
+					OperationStatus cause = new OperationStatus(false, "UNDEFINED");
+					missedKeys.put(new String(data), new CollectionOperationStatus(cause));
 				}
 			});
 			ops.add(op);
@@ -2561,7 +2563,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 			@Override
 			public List<String> getMissedKeyList() {
-				return missedKey;
+				return missedKeyList;
 			}
 			
 			@Override
@@ -2632,10 +2634,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 		
 		final CountDownLatch blatch = new CountDownLatch(smGetList.size());
 		final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-		final Map<String, CollectionOperationStatus> missedKeys = 
-					Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
 		final List<String> missedKeyList = 
 					Collections.synchronizedList(new ArrayList<String>());
+		final Map<String, CollectionOperationStatus> missedKeys = 
+					Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
 		final int totalResultElementCount = count;
 		
 		final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
@@ -2926,10 +2928,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 				@Override
 				public void gotMissedKey(String key, OperationStatus cause) {
-					if (cause.getMessage().equals("UNDEFINED"))
-						missedKeyList.add(key);
-					else
-						missedKeys.put(key, new CollectionOperationStatus(cause));
+					missedKeyList.add(key);
+					missedKeys.put(key, new CollectionOperationStatus(cause));
 				}
 				
 				@Override
@@ -2983,13 +2983,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 			}
 
 			@Override
-			public Map<String, CollectionOperationStatus> getMissedKeys() {
-				return missedKeys;
+			public List<String> getMissedKeyList() {
+				return missedKeyList;
 			}
 			
 			@Override
-			public List<String> getMissedKeyList() {
-				return missedKeyList;
+			public Map<String, CollectionOperationStatus> getMissedKeys() {
+				return missedKeys;
 			}
 			
 			@Override
