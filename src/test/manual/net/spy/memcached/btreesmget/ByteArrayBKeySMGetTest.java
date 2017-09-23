@@ -81,8 +81,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 					.get(1000L, TimeUnit.SECONDS);
 
 			Assert.assertTrue(map.isEmpty());
-			Assert.assertEquals(oldFuture.getMissedKeyList().toString(), 10,
-			                    oldFuture.getMissedKeyList().size());
+			Assert.assertEquals(oldFuture.getMissedKeyList().size(), 10);
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
@@ -98,8 +97,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 					.get(1000L, TimeUnit.SECONDS);
 
 			Assert.assertTrue(map.isEmpty());
-			Assert.assertEquals(future.getMissedKeys().toString(), 10,
-			                    future.getMissedKeys().size());
+			Assert.assertEquals(future.getMissedKeys().size(), 10);
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -447,8 +445,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(oldFuture.getMissedKeyList().toString(), 5,
-			             oldFuture.getMissedKeyList().size());
+			assertEquals(oldFuture.getMissedKeyList().size(), 5);
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
@@ -465,8 +462,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(future.getMissedKeys().toString(), 5,
-			             future.getMissedKeys().size());
+			assertEquals(future.getMissedKeys().size(), 5);
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
@@ -503,8 +499,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(oldFuture.getMissedKeyList().toString(), 5,
-			             oldFuture.getMissedKeyList().size());
+			assertEquals(oldFuture.getMissedKeyList().size(), 5);
 		} catch (Exception e) {
 			oldFuture.cancel(true);
 			e.printStackTrace();
@@ -521,8 +516,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 
 			assertEquals(5, map.size());
 
-			assertEquals(future.getMissedKeys().toString(), 5,
-			             future.getMissedKeys().size());
+			assertEquals(future.getMissedKeys().size(), 5);
 		} catch (Exception e) {
 			future.cancel(true);
 			e.printStackTrace();
