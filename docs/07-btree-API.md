@@ -1263,7 +1263,7 @@ try {
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
 4. 조회된 값은 List\<SMGetElement\>형태로 반환된다. 이로부터 조회된 element를 조회할 수 있다.
    조회 결과에 동일한 bkey가 존재하면 key를 기준으로 정렬되어 반환된다.
-5. 조회할 때 지정한 key들 중에 smget에 참여하지 key들은 future.getMissedKeyList()를 통해 Map 형태로 실패 원인과 함께 조회할 수 있다.
+5. 조회할 때 지정한 key들 중에 smget에 참여하지 key들은 future.getMissedKeys()를 통해 Map 형태로 실패 원인과 함께 조회할 수 있다.
    - 실패원인은 cache miss(NOT_FOUND), unreadable 상태(UNREADABLE), bkey 범위 조회를 만족하는 처음 bkey가 trim된 상태(OUT_OF_RANGE) 중 하나이다.
    - 응용은 이들 키들에 대해서는 back-end storage인 DB에서 동일 조회 조건으로 elements를 검색하여 sort-merge 결과에 반영하여야 한다.
 6. bkey 조회 범위의 처음 bkey가 존재하지만 bkey 범위의 끝에 다다르기 전에 trim이 발생한 key와 trim 직전에 cache에 있는 마지막 bkey를 조회할 수 있다.
