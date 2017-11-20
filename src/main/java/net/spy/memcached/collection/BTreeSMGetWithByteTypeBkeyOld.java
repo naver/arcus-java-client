@@ -173,4 +173,10 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
       this.dataLength = Integer.parseInt(splited[3]);
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  public Map<String, Object> getArgument() {
+    return null; /* Old SMGet operation not supported */
+  }
+  /* ENABLE_MIGRATION end */
 }

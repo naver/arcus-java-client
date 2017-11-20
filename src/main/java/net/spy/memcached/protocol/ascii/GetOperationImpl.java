@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.Operation;
 
 /**
  * Operation for retrieving data.
@@ -25,5 +26,12 @@ class GetOperationImpl extends BaseGetOpImpl implements GetOperation {
     super(CMD, c, new HashSet<String>(k));
     setAPIType(APIType.GET);
   }
+
+  /* ENABLE_MIGRATION if */
+  public GetOperationImpl(Collection<String> k, GetOperation.Callback c, Operation p) {
+    super(CMD, c, new HashSet<String>(k), p);
+    setAPIType(APIType.GET);
+  }
+  /* ENABLE_MIGRATION end */
 
 }

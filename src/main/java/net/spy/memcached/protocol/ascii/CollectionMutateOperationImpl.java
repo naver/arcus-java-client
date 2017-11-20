@@ -89,6 +89,12 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     }
 
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     try {
       Long.valueOf(line);
       getCallback().receivedStatus(new OperationStatus(true, line));

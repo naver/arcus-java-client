@@ -16,10 +16,13 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.util.BTreeUtil;
+import net.spy.memcached.ops.Operation;
 
 public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
@@ -37,6 +40,9 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   protected int offset = -1;
   protected int count;
   protected boolean reverse;
+  /* ENABLE_MIGRATION if */
+  protected boolean byteBkey;
+  /* ENABLE_MIGRATION end */
 
   protected Map<Integer, T> map;
 
@@ -55,6 +61,9 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.offset = offset;
     this.count = count;
     this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
+    /* ENABLE_MIGRATION if */
+    this.byteBkey = true;
+    /* ENABLE_MIGRATION end */
   }
 
   protected BTreeGetBulkImpl(List<String> keyList, long from, long to,
@@ -66,7 +75,23 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.offset = offset;
     this.count = count;
     this.reverse = (from > to);
+    /* ENABLE_MIGRATION if */
+    this.byteBkey = false;
+    /* ENABLE_MIGRATION end */
   }
+
+  /* ENABLE_MIGRATION if */
+  protected BTreeGetBulkImpl(List<String> keyList, String range,
+                             ElementFlagFilter eFlagFilter, int offset, int count, boolean reverse) {
+
+    this.keyList = keyList;
+    this.range = range;
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+    this.reverse = reverse;
+  }
+  /* ENABLE_MIGRATION end */
 
   public void setKeySeparator(String keySeparator) {
     this.keySeparator = keySeparator;
@@ -157,4 +182,18 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   public byte[] getEFlag() {
     return eflag;
   }
+
+  /* ENABLE_MIGRATION if */
+  public Map<String, Object> getArgument() {
+    Map<String, Object> arguments = new HashMap<String, Object>();
+    arguments.put("byteBkey", byteBkey);
+    arguments.put("range", range);
+    arguments.put("eFlagFilter", eFlagFilter);
+    arguments.put("offset", offset);
+    arguments.put("count", count);
+    arguments.put("reverse", reverse);
+
+    return arguments;
+  }
+  /* ENABLE_MIGRATION end */
 }

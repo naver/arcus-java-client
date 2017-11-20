@@ -30,6 +30,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.Operation;
 
 /**
  * Operation to store collection data in a memcached server.
@@ -69,6 +70,11 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
   protected int count;
   protected int index = 0;
   protected boolean successAll = true;
+  /* ENABLE_MIGRATION if */
+  private Operation parentOperation = null;
+  private int migratingCount = 0;
+  private boolean migrating = false;
+  /* ENABLE_MIGRATION end */
 
   public CollectionBulkStoreOperationImpl(List<String> keyList,
                                           CollectionBulkStore<?> store, OperationCallback cb) {
@@ -76,6 +82,24 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
     this.key = keyList.get(0);
     this.store = store;
     this.cb = (Callback) cb;
+    if (this.store instanceof CollectionBulkStore.ListBulkStore)
+      setAPIType(APIType.LOP_INSERT);
+    else if (this.store instanceof CollectionBulkStore.SetBulkStore)
+      setAPIType(APIType.SOP_INSERT);
+    else if (this.store instanceof CollectionBulkStore.MapBulkStore)
+      setAPIType(APIType.MOP_INSERT);
+    else if (this.store instanceof CollectionBulkStore.BTreeBulkStore)
+      setAPIType(APIType.BOP_INSERT);
+    setOperationType(OperationType.WRITE);
+  }
+
+  public CollectionBulkStoreOperationImpl(List<String> keyList,
+                                          CollectionBulkStore<?> store, OperationCallback cb, Operation p) {
+    super(cb);
+    this.key = keyList.get(0);
+    this.store = store;
+    this.cb = (Callback) cb;
+    this.parentOperation = p;
     if (this.store instanceof CollectionBulkStore.ListBulkStore)
       setAPIType(APIType.LOP_INSERT);
     else if (this.store instanceof CollectionBulkStore.SetBulkStore)
@@ -100,6 +124,31 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 
     /* ENABLE_REPLICATION end */
     if (store.getItemCount() == 1) {
+      /* ENABLE_MIGRATION if */
+      if (line.startsWith("NOT_MY_KEY ")) {
+        this.store.setNextOpIndex(index);
+        receivedMigrateOperations(line, true);
+      } else {
+        if (parentOperation == null) {
+          OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
+                  NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+                  TYPE_MISMATCH, BKEY_MISMATCH);
+
+          if (status.isSuccess()) {
+            cb.receivedStatus(END);
+          } else {
+            cb.gotStatus(index, status);
+            cb.receivedStatus(FAILED_END);
+          }
+        }
+        transitionState(OperationState.COMPLETE);
+        if (parentOperation != null) {
+          parentOperation.decrMigratingCount(key, line);
+        }
+      }
+      return;
+      /* else */
+      /*
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
@@ -111,11 +160,32 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
       }
       transitionState(OperationState.COMPLETE);
       return;
+      */
+      /* ENABLE_MIGRATION end */
     }
 
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (migrating) {
+        transitionState(OperationState.MIGRATING);
+        migrating = false;
+      } else {
+        cb.receivedStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.COMPLETE);
+      }
+      /* else */
+      /*
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
+      return;
+      */
+      /* ENABLE_MIGRATION end */
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      this.store.setNextOpIndex(index);
+      receivedMigrateOperations(line, false);
+      migrating = true;
+    /* ENABLE_MIGRATION end */
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 
@@ -150,6 +220,30 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
               + (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public void setMigratingCount(int count) {
+    migratingCount = count;
+  }
+
+  @Override
+  public void decrMigratingCount(String key, String line) {
+    OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
+            NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+            TYPE_MISMATCH, BKEY_MISMATCH);
+    if (!status.isSuccess()) {
+      cb.gotStatus(this.store.getKeyList().indexOf(key), status);
+      successAll = false;
+    }
+
+    migratingCount -= 1;
+    if (migratingCount == 0) {
+      cb.receivedStatus((successAll) ? END : FAILED_END);
+      transitionState(OperationState.COMPLETE);
+    }
+  }
+  /* ENABLE_MIGRATION end */
 
   @Override
   protected void wasCancelled() {

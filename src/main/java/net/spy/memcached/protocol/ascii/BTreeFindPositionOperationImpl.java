@@ -95,6 +95,11 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
       } catch (Exception e) {
         // expected : <error_string>
       }
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+		/* ENABLE_MIGRATION end */
     } else {
       OperationStatus status = matchStatus(line, NOT_FOUND, UNREADABLE,
               BKEY_MISMATCH, TYPE_MISMATCH, NOT_FOUND_ELEMENT);

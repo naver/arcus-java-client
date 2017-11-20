@@ -73,6 +73,12 @@ final class MutatorOperationImpl extends OperationImpl
     }
 
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     OperationStatus status = null;
     try {
       Long.valueOf(line);

@@ -102,6 +102,10 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
         // start to read actual data
         setReadType(OperationReadType.DATA);
       }
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+    /* ENABLE_MIGRATION end */
     } else {
       OperationStatus status = matchStatus(line, END, NOT_FOUND,
               UNREADABLE, TYPE_MISMATCH, NOT_FOUND_ELEMENT);

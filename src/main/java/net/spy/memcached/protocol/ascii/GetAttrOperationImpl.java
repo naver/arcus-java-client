@@ -69,6 +69,10 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
       assert stuff[0].equals("ATTR");
 
       cb.gotAttribute(key, stuff[1]);
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+		/* ENABLE_MIGRATION end */
     } else {
       OperationStatus status = matchStatus(line, END, NOT_FOUND,
               ATTR_ERROR_NOT_FOUND);
