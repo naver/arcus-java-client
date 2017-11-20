@@ -17,6 +17,7 @@
 package net.spy.memcached.collection;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BTreeGetBulk<T> {
 
@@ -49,4 +50,8 @@ public interface BTreeGetBulk<T> {
   public void decodeItemHeader(String itemHeader);
 
   public void decodeKeyHeader(String keyHeader);
+
+  /* ENABLE_MIGRATION if */
+  public Map<String, Object> getArgument();
+  /* ENABLE_MIGRATION end */
 }

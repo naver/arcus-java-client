@@ -258,4 +258,20 @@ public class MockMemcachedNode implements MemcachedNode {
     return 0;
   }
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+  @Override
+  public void makeMoveOperation(Operation op) {
+    // noop
+  }
+
+  @Override
+  public void moveOperation(Operation op, final MemcachedNode toNode) {
+    // noop
+  }
+
+  @Override
+  public void addMovesOp(Operation op) {
+    // noop
+  }
+  /* ENABLE_MIGRATION end */
 }

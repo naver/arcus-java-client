@@ -58,6 +58,12 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     }
 
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(matchStatus(line,
             STORED, NOT_FOUND, EXISTS));
     transitionState(OperationState.COMPLETE);

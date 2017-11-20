@@ -151,6 +151,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     socketAddress=sa;
     */
     /* ENABLE_REPLICATION end */
+
     setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
@@ -813,5 +814,34 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
     return opCount;
   }
+
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+  public final void addMovesOp(Operation op) {
+    if (inputQueue.remainingCapacity() > 0) {
+      addOp(op);
+      return;
+    }
+    /* FIXME::handle input queue and write queue capacity
+     * it works by handleIO thread only.
+     * so someone does not pull out the queue.
+     * should review the handling.
+     */
+    copyInputQueue();
+    addOp(op);
+  }
+
+  public void makeMoveOperation(Operation op) {
+    op.initialize(); // write completed or not yet initialized
+    op.resetState(); // reset operation state
+    op.setHandlingNode(this);
+    op.setMoved(true);
+  }
+
+  public void moveOperation(Operation op, final MemcachedNode toNode) {
+    toNode.makeMoveOperation(op);
+    toNode.addMovesOp(op);
+    getLogger().debug("operation : " + op + " have been moved to %s", toNode);
+  }
+  /* ENABLE_MIGRATION end */
 }

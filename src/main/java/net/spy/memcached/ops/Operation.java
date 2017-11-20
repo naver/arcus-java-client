@@ -2,6 +2,7 @@ package net.spy.memcached.ops;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 import net.spy.memcached.MemcachedNode;
 
@@ -56,6 +57,18 @@ public interface Operation {
   void setMoved(boolean s);
 
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+
+  /**
+   * Get the response string of Migration from server(memcached node).
+   */
+  String getMgResponse(int index);
+
+  /**
+   * Get the response size of Migration from server(memcached node).
+   */
+  int getMgResponseSize();
+  /* ENABLE_MIGRATION end */
 
   /**
    * Get the write buffer for this operation.
@@ -104,4 +117,14 @@ public interface Operation {
   boolean isReadOperation();
 
   APIType getAPIType();
+
+  /* ENABLE_MIGRATION if */
+  void setMigratingCount(int count);
+
+  void decrMigratingCount(String line);
+
+  void decrMigratingCount(String key, String line);
+
+  Map<String, Object> getArguments();
+  /* ENABLE_MIGRATION end */
 }

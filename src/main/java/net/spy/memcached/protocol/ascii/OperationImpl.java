@@ -155,6 +155,11 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
         break;
       }
       /* ENABLE_REPLICATION end */
+      /* ENABLE_MIGRATION if */
+      if (getState() == OperationState.MIGRATING) {
+        break;
+      }
+      /* ENABLE_MIGRATION end */
     }
   }
 

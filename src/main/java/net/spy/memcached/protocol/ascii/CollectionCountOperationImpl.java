@@ -80,6 +80,10 @@ public class CollectionCountOperationImpl extends OperationImpl implements
               new CollectionOperationStatus(new OperationStatus(true,
                       String.valueOf(count))));
       transitionState(OperationState.COMPLETE);
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+    /* ENABLE_MIGRATION end */
     } else {
       OperationStatus status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);

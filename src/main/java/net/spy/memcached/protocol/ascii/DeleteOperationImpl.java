@@ -46,6 +46,12 @@ final class DeleteOperationImpl extends OperationImpl
     }
 
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
     transitionState(OperationState.COMPLETE);
   }

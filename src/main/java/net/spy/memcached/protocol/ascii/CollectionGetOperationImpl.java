@@ -107,7 +107,13 @@ public class CollectionGetOperationImpl extends OperationImpl
       return;
     }
 
-    /* ENABLE_REPLICATION end */
+		/* ENABLE_REPLICATION end */
+		/* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+		/* ENABLE_MIGRATION end */
     if (line.startsWith("VALUE ")) {
       // Response header
       getLogger().debug("Got line %s", line);

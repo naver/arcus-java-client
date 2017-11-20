@@ -88,6 +88,9 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
+/* ENABLE_MIGRATION if */
+import net.spy.memcached.ops.ClusterOperation;
+/* ENABLE_MIGRATION end */
 
 /**
  * Factory for binary operations.
@@ -119,6 +122,19 @@ public class BinaryOperationFactory extends BaseOperationFactory {
     throw new RuntimeException(
             "mget is not supported in binary protocol yet.");
   }
+
+  /* ENABLE_MIGRATION if */
+  public GetOperation get(Collection<String> keys, GetOperation.Callback cb, Operation parentOp) {
+    throw new RuntimeException(
+            "get of migration is not supported in binary protocol yet.");
+  }
+
+  public GetOperation mget(Collection<String> keys, GetOperation.Callback cb, Operation parentOp) {
+    throw new RuntimeException(
+            "mget of migration is not supported in binary protocol yet.");
+  }
+
+  /* ENABLE_MIGRATION end */
 
   public MutatorOperation mutate(Mutator m, String key, int by,
                                  long def, int exp, OperationCallback cb) {
@@ -317,12 +333,31 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "Collection piped store2 operation is not supported in binary protocol yet.");
   }
 
+  /* ENABLE_MIGRATION if */
+  @Override
+  public CollectionBulkStoreOperation collectionBulkStore(
+          List<String> key, CollectionBulkStore<?> store,
+          OperationCallback cb, Operation parentOp) {
+    throw new RuntimeException(
+            "Collection piped store2 operation is not supported in binary protocol yet.");
+  }
+  /* ENABLE_MIGRATION end */
+
   @Override
   public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get,
                                           BTreeGetBulkOperation.Callback<?> cb) {
     throw new RuntimeException(
             "BTree get bulk operation is not supported in binary protocol yet.");
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get,
+                                          BTreeGetBulkOperation.Callback<?> cb, Operation parentOp) {
+    throw new RuntimeException(
+            "BTree get bulk operation is not supported in binary protocol yet.");
+  }
+  /* ENABLE_MIGRATION end */
 
   @Override
   public BTreeGetByPositionOperation bopGetByPosition(String key,
@@ -352,4 +387,10 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "BTree store and get operation is not supported in binary protocol yet.");
   }
 
+  /* ENABLE_MIGRATION if */
+  public ClusterOperation cluster(long version, OperationCallback cb) {
+    throw new RuntimeException(
+            "ClusterOperation is not supported in binary protocol yet.");
+  }
+  /* ENABLE_MIGRATION end */
 }

@@ -38,4 +38,10 @@ public enum OperationState {
    */
   MOVING
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+  /**
+   * State indication this key (operation) was migrated
+   */
+  , MIGRATING
+  /* ENABLE_MIGRATION end */
 }

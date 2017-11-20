@@ -27,6 +27,13 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(keyList, from, to, eFlagFilter, offset, count);
   }
 
+  /* ENABLE_MIGRATION if */
+  public BTreeGetBulkWithByteTypeBkey(List<String> keyList, String range,
+                                      ElementFlagFilter eFlagFilter, int offset, int count, boolean reverse) {
+    super(keyList, range, eFlagFilter, offset, count, reverse);
+  }
+  /* ENABLE_MIGRATION end */
+
   public byte[] getSubkey() {
     return (byte[]) subkey;
   }
