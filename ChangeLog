@@ -57,7 +57,7 @@
 	* [Other] Followings are modified to get additional arguments.
 	   - CollectionDelete, CollectionExist, SetExit
 	   - CollecitionGet and its subclasses
-	* [Other] Extensice code refactoring
+	* [Other] Extensive code refactoring
 
 2016-02-04 [version 1.9.3] stable (but, verbose messages)
 	* Add cancel message to detect the cancel cause.
