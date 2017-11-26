@@ -125,7 +125,7 @@ ElementFlagFilter setBitOperand(BitWiseOperands bitOp, byte[] bitCompValue)
 
 #### ElementFlagFilter 사용 예제
 
-첫째 예는 b+tree에 저장된 전제 element들에서 eflag 값이 0x0102와 일치하는 element의 개수를 조회한다.
+첫째 예는 b+tree에 저장된 전체 element들에서 eflag 값이 0x0102와 일치하는 element의 개수를 조회한다.
 
 ```java
 ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal, new byte[] { 1, 2 }); // (1) 
@@ -183,7 +183,7 @@ ElementMultiFlagsFilter는 여러 compare value를 지정할 수 있고, 아래 
 - ElementFlagFilter.CompOperands.NotEqual
 
 ElementMultiFlagsFilter 사용 예로,
-아래는 b+tree의 전체element들 중에 eflag의 값이 0x0102 또는 0x0104에 일치하는 element의 개수를 조회한다.
+아래는 b+tree의 전체 element들 중에 eflag의 값이 0x0102 또는 0x0104에 일치하는 element의 개수를 조회한다.
 즉, IN 연산의 filtering을 수행한다.
 
 ```java
