@@ -145,7 +145,7 @@ Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/L
 
 ## Patents
 
-Arcus has patents on b+tree smget operation.
+Arcus has patents on b+tree segment operation.
 Refer to PATENTS file in this directory to get the patent information.
 
 Under the Apache License 2.0, a perpetual, worldwide, non-exclusive,
