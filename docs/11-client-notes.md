@@ -79,7 +79,7 @@ if (future != null) {
 Operation queue block timeout 옵션을 설정하지 않으면, 작업 요청을 하는 client 함수들은 모두 blocking을 당할 수가 있다.
 물론, 실제로 future.get 수행시 정상 처리가 되든 exception이 나서 취소가 되든 operation queue에 등록된 작업은
 지속적으로 빠져나가 operation queue에 작업을 등록할 공간은 느리지만 생길 것이다.
-그러나, request 요청 속도가 operation queue에 등록된 작업의 처리 속도보다 매우 빠른다면,
+그러나, request 요청 속도가 operation queue에 등록된 작업의 처리 속도보다 매우 빠르다면,
 해당 request를 요청하는 것보다 차라리 바로 실패로 처리하고,
 back-end 데이터 저장소로 요청을 보내는 것이 더 좋은 선택이 될 수 있다.
 
@@ -109,14 +109,13 @@ boolean result = setResult.get(300L, TimeUnit.MILLISECONDS);
 첫째, 이 코드가 실행되는 시점에서 full GC(garbage collection)가 발생했고, 
 full GC time이 500ms였다면 이 요청은 timeout이 되게 된다.
 **따라서, timeout값은 JVM full GC time을 고려하여 설정해야 한다.**
-**대부분 몇 십개의 timeout이 발생하는 문제는 full GC time이 길어서 발생하는 문제이다.**
+**대부분 몇십 개의 timeout이 발생하는 문제는 full GC time이 길어서 발생하는 문제이다.**
 
 둘째, burst traffic, small packet buffer size 등의 이유로 cache client와 cache server 사이에
 packet retransmission이 발생할 수 있다.
 Linux 환경에서 최소 retransmission timeout은 200ms이며,
-그 다음의 retransmission timeout은 400ms, 800ms, ... 형태로 두배씩 길어지게 된다.
+그 다음의 retransmission timeout은 400ms, 800ms, ... 형태로 두 배씩 길어지게 된다.
 Packet retransmission은 제법 흔하게 발생하고 있으므로,
 이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
 따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
-
 
