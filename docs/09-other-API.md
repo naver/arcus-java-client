@@ -7,7 +7,7 @@
 ### Flush
 
 Arcus는 prefix단위로 flush하는 기능을 제공한다.
-캐시 서버에 저장된 모든 데이터들 중 특정 prefix를 사용하는 모든 key들을 한번의 요청으로 삭제할 수 있다.
+캐시 서버에 저장된 모든 데이터들 중 특정 prefix를 사용하는 모든 key들을 한번의 요청으로 삭제할 수 있다. 단, Front Cache의 데이터는 flush 되지 않는다.
 
 ```java
 OperationFuture<Boolean> flush(String prefix)

@@ -378,6 +378,7 @@ Front cache 사용 상의 주의 사항은 다음과 같다.
 - Front cache는 remote Arcus와 sync를 맞추지 않기 때문에 주로 read-only data를 caching하는데 적합하다.
   그리고 front caching expire time도 remote cache entry update주기에 따라 sync가 맞지 않는 기간을 잘 파악하여
   설정해야 한다.
+- Front Cache 데이터는 flush 명령어를 통해서 flush 되지 않는다
 
 아래는 Front cache를 사용하기 위한 코드이다.
 setMaxFrontCacheElements만 0보다 큰 값으로 설정하면 Front Cache가 활성화된다. (setFrontCacheExpireTime 도 사용 용도에 맞도록 명시적인 값을 설정해 주는 것을 추천함)
