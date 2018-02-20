@@ -13,6 +13,8 @@ Arcus는 prefix단위로 flush하는 기능을 제공한다.
 OperationFuture<Boolean> flush(String prefix)
 ```
 
+정상적으로 prefix가 제거되었을 경우 true를 반환하며 만약 해당 prefix가 존재하지 않아 제거에 실패하였을 경우 false를 반환한다.
+
 **특정 prefix의 모든 item들을 삭제하는 기능이기 때문에 그 사용에 주의하여야 한다.**
 **특히, prefix를 입력하지 않으면, cache node의 모든 item들이 삭제므로 공용으로 사용하는 cloud에선 각별히 주의해야 한다.**
 

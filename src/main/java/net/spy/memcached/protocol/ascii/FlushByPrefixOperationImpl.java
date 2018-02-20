@@ -32,7 +32,7 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
 		FlushOperation {
 
 	private static final OperationStatus OK = new OperationStatus(true, "OK");
-	private static final OperationStatus NOT_FOUND = new OperationStatus(true, "NOT_FOUND");
+	private static final OperationStatus NOT_FOUND = new OperationStatus(false, "NOT_FOUND");
 
 	private final String prefix;
 	private final int delay;
