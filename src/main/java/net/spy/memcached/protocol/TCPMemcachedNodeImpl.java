@@ -38,6 +38,7 @@ import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -296,7 +297,13 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 					preparePending();
 					if(shouldOptimize) {
-						optimize();
+						/* FIXME
+						 * MGetOperation needs optimization.
+						 * Temporarily do not optimize on MGetOperation.
+						 */
+						if (writeQ.peek().getAPIType() != APIType.MGET) {
+							optimize();
+						}
 					}
 
 					o=getCurrentWriteOp();
