@@ -301,7 +301,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 						 * MGetOperation needs optimization.
 						 * Temporarily do not optimize on MGetOperation.
 						 */
-						if (writeQ.peek().getAPIType() != APIType.MGET) {
+						if (writeQ.peek() != null && writeQ.peek().getAPIType() != APIType.MGET) {
 							optimize();
 						}
 					}
