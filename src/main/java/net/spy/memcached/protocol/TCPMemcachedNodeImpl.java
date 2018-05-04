@@ -572,12 +572,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 */
 	private final void setEnableMGetOp() {
 		StringTokenizer tokens = new StringTokenizer(version,".");
-		String makedVersion = tokens.nextToken()+"."+tokens.nextToken();
-		double versionStandard = Double.parseDouble(makedVersion);
+		int majorVersion = Integer.parseInt(tokens.nextToken());
+		int minorVersion = Integer.parseInt(tokens.nextToken());
 		if (version.contains("E")) {
-			enabledMGetOp = versionStandard >= 0.7;
+			enabledMGetOp = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
 		} else {
-			enabledMGetOp = versionStandard >= 1.11;
+			enabledMGetOp = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
 		}
 	}
 
