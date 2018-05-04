@@ -25,7 +25,7 @@ public class BinaryMemcachedNodeImpl extends TCPMemcachedNodeImpl {
 			BlockingQueue<Operation> wq, BlockingQueue<Operation> iq,
 			Long opQueueMaxBlockTimeNs, boolean waitForAuth) {
 		super(sa, c, bufSize, rq, wq, iq, opQueueMaxBlockTimeNs,
-			waitForAuth);
+			waitForAuth, false /* binary protocol */);
 	}
 
 	@Override
