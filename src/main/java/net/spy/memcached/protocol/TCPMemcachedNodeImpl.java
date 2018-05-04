@@ -297,13 +297,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 					preparePending();
 					if(shouldOptimize) {
-						/* FIXME
-						 * MGetOperation needs optimization.
-						 * Temporarily do not optimize on MGetOperation.
-						 */
-						if (writeQ.peek() != null && writeQ.peek().getAPIType() != APIType.MGET) {
-							optimize();
-						}
+						optimize();
 					}
 
 					o=getCurrentWriteOp();
