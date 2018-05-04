@@ -30,6 +30,7 @@ public class BinaryMemcachedNodeImpl extends TCPMemcachedNodeImpl {
 
 	@Override
 	protected void optimize() {
+		// MGetOperation does not support binary protocol
 		Operation firstOp = writeQ.peek();
 		if(firstOp instanceof GetOperation) {
 			optimizeGets();
