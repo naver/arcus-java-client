@@ -35,92 +35,92 @@ import net.spy.memcached.ops.OperationType;
  * Operation for mutating integers inside of memcached.
  */
 final class MutatorOperationImpl extends OperationImpl
-	implements MutatorOperation {
+        implements MutatorOperation {
 
-	public static final int OVERHEAD=32;
+  public static final int OVERHEAD = 32;
 
-	private static final OperationStatus NOT_FOUND=
-		new OperationStatus(false, "NOT_FOUND");
-	private static final OperationStatus TYPE_MISMATCH=
-		new OperationStatus(false, "TYPE_MISMATCH");
+  private static final OperationStatus NOT_FOUND =
+          new OperationStatus(false, "NOT_FOUND");
+  private static final OperationStatus TYPE_MISMATCH =
+          new OperationStatus(false, "TYPE_MISMATCH");
 
-	private final Mutator mutator;
-	private final String key;
-	private final int amount;
-	private final long def;
-	private final int exp;
+  private final Mutator mutator;
+  private final String key;
+  private final int amount;
+  private final long def;
+  private final int exp;
 
-	public MutatorOperationImpl(Mutator m, String k, int amt, long d, int e,
-			OperationCallback c) {
-		super(c);
-		mutator=m;
-		key=k;
-		amount=amt;
-		def=d;
-		exp=e;
-		if (m == Mutator.incr)
-			setAPIType(APIType.INCR);
-		else if (m == Mutator.decr)
-			setAPIType(APIType.DECR);
-		setOperationType(OperationType.WRITE);
-	}
+  public MutatorOperationImpl(Mutator m, String k, int amt, long d, int e,
+                              OperationCallback c) {
+    super(c);
+    mutator = m;
+    key = k;
+    amount = amt;
+    def = d;
+    exp = e;
+    if (m == Mutator.incr)
+      setAPIType(APIType.INCR);
+    else if (m == Mutator.decr)
+      setAPIType(APIType.DECR);
+    setOperationType(OperationType.WRITE);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		/* ENABLE_REPLICATION if */
-		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-			receivedMoveOperations(line);
-		}
+  @Override
+  public void handleLine(String line) {
+    /* ENABLE_REPLICATION if */
+    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+      receivedMoveOperations(line);
+    }
 
-		/* ENABLE_REPLICATION end */
-		OperationStatus status=null;
-		try {
-			Long.valueOf(line);
-			getCallback().receivedStatus(new OperationStatus(true, line));
-		} catch (NumberFormatException e) {
-			status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
-			getCallback().receivedStatus(status);
-		}
-		transitionState(OperationState.COMPLETE);
-	}
+    /* ENABLE_REPLICATION end */
+    OperationStatus status = null;
+    try {
+      Long.valueOf(line);
+      getCallback().receivedStatus(new OperationStatus(true, line));
+    } catch (NumberFormatException e) {
+      status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
+      getCallback().receivedStatus(status);
+    }
+    transitionState(OperationState.COMPLETE);
+  }
 
-	@Override
-	public void initialize() {
-		int size=KeyUtil.getKeyBytes(key).length + OVERHEAD;
-		ByteBuffer b=ByteBuffer.allocate(size);
-		if (def > -1) {
-			setArguments(b, mutator.name(), key, amount, 0, exp, def);
-		} else {
-			setArguments(b, mutator.name(), key, amount);
-		}
-		b.flip();
-		setBuffer(b);
-	}
+  @Override
+  public void initialize() {
+    int size = KeyUtil.getKeyBytes(key).length + OVERHEAD;
+    ByteBuffer b = ByteBuffer.allocate(size);
+    if (def > -1) {
+      setArguments(b, mutator.name(), key, amount, 0, exp, def);
+    } else {
+      setArguments(b, mutator.name(), key, amount);
+    }
+    b.flip();
+    setBuffer(b);
+  }
 
-	@Override
-	protected void wasCancelled() {
-		// XXX:  Replace this comment with why the hell I did this.
-		getCallback().receivedStatus(CANCELLED);
-	}
+  @Override
+  protected void wasCancelled() {
+    // XXX:  Replace this comment with why the hell I did this.
+    getCallback().receivedStatus(CANCELLED);
+  }
 
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
-	public int getBy() {
-		return amount;
-	}
+  public int getBy() {
+    return amount;
+  }
 
-	public long getDefault() {
-		return -1;
-	}
+  public long getDefault() {
+    return -1;
+  }
 
-	public int getExpiration() {
-		return -1;
-	}
+  public int getExpiration() {
+    return -1;
+  }
 
-	public Mutator getType() {
-		return mutator;
-	}
+  public Mutator getType() {
+    return mutator;
+  }
 
 }

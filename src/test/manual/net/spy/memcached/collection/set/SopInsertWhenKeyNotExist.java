@@ -23,87 +23,87 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
-	private String key = "SopInsertWhenKeyNotExist";
+  private String key = "SopInsertWhenKeyNotExist";
 
-	protected void tearDown() {
-		try {
-			mc.delete(key).get();
-			super.tearDown();
-		} catch (Exception e) {
-		}
-	}
+  protected void tearDown() {
+    try {
+      mc.delete(key).get();
+      super.tearDown();
+    } catch (Exception e) {
+    }
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * true	false	null
-	 * </pre>
-	 */
-	public void testSopInsert_nokey_01() throws Exception {
-		insertToFail(key, true, false, null);
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * true	false	null
+   * </pre>
+   */
+  public void testSopInsert_nokey_01() throws Exception {
+    insertToFail(key, true, false, null);
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * false	true	not null
-	 * </pre>
-	 */
-	public void testSopInsert_nokey_02() throws Exception {
-		assertFalse(insertToSucceed(key, false, true, "some value"));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * false	true	not null
+   * </pre>
+   */
+  public void testSopInsert_nokey_02() throws Exception {
+    assertFalse(insertToSucceed(key, false, true, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * false	false	not null
-	 * </pre>
-	 */
-	public void testSopInsert_nokey_04() throws Exception {
-		assertFalse(insertToSucceed(key, false, false, "some value"));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * false	false	not null
+   * </pre>
+   */
+  public void testSopInsert_nokey_04() throws Exception {
+    assertFalse(insertToSucceed(key, false, false, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * true	true	not null
-	 * </pre>
-	 */
-	public void testSopInsert_nokey_05() throws Exception {
-		assertTrue(insertToSucceed(key, true, true, "some value"));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * true	true	not null
+   * </pre>
+   */
+  public void testSopInsert_nokey_05() throws Exception {
+    assertTrue(insertToSucceed(key, true, true, "some value"));
+  }
 
-	boolean insertToFail(String key, boolean createKeyIfNotExists,
-			boolean fixed, Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncSopInsert(
-							key,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-			fail("should be failed");
-		} catch (Exception e) {
-		}
-		return result;
-	}
+  boolean insertToFail(String key, boolean createKeyIfNotExists,
+                       boolean fixed, Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncSopInsert(
+                      key,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+      fail("should be failed");
+    } catch (Exception e) {
+    }
+    return result;
+  }
 
-	boolean insertToSucceed(String key, boolean createKeyIfNotExists,
-			boolean fixed, Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncSopInsert(
-							key,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("should not be failed");
-		}
-		return result;
-	}
+  boolean insertToSucceed(String key, boolean createKeyIfNotExists,
+                          boolean fixed, Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncSopInsert(
+                      key,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("should not be failed");
+    }
+    return result;
+  }
 
 }

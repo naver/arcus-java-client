@@ -21,17 +21,17 @@ package net.spy.memcached.ops;
  */
 public interface GetAttrOperation extends KeyedOperation {
 
-	/**
-	 * Operation callback for the get request.
-	 */
-	interface Callback extends OperationCallback {
-		/**
-		 * Callback for each result from a get.
-		 *
-		 * @param key the key that was retrieved
-		 * @param attr an attribute(name=value) returned by the memcached server
-		 */
-		void gotAttribute(String key, String attr);
-	}
+  /**
+   * Operation callback for the get request.
+   */
+  interface Callback extends OperationCallback {
+    /**
+     * Callback for each result from a get.
+     *
+     * @param key  the key that was retrieved
+     * @param attr an attribute(name=value) returned by the memcached server
+     */
+    void gotAttribute(String key, String attr);
+  }
 
 }

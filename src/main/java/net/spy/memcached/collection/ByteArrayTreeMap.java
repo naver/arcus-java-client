@@ -21,18 +21,18 @@ import java.util.TreeMap;
 
 public final class ByteArrayTreeMap<K, V> extends TreeMap<K, V> {
 
-	private static final long serialVersionUID = -304580135331634224L;
+  private static final long serialVersionUID = -304580135331634224L;
 
-	public ByteArrayTreeMap(Comparator<? super K> comparator) {
-		super(comparator);
-	}
+  public ByteArrayTreeMap(Comparator<? super K> comparator) {
+    super(comparator);
+  }
 
-	@Override
-	public V get(Object key) {
-		if (key instanceof byte[]) {
-			return super.get(new ByteArrayBKey((byte[]) key));
-		} else {
-			return super.get(key);
-		}
-	}
+  @Override
+  public V get(Object key) {
+    if (key instanceof byte[]) {
+      return super.get(new ByteArrayBKey((byte[]) key));
+    } else {
+      return super.get(key);
+    }
+  }
 }

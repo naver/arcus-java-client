@@ -24,65 +24,65 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 
 public class CreateEmptyListTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
+  private final String KEY = this.getClass().getSimpleName();
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testCreateEmptyWithDefaultAttribute() {
-		try {
-			// create empty
-			CollectionAttributes attribute = new CollectionAttributes();
-			Boolean insertResult = mc.asyncLopCreate(KEY,
-					ElementValueType.OTHERS, attribute).get();
+  public void testCreateEmptyWithDefaultAttribute() {
+    try {
+      // create empty
+      CollectionAttributes attribute = new CollectionAttributes();
+      Boolean insertResult = mc.asyncLopCreate(KEY,
+              ElementValueType.OTHERS, attribute).get();
 
-			Assert.assertTrue(insertResult);
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      // check attribute
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-			Assert.assertEquals(new Long(0), attr.getCount());
-			Assert.assertEquals(new Long(4000), attr.getMaxCount());
-			Assert.assertEquals(new Integer(0), attr.getExpireTime());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(new Long(4000), attr.getMaxCount());
+      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testCreateEmptyWithSpecifiedAttribute() {
-		try {
-			// create empty
-			CollectionAttributes attribute = new CollectionAttributes();
-			attribute.setMaxCount(10000);
-			attribute.setExpireTime(9999);
-			attribute.setOverflowAction(CollectionOverflowAction.error);
-			Boolean insertResult = mc.asyncLopCreate(KEY,
-					ElementValueType.OTHERS, attribute).get();
+  public void testCreateEmptyWithSpecifiedAttribute() {
+    try {
+      // create empty
+      CollectionAttributes attribute = new CollectionAttributes();
+      attribute.setMaxCount(10000);
+      attribute.setExpireTime(9999);
+      attribute.setOverflowAction(CollectionOverflowAction.error);
+      Boolean insertResult = mc.asyncLopCreate(KEY,
+              ElementValueType.OTHERS, attribute).get();
 
-			Assert.assertTrue(insertResult);
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      // check attribute
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-			Assert.assertEquals(new Long(0), attr.getCount());
-			Assert.assertEquals(new Long(10000), attr.getMaxCount());
-			Assert.assertEquals(CollectionOverflowAction.error,
-					attr.getOverflowAction());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(new Long(10000), attr.getMaxCount());
+      Assert.assertEquals(CollectionOverflowAction.error,
+              attr.getOverflowAction());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
 }

@@ -18,80 +18,80 @@ package net.spy.memcached.collection;
 
 public abstract class CollectionUpdate<T> {
 
-	protected int flags = 0;
-	protected T newValue;
-	protected ElementFlagUpdate eflagUpdate;
-	protected boolean noreply = false;
-	protected String str;
+  protected int flags = 0;
+  protected T newValue;
+  protected ElementFlagUpdate eflagUpdate;
+  protected boolean noreply = false;
+  protected String str;
 
-	public CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
+  public CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
 
-		if (eflagUpdate == null) {
-			if (newValue == null) {
-				throw new IllegalArgumentException(
-						"One of the newValue or elementFlag must not be null.");
-			}
-		} else {		
-			if (eflagUpdate.getElementFlag().length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
-				throw new IllegalArgumentException("length of element flag cannot exceed "
-						+ ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
-			}
-		}
-		this.newValue = newValue;
-		this.eflagUpdate = eflagUpdate;
-		this.noreply = noreply;
-	}
+    if (eflagUpdate == null) {
+      if (newValue == null) {
+        throw new IllegalArgumentException(
+                "One of the newValue or elementFlag must not be null.");
+      }
+    } else {
+      if (eflagUpdate.getElementFlag().length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
+        throw new IllegalArgumentException("length of element flag cannot exceed "
+                + ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
+      }
+    }
+    this.newValue = newValue;
+    this.eflagUpdate = eflagUpdate;
+    this.noreply = noreply;
+  }
 
-	public String stringify() {
-		if (str != null)
-			return str;
+  public String stringify() {
+    if (str != null)
+      return str;
 
-		StringBuilder b = new StringBuilder();
+    StringBuilder b = new StringBuilder();
 
-		if (noreply) {
-			b.append((b.length() <= 0) ? "" : " ").append("noreply");
-		}
+    if (noreply) {
+      b.append((b.length() <= 0) ? "" : " ").append("noreply");
+    }
 
-		str = b.toString();
-		return str;
-	}
+    str = b.toString();
+    return str;
+  }
 
-	public int getFlags() {
-		return flags;
-	}
+  public int getFlags() {
+    return flags;
+  }
 
-	public void setFlags(int flags) {
-		this.flags = flags;
-	}
+  public void setFlags(int flags) {
+    this.flags = flags;
+  }
 
-	public T getNewValue() {
-		return newValue;
-	}
+  public T getNewValue() {
+    return newValue;
+  }
 
-	public void setNewValue(T newValue) {
-		this.newValue = newValue;
-	}
+  public void setNewValue(T newValue) {
+    this.newValue = newValue;
+  }
 
-	public ElementFlagUpdate getElementFlagUpdate() {
-		return eflagUpdate;
-	}
+  public ElementFlagUpdate getElementFlagUpdate() {
+    return eflagUpdate;
+  }
 
-	public void setElementFlagUpdate(ElementFlagUpdate eflagUpdate) {
-		this.eflagUpdate = eflagUpdate;
-	}
+  public void setElementFlagUpdate(ElementFlagUpdate eflagUpdate) {
+    this.eflagUpdate = eflagUpdate;
+  }
 
-	public boolean isNoreply() {
-		return noreply;
-	}
+  public boolean isNoreply() {
+    return noreply;
+  }
 
-	public void setNoreply(boolean noreply) {
-		this.noreply = noreply;
-	}
+  public void setNoreply(boolean noreply) {
+    this.noreply = noreply;
+  }
 
-	public String toString() {
-		return (str != null) ? str : stringify();
-	}
+  public String toString() {
+    return (str != null) ? str : stringify();
+  }
 
-	public abstract String getCommand();
+  public abstract String getCommand();
 
 }

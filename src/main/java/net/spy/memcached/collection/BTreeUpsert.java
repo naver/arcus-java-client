@@ -18,19 +18,19 @@ package net.spy.memcached.collection;
 
 public class BTreeUpsert<T> extends CollectionStore<T> {
 
-	private static final String command = "bop upsert";
+  private static final String command = "bop upsert";
 
-	public BTreeUpsert() {
-		super();
-	}
+  public BTreeUpsert() {
+    super();
+  }
 
-	public BTreeUpsert(T value, byte[] eFlag, boolean createKeyIfNotExists,
-			RequestMode requestMode, CollectionAttributes attr) {
-		super(value, eFlag, createKeyIfNotExists, requestMode, attr);
-	}
+  public BTreeUpsert(T value, byte[] eFlag, boolean createKeyIfNotExists,
+                     RequestMode requestMode, CollectionAttributes attr) {
+    super(value, eFlag, createKeyIfNotExists, requestMode, attr);
+  }
 
-	public String getCommand() {
-		return command;
-	}
+  public String getCommand() {
+    return command;
+  }
 
 }

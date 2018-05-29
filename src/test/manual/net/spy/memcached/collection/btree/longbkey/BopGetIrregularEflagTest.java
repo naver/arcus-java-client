@@ -28,122 +28,122 @@ import net.spy.memcached.collection.ElementFlagFilter;
 
 public class BopGetIrregularEflagTest extends BaseIntegrationTest {
 
-	private final String key = "BopGetIrregularEflagTest";
+  private final String key = "BopGetIrregularEflagTest";
 
-	private final byte[] eFlag = { 1 };
+  private final byte[] eFlag = {1};
 
-	private final Object value = "valvalvalvalvalvalvalvalvalval";
+  private final Object value = "valvalvalvalvalvalvalvalvalval";
 
-	public void testGetAll_1() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, new byte[] { 0 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 1 }, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 2 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_1() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, new byte[]{0}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{1}, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{2}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
-					new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
+              new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Element<Object> object = map.get(new byte[] { (byte) i });
-				Assert.assertEquals(value + String.valueOf(i),
-						object.getValue());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Element<Object> object = map.get(new byte[]{(byte) i});
+        Assert.assertEquals(value + String.valueOf(i),
+                object.getValue());
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_2() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, new byte[] { 0 }, null, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 1 }, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 2 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_2() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, new byte[]{0}, null, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{1}, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{2}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
-					new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
+              new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Element<Object> object = map.get(new byte[] { (byte) i });
-				Assert.assertEquals(value + String.valueOf(i),
-						object.getValue());
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Element<Object> object = map.get(new byte[]{(byte) i});
+        Assert.assertEquals(value + String.valueOf(i),
+                object.getValue());
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_3() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, new byte[] { 0 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 1 }, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 2 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_3() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, new byte[]{0}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{1}, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{2}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
-					new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
+              new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Element<Object> object = map.get(new byte[] { (byte) i });
-				Assert.assertEquals(value + String.valueOf(i),
-						object.getValue());
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Element<Object> object = map.get(new byte[]{(byte) i});
+        Assert.assertEquals(value + String.valueOf(i),
+                object.getValue());
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_4() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, new byte[] { 0 }, null, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 1 }, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, new byte[] { 2 }, null, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_4() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, new byte[]{0}, null, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{1}, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, new byte[]{2}, null, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
-					new byte[] { 0 }, new byte[] { 10 },
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key,
+              new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Element<Object> object = map.get(new byte[] { (byte) i });
-				Assert.assertEquals(value + String.valueOf(i),
-						object.getValue());
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Element<Object> object = map.get(new byte[]{(byte) i});
+        Assert.assertEquals(value + String.valueOf(i),
+                object.getValue());
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 }

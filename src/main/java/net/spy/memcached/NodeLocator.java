@@ -24,36 +24,36 @@ import java.util.Iterator;
  */
 public interface NodeLocator {
 
-	/**
-	 * Get the primary location for the given key.
-	 *
-	 * @param k the object key
-	 * @return the QueueAttachment containing the primary storage for a key
-	 */
-	MemcachedNode getPrimary(String k);
+  /**
+   * Get the primary location for the given key.
+   *
+   * @param k the object key
+   * @return the QueueAttachment containing the primary storage for a key
+   */
+  MemcachedNode getPrimary(String k);
 
-	/**
-	 * Get an iterator over the sequence of nodes that make up the backup
-	 * locations for a given key.
-	 *
-	 * @param k the object key
-	 * @return the sequence of backup nodes.
-	 */
-	Iterator<MemcachedNode> getSequence(String k);
+  /**
+   * Get an iterator over the sequence of nodes that make up the backup
+   * locations for a given key.
+   *
+   * @param k the object key
+   * @return the sequence of backup nodes.
+   */
+  Iterator<MemcachedNode> getSequence(String k);
 
-	/**
-	 * Get all memcached nodes.  This is useful for broadcasting messages.
-	 */
-	Collection<MemcachedNode> getAll();
+  /**
+   * Get all memcached nodes.  This is useful for broadcasting messages.
+   */
+  Collection<MemcachedNode> getAll();
 
-	/**
-	 * Create a read-only copy of this NodeLocator.
-	 */
-	NodeLocator getReadonlyCopy();
-	
-	/**
-	 * Update all memcached nodes. Note that this feature is
-	 * only available in ArcusKetamaNodeLocator.
-	 */
-	void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
+  /**
+   * Create a read-only copy of this NodeLocator.
+   */
+  NodeLocator getReadonlyCopy();
+
+  /**
+   * Update all memcached nodes. Note that this feature is
+   * only available in ArcusKetamaNodeLocator.
+   */
+  void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
 }

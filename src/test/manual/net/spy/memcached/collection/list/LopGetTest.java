@@ -24,81 +24,81 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class LopGetTest extends BaseIntegrationTest {
 
-	private String key = "LopGetTest";
+  private String key = "LopGetTest";
 
-	private Long[] items9 = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
+  private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
-	protected void setUp() throws Exception {
-		super.setUp();
+  protected void setUp() throws Exception {
+    super.setUp();
 
-		deleteList(key, 1000);
-		addToList(key, items9);
+    deleteList(key, 1000);
+    addToList(key, items9);
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
-	}
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+  }
 
-	protected void tearDown() throws Exception {
-		try {
-			deleteList(key, 1000);
-			super.tearDown();
-		} catch (Exception e) {
-		}
-	}
+  protected void tearDown() throws Exception {
+    try {
+      deleteList(key, 1000);
+      super.tearDown();
+    } catch (Exception e) {
+    }
+  }
 
-	public void testLopGet_NoKey() throws Exception {
-		List<Object> rlist = mc.asyncLopGet("no_key", 0, false, false).get(
-				1000, TimeUnit.MILLISECONDS);
+  public void testLopGet_NoKey() throws Exception {
+    List<Object> rlist = mc.asyncLopGet("no_key", 0, false, false).get(
+            1000, TimeUnit.MILLISECONDS);
 
-		// We've got an empty list
-		assertNull(rlist);
-	}
+    // We've got an empty list
+    assertNull(rlist);
+  }
 
-	public void testLopGet_OutOfRange() throws Exception {
-		List<Object> list = mc.asyncLopGet(key, 20, false, false).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertNotNull(list);
-		assertTrue(list.isEmpty());
-	}
+  public void testLopGet_OutOfRange() throws Exception {
+    List<Object> list = mc.asyncLopGet(key, 20, false, false).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertNotNull(list);
+    assertTrue(list.isEmpty());
+  }
 
-	public void testLopGet_GetByBestEffort() throws Exception {
-		// Retrieve items(2..11) in the list
-		List<Object> rlist = mc.asyncLopGet(key, 2, 11, false, false).get(1000,
-				TimeUnit.MILLISECONDS);
+  public void testLopGet_GetByBestEffort() throws Exception {
+    // Retrieve items(2..11) in the list
+    List<Object> rlist = mc.asyncLopGet(key, 2, 11, false, false).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		// By rule of 'best effort',
-		// items(2..9) should be retrieved
-		assertEquals(7, rlist.size());
-		for (int i = 0; i < rlist.size(); i++) {
-			assertEquals(items9[i + 2], rlist.get(i));
-		}
-	}
+    // By rule of 'best effort',
+    // items(2..9) should be retrieved
+    assertEquals(7, rlist.size());
+    for (int i = 0; i < rlist.size(); i++) {
+      assertEquals(items9[i + 2], rlist.get(i));
+    }
+  }
 
-	public void testLopGet_GetWithDeletion() throws Exception {
-		CollectionAttributes attrs = null;
-		List<Object> rlist = null;
+  public void testLopGet_GetWithDeletion() throws Exception {
+    CollectionAttributes attrs = null;
+    List<Object> rlist = null;
 
-		// Retrieve items(0..5) in the list with delete option
-		rlist = mc.asyncLopGet(key, 0, 5, true, false).get(1000,
-				TimeUnit.MILLISECONDS);
+    // Retrieve items(0..5) in the list with delete option
+    rlist = mc.asyncLopGet(key, 0, 5, true, false).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		assertEquals(6, rlist.size());
+    assertEquals(6, rlist.size());
 
-		// Check the remaining item count in the list
-		attrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
-		assertEquals(3, attrs.getCount().intValue());
+    // Check the remaining item count in the list
+    attrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(3, attrs.getCount().intValue());
 
-		// Retrieve items(0..2) in the list with delete option
-		rlist = mc.asyncLopGet(key, 0, 2, true, true).get(1000,
-				TimeUnit.MILLISECONDS);
+    // Retrieve items(0..2) in the list with delete option
+    rlist = mc.asyncLopGet(key, 0, 2, true, true).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		assertEquals(3, rlist.size());
+    assertEquals(3, rlist.size());
 
-		// Now our list has no items and would be deleted
-		rlist = mc.asyncLopGet(key, 0, 10, true, false).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertNull(rlist);
-	}
+    // Now our list has no items and would be deleted
+    rlist = mc.asyncLopGet(key, 0, 10, true, false).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertNull(rlist);
+  }
 
 }

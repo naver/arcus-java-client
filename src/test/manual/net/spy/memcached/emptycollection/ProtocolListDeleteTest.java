@@ -22,33 +22,33 @@ import net.spy.memcached.collection.ListDelete;
 
 public class ProtocolListDeleteTest extends TestCase {
 
-	public void testStringfy() {
-		// default setting : dropIfEmpty = true
+  public void testStringfy() {
+    // default setting : dropIfEmpty = true
 
-		Assert.assertEquals("10 drop",
-				(new ListDelete(10, false)).stringify());
+    Assert.assertEquals("10 drop",
+            (new ListDelete(10, false)).stringify());
 
-		Assert.assertEquals("10",
-				(new ListDelete(10, false, false)).stringify());
-		Assert.assertEquals("10 drop",
-				(new ListDelete(10, false, true)).stringify());
+    Assert.assertEquals("10",
+            (new ListDelete(10, false, false)).stringify());
+    Assert.assertEquals("10 drop",
+            (new ListDelete(10, false, true)).stringify());
 
-		Assert.assertEquals("10..20", (new ListDelete(10, 20, false,
-				false)).stringify());
-		Assert.assertEquals("10..20 drop", (new ListDelete(10, 20,
-				false, true)).stringify());
+    Assert.assertEquals("10..20", (new ListDelete(10, 20, false,
+            false)).stringify());
+    Assert.assertEquals("10..20 drop", (new ListDelete(10, 20,
+            false, true)).stringify());
 
-		Assert.assertEquals("10 drop noreply",
-				(new ListDelete(10, true)).stringify());
+    Assert.assertEquals("10 drop noreply",
+            (new ListDelete(10, true)).stringify());
 
-		Assert.assertEquals("10 noreply", (new ListDelete(10, true,
-				false)).stringify());
-		Assert.assertEquals("10 drop noreply", (new ListDelete(10,
-				true, true)).stringify());
+    Assert.assertEquals("10 noreply", (new ListDelete(10, true,
+            false)).stringify());
+    Assert.assertEquals("10 drop noreply", (new ListDelete(10,
+            true, true)).stringify());
 
-		Assert.assertEquals("10..20 noreply", (new ListDelete(10, 20,
-				true, false)).stringify());
-		Assert.assertEquals("10..20 drop noreply", (new ListDelete(10,
-				20, true, true)).stringify());
-	}
+    Assert.assertEquals("10..20 noreply", (new ListDelete(10, 20,
+            true, false)).stringify());
+    Assert.assertEquals("10..20 drop noreply", (new ListDelete(10,
+            20, true, true)).stringify());
+  }
 }

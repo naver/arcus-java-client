@@ -25,62 +25,62 @@ import net.spy.memcached.transcoders.LongTranscoder;
 
 public class SopInsertWhenKeyExists extends BaseIntegrationTest {
 
-	private String key = "SopInsertWhenKeyExists";
+  private String key = "SopInsertWhenKeyExists";
 
-	private Long[] items9 = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
-	private Long[] items10 = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L };
+  private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
+  private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
-	protected void tearDown() {
-		try {
-			deleteSet(key, items10);
-			super.tearDown();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+  protected void tearDown() {
+    try {
+      deleteSet(key, items10);
+      super.tearDown();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	public void testSopInsert_Normal() throws Exception {
-		// Create a list and add it 9 items
-		addToSet(key, items9);
+  public void testSopInsert_Normal() throws Exception {
+    // Create a list and add it 9 items
+    addToSet(key, items9);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Insert one item
-		assertTrue(mc.asyncSopInsert(key, 10L, new CollectionAttributes()).get(
-				1000, TimeUnit.MILLISECONDS));
+    // Insert one item
+    assertTrue(mc.asyncSopInsert(key, 10L, new CollectionAttributes()).get(
+            1000, TimeUnit.MILLISECONDS));
 
-		// Check inserted item
-		Set<Long> rlist = mc.asyncSopGet(key, 10, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
-		assertEquals(10, rlist.size());
-		assertTrue(rlist.contains(10L));
+    // Check inserted item
+    Set<Long> rlist = mc.asyncSopGet(key, 10, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(10, rlist.size());
+    assertTrue(rlist.contains(10L));
 
-		// Check list attributes
-		CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertEquals(10, rattrs.getCount().intValue());
-	}
+    // Check list attributes
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertEquals(10, rattrs.getCount().intValue());
+  }
 
-	public void testSopInsert_SameItem() throws Exception {
-		// Create a list and add it 9 items
-		addToSet(key, items9);
+  public void testSopInsert_SameItem() throws Exception {
+    // Create a list and add it 9 items
+    addToSet(key, items9);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Insert an item same to the last item
-		mc.asyncSopInsert(key, 9L, new CollectionAttributes()).get(1000,
-				TimeUnit.MILLISECONDS);
+    // Insert an item same to the last item
+    mc.asyncSopInsert(key, 9L, new CollectionAttributes()).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		// Check that item was not inserted
-		Set<Long> rlist = mc.asyncSopGet(key, 10, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
-		assertEquals(9, rlist.size());
-	}
+    // Check that item was not inserted
+    Set<Long> rlist = mc.asyncSopGet(key, 10, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(9, rlist.size());
+  }
 
 }

@@ -9,28 +9,28 @@ import java.util.Iterator;
  * returns false.
  */
 public class SingleElementInfiniteIterator<T>
-	implements Iterator<T> {
-	private final T element;
+        implements Iterator<T> {
+  private final T element;
 
-	/**
-	 * Construct a iterator tat returns the input element an
-	 * infinite number of times.
-	 *
-	 * @param element the element that #next() should return
-	 */
-	public SingleElementInfiniteIterator(T element) {
-		this.element = element;
-	}
+  /**
+   * Construct a iterator tat returns the input element an
+   * infinite number of times.
+   *
+   * @param element the element that #next() should return
+   */
+  public SingleElementInfiniteIterator(T element) {
+    this.element = element;
+  }
 
-	public boolean hasNext() {
-		return true;
-	}
+  public boolean hasNext() {
+    return true;
+  }
 
-	public T next() {
-		return element;
-	}
+  public T next() {
+    return element;
+  }
 
-	public void remove() {
-		throw new UnsupportedOperationException("Cannot remove from this iterator.");
-	}
+  public void remove() {
+    throw new UnsupportedOperationException("Cannot remove from this iterator.");
+  }
 }

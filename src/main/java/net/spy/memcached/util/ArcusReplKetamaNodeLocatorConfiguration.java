@@ -22,23 +22,23 @@ import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedReplicaGroup;
 
 public class ArcusReplKetamaNodeLocatorConfiguration implements
-		KetamaNodeLocatorConfiguration {
+        KetamaNodeLocatorConfiguration {
 
-	final int NUM_REPS=160;
+  final int NUM_REPS = 160;
 
-	public String getKeyForNode(MemcachedNode node, int repetition) {
-		ArcusReplNodeAddress addr = (ArcusReplNodeAddress)node.getSocketAddress();
-		String key = addr.getGroupName() + "-" + repetition;
-		return key;
-	}
+  public String getKeyForNode(MemcachedNode node, int repetition) {
+    ArcusReplNodeAddress addr = (ArcusReplNodeAddress) node.getSocketAddress();
+    String key = addr.getGroupName() + "-" + repetition;
+    return key;
+  }
 
-	public String getKeyForGroup(MemcachedReplicaGroup group, int repetition) {
-		String key = group.getGroupName() + "-" + repetition;
-		return key;
-	}
+  public String getKeyForGroup(MemcachedReplicaGroup group, int repetition) {
+    String key = group.getGroupName() + "-" + repetition;
+    return key;
+  }
 
-	public int getNodeRepetitions() {
-		return NUM_REPS;
-	}
+  public int getNodeRepetitions() {
+    return NUM_REPS;
+  }
 }
 /* ENABLE_REPLICATION end */

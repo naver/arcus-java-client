@@ -18,50 +18,50 @@ package net.spy.memcached.collection;
 
 /**
  * Ascii protocol implementation for "bop position" (B+Tree find position)
- * 
+ *
  * bop position <key> <bkey> <order>\r\n <position> = 0 or positive integer
  * END\r\n (CLIENT_ERROR, NOT_FOUND, UNREADABLE, BKEY_MISMATCH, TYPE_MISMATCH,
  * NOT_FOUND_ELEMENT)
  */
 public class BTreeFindPosition {
 
-	private static final String command = "bop position";
-	
-	private final BKeyObject bkeyObject;
-	private final BTreeOrder order;
-	private String str;
+  private static final String command = "bop position";
 
-	public BTreeFindPosition(long longBKey, BTreeOrder order) {
-		this.bkeyObject = new BKeyObject(longBKey);
-		this.order = order;
-	}
+  private final BKeyObject bkeyObject;
+  private final BTreeOrder order;
+  private String str;
 
-	public BTreeFindPosition(byte[] byteArrayBKey, BTreeOrder order) {
-		this.bkeyObject = new BKeyObject(byteArrayBKey);
-		this.order = order;
-	}
+  public BTreeFindPosition(long longBKey, BTreeOrder order) {
+    this.bkeyObject = new BKeyObject(longBKey);
+    this.order = order;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
-		StringBuilder b = new StringBuilder();
-		b.append(bkeyObject.getBKeyAsString());
-		b.append(" ");
-		b.append(order.getAscii());
-		
-		str = b.toString();
-		return str;
-	}
-	
-	public String getCommand() {
-		return command;
-	}
+  public BTreeFindPosition(byte[] byteArrayBKey, BTreeOrder order) {
+    this.bkeyObject = new BKeyObject(byteArrayBKey);
+    this.order = order;
+  }
 
-	public BKeyObject getBkeyObject() {
-		return bkeyObject;
-	}
+  public String stringify() {
+    if (str != null) return str;
+    StringBuilder b = new StringBuilder();
+    b.append(bkeyObject.getBKeyAsString());
+    b.append(" ");
+    b.append(order.getAscii());
 
-	public BTreeOrder getOrder() {
-		return order;
-	}
-	
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public BKeyObject getBkeyObject() {
+    return bkeyObject;
+  }
+
+  public BTreeOrder getOrder() {
+    return order;
+  }
+
 }

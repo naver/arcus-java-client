@@ -18,54 +18,54 @@ package net.spy.memcached.collection;
 
 public abstract class ElementValueType {
 
-	public static final ElementValueType STRING = new StringType();
-	public static final ElementValueType LONG = new LongType();
-	public static final ElementValueType INTEGER = new IntegerType();
-	public static final ElementValueType BOOLEAN = new BooleanType();
-	public static final ElementValueType DATE = new DateType();
-	public static final ElementValueType BYTE = new ByteType();
-	public static final ElementValueType FLOAT = new FloatType();
-	public static final ElementValueType DOUBLE = new DoubleType();
-	public static final ElementValueType BYTEARRAY = new ByteArrayType();
-	public static final ElementValueType OTHERS = new OtherObjectType();
+  public static final ElementValueType STRING = new StringType();
+  public static final ElementValueType LONG = new LongType();
+  public static final ElementValueType INTEGER = new IntegerType();
+  public static final ElementValueType BOOLEAN = new BooleanType();
+  public static final ElementValueType DATE = new DateType();
+  public static final ElementValueType BYTE = new ByteType();
+  public static final ElementValueType FLOAT = new FloatType();
+  public static final ElementValueType DOUBLE = new DoubleType();
+  public static final ElementValueType BYTEARRAY = new ByteArrayType();
+  public static final ElementValueType OTHERS = new OtherObjectType();
 
-	private static class StringType extends ElementValueType {
+  private static class StringType extends ElementValueType {
 
-	}
+  }
 
-	private static class LongType extends ElementValueType {
+  private static class LongType extends ElementValueType {
 
-	}
+  }
 
-	private static class IntegerType extends ElementValueType {
+  private static class IntegerType extends ElementValueType {
 
-	}
+  }
 
-	private static class BooleanType extends ElementValueType {
+  private static class BooleanType extends ElementValueType {
 
-	}
+  }
 
-	private static class DateType extends ElementValueType {
+  private static class DateType extends ElementValueType {
 
-	}
+  }
 
-	private static class ByteType extends ElementValueType {
+  private static class ByteType extends ElementValueType {
 
-	}
+  }
 
-	private static class FloatType extends ElementValueType {
+  private static class FloatType extends ElementValueType {
 
-	}
+  }
 
-	private static class DoubleType extends ElementValueType {
+  private static class DoubleType extends ElementValueType {
 
-	}
+  }
 
-	private static class ByteArrayType extends ElementValueType {
+  private static class ByteArrayType extends ElementValueType {
 
-	}
+  }
 
-	private static class OtherObjectType extends ElementValueType {
+  private static class OtherObjectType extends ElementValueType {
 
-	}
+  }
 }

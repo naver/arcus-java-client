@@ -24,51 +24,51 @@ import net.spy.memcached.ops.OperationStatus;
 
 public class CollectionFutureTest extends BaseIntegrationTest {
 
-	private String key = "CollectionFutureTest";
+  private String key = "CollectionFutureTest";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true);
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true);
+  }
 
-	public void testAfterSuccess() throws Exception {
-		CollectionFuture<Boolean> future;
-		OperationStatus status;
+  public void testAfterSuccess() throws Exception {
+    CollectionFuture<Boolean> future;
+    OperationStatus status;
 
-		future = mc.asyncBopInsert(key, 0, null, "hello", new CollectionAttributes());
+    future = mc.asyncBopInsert(key, 0, null, "hello", new CollectionAttributes());
 
-		// OperationStatus should be null before operation completion
-		// status = future.getOperationStatus();
-		// assertNull(status);
+    // OperationStatus should be null before operation completion
+    // status = future.getOperationStatus();
+    // assertNull(status);
 
-		// After operation completion (SUCCESS)
-		Boolean success = future.get(1000, TimeUnit.MILLISECONDS);
-		status = future.getOperationStatus();
+    // After operation completion (SUCCESS)
+    Boolean success = future.get(1000, TimeUnit.MILLISECONDS);
+    status = future.getOperationStatus();
 
-		assertTrue(success);
-		assertNotNull(status);
-		assertTrue(status.isSuccess());
-		assertEquals("CREATED_STORED", status.getMessage());
-	}
+    assertTrue(success);
+    assertNotNull(status);
+    assertTrue(status.isSuccess());
+    assertEquals("CREATED_STORED", status.getMessage());
+  }
 
-	public void testAfterFailure() throws Exception {
-		CollectionFuture<Map<Long, Element<Object>>> future;
-		OperationStatus status;
+  public void testAfterFailure() throws Exception {
+    CollectionFuture<Map<Long, Element<Object>>> future;
+    OperationStatus status;
 
-		future = mc.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
+    future = mc.asyncBopGet(key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
 
-		// OperationStatus should be null before operation completion
-		// status = future.getOperationStatus();
-		// assertNull(status);
+    // OperationStatus should be null before operation completion
+    // status = future.getOperationStatus();
+    // assertNull(status);
 
-		// After operation completion (FAILURE)
-		Map<Long, Element<Object>> result = future.get(1000, TimeUnit.MILLISECONDS);
-		status = future.getOperationStatus();
+    // After operation completion (FAILURE)
+    Map<Long, Element<Object>> result = future.get(1000, TimeUnit.MILLISECONDS);
+    status = future.getOperationStatus();
 
-		assertNull(result);
-		assertNotNull(status);
-		assertFalse(status.isSuccess());
-		assertEquals("NOT_FOUND", status.getMessage());
-	}
+    assertNull(result);
+    assertNotNull(status);
+    assertFalse(status.isSuccess());
+    assertEquals("NOT_FOUND", status.getMessage());
+  }
 }

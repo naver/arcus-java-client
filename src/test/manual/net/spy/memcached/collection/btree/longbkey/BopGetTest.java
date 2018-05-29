@@ -27,41 +27,41 @@ import net.spy.memcached.collection.ElementFlagFilter;
 
 public class BopGetTest extends BaseIntegrationTest {
 
-	private static final String KEY = BopGetTest.class.getSimpleName();
+  private static final String KEY = BopGetTest.class.getSimpleName();
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testBopGet() throws Exception {
+  public void testBopGet() throws Exception {
 
-		byte[] bkey = new byte[] { (byte) 1 };
+    byte[] bkey = new byte[]{(byte) 1};
 
-		Boolean boolean1 = mc.asyncBopInsert(KEY, bkey, null, "value",
-				new CollectionAttributes()).get();
+    Boolean boolean1 = mc.asyncBopInsert(KEY, bkey, null, "value",
+            new CollectionAttributes()).get();
 
-		Assert.assertTrue(boolean1);
+    Assert.assertTrue(boolean1);
 
-		Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(KEY, bkey,
-				ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+    Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(KEY, bkey,
+            ElementFlagFilter.DO_NOT_FILTER, false, false).get();
 
-		Assert.assertEquals(1, map.size());
+    Assert.assertEquals(1, map.size());
 
-		Element<Object> el = map.get(new ByteArrayBKey(bkey));
+    Element<Object> el = map.get(new ByteArrayBKey(bkey));
 
-		Assert.assertNotNull(el);
+    Assert.assertNotNull(el);
 
-		Assert.assertEquals("value", el.getValue());
-		Assert.assertEquals("0x01", el.getBkeyByHex());
-		Assert.assertEquals("", el.getFlagByHex());
-	}
+    Assert.assertEquals("value", el.getValue());
+    Assert.assertEquals("0x01", el.getBkeyByHex());
+    Assert.assertEquals("", el.getFlagByHex());
+  }
 }

@@ -16,31 +16,30 @@ import java.util.concurrent.TimeUnit;
  * especially useful in case of large multi gets.
  * </p>
  *
- * @author boris.partensky@gmail.com
  * @param <V>
- *
+ * @author boris.partensky@gmail.com
  */
 public interface BulkFuture<V> extends Future<V> {
 
-	/**
-	 * @return true if timeout was reached, false otherwise
-	 */
-	public boolean isTimeout();
+  /**
+   * @return true if timeout was reached, false otherwise
+   */
+  public boolean isTimeout();
 
-    /**
-     * Wait for the operation to complete and return results.
-     *
-     * If operation could not complete within specified
-     * timeout, partial result is returned. Otherwise, the
-     * behavior is identical to {@link #get(long, TimeUnit)}
-     *
-     * @param timeout the maximum time to wait
-     * @param unit the time unit of the timeout argument
-     * @return the computed result
-     * @throws InterruptedException if the current thread was interrupted while waiting
-     * @throws ExecutionException if the computation threw an exception
-     */
-	public V getSome(long timeout, TimeUnit unit)
-			throws InterruptedException, ExecutionException;
+  /**
+   * Wait for the operation to complete and return results.
+   *
+   * If operation could not complete within specified
+   * timeout, partial result is returned. Otherwise, the
+   * behavior is identical to {@link #get(long, TimeUnit)}
+   *
+   * @param timeout the maximum time to wait
+   * @param unit    the time unit of the timeout argument
+   * @return the computed result
+   * @throws InterruptedException if the current thread was interrupted while waiting
+   * @throws ExecutionException   if the computation threw an exception
+   */
+  public V getSome(long timeout, TimeUnit unit)
+          throws InterruptedException, ExecutionException;
 
 }

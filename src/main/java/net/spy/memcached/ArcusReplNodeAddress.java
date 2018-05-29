@@ -25,161 +25,158 @@ import java.util.Map;
 
 public class ArcusReplNodeAddress extends InetSocketAddress {
 
-	private static final long serialVersionUID = -1555690881482453720L;
-	boolean master;
-	String group;
-	String ip;
-	int port;
+  private static final long serialVersionUID = -1555690881482453720L;
+  boolean master;
+  String group;
+  String ip;
+  int port;
 
-	private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
-		super(ip, port);
-		this.group = group;
-		this.master = master;
-		this.ip = ip;
-		this.port = port;
-	}
-	
-	public ArcusReplNodeAddress(ArcusReplNodeAddress addr) {
-		this(addr.group, addr.master, addr.ip, addr.port);
-	}
+  private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
+    super(ip, port);
+    this.group = group;
+    this.master = master;
+    this.ip = ip;
+    this.port = port;
+  }
 
-	public String toString() {
-		return "Group(" + group + ") Address(" + ip + ":" + port + ") " + (master ? "MASTER" : "SLAVE");
-	}
+  public ArcusReplNodeAddress(ArcusReplNodeAddress addr) {
+    this(addr.group, addr.master, addr.ip, addr.port);
+  }
 
-	public String getIPPort() {
-		return this.ip + ":" + this.port;
-	}
+  public String toString() {
+    return "Group(" + group + ") Address(" + ip + ":" + port + ") " + (master ? "MASTER" : "SLAVE");
+  }
 
-	public String getGroupName() {
-		return group;
-	}
+  public String getIPPort() {
+    return this.ip + ":" + this.port;
+  }
 
-	static ArcusReplNodeAddress create(String group, boolean master, String ipport) {
-		String[] temp = ipport.split(":");
-		String ip = temp[0];
-		int port = Integer.parseInt(temp[1]);
-		return new ArcusReplNodeAddress(group, master, ip, port);
-	}
+  public String getGroupName() {
+    return group;
+  }
 
-	static ArcusReplNodeAddress createFake(String groupName) {
-		return create(groupName == null ? "invalid" : groupName,
-					  true, CacheManager.FAKE_SERVER_NODE);
-	}
+  static ArcusReplNodeAddress create(String group, boolean master, String ipport) {
+    String[] temp = ipport.split(":");
+    String ip = temp[0];
+    int port = Integer.parseInt(temp[1]);
+    return new ArcusReplNodeAddress(group, master, ip, port);
+  }
 
-	private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
-		List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+  static ArcusReplNodeAddress createFake(String groupName) {
+    return create(groupName == null ? "invalid" : groupName,
+            true, CacheManager.FAKE_SERVER_NODE);
+  }
 
-		for (String node : s.split(",")) {
-			ArcusReplNodeAddress a = null;
-			if (node.equals(CacheManager.FAKE_SERVER_NODE)) {
-				a = ArcusReplNodeAddress.createFake(null);
-			} else {
-				String[] temp = node.split("\\^");
-				String group = temp[0];
-				boolean master = temp[1].equals("M") ? true : false;
-				String ipport = temp[2];
-				// We may throw null pointer exception if the string has
-				// an unexpected format.  Abort the whole method instead of
-				// trying to ignore malformed strings.
-				// Is this the right behavior?  FIXME
-	
-				a = ArcusReplNodeAddress.create(group, master, ipport);
-			}
-			addrs.add(a);
-		}
-		return addrs;
-	}
+  private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
+    List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
-	// Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
-	// Znode names are group^{M,S}^ip:port-hostname
-	static List<InetSocketAddress> getAddresses(String s) {
-		List<InetSocketAddress> list = null;
+    for (String node : s.split(",")) {
+      ArcusReplNodeAddress a = null;
+      if (node.equals(CacheManager.FAKE_SERVER_NODE)) {
+        a = ArcusReplNodeAddress.createFake(null);
+      } else {
+        String[] temp = node.split("\\^");
+        String group = temp[0];
+        boolean master = temp[1].equals("M") ? true : false;
+        String ipport = temp[2];
+        // We may throw null pointer exception if the string has
+        // an unexpected format.  Abort the whole method instead of
+        // trying to ignore malformed strings.
+        // Is this the right behavior?  FIXME
 
-		try {
-			list = parseNodeNames(s);
-		} catch (Exception e) {
-			// May see an exception if nodes do not follow the replication naming convention
-			ArcusClient.arcusLogger.error("Exception caught while parsing node" +
-									" addresses. cache_list=" + s + "\n" + e);
-			e.printStackTrace();
-			list = null;
-		}
-		// Return at least one node in all cases.  Otherwise we may see unexpected null pointer
-		// exceptions throughout this client library...
-		if (list == null || list.size() == 0) {
-			list = new ArrayList<InetSocketAddress>(1);
-			list.add((InetSocketAddress)ArcusReplNodeAddress.createFake(null));
-		}
-		return list;
-	}
+        a = ArcusReplNodeAddress.create(group, master, ipport);
+      }
+      addrs.add(a);
+    }
+    return addrs;
+  }
 
-	static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrsList (
-											List<InetSocketAddress> addrs) {
+  // Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
+  // Znode names are group^{M,S}^ip:port-hostname
+  static List<InetSocketAddress> getAddresses(String s) {
+    List<InetSocketAddress> list = null;
 
-		Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-				new HashMap<String, List<ArcusReplNodeAddress>>();
+    try {
+      list = parseNodeNames(s);
+    } catch (Exception e) {
+      // May see an exception if nodes do not follow the replication naming convention
+      ArcusClient.arcusLogger.error("Exception caught while parsing node" +
+              " addresses. cache_list=" + s + "\n" + e);
+      e.printStackTrace();
+      list = null;
+    }
+    // Return at least one node in all cases.  Otherwise we may see unexpected null pointer
+    // exceptions throughout this client library...
+    if (list == null || list.size() == 0) {
+      list = new ArrayList<InetSocketAddress>(1);
+      list.add((InetSocketAddress) ArcusReplNodeAddress.createFake(null));
+    }
+    return list;
+  }
 
-		for (int i = 0; i < addrs.size(); i++) {
-			ArcusReplNodeAddress a = (ArcusReplNodeAddress)addrs.get(i);
-			String groupName = a.getGroupName();
-			List<ArcusReplNodeAddress> gNodeList = newAllGroups.get(groupName);
-			if (gNodeList == null) {
-				gNodeList = new ArrayList<ArcusReplNodeAddress>();
-				newAllGroups.put(groupName, gNodeList);
-			}
-			/* Make a master node the first element of node list. */
-			if (a.master) /* shifts the element currently at that position */
-				gNodeList.add(0, a);
-			else /* Don't care the index, just add. */
-				gNodeList.add(a);
-		}
+  static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrsList(
+          List<InetSocketAddress> addrs) {
 
-		for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-			/* If newGroupNodes is validate
-			 * then newGroupNodes is sorted by master / slave
-			 */
-			List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
+    Map<String, List<ArcusReplNodeAddress>> newAllGroups =
+            new HashMap<String, List<ArcusReplNodeAddress>>();
 
-			if (newGroupNodes.size() >= 3) {
-				ArcusClient.arcusLogger.error(entry.getKey()
-						+ " group have too many node. " + newGroupNodes);
-				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-			}
-			else if (newGroupNodes.size() == 2 &&
-					newGroupNodes.get(0).getIPPort().equals(newGroupNodes.get(1).getIPPort())) {
-				/*
-				 * Two nodes have the same ip and port
-				 */
-				ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
-						+ "Master and Slave nodes have the same ip and port. "
-						+ newGroupNodes);
-				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-			}
-			else if (newGroupNodes.size() == 2 &&
-					newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
-				/*
-				 * Two nodes are master
-				 */
-				ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
-						+ "This group have two master node. "
-						+ newGroupNodes);
-				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-			}
-			else if (!newGroupNodes.get(0).master) {
-				/*
-				 * Fake group (node) is always master...
-				 * 
-				 * Maybe! this group have slave and slave node
-				 * or slave node only
-				 */
-			 	ArcusClient.arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
-						+ "This group don't have master node. "
-						+ newGroupNodes);
-				entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-			}
-		}
-		return newAllGroups;
-	}
+    for (int i = 0; i < addrs.size(); i++) {
+      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addrs.get(i);
+      String groupName = a.getGroupName();
+      List<ArcusReplNodeAddress> gNodeList = newAllGroups.get(groupName);
+      if (gNodeList == null) {
+        gNodeList = new ArrayList<ArcusReplNodeAddress>();
+        newAllGroups.put(groupName, gNodeList);
+      }
+            /* Make a master node the first element of node list. */
+      if (a.master) /* shifts the element currently at that position */
+        gNodeList.add(0, a);
+      else /* Don't care the index, just add. */
+        gNodeList.add(a);
+    }
+
+    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+      /* If newGroupNodes is validate
+       * then newGroupNodes is sorted by master / slave
+       */
+      List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
+
+      if (newGroupNodes.size() >= 3) {
+        ArcusClient.arcusLogger.error(entry.getKey()
+                + " group have too many node. " + newGroupNodes);
+        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
+      } else if (newGroupNodes.size() == 2 &&
+              newGroupNodes.get(0).getIPPort().equals(newGroupNodes.get(1).getIPPort())) {
+        /*
+         * Two nodes have the same ip and port
+         */
+        ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+                + "Master and Slave nodes have the same ip and port. "
+                + newGroupNodes);
+        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
+      } else if (newGroupNodes.size() == 2 &&
+              newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
+        /*
+         * Two nodes are master
+         */
+        ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+                + "This group have two master node. "
+                + newGroupNodes);
+        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
+      } else if (!newGroupNodes.get(0).master) {
+        /*
+         * Fake group (node) is always master...
+         *
+         * Maybe! this group have slave and slave node
+         * or slave node only
+         */
+        ArcusClient.arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
+                + "This group don't have master node. "
+                + newGroupNodes);
+        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
+      }
+    }
+    return newAllGroups;
+  }
 }
 /* ENABLE_REPLICATION end */

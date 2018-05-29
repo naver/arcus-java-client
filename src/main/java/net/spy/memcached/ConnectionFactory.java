@@ -36,197 +36,198 @@ import net.spy.memcached.transcoders.Transcoder;
  */
 public interface ConnectionFactory {
 
-	/**
-	 * Create a MemcachedConnection for the given SocketAddresses.
-	 *
-	 * @param addrs the addresses of the memcached servers
-	 * @return a new MemcachedConnection connected to those addresses
-	 * @throws IOException for problems initializing the memcached connections
-	 */
-	MemcachedConnection createConnection(List<InetSocketAddress> addrs)
-		throws IOException;
+  /**
+   * Create a MemcachedConnection for the given SocketAddresses.
+   *
+   * @param addrs the addresses of the memcached servers
+   * @return a new MemcachedConnection connected to those addresses
+   * @throws IOException for problems initializing the memcached connections
+   */
+  MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+          throws IOException;
 
-	/**
-	 * Create a new memcached node.
-	 */
-	MemcachedNode createMemcachedNode(SocketAddress sa,
-			SocketChannel c, int bufSize);
+  /**
+   * Create a new memcached node.
+   */
+  MemcachedNode createMemcachedNode(SocketAddress sa,
+                                    SocketChannel c, int bufSize);
 
-	/**
-	 * Create a BlockingQueue for operations for a connection.
-	 */
-	BlockingQueue<Operation> createOperationQueue();
+  /**
+   * Create a BlockingQueue for operations for a connection.
+   */
+  BlockingQueue<Operation> createOperationQueue();
 
-	/**
-	 * Create a BlockingQueue for the operations currently expecting to read
-	 * responses from memcached.
-	 */
-	BlockingQueue<Operation> createReadOperationQueue();
+  /**
+   * Create a BlockingQueue for the operations currently expecting to read
+   * responses from memcached.
+   */
+  BlockingQueue<Operation> createReadOperationQueue();
 
-	/**
-	 * Create a BlockingQueue for the operations currently expecting to write
-	 * requests to memcached.
-	 */
-	BlockingQueue<Operation> createWriteOperationQueue();
+  /**
+   * Create a BlockingQueue for the operations currently expecting to write
+   * requests to memcached.
+   */
+  BlockingQueue<Operation> createWriteOperationQueue();
 
-	/**
-	 * Get the maximum amount of time (in milliseconds) a client is willing
-	 * to wait to add a new item to a queue.
-	 */
-	long getOpQueueMaxBlockTime();
+  /**
+   * Get the maximum amount of time (in milliseconds) a client is willing
+   * to wait to add a new item to a queue.
+   */
+  long getOpQueueMaxBlockTime();
 
-	/**
-	 * Create a NodeLocator instance for the given list of nodes.
-	 */
-	NodeLocator createLocator(List<MemcachedNode> nodes);
+  /**
+   * Create a NodeLocator instance for the given list of nodes.
+   */
+  NodeLocator createLocator(List<MemcachedNode> nodes);
 
-	/**
-	 * Get the operation factory for connections built by this connection
-	 * factory.
-	 */
-	OperationFactory getOperationFactory();
+  /**
+   * Get the operation factory for connections built by this connection
+   * factory.
+   */
+  OperationFactory getOperationFactory();
 
-	/**
-	 * Get the operation timeout used by this connection.
-	 */
-	long getOperationTimeout();
+  /**
+   * Get the operation timeout used by this connection.
+   */
+  long getOperationTimeout();
 
-	/**
-	 * If true, the IO thread should be a daemon thread.
-	 */
-	boolean isDaemon();
+  /**
+   * If true, the IO thread should be a daemon thread.
+   */
+  boolean isDaemon();
 
-	/**
-	 * If true, the nagle algorithm will be used on connected sockets.
-	 *
-	 * <p>
-	 * See {@link java.net.Socket#setTcpNoDelay(boolean)} for more information.
-	 * </p>
-	 */
-	boolean useNagleAlgorithm();
+  /**
+   * If true, the nagle algorithm will be used on connected sockets.
+   *
+   * <p>
+   * See {@link java.net.Socket#setTcpNoDelay(boolean)} for more information.
+   * </p>
+   */
+  boolean useNagleAlgorithm();
 
-	/**
-	 * Observers that should be established at the time of connection
-	 * instantiation.
-	 *
-	 * These observers will see the first connection established.
-	 */
-	Collection<ConnectionObserver> getInitialObservers();
+  /**
+   * Observers that should be established at the time of connection
+   * instantiation.
+   *
+   * These observers will see the first connection established.
+   */
+  Collection<ConnectionObserver> getInitialObservers();
 
-	/**
-	 * Get the default failure mode for the underlying connection.
-	 */
-	FailureMode getFailureMode();
+  /**
+   * Get the default failure mode for the underlying connection.
+   */
+  FailureMode getFailureMode();
 
-	/**
-	 * Get the default transcoder to be used in connections created by this
-	 * factory.
-	 */
-	Transcoder<Object> getDefaultTranscoder();
+  /**
+   * Get the default transcoder to be used in connections created by this
+   * factory.
+   */
+  Transcoder<Object> getDefaultTranscoder();
 
-	/**
-	 * Get the default collection transcoder to be used in connections created by this
-	 * factory.
-	 */
-	Transcoder<Object> getDefaultCollectionTranscoder();
+  /**
+   * Get the default collection transcoder to be used in connections created by this
+   * factory.
+   */
+  Transcoder<Object> getDefaultCollectionTranscoder();
 
-	/**
-	 * If true, low-level optimization is in effect.
-	 */
-	boolean shouldOptimize();
+  /**
+   * If true, low-level optimization is in effect.
+   */
+  boolean shouldOptimize();
 
-	/**
-	 * Get the read buffer size set at construct time.
-	 */
-	int getReadBufSize();
+  /**
+   * Get the read buffer size set at construct time.
+   */
+  int getReadBufSize();
 
-	/**
-	 * Get the hash algorithm to be used.
-	 */
-	public HashAlgorithm getHashAlg();
+  /**
+   * Get the hash algorithm to be used.
+   */
+  public HashAlgorithm getHashAlg();
 
-	/**
-	 * Maximum number of milliseconds to wait between reconnect attempts.
-	 */
-	long getMaxReconnectDelay();
+  /**
+   * Maximum number of milliseconds to wait between reconnect attempts.
+   */
+  long getMaxReconnectDelay();
 
-	/**
-	 * Authenticate connections using the given auth descriptor.
-	 *
-	 * @return null if no authentication should take place
-	 */
-	AuthDescriptor getAuthDescriptor();
+  /**
+   * Authenticate connections using the given auth descriptor.
+   *
+   * @return null if no authentication should take place
+   */
+  AuthDescriptor getAuthDescriptor();
 
-	/**
-	 * Maximum number of timeout exception for shutdown connection
-	 */
-	int getTimeoutExceptionThreshold();
-	
-	/**
-	 * Maximum timeout ratio for shutdown connection
-	 */
-	int getTimeoutRatioThreshold();
+  /**
+   * Maximum number of timeout exception for shutdown connection
+   */
+  int getTimeoutExceptionThreshold();
 
-	/**
-	 * Set the maximum number of front cache elements.
-	 */
-	int getMaxFrontCacheElements();
-	
-	/**
-	 * Set front cache's expire time.
-	 */
-	int getFrontCacheExpireTime();
+  /**
+   * Maximum timeout ratio for shutdown connection
+   */
+  int getTimeoutRatioThreshold();
 
-	/**
-	 * get front cache name
-	 */
-	String getFrontCacheName();
+  /**
+   * Set the maximum number of front cache elements.
+   */
+  int getMaxFrontCacheElements();
 
-	/**
-	 * get copyOnRead property for front cache
-	 */
-	boolean getFrontCacheCopyOnRead();
+  /**
+   * Set front cache's expire time.
+   */
+  int getFrontCacheExpireTime();
 
-	/**
-	 * get copyOnWrite property for front cache
-	 */
-	boolean getFrontCacheCopyOnWrite();
+  /**
+   * get front cache name
+   */
+  String getFrontCacheName();
 
-	/**
-	 * Bulk service thread count 
-	 */
-	int getBulkServiceThreadCount();
-	
-	/**
-	 * Bulk service loop limit
-	 */
-	int getBulkServiceLoopLimit();
-	
-	/**
-	 * Bulk service single operation timeout
-	 */
-	long getBulkServiceSingleOpTimeout();
+  /**
+   * get copyOnRead property for front cache
+   */
+  boolean getFrontCacheCopyOnRead();
 
-	/**
-	 * get max smget key chunk size
-	 */
-	int getDefaultMaxSMGetKeyChunkSize();
+  /**
+   * get copyOnWrite property for front cache
+   */
+  boolean getFrontCacheCopyOnWrite();
 
-	/**
-	 * get delimiter
-	 */
-	byte getDelimiter();
-	/* ENABLE_REPLICATION if */
+  /**
+   * Bulk service thread count
+   */
+  int getBulkServiceThreadCount();
 
-	/**
-	 * get read priority on replica nodes
-	 */
-	ReadPriority getReadPriority();
+  /**
+   * Bulk service loop limit
+   */
+  int getBulkServiceLoopLimit();
 
-	/**
-	 * get api read priority 
-	 * @return
-	 */
-	Map<APIType, ReadPriority> getAPIReadPriority();
-	/* ENABLE_REPLICATION end */
+  /**
+   * Bulk service single operation timeout
+   */
+  long getBulkServiceSingleOpTimeout();
+
+  /**
+   * get max smget key chunk size
+   */
+  int getDefaultMaxSMGetKeyChunkSize();
+
+  /**
+   * get delimiter
+   */
+  byte getDelimiter();
+  /* ENABLE_REPLICATION if */
+
+  /**
+   * get read priority on replica nodes
+   */
+  ReadPriority getReadPriority();
+
+  /**
+   * get api read priority
+   *
+   * @return
+   */
+  Map<APIType, ReadPriority> getAPIReadPriority();
+  /* ENABLE_REPLICATION end */
 }

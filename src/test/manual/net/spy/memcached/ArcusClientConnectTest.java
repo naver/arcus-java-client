@@ -29,25 +29,25 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(JUnit4ClassRunner.class)
 public class ArcusClientConnectTest extends BaseIntegrationTest {
 
-	@Before
-	@Override
-	public void setUp() throws Exception {
-		// This test assumes we use ZK
-		assumeTrue(USE_ZK);
-		openFromZK();
-	}
+  @Before
+  @Override
+  public void setUp() throws Exception {
+    // This test assumes we use ZK
+    assumeTrue(USE_ZK);
+    openFromZK();
+  }
 
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		// do nothing
-	}
+  @After
+  @Override
+  public void tearDown() throws Exception {
+    // do nothing
+  }
 
-	@Test
-	public void testOpenAndWait() {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-				ZK_SERVICE_ID, cfb);
-		client.shutdown();
-	}
+  @Test
+  public void testOpenAndWait() {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
+            ZK_SERVICE_ID, cfb);
+    client.shutdown();
+  }
 }

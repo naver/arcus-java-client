@@ -33,6 +33,6 @@ public class ProtocolSetExistTest extends TestCase {
 
   public void testGetAdditionalArgs() {
     SetExist<Object> exist = new SetExist<Object>(value, testTranscoder);
-    Assert.assertArrayEquals(new byte[]{'v','a','l','u','e'}, exist.getAdditionalArgs());
+    Assert.assertArrayEquals(new byte[]{'v', 'a', 'l', 'u', 'e'}, exist.getAdditionalArgs());
   }
 }

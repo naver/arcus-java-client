@@ -24,71 +24,71 @@ import java.util.Set;
  */
 public enum CollectionResponse {
 
-	OK,
-	END,
-	NOT_FOUND,
-	NOT_FOUND_ELEMENT,
-	ELEMENT_EXISTS,
-	CREATED_STORED,
-	STORED,
-	REPLACED,
-	DELETED,
-	DELETED_DROPPED,
-	TYPE_MISMATCH,
-	OVERFLOWED,
-	OUT_OF_RANGE,
-	ATTR_ERROR_NOT_FOUND,
-	ATTR_ERROR_BAD_VALUE,
-	EXIST,
-	NOT_EXIST,
-	
-	UNDEFINED,
-	CANCELED,
-	
-	INTERRUPT_EXCEPTION,
-	EXECUTION_EXCEPTION,
-	TIMEOUT_EXCEPTION,
-	EXCEPTION,
-	
-	UPDATED,
-	BKEY_MISMATCH,
-	EFLAG_MISMATCH,
-	
-	CREATED,
-	EXISTS,
-	SERVER_ERROR,
-	
-	/**
-	 * Command pipelining result
-	 */
-	RESPONSE,
-	
-	/**
-	 * read only collection
-	 */
-	UNREADABLE,
-	
-	DUPLICATED,
-	TRIMMED,
-	DUPLICATED_TRIMMED,
-	ATTR_MISMATCH,
-	NOTHING_TO_UPDATE;
-	
-	private static final Set<String> ENUM_STRINGS;
+  OK,
+  END,
+  NOT_FOUND,
+  NOT_FOUND_ELEMENT,
+  ELEMENT_EXISTS,
+  CREATED_STORED,
+  STORED,
+  REPLACED,
+  DELETED,
+  DELETED_DROPPED,
+  TYPE_MISMATCH,
+  OVERFLOWED,
+  OUT_OF_RANGE,
+  ATTR_ERROR_NOT_FOUND,
+  ATTR_ERROR_BAD_VALUE,
+  EXIST,
+  NOT_EXIST,
 
-	static {
-		CollectionResponse[] values = CollectionResponse.values();
-		ENUM_STRINGS = new HashSet<String>(values.length);
-		for (CollectionResponse e : values) {
-			ENUM_STRINGS.add(e.toString());
-		}
-	}
+  UNDEFINED,
+  CANCELED,
 
-	public static CollectionResponse resolve(String s) {
-		if (ENUM_STRINGS.contains(s)) {
-			return CollectionResponse.valueOf(s);
-		} else {
-			return UNDEFINED;
-		}
-	}
+  INTERRUPT_EXCEPTION,
+  EXECUTION_EXCEPTION,
+  TIMEOUT_EXCEPTION,
+  EXCEPTION,
+
+  UPDATED,
+  BKEY_MISMATCH,
+  EFLAG_MISMATCH,
+
+  CREATED,
+  EXISTS,
+  SERVER_ERROR,
+
+  /**
+   * Command pipelining result
+   */
+  RESPONSE,
+
+  /**
+   * read only collection
+   */
+  UNREADABLE,
+
+  DUPLICATED,
+  TRIMMED,
+  DUPLICATED_TRIMMED,
+  ATTR_MISMATCH,
+  NOTHING_TO_UPDATE;
+
+  private static final Set<String> ENUM_STRINGS;
+
+  static {
+    CollectionResponse[] values = CollectionResponse.values();
+    ENUM_STRINGS = new HashSet<String>(values.length);
+    for (CollectionResponse e : values) {
+      ENUM_STRINGS.add(e.toString());
+    }
+  }
+
+  public static CollectionResponse resolve(String s) {
+    if (ENUM_STRINGS.contains(s)) {
+      return CollectionResponse.valueOf(s);
+    } else {
+      return UNDEFINED;
+    }
+  }
 }

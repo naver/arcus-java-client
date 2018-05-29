@@ -19,61 +19,61 @@ package net.spy.memcached;
 
 public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 
-	public MemcachedReplicaGroupImpl(final MemcachedNode node) {
-		super(getGroupNameForNode(node));
+  public MemcachedReplicaGroupImpl(final MemcachedNode node) {
+    super(getGroupNameForNode(node));
 
-		// Cannot make MemcachedReplicaGoup instance without group name and master/slave node  
-		if (node == null)
-			throw new IllegalArgumentException("Memcached Node must not be null");		
+    // Cannot make MemcachedReplicaGoup instance without group name and master/slave node
+    if (node == null)
+      throw new IllegalArgumentException("Memcached Node must not be null");
 
-		setMemcachedNode(node);
-	}
-	
-	public boolean setMemcachedNode(final MemcachedNode node) {
-		if (node == null)
-			return false;
+    setMemcachedNode(node);
+  }
 
-		if (this.group.equals(getGroupNameForNode(node))) {
-			if (((ArcusReplNodeAddress)node.getSocketAddress()).master)
-				this.masterNode = node;
-			else
-				this.slaveNode = node;
+  public boolean setMemcachedNode(final MemcachedNode node) {
+    if (node == null)
+      return false;
 
-			node.setReplicaGroup(this);
-			return true;
-		} else {
-			return false;
-		}
-	}
+    if (this.group.equals(getGroupNameForNode(node))) {
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).master)
+        this.masterNode = node;
+      else
+        this.slaveNode = node;
 
-	public boolean deleteMemcachedNode(final MemcachedNode node) {
-		if (node == null)
-			return false;		
+      node.setReplicaGroup(this);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-		if (this.group.equals(getGroupNameForNode(node))) {
-			if (((ArcusReplNodeAddress)node.getSocketAddress()).master)
-				this.masterNode = null;
-			else
-				this.slaveNode = null;
-			return true;
-		} else {
-			return false;
-		}
-	}
+  public boolean deleteMemcachedNode(final MemcachedNode node) {
+    if (node == null)
+      return false;
 
-	public boolean changeRole() {
-		/* role change */
-		MemcachedNode tmpNode = this.masterNode;
+    if (this.group.equals(getGroupNameForNode(node))) {
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).master)
+        this.masterNode = null;
+      else
+        this.slaveNode = null;
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-		this.masterNode = this.slaveNode;
-		if (this.masterNode != null) // previous slave node
-			((ArcusReplNodeAddress)this.masterNode.getSocketAddress()).master = true;
+  public boolean changeRole() {
+        /* role change */
+    MemcachedNode tmpNode = this.masterNode;
 
-		this.slaveNode = tmpNode; 
-		if (this.slaveNode != null) // previous master node
-			((ArcusReplNodeAddress)this.slaveNode.getSocketAddress()).master = false;
+    this.masterNode = this.slaveNode;
+    if (this.masterNode != null) // previous slave node
+      ((ArcusReplNodeAddress) this.masterNode.getSocketAddress()).master = true;
 
-		return true;
-	}
+    this.slaveNode = tmpNode;
+    if (this.slaveNode != null) // previous master node
+      ((ArcusReplNodeAddress) this.slaveNode.getSocketAddress()).master = false;
+
+    return true;
+  }
 }
 /* ENABLE_REPLICATION end */

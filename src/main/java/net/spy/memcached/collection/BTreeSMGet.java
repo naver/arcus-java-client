@@ -20,31 +20,31 @@ import java.util.List;
 
 public interface BTreeSMGet<T> {
 
-	public int headerCount = 4;
-	
-	public String getSpaceSeparatedKeys();
+  public int headerCount = 4;
 
-	public String getRepresentKey();
+  public String getSpaceSeparatedKeys();
 
-	public List<String> getKeyList();
+  public String getRepresentKey();
 
-	public String stringify();
+  public List<String> getKeyList();
 
-	public String getCommand();
+  public String stringify();
 
-	public boolean headerReady(int spaceCount);
+  public String getCommand();
 
-	public String getKey();
+  public boolean headerReady(int spaceCount);
 
-	public int getFlag();
+  public String getKey();
 
-	public Object getSubkey();
+  public int getFlag();
 
-	public int getDataLength();
+  public Object getSubkey();
 
-	public boolean isReverse();
+  public int getDataLength();
 
-	public boolean hasEflag();
+  public boolean isReverse();
 
-	public void decodeItemHeader(String itemHeader);
+  public boolean hasEflag();
+
+  public void decodeItemHeader(String itemHeader);
 }

@@ -23,26 +23,30 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 @Ignore
 public class ArcusClientNotExistsServiceCodeTest extends BaseIntegrationTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		// do nothing
-	};
+  @Override
+  protected void setUp() throws Exception {
+    // do nothing
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		// do nothing
-	};
+  ;
 
-	public void testNotExistsServiceCode() {
-		if (!USE_ZK)
-			return;
+  @Override
+  protected void tearDown() throws Exception {
+    // do nothing
+  }
 
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		try {
-			ArcusClient.createArcusClient(ZK_HOST, "NOT_EXISTS_SVC_CODE", cfb);
-		} catch (NotExistsServiceCodeException e) {
-			return;
-		}
-		fail("not exists service code test failed.");
-	}
+  ;
+
+  public void testNotExistsServiceCode() {
+    if (!USE_ZK)
+      return;
+
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    try {
+      ArcusClient.createArcusClient(ZK_HOST, "NOT_EXISTS_SVC_CODE", cfb);
+    } catch (NotExistsServiceCodeException e) {
+      return;
+    }
+    fail("not exists service code test failed.");
+  }
 }

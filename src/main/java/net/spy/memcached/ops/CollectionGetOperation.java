@@ -23,10 +23,10 @@ import net.spy.memcached.collection.CollectionGet;
  */
 public interface CollectionGetOperation extends KeyedOperation {
 
-	CollectionGet getGet();
-	
-	interface Callback extends OperationCallback {
-		void gotData(String key, String subkey, int flags, byte[] data);
-	}
-	
+  CollectionGet getGet();
+
+  interface Callback extends OperationCallback {
+    void gotData(String key, String subkey, int flags, byte[] data);
+  }
+
 }

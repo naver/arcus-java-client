@@ -29,195 +29,195 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
-	public static final String PIPE = "pipe";
-	public static final int MAX_PIPED_ITEM_COUNT = 500;
+  public static final String PIPE = "pipe";
+  public static final int MAX_PIPED_ITEM_COUNT = 500;
 
-	protected String key;
-	protected Transcoder<T> tc;
-	protected int itemCount;
-	protected int nextOpIndex = 0;
+  protected String key;
+  protected Transcoder<T> tc;
+  protected int itemCount;
+  protected int nextOpIndex = 0;
 
-	public abstract ByteBuffer getAsciiCommand();
+  public abstract ByteBuffer getAsciiCommand();
 
-	public abstract ByteBuffer getBinaryCommand();
+  public abstract ByteBuffer getBinaryCommand();
 
-	public static class BTreePipedUpdate<T> extends CollectionPipedUpdate<T> {
+  public static class BTreePipedUpdate<T> extends CollectionPipedUpdate<T> {
 
-		private static final String COMMAND = "bop update";
-		private List<Element<T>> elements;
+    private static final String COMMAND = "bop update";
+    private List<Element<T>> elements;
 
-		public BTreePipedUpdate(String key, List<Element<T>> elements,
-				Transcoder<T> tc) {
-			this.key = key;
-			this.elements = elements;
-			this.tc = tc;
-			this.itemCount = elements.size();
-		}
+    public BTreePipedUpdate(String key, List<Element<T>> elements,
+                            Transcoder<T> tc) {
+      this.key = key;
+      this.elements = elements;
+      this.tc = tc;
+      this.itemCount = elements.size();
+    }
 
-		public ByteBuffer getAsciiCommand() {
-			int capacity = 0;
+    public ByteBuffer getAsciiCommand() {
+      int capacity = 0;
 
-			// decode parameters
-			List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
-			CachedData cd = null;
-			for (Element<T> each : elements) {
-				if (each.getValue() != null) {
-					cd = tc.encode(each.getValue());
-					decodedList.add(cd.getData());
-				} else {
-					decodedList.add(null);
-				}
-			}
+      // decode parameters
+      List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
+      CachedData cd = null;
+      for (Element<T> each : elements) {
+        if (each.getValue() != null) {
+          cd = tc.encode(each.getValue());
+          decodedList.add(cd.getData());
+        } else {
+          decodedList.add(null);
+        }
+      }
 
-			// estimate the buffer capacity
-			int i = 0;
-			ElementFlagUpdate eflagUpdate;
-			byte[] value;
-			StringBuilder b;
+      // estimate the buffer capacity
+      int i = 0;
+      ElementFlagUpdate eflagUpdate;
+      byte[] value;
+      StringBuilder b;
 
-			for (Element<T> each : elements) {
-				eflagUpdate = each.getElementFlagUpdate();
-				if (eflagUpdate != null) {
-					// eflag
-					capacity += KeyUtil.getKeyBytes(eflagUpdate.getElementFlagByHex()).length;
-					// fwhere bitwop
-					if (eflagUpdate.getElementFlagOffset() > -1) {
-						capacity += 6;
-					}
-				}
+      for (Element<T> each : elements) {
+        eflagUpdate = each.getElementFlagUpdate();
+        if (eflagUpdate != null) {
+          // eflag
+          capacity += KeyUtil.getKeyBytes(eflagUpdate.getElementFlagByHex()).length;
+          // fwhere bitwop
+          if (eflagUpdate.getElementFlagOffset() > -1) {
+            capacity += 6;
+          }
+        }
 
-				capacity += KeyUtil.getKeyBytes(key).length;
-				capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
-						.getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
-				if (decodedList.get(i) != null) {
-					capacity += decodedList.get(i++).length;
-				}
-				capacity += 64;
-			}
+        capacity += KeyUtil.getKeyBytes(key).length;
+        capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
+                .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
+        if (decodedList.get(i) != null) {
+          capacity += decodedList.get(i++).length;
+        }
+        capacity += 64;
+      }
 
-			// allocate the buffer
-			ByteBuffer bb = ByteBuffer.allocate(capacity);
+      // allocate the buffer
+      ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-			int eSize = elements.size();
-			for (i = this.nextOpIndex; i < eSize; i++) {
-				Element<T> element = elements.get(i);
-				value = decodedList.get(i);
-				eflagUpdate = element.getElementFlagUpdate();
-				b = new StringBuilder();
+      int eSize = elements.size();
+      for (i = this.nextOpIndex; i < eSize; i++) {
+        Element<T> element = elements.get(i);
+        value = decodedList.get(i);
+        eflagUpdate = element.getElementFlagUpdate();
+        b = new StringBuilder();
 
-				// has element eflag update
-				if (eflagUpdate != null) {
-					// use fwhere bitop
-					if (eflagUpdate.getElementFlagOffset() > -1 && eflagUpdate.getBitOp() != null) {
-						b.append(eflagUpdate.getElementFlagOffset()).append(" ");
-						b.append(eflagUpdate.getBitOp()).append(" ");
-					}
-					b.append(eflagUpdate.getElementFlagByHex());
-				}
+        // has element eflag update
+        if (eflagUpdate != null) {
+          // use fwhere bitop
+          if (eflagUpdate.getElementFlagOffset() > -1 && eflagUpdate.getBitOp() != null) {
+            b.append(eflagUpdate.getElementFlagOffset()).append(" ");
+            b.append(eflagUpdate.getBitOp()).append(" ");
+          }
+          b.append(eflagUpdate.getElementFlagByHex());
+        }
 
-				setArguments(bb, COMMAND, key,
-						(element.isByteArraysBkey() ? element.getBkeyByHex()
-								: String.valueOf(element.getLongBkey())),
-						b.toString(), (value == null ? -1 : value.length),
-						(i < eSize - 1) ? PIPE : "");
-				if (value != null) {
-					if (value.length > 0) {
-						bb.put(value);
-					}
-					bb.put(CRLF);
-				}
-			}
+        setArguments(bb, COMMAND, key,
+                (element.isByteArraysBkey() ? element.getBkeyByHex()
+                        : String.valueOf(element.getLongBkey())),
+                b.toString(), (value == null ? -1 : value.length),
+                (i < eSize - 1) ? PIPE : "");
+        if (value != null) {
+          if (value.length > 0) {
+            bb.put(value);
+          }
+          bb.put(CRLF);
+        }
+      }
 
-			// flip the buffer
-			bb.flip();
+      // flip the buffer
+      bb.flip();
 
-			return bb;
-		}
+      return bb;
+    }
 
-		public ByteBuffer getBinaryCommand() {
-			throw new RuntimeException("not supported in binary protocol yet.");
-		}
-	}
+    public ByteBuffer getBinaryCommand() {
+      throw new RuntimeException("not supported in binary protocol yet.");
+    }
+  }
 
 
-	public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
+  public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
 
-		private static final String COMMAND = "mop update";
-		private Map<String, T> elements;
+    private static final String COMMAND = "mop update";
+    private Map<String, T> elements;
 
-		public MapPipedUpdate(String key, Map<String, T> elements,
-		                      Transcoder<T> tc) {
-			this.key = key;
-			this.elements = elements;
-			this.tc = tc;
-			this.itemCount = elements.size();
-		}
+    public MapPipedUpdate(String key, Map<String, T> elements,
+                          Transcoder<T> tc) {
+      this.key = key;
+      this.elements = elements;
+      this.tc = tc;
+      this.itemCount = elements.size();
+    }
 
-		public ByteBuffer getAsciiCommand() {
-			int capacity = 0;
+    public ByteBuffer getAsciiCommand() {
+      int capacity = 0;
 
-			// encode parameters
-			List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
-			CachedData cd = null;
-			for (T each : elements.values()) {
-				cd = tc.encode(each);
-				encodedList.add(cd.getData());
-			}
+      // encode parameters
+      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
+      CachedData cd = null;
+      for (T each : elements.values()) {
+        cd = tc.encode(each);
+        encodedList.add(cd.getData());
+      }
 
-			// estimate the buffer capacity
-			int i = 0;
-			byte[] value;
-			StringBuilder b;
+      // estimate the buffer capacity
+      int i = 0;
+      byte[] value;
+      StringBuilder b;
 
-			for (String eachMkey : elements.keySet()) {
-				capacity += KeyUtil.getKeyBytes(key).length;
-				capacity += KeyUtil.getKeyBytes(eachMkey).length;
-				capacity += encodedList.get(i++).length;
-				capacity += 64;
-			}
+      for (String eachMkey : elements.keySet()) {
+        capacity += KeyUtil.getKeyBytes(key).length;
+        capacity += KeyUtil.getKeyBytes(eachMkey).length;
+        capacity += encodedList.get(i++).length;
+        capacity += 64;
+      }
 
-			// allocate the buffer
-			ByteBuffer bb = ByteBuffer.allocate(capacity);
+      // allocate the buffer
+      ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-			// create ascii operation string
-			int mkeySize = elements.keySet().size();
-			List<String> keyList = new ArrayList<String>(elements.keySet());
-			for (i = this.nextOpIndex; i < mkeySize; i++) {
-				String mkey = keyList.get(i);
-				value = encodedList.get(i);
-				b = new StringBuilder();
+      // create ascii operation string
+      int mkeySize = elements.keySet().size();
+      List<String> keyList = new ArrayList<String>(elements.keySet());
+      for (i = this.nextOpIndex; i < mkeySize; i++) {
+        String mkey = keyList.get(i);
+        value = encodedList.get(i);
+        b = new StringBuilder();
 
-				setArguments(bb, COMMAND, key, mkey,
-						b.toString(), (value == null ? -1 : value.length),
-						(i < mkeySize - 1) ? PIPE : "");
-				if (value != null) {
-					if (value.length > 0) {
-						bb.put(value);
-					}
-					bb.put(CRLF);
-				}
-			}
+        setArguments(bb, COMMAND, key, mkey,
+                b.toString(), (value == null ? -1 : value.length),
+                (i < mkeySize - 1) ? PIPE : "");
+        if (value != null) {
+          if (value.length > 0) {
+            bb.put(value);
+          }
+          bb.put(CRLF);
+        }
+      }
 
-			// flip the buffer
-			bb.flip();
+      // flip the buffer
+      bb.flip();
 
-			return bb;
-		}
+      return bb;
+    }
 
-		public ByteBuffer getBinaryCommand() {
-			throw new RuntimeException("not supported in binary protocol yet.");
-		}
-	}
+    public ByteBuffer getBinaryCommand() {
+      throw new RuntimeException("not supported in binary protocol yet.");
+    }
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public String getKey() {
+    return key;
+  }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-	public int getItemCount() {
-		return this.itemCount;
-	}
+  public int getItemCount() {
+    return this.itemCount;
+  }
 }

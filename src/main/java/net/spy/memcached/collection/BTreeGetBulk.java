@@ -19,32 +19,32 @@ package net.spy.memcached.collection;
 import java.util.List;
 
 public interface BTreeGetBulk<T> {
-	
-	public String getSpaceSeparatedKeys();
 
-	public String getRepresentKey();
+  public String getSpaceSeparatedKeys();
 
-	public List<String> getKeyList();
+  public String getRepresentKey();
 
-	public String stringify();
+  public List<String> getKeyList();
 
-	public String getCommand();
+  public String stringify();
 
-	public boolean elementHeaderReady(int spaceCount);
+  public String getCommand();
 
-	public boolean keyHeaderReady(int spaceCount);
+  public boolean elementHeaderReady(int spaceCount);
 
-	public String getKey();
+  public boolean keyHeaderReady(int spaceCount);
 
-	public int getFlag();
+  public String getKey();
 
-	public Object getSubkey();
+  public int getFlag();
 
-	public int getDataLength();
-	
-	public byte[] getEFlag();
+  public Object getSubkey();
 
-	public void decodeItemHeader(String itemHeader);
-	
-	public void decodeKeyHeader(String keyHeader);
+  public int getDataLength();
+
+  public byte[] getEFlag();
+
+  public void decodeItemHeader(String itemHeader);
+
+  public void decodeKeyHeader(String keyHeader);
 }

@@ -23,40 +23,40 @@ import javax.management.ObjectName;
 
 public final class ArcusMBeanServer {
 
-	private final MBeanServer mbserver;
+  private final MBeanServer mbserver;
 
-	private static class SingletonHolder {
-		private final static ArcusMBeanServer INSTANCE = new ArcusMBeanServer();
-	}
+  private static class SingletonHolder {
+    private final static ArcusMBeanServer INSTANCE = new ArcusMBeanServer();
+  }
 
-	private ArcusMBeanServer() {
-		mbserver = ManagementFactory.getPlatformMBeanServer();
-	}
+  private ArcusMBeanServer() {
+    mbserver = ManagementFactory.getPlatformMBeanServer();
+  }
 
-	public static ArcusMBeanServer getInstance() {
-		return SingletonHolder.INSTANCE;
-	}
+  public static ArcusMBeanServer getInstance() {
+    return SingletonHolder.INSTANCE;
+  }
 
-	public boolean isRegistered(String name) {
-		try {
-			return mbserver != null
-					&& mbserver.isRegistered(new ObjectName(name));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+  public boolean isRegistered(String name) {
+    try {
+      return mbserver != null
+              && mbserver.isRegistered(new ObjectName(name));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-	public void registMBean(Object o, String name) {
-		if (isRegistered(name)) {
-			return;
-		}
+  public void registMBean(Object o, String name) {
+    if (isRegistered(name)) {
+      return;
+    }
 
-		if (mbserver != null) {
-			try {
-				mbserver.registerMBean(o, new ObjectName(name));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
+    if (mbserver != null) {
+      try {
+        mbserver.registerMBean(o, new ObjectName(name));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 }

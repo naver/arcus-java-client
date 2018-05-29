@@ -39,83 +39,83 @@ import net.spy.memcached.ops.OperationType;
  * Operation to create empty collection in a memcached server.
  */
 public class CollectionCreateOperationImpl extends OperationImpl
-	implements CollectionCreateOperation {
+        implements CollectionCreateOperation {
 
-	private static final int OVERHEAD = 32;
+  private static final int OVERHEAD = 32;
 
-	private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus CREATED = new CollectionOperationStatus(
-			true, "CREATED", CollectionResponse.CREATED);
-	private static final OperationStatus EXISTS = new CollectionOperationStatus(
-			false, "EXISTS", CollectionResponse.EXISTS);
-	private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
-			false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
+  private static final OperationStatus CREATED = new CollectionOperationStatus(
+          true, "CREATED", CollectionResponse.CREATED);
+  private static final OperationStatus EXISTS = new CollectionOperationStatus(
+          false, "EXISTS", CollectionResponse.EXISTS);
+  private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
+          false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
-	protected final String key;
-	protected final CollectionCreate collectionCreate;
+  protected final String key;
+  protected final CollectionCreate collectionCreate;
 
-	public CollectionCreateOperationImpl(String key,
-			CollectionCreate collectionCreate, OperationCallback cb) {
-		super(cb);
-		this.key = key;
-		this.collectionCreate = collectionCreate;
-		if (this.collectionCreate instanceof ListCreate)
-			setAPIType(APIType.LOP_CREATE);
-		else if (this.collectionCreate instanceof SetCreate)
-			setAPIType(APIType.SOP_CREATE);
-		else if (this.collectionCreate instanceof BTreeCreate)
-			setAPIType(APIType.BOP_CREATE);
-		else if (this.collectionCreate instanceof MapCreate)
-			setAPIType(APIType.MOP_CREATE);
-		setOperationType(OperationType.WRITE);
-	}
+  public CollectionCreateOperationImpl(String key,
+                                       CollectionCreate collectionCreate, OperationCallback cb) {
+    super(cb);
+    this.key = key;
+    this.collectionCreate = collectionCreate;
+    if (this.collectionCreate instanceof ListCreate)
+      setAPIType(APIType.LOP_CREATE);
+    else if (this.collectionCreate instanceof SetCreate)
+      setAPIType(APIType.SOP_CREATE);
+    else if (this.collectionCreate instanceof BTreeCreate)
+      setAPIType(APIType.BOP_CREATE);
+    else if (this.collectionCreate instanceof MapCreate)
+      setAPIType(APIType.MOP_CREATE);
+    setOperationType(OperationType.WRITE);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		assert getState() == OperationState.READING
-			: "Read ``" + line + "'' when in " + getState() + " state";
-		/* ENABLE_REPLICATION if */
-		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-			receivedMoveOperations(line);
-			return;
-		}
+  @Override
+  public void handleLine(String line) {
+    assert getState() == OperationState.READING
+            : "Read ``" + line + "'' when in " + getState() + " state";
+    /* ENABLE_REPLICATION if */
+    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+      receivedMoveOperations(line);
+      return;
+    }
 
-		/* ENABLE_REPLICATION end */
-		getCallback().receivedStatus(
-				matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
-		transitionState(OperationState.COMPLETE);
-	}
+    /* ENABLE_REPLICATION end */
+    getCallback().receivedStatus(
+            matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
+    transitionState(OperationState.COMPLETE);
+  }
 
-	@Override
-	public void initialize() {
-		String args = collectionCreate.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-				+ args.length()
-				+ OVERHEAD);
-		setArguments(bb, collectionCreate.getCommand(), key, args);
-		bb.flip();
-		setBuffer(bb);
+  @Override
+  public void initialize() {
+    String args = collectionCreate.stringify();
+    ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+            + args.length()
+            + OVERHEAD);
+    setArguments(bb, collectionCreate.getCommand(), key, args);
+    bb.flip();
+    setBuffer(bb);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: "
-					+ (new String(bb.array())).replaceAll("\\r\\n", ""));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Request in ascii protocol: "
+              + (new String(bb.array())).replaceAll("\\r\\n", ""));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(STORE_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(STORE_CANCELED);
+  }
 
-	@Override
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  @Override
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
-	@Override
-	public CollectionCreate getCreate() {
-		return collectionCreate;
-	}
+  @Override
+  public CollectionCreate getCreate() {
+    return collectionCreate;
+  }
 }

@@ -31,122 +31,120 @@ import org.apache.zookeeper.ZooKeeper;
  * in the ZooKeeper node(/arcus/cache_list/<service_code>).
  */
 public class CacheMonitor extends SpyObject implements Watcher,
-		ChildrenCallback {
+        ChildrenCallback {
 
-	ZooKeeper zk;
+  ZooKeeper zk;
 
-	String cacheListZPath;
-	
-	String serviceCode;
+  String cacheListZPath;
 
-	volatile boolean dead;
+  String serviceCode;
 
-	CacheMonitorListener listener;
+  volatile boolean dead;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param zk
-	 *            ZooKeeper connection
-	 * @param serviceCode
-	 *            service code (or cloud name) to identify each cloud
-	 * @param listener
-	 *            Callback listener
-	 */
-	public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
-			CacheMonitorListener listener) {
-		this.zk = zk;
-		this.cacheListZPath = cacheListZPath;
-		this.serviceCode = serviceCode;
-		this.listener = listener;
+  CacheMonitorListener listener;
 
-		getLogger().info("Initializing the CacheMonitor.");
-		
-		// Get the cache list from the Arcus admin asynchronously.
-		// Returning list would be processed in processResult().
-		asyncGetCacheList();
-	}
+  /**
+   * Constructor
+   *
+   * @param zk          ZooKeeper connection
+   * @param serviceCode service code (or cloud name) to identify each cloud
+   * @param listener    Callback listener
+   */
+  public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
+                      CacheMonitorListener listener) {
+    this.zk = zk;
+    this.cacheListZPath = cacheListZPath;
+    this.serviceCode = serviceCode;
+    this.listener = listener;
 
-	/**
-	 * Other classes use the CacheMonitor by implementing this method
-	 */
-	public interface CacheMonitorListener {
-		/**
-		 * The existing children of the node has changed.
-		 */
-		void commandNodeChange(List<String> children);
+    getLogger().info("Initializing the CacheMonitor.");
 
-		List<String> getPrevChildren();
-		/**
-		 * The ZooKeeper session is no longer valid.
-		 */
-		void closing();
-	}
+    // Get the cache list from the Arcus admin asynchronously.
+    // Returning list would be processed in processResult().
+    asyncGetCacheList();
+  }
 
-	/**
-	 * Processes every events from the ZooKeeper.
-	 */
-	public void process(WatchedEvent event) {
-		if (event.getType() == Event.EventType.NodeChildrenChanged)
-			asyncGetCacheList();
-	}
+  /**
+   * Other classes use the CacheMonitor by implementing this method
+   */
+  public interface CacheMonitorListener {
+    /**
+     * The existing children of the node has changed.
+     */
+    void commandNodeChange(List<String> children);
 
-	/**
-	 * A callback function to process the result of getChildren(watch=true).
-	 */
-	public void processResult(int rc, String path, Object ctx,
-			List<String> children) {
-		switch (Code.get(rc)) {
-		case OK:
-			listener.commandNodeChange(children);
-			return;
-		case NONODE:
-			getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());
-			return;
-		case SESSIONEXPIRED:
-			getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
-			shutdown();
-			return;
-		case NOAUTH:
-			getLogger().fatal("Authorization failed " + getInfo());
-			shutdown();
-			return;
-		case CONNECTIONLOSS:
-			getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
-			asyncGetCacheList();
-			return;
-		default:
-			getLogger().warn("Ignoring an unexpected event from the Arcus admin. code=" + Code.get(rc) + ", " + getInfo());
-			asyncGetCacheList();
-			return;
-		}
-	}
+    List<String> getPrevChildren();
 
-	/**
-	 * Get the cache list asynchronously from the Arcus admin.
-	 */
-	void asyncGetCacheList() {
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
-		}
-		
-		zk.getChildren(cacheListZPath + serviceCode, this, this, null);
-	}
+    /**
+     * The ZooKeeper session is no longer valid.
+     */
+    void closing();
+  }
 
-	/**
-	 * Shutdown the CacheMonitor.
-	 */
-	public void shutdown() {
-		getLogger().info("Shutting down the CacheMonitor. " + getInfo());
-		dead = true;
-		listener.closing();
-	}
-	
-	private String getInfo() {
-		String zkSessionId = null;
-		if (zk != null) {
-			zkSessionId = "0x" + Long.toHexString(zk.getSessionId());
-		}
-		return "[serviceCode=" + serviceCode + ", adminSessionId=" + zkSessionId + "]";
-	}
+  /**
+   * Processes every events from the ZooKeeper.
+   */
+  public void process(WatchedEvent event) {
+    if (event.getType() == Event.EventType.NodeChildrenChanged)
+      asyncGetCacheList();
+  }
+
+  /**
+   * A callback function to process the result of getChildren(watch=true).
+   */
+  public void processResult(int rc, String path, Object ctx,
+                            List<String> children) {
+    switch (Code.get(rc)) {
+      case OK:
+        listener.commandNodeChange(children);
+        return;
+      case NONODE:
+        getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());
+        return;
+      case SESSIONEXPIRED:
+        getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
+        shutdown();
+        return;
+      case NOAUTH:
+        getLogger().fatal("Authorization failed " + getInfo());
+        shutdown();
+        return;
+      case CONNECTIONLOSS:
+        getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
+        asyncGetCacheList();
+        return;
+      default:
+        getLogger().warn("Ignoring an unexpected event from the Arcus admin. code=" + Code.get(rc) + ", " + getInfo());
+        asyncGetCacheList();
+        return;
+    }
+  }
+
+  /**
+   * Get the cache list asynchronously from the Arcus admin.
+   */
+  void asyncGetCacheList() {
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
+    }
+
+    zk.getChildren(cacheListZPath + serviceCode, this, this, null);
+  }
+
+  /**
+   * Shutdown the CacheMonitor.
+   */
+  public void shutdown() {
+    getLogger().info("Shutting down the CacheMonitor. " + getInfo());
+    dead = true;
+    listener.closing();
+  }
+
+  private String getInfo() {
+    String zkSessionId = null;
+    if (zk != null) {
+      zkSessionId = "0x" + Long.toHexString(zk.getSessionId());
+    }
+    return "[serviceCode=" + serviceCode + ", adminSessionId=" + zkSessionId + "]";
+  }
 }

@@ -18,16 +18,17 @@ package net.spy.memcached.collection;
 
 public class SetStore<T> extends CollectionStore<T> {
 
-	private static final String command = "sop insert";
-	
-	public SetStore() { }
+  private static final String command = "sop insert";
 
-	public SetStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-		super(value, null, createKeyIfNotExists, requestMode, attr);
-	}
+  public SetStore() {
+  }
 
-	public String getCommand() {
-		return command;
-	}
-	
+  public SetStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+    super(value, null, createKeyIfNotExists, requestMode, attr);
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
 }

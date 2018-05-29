@@ -21,10 +21,10 @@ import net.spy.memcached.collection.BTreeStoreAndGet;
 
 public interface BTreeStoreAndGetOperation extends KeyedOperation {
 
-	BTreeStoreAndGet<?> getGet();
-	
-	interface Callback extends OperationCallback {
-		void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
-	}
-	
+  BTreeStoreAndGet<?> getGet();
+
+  interface Callback extends OperationCallback {
+    void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
+  }
+
 }

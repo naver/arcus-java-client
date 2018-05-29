@@ -20,73 +20,73 @@ package net.spy.memcached;
 import net.spy.memcached.compat.SpyObject;
 
 public abstract class MemcachedReplicaGroup extends SpyObject {
-	protected final String group;
-	protected MemcachedNode masterNode;
-	protected MemcachedNode slaveNode;
-	private boolean prevMasterPick;
+  protected final String group;
+  protected MemcachedNode masterNode;
+  protected MemcachedNode slaveNode;
+  private boolean prevMasterPick;
 
-	protected MemcachedReplicaGroup(final String groupName) {
-		if (groupName == null)
-			throw new IllegalArgumentException("Memcached in Replica Group must have group name");
-		this.group = groupName;
-	}
+  protected MemcachedReplicaGroup(final String groupName) {
+    if (groupName == null)
+      throw new IllegalArgumentException("Memcached in Replica Group must have group name");
+    this.group = groupName;
+  }
 
-	public String toString() {
-		return "[" + this.masterNode + ", " + this.slaveNode + "]";
-	}
+  public String toString() {
+    return "[" + this.masterNode + ", " + this.slaveNode + "]";
+  }
 
-	public boolean isEmptyGroup() {
-		return masterNode == null && slaveNode == null;
-	}
+  public boolean isEmptyGroup() {
+    return masterNode == null && slaveNode == null;
+  }
 
-	public abstract boolean setMemcachedNode(final MemcachedNode node);
+  public abstract boolean setMemcachedNode(final MemcachedNode node);
 
-	public abstract boolean deleteMemcachedNode(final MemcachedNode node);
+  public abstract boolean deleteMemcachedNode(final MemcachedNode node);
 
-	public String getGroupName() {
-		return this.group;
-	}
+  public String getGroupName() {
+    return this.group;
+  }
 
-	public MemcachedNode getMasterNode() {
-		return masterNode;
-	}
+  public MemcachedNode getMasterNode() {
+    return masterNode;
+  }
 
-	public MemcachedNode getSlaveNode() {
-		return slaveNode;
-	}
+  public MemcachedNode getSlaveNode() {
+    return slaveNode;
+  }
 
-	public MemcachedNode getNodeForReplicaPick(ReplicaPick priority) {
-		MemcachedNode node = null;
+  public MemcachedNode getNodeForReplicaPick(ReplicaPick priority) {
+    MemcachedNode node = null;
 
-		switch (priority) {
-			case MASTER:
-				node = masterNode;
-				break;
-			case SLAVE:
-				if (slaveNode != null && slaveNode.isActive()) {
-					node = slaveNode;
-				} else {
-					node = masterNode;
-				}
-				break;
-			case RR:
-				if (prevMasterPick && slaveNode != null && slaveNode.isActive()) {
-					node = slaveNode;
-				} else {
-					node = masterNode;
-				}
-				prevMasterPick = prevMasterPick ? false : true;
-				break;
-			default: // This case never exist.
-				break;
-		}
-		return node; 
-	}
+    switch (priority) {
+      case MASTER:
+        node = masterNode;
+        break;
+      case SLAVE:
+        if (slaveNode != null && slaveNode.isActive()) {
+          node = slaveNode;
+        } else {
+          node = masterNode;
+        }
+        break;
+      case RR:
+        if (prevMasterPick && slaveNode != null && slaveNode.isActive()) {
+          node = slaveNode;
+        } else {
+          node = masterNode;
+        }
+        prevMasterPick = prevMasterPick ? false : true;
+        break;
+      default: // This case never exist.
+        break;
+    }
+    return node;
+  }
 
-	public abstract boolean changeRole();
+  public abstract boolean changeRole();
 
-	public static String getGroupNameForNode(final MemcachedNode node) {
-		return ((ArcusReplNodeAddress)node.getSocketAddress()).getGroupName();
-	}
+  public static String getGroupNameForNode(final MemcachedNode node) {
+    return ((ArcusReplNodeAddress) node.getSocketAddress()).getGroupName();
+  }
 }
 /* ENABLE_REPLICATION end */

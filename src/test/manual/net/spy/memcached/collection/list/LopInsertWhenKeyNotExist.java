@@ -23,127 +23,127 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
-	private String key = "LopInsertWhenKeyNotExist";
+  private String key = "LopInsertWhenKeyNotExist";
 
-	protected void tearDown() {
-		try {
-			deleteList(key, 1000);
-			super.tearDown();
-		} catch (Exception e) {
-		}
-	}
+  protected void tearDown() {
+    try {
+      deleteList(key, 1000);
+      super.tearDown();
+    } catch (Exception e) {
+    }
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * -1	true	false	null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_01() throws Exception {
-		insertToFail(key, -1, true, null);
-	}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * -1	true	false	null
+   * </pre>
+   */
+  public void testLopInsert_nokey_01() throws Exception {
+    insertToFail(key, -1, true, null);
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * -1	false	true	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_02() throws Exception {
-		boolean success = insertToSucceed(key, -1, false, "some value");
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * -1	false	true	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_02() throws Exception {
+    boolean success = insertToSucceed(key, -1, false, "some value");
 
-		assertFalse(success);
-	}
+    assertFalse(success);
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * 0	false	true	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_03() throws Exception {
-		assertFalse(insertToSucceed(key, 0, false, "some value"));
-	}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * 0	false	true	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_03() throws Exception {
+    assertFalse(insertToSucceed(key, 0, false, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * 0	false	false	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_04() throws Exception {
-		assertFalse(insertToSucceed(key, 0, false, "some value"));
-	}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * 0	false	false	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_04() throws Exception {
+    assertFalse(insertToSucceed(key, 0, false, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * 0	true	true	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_05() throws Exception {
-		assertTrue(insertToSucceed(key, 0, true, "some value"));
-	}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * 0	true	true	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_05() throws Exception {
+    assertTrue(insertToSucceed(key, 0, true, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * -1	true	false	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_06() throws Exception {
-		assertTrue(insertToSucceed(key, -1, true, "some value"));
-	}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * -1	true	false	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_06() throws Exception {
+    assertTrue(insertToSucceed(key, -1, true, "some value"));
+  }
 
-	/**
-	 * <pre>
-	 * INDEX	CREATE	FIXED	VALUE
-	 * count	true	true	not null
-	 * </pre>
-	 */
-	public void testLopInsert_nokey_07() throws Exception {
-		// Prepare 3 items
-		String[] items = { "item01", "item02", "item03" };
-		for (String item : items) {
-			assertTrue(insertToSucceed(key, -1, true, item));
-		}
+  /**
+   * <pre>
+   * INDEX	CREATE	FIXED	VALUE
+   * count	true	true	not null
+   * </pre>
+   */
+  public void testLopInsert_nokey_07() throws Exception {
+    // Prepare 3 items
+    String[] items = {"item01", "item02", "item03"};
+    for (String item : items) {
+      assertTrue(insertToSucceed(key, -1, true, item));
+    }
 
-		assertTrue(insertToSucceed(key, items.length, true, "item04"));
-	}
+    assertTrue(insertToSucceed(key, items.length, true, "item04"));
+  }
 
-	boolean insertToFail(String key, int index, boolean createKeyIfNotExists,
-			Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncLopInsert(
-							key,
-							index,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-			fail("should be failed");
-		} catch (Exception e) {
-		}
-		return result;
-	}
+  boolean insertToFail(String key, int index, boolean createKeyIfNotExists,
+                       Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncLopInsert(
+                      key,
+                      index,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+      fail("should be failed");
+    } catch (Exception e) {
+    }
+    return result;
+  }
 
-	boolean insertToSucceed(String key, int index,
-			boolean createKeyIfNotExists, Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncLopInsert(
-							key,
-							index,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("should not be failed");
-		}
-		return result;
-	}
+  boolean insertToSucceed(String key, int index,
+                          boolean createKeyIfNotExists, Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncLopInsert(
+                      key,
+                      index,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("should not be failed");
+    }
+    return result;
+  }
 
 }

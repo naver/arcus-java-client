@@ -12,24 +12,24 @@ import net.spy.memcached.ops.StoreType;
  * Operation to store data in a memcached server.
  */
 final class StoreOperationImpl extends BaseStoreOperationImpl
-	implements StoreOperation {
+        implements StoreOperation {
 
-	private final StoreType storeType;
+  private final StoreType storeType;
 
-	public StoreOperationImpl(StoreType t, String k, int f, int e,
-			byte[] d, OperationCallback cb) {
-		super(t.name(), k, f, e, d, cb);
-		storeType = t;
-		if (t == StoreType.add)
-			setAPIType(APIType.ADD);
-		else if (t == StoreType.set)
-			setAPIType(APIType.SET);
-		else if (t == StoreType.replace)
-			setAPIType(APIType.REPLACE);
-	}
+  public StoreOperationImpl(StoreType t, String k, int f, int e,
+                            byte[] d, OperationCallback cb) {
+    super(t.name(), k, f, e, d, cb);
+    storeType = t;
+    if (t == StoreType.add)
+      setAPIType(APIType.ADD);
+    else if (t == StoreType.set)
+      setAPIType(APIType.SET);
+    else if (t == StoreType.replace)
+      setAPIType(APIType.REPLACE);
+  }
 
-	public StoreType getStoreType() {
-		return storeType;
-	}
+  public StoreType getStoreType() {
+    return storeType;
+  }
 
 }

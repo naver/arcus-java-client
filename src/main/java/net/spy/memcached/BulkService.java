@@ -40,235 +40,235 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class BulkService extends SpyObject {
 
-	private static int DEFAULT_LOOP_LIMIT;
-	private final ExecutorService executor;
-	private final long singleOpTimeout;
+  private static int DEFAULT_LOOP_LIMIT;
+  private final ExecutorService executor;
+  private final long singleOpTimeout;
 
-	BulkService(int loopLimit, int threadCount, long singleOpTimeout) {
-		this.executor = new ThreadPoolExecutor(threadCount, threadCount, 60L,
-				TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
-				new BasicThreadFactory("bulk-service", true),
-				new ThreadPoolExecutor.AbortPolicy());
-		BulkService.DEFAULT_LOOP_LIMIT = loopLimit;
-		this.singleOpTimeout = singleOpTimeout;
-	}
+  BulkService(int loopLimit, int threadCount, long singleOpTimeout) {
+    this.executor = new ThreadPoolExecutor(threadCount, threadCount, 60L,
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+            new BasicThreadFactory("bulk-service", true),
+            new ThreadPoolExecutor.AbortPolicy());
+    BulkService.DEFAULT_LOOP_LIMIT = loopLimit;
+    this.singleOpTimeout = singleOpTimeout;
+  }
 
-	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
-					List<String> keys, int exp, T value, Transcoder<T> transcoder,
-					ArcusClient[] client) {
-		if (keys == null) {
-			throw new IllegalArgumentException("Key list is null.");
-		}
-		assert !executor.isShutdown() : "Pool has already shut down.";
-		BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
-				client, singleOpTimeout);
-		BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
-				w);
-		executor.submit(task);
-		return task;
-	}
+  <T> Future<Map<String, CollectionOperationStatus>> setBulk(
+          List<String> keys, int exp, T value, Transcoder<T> transcoder,
+          ArcusClient[] client) {
+    if (keys == null) {
+      throw new IllegalArgumentException("Key list is null.");
+    }
+    assert !executor.isShutdown() : "Pool has already shut down.";
+    BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
+            client, singleOpTimeout);
+    BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
+            w);
+    executor.submit(task);
+    return task;
+  }
 
-	<T> Future<Map<String, CollectionOperationStatus>> setBulk(
-			Map<String, T> o, int exp, Transcoder<T> transcoder,
-			ArcusClient[] client) {
-		if (o == null) {
-			throw new IllegalArgumentException("Map is null.");
-		}
-		assert !executor.isShutdown() : "Pool has already shut down.";
-		BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder, client,
-				singleOpTimeout);
-		BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
-				w);
-		executor.submit(task);
-		return task;
-	}
+  <T> Future<Map<String, CollectionOperationStatus>> setBulk(
+          Map<String, T> o, int exp, Transcoder<T> transcoder,
+          ArcusClient[] client) {
+    if (o == null) {
+      throw new IllegalArgumentException("Map is null.");
+    }
+    assert !executor.isShutdown() : "Pool has already shut down.";
+    BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder, client,
+            singleOpTimeout);
+    BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
+            w);
+    executor.submit(task);
+    return task;
+  }
 
-	void shutdown() {
-		try {
-			executor.shutdown();
-		} catch (Exception e) {
-			getLogger().warn("exception while shutting down bulk set service.",
-					e);
-		}
-	}
+  void shutdown() {
+    try {
+      executor.shutdown();
+    } catch (Exception e) {
+      getLogger().warn("exception while shutting down bulk set service.",
+              e);
+    }
+  }
 
-	private static class Task<T> extends FutureTask<T> {
-		private final BulkWorker worker;
+  private static class Task<T> extends FutureTask<T> {
+    private final BulkWorker worker;
 
-		public Task(Callable<T> callable) {
-			super(callable);
-			this.worker = (BulkWorker) callable;
-		}
+    public Task(Callable<T> callable) {
+      super(callable);
+      this.worker = (BulkWorker) callable;
+    }
 
-		@Override
-		public boolean cancel(boolean mayInterruptIfRunning) {
-			return worker.cancel() && super.cancel(mayInterruptIfRunning);
-		}
-	}
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+      return worker.cancel() && super.cancel(mayInterruptIfRunning);
+    }
+  }
 
-	/**
-	 * Bulk operation worker
-	 */
-	private abstract static class BulkWorker<T> extends SpyObject implements
-			Callable<Map<String, CollectionOperationStatus>> {
+  /**
+   * Bulk operation worker
+   */
+  private abstract static class BulkWorker<T> extends SpyObject implements
+          Callable<Map<String, CollectionOperationStatus>> {
 
-		protected final ArcusClient[] clientList;
-		protected final ArrayList<Future<Boolean>> future;
-		protected final long operationTimeout;
-		protected final AtomicBoolean isRunnable = new AtomicBoolean(true);
-		protected final Map<String, CollectionOperationStatus> errorList;
+    protected final ArcusClient[] clientList;
+    protected final ArrayList<Future<Boolean>> future;
+    protected final long operationTimeout;
+    protected final AtomicBoolean isRunnable = new AtomicBoolean(true);
+    protected final Map<String, CollectionOperationStatus> errorList;
 
-		protected final int totalCount;
-		protected final int fromIndex;
-		protected final int toIndex;
+    protected final int totalCount;
+    protected final int fromIndex;
+    protected final int toIndex;
 
-		public BulkWorker(Collection keys, long timeout, ArcusClient[] clientList) {
-			if(keys.size() < 1) {
-				throw new IllegalArgumentException("Keys size must be greater than 0");
-			}
-			this.future = new ArrayList<Future<Boolean>>(keys.size());
-			this.operationTimeout = timeout;
-			this.clientList = getOptimalClients(clientList);
-			this.errorList = new HashMap<String, CollectionOperationStatus>();
+    public BulkWorker(Collection keys, long timeout, ArcusClient[] clientList) {
+      if (keys.size() < 1) {
+        throw new IllegalArgumentException("Keys size must be greater than 0");
+      }
+      this.future = new ArrayList<Future<Boolean>>(keys.size());
+      this.operationTimeout = timeout;
+      this.clientList = getOptimalClients(clientList);
+      this.errorList = new HashMap<String, CollectionOperationStatus>();
 
-			fromIndex = 0;
-			toIndex = keys.size() - 1;
-			totalCount = toIndex - fromIndex + 1;
-		}
+      fromIndex = 0;
+      toIndex = keys.size() - 1;
+      totalCount = toIndex - fromIndex + 1;
+    }
 
-		public boolean cancel() {
-			if (!isRunnable()) {
-				return false;
-			}
+    public boolean cancel() {
+      if (!isRunnable()) {
+        return false;
+      }
 
-			isRunnable.set(false);
+      isRunnable.set(false);
 
-			boolean ret = true;
-			
-			for (Future<Boolean> f : future) {
-				if (f == null) {
-					continue;
-				}
-				if (f.isCancelled() || f.isDone()) {
-					continue;
-				}
-				ret &= f.cancel(true);
-								
-				if (getLogger().isDebugEnabled()) {
-					getLogger().debug("Cancel the future. " + f);
-				}
-			}
-			getLogger().info("Cancel, bulk set worker.");
-			return ret;
-		}
+      boolean ret = true;
 
-		private ArcusClient[] getOptimalClients(ArcusClient[] clientList) {
-			return clientList;
-		}
+      for (Future<Boolean> f : future) {
+        if (f == null) {
+          continue;
+        }
+        if (f.isCancelled() || f.isDone()) {
+          continue;
+        }
+        ret &= f.cancel(true);
 
-		protected boolean isRunnable() {
-			return isRunnable.get() && !Thread.currentThread().isInterrupted();
-		}
+        if (getLogger().isDebugEnabled()) {
+          getLogger().debug("Cancel the future. " + f);
+        }
+      }
+      getLogger().info("Cancel, bulk set worker.");
+      return ret;
+    }
 
-		protected void setErrorOpStatus(String key, int indexOfFuture) {
-			errorList.put(key,
-					((CollectionFuture<Boolean>) future.get(indexOfFuture))
-							.getOperationStatus());
-		}
+    private ArcusClient[] getOptimalClients(ArcusClient[] clientList) {
+      return clientList;
+    }
 
-		public abstract Future<Boolean> processItem(int index);
+    protected boolean isRunnable() {
+      return isRunnable.get() && !Thread.currentThread().isInterrupted();
+    }
 
-		public abstract void awaitProcessResult(int index);
+    protected void setErrorOpStatus(String key, int indexOfFuture) {
+      errorList.put(key,
+              ((CollectionFuture<Boolean>) future.get(indexOfFuture))
+                      .getOperationStatus());
+    }
 
-		public Map<String, CollectionOperationStatus> call() throws Exception {
-			for (int pos = fromIndex; isRunnable() && pos <= toIndex; pos++) {
-				if ((pos - fromIndex) > 0
-						&& (pos - fromIndex) % DEFAULT_LOOP_LIMIT == 0) {
-					for (int i = pos - DEFAULT_LOOP_LIMIT; isRunnable()
-							&& i < pos; i++) {
-						awaitProcessResult(i);
-					}
-				}
-				try {
-					if (isRunnable()) {
-						future.add(pos, processItem(pos));
-					}
-				} catch (IllegalStateException e) {
-					if (Thread.currentThread().isInterrupted()) {
-						break;
-					} else {
-						throw e;
-					}
-				}
-			}
-			for (int i = toIndex
-					- (totalCount % DEFAULT_LOOP_LIMIT == 0 ? DEFAULT_LOOP_LIMIT
-							: totalCount % DEFAULT_LOOP_LIMIT) + 1; isRunnable()
-					&& i <= toIndex; i++) {
-				awaitProcessResult(i);
-			}
-			return errorList;
-		}
-	}
+    public abstract Future<Boolean> processItem(int index);
 
-	/**
-	 * Bulk set operation worker
-	 */
-	private static class BulkSetWorker<T> extends BulkWorker<T> {
-		private final List<String> keys;
-		private final int exp;
-		private final int cntCos;
-		private List<CachedData> cos;
+    public abstract void awaitProcessResult(int index);
 
-		public BulkSetWorker(List<String> keys, int exp, T value,
-				Transcoder<T> transcoder, ArcusClient[] clientList,
-				long timeout) {
-			super(keys, timeout, clientList);
-			this.keys = keys;
-			this.exp = exp;
-			this.cos = new ArrayList<CachedData>();
-			this.cos.add(transcoder.encode(value));
-			this.cntCos = 1;
-		}
+    public Map<String, CollectionOperationStatus> call() throws Exception {
+      for (int pos = fromIndex; isRunnable() && pos <= toIndex; pos++) {
+        if ((pos - fromIndex) > 0
+                && (pos - fromIndex) % DEFAULT_LOOP_LIMIT == 0) {
+          for (int i = pos - DEFAULT_LOOP_LIMIT; isRunnable()
+                  && i < pos; i++) {
+            awaitProcessResult(i);
+          }
+        }
+        try {
+          if (isRunnable()) {
+            future.add(pos, processItem(pos));
+          }
+        } catch (IllegalStateException e) {
+          if (Thread.currentThread().isInterrupted()) {
+            break;
+          } else {
+            throw e;
+          }
+        }
+      }
+      for (int i = toIndex
+              - (totalCount % DEFAULT_LOOP_LIMIT == 0 ? DEFAULT_LOOP_LIMIT
+              : totalCount % DEFAULT_LOOP_LIMIT) + 1; isRunnable()
+                   && i <= toIndex; i++) {
+        awaitProcessResult(i);
+      }
+      return errorList;
+    }
+  }
 
-		public BulkSetWorker(Map<String, T> o, int exp,
-				Transcoder<T> transcoder, ArcusClient[] clientList, long timeout) {
+  /**
+   * Bulk set operation worker
+   */
+  private static class BulkSetWorker<T> extends BulkWorker<T> {
+    private final List<String> keys;
+    private final int exp;
+    private final int cntCos;
+    private List<CachedData> cos;
 
-			super(o.keySet(), timeout, clientList);
+    public BulkSetWorker(List<String> keys, int exp, T value,
+                         Transcoder<T> transcoder, ArcusClient[] clientList,
+                         long timeout) {
+      super(keys, timeout, clientList);
+      this.keys = keys;
+      this.exp = exp;
+      this.cos = new ArrayList<CachedData>();
+      this.cos.add(transcoder.encode(value));
+      this.cntCos = 1;
+    }
 
-			this.keys = new ArrayList<String>(o.keySet());
-			this.exp = exp;
+    public BulkSetWorker(Map<String, T> o, int exp,
+                         Transcoder<T> transcoder, ArcusClient[] clientList, long timeout) {
 
-			this.cos = new ArrayList<CachedData>();
-			for (String key : keys) {
-				this.cos.add(transcoder.encode(o.get(key)));
-			}
-			this.cntCos = this.cos.size();
-		}
+      super(o.keySet(), timeout, clientList);
 
-		@Override
-		public Future<Boolean> processItem(int index) {
-			return clientList[index % clientList.length].asyncStore(
-					StoreType.set, keys.get(index), exp,
-					(this.cntCos > 1 ? cos.get(index) : cos.get(0)));
-		}
+      this.keys = new ArrayList<String>(o.keySet());
+      this.exp = exp;
 
-		@Override
-		public void awaitProcessResult(int index) {
-			try {
-				boolean success = future.get(index).get(operationTimeout,
-						TimeUnit.MILLISECONDS);
-				if (!success) {
-					errorList.put(
-							keys.get(index),
-							new CollectionOperationStatus(false, String
-									.valueOf(success), CollectionResponse.END));
-				}
-			} catch (Exception e) {
-				future.get(index).cancel(true);
-				errorList.put(keys.get(index), new CollectionOperationStatus(
-						false, e.getMessage(), CollectionResponse.EXCEPTION));
-			}
-		}
-	}
+      this.cos = new ArrayList<CachedData>();
+      for (String key : keys) {
+        this.cos.add(transcoder.encode(o.get(key)));
+      }
+      this.cntCos = this.cos.size();
+    }
+
+    @Override
+    public Future<Boolean> processItem(int index) {
+      return clientList[index % clientList.length].asyncStore(
+              StoreType.set, keys.get(index), exp,
+              (this.cntCos > 1 ? cos.get(index) : cos.get(0)));
+    }
+
+    @Override
+    public void awaitProcessResult(int index) {
+      try {
+        boolean success = future.get(index).get(operationTimeout,
+                TimeUnit.MILLISECONDS);
+        if (!success) {
+          errorList.put(
+                  keys.get(index),
+                  new CollectionOperationStatus(false, String
+                          .valueOf(success), CollectionResponse.END));
+        }
+      } catch (Exception e) {
+        future.get(index).cancel(true);
+        errorList.put(keys.get(index), new CollectionOperationStatus(
+                false, e.getMessage(), CollectionResponse.EXCEPTION));
+      }
+    }
+  }
 }

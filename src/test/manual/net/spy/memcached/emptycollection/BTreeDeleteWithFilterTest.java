@@ -24,74 +24,76 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final long BKEY = 10L;
-	private final int VALUE = 1234567890;
+  private final String KEY = this.getClass().getSimpleName();
+  private final long BKEY = 10L;
+  private final int VALUE = 1234567890;
 
-	private final String FLAG = "flag";
+  private final String FLAG = "flag";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	};
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testDeleteWithMatchedFilter() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, FLAG.getBytes());
+  ;
 
-			boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult);
+  public void testDeleteWithMatchedFilter() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, FLAG.getBytes());
 
-			// check attr
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult);
 
-			// delete one bkey
-			Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
-			Assert.assertTrue(delete);
+      // check attr
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// check attr again
-			Assert.assertEquals(new Long(0), mc.asyncGetAttr(KEY).get()
-					.getCount());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // delete one bkey
+      Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
+      Assert.assertTrue(delete);
 
-	public void testDeleteWithUnMatchedFilter() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "aa".getBytes());
+      // check attr again
+      Assert.assertEquals(new Long(0), mc.asyncGetAttr(KEY).get()
+              .getCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult);
+  public void testDeleteWithUnMatchedFilter() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "aa".getBytes());
 
-			// check attr
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult);
 
-			// delete one bkey
-			Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
-			Assert.assertFalse(delete);
+      // check attr
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// check attr again
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // delete one bkey
+      Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
+      Assert.assertFalse(delete);
+
+      // check attr again
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
 }

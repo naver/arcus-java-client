@@ -20,89 +20,89 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BKeyObject {
 
-	public enum BKeyType {
-		LONG, BYTEARRAY, UNKNOWN
-	}
+  public enum BKeyType {
+    LONG, BYTEARRAY, UNKNOWN
+  }
 
-	private BKeyType type = BKeyType.UNKNOWN;
-	private Long longBKey;
-	private ByteArrayBKey byteArrayBKey;
+  private BKeyType type = BKeyType.UNKNOWN;
+  private Long longBKey;
+  private ByteArrayBKey byteArrayBKey;
 
-	public BKeyObject() {
-		
-	}
-	
-	public BKeyObject(long longBKey) {
-		setLongBKey(longBKey);
-	}
+  public BKeyObject() {
 
-	public BKeyObject(byte[] byteArrayBKey) {
-		setByteArrayBKey(new ByteArrayBKey(byteArrayBKey));
-	}
-	
-	public BKeyObject(ByteArrayBKey byteArrayBKey) {
-		setByteArrayBKey(byteArrayBKey);
-	}
-	
-	public BKeyObject(String bkeyString) {
-		byte[] b = BTreeUtil.hexStringToByteArrays(bkeyString);
-		ByteArrayBKey byteArrayBKey = new ByteArrayBKey(b);
-		setByteArrayBKey(byteArrayBKey);
-	}
-	
-	public BKeyType getType() {
-		return type;
-	}
+  }
 
-	public Long getLongBKey() {
-		if (BKeyType.LONG == type) {
-			return longBKey;
-		} else {
-			return null;
-		}
-	}
+  public BKeyObject(long longBKey) {
+    setLongBKey(longBKey);
+  }
 
-	public void setLongBKey(long longBKey) {
-		this.type = BKeyType.LONG;
-		this.longBKey = longBKey;
-		this.byteArrayBKey = null;
-	}
+  public BKeyObject(byte[] byteArrayBKey) {
+    setByteArrayBKey(new ByteArrayBKey(byteArrayBKey));
+  }
 
-	public ByteArrayBKey getByteArrayBKey() {
-		if (BKeyType.BYTEARRAY == type) {
-			return byteArrayBKey;
-		} else {
-			return null;
-		}
-	}
-	
-	public byte[] getByteArrayBKeyRaw() {
-		if (BKeyType.BYTEARRAY == type) {
-			return byteArrayBKey.getBytes();
-		} else {
-			return null;
-		}
-	}
+  public BKeyObject(ByteArrayBKey byteArrayBKey) {
+    setByteArrayBKey(byteArrayBKey);
+  }
 
-	public void setByteArrayBKey(ByteArrayBKey byteArrayBKey) {
-		this.type = BKeyType.BYTEARRAY;
-		this.byteArrayBKey = byteArrayBKey;
-		this.longBKey = null;
-	}
-	
-	public String getBKeyAsString() {
-		if (BKeyType.LONG == type) {
-			return String.valueOf(longBKey);
-		} else if (BKeyType.BYTEARRAY == type) {
-			return BTreeUtil.toHex(byteArrayBKey.getBytes());
-		} else {
-			return null;
-		}
-	}
-	
-	@Override
-	public String toString() {
-		return getBKeyAsString();
-	}
+  public BKeyObject(String bkeyString) {
+    byte[] b = BTreeUtil.hexStringToByteArrays(bkeyString);
+    ByteArrayBKey byteArrayBKey = new ByteArrayBKey(b);
+    setByteArrayBKey(byteArrayBKey);
+  }
+
+  public BKeyType getType() {
+    return type;
+  }
+
+  public Long getLongBKey() {
+    if (BKeyType.LONG == type) {
+      return longBKey;
+    } else {
+      return null;
+    }
+  }
+
+  public void setLongBKey(long longBKey) {
+    this.type = BKeyType.LONG;
+    this.longBKey = longBKey;
+    this.byteArrayBKey = null;
+  }
+
+  public ByteArrayBKey getByteArrayBKey() {
+    if (BKeyType.BYTEARRAY == type) {
+      return byteArrayBKey;
+    } else {
+      return null;
+    }
+  }
+
+  public byte[] getByteArrayBKeyRaw() {
+    if (BKeyType.BYTEARRAY == type) {
+      return byteArrayBKey.getBytes();
+    } else {
+      return null;
+    }
+  }
+
+  public void setByteArrayBKey(ByteArrayBKey byteArrayBKey) {
+    this.type = BKeyType.BYTEARRAY;
+    this.byteArrayBKey = byteArrayBKey;
+    this.longBKey = null;
+  }
+
+  public String getBKeyAsString() {
+    if (BKeyType.LONG == type) {
+      return String.valueOf(longBKey);
+    } else if (BKeyType.BYTEARRAY == type) {
+      return BTreeUtil.toHex(byteArrayBKey.getBytes());
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return getBKeyAsString();
+  }
 
 }

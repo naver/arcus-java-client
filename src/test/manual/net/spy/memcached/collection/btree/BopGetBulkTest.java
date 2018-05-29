@@ -34,349 +34,351 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 
 public class BopGetBulkTest extends BaseIntegrationTest {
 
-	private final List<String> keyList = new ArrayList<String>() {
-		private static final long serialVersionUID = -4044682425313432602L;
-		{
-			add("BopGetBulkTest1");
-			add("BopGetBulkTest2");
-			add("BopGetBulkTest3");
-			add("BopGetBulkTest4");
-			add("BopGetBulkTest5");
-		}
-	};
+  private final List<String> keyList = new ArrayList<String>() {
+    private static final long serialVersionUID = -4044682425313432602L;
 
-	private final List<String> keyList2 = new ArrayList<String>() {
-		private static final long serialVersionUID = -4044682425313432602L;
-		{
-			for (int i = 1; i < 500; i++) {
-				add("BopGetBulkTest" + i);
-			}
-		}
-	};
+    {
+      add("BopGetBulkTest1");
+      add("BopGetBulkTest2");
+      add("BopGetBulkTest3");
+      add("BopGetBulkTest4");
+      add("BopGetBulkTest5");
+    }
+  };
 
-	private final byte[] eFlag = { 1, 8, 16, 32, 64 };
+  private final List<String> keyList2 = new ArrayList<String>() {
+    private static final long serialVersionUID = -4044682425313432602L;
 
-	private final String value = String.valueOf(new Random().nextLong());
+    {
+      for (int i = 1; i < 500; i++) {
+        add("BopGetBulkTest" + i);
+      }
+    }
+  };
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		try {
-			for (int i = 0; i < keyList.size(); i++) {
-				mc.delete(keyList.get(i)).get();
-				mc.asyncBopInsert(keyList.get(i), 0, null, value + "0",
-						new CollectionAttributes()).get();
-				mc.asyncBopInsert(keyList.get(i), 1, eFlag, value + "1",
-						new CollectionAttributes()).get();
-				mc.asyncBopInsert(keyList.get(i), 2, null, value + "2",
-						new CollectionAttributes()).get();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+  private final byte[] eFlag = {1, 8, 16, 32, 64};
 
-	}
+  private final String value = String.valueOf(new Random().nextLong());
 
-	public void testGetBulkLongBkeyGetAll() {
-		try {
-			ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    try {
+      for (int i = 0; i < keyList.size(); i++) {
+        mc.delete(keyList.get(i)).get();
+        mc.asyncBopInsert(keyList.get(i), 0, null, value + "0",
+                new CollectionAttributes()).get();
+        mc.asyncBopInsert(keyList.get(i), 1, eFlag, value + "1",
+                new CollectionAttributes()).get();
+        mc.asyncBopInsert(keyList.get(i), 2, null, value + "2",
+                new CollectionAttributes()).get();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
-					.asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
+  }
 
-			Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
-					TimeUnit.MILLISECONDS);
+  public void testGetBulkLongBkeyGetAll() {
+    try {
+      ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
-			Assert.assertEquals(keyList.size(), results.size());
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
+              .asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
 
-			// System.out.println("\n\n\n");
-			// for(Entry<String, BTreeGetResult<Long, Object>> entry :
-			// results.entrySet()) {
-			// System.out.println("\nk=" + entry.getKey());
-			// System.out.println("code=" +
-			// entry.getValue().getCollectionResponse().getMessage());
-			//
-			// if (entry.getValue().getElements() != null) {
-			// for(Entry<Long, BTreeElement<Long, Object>> el :
-			// entry.getValue().getElements().entrySet()) {
-			// System.out.println("bkey=" + el.getKey() + ", eflag=" +
-			// Arrays.toString(el.getValue().getEflag()) + ", value=" +
-			// el.getValue().getValue());
-			// }
-			// }
-			// }
+      Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
+              TimeUnit.MILLISECONDS);
 
-			for (int i = 0; i < keyList.size(); i++) {
-				BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
+      Assert.assertEquals(keyList.size(), results.size());
 
-				// check response
-				Assert.assertNotNull(r.getCollectionResponse().getResponse());
-				// Assert.assertEquals(CollectionResponse.OK,
-				// r.getCollectionResponse().getResponse());
+      // System.out.println("\n\n\n");
+      // for(Entry<String, BTreeGetResult<Long, Object>> entry :
+      // results.entrySet()) {
+      // System.out.println("\nk=" + entry.getKey());
+      // System.out.println("code=" +
+      // entry.getValue().getCollectionResponse().getMessage());
+      //
+      // if (entry.getValue().getElements() != null) {
+      // for(Entry<Long, BTreeElement<Long, Object>> el :
+      // entry.getValue().getElements().entrySet()) {
+      // System.out.println("bkey=" + el.getKey() + ", eflag=" +
+      // Arrays.toString(el.getValue().getEflag()) + ", value=" +
+      // el.getValue().getValue());
+      // }
+      // }
+      // }
 
-				// check elements
-				Map<Long, BTreeElement<Long, Object>> elements = r
-						.getElements();
+      for (int i = 0; i < keyList.size(); i++) {
+        BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
 
-				Assert.assertEquals(3, elements.size());
+        // check response
+        Assert.assertNotNull(r.getCollectionResponse().getResponse());
+        // Assert.assertEquals(CollectionResponse.OK,
+        // r.getCollectionResponse().getResponse());
 
-				Assert.assertTrue(Arrays.equals(eFlag, elements.get(1L)
-						.getEflag()));
+        // check elements
+        Map<Long, BTreeElement<Long, Object>> elements = r
+                .getElements();
 
-				for (long j = 0; j < elements.size(); j++) {
-					Assert.assertEquals(j, (long) elements.get(j).getBkey());
-					Assert.assertEquals(value + j, (String) elements.get(j)
-							.getValue());
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+        Assert.assertEquals(3, elements.size());
 
-	public void testGetBulkNotFoundAll() {
-		try {
-			for (int i = 0; i < keyList.size(); i++) {
-				mc.delete(keyList.get(i)).get();
-			}
+        Assert.assertTrue(Arrays.equals(eFlag, elements.get(1L)
+                .getEflag()));
 
-			ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
+        for (long j = 0; j < elements.size(); j++) {
+          Assert.assertEquals(j, (long) elements.get(j).getBkey());
+          Assert.assertEquals(value + j, (String) elements.get(j)
+                  .getValue());
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
-					.asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
+  public void testGetBulkNotFoundAll() {
+    try {
+      for (int i = 0; i < keyList.size(); i++) {
+        mc.delete(keyList.get(i)).get();
+      }
 
-			Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
-					TimeUnit.MILLISECONDS);
+      ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
-			Assert.assertEquals(keyList.size(), results.size());
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
+              .asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
 
-			// System.out.println("\n\n\n");
-			// for(Entry<String, BTreeGetResult<Long, Object>> entry :
-			// results.entrySet()) {
-			// System.out.println("\nk=" + entry.getKey());
-			// System.out.println("code=" +
-			// entry.getValue().getCollectionResponse().getMessage());
-			//
-			// if (entry.getValue().getElements() != null) {
-			// for(Entry<Long, BTreeElement<Long, Object>> el :
-			// entry.getValue().getElements().entrySet()) {
-			// System.out.println("bkey=" + el.getKey() + ", eflag=" +
-			// Arrays.toString(el.getValue().getEflag()) + ", value=" +
-			// el.getValue().getValue());
-			// }
-			// }
-			// }
+      Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
+              TimeUnit.MILLISECONDS);
 
-			for (int i = 0; i < keyList.size(); i++) {
-				BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
+      Assert.assertEquals(keyList.size(), results.size());
 
-				Assert.assertEquals(CollectionResponse.NOT_FOUND, r
-						.getCollectionResponse().getResponse());
-				Assert.assertNull(r.getElements());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // System.out.println("\n\n\n");
+      // for(Entry<String, BTreeGetResult<Long, Object>> entry :
+      // results.entrySet()) {
+      // System.out.println("\nk=" + entry.getKey());
+      // System.out.println("code=" +
+      // entry.getValue().getCollectionResponse().getMessage());
+      //
+      // if (entry.getValue().getElements() != null) {
+      // for(Entry<Long, BTreeElement<Long, Object>> el :
+      // entry.getValue().getElements().entrySet()) {
+      // System.out.println("bkey=" + el.getKey() + ", eflag=" +
+      // Arrays.toString(el.getValue().getEflag()) + ", value=" +
+      // el.getValue().getValue());
+      // }
+      // }
+      // }
 
-	public void testGetBulkNotFoundMixed() {
-		try {
-			// delete some data.
-			for (int i = 0; i < keyList.size(); i++) {
-				if (i % 2 == 0)
-					mc.delete(keyList.get(i)).get();
-			}
+      for (int i = 0; i < keyList.size(); i++) {
+        BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
 
-			ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
+        Assert.assertEquals(CollectionResponse.NOT_FOUND, r
+                .getCollectionResponse().getResponse());
+        Assert.assertNull(r.getElements());
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
-					.asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
+  public void testGetBulkNotFoundMixed() {
+    try {
+      // delete some data.
+      for (int i = 0; i < keyList.size(); i++) {
+        if (i % 2 == 0)
+          mc.delete(keyList.get(i)).get();
+      }
 
-			Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
-					TimeUnit.MILLISECONDS);
+      ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
-			Assert.assertEquals(keyList.size(), results.size());
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = mc
+              .asyncBopGetBulk(keyList, 0, 10, filter, 0, 10);
 
-			// for debug
-			// System.out.println("\n\n\n");
-			// for(Entry<String, BTreeGetResult<Long, Object>> entry :
-			// results.entrySet()) {
-			// System.out.println("\nk=" + entry.getKey());
-			// System.out.println("code=" +
-			// entry.getValue().getCollectionResponse().getMessage());
-			//
-			// if (entry.getValue().getElements() != null) {
-			// for(Entry<Long, BTreeElement<Long, Object>> el :
-			// entry.getValue().getElements().entrySet()) {
-			// System.out.println("bkey=" + el.getKey() + ", eflag=" +
-			// Arrays.toString(el.getValue().getEflag()) + ", value=" +
-			// el.getValue().getValue());
-			// }
-			// }
-			// }
+      Map<String, BTreeGetResult<Long, Object>> results = f.get(1000L,
+              TimeUnit.MILLISECONDS);
 
-			// check result
-			for (int i = 0; i < keyList.size(); i++) {
-				BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
+      Assert.assertEquals(keyList.size(), results.size());
 
-				if (i % 2 == 0) {
-					Assert.assertEquals(CollectionResponse.NOT_FOUND, r
-							.getCollectionResponse().getResponse());
-				} else {
-					Assert.assertEquals(CollectionResponse.OK, r
-							.getCollectionResponse().getResponse());
+      // for debug
+      // System.out.println("\n\n\n");
+      // for(Entry<String, BTreeGetResult<Long, Object>> entry :
+      // results.entrySet()) {
+      // System.out.println("\nk=" + entry.getKey());
+      // System.out.println("code=" +
+      // entry.getValue().getCollectionResponse().getMessage());
+      //
+      // if (entry.getValue().getElements() != null) {
+      // for(Entry<Long, BTreeElement<Long, Object>> el :
+      // entry.getValue().getElements().entrySet()) {
+      // System.out.println("bkey=" + el.getKey() + ", eflag=" +
+      // Arrays.toString(el.getValue().getEflag()) + ", value=" +
+      // el.getValue().getValue());
+      // }
+      // }
+      // }
 
-					Map<Long, BTreeElement<Long, Object>> elements = r
-							.getElements();
+      // check result
+      for (int i = 0; i < keyList.size(); i++) {
+        BTreeGetResult<Long, Object> r = results.get(keyList.get(i));
 
-					Assert.assertEquals(3, elements.size());
+        if (i % 2 == 0) {
+          Assert.assertEquals(CollectionResponse.NOT_FOUND, r
+                  .getCollectionResponse().getResponse());
+        } else {
+          Assert.assertEquals(CollectionResponse.OK, r
+                  .getCollectionResponse().getResponse());
 
-					Assert.assertTrue(Arrays.equals(eFlag, elements.get(1L)
-							.getEflag()));
+          Map<Long, BTreeElement<Long, Object>> elements = r
+                  .getElements();
 
-					for (long j = 0; j < elements.size(); j++) {
-						Assert.assertEquals(j, (long) elements.get(j).getBkey());
-						Assert.assertEquals(value + j, (String) elements.get(j)
-								.getValue());
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+          Assert.assertEquals(3, elements.size());
 
-	public void testErrorArguments() {
-		try {
-			Map<String, BTreeGetResult<Long, Object>> results = null;
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
+          Assert.assertTrue(Arrays.equals(eFlag, elements.get(1L)
+                  .getEflag()));
 
-			// empty key list
-			f = mc.asyncBopGetBulk(new ArrayList<String>(), 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			results = f.get(1000L, TimeUnit.MILLISECONDS);
-			Assert.assertEquals(0, results.size());
+          for (long j = 0; j < elements.size(); j++) {
+            Assert.assertEquals(j, (long) elements.get(j).getBkey());
+            Assert.assertEquals(value + j, (String) elements.get(j)
+                    .getValue());
+          }
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			// max key list
-			try {
-				f = mc.asyncBopGetBulk(keyList2, 0, 10,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-				results = f.get(1000L, TimeUnit.MILLISECONDS);
-			} catch (IllegalArgumentException e) {
+  public void testErrorArguments() {
+    try {
+      Map<String, BTreeGetResult<Long, Object>> results = null;
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
 
-			}
+      // empty key list
+      f = mc.asyncBopGetBulk(new ArrayList<String>(), 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      results = f.get(1000L, TimeUnit.MILLISECONDS);
+      Assert.assertEquals(0, results.size());
 
-			// max count list
-			try {
-				f = mc.asyncBopGetBulk(keyList, 0, 10,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 1000);
-				results = f.get(1000L, TimeUnit.MILLISECONDS);
-			} catch (IllegalArgumentException e) {
+      // max key list
+      try {
+        f = mc.asyncBopGetBulk(keyList2, 0, 10,
+                ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+        results = f.get(1000L, TimeUnit.MILLISECONDS);
+      } catch (IllegalArgumentException e) {
 
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      }
 
-	public void testUnreadable() {
-		try {
-			Map<String, BTreeGetResult<Long, Object>> results = null;
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
+      // max count list
+      try {
+        f = mc.asyncBopGetBulk(keyList, 0, 10,
+                ElementFlagFilter.DO_NOT_FILTER, 0, 1000);
+        results = f.get(1000L, TimeUnit.MILLISECONDS);
+      } catch (IllegalArgumentException e) {
 
-			mc.delete(keyList.get(0)).get();
-			CollectionAttributes attrs = new CollectionAttributes();
-			attrs.setReadable(false);
-			mc.asyncBopInsert(keyList.get(0), 0, null, value + "0", attrs)
-					.get();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			f = mc.asyncBopGetBulk(keyList, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			results = f.get(1000L, TimeUnit.MILLISECONDS);
+  public void testUnreadable() {
+    try {
+      Map<String, BTreeGetResult<Long, Object>> results = null;
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
 
-			Assert.assertEquals(keyList.size(), results.size());
-			Assert.assertEquals("UNREADABLE", results.get(keyList.get(0))
-					.getCollectionResponse().getMessage());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      mc.delete(keyList.get(0)).get();
+      CollectionAttributes attrs = new CollectionAttributes();
+      attrs.setReadable(false);
+      mc.asyncBopInsert(keyList.get(0), 0, null, value + "0", attrs)
+              .get();
 
-	public void testNotFoundElement() {
-		try {
-			Map<String, BTreeGetResult<Long, Object>> results = null;
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
+      f = mc.asyncBopGetBulk(keyList, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-			mc.delete(keyList.get(0)).get();
-			mc.asyncBopInsert(keyList.get(0), 0, null, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(keyList.get(0), 1, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(keyList.get(0), 2, null, value + "2",
-					new CollectionAttributes()).get();
+      Assert.assertEquals(keyList.size(), results.size());
+      Assert.assertEquals("UNREADABLE", results.get(keyList.get(0))
+              .getCollectionResponse().getMessage());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			f = mc.asyncBopGetBulk(keyList, 1000, 10000,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			results = f.get(1000L, TimeUnit.MILLISECONDS);
+  public void testNotFoundElement() {
+    try {
+      Map<String, BTreeGetResult<Long, Object>> results = null;
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
 
-			Assert.assertEquals(keyList.size(), results.size());
-			for (int i = 0; i < results.size(); i++) {
-				Assert.assertEquals("NOT_FOUND_ELEMENT",
-						results.get(keyList.get(i)).getCollectionResponse()
-								.getMessage());
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      mc.delete(keyList.get(0)).get();
+      mc.asyncBopInsert(keyList.get(0), 0, null, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(0), 1, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(0), 2, null, value + "2",
+              new CollectionAttributes()).get();
 
-	public void testTypeMismatch() {
-		try {
-			Map<String, BTreeGetResult<Long, Object>> results = null;
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
+      f = mc.asyncBopGetBulk(keyList, 1000, 10000,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-			mc.delete(keyList.get(0)).get();
-			mc.set(keyList.get(0), 10, "V").get(200L, TimeUnit.MILLISECONDS);
+      Assert.assertEquals(keyList.size(), results.size());
+      for (int i = 0; i < results.size(); i++) {
+        Assert.assertEquals("NOT_FOUND_ELEMENT",
+                results.get(keyList.get(i)).getCollectionResponse()
+                        .getMessage());
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			f = mc.asyncBopGetBulk(keyList, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			results = f.get(1000L, TimeUnit.MILLISECONDS);
+  public void testTypeMismatch() {
+    try {
+      Map<String, BTreeGetResult<Long, Object>> results = null;
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
 
-			Assert.assertEquals(keyList.size(), results.size());
-			Assert.assertEquals("TYPE_MISMATCH", results.get(keyList.get(0))
-					.getCollectionResponse().getMessage());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      mc.delete(keyList.get(0)).get();
+      mc.set(keyList.get(0), 10, "V").get(200L, TimeUnit.MILLISECONDS);
 
-	public void testBKeyMismatch() {
-		try {
-			Map<String, BTreeGetResult<Long, Object>> results = null;
-			CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
+      f = mc.asyncBopGetBulk(keyList, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-			mc.delete(keyList.get(0)).get();
-			mc.asyncBopInsert(keyList.get(0), new byte[] { 0 }, null,
-					value + "0", new CollectionAttributes()).get();
-			mc.asyncBopInsert(keyList.get(0), new byte[] { 1 }, eFlag,
-					value + "0", new CollectionAttributes()).get();
-			mc.asyncBopInsert(keyList.get(0), new byte[] { 2 }, null,
-					value + "0", new CollectionAttributes()).get();
+      Assert.assertEquals(keyList.size(), results.size());
+      Assert.assertEquals("TYPE_MISMATCH", results.get(keyList.get(0))
+              .getCollectionResponse().getMessage());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			f = mc.asyncBopGetBulk(keyList, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			results = f.get(1000L, TimeUnit.MILLISECONDS);
+  public void testBKeyMismatch() {
+    try {
+      Map<String, BTreeGetResult<Long, Object>> results = null;
+      CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
 
-			Assert.assertEquals(keyList.size(), results.size());
-			Assert.assertEquals("BKEY_MISMATCH", results.get(keyList.get(0))
-					.getCollectionResponse().getMessage());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      mc.delete(keyList.get(0)).get();
+      mc.asyncBopInsert(keyList.get(0), new byte[]{0}, null,
+              value + "0", new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(0), new byte[]{1}, eFlag,
+              value + "0", new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(0), new byte[]{2}, null,
+              value + "0", new CollectionAttributes()).get();
+
+      f = mc.asyncBopGetBulk(keyList, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      results = f.get(1000L, TimeUnit.MILLISECONDS);
+
+      Assert.assertEquals(keyList.size(), results.size());
+      Assert.assertEquals("BKEY_MISMATCH", results.get(keyList.get(0))
+              .getCollectionResponse().getMessage());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 }

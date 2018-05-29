@@ -23,29 +23,29 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 
 public class CollectionMaxElementSize extends BaseIntegrationTest {
 
-	private String key = "CollectionMaxElementSize";
+  private String key = "CollectionMaxElementSize";
 
-	public void testExceed() throws Exception {
-		CollectionFuture<Boolean> future;
-		future = mc.asyncLopInsert(key, -1, "test", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testExceed() throws Exception {
+    CollectionFuture<Boolean> future;
+    future = mc.asyncLopInsert(key, -1, "test", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < CollectionTranscoder.MAX_SIZE + 1; i++) {
-			sb.append(i % 9);
-		}
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < CollectionTranscoder.MAX_SIZE + 1; i++) {
+      sb.append(i % 9);
+    }
 
-		String tooLargeValue = sb.toString();
-		assertEquals(CollectionTranscoder.MAX_SIZE + 1, tooLargeValue.length());
+    String tooLargeValue = sb.toString();
+    assertEquals(CollectionTranscoder.MAX_SIZE + 1, tooLargeValue.length());
 
-		try {
-			future = mc.asyncLopInsert(key, -1, tooLargeValue,
-					new CollectionAttributes());
-			fail();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			assertTrue(e.getMessage().contains("Cannot cache data larger than"));
-		}
-	}
+    try {
+      future = mc.asyncLopInsert(key, -1, tooLargeValue,
+              new CollectionAttributes());
+      fail();
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+      assertTrue(e.getMessage().contains("Cannot cache data larger than"));
+    }
+  }
 
 }

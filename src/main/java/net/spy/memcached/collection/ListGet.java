@@ -18,63 +18,63 @@ package net.spy.memcached.collection;
 
 public class ListGet extends CollectionGet {
 
-	public static final int FIRST = 0;
-	public static final int LAST = -1;
-	
-	private static final String command = "lop get";
-	
-	public ListGet(int index, boolean delete) {
-		this.headerCount = 1;
-		this.range = String.valueOf(index);
-		this.delete = delete;
-	}
-	
-	public ListGet(int index, boolean delete, boolean dropIfEmpty) {
-		this(index, delete);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	public ListGet(int from, int to, boolean delete) {
-		this.headerCount = 1;
-		this.range = String.valueOf(from) + ".." + String.valueOf(to);
-		this.delete = delete;
-	}
+  public static final int FIRST = 0;
+  public static final int LAST = -1;
 
-	public ListGet(int from, int to, boolean delete, boolean dropIfEmpty) {
-		this(from, to, delete);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	public String getRange() {
-		return range;
-	}
+  private static final String command = "lop get";
 
-	public void setRange(String range) {
-		this.range = range;
-	}
+  public ListGet(int index, boolean delete) {
+    this.headerCount = 1;
+    this.range = String.valueOf(index);
+    this.delete = delete;
+  }
 
-	@Override
-	public byte[] getAddtionalArgs() {
-		return null;
-	}
+  public ListGet(int index, boolean delete, boolean dropIfEmpty) {
+    this(index, delete);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
-		
-		StringBuilder b = new StringBuilder();
-		b.append(range);
-		if (delete && dropIfEmpty) b.append(" drop");
-		if (delete && !dropIfEmpty) b.append(" delete");
-		
-		str = b.toString();
-		return str;
-	}
-	
-	public String getCommand() {
-		return command;
-	}
-	
-	public void decodeItemHeader(String itemHeader) {
-		this.dataLength = Integer.parseInt(itemHeader);
-	}
+  public ListGet(int from, int to, boolean delete) {
+    this.headerCount = 1;
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.delete = delete;
+  }
+
+  public ListGet(int from, int to, boolean delete, boolean dropIfEmpty) {
+    this(from, to, delete);
+    this.dropIfEmpty = dropIfEmpty;
+  }
+
+  public String getRange() {
+    return range;
+  }
+
+  public void setRange(String range) {
+    this.range = range;
+  }
+
+  @Override
+  public byte[] getAddtionalArgs() {
+    return null;
+  }
+
+  public String stringify() {
+    if (str != null) return str;
+
+    StringBuilder b = new StringBuilder();
+    b.append(range);
+    if (delete && dropIfEmpty) b.append(" drop");
+    if (delete && !dropIfEmpty) b.append(" delete");
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public void decodeItemHeader(String itemHeader) {
+    this.dataLength = Integer.parseInt(itemHeader);
+  }
 }

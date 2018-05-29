@@ -20,5 +20,5 @@ package net.spy.memcached.ops;
  * Operation that represents empty collection object create.
  */
 public interface CollectionCountOperation extends KeyedOperation {
-	
+
 }

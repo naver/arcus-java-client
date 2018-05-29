@@ -27,113 +27,113 @@ import net.spy.memcached.collection.ElementFlagFilter;
 
 public class BopGetIrregularEflagTest extends BaseIntegrationTest {
 
-	private final String key = "BopGetIrregularEflagTest";
+  private final String key = "BopGetIrregularEflagTest";
 
-	private final byte[] eFlag = { 1 };
+  private final byte[] eFlag = {1};
 
-	private final Object value = "valvalvalvalvalvalvalvalvalval";
+  private final Object value = "valvalvalvalvalvalvalvalvalval";
 
-	public void testGetAll_1() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, 0, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 1, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 2, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_1() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, 0, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 1, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 2, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Object object = map.get(i).getValue();
-				Assert.assertEquals(value + String.valueOf(i), object);
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Object object = map.get(i).getValue();
+        Assert.assertEquals(value + String.valueOf(i), object);
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_2() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, 0, null, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 1, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 2, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_2() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, 0, null, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 1, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 2, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Object object = map.get(i).getValue();
-				Assert.assertEquals(value + String.valueOf(i), object);
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Object object = map.get(i).getValue();
+        Assert.assertEquals(value + String.valueOf(i), object);
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_3() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, 0, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 1, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 2, eFlag, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_3() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, 0, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 1, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 2, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Object object = map.get(i).getValue();
-				Assert.assertEquals(value + String.valueOf(i), object);
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Object object = map.get(i).getValue();
+        Assert.assertEquals(value + String.valueOf(i), object);
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetAll_4() {
-		try {
-			mc.delete(key).get();
-			mc.asyncBopInsert(key, 0, null, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 1, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key, 2, null, value + "2",
-					new CollectionAttributes()).get();
+  public void testGetAll_4() {
+    try {
+      mc.delete(key).get();
+      mc.asyncBopInsert(key, 0, null, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 1, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key, 2, null, value + "2",
+              new CollectionAttributes()).get();
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
-					100L, TimeUnit.MILLISECONDS);
+      Map<Long, Element<Object>> map = mc.asyncBopGet(key, 0, 10,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
+              100L, TimeUnit.MILLISECONDS);
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(3, map.size());
+      Assert.assertNotNull(map);
+      Assert.assertEquals(3, map.size());
 
-			for (long i = 0; i < map.size(); i++) {
-				Object object = map.get(i).getValue();
-				Assert.assertEquals(value + String.valueOf(i), object);
-			}
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (long i = 0; i < map.size(); i++) {
+        Object object = map.get(i).getValue();
+        Assert.assertEquals(value + String.valueOf(i), object);
+      }
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 }

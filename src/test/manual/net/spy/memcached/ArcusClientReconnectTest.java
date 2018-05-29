@@ -23,37 +23,37 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 @Ignore
 public class ArcusClientReconnectTest extends BaseIntegrationTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		// do nothing
-	}
+  @Override
+  protected void setUp() throws Exception {
+    // do nothing
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		// do nothing
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    // do nothing
+  }
 
-	public void testOpenAndWait() {
-		if (!USE_ZK) {
-			return;
-		}
+  public void testOpenAndWait() {
+    if (!USE_ZK) {
+      return;
+    }
 
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-				ZK_SERVICE_ID, cfb);
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
+            ZK_SERVICE_ID, cfb);
 
-		try {
-			Thread.sleep(120000L);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+    try {
+      Thread.sleep(120000L);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
-		client.shutdown();
+    client.shutdown();
 
-		try {
-			Thread.sleep(Long.MAX_VALUE);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+    try {
+      Thread.sleep(Long.MAX_VALUE);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
 }

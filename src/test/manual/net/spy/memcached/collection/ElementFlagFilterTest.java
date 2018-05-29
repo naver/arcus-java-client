@@ -23,76 +23,76 @@ import junit.framework.TestCase;
 
 public class ElementFlagFilterTest extends TestCase {
 
-	public void testValidate1() {
-		try {
-			new ElementFlagFilter(null, null);
-		} catch (NullPointerException e) {
-			return;
-		}
-		Assert.fail("Argument validation failed.");
-	}
+  public void testValidate1() {
+    try {
+      new ElementFlagFilter(null, null);
+    } catch (NullPointerException e) {
+      return;
+    }
+    Assert.fail("Argument validation failed.");
+  }
 
-	public void testValidate2() {
-		try {
-			new ElementFlagFilter(null, "".getBytes());
-		} catch (NullPointerException e) {
-			return;
-		}
-		Assert.fail("Argument validation failed.");
-	}
+  public void testValidate2() {
+    try {
+      new ElementFlagFilter(null, "".getBytes());
+    } catch (NullPointerException e) {
+      return;
+    }
+    Assert.fail("Argument validation failed.");
+  }
 
-	public void testValidate3() {
-		try {
-			new ElementFlagFilter(CompOperands.Equal, null);
-		} catch (NullPointerException e) {
-			return;
-		}
-		Assert.fail("Argument validation failed.");
-	}
+  public void testValidate3() {
+    try {
+      new ElementFlagFilter(CompOperands.Equal, null);
+    } catch (NullPointerException e) {
+      return;
+    }
+    Assert.fail("Argument validation failed.");
+  }
 
-	public void testZeroLengthCompValue() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "".getBytes());
-			filter.toString();
-		} catch (IllegalArgumentException e) {
-			return;
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-		fail("Oops. Something's going wrong.");
-	}
+  public void testZeroLengthCompValue() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "".getBytes());
+      filter.toString();
+    } catch (IllegalArgumentException e) {
+      return;
+    } catch (Exception e) {
+      fail(e.toString());
+    }
+    fail("Oops. Something's going wrong.");
+  }
 
-	public void testZeroLengthBitCompValue() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "A".getBytes());
+  public void testZeroLengthBitCompValue() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "A".getBytes());
 
-			filter.setBitOperand(BitWiseOperands.AND, "".getBytes());
-			filter.toString();
-		} catch (IllegalArgumentException e) {
-			return;
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-		fail("Oops. Something's going wrong.");
-	}
+      filter.setBitOperand(BitWiseOperands.AND, "".getBytes());
+      filter.toString();
+    } catch (IllegalArgumentException e) {
+      return;
+    } catch (Exception e) {
+      fail(e.toString());
+    }
+    fail("Oops. Something's going wrong.");
+  }
 
-	public void testConstruct() {
-		String src = "ABC";
+  public void testConstruct() {
+    String src = "ABC";
 
-		ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal,
-				src.getBytes());
+    ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal,
+            src.getBytes());
 
-		Assert.assertEquals("0 EQ 0x414243", filter.toString());
+    Assert.assertEquals("0 EQ 0x414243", filter.toString());
 
-		filter.setCompareOffset(2);
+    filter.setCompareOffset(2);
 
-		Assert.assertEquals("2 EQ 0x414243", filter.toString());
+    Assert.assertEquals("2 EQ 0x414243", filter.toString());
 
-		filter.setBitOperand(BitWiseOperands.AND, src.getBytes());
+    filter.setBitOperand(BitWiseOperands.AND, src.getBytes());
 
-		Assert.assertEquals("2 & 0x414243 EQ 0x414243", filter.toString());
-	}
+    Assert.assertEquals("2 & 0x414243 EQ 0x414243", filter.toString());
+  }
 
 }

@@ -20,32 +20,35 @@ import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 
 public class ReconnectJob {
-	
-	String hostPort;
-	String serviceCode;
-	ConnectionFactoryBuilder cfb;
-	ArcusClient[] client;
-	
-	public ReconnectJob(String hostPort, String serviceCode,
-			ConnectionFactoryBuilder cfb, ArcusClient[] client) {
-		super();
-		this.hostPort = hostPort;
-		this.serviceCode = serviceCode;
-		this.cfb = cfb;
-		this.client = client;
-	}
-	
-	public String getHostPort() {
-		return hostPort;
-	}
-	public String getServiceCode() {
-		return serviceCode;
-	}
-	public ConnectionFactoryBuilder getCfb() {
-		return cfb;
-	}
-	public ArcusClient[] getClient() {
-		return client;
-	}
-	
+
+  String hostPort;
+  String serviceCode;
+  ConnectionFactoryBuilder cfb;
+  ArcusClient[] client;
+
+  public ReconnectJob(String hostPort, String serviceCode,
+                      ConnectionFactoryBuilder cfb, ArcusClient[] client) {
+    super();
+    this.hostPort = hostPort;
+    this.serviceCode = serviceCode;
+    this.cfb = cfb;
+    this.client = client;
+  }
+
+  public String getHostPort() {
+    return hostPort;
+  }
+
+  public String getServiceCode() {
+    return serviceCode;
+  }
+
+  public ConnectionFactoryBuilder getCfb() {
+    return cfb;
+  }
+
+  public ArcusClient[] getClient() {
+    return client;
+  }
+
 }

@@ -24,138 +24,138 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 
 public class BopUpdateTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final byte[] BKEY = new byte[] { (byte) 1 };
-	private final String VALUE = "VALUE";
-	private final String EFLAG = "EFLAG";
+  private final String KEY = this.getClass().getSimpleName();
+  private final byte[] BKEY = new byte[]{(byte) 1};
+  private final String VALUE = "VALUE";
+  private final String EFLAG = "EFLAG";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testNotExistsUpdateWithValue() {
-		try {
-			Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(new byte[] { 0 }), VALUE).get());
+  public void testNotExistsUpdateWithValue() {
+    try {
+      Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(new byte[]{0}), VALUE).get());
 
-			Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testNotExistsUpdateWithoutValue() {
-		try {
-			Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(new byte[] { 0 }), null).get());
+  public void testNotExistsUpdateWithoutValue() {
+    try {
+      Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(new byte[]{0}), null).get());
 
-			Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(EFLAG.getBytes()), null).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(EFLAG.getBytes()), null).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testExistsUpdateWithValue() {
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
-					new CollectionAttributes()).get());
+  public void testExistsUpdateWithValue() {
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+              new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(new byte[] { 0 }), VALUE).get());
+      Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(new byte[]{0}), VALUE).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testExistsUpdateWithoutValue() {
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
-					new CollectionAttributes()).get());
+  public void testExistsUpdateWithoutValue() {
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+              new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(new byte[] { 0 }), null).get());
+      Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(new byte[]{0}), null).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-					new ElementFlagUpdate(EFLAG.getBytes()), null).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
+              new ElementFlagUpdate(EFLAG.getBytes()), null).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	//
-	//
-	//
-	// with bitop
-	//
-	//
-	//
+  //
+  //
+  //
+  // with bitop
+  //
+  //
+  //
 
-	public void testNotExistsUpdateUsingBitOpWithValue() {
-		try {
-			Assert.assertFalse(mc.asyncBopUpdate(
-					KEY,
-					BKEY,
-					new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-							.getBytes()), VALUE).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+  public void testNotExistsUpdateUsingBitOpWithValue() {
+    try {
+      Assert.assertFalse(mc.asyncBopUpdate(
+              KEY,
+              BKEY,
+              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
+                      .getBytes()), VALUE).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testNotExistsUpdateUsingBitOpWithoutValue() {
-		try {
-			Assert.assertFalse(mc.asyncBopUpdate(
-					KEY,
-					BKEY,
-					new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-							.getBytes()), null).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+  public void testNotExistsUpdateUsingBitOpWithoutValue() {
+    try {
+      Assert.assertFalse(mc.asyncBopUpdate(
+              KEY,
+              BKEY,
+              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
+                      .getBytes()), null).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testExistsUpdateUsingBitOpWithValue() {
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
-					VALUE, new CollectionAttributes()).get());
+  public void testExistsUpdateUsingBitOpWithValue() {
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
+              VALUE, new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(
-					KEY,
-					BKEY,
-					new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-							.getBytes()), VALUE).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(mc.asyncBopUpdate(
+              KEY,
+              BKEY,
+              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
+                      .getBytes()), VALUE).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testExistsUpdateUsingBitOpWithoutValue() {
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
-					VALUE, new CollectionAttributes()).get());
+  public void testExistsUpdateUsingBitOpWithoutValue() {
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
+              VALUE, new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopUpdate(
-					KEY,
-					BKEY,
-					new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-							.getBytes()), null).get());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(mc.asyncBopUpdate(
+              KEY,
+              BKEY,
+              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
+                      .getBytes()), null).get());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
 }

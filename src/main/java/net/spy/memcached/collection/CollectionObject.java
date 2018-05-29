@@ -23,23 +23,23 @@ import net.spy.memcached.compat.SpyObject;
 
 public class CollectionObject extends SpyObject {
 
-	protected static final byte[] CRLF={'\r', '\n'};
-	
-	/**
-	 * Set some arguments for an operation into the given byte buffer.
-	 */
-	protected final void setArguments(ByteBuffer bb, Object... args) {
-		boolean wasFirst=true;
-		for(Object o : args) {
-			String s = String.valueOf(o);
-			if(wasFirst) {
-				wasFirst=false;
-			} else if (!"".equals(s)) {
-				bb.put((byte)' ');
-			}
-			bb.put(KeyUtil.getKeyBytes(s));
-		}
-		bb.put(CRLF);
-	}
-	
+  protected static final byte[] CRLF = {'\r', '\n'};
+
+  /**
+   * Set some arguments for an operation into the given byte buffer.
+   */
+  protected final void setArguments(ByteBuffer bb, Object... args) {
+    boolean wasFirst = true;
+    for (Object o : args) {
+      String s = String.valueOf(o);
+      if (wasFirst) {
+        wasFirst = false;
+      } else if (!"".equals(s)) {
+        bb.put((byte) ' ');
+      }
+      bb.put(KeyUtil.getKeyBytes(s));
+    }
+    bb.put(CRLF);
+  }
+
 }

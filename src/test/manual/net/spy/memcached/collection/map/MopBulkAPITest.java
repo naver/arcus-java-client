@@ -30,124 +30,124 @@ import java.util.concurrent.TimeUnit;
 
 public class MopBulkAPITest extends BaseIntegrationTest {
 
-	private String key = "MopBulkAPITest33";
-	Map<String, Object> elements = new HashMap<String, Object>();
-	Map<String, Object> updateMap = new HashMap<String, Object>();
+  private String key = "MopBulkAPITest33";
+  Map<String, Object> elements = new HashMap<String, Object>();
+  Map<String, Object> updateMap = new HashMap<String, Object>();
 
 
-	private int getValueCount() {
-		return mc.getMaxPipedItemCount();
-	}
+  private int getValueCount() {
+    return mc.getMaxPipedItemCount();
+  }
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		for (long i = 0; i < getValueCount(); i++) {
-			elements.put("mkey" + String.valueOf(i),
-						"value" + String.valueOf(i));
-			updateMap.put("mkey" + String.valueOf(i),
-						"newvalue" + String.valueOf(i));
-		}
-	}
+  protected void setUp() throws Exception {
+    super.setUp();
+    for (long i = 0; i < getValueCount(); i++) {
+      elements.put("mkey" + String.valueOf(i),
+              "value" + String.valueOf(i));
+      updateMap.put("mkey" + String.valueOf(i),
+              "newvalue" + String.valueOf(i));
+    }
+  }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testBulk() throws Exception {
-		for (int i = 0; i < 10; i++) {
-			mc.delete(key).get();
-			bulk();
-		}
-	}
+  public void testBulk() throws Exception {
+    for (int i = 0; i < 10; i++) {
+      mc.delete(key).get();
+      bulk();
+    }
+  }
 
-	public void bulk() {
-		try {
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, elements,
-							new CollectionAttributes());
+  public void bulk() {
+    try {
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, elements,
+                      new CollectionAttributes());
 
-			Map<Integer, CollectionOperationStatus> map = future.get(10000,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map = future.get(10000,
+              TimeUnit.MILLISECONDS);
 
-			Map<String, Object> rmap = mc.asyncMopGet(key, false,
-					false).get();
-			assertEquals(getValueCount(), rmap.size());
-			assertEquals(0, map.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<String, Object> rmap = mc.asyncMopGet(key, false,
+              false).get();
+      assertEquals(getValueCount(), rmap.size());
+      assertEquals(0, map.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testBulkFailed() {
-		try {
-			mc.asyncMopDelete(key, true).get(1000,
-					TimeUnit.MILLISECONDS);
+  public void testBulkFailed() {
+    try {
+      mc.asyncMopDelete(key, true).get(1000,
+              TimeUnit.MILLISECONDS);
 
-			mc.asyncMopInsert(key, "mkey1", "value1", new CollectionAttributes())
-					.get();
+      mc.asyncMopInsert(key, "mkey1", "value1", new CollectionAttributes())
+              .get();
 
-			mc.asyncSetAttr(key, new CollectionAttributes(0, 1L, CollectionOverflowAction.error)).get();
+      mc.asyncSetAttr(key, new CollectionAttributes(0, 1L, CollectionOverflowAction.error)).get();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, elements,
-							new CollectionAttributes());
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, elements,
+                      new CollectionAttributes());
 
-			Map<Integer, CollectionOperationStatus> map = future.get(10000,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map = future.get(10000,
+              TimeUnit.MILLISECONDS);
 
-			assertEquals(getValueCount(), map.size());
-			assertFalse(future.getOperationStatus().isSuccess());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      assertEquals(getValueCount(), map.size());
+      assertFalse(future.getOperationStatus().isSuccess());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testBulkEmptyElements() {
-		try {
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, new HashMap<String, Object>(),
-							new CollectionAttributes());
+  public void testBulkEmptyElements() {
+    try {
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, new HashMap<String, Object>(),
+                      new CollectionAttributes());
 
-			future.get(10000, TimeUnit.MILLISECONDS);
-			Assert.fail();
-		} catch (IllegalArgumentException e) {
-			return;
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		Assert.fail();
-	}
+      future.get(10000, TimeUnit.MILLISECONDS);
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      return;
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+    Assert.fail();
+  }
 
-	public void testUpdateBulk() {
-		try {
-			mc.asyncMopDelete(key, true).get(1000,
-					TimeUnit.MILLISECONDS);
+  public void testUpdateBulk() {
+    try {
+      mc.asyncMopDelete(key, true).get(1000,
+              TimeUnit.MILLISECONDS);
 
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, elements,
-							new CollectionAttributes());
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, elements,
+                      new CollectionAttributes());
 
-			Map<Integer, CollectionOperationStatus> map = future.get(10000,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map = future.get(10000,
+              TimeUnit.MILLISECONDS);
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncMopPipedUpdateBulk(key, updateMap);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncMopPipedUpdateBulk(key, updateMap);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(10000,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(10000,
+              TimeUnit.MILLISECONDS);
 
-			Map<String, Object> rmap = mc.asyncMopGet(key, false, false).get();
-			assertEquals(getValueCount(), rmap.size());
-			assertEquals(0, map.size());
-			assertEquals(0, map2.size());
+      Map<String, Object> rmap = mc.asyncMopGet(key, false, false).get();
+      assertEquals(getValueCount(), rmap.size());
+      assertEquals(0, map.size());
+      assertEquals(0, map2.size());
 
-			assertEquals("newvalue1", rmap.get("mkey1"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      assertEquals("newvalue1", rmap.get("mkey1"));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

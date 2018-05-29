@@ -9,6 +9,6 @@ import org.jmock.MockObjectTestCase;
  */
 public abstract class BaseMockCase extends MockObjectTestCase {
 
-	// Nothing special needed here.
+  // Nothing special needed here.
 
 }

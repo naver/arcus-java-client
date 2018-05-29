@@ -23,6 +23,6 @@ import net.spy.memcached.collection.Attributes;
  */
 public interface SetAttrOperation extends KeyedOperation {
 
-	Attributes getAttributes();
+  Attributes getAttributes();
 
 }

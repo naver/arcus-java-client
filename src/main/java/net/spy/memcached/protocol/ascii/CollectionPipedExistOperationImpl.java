@@ -31,112 +31,112 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
 public class CollectionPipedExistOperationImpl extends OperationImpl implements
-		CollectionPipedExistOperation {
+        CollectionPipedExistOperation {
 
-	private static final OperationStatus EXIST_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus EXIST_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus EXIST = new CollectionOperationStatus(
-			true, "EXIST", CollectionResponse.EXIST);
-	private static final OperationStatus NOT_EXIST = new CollectionOperationStatus(
-			true, "NOT_EXIST", CollectionResponse.NOT_EXIST);
+  private static final OperationStatus EXIST = new CollectionOperationStatus(
+          true, "EXIST", CollectionResponse.EXIST);
+  private static final OperationStatus NOT_EXIST = new CollectionOperationStatus(
+          true, "NOT_EXIST", CollectionResponse.NOT_EXIST);
 
-	private static final OperationStatus END = new CollectionOperationStatus(
-			true, "END", CollectionResponse.END);
-	private static final OperationStatus FAILED_END = new CollectionOperationStatus(
-			false, "END", CollectionResponse.END);
+  private static final OperationStatus END = new CollectionOperationStatus(
+          true, "END", CollectionResponse.END);
+  private static final OperationStatus FAILED_END = new CollectionOperationStatus(
+          false, "END", CollectionResponse.END);
 
-	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
-			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
-			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
-	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
-			false, "UNREADABLE", CollectionResponse.UNREADABLE);
+  private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
+          false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+  private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
+          false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
+  private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
+          false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-	protected final String key;
-	protected final SetPipedExist<?> setPipedExist;
-	protected final CollectionPipedExistOperation.Callback cb;
+  protected final String key;
+  protected final SetPipedExist<?> setPipedExist;
+  protected final CollectionPipedExistOperation.Callback cb;
 
-	protected int count;
-	protected int index = 0;
-	protected boolean successAll = true;
+  protected int count;
+  protected int index = 0;
+  protected boolean successAll = true;
 
-	public CollectionPipedExistOperationImpl(String key,
-			SetPipedExist<?> collectionExist, OperationCallback cb) {
-		super(cb);
-		this.key = key;
-		this.setPipedExist = collectionExist;
-		this.cb = (Callback) cb;
-		if (this.setPipedExist instanceof SetPipedExist)
-			setAPIType(APIType.SOP_EXIST);
-		setOperationType(OperationType.READ);
-	}
+  public CollectionPipedExistOperationImpl(String key,
+                                           SetPipedExist<?> collectionExist, OperationCallback cb) {
+    super(cb);
+    this.key = key;
+    this.setPipedExist = collectionExist;
+    this.cb = (Callback) cb;
+    if (this.setPipedExist instanceof SetPipedExist)
+      setAPIType(APIType.SOP_EXIST);
+    setOperationType(OperationType.READ);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		assert getState() == OperationState.READING : "Read ``" + line
-				+ "'' when in " + getState() + " state";
+  @Override
+  public void handleLine(String line) {
+    assert getState() == OperationState.READING : "Read ``" + line
+            + "'' when in " + getState() + " state";
 
-		if (setPipedExist.getItemCount() == 1) {
-			OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
-					NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
-			cb.gotStatus(index, status);
-			cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
-			transitionState(OperationState.COMPLETE);
-			return;
-		}
+    if (setPipedExist.getItemCount() == 1) {
+      OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
+              NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+      cb.gotStatus(index, status);
+      cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
+      transitionState(OperationState.COMPLETE);
+      return;
+    }
 
-		if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
-			cb.receivedStatus((successAll) ? END : FAILED_END);
-			transitionState(OperationState.COMPLETE);
-		} else if (line.startsWith("RESPONSE ")) {
-			getLogger().debug("Got line %s", line);
+    if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      cb.receivedStatus((successAll) ? END : FAILED_END);
+      transitionState(OperationState.COMPLETE);
+    } else if (line.startsWith("RESPONSE ")) {
+      getLogger().debug("Got line %s", line);
 
-			// TODO server should be fixed
-			line = line.replace("   ", " ");
-			line = line.replace("  ", " ");
+      // TODO server should be fixed
+      line = line.replace("   ", " ");
+      line = line.replace("  ", " ");
 
-			String[] stuff = line.split(" ");
-			assert "RESPONSE".equals(stuff[0]);
-			count = Integer.parseInt(stuff[1]);
-		} else {
-			OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
-					NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+      String[] stuff = line.split(" ");
+      assert "RESPONSE".equals(stuff[0]);
+      count = Integer.parseInt(stuff[1]);
+    } else {
+      OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
+              NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
 
-			if (!status.isSuccess()) {
-				successAll = false;
-			}
-			cb.gotStatus(index, status);
-			/* ENABLE_REPLICATION if */
-			this.setPipedExist.setNextOpIndex(index);
-			/* ENABLE_REPLICATION end */
-			index++;
-		}
-	}
+      if (!status.isSuccess()) {
+        successAll = false;
+      }
+      cb.gotStatus(index, status);
+      /* ENABLE_REPLICATION if */
+      this.setPipedExist.setNextOpIndex(index);
+      /* ENABLE_REPLICATION end */
+      index++;
+    }
+  }
 
-	@Override
-	public void initialize() {
-		ByteBuffer buffer = setPipedExist.getAsciiCommand();
-		setBuffer(buffer);
+  @Override
+  public void initialize() {
+    ByteBuffer buffer = setPipedExist.getAsciiCommand();
+    setBuffer(buffer);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug(
-					"Request in ascii protocol: \n"
-							+ (new String(buffer.array())).replaceAll("\\r\\n",
-									"\n"));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug(
+              "Request in ascii protocol: \n"
+                      + (new String(buffer.array())).replaceAll("\\r\\n",
+                      "\n"));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(EXIST_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(EXIST_CANCELED);
+  }
 
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
-	public SetPipedExist<?> getExist() {
-		return setPipedExist;
-	}
+  public SetPipedExist<?> getExist() {
+    return setPipedExist;
+  }
 }

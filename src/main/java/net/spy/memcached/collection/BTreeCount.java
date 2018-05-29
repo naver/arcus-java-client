@@ -20,49 +20,49 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeCount extends CollectionCount {
 
-	private static final String command = "bop count";
-	
-	protected final String range;
-	
-	protected final ElementFlagFilter elementFlagFilter;
+  private static final String command = "bop count";
 
-	public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
-		this.range = String.valueOf(from) + ".." + String.valueOf(to);
-		this.elementFlagFilter = elementFlagFilter;
-	}
+  protected final String range;
 
-	public BTreeCount(byte[] from, byte[] to, ElementFlagFilter elementFlagFilter) {
-		this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-		this.elementFlagFilter = elementFlagFilter;
-	}
+  protected final ElementFlagFilter elementFlagFilter;
 
-	public BTreeCount(long from, long to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-		this.range = String.valueOf(from) + ".." + String.valueOf(to);
-		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
-	}
+  public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.elementFlagFilter = elementFlagFilter;
+  }
 
-	public BTreeCount(byte[] from, byte[] to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-		this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-		this.elementFlagFilter = (ElementFlagFilter)elementMultiFlagsFilter;
-	}
+  public BTreeCount(byte[] from, byte[] to, ElementFlagFilter elementFlagFilter) {
+    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+    this.elementFlagFilter = elementFlagFilter;
+  }
 
-	public String stringify() {
-		if (str != null)
-			return str;
+  public BTreeCount(long from, long to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+  }
 
-		StringBuilder b = new StringBuilder();
+  public BTreeCount(byte[] from, byte[] to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
+    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+  }
 
-		b.append(range);
+  public String stringify() {
+    if (str != null)
+      return str;
 
-		if (elementFlagFilter != null) {
-			b.append(" ").append(elementFlagFilter.toString());
-		}
+    StringBuilder b = new StringBuilder();
 
-		str = b.toString();
-		return str;
-	}
+    b.append(range);
 
-	public String getCommand() {
-		return command;
-	}
+    if (elementFlagFilter != null) {
+      b.append(" ").append(elementFlagFilter.toString());
+    }
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
 }

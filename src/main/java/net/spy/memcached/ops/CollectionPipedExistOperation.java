@@ -23,10 +23,10 @@ import net.spy.memcached.collection.SetPipedExist;
  */
 public interface CollectionPipedExistOperation extends KeyedOperation {
 
-	SetPipedExist<?> getExist();
+  SetPipedExist<?> getExist();
 
-	interface Callback extends OperationCallback {
-		void gotStatus(Integer index, OperationStatus status);
-	}
-	
+  interface Callback extends OperationCallback {
+    void gotStatus(Integer index, OperationStatus status);
+  }
+
 }

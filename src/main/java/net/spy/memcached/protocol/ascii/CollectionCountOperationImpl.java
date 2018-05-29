@@ -36,83 +36,83 @@ import net.spy.memcached.ops.OperationType;
  * Operation to get exists item count from collection in a memcached server.
  */
 public class CollectionCountOperationImpl extends OperationImpl implements
-		CollectionCountOperation {
+        CollectionCountOperation {
 
-	private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
-			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
-			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
-	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
-			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-	private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
-			false, "UNREADABLE", CollectionResponse.UNREADABLE);
+  private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
+          false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+  private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
+          false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
+  private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
+          false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
+  private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
+          false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-	protected final String key;
-	protected final CollectionCount collectionCount;
+  protected final String key;
+  protected final CollectionCount collectionCount;
 
-	protected int count = 0;
+  protected int count = 0;
 
-	public CollectionCountOperationImpl(String key,
-			CollectionCount collectionCount, OperationCallback cb) {
-		super(cb);
-		this.key = key;
-		this.collectionCount = collectionCount;
-		if (this.collectionCount instanceof BTreeCount)
-			setAPIType(APIType.BOP_COUNT);
-		setOperationType(OperationType.READ);
-	}
+  public CollectionCountOperationImpl(String key,
+                                      CollectionCount collectionCount, OperationCallback cb) {
+    super(cb);
+    this.key = key;
+    this.collectionCount = collectionCount;
+    if (this.collectionCount instanceof BTreeCount)
+      setAPIType(APIType.BOP_COUNT);
+    setOperationType(OperationType.READ);
+  }
 
-	/**
-	 * VALUE <flag> <count>\r\n
-	 */
-	public void handleLine(String line) {
-		if (line.startsWith("COUNT=")) {
-			getLogger().debug("Got line %s", line);
+  /**
+   * VALUE <flag> <count>\r\n
+   */
+  public void handleLine(String line) {
+    if (line.startsWith("COUNT=")) {
+      getLogger().debug("Got line %s", line);
 
-			String[] stuff = line.split("=");
-			assert "COUNT".equals(stuff[0]);
-			count = Integer.parseInt(stuff[1]);
+      String[] stuff = line.split("=");
+      assert "COUNT".equals(stuff[0]);
+      count = Integer.parseInt(stuff[1]);
 
-			getCallback().receivedStatus(
-					new CollectionOperationStatus(new OperationStatus(true,
-							String.valueOf(count))));
-			transitionState(OperationState.COMPLETE);
-		} else {
-			OperationStatus status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
-			getLogger().debug(status);
-			getCallback().receivedStatus(status);
-			transitionState(OperationState.COMPLETE);
-			return;
-		}
-	}
+      getCallback().receivedStatus(
+              new CollectionOperationStatus(new OperationStatus(true,
+                      String.valueOf(count))));
+      transitionState(OperationState.COMPLETE);
+    } else {
+      OperationStatus status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
+      getLogger().debug(status);
+      getCallback().receivedStatus(status);
+      transitionState(OperationState.COMPLETE);
+      return;
+    }
+  }
 
-	public void initialize() {
-		String cmd = collectionCount.getCommand();
-		String args = collectionCount.stringify();
-		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-				+ cmd.length() + args.length() + 16);
+  public void initialize() {
+    String cmd = collectionCount.getCommand();
+    String args = collectionCount.stringify();
+    ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+            + cmd.length() + args.length() + 16);
 
-		setArguments(bb, cmd, key, args);
-		bb.flip();
-		setBuffer(bb);
+    setArguments(bb, cmd, key, args);
+    bb.flip();
+    setBuffer(bb);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug(
-					"Request in ascii protocol: "
-							+ (new String(bb.array()))
-									.replace("\r\n", "\\r\\n"));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug(
+              "Request in ascii protocol: "
+                      + (new String(bb.array()))
+                      .replace("\r\n", "\\r\\n"));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(GET_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(GET_CANCELED);
+  }
 
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 }

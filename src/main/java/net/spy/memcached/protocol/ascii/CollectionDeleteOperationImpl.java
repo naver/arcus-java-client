@@ -39,100 +39,100 @@ import net.spy.memcached.ops.OperationType;
  * Operation to delete collection data in a memcached server.
  */
 public class CollectionDeleteOperationImpl extends OperationImpl
-	implements CollectionDeleteOperation {
+        implements CollectionDeleteOperation {
 
-	private static final OperationStatus DELETE_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus DELETE_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus DELETED = new CollectionOperationStatus(
-			true, "DELETED", CollectionResponse.DELETED);
-	private static final OperationStatus DELETED_DROPPED = new CollectionOperationStatus(
-			true, "DELETED_DROPPED", CollectionResponse.DELETED_DROPPED);
-	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
-			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
-			false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
-	private static final OperationStatus OUT_OF_RANGE = new CollectionOperationStatus(
-			false, "OUT_OF_RANGE", CollectionResponse.OUT_OF_RANGE);
-	private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
-			false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
-	private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
-			false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
+  private static final OperationStatus DELETED = new CollectionOperationStatus(
+          true, "DELETED", CollectionResponse.DELETED);
+  private static final OperationStatus DELETED_DROPPED = new CollectionOperationStatus(
+          true, "DELETED_DROPPED", CollectionResponse.DELETED_DROPPED);
+  private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
+          false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+  private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
+          false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
+  private static final OperationStatus OUT_OF_RANGE = new CollectionOperationStatus(
+          false, "OUT_OF_RANGE", CollectionResponse.OUT_OF_RANGE);
+  private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
+          false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
+  private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
+          false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-	protected String key;
-	protected CollectionDelete collectionDelete;
+  protected String key;
+  protected CollectionDelete collectionDelete;
 
-	public CollectionDeleteOperationImpl(String key,
-			CollectionDelete collectionDelete, OperationCallback cb) {
-		super(cb);
-		this.key = key;
-		this.collectionDelete = collectionDelete;
-		if (this.collectionDelete instanceof ListDelete)
-			setAPIType(APIType.LOP_DELETE);
-		else if (this.collectionDelete instanceof SetDelete)
-			setAPIType(APIType.SOP_DELETE);
-		else if (this.collectionDelete instanceof MapDelete)
-			setAPIType(APIType.MOP_DELETE);
-		else if (this.collectionDelete instanceof BTreeDelete)
-			setAPIType(APIType.BOP_DELETE);
-		setOperationType(OperationType.WRITE);
-	}
+  public CollectionDeleteOperationImpl(String key,
+                                       CollectionDelete collectionDelete, OperationCallback cb) {
+    super(cb);
+    this.key = key;
+    this.collectionDelete = collectionDelete;
+    if (this.collectionDelete instanceof ListDelete)
+      setAPIType(APIType.LOP_DELETE);
+    else if (this.collectionDelete instanceof SetDelete)
+      setAPIType(APIType.SOP_DELETE);
+    else if (this.collectionDelete instanceof MapDelete)
+      setAPIType(APIType.MOP_DELETE);
+    else if (this.collectionDelete instanceof BTreeDelete)
+      setAPIType(APIType.BOP_DELETE);
+    setOperationType(OperationType.WRITE);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		assert getState() == OperationState.READING
-		: "Read ``" + line + "'' when in " + getState() + " state";
-		/* ENABLE_REPLICATION if */
-		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-			receivedMoveOperations(line);
-			return;
-		}
+  @Override
+  public void handleLine(String line) {
+    assert getState() == OperationState.READING
+            : "Read ``" + line + "'' when in " + getState() + " state";
+    /* ENABLE_REPLICATION if */
+    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+      receivedMoveOperations(line);
+      return;
+    }
 
-		/* ENABLE_REPLICATION end */
-		OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
-				NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
-				BKEY_MISMATCH);
-		getCallback().receivedStatus(status);
-		transitionState(OperationState.COMPLETE);
-	}
+    /* ENABLE_REPLICATION end */
+    OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
+            NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
+            BKEY_MISMATCH);
+    getCallback().receivedStatus(status);
+    transitionState(OperationState.COMPLETE);
+  }
 
-	@Override
-	public void initialize() {
-		String cmd = collectionDelete.getCommand();
-		String args = collectionDelete.stringify();
-		byte[] additionalArgs = collectionDelete.getAdditionalArgs();
+  @Override
+  public void initialize() {
+    String cmd = collectionDelete.getCommand();
+    String args = collectionDelete.stringify();
+    byte[] additionalArgs = collectionDelete.getAdditionalArgs();
 
-		ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-						+ cmd.length() + args.length() +
-						((null == additionalArgs)? 0 : additionalArgs.length) + 16);
+    ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
+            + cmd.length() + args.length() +
+            ((null == additionalArgs) ? 0 : additionalArgs.length) + 16);
 
-		setArguments(bb, cmd, key, args);
+    setArguments(bb, cmd, key, args);
 
-		if (null != additionalArgs) {
-			bb.put(additionalArgs);
-			bb.put(CRLF);
-		}
+    if (null != additionalArgs) {
+      bb.put(additionalArgs);
+      bb.put(CRLF);
+    }
 
-		bb.flip();
-		setBuffer(bb);
+    bb.flip();
+    setBuffer(bb);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: "
-					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Request in ascii protocol: "
+              + (new String(bb.array())).replace("\r\n", "\\r\\n"));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(DELETE_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(DELETE_CANCELED);
+  }
 
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
-	public CollectionDelete getDelete() {
-		return collectionDelete;
-	}
+  public CollectionDelete getDelete() {
+    return collectionDelete;
+  }
 
 }

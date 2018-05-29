@@ -18,51 +18,51 @@ package net.spy.memcached.collection;
 
 public class SetGet extends CollectionGet {
 
-	private static final String command = "sop get";
-	
-	protected int count;
+  private static final String command = "sop get";
 
-	public SetGet(int count, boolean delete) {
-		this.headerCount = 1;
-		this.count = count;
-		this.delete = delete;
-	}
-	
-	public SetGet(int count, boolean delete, boolean dropIfEmpty) {
-		this(count, delete);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	public int getCount() {
-		return count;
-	}
-	
-	public void setCount(int count) {
-		this.count = count;
-	}
+  protected int count;
 
-	@Override
-	public byte[] getAddtionalArgs() {
-		return null;
-	}
+  public SetGet(int count, boolean delete) {
+    this.headerCount = 1;
+    this.count = count;
+    this.delete = delete;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
-		
-		StringBuilder b = new StringBuilder();
-		b.append(count);
-		if (delete && dropIfEmpty) b.append(" drop");
-		if (delete && !dropIfEmpty) b.append(" delete");
-		
-		str = b.toString();
-		return str;
-	}
-	
-	public String getCommand() {
-		return command;
-	}
+  public SetGet(int count, boolean delete, boolean dropIfEmpty) {
+    this(count, delete);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public void decodeItemHeader(String itemHeader) {
-		this.dataLength = Integer.parseInt(itemHeader);
-	}
+  public int getCount() {
+    return count;
+  }
+
+  public void setCount(int count) {
+    this.count = count;
+  }
+
+  @Override
+  public byte[] getAddtionalArgs() {
+    return null;
+  }
+
+  public String stringify() {
+    if (str != null) return str;
+
+    StringBuilder b = new StringBuilder();
+    b.append(count);
+    if (delete && dropIfEmpty) b.append(" drop");
+    if (delete && !dropIfEmpty) b.append(" delete");
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public void decodeItemHeader(String itemHeader) {
+    this.dataLength = Integer.parseInt(itemHeader);
+  }
 }

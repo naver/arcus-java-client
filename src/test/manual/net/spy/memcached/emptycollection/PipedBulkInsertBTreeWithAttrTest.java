@@ -32,182 +32,182 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final long BKEY = 10;
-	private final int EXPIRE_TIME_IN_SEC = 1;
+  private final String KEY = this.getClass().getSimpleName();
+  private final long BKEY = 10;
+  private final int EXPIRE_TIME_IN_SEC = 1;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testInsertWithAttribute() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithAttribute() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert with create option
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setExpireTime(EXPIRE_TIME_IN_SEC);
-			attr.setMaxCount(3333);
+      // insert with create option
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setExpireTime(EXPIRE_TIME_IN_SEC);
+      attr.setMaxCount(3333);
 
-			Map<Long, Object> elements = new HashMap<Long, Object>();
-			for (long i = 1; i < 11; i++)
-				elements.put(i, 1);
-			Map<Integer, CollectionOperationStatus> insertResult = mc
-					.asyncBopPipedInsertBulk(KEY, elements, attr).get();
-			Assert.assertTrue(insertResult.isEmpty());
+      Map<Long, Object> elements = new HashMap<Long, Object>();
+      for (long i = 1; i < 11; i++)
+        elements.put(i, 1);
+      Map<Integer, CollectionOperationStatus> insertResult = mc
+              .asyncBopPipedInsertBulk(KEY, elements, attr).get();
+      Assert.assertTrue(insertResult.isEmpty());
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			Assert.assertEquals(new Long(3333),
-					collectionAttributes.getMaxCount());
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      Assert.assertEquals(new Long(3333),
+              collectionAttributes.getMaxCount());
 
-			// check expire time
-			Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertNull(map);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check expire time
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertNull(map);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithDefaultAttribute() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithDefaultAttribute() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert with create option
-			CollectionAttributes attr = new CollectionAttributes();
+      // insert with create option
+      CollectionAttributes attr = new CollectionAttributes();
 
-			Map<Long, Object> elements = new HashMap<Long, Object>();
-			for (long i = 1; i < 11; i++)
-				elements.put(i, 1);
-			Map<Integer, CollectionOperationStatus> insertResult = mc
-					.asyncBopPipedInsertBulk(KEY, elements, attr).get();
-			Assert.assertTrue(insertResult.isEmpty());
+      Map<Long, Object> elements = new HashMap<Long, Object>();
+      for (long i = 1; i < 11; i++)
+        elements.put(i, 1);
+      Map<Integer, CollectionOperationStatus> insertResult = mc
+              .asyncBopPipedInsertBulk(KEY, elements, attr).get();
+      Assert.assertTrue(insertResult.isEmpty());
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			Assert.assertEquals(new Long(4000),
-					collectionAttributes.getMaxCount());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      Assert.assertEquals(new Long(4000),
+              collectionAttributes.getMaxCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithoutAttributeCreate() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithoutAttributeCreate() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			Map<Long, Object> elements = new HashMap<Long, Object>();
-			for (long i = 1; i < 11; i++)
-				elements.put(i, 1);
-			Map<Integer, CollectionOperationStatus> insertResult = mc
-					.asyncBopPipedInsertBulk(KEY, elements,
-							new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult.isEmpty());
+      Map<Long, Object> elements = new HashMap<Long, Object>();
+      for (long i = 1; i < 11; i++)
+        elements.put(i, 1);
+      Map<Integer, CollectionOperationStatus> insertResult = mc
+              .asyncBopPipedInsertBulk(KEY, elements,
+                      new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult.isEmpty());
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			Assert.assertEquals(new Long(4000),
-					collectionAttributes.getMaxCount());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      Assert.assertEquals(new Long(4000),
+              collectionAttributes.getMaxCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithoutAttributeDoNotCreate() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithoutAttributeDoNotCreate() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			Map<Long, Object> elements = new HashMap<Long, Object>();
-			for (long i = 1; i < 11; i++)
-				elements.put(i, 1);
-			Map<Integer, CollectionOperationStatus> insertResult = mc
-					.asyncBopPipedInsertBulk(KEY, elements, null).get();
-			Assert.assertEquals(10, insertResult.size());
+      Map<Long, Object> elements = new HashMap<Long, Object>();
+      for (long i = 1; i < 11; i++)
+        elements.put(i, 1);
+      Map<Integer, CollectionOperationStatus> insertResult = mc
+              .asyncBopPipedInsertBulk(KEY, elements, null).get();
+      Assert.assertEquals(10, insertResult.size());
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			assertNull(collectionAttributes);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      assertNull(collectionAttributes);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithEflag() {
-		try {
-			byte[] eflag = new byte[] { 0, 1, 0, 1 };
-			List<Element<Object>> elements = new ArrayList<Element<Object>>();
-			for (int i = 0; i < 10; i++)
-				elements.add(new Element<Object>(new byte[] { (byte) i },
-						"VALUE" + i, eflag));
+  public void testInsertWithEflag() {
+    try {
+      byte[] eflag = new byte[]{0, 1, 0, 1};
+      List<Element<Object>> elements = new ArrayList<Element<Object>>();
+      for (int i = 0; i < 10; i++)
+        elements.add(new Element<Object>(new byte[]{(byte) i},
+                "VALUE" + i, eflag));
 
-			Map<Integer, CollectionOperationStatus> map = mc
-					.asyncBopPipedInsertBulk(KEY, elements,
-							new CollectionAttributes()).get();
+      Map<Integer, CollectionOperationStatus> map = mc
+              .asyncBopPipedInsertBulk(KEY, elements,
+                      new CollectionAttributes()).get();
 
-			Assert.assertTrue(map.isEmpty());
+      Assert.assertTrue(map.isEmpty());
 
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, eflag);
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, eflag);
 
-			Map<ByteArrayBKey, Element<Object>> map2 = mc.asyncBopGet(KEY,
-					new byte[] { (byte) 0 }, new byte[] { (byte) 9 }, filter,
-					0, 100, false, false).get();
+      Map<ByteArrayBKey, Element<Object>> map2 = mc.asyncBopGet(KEY,
+              new byte[]{(byte) 0}, new byte[]{(byte) 9}, filter,
+              0, 100, false, false).get();
 
-			Assert.assertEquals(10, map2.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertEquals(10, map2.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithEflagLongBkey() {
-		try {
-			byte[] eflag = new byte[] { 0, 1, 0, 1 };
+  public void testInsertWithEflagLongBkey() {
+    try {
+      byte[] eflag = new byte[]{0, 1, 0, 1};
 
-			List<Element<Object>> elements = new ArrayList<Element<Object>>();
-			for (int i = 0; i < 10; i++)
-				elements.add(new Element<Object>(i, "VALUE" + i, eflag));
+      List<Element<Object>> elements = new ArrayList<Element<Object>>();
+      for (int i = 0; i < 10; i++)
+        elements.add(new Element<Object>(i, "VALUE" + i, eflag));
 
-			Map<Integer, CollectionOperationStatus> map = mc
-					.asyncBopPipedInsertBulk(KEY, elements,
-							new CollectionAttributes()).get();
+      Map<Integer, CollectionOperationStatus> map = mc
+              .asyncBopPipedInsertBulk(KEY, elements,
+                      new CollectionAttributes()).get();
 
-			Assert.assertTrue(map.isEmpty());
+      Assert.assertTrue(map.isEmpty());
 
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, eflag);
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, eflag);
 
-			Map<Long, Element<Object>> map2 = mc.asyncBopGet(KEY, 0, 10,
-					filter, 0, 100, false, false).get();
+      Map<Long, Element<Object>> map2 = mc.asyncBopGet(KEY, 0, 10,
+              filter, 0, 100, false, false).get();
 
-			Assert.assertEquals(10, map2.size());
+      Assert.assertEquals(10, map2.size());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

@@ -23,133 +23,133 @@ import net.spy.memcached.util.BTreeUtil;
 
 public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
-	private static final String command = "bop mget";
+  private static final String command = "bop mget";
 
-	private String spaceSeparatedKeys;
+  private String spaceSeparatedKeys;
 
-	protected String str;
-	protected int lenKeys;
+  protected String str;
+  protected int lenKeys;
 
-	protected List<String> keyList;
-	protected String range;
-	protected ElementFlagFilter eFlagFilter;
-	protected int offset = -1;
-	protected int count;
-	protected boolean reverse;
+  protected List<String> keyList;
+  protected String range;
+  protected ElementFlagFilter eFlagFilter;
+  protected int offset = -1;
+  protected int count;
+  protected boolean reverse;
 
-	protected Map<Integer, T> map;
+  protected Map<Integer, T> map;
 
-	public String key;
-	public int flag;
-	public Object subkey;
-	public int dataLength;
-	public byte[] eflag = null;
+  public String key;
+  public int flag;
+  public Object subkey;
+  public int dataLength;
+  public byte[] eflag = null;
 
-	protected BTreeGetBulkImpl(List<String> keyList, byte[] from, byte[] to,
-			ElementFlagFilter eFlagFilter, int offset, int count) {
-		
-		this.keyList = keyList;
-		this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-		this.eFlagFilter = eFlagFilter;
-		this.offset = offset;
-		this.count = count;
-		this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
-	}
+  protected BTreeGetBulkImpl(List<String> keyList, byte[] from, byte[] to,
+                             ElementFlagFilter eFlagFilter, int offset, int count) {
 
-	protected BTreeGetBulkImpl(List<String> keyList, long from, long to,
-			ElementFlagFilter eFlagFilter, int offset, int count) {
-		
-		this.keyList = keyList;
-		this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
-		this.eFlagFilter = eFlagFilter;
-		this.offset = offset;
-		this.count = count;
-		this.reverse = (from > to);
-	}
+    this.keyList = keyList;
+    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+    this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
+  }
 
-	public String getSpaceSeparatedKeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
-		}
+  protected BTreeGetBulkImpl(List<String> keyList, long from, long to,
+                             ElementFlagFilter eFlagFilter, int offset, int count) {
 
-		StringBuilder sb = new StringBuilder();
-		int numkeys = keyList.size();
-		for (int i = 0; i < numkeys; i++) {
-			sb.append(keyList.get(i));
-			if ((i + 1) < numkeys) {
-				sb.append(" ");
-			}
-		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
-	}
+    this.keyList = keyList;
+    this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+    this.reverse = (from > to);
+  }
 
-	public String getRepresentKey() {
-		if (keyList == null || keyList.isEmpty()) {
-			throw new IllegalStateException("Key list is empty.");
-		}
-		return keyList.get(0);
-	}
+  public String getSpaceSeparatedKeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
 
-	public List<String> getKeyList() {
-		return keyList;
-	}
+    StringBuilder sb = new StringBuilder();
+    int numkeys = keyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(keyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(" ");
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
+  }
 
-	public String stringify() {
-		if (str != null)
-			return str;
+  public String getRepresentKey() {
+    if (keyList == null || keyList.isEmpty()) {
+      throw new IllegalStateException("Key list is empty.");
+    }
+    return keyList.get(0);
+  }
 
-		/*
-		 * 
-		 * bop mget <lenkeys> <numkeys> <bkey or "bkey range"> [<eflag_filter>]
-		 * [<offset>] <count>\r\n<"comma separated keys">\r\n
-		 * <eflag_filter> : <fwhere> [<bitwop> <foperand>] <compop> <fvalue>
-		 * 
-		 */
-		
-		StringBuilder b = new StringBuilder();
+  public List<String> getKeyList() {
+    return keyList;
+  }
 
-		b.append(getSpaceSeparatedKeys().length());
-		b.append(" ").append(keyList.size());
-		b.append(" ").append(range);
+  public String stringify() {
+    if (str != null)
+      return str;
 
-		if (eFlagFilter != null)
-			b.append(" ").append(eFlagFilter.toString());
+    /*
+     *
+     * bop mget <lenkeys> <numkeys> <bkey or "bkey range"> [<eflag_filter>]
+     * [<offset>] <count>\r\n<"comma separated keys">\r\n
+     * <eflag_filter> : <fwhere> [<bitwop> <foperand>] <compop> <fvalue>
+     *
+     */
 
-		if (offset > 0)
-			b.append(" ").append(offset);
+    StringBuilder b = new StringBuilder();
 
-		b.append(" ").append(count);
+    b.append(getSpaceSeparatedKeys().length());
+    b.append(" ").append(keyList.size());
+    b.append(" ").append(range);
 
-		str = b.toString();
-		return str;
-	}
+    if (eFlagFilter != null)
+      b.append(" ").append(eFlagFilter.toString());
 
-	public String getCommand() {
-		return command;
-	}
+    if (offset > 0)
+      b.append(" ").append(offset);
 
-	public boolean elementHeaderReady(int spaceCount) {
-		return spaceCount == 3 || spaceCount == 4;
-	}
+    b.append(" ").append(count);
 
-	public boolean keyHeaderReady(int spaceCount) {
-		return spaceCount == 3 || spaceCount == 5;
-	}
+    str = b.toString();
+    return str;
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public String getCommand() {
+    return command;
+  }
 
-	public int getFlag() {
-		return flag;
-	}
+  public boolean elementHeaderReady(int spaceCount) {
+    return spaceCount == 3 || spaceCount == 4;
+  }
 
-	public int getDataLength() {
-		return dataLength;
-	}
+  public boolean keyHeaderReady(int spaceCount) {
+    return spaceCount == 3 || spaceCount == 5;
+  }
 
-	public byte[] getEFlag() {
-		return eflag;
-	}
+  public String getKey() {
+    return key;
+  }
+
+  public int getFlag() {
+    return flag;
+  }
+
+  public int getDataLength() {
+    return dataLength;
+  }
+
+  public byte[] getEFlag() {
+    return eflag;
+  }
 }

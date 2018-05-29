@@ -7,12 +7,12 @@ import net.spy.memcached.ops.OperationCallback;
  */
 public abstract class ExtensibleOperationImpl extends OperationImpl {
 
-	public ExtensibleOperationImpl() {
-		super();
-	}
+  public ExtensibleOperationImpl() {
+    super();
+  }
 
-	public ExtensibleOperationImpl(OperationCallback cb) {
-		super(cb);
-	}
+  public ExtensibleOperationImpl(OperationCallback cb) {
+    super(cb);
+  }
 
 }

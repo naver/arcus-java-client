@@ -20,22 +20,22 @@ import net.spy.memcached.CachedData;
 
 public class InspectObjectSizeTranscoder extends SerializingTranscoder {
 
-	public static interface LoggingObjectSize {
-		void histogram(int size);
-	}
+  public static interface LoggingObjectSize {
+    void histogram(int size);
+  }
 
-	private final LoggingObjectSize objSizeLogger;
+  private final LoggingObjectSize objSizeLogger;
 
-	public InspectObjectSizeTranscoder(LoggingObjectSize objSizeLogger) {
-		this.objSizeLogger = objSizeLogger;
-	}
+  public InspectObjectSizeTranscoder(LoggingObjectSize objSizeLogger) {
+    this.objSizeLogger = objSizeLogger;
+  }
 
-	@Override
-	public CachedData encode(Object o) {
-		CachedData encoded = super.encode(o);
+  @Override
+  public CachedData encode(Object o) {
+    CachedData encoded = super.encode(o);
 
-		objSizeLogger.histogram(encoded.getData().length);
+    objSizeLogger.histogram(encoded.getData().length);
 
-		return encoded;
-	}
+    return encoded;
+  }
 }

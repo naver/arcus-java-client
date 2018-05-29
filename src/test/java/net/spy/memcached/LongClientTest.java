@@ -18,47 +18,49 @@ import net.spy.memcached.compat.SyncThread;
  */
 public class LongClientTest extends ClientBaseCase {
 
-	public void testParallelGet() throws Throwable {
-		// Get a connection with the get optimization disabled.
-		client.shutdown();
-		initClient(new DefaultConnectionFactory(){
-			@Override
-			public long getOperationTimeout() {
-				return 15000;
-			}
-			@Override
-			public boolean shouldOptimize() {
-				return false;
-			}
-			});
+  public void testParallelGet() throws Throwable {
+    // Get a connection with the get optimization disabled.
+    client.shutdown();
+    initClient(new DefaultConnectionFactory() {
+      @Override
+      public long getOperationTimeout() {
+        return 15000;
+      }
 
-		// Throw in some seed data.
-		byte data[]=new byte[32768];
-		Random r=new Random();
-		r.nextBytes(data);
-		final int hashcode=Arrays.hashCode(data);
-		final Collection<String> keys=new ArrayList<String>();
-		for(int i=0; i<50; i++) {
-			client.set("k" + i, 60, data);
-			keys.add("k" + i);
-		}
+      @Override
+      public boolean shouldOptimize() {
+        return false;
+      }
+    });
 
-		// Make sure it got in.
-		client.waitForQueues(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+    // Throw in some seed data.
+    byte data[] = new byte[32768];
+    Random r = new Random();
+    r.nextBytes(data);
+    final int hashcode = Arrays.hashCode(data);
+    final Collection<String> keys = new ArrayList<String>();
+    for (int i = 0; i < 50; i++) {
+      client.set("k" + i, 60, data);
+      keys.add("k" + i);
+    }
 
-		int cnt=SyncThread.getDistinctResultCount(25, new Callable<Integer>(){
-			public Integer call() throws Exception {
-				for(int i=0; i<25; i++) {
-					Map<String, Object> m = client.getBulk(keys);
-					for(String s : keys) {
-						byte b[]=(byte[])m.get(s);
-						assert Arrays.hashCode(b) == hashcode
-							: "Expected " + hashcode + " was "
-								+ Arrays.hashCode(b);
-					}
-				}
-				return hashcode;
-			}});
-		assertEquals(cnt, 25);
-	}
+    // Make sure it got in.
+    client.waitForQueues(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
+    int cnt = SyncThread.getDistinctResultCount(25, new Callable<Integer>() {
+      public Integer call() throws Exception {
+        for (int i = 0; i < 25; i++) {
+          Map<String, Object> m = client.getBulk(keys);
+          for (String s : keys) {
+            byte b[] = (byte[]) m.get(s);
+            assert Arrays.hashCode(b) == hashcode
+                    : "Expected " + hashcode + " was "
+                    + Arrays.hashCode(b);
+          }
+        }
+        return hashcode;
+      }
+    });
+    assertEquals(cnt, 25);
+  }
 }

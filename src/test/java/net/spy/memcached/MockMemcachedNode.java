@@ -31,161 +31,227 @@ import java.util.concurrent.BlockingQueue;
 import net.spy.memcached.ops.Operation;
 
 public class MockMemcachedNode implements MemcachedNode {
-	private final InetSocketAddress socketAddress;
-	public SocketAddress getSocketAddress() {return socketAddress;}
+  private final InetSocketAddress socketAddress;
 
-	public MockMemcachedNode(InetSocketAddress socketAddress) {
-		this.socketAddress = socketAddress;
-	}
+  public SocketAddress getSocketAddress() {
+    return socketAddress;
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+  public MockMemcachedNode(InetSocketAddress socketAddress) {
+    this.socketAddress = socketAddress;
+  }
 
-		MockMemcachedNode that = (MockMemcachedNode) o;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-		if (socketAddress != null
-				? !socketAddress.equals(that.socketAddress)
-				: that.socketAddress != null) {
-			return false;
-		}
+    MockMemcachedNode that = (MockMemcachedNode) o;
 
-		return true;
-	}
+    if (socketAddress != null
+            ? !socketAddress.equals(that.socketAddress)
+            : that.socketAddress != null) {
+      return false;
+    }
 
-	@Override
-	public int hashCode() {
-		return (socketAddress != null ? socketAddress.hashCode() : 0);
-	}
+    return true;
+  }
 
-	public void copyInputQueue() {
-		// noop
-	}
-	public void setupResend(boolean cancelWrite, String cause) {
-		// noop
-	}
-	public void fillWriteBuffer(boolean optimizeGets) {
-		// noop
-	}
-	public void transitionWriteItem() {
-		// noop
-	}
-	public Operation getCurrentReadOp() {return null;}
-	public Operation removeCurrentReadOp() {return null;}
-	public Operation getCurrentWriteOp() {return null;}
-	public Operation removeCurrentWriteOp() {return null;}
-	public boolean hasReadOp() {return false;}
-	public boolean hasWriteOp() {return false;}
-	public void addOp(Operation op) {
-		// noop
-	}
-	public void insertOp(Operation op) {
-		// noop
-	}
-	public int getSelectionOps() {return 0;}
-	public ByteBuffer getRbuf() {return null;}
-	public ByteBuffer getWbuf() {return null;}
-	public boolean isActive() {return false;}
-	public void reconnecting() {
-		// noop
-	}
-	public void connected() {
-		// noop
-	}
-	public int getReconnectCount() {return 0;}
-	public void registerChannel(SocketChannel ch, SelectionKey selectionKey) {
-		// noop
-	}
-	public void setChannel(SocketChannel to) {
-		// noop
-	}
-	public SocketChannel getChannel() {return null;}
-	public void setSk(SelectionKey to) {
-		// noop
-	}
-	public SelectionKey getSk() {return null;}
-	public void setVersion(String vr) {
-		// noop
-	}
-	public String getVersion() {return null;}
-	public boolean enabledMGetOp() {return false;}
-	public int getBytesRemainingToWrite() {return 0;}
-	public int writeSome() throws IOException {return 0;}
-	public void fixupOps() {
-		// noop
-	}
+  @Override
+  public int hashCode() {
+    return (socketAddress != null ? socketAddress.hashCode() : 0);
+  }
 
-	public Collection<Operation> destroyInputQueue() {
-		return null;
-	}
+  public void copyInputQueue() {
+    // noop
+  }
 
-	public Collection<Operation> destroyWriteQueue(boolean resend) {
-		return null;
-	}
+  public void setupResend(boolean cancelWrite, String cause) {
+    // noop
+  }
 
-	public void authComplete() {
-		// noop
-	}
+  public void fillWriteBuffer(boolean optimizeGets) {
+    // noop
+  }
 
-	public void setupForAuth(String cause) {
-		// noop
-	}
+  public void transitionWriteItem() {
+    // noop
+  }
 
-	public int getContinuousTimeout() {
-		return 0;
-	}
+  public Operation getCurrentReadOp() {
+    return null;
+  }
 
-	public void setContinuousTimeout(boolean timedOut) {
-		// noop
-	}
-	
-	public void enableTimeoutRatio() {
-		// noop
-	}
+  public Operation removeCurrentReadOp() {
+    return null;
+  }
 
-	public int getTimeoutRatioNow() {
-		return -1; // disabled
-	}
+  public Operation getCurrentWriteOp() {
+    return null;
+  }
 
-	public boolean isFake() {
-		return false;
-	}
+  public Operation removeCurrentWriteOp() {
+    return null;
+  }
 
-	public void shutdown() throws IOException {
-		// noop
-	}
-	
-	@Override
-	public String getStatus() {
-		return "MOCK_STATE";
-	}
-	/* ENABLE_REPLICATION if */
+  public boolean hasReadOp() {
+    return false;
+  }
 
-	@Override
-	public void setReplicaGroup(MemcachedReplicaGroup g) {
-		// noop
-	}
+  public boolean hasWriteOp() {
+    return false;
+  }
 
-	@Override
-	public MemcachedReplicaGroup getReplicaGroup() {
-		// noop
-		return null;
-	}
+  public void addOp(Operation op) {
+    // noop
+  }
 
-	@Override
-	public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
-		// noop
-	}
+  public void insertOp(Operation op) {
+    // noop
+  }
 
-	@Override
-	public int moveOperations(final MemcachedNode toNode) {
-		// noop
-		return 0;
-	}
-	/* ENABLE_REPLICATION end */
+  public int getSelectionOps() {
+    return 0;
+  }
+
+  public ByteBuffer getRbuf() {
+    return null;
+  }
+
+  public ByteBuffer getWbuf() {
+    return null;
+  }
+
+  public boolean isActive() {
+    return false;
+  }
+
+  public void reconnecting() {
+    // noop
+  }
+
+  public void connected() {
+    // noop
+  }
+
+  public int getReconnectCount() {
+    return 0;
+  }
+
+  public void registerChannel(SocketChannel ch, SelectionKey selectionKey) {
+    // noop
+  }
+
+  public void setChannel(SocketChannel to) {
+    // noop
+  }
+
+  public SocketChannel getChannel() {
+    return null;
+  }
+
+  public void setSk(SelectionKey to) {
+    // noop
+  }
+
+  public SelectionKey getSk() {
+    return null;
+  }
+
+  public void setVersion(String vr) {
+    // noop
+  }
+
+  public String getVersion() {
+    return null;
+  }
+
+  public boolean enabledMGetOp() {
+    return false;
+  }
+
+  public int getBytesRemainingToWrite() {
+    return 0;
+  }
+
+  public int writeSome() throws IOException {
+    return 0;
+  }
+
+  public void fixupOps() {
+    // noop
+  }
+
+  public Collection<Operation> destroyInputQueue() {
+    return null;
+  }
+
+  public Collection<Operation> destroyWriteQueue(boolean resend) {
+    return null;
+  }
+
+  public void authComplete() {
+    // noop
+  }
+
+  public void setupForAuth(String cause) {
+    // noop
+  }
+
+  public int getContinuousTimeout() {
+    return 0;
+  }
+
+  public void setContinuousTimeout(boolean timedOut) {
+    // noop
+  }
+
+  public void enableTimeoutRatio() {
+    // noop
+  }
+
+  public int getTimeoutRatioNow() {
+    return -1; // disabled
+  }
+
+  public boolean isFake() {
+    return false;
+  }
+
+  public void shutdown() throws IOException {
+    // noop
+  }
+
+  @Override
+  public String getStatus() {
+    return "MOCK_STATE";
+  }
+  /* ENABLE_REPLICATION if */
+
+  @Override
+  public void setReplicaGroup(MemcachedReplicaGroup g) {
+    // noop
+  }
+
+  @Override
+  public MemcachedReplicaGroup getReplicaGroup() {
+    // noop
+    return null;
+  }
+
+  @Override
+  public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+    // noop
+  }
+
+  @Override
+  public int moveOperations(final MemcachedNode toNode) {
+    // noop
+    return 0;
+  }
+  /* ENABLE_REPLICATION end */
 }

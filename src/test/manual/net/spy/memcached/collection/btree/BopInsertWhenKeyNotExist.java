@@ -23,93 +23,93 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class BopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
-	private String key = "BopInsertWhenKeyNotExist";
+  private String key = "BopInsertWhenKeyNotExist";
 
-	private String[] items9 = { "value0", "value1", "value2", "value3",
-			"value4", "value5", "value6", "value7", "value8", };
+  private String[] items9 = {"value0", "value1", "value2", "value3",
+          "value4", "value5", "value6", "value7", "value8",};
 
-	protected void tearDown() {
-		try {
-			deleteBTree(key, items9);
-			super.tearDown();
-		} catch (Exception e) {
-		}
-	}
+  protected void tearDown() {
+    try {
+      deleteBTree(key, items9);
+      super.tearDown();
+    } catch (Exception e) {
+    }
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * true	false	null
-	 * </pre>
-	 */
-	public void testBopInsert_nokey_01() throws Exception {
-		insertToFail(key, true, null);
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * true	false	null
+   * </pre>
+   */
+  public void testBopInsert_nokey_01() throws Exception {
+    insertToFail(key, true, null);
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * false	true	not null
-	 * </pre>
-	 */
-	public void testBopInsert_nokey_02() throws Exception {
-		assertFalse(insertToSucceed(key, false, items9[0]));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * false	true	not null
+   * </pre>
+   */
+  public void testBopInsert_nokey_02() throws Exception {
+    assertFalse(insertToSucceed(key, false, items9[0]));
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * false	false	not null
-	 * </pre>
-	 */
-	public void testBopInsert_nokey_04() throws Exception {
-		assertFalse(insertToSucceed(key, false, items9[0]));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * false	false	not null
+   * </pre>
+   */
+  public void testBopInsert_nokey_04() throws Exception {
+    assertFalse(insertToSucceed(key, false, items9[0]));
+  }
 
-	/**
-	 * <pre>
-	 * CREATE	FIXED	VALUE
-	 * true	true	not null
-	 * </pre>
-	 */
-	public void testBopInsert_nokey_05() throws Exception {
-		assertTrue(insertToSucceed(key, true, items9[0]));
-	}
+  /**
+   * <pre>
+   * CREATE	FIXED	VALUE
+   * true	true	not null
+   * </pre>
+   */
+  public void testBopInsert_nokey_05() throws Exception {
+    assertTrue(insertToSucceed(key, true, items9[0]));
+  }
 
-	boolean insertToFail(String key, boolean createKeyIfNotExists, Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncBopInsert(
-							key,
-							0,
-							null,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-			fail("should be failed");
-		} catch (Exception e) {
-		}
-		return result;
-	}
+  boolean insertToFail(String key, boolean createKeyIfNotExists, Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncBopInsert(
+                      key,
+                      0,
+                      null,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+      fail("should be failed");
+    } catch (Exception e) {
+    }
+    return result;
+  }
 
-	boolean insertToSucceed(String key, boolean createKeyIfNotExists,
-			Object value) {
-		boolean result = false;
-		try {
-			result = mc
-					.asyncBopInsert(
-							key,
-							0,
-							null,
-							value,
-							((createKeyIfNotExists) ? new CollectionAttributes()
-									: null)).get(1000, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("should not be failed");
-		}
-		return result;
-	}
+  boolean insertToSucceed(String key, boolean createKeyIfNotExists,
+                          Object value) {
+    boolean result = false;
+    try {
+      result = mc
+              .asyncBopInsert(
+                      key,
+                      0,
+                      null,
+                      value,
+                      ((createKeyIfNotExists) ? new CollectionAttributes()
+                              : null)).get(1000, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("should not be failed");
+    }
+    return result;
+  }
 
 }

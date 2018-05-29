@@ -26,102 +26,102 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class UnReadableMapTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final String MKEY = "MKEY";
-	private final String VALUE = "VALUE";
+  private final String KEY = this.getClass().getSimpleName();
+  private final String MKEY = "MKEY";
+  private final String VALUE = "VALUE";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testCreateUnreadableMapTest() {
-		try {
-			// create unreadable empty
-			CollectionAttributes attribute = new CollectionAttributes();
-			attribute.setReadable(false);
+  public void testCreateUnreadableMapTest() {
+    try {
+      // create unreadable empty
+      CollectionAttributes attribute = new CollectionAttributes();
+      attribute.setReadable(false);
 
-			Boolean insertResult = mc.asyncMopCreate(KEY,
-					ElementValueType.STRING, attribute).get();
-			Assert.assertTrue(insertResult);
+      Boolean insertResult = mc.asyncMopCreate(KEY,
+              ElementValueType.STRING, attribute).get();
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      // check attribute
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-			Assert.assertEquals(new Long(0), attr.getCount());
-			Assert.assertEquals(new Long(4000), attr.getMaxCount());
-			Assert.assertEquals(new Integer(0), attr.getExpireTime());
-			Assert.assertFalse(attr.getReadable());
+      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(new Long(4000), attr.getMaxCount());
+      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertFalse(attr.getReadable());
 
-			// insert an item
-			Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
-					.get());
+      // insert an item
+      Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
+              .get());
 
-			// get an item
-			CollectionFuture<Map<String, Object>> f = mc.asyncMopGet(
-					KEY, MKEY, false, false);
-			Assert.assertNull(f.get());
-			Assert.assertEquals("UNREADABLE", f.getOperationStatus()
-					.getMessage());
+      // get an item
+      CollectionFuture<Map<String, Object>> f = mc.asyncMopGet(
+              KEY, MKEY, false, false);
+      Assert.assertNull(f.get());
+      Assert.assertEquals("UNREADABLE", f.getOperationStatus()
+              .getMessage());
 
-			// set readable
-			attribute.setReadable(true);
-			Assert.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
+      // set readable
+      attribute.setReadable(true);
+      Assert.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
 
-			// get an item again
-			f = mc.asyncMopGet(KEY, MKEY, false, false);
-			Map<String, Object> map = f.get();
+      // get an item again
+      f = mc.asyncMopGet(KEY, MKEY, false, false);
+      Map<String, Object> map = f.get();
 
-			Assert.assertNotNull(map);
-			Assert.assertEquals(VALUE, map.get(MKEY));
-			Assert.assertEquals("END", f.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertNotNull(map);
+      Assert.assertEquals(VALUE, map.get(MKEY));
+      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testCreateReadableMapTest() {
-		try {
-			// create readable empty
-			CollectionAttributes attribute = new CollectionAttributes();
-			attribute.setReadable(true);
+  public void testCreateReadableMapTest() {
+    try {
+      // create readable empty
+      CollectionAttributes attribute = new CollectionAttributes();
+      attribute.setReadable(true);
 
-			Boolean insertResult = mc.asyncMopCreate(KEY,
-					ElementValueType.STRING, attribute).get();
-			Assert.assertTrue(insertResult);
+      Boolean insertResult = mc.asyncMopCreate(KEY,
+              ElementValueType.STRING, attribute).get();
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      // check attribute
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-			Assert.assertEquals(new Long(0), attr.getCount());
-			Assert.assertEquals(new Long(4000), attr.getMaxCount());
-			Assert.assertEquals(new Integer(0), attr.getExpireTime());
-			Assert.assertTrue(attr.getReadable());
+      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(new Long(4000), attr.getMaxCount());
+      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertTrue(attr.getReadable());
 
-			// insert an item
-			Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
-					.get());
+      // insert an item
+      Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
+              .get());
 
-			// get an item
-			CollectionFuture<Map<String, Object>> f = mc.asyncMopGet(
-					KEY, MKEY, false, false);
+      // get an item
+      CollectionFuture<Map<String, Object>> f = mc.asyncMopGet(
+              KEY, MKEY, false, false);
 
-			Map<String, Object> map = f.get();
-			Assert.assertNotNull(map);
-			Assert.assertEquals(VALUE, map.get(MKEY));
-			Assert.assertEquals("END", f.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<String, Object> map = f.get();
+      Assert.assertNotNull(map);
+      Assert.assertEquals(VALUE, map.get(MKEY));
+      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
 }

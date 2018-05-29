@@ -19,71 +19,71 @@ package net.spy.memcached.collection;
 import java.util.List;
 
 public class MapDelete extends CollectionDelete {
-	private static final String command = "mop delete";
+  private static final String command = "mop delete";
 
-	protected List<String> mkeyList;
-	private String spaceSeparatedKeys;
-	protected byte[] additionalArgs;
+  protected List<String> mkeyList;
+  private String spaceSeparatedKeys;
+  protected byte[] additionalArgs;
 
-	public MapDelete(List<String> mkeyList, boolean noreply) {
-		this.mkeyList = mkeyList;
-		this.noreply = noreply;
-		if (mkeyList.size() == 0) {
-			this.additionalArgs = null;
-		} else {
-			this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
-		}
-	}
+  public MapDelete(List<String> mkeyList, boolean noreply) {
+    this.mkeyList = mkeyList;
+    this.noreply = noreply;
+    if (mkeyList.size() == 0) {
+      this.additionalArgs = null;
+    } else {
+      this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
+    }
+  }
 
-	public MapDelete(List<String> mkeyList, boolean noreply, boolean dropIfEmpty) {
-		this(mkeyList, noreply);
-		this.dropIfEmpty = dropIfEmpty;
-	}
+  public MapDelete(List<String> mkeyList, boolean noreply, boolean dropIfEmpty) {
+    this(mkeyList, noreply);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public String getSpaceSeparatedMkeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
-		}
+  public String getSpaceSeparatedMkeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
 
-		StringBuilder sb = new StringBuilder();
-		int numkeys = mkeyList.size();
-		for (int i = 0; i < numkeys; i++) {
-			sb.append(mkeyList.get(i));
-			if ((i + 1) < numkeys) {
-				sb.append(" ");
-			}
-		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
-	}
+    StringBuilder sb = new StringBuilder();
+    int numkeys = mkeyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(mkeyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(" ");
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
+  }
 
-	public byte[] getAdditionalArgs() {
-		return additionalArgs;
-	}
+  public byte[] getAdditionalArgs() {
+    return additionalArgs;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
+  public String stringify() {
+    if (str != null) return str;
 
-		StringBuilder b = new StringBuilder();
-		if (additionalArgs == null) {
-			b.append("0");
-		} else {
-			b.append(additionalArgs.length);
-		}
-		b.append(" ").append(mkeyList.size());
+    StringBuilder b = new StringBuilder();
+    if (additionalArgs == null) {
+      b.append("0");
+    } else {
+      b.append(additionalArgs.length);
+    }
+    b.append(" ").append(mkeyList.size());
 
-		if (dropIfEmpty) {
-			b.append(" drop");
-		}
-		if (noreply) {
-			b.append(" noreply");
-		}
+    if (dropIfEmpty) {
+      b.append(" drop");
+    }
+    if (noreply) {
+      b.append(" noreply");
+    }
 
-		str = b.toString();
-		return str;
-	}
+    str = b.toString();
+    return str;
+  }
 
-	public String getCommand() {
-		return command;
-	}
+  public String getCommand() {
+    return command;
+  }
 }

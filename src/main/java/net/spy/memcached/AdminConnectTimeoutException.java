@@ -17,11 +17,11 @@
 package net.spy.memcached;
 
 public class AdminConnectTimeoutException extends RuntimeException {
-	
-	private static final long serialVersionUID = -1461409015284668293L;
 
-	public AdminConnectTimeoutException(String message) {
-		super(message);
-	}
-	
+  private static final long serialVersionUID = -1461409015284668293L;
+
+  public AdminConnectTimeoutException(String message) {
+    super(message);
+  }
+
 }

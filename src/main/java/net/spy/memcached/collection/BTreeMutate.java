@@ -21,78 +21,78 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeMutate extends CollectionMutate {
 
-	private final String command;
-	
-	protected final Mutator m;
+  private final String command;
 
-	protected final int by;
+  protected final Mutator m;
 
-	protected long initial = -1;
+  protected final int by;
 
-	protected byte[] elementFlag;
+  protected long initial = -1;
 
-	public BTreeMutate(Mutator m, int by) {
-		if (by <= 0) {
-			throw new IllegalArgumentException("by must be positive value.");
-		}
+  protected byte[] elementFlag;
 
-		if (Mutator.incr == m) {
-			command = "bop incr";
-		} else {
-			command = "bop decr";
-		}
+  public BTreeMutate(Mutator m, int by) {
+    if (by <= 0) {
+      throw new IllegalArgumentException("by must be positive value.");
+    }
 
-		this.m = m;
-		this.by = by;
-	}
+    if (Mutator.incr == m) {
+      command = "bop incr";
+    } else {
+      command = "bop decr";
+    }
 
-	public BTreeMutate(Mutator m, int by, long initial, byte[] eFlag) {
-		if (by <= 0) {
-			throw new IllegalArgumentException("by must be positive value.");
-		}
-		if (initial < 0) {
-			throw new IllegalArgumentException("initial must be 0 or positive value.");
-		}
-		if (eFlag != null && (eFlag.length < 1 || eFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH)) {
-			throw new IllegalArgumentException(
-					"length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + "." );
-		}
+    this.m = m;
+    this.by = by;
+  }
 
-		if (Mutator.incr == m) {
-			command = "bop incr";
-		} else {
-			command = "bop decr";
-		}
+  public BTreeMutate(Mutator m, int by, long initial, byte[] eFlag) {
+    if (by <= 0) {
+      throw new IllegalArgumentException("by must be positive value.");
+    }
+    if (initial < 0) {
+      throw new IllegalArgumentException("initial must be 0 or positive value.");
+    }
+    if (eFlag != null && (eFlag.length < 1 || eFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH)) {
+      throw new IllegalArgumentException(
+              "length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + ".");
+    }
 
-		this.m = m;
-		this.by = by;
-		this.initial = initial;
-		this.elementFlag = eFlag;
-	}
-	
-	public String stringify() {
-		if (str != null)
-			return str;
+    if (Mutator.incr == m) {
+      command = "bop incr";
+    } else {
+      command = "bop decr";
+    }
 
-		StringBuilder b = new StringBuilder();
-		b.append(by);
+    this.m = m;
+    this.by = by;
+    this.initial = initial;
+    this.elementFlag = eFlag;
+  }
 
-		if (initial > 0) b.append(" ").append(initial);
-		if (elementFlag != null) b.append(" ").append(getElementFlagByHex());
+  public String stringify() {
+    if (str != null)
+      return str;
 
-		str = b.toString();
-		return str;
-	}
+    StringBuilder b = new StringBuilder();
+    b.append(by);
 
-	public String getCommand() {
-		return command;
-	}
-	
-	public Mutator getMutator() {
-		return this.m;
-	}
+    if (initial > 0) b.append(" ").append(initial);
+    if (elementFlag != null) b.append(" ").append(getElementFlagByHex());
 
-	public String getElementFlagByHex() {
-		return BTreeUtil.toHex(elementFlag);
-	}
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public Mutator getMutator() {
+    return this.m;
+  }
+
+  public String getElementFlagByHex() {
+    return BTreeUtil.toHex(elementFlag);
+  }
 }

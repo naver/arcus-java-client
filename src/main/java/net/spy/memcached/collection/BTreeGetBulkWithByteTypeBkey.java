@@ -22,37 +22,37 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
-	public BTreeGetBulkWithByteTypeBkey(List<String> keyList, byte[] from,
-			byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
-		super(keyList, from, to, eFlagFilter, offset, count);
-	}
+  public BTreeGetBulkWithByteTypeBkey(List<String> keyList, byte[] from,
+                                      byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+    super(keyList, from, to, eFlagFilter, offset, count);
+  }
 
-	public byte[] getSubkey() {
-		return (byte[]) subkey;
-	}
+  public byte[] getSubkey() {
+    return (byte[]) subkey;
+  }
 
-	public void decodeItemHeader(String itemHeader) {
-		String[] splited = itemHeader.split(" ");
+  public void decodeItemHeader(String itemHeader) {
+    String[] splited = itemHeader.split(" ");
 
-		if (splited.length == 3) {
-			// ELEMENT <bkey> <bytes>
-			this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-			this.dataLength = Integer.parseInt(splited[2]);
-			this.eflag = null;
-		} else if (splited.length == 4) {
-			// ELEMENT <bkey> <eflag> <bytes>
-			this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-			this.eflag = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
-			this.dataLength = Integer.parseInt(splited[3]);
-		}
-	}
+    if (splited.length == 3) {
+      // ELEMENT <bkey> <bytes>
+      this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
+      this.dataLength = Integer.parseInt(splited[2]);
+      this.eflag = null;
+    } else if (splited.length == 4) {
+      // ELEMENT <bkey> <eflag> <bytes>
+      this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
+      this.eflag = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
+      this.dataLength = Integer.parseInt(splited[3]);
+    }
+  }
 
-	@Override
-	public void decodeKeyHeader(String keyHeader) {
-		String[] splited = keyHeader.split(" ");
-		this.key = splited[1];
-		if (splited.length == 5) {
-			this.flag = Integer.valueOf(splited[3]);
-		}
-	}
+  @Override
+  public void decodeKeyHeader(String keyHeader) {
+    String[] splited = keyHeader.split(" ");
+    this.key = splited[1];
+    if (splited.length == 5) {
+      this.flag = Integer.valueOf(splited[3]);
+    }
+  }
 }

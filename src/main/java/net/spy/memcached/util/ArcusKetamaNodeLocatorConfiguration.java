@@ -19,22 +19,24 @@ package net.spy.memcached.util;
 import net.spy.memcached.MemcachedNode;
 
 public class ArcusKetamaNodeLocatorConfiguration extends
-		DefaultKetamaNodeLocatorConfiguration {
+        DefaultKetamaNodeLocatorConfiguration {
 
-	/**
-	 * insert a node from the internal node-address map.
-	 * @param node
-	 */
-	public void insertNode(MemcachedNode node) {
-		getSocketAddressForNode(node);
-	}
+  /**
+   * insert a node from the internal node-address map.
+   *
+   * @param node
+   */
+  public void insertNode(MemcachedNode node) {
+    getSocketAddressForNode(node);
+  }
 
-	/**
-	 * Removes a node from the internal node-address map.
-	 * @param node
-	 */
-	public void removeNode(MemcachedNode node) {
-		super.socketAddresses.remove(node);
-	}
-	
+  /**
+   * Removes a node from the internal node-address map.
+   *
+   * @param node
+   */
+  public void removeNode(MemcachedNode node) {
+    super.socketAddresses.remove(node);
+  }
+
 }

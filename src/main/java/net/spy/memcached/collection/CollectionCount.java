@@ -17,8 +17,9 @@
 package net.spy.memcached.collection;
 
 public abstract class CollectionCount {
-	protected String str;
+  protected String str;
 
-	public abstract String stringify();
-	public abstract String getCommand();
+  public abstract String stringify();
+
+  public abstract String getCommand();
 }

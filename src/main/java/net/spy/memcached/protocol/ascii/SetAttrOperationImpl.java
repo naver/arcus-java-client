@@ -33,78 +33,78 @@ import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.SetAttrOperation;
 
 class SetAttrOperationImpl extends OperationImpl
-		implements SetAttrOperation {
+        implements SetAttrOperation {
 
-	private static final int OVERHEAD = 64;
+  private static final int OVERHEAD = 64;
 
-	private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus OK =
-		new CollectionOperationStatus(true, "OK", CollectionResponse.OK);
-	private static final OperationStatus NOT_FOUND =
-		new CollectionOperationStatus(false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus ATTR_ERROR_NOT_FOUND =
-		new CollectionOperationStatus(false, "ATTR_ERROR not found", CollectionResponse.ATTR_ERROR_NOT_FOUND);
-	private static final OperationStatus ATTR_ERROR_BAD_VALUE =
-		new CollectionOperationStatus(false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
+  private static final OperationStatus OK =
+          new CollectionOperationStatus(true, "OK", CollectionResponse.OK);
+  private static final OperationStatus NOT_FOUND =
+          new CollectionOperationStatus(false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+  private static final OperationStatus ATTR_ERROR_NOT_FOUND =
+          new CollectionOperationStatus(false, "ATTR_ERROR not found", CollectionResponse.ATTR_ERROR_NOT_FOUND);
+  private static final OperationStatus ATTR_ERROR_BAD_VALUE =
+          new CollectionOperationStatus(false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
 
-	protected final String key;
-	protected final Attributes attrs;
+  protected final String key;
+  protected final Attributes attrs;
 
-	public SetAttrOperationImpl(String key, Attributes attrs,
-			OperationCallback cb) {
-		super(cb);
-		this.key = key;
-		// If no attributes given, set to default values
-		this.attrs = (attrs == null)? new CollectionAttributes() : attrs;
-		setAPIType(APIType.SETATTR);
-		setOperationType(OperationType.WRITE);
-	}
+  public SetAttrOperationImpl(String key, Attributes attrs,
+                              OperationCallback cb) {
+    super(cb);
+    this.key = key;
+    // If no attributes given, set to default values
+    this.attrs = (attrs == null) ? new CollectionAttributes() : attrs;
+    setAPIType(APIType.SETATTR);
+    setOperationType(OperationType.WRITE);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		assert getState() == OperationState.READING
-			: "Read ``" + line + "'' when in " + getState() + " state";
-		/* ENABLE_REPLICATION if */
-		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-			receivedMoveOperations(line);
-		}
+  @Override
+  public void handleLine(String line) {
+    assert getState() == OperationState.READING
+            : "Read ``" + line + "'' when in " + getState() + " state";
+    /* ENABLE_REPLICATION if */
+    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+      receivedMoveOperations(line);
+    }
 
-		/* ENABLE_REPLICATION end */
-		getCallback().receivedStatus(
-				matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
-						ATTR_ERROR_BAD_VALUE));
-		transitionState(OperationState.COMPLETE);
-	}
+    /* ENABLE_REPLICATION end */
+    getCallback().receivedStatus(
+            matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
+                    ATTR_ERROR_BAD_VALUE));
+    transitionState(OperationState.COMPLETE);
+  }
 
-	@Override
-	public void initialize() {
-		ByteBuffer bb=ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length +
-			attrs.getLength() + OVERHEAD);
+  @Override
+  public void initialize() {
+    ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length +
+            attrs.getLength() + OVERHEAD);
 
-		setArguments(bb, "setattr", key, attrs);
+    setArguments(bb, "setattr", key, attrs);
 
-		bb.flip();
-		setBuffer(bb);
+    bb.flip();
+    setBuffer(bb);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: "
-					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Request in ascii protocol: "
+              + (new String(bb.array())).replace("\r\n", "\\r\\n"));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(ATTR_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(ATTR_CANCELED);
+  }
 
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
-	public Attributes getAttributes() {
-		return attrs;
-	}
+  public Attributes getAttributes() {
+    return attrs;
+  }
 
 }

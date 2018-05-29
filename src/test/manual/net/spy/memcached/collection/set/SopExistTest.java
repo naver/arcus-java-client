@@ -25,54 +25,54 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class SopExistTest extends BaseIntegrationTest {
 
-	String key = "SopExistTest";
-	String value = "value";
+  String key = "SopExistTest";
+  String value = "value";
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(key).get();
-	}
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(key).get();
+  }
 
-	public void testExist() throws Exception {
-		Boolean result = mc.asyncSopInsert(key, value,
-				new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
-		assertTrue(result);
+  public void testExist() throws Exception {
+    Boolean result = mc.asyncSopInsert(key, value,
+            new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
+    assertTrue(result);
 
-		CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
-		assertEquals(CollectionResponse.EXIST, future.getOperationStatus()
-				.getResponse());
-	}
+    CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    assertEquals(CollectionResponse.EXIST, future.getOperationStatus()
+            .getResponse());
+  }
 
-	public void testNotExist() throws Exception {
-		Boolean result = mc.asyncSopInsert(key, value,
-				new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
-		assertTrue(result);
+  public void testNotExist() throws Exception {
+    Boolean result = mc.asyncSopInsert(key, value,
+            new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
+    assertTrue(result);
 
-		CollectionFuture<Boolean> future = mc.asyncSopExist(key, "dummy");
-		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
-		assertEquals(CollectionResponse.NOT_EXIST, future.getOperationStatus()
-				.getResponse());
-	}
+    CollectionFuture<Boolean> future = mc.asyncSopExist(key, "dummy");
+    assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
+    assertEquals(CollectionResponse.NOT_EXIST, future.getOperationStatus()
+            .getResponse());
+  }
 
-	public void testNotFound() throws Exception {
-		CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
-		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
-		assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
-				.getResponse());
-	}
+  public void testNotFound() throws Exception {
+    CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
+    assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
+    assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
+            .getResponse());
+  }
 
-	public void testUnreadabled() throws Exception {
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setReadable(false);
+  public void testUnreadabled() throws Exception {
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setReadable(false);
 
-		Boolean result = mc.asyncSopInsert(key, value, attrs).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertTrue(result);
+    Boolean result = mc.asyncSopInsert(key, value, attrs).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertTrue(result);
 
-		CollectionFuture<Boolean> future = mc.asyncSopExist(key, "dummy");
-		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
-		assertEquals(CollectionResponse.UNREADABLE, future.getOperationStatus()
-				.getResponse());
-	}
+    CollectionFuture<Boolean> future = mc.asyncSopExist(key, "dummy");
+    assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
+    assertEquals(CollectionResponse.UNREADABLE, future.getOperationStatus()
+            .getResponse());
+  }
 }

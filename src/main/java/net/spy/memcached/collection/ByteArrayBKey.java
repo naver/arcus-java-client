@@ -22,33 +22,33 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
 
-	public static final byte[] MIN = new byte[] { (byte) 0 };
+  public static final byte[] MIN = new byte[]{(byte) 0};
 
-	public static final byte[] MAX = new byte[] { (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-			(byte) 255, (byte) 255, (byte) 255, (byte) 255 };
-	
-	private final byte[] bkey;
+  public static final byte[] MAX = new byte[]{(byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+          (byte) 255, (byte) 255, (byte) 255, (byte) 255};
 
-	public ByteArrayBKey(byte[] bkey) {
-		this.bkey = bkey;
-	}
+  private final byte[] bkey;
 
-	public byte[] getBytes() {
-		return bkey;
-	}
-	
-	@Override
-	public int compareTo(ByteArrayBKey o) {
-		return BTreeUtil.compareByteArraysInLexOrder(bkey, o.getBytes());
-	}
-	
-	@Override
-	public String toString() {
-		return Arrays.toString(bkey);
-	}
+  public ByteArrayBKey(byte[] bkey) {
+    this.bkey = bkey;
+  }
+
+  public byte[] getBytes() {
+    return bkey;
+  }
+
+  @Override
+  public int compareTo(ByteArrayBKey o) {
+    return BTreeUtil.compareByteArraysInLexOrder(bkey, o.getBytes());
+  }
+
+  @Override
+  public String toString() {
+    return Arrays.toString(bkey);
+  }
 }

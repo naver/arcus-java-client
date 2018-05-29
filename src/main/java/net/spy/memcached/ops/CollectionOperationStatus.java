@@ -23,24 +23,24 @@ import net.spy.memcached.collection.CollectionResponse;
  */
 public class CollectionOperationStatus extends OperationStatus {
 
-	private final CollectionResponse collectionResponse;
+  private final CollectionResponse collectionResponse;
 
-	public CollectionOperationStatus(boolean success, String msg,
-			CollectionResponse res) {
-		super(success, msg);
-		this.collectionResponse = res;
-	}
-	
-	public CollectionOperationStatus(OperationStatus status) {
-		super(status.isSuccess(), status.getMessage());
-		this.collectionResponse = CollectionResponse.resolve(status.getMessage());
-	}
+  public CollectionOperationStatus(boolean success, String msg,
+                                   CollectionResponse res) {
+    super(success, msg);
+    this.collectionResponse = res;
+  }
 
-	/**
-	 * Get the collection response indicated here.
-	 */
-	public CollectionResponse getResponse() {
-		return collectionResponse;
-	}
+  public CollectionOperationStatus(OperationStatus status) {
+    super(status.isSuccess(), status.getMessage());
+    this.collectionResponse = CollectionResponse.resolve(status.getMessage());
+  }
+
+  /**
+   * Get the collection response indicated here.
+   */
+  public CollectionResponse getResponse() {
+    return collectionResponse;
+  }
 
 }

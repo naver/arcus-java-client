@@ -28,82 +28,82 @@ import net.spy.memcached.collection.ElementFlagFilter;
 
 public class BopDeleteTest extends BaseIntegrationTest {
 
-	private String key = "UnReadableBTreeTest";
+  private String key = "UnReadableBTreeTest";
 
-	private Long[] items9 = { 0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L };
+  private Long[] items9 = {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L};
 
-	protected void setUp() throws Exception {
-		super.setUp();
+  protected void setUp() throws Exception {
+    super.setUp();
 
-		mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
-				false).get(1000, TimeUnit.MILLISECONDS);
-		addToBTree(key, items9);
+    mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
+            false).get(1000, TimeUnit.MILLISECONDS);
+    addToBTree(key, items9);
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
-	}
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+  }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testBopDelete_NoKey() throws Exception {
-		assertFalse(mc.asyncBopDelete("no_key", 0,
-				ElementFlagFilter.DO_NOT_FILTER, false).get(1000,
-				TimeUnit.MILLISECONDS));
-	}
+  public void testBopDelete_NoKey() throws Exception {
+    assertFalse(mc.asyncBopDelete("no_key", 0,
+            ElementFlagFilter.DO_NOT_FILTER, false).get(1000,
+            TimeUnit.MILLISECONDS));
+  }
 
-	public void testBopDelete_OutOfRange() throws Exception {
-		assertFalse(mc.asyncBopDelete(key, 11, ElementFlagFilter.DO_NOT_FILTER,
-				false).get(1000, TimeUnit.MILLISECONDS));
-	}
+  public void testBopDelete_OutOfRange() throws Exception {
+    assertFalse(mc.asyncBopDelete(key, 11, ElementFlagFilter.DO_NOT_FILTER,
+            false).get(1000, TimeUnit.MILLISECONDS));
+  }
 
-	public void testBopDelete_DeleteByBestEffort() throws Exception {
-		// Delete items(2..11) in the list
-		assertTrue(mc.asyncBopDelete(key, 2, 11,
-				ElementFlagFilter.DO_NOT_FILTER, 0, false).get(1000,
-				TimeUnit.MILLISECONDS));
+  public void testBopDelete_DeleteByBestEffort() throws Exception {
+    // Delete items(2..11) in the list
+    assertTrue(mc.asyncBopDelete(key, 2, 11,
+            ElementFlagFilter.DO_NOT_FILTER, 0, false).get(1000,
+            TimeUnit.MILLISECONDS));
 
-		mc.asyncBopGet(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, 100,
-				false, false).get(1000, TimeUnit.MILLISECONDS);
+    mc.asyncBopGet(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, 100,
+            false, false).get(1000, TimeUnit.MILLISECONDS);
 
-		// By rule of 'best effort',
-		// items(2..9) should be deleted
-		// assertEquals(2, rmap.size());
-		// assertEquals(1L, rlist.get(0));
-		// assertEquals(2L, rlist.get(1));
-	}
+    // By rule of 'best effort',
+    // items(2..9) should be deleted
+    // assertEquals(2, rmap.size());
+    // assertEquals(1L, rlist.get(0));
+    // assertEquals(2L, rlist.get(1));
+  }
 
-	public void testBopDelete_DeletedDropped() throws Exception {
-		// Delete all items in the list
-		assertTrue(mc.asyncBopDelete(key, 0, items9.length,
-				ElementFlagFilter.DO_NOT_FILTER, 0, true).get(1000,
-				TimeUnit.MILLISECONDS));
+  public void testBopDelete_DeletedDropped() throws Exception {
+    // Delete all items in the list
+    assertTrue(mc.asyncBopDelete(key, 0, items9.length,
+            ElementFlagFilter.DO_NOT_FILTER, 0, true).get(1000,
+            TimeUnit.MILLISECONDS));
 
-		CollectionAttributes attrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertNull(attrs);
-	}
+    CollectionAttributes attrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertNull(attrs);
+  }
 
-	public void testBopDeleteWithSingleBkey() throws Exception {
-		mc.delete(key).get();
+  public void testBopDeleteWithSingleBkey() throws Exception {
+    mc.delete(key).get();
 
-		byte[] bkey = new byte[] { (byte) 1 };
-		Assert.assertTrue(mc.asyncBopInsert(key, bkey, null, "value",
-				new CollectionAttributes()).get());
+    byte[] bkey = new byte[]{(byte) 1};
+    Assert.assertTrue(mc.asyncBopInsert(key, bkey, null, "value",
+            new CollectionAttributes()).get());
 
-		Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key, bkey,
-				ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-		Assert.assertNotNull(map);
-		Assert.assertEquals(1, map.size());
-		Assert.assertTrue(mc.asyncBopDelete(key, bkey,
-				ElementFlagFilter.DO_NOT_FILTER, true).get());
+    Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(key, bkey,
+            ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+    Assert.assertNotNull(map);
+    Assert.assertEquals(1, map.size());
+    Assert.assertTrue(mc.asyncBopDelete(key, bkey,
+            ElementFlagFilter.DO_NOT_FILTER, true).get());
 
-		Assert.assertNull(mc.asyncBopGet(key, bkey,
-				ElementFlagFilter.DO_NOT_FILTER, false, false).get());
+    Assert.assertNull(mc.asyncBopGet(key, bkey,
+            ElementFlagFilter.DO_NOT_FILTER, false, false).get());
 
-		mc.delete(key).get();
-	}
+    mc.delete(key).get();
+  }
 
 }

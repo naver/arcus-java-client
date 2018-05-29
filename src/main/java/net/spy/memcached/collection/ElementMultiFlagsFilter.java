@@ -22,83 +22,83 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class ElementMultiFlagsFilter extends ElementFlagFilter {
 
-	final static int MAX_EFLAGS = 100;
-	private ArrayList<byte[]> compValue = new ArrayList<byte[]>();
+  final static int MAX_EFLAGS = 100;
+  private ArrayList<byte[]> compValue = new ArrayList<byte[]>();
 
-	public ElementMultiFlagsFilter() {
-	}
+  public ElementMultiFlagsFilter() {
+  }
 
-	public ElementMultiFlagsFilter setCompOperand(CompOperands compOperand) {
-		if (compOperand == null) {
-			throw new NullPointerException("Invalid compOperand");
-		}
+  public ElementMultiFlagsFilter setCompOperand(CompOperands compOperand) {
+    if (compOperand == null) {
+      throw new NullPointerException("Invalid compOperand");
+    }
 
-		if (compOperand != CompOperands.Equal
-				&& compOperand != CompOperands.NotEqual) {
-			throw new IllegalArgumentException(
-					"The only compOperand Equal and NotEqual can compare multi compValues.");
-		}
+    if (compOperand != CompOperands.Equal
+            && compOperand != CompOperands.NotEqual) {
+      throw new IllegalArgumentException(
+              "The only compOperand Equal and NotEqual can compare multi compValues.");
+    }
 
-		this.compOp = compOperand;
+    this.compOp = compOperand;
 
-		return this;
-	}
+    return this;
+  }
 
-	public ElementMultiFlagsFilter addCompValue(byte[] compValue) {
+  public ElementMultiFlagsFilter addCompValue(byte[] compValue) {
 
-		if (compValue == null) {
-			throw new NullPointerException("Invalid compOperand and compValue.");
-		}
+    if (compValue == null) {
+      throw new NullPointerException("Invalid compOperand and compValue.");
+    }
 
-		if (compValue.length == 0) {
-			throw new IllegalArgumentException(
-					"Length of comparison value must be larger than 0.");
-		}
+    if (compValue.length == 0) {
+      throw new IllegalArgumentException(
+              "Length of comparison value must be larger than 0.");
+    }
 
-		if (compValue.length > MAX_EFLAG_LENGTH) {
-			throw new IllegalArgumentException(
-					"Length of comparison value must be less than "
-							+ MAX_EFLAG_LENGTH);
-		}
+    if (compValue.length > MAX_EFLAG_LENGTH) {
+      throw new IllegalArgumentException(
+              "Length of comparison value must be less than "
+                      + MAX_EFLAG_LENGTH);
+    }
 
-		if (this.compValue.size() > MAX_EFLAGS) {
-			throw new IllegalArgumentException(
-					"Count of comparison values must be less than "
-							+ MAX_EFLAGS);
-		}
+    if (this.compValue.size() > MAX_EFLAGS) {
+      throw new IllegalArgumentException(
+              "Count of comparison values must be less than "
+                      + MAX_EFLAGS);
+    }
 
-		if (this.compValue.size() > 0
-				&& this.compValue.get(0).length != compValue.length) {
-			throw new IllegalArgumentException(
-					"Length of comparison value must be same with "
-							+ this.compValue.get(0).length);
-		}
+    if (this.compValue.size() > 0
+            && this.compValue.get(0).length != compValue.length) {
+      throw new IllegalArgumentException(
+              "Length of comparison value must be same with "
+                      + this.compValue.get(0).length);
+    }
 
-		this.compValue.add(compValue);
+    this.compValue.add(compValue);
 
-		return this;
-	}
+    return this;
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
 
-		sb.append(fwhere).append(" ");
+    sb.append(fwhere).append(" ");
 
-		if (isBitWiseOpEnabled()) {
-			sb.append(bitOp).append(" ");
-			sb.append(BTreeUtil.toHex(bitCompValue)).append(" ");
-		}
+    if (isBitWiseOpEnabled()) {
+      sb.append(bitOp).append(" ");
+      sb.append(BTreeUtil.toHex(bitCompValue)).append(" ");
+    }
 
-		sb.append(compOp).append(" ");
+    sb.append(compOp).append(" ");
 
-		for (int i = 0; i < compValue.size(); i++) {
-			if (i > 0) {
-				sb.append(",");
-			}
-			sb.append(BTreeUtil.toHex(compValue.get(i)));
-		}
+    for (int i = 0; i < compValue.size(); i++) {
+      if (i > 0) {
+        sb.append(",");
+      }
+      sb.append(BTreeUtil.toHex(compValue.get(i)));
+    }
 
-		return sb.toString();
-	}
+    return sb.toString();
+  }
 }

@@ -29,56 +29,56 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(JUnit4ClassRunner.class)
 public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
 
-	@Before
-	@Override
-	public void setUp() throws Exception {
-		// This test assumes we use ZK
-		assumeTrue(USE_ZK);
-		openFromZK();
-	}
+  @Before
+  @Override
+  public void setUp() throws Exception {
+    // This test assumes we use ZK
+    assumeTrue(USE_ZK);
+    openFromZK();
+  }
 
-	@After
-	@Override
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+  @After
+  @Override
+  public void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	@Test
-	public void testCreateSingleClient() {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		cfb.setFrontCacheExpireTime(10);
-		cfb.setMaxFrontCacheElements(10);
+  @Test
+  public void testCreateSingleClient() {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setFrontCacheExpireTime(10);
+    cfb.setMaxFrontCacheElements(10);
 
-		ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
-	}
+    ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
+  }
 
-	@Test
-	public void testCreatePool() {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		cfb.setFrontCacheExpireTime(10);
-		cfb.setMaxFrontCacheElements(10);
+  @Test
+  public void testCreatePool() {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setFrontCacheExpireTime(10);
+    cfb.setMaxFrontCacheElements(10);
 
-		ArcusClient.createArcusClientPool(ZK_HOST, ZK_SERVICE_ID, cfb, 4);
-	}
+    ArcusClient.createArcusClientPool(ZK_HOST, ZK_SERVICE_ID, cfb, 4);
+  }
 
-	@Test
-	public void testKV() {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		cfb.setFrontCacheExpireTime(10);
-		cfb.setMaxFrontCacheElements(10);
+  @Test
+  public void testKV() {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setFrontCacheExpireTime(10);
+    cfb.setMaxFrontCacheElements(10);
 
-		ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-				ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
+            ZK_SERVICE_ID, cfb);
 
-		try {
-			Assert.assertTrue(client.set("test:key", 100, "value").get());
-			Assert.assertEquals("value", client.get("test:key"));
+    try {
+      Assert.assertTrue(client.set("test:key", 100, "value").get());
+      Assert.assertEquals("value", client.get("test:key"));
 
-			Assert.assertTrue(client.delete("test:key").get());
+      Assert.assertTrue(client.delete("test:key").get());
 
-			Assert.assertNull(client.get("test:key"));
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
+      Assert.assertNull(client.get("test:key"));
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
+  }
 }

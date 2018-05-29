@@ -10,16 +10,16 @@ import junit.framework.TestCase;
  */
 public class KetamaConnectionFactoryTest extends TestCase {
 
-	/*
-	 * This *is* kinda lame, but it tests the specific differences from the
-	 * DefaultConnectionFactory.
-	 */
-	public void testCorrectTypes() {
-		ConnectionFactory factory = new KetamaConnectionFactory();
+  /*
+   * This *is* kinda lame, but it tests the specific differences from the
+   * DefaultConnectionFactory.
+   */
+  public void testCorrectTypes() {
+    ConnectionFactory factory = new KetamaConnectionFactory();
 
-		NodeLocator locator = factory.createLocator(new ArrayList<MemcachedNode>());
-		assertTrue(locator instanceof KetamaNodeLocator);
+    NodeLocator locator = factory.createLocator(new ArrayList<MemcachedNode>());
+    assertTrue(locator instanceof KetamaNodeLocator);
 
-		assertEquals(HashAlgorithm.KETAMA_HASH, factory.getHashAlg());
-	}
+    assertEquals(HashAlgorithm.KETAMA_HASH, factory.getHashAlg());
+  }
 }

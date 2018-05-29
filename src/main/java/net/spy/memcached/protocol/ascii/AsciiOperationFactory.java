@@ -92,217 +92,217 @@ import net.spy.memcached.ops.VersionOperation;
  */
 public class AsciiOperationFactory extends BaseOperationFactory {
 
-	public DeleteOperation delete(String key, OperationCallback cb) {
-		return new DeleteOperationImpl(key, cb);
-	}
+  public DeleteOperation delete(String key, OperationCallback cb) {
+    return new DeleteOperationImpl(key, cb);
+  }
 
-	public FlushOperation flush(int delay, OperationCallback cb) {
-		return new FlushOperationImpl(delay, cb);
-	}
+  public FlushOperation flush(int delay, OperationCallback cb) {
+    return new FlushOperationImpl(delay, cb);
+  }
 
-	public GetOperation get(String key, GetOperation.Callback cb) {
-		return new GetOperationImpl(key, cb);
-	}
+  public GetOperation get(String key, GetOperation.Callback cb) {
+    return new GetOperationImpl(key, cb);
+  }
 
-	public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {
-		return new GetOperationImpl(keys, cb);
-	}
+  public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {
+    return new GetOperationImpl(keys, cb);
+  }
 
-	public GetsOperation gets(String key, GetsOperation.Callback cb) {
-		 return new GetsOperationImpl(key, cb);
-	}
+  public GetsOperation gets(String key, GetsOperation.Callback cb) {
+    return new GetsOperationImpl(key, cb);
+  }
 
-	public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
-		return new MGetOperationImpl(keys, cb);
-	}
+  public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
+    return new MGetOperationImpl(keys, cb);
+  }
 
-	public MutatorOperation mutate(Mutator m, String key, int by,
-			long def, int exp, OperationCallback cb) {
-		return new MutatorOperationImpl(m, key, by, def, exp, cb);
-	}
+  public MutatorOperation mutate(Mutator m, String key, int by,
+                                 long def, int exp, OperationCallback cb) {
+    return new MutatorOperationImpl(m, key, by, def, exp, cb);
+  }
 
-	public StatsOperation stats(String arg, StatsOperation.Callback cb) {
-		return new StatsOperationImpl(arg, cb);
-	}
+  public StatsOperation stats(String arg, StatsOperation.Callback cb) {
+    return new StatsOperationImpl(arg, cb);
+  }
 
-	public StoreOperation store(StoreType storeType, String key, int flags,
-			int exp, byte[] data, OperationCallback cb) {
-		return new StoreOperationImpl(storeType, key, flags, exp, data, cb);
-	}
+  public StoreOperation store(StoreType storeType, String key, int flags,
+                              int exp, byte[] data, OperationCallback cb) {
+    return new StoreOperationImpl(storeType, key, flags, exp, data, cb);
+  }
 
-	public VersionOperation version(OperationCallback cb) {
-		return new VersionOperationImpl(cb);
-	}
+  public VersionOperation version(OperationCallback cb) {
+    return new VersionOperationImpl(cb);
+  }
 
-	public NoopOperation noop(OperationCallback cb) {
-		return new VersionOperationImpl(cb);
-	}
+  public NoopOperation noop(OperationCallback cb) {
+    return new VersionOperationImpl(cb);
+  }
 
-	public CASOperation cas(StoreType type, String key, long casId, int flags,
-			int exp, byte[] data, OperationCallback cb) {
-		return new CASOperationImpl(key, casId, flags, exp, data, cb);
-	}
+  public CASOperation cas(StoreType type, String key, long casId, int flags,
+                          int exp, byte[] data, OperationCallback cb) {
+    return new CASOperationImpl(key, casId, flags, exp, data, cb);
+  }
 
-	public ConcatenationOperation cat(ConcatenationType catType,
-			long casId,
-			String key, byte[] data, OperationCallback cb) {
-		return new ConcatenationOperationImpl(catType, key, data, cb);
-	}
+  public ConcatenationOperation cat(ConcatenationType catType,
+                                    long casId,
+                                    String key, byte[] data, OperationCallback cb) {
+    return new ConcatenationOperationImpl(catType, key, data, cb);
+  }
 
-	@Override
-	protected Collection<? extends Operation> cloneGet(KeyedOperation op) {
-		Collection<Operation> rv=new ArrayList<Operation>();
-		GetOperation.Callback callback = new MultiGetOperationCallback(
-				op.getCallback(), op.getKeys().size());
-		for(String k : op.getKeys()) {
-			rv.add(get(k, callback));
-		}
-		return rv;
-	}
+  @Override
+  protected Collection<? extends Operation> cloneGet(KeyedOperation op) {
+    Collection<Operation> rv = new ArrayList<Operation>();
+    GetOperation.Callback callback = new MultiGetOperationCallback(
+            op.getCallback(), op.getKeys().size());
+    for (String k : op.getKeys()) {
+      rv.add(get(k, callback));
+    }
+    return rv;
+  }
 
-	public SASLMechsOperation saslMechs(OperationCallback cb) {
-		throw new UnsupportedOperationException();
-	}
+  public SASLMechsOperation saslMechs(OperationCallback cb) {
+    throw new UnsupportedOperationException();
+  }
 
-	public SASLStepOperation saslStep(String[] mech, byte[] challenge,
-			String serverName, Map<String, ?> props, CallbackHandler cbh,
-			OperationCallback cb) {
-		throw new UnsupportedOperationException();
-	}
+  public SASLStepOperation saslStep(String[] mech, byte[] challenge,
+                                    String serverName, Map<String, ?> props, CallbackHandler cbh,
+                                    OperationCallback cb) {
+    throw new UnsupportedOperationException();
+  }
 
-	public SASLAuthOperation saslAuth(String[] mech, String serverName,
-			Map<String, ?> props, CallbackHandler cbh, OperationCallback cb) {
-		throw new UnsupportedOperationException();
-	}
+  public SASLAuthOperation saslAuth(String[] mech, String serverName,
+                                    Map<String, ?> props, CallbackHandler cbh, OperationCallback cb) {
+    throw new UnsupportedOperationException();
+  }
 
-	public SetAttrOperation setAttr(String key, Attributes attrs,
-			OperationCallback cb) {
-		return new SetAttrOperationImpl(key, attrs, cb);
-	}
+  public SetAttrOperation setAttr(String key, Attributes attrs,
+                                  OperationCallback cb) {
+    return new SetAttrOperationImpl(key, attrs, cb);
+  }
 
-	public GetAttrOperation getAttr(String key, GetAttrOperation.Callback cb) {
-		return new GetAttrOperationImpl(key, cb);
-	}
-	
-	public CollectionStoreOperation collectionStore(String key, String subkey,
-			CollectionStore<?> collectionStore, byte[] data, OperationCallback cb) {
-		return new CollectionStoreOperationImpl(key, subkey,
-				collectionStore, data, cb);
-	}
-	
-	public CollectionPipedStoreOperation collectionPipedStore(String key,
-			CollectionPipedStore<?> store, OperationCallback cb) {
-		return new CollectionPipedStoreOperationImpl(key, store, cb);
-	}
+  public GetAttrOperation getAttr(String key, GetAttrOperation.Callback cb) {
+    return new GetAttrOperationImpl(key, cb);
+  }
 
-	public CollectionGetOperation collectionGet(String key,
-			CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
-		return new CollectionGetOperationImpl(key, collectionGet, cb);
-	}
+  public CollectionStoreOperation collectionStore(String key, String subkey,
+                                                  CollectionStore<?> collectionStore, byte[] data, OperationCallback cb) {
+    return new CollectionStoreOperationImpl(key, subkey,
+            collectionStore, data, cb);
+  }
 
-	public CollectionDeleteOperation collectionDelete(String key,
-			CollectionDelete collectionDelete, OperationCallback cb) {
-		return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
-	}
-	
-	public CollectionExistOperation collectionExist(String key, String subkey,
-			CollectionExist collectionExist, OperationCallback cb) {
-		return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
-	}
+  public CollectionPipedStoreOperation collectionPipedStore(String key,
+                                                            CollectionPipedStore<?> store, OperationCallback cb) {
+    return new CollectionPipedStoreOperationImpl(key, store, cb);
+  }
 
-	public CollectionCreateOperation collectionCreate(String key,
-			CollectionCreate collectionCreate, OperationCallback cb) {
-		return new CollectionCreateOperationImpl(key, collectionCreate, cb);
-	}
-	
-	public CollectionCountOperation collectionCount(String key,
-			CollectionCount collectionCount, OperationCallback cb) {
-		return new CollectionCountOperationImpl(key, collectionCount, cb);
-	}
-	
-	public FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb) {
-		return new FlushByPrefixOperationImpl(prefix, delay, noreply, cb);
-	}
+  public CollectionGetOperation collectionGet(String key,
+                                              CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
+    return new CollectionGetOperationImpl(key, collectionGet, cb);
+  }
 
-	public BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
-			BTreeSortMergeGetOperationOld.Callback cb) {
-		return new BTreeSortMergeGetOperationOldImpl(smGet, cb);
-	}
-	
-	public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
-			BTreeSortMergeGetOperation.Callback cb) {
-		return new BTreeSortMergeGetOperationImpl(smGet, cb);
-	}
+  public CollectionDeleteOperation collectionDelete(String key,
+                                                    CollectionDelete collectionDelete, OperationCallback cb) {
+    return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
+  }
 
-	@Override
-	public CollectionUpsertOperation collectionUpsert(String key, String subkey,
-			CollectionStore<?> collectionStore, byte[] data,
-			OperationCallback cb) {
-		return new CollectionUpsertOperationImpl(key, subkey, collectionStore,
-				data, cb);
-	}
+  public CollectionExistOperation collectionExist(String key, String subkey,
+                                                  CollectionExist collectionExist, OperationCallback cb) {
+    return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
+  }
 
-	@Override
-	public CollectionUpdateOperation collectionUpdate(String key,
-			String subkey, CollectionUpdate<?> collectionUpdate, byte[] data,
-			OperationCallback cb) {
-		return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
-				data, cb);
-	}
+  public CollectionCreateOperation collectionCreate(String key,
+                                                    CollectionCreate collectionCreate, OperationCallback cb) {
+    return new CollectionCreateOperationImpl(key, collectionCreate, cb);
+  }
 
-	@Override
-	public CollectionPipedUpdateOperation collectionPipedUpdate(String key,
-			CollectionPipedUpdate<?> update, OperationCallback cb) {
-		return new CollectionPipedUpdateOperationImpl(key, update, cb);
-	}
-	
-	@Override
-	public CollectionPipedExistOperation collectionPipedExist(String key,
-			SetPipedExist<?> exist, OperationCallback cb) {
-		return new CollectionPipedExistOperationImpl(key, exist, cb);
-	}
+  public CollectionCountOperation collectionCount(String key,
+                                                  CollectionCount collectionCount, OperationCallback cb) {
+    return new CollectionCountOperationImpl(key, collectionCount, cb);
+  }
 
-	@Override
-	public CollectionBulkStoreOperation collectionBulkStore(List<String> key,
-			CollectionBulkStore<?> store, OperationCallback cb) {
-		return new CollectionBulkStoreOperationImpl(key, store, cb);
-	}
+  public FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb) {
+    return new FlushByPrefixOperationImpl(prefix, delay, noreply, cb);
+  }
 
-	@Override
-	public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> getBulk,
-			BTreeGetBulkOperation.Callback<?> cb) {
-		return new BTreeGetBulkOperationImpl(getBulk, cb);
-	}
+  public BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
+                                                BTreeSortMergeGetOperationOld.Callback cb) {
+    return new BTreeSortMergeGetOperationOldImpl(smGet, cb);
+  }
 
-	@Override
-	public CollectionMutateOperation collectionMutate(String key,
-			String subkey, CollectionMutate collectionMutate,
-			OperationCallback cb) {
-		return new CollectionMutateOperationImpl(key, subkey, collectionMutate, cb);
-	}
+  public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
+                                             BTreeSortMergeGetOperation.Callback cb) {
+    return new BTreeSortMergeGetOperationImpl(smGet, cb);
+  }
 
-	@Override
-	public BTreeGetByPositionOperation bopGetByPosition(String key,
-			BTreeGetByPosition get, OperationCallback cb) {
-		return new BTreeGetByPositionOperationImpl(key, get, cb);
-	}
+  @Override
+  public CollectionUpsertOperation collectionUpsert(String key, String subkey,
+                                                    CollectionStore<?> collectionStore, byte[] data,
+                                                    OperationCallback cb) {
+    return new CollectionUpsertOperationImpl(key, subkey, collectionStore,
+            data, cb);
+  }
 
-	@Override
-	public BTreeFindPositionOperation bopFindPosition(String key,
-			BTreeFindPosition get, OperationCallback cb) {
-		return new BTreeFindPositionOperationImpl(key, get, cb);
-	}
+  @Override
+  public CollectionUpdateOperation collectionUpdate(String key,
+                                                    String subkey, CollectionUpdate<?> collectionUpdate, byte[] data,
+                                                    OperationCallback cb) {
+    return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
+            data, cb);
+  }
 
-	@Override
-	public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-			BTreeFindPositionWithGet get, OperationCallback cb) {
-		return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
-	}
+  @Override
+  public CollectionPipedUpdateOperation collectionPipedUpdate(String key,
+                                                              CollectionPipedUpdate<?> update, OperationCallback cb) {
+    return new CollectionPipedUpdateOperationImpl(key, update, cb);
+  }
 
-	@Override
-	public BTreeStoreAndGetOperation bopStoreAndGet(String key,
-			BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb) {
-		return new BTreeStoreAndGetOperationImpl(key, get, dataToStore, cb);
-	}
-	
+  @Override
+  public CollectionPipedExistOperation collectionPipedExist(String key,
+                                                            SetPipedExist<?> exist, OperationCallback cb) {
+    return new CollectionPipedExistOperationImpl(key, exist, cb);
+  }
+
+  @Override
+  public CollectionBulkStoreOperation collectionBulkStore(List<String> key,
+                                                          CollectionBulkStore<?> store, OperationCallback cb) {
+    return new CollectionBulkStoreOperationImpl(key, store, cb);
+  }
+
+  @Override
+  public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> getBulk,
+                                          BTreeGetBulkOperation.Callback<?> cb) {
+    return new BTreeGetBulkOperationImpl(getBulk, cb);
+  }
+
+  @Override
+  public CollectionMutateOperation collectionMutate(String key,
+                                                    String subkey, CollectionMutate collectionMutate,
+                                                    OperationCallback cb) {
+    return new CollectionMutateOperationImpl(key, subkey, collectionMutate, cb);
+  }
+
+  @Override
+  public BTreeGetByPositionOperation bopGetByPosition(String key,
+                                                      BTreeGetByPosition get, OperationCallback cb) {
+    return new BTreeGetByPositionOperationImpl(key, get, cb);
+  }
+
+  @Override
+  public BTreeFindPositionOperation bopFindPosition(String key,
+                                                    BTreeFindPosition get, OperationCallback cb) {
+    return new BTreeFindPositionOperationImpl(key, get, cb);
+  }
+
+  @Override
+  public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
+                                                                  BTreeFindPositionWithGet get, OperationCallback cb) {
+    return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
+  }
+
+  @Override
+  public BTreeStoreAndGetOperation bopStoreAndGet(String key,
+                                                  BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb) {
+    return new BTreeStoreAndGetOperationImpl(key, get, dataToStore, cb);
+  }
+
 }

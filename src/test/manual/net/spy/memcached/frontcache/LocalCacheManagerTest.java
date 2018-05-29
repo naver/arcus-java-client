@@ -31,198 +31,198 @@ import net.spy.memcached.transcoders.Transcoder;
 @Ignore
 public class LocalCacheManagerTest extends TestCase {
 
-	private ArcusClient client;
+  private ArcusClient client;
 
-	// put keys
-	String[] keys = { "key0", "key1", "key2", "key3", "key4", "key5", "key6",
-			"key7", "key8", "key9" };
+  // put keys
+  String[] keys = {"key0", "key1", "key2", "key3", "key4", "key5", "key6",
+          "key7", "key8", "key9"};
 
-	protected void setUp() throws Exception {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		cfb.setFrontCacheExpireTime(5);
-		cfb.setMaxFrontCacheElements(10);
-		client = ArcusClient.createArcusClient("127.0.0.1:2181", "test", cfb);
-	}
+  protected void setUp() throws Exception {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setFrontCacheExpireTime(5);
+    cfb.setMaxFrontCacheElements(10);
+    client = ArcusClient.createArcusClient("127.0.0.1:2181", "test", cfb);
+  }
 
-	protected void tearDown() throws Exception {
-		client.shutdown();
-	}
+  protected void tearDown() throws Exception {
+    client.shutdown();
+  }
 
-	public void testGet() throws Exception {
-		for (String k : keys) {
-			client.set(k, 2, k + "_value").get();
-		}
+  public void testGet() throws Exception {
+    for (String k : keys) {
+      client.set(k, 2, k + "_value").get();
+    }
 
-		Future<Object> f = client.asyncGet(keys[0]);
-		Object result = f.get();
+    Future<Object> f = client.asyncGet(keys[0]);
+    Object result = f.get();
 
-		Transcoder<Object> tc = null;
-		Object cached = client.getLocalCacheManager().get(keys[0], tc);
+    Transcoder<Object> tc = null;
+    Object cached = client.getLocalCacheManager().get(keys[0], tc);
 
-		assertNotNull(result);
-		assertNotNull(cached);
-		assertSame("not the same result", result, cached);
+    assertNotNull(result);
+    assertNotNull(cached);
+    assertSame("not the same result", result, cached);
 
-		// after 3 seconds : remote expired, locally cached
-		Thread.sleep(3000);
+    // after 3 seconds : remote expired, locally cached
+    Thread.sleep(3000);
 
-		f = client.asyncGet(keys[0]);
-		result = f.get();
+    f = client.asyncGet(keys[0]);
+    result = f.get();
 
-		cached = client.getLocalCacheManager().get(keys[0], tc);
+    cached = client.getLocalCacheManager().get(keys[0], tc);
 
-		assertNotNull(result);
-		assertNotNull(cached);
-		assertEquals("not the same result", result, cached);
+    assertNotNull(result);
+    assertNotNull(cached);
+    assertEquals("not the same result", result, cached);
 
-		// after another 3 seconds : both remote and local expired
-		Thread.sleep(3000);
+    // after another 3 seconds : both remote and local expired
+    Thread.sleep(3000);
 
-		f = client.asyncGet(keys[0]);
-		result = f.get();
+    f = client.asyncGet(keys[0]);
+    result = f.get();
 
-		cached = client.getLocalCacheManager().get(keys[0], tc);
+    cached = client.getLocalCacheManager().get(keys[0], tc);
 
-		assertNull(result);
-		assertNull(cached);
-	}
+    assertNull(result);
+    assertNull(cached);
+  }
 
-	public void testGetBulk() throws Exception {
-		for (String k : keys) {
-			client.set(k, 2, k + "_value").get();
-		}
+  public void testGetBulk() throws Exception {
+    for (String k : keys) {
+      client.set(k, 2, k + "_value").get();
+    }
 
-		// read-through.
-		Map<String, Object> result = client.getBulk(keys);
+    // read-through.
+    Map<String, Object> result = client.getBulk(keys);
 
-		// expecting that the keys are locally cached.
-		LocalCacheManager lcm = client.getLocalCacheManager();
-		for (String k : keys) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNotNull(got);
-		}
+    // expecting that the keys are locally cached.
+    LocalCacheManager lcm = client.getLocalCacheManager();
+    for (String k : keys) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNotNull(got);
+    }
 
-		// after 3 seconds, all keys should be expired.
-		Thread.sleep(3000);
+    // after 3 seconds, all keys should be expired.
+    Thread.sleep(3000);
 
-		// but we have locally cached results.
-		result = client.getBulk(keys);
-		assertNotNull(result);
-		assertTrue(keys.length == result.size());
+    // but we have locally cached results.
+    result = client.getBulk(keys);
+    assertNotNull(result);
+    assertTrue(keys.length == result.size());
 
-		// then after additional 3 seconds, locally cached results should be
-		// expired.
-		Thread.sleep(3000);
+    // then after additional 3 seconds, locally cached results should be
+    // expired.
+    Thread.sleep(3000);
 
-		for (String k : keys) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNull(got);
-		}
+    for (String k : keys) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNull(got);
+    }
 
-		result = client.getBulk(keys);
-		assertNotNull(result);
-		assertTrue(0 == result.size());
-	}
+    result = client.getBulk(keys);
+    assertNotNull(result);
+    assertTrue(0 == result.size());
+  }
 
-	public void testAsyncGetBulk() throws Exception {
-		for (String k : keys) {
-			client.set(k, 2, k + "_value").get();
-		}
+  public void testAsyncGetBulk() throws Exception {
+    for (String k : keys) {
+      client.set(k, 2, k + "_value").get();
+    }
 
-		// read-through.
-		BulkFuture<Map<String, Object>> f = client.asyncGetBulk(keys);
-		Map<String, Object> result = f.get();
+    // read-through.
+    BulkFuture<Map<String, Object>> f = client.asyncGetBulk(keys);
+    Map<String, Object> result = f.get();
 
-		// expecting that the keys are locally cached.
-		LocalCacheManager lcm = client.getLocalCacheManager();
-		for (String k : keys) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNotNull(got);
-		}
+    // expecting that the keys are locally cached.
+    LocalCacheManager lcm = client.getLocalCacheManager();
+    for (String k : keys) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNotNull(got);
+    }
 
-		// after 3 seconds, all keys should be expired.
-		Thread.sleep(3000);
+    // after 3 seconds, all keys should be expired.
+    Thread.sleep(3000);
 
-		// but we have locally cached results.
-		f = client.asyncGetBulk(keys);
-		result = f.get();
-		assertNotNull(result);
-		assertTrue(keys.length == result.size());
+    // but we have locally cached results.
+    f = client.asyncGetBulk(keys);
+    result = f.get();
+    assertNotNull(result);
+    assertTrue(keys.length == result.size());
 
-		// then after additional 3 seconds, locally cached results should be
-		// expired.
-		Thread.sleep(3000);
+    // then after additional 3 seconds, locally cached results should be
+    // expired.
+    Thread.sleep(3000);
 
-		for (String k : keys) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNull(got);
-		}
+    for (String k : keys) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNull(got);
+    }
 
-		f = client.asyncGetBulk(keys);
-		result = f.get();
-		assertNotNull(result);
-		assertTrue(0 == result.size());
-	}
+    f = client.asyncGetBulk(keys);
+    result = f.get();
+    assertNotNull(result);
+    assertTrue(0 == result.size());
+  }
 
-	public void testBulkPartial() throws Exception {
-		String keySet1[] = new String[keys.length / 2];
-		String keySet2[] = new String[keys.length / 2];
+  public void testBulkPartial() throws Exception {
+    String keySet1[] = new String[keys.length / 2];
+    String keySet2[] = new String[keys.length / 2];
 
-		for (int i = 0; i < keys.length / 2; i++) {
-			keySet1[i] = keys[i * 2];
-			keySet2[i] = keys[i * 2 + 1];
-		}
+    for (int i = 0; i < keys.length / 2; i++) {
+      keySet1[i] = keys[i * 2];
+      keySet2[i] = keys[i * 2 + 1];
+    }
 
-		// Set 1
-		for (String k : keySet1) {
-			client.set(k, 2, k + "_value").get();
-		}
+    // Set 1
+    for (String k : keySet1) {
+      client.set(k, 2, k + "_value").get();
+    }
 
-		// read-through.
-		BulkFuture<Map<String, Object>> f = client.asyncGetBulk(keys);
-		Map<String, Object> result = f.get();
+    // read-through.
+    BulkFuture<Map<String, Object>> f = client.asyncGetBulk(keys);
+    Map<String, Object> result = f.get();
 
-		// expecting that the keys are locally cached.
-		LocalCacheManager lcm = client.getLocalCacheManager();
-		for (String k : keySet1) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNotNull(got);
-		}
+    // expecting that the keys are locally cached.
+    LocalCacheManager lcm = client.getLocalCacheManager();
+    for (String k : keySet1) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNotNull(got);
+    }
 
-		// after 3 seconds, put another set of keys
-		Thread.sleep(3000);
+    // after 3 seconds, put another set of keys
+    Thread.sleep(3000);
 
-		// Set 2
-		for (String k : keySet2) {
-			client.set(k, 4, k + "_value").get();
-		}
+    // Set 2
+    for (String k : keySet2) {
+      client.set(k, 4, k + "_value").get();
+    }
 
-		// Set 1 : locally cached
-		// Set 2 : from the remote cache
-		f = client.asyncGetBulk(keys);
-		result = f.get();
-		assertNotNull(result);
-		assertTrue(keys.length == result.size());
+    // Set 1 : locally cached
+    // Set 2 : from the remote cache
+    f = client.asyncGetBulk(keys);
+    result = f.get();
+    assertNotNull(result);
+    assertTrue(keys.length == result.size());
 
-		// then after additional 3 seconds, locally cached Set 1 should be
-		// expired.
-		Thread.sleep(3000);
+    // then after additional 3 seconds, locally cached Set 1 should be
+    // expired.
+    Thread.sleep(3000);
 
-		for (String k : keySet1) {
-			Transcoder<Object> tc = null;
-			Object got = lcm.get(k, tc);
-			assertNull(got);
-		}
+    for (String k : keySet1) {
+      Transcoder<Object> tc = null;
+      Object got = lcm.get(k, tc);
+      assertNull(got);
+    }
 
-		f = client.asyncGetBulk(keys);
-		result = f.get();
-		assertNotNull(result);
-		assertTrue(keySet2.length == result.size());
-	}
+    f = client.asyncGetBulk(keys);
+    result = f.get();
+    assertNotNull(result);
+    assertTrue(keySet2.length == result.size());
+  }
 
 }

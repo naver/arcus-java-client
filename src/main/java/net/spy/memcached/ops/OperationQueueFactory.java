@@ -8,9 +8,9 @@ import java.util.concurrent.BlockingQueue;
  */
 public interface OperationQueueFactory {
 
-	/**
-	 * Create an instance of a queue.
-	 */
-	BlockingQueue<Operation> create();
+  /**
+   * Create an instance of a queue.
+   */
+  BlockingQueue<Operation> create();
 
 }
