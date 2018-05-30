@@ -25,55 +25,55 @@ import java.util.concurrent.TimeUnit;
 
 public class MopUpdateTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
+  private final String KEY = this.getClass().getSimpleName();
 
-	private final String mkey = "updateTestMkey";
+  private final String mkey = "updateTestMkey";
 
-	private final String VALUE = "VALUE";
-	private final String NEW_VALUE = "NEWVALUE";
+  private final String VALUE = "VALUE";
+  private final String NEW_VALUE = "NEWVALUE";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testUpdateNotExistsKey() {
-		try {
-			// update value
-			Assert.assertFalse(mc.asyncMopUpdate(KEY, mkey, VALUE).get());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+  public void testUpdateNotExistsKey() {
+    try {
+      // update value
+      Assert.assertFalse(mc.asyncMopUpdate(KEY, mkey, VALUE).get());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testExistsKey() {
-		try {
-			// insert one
-			Assert.assertTrue(mc.asyncMopInsert(KEY, mkey, VALUE,
-					new CollectionAttributes()).get());
+  public void testExistsKey() {
+    try {
+      // insert one
+      Assert.assertTrue(mc.asyncMopInsert(KEY, mkey, VALUE,
+              new CollectionAttributes()).get());
 
-			// update value only
-			Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
-										.get(1000, TimeUnit.MILLISECONDS);
+      // update value only
+      Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
+              .get(1000, TimeUnit.MILLISECONDS);
 
-			Assert.assertEquals(VALUE, rmap.get(mkey));
+      Assert.assertEquals(VALUE, rmap.get(mkey));
 
-			Assert.assertTrue(mc.asyncMopUpdate(KEY, mkey, NEW_VALUE).get());
+      Assert.assertTrue(mc.asyncMopUpdate(KEY, mkey, NEW_VALUE).get());
 
-			Map<String, Object> urmap = mc.asyncMopGet(KEY, false, false)
-										.get(1000, TimeUnit.MILLISECONDS);
-			Assert.assertEquals(NEW_VALUE, urmap.get(mkey));
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<String, Object> urmap = mc.asyncMopGet(KEY, false, false)
+              .get(1000, TimeUnit.MILLISECONDS);
+      Assert.assertEquals(NEW_VALUE, urmap.get(mkey));
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 }

@@ -18,31 +18,33 @@ package net.spy.memcached.collection;
 
 public abstract class CollectionDelete {
 
-	protected String range;
-	protected boolean noreply;
-	protected boolean dropIfEmpty = true;
-	
-	protected String str;
+  protected String range;
+  protected boolean noreply;
+  protected boolean dropIfEmpty = true;
 
-	public String getRange() {
-		return range;
-	}
+  protected String str;
 
-	public void setRange(String range) {
-		this.range = range;
-	}
+  public String getRange() {
+    return range;
+  }
 
-	public boolean isNoreply() {
-		return noreply;
-	}
+  public void setRange(String range) {
+    this.range = range;
+  }
 
-	public void setNoreply(boolean noreply) {
-		this.noreply = noreply;
-	}
+  public boolean isNoreply() {
+    return noreply;
+  }
+
+  public void setNoreply(boolean noreply) {
+    this.noreply = noreply;
+  }
 
 
-	public abstract byte[] getAdditionalArgs();
-	public abstract String stringify();
-	public abstract String getCommand();
+  public abstract byte[] getAdditionalArgs();
+
+  public abstract String stringify();
+
+  public abstract String getCommand();
 
 }

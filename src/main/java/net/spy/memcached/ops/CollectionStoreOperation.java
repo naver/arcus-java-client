@@ -23,10 +23,10 @@ import net.spy.memcached.collection.CollectionStore;
  */
 public interface CollectionStoreOperation extends KeyedOperation {
 
-	String getSubKey();
+  String getSubKey();
 
-	CollectionStore<?> getStore();
+  CollectionStore<?> getStore();
 
-	byte[] getData();
+  byte[] getData();
 
 }

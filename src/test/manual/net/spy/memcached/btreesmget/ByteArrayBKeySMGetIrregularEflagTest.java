@@ -29,80 +29,80 @@ import net.spy.memcached.collection.SMGetMode;
 
 public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
-	private final String key1 = "ByteArrayBKeySMGetIrregularEflagTest1"
-			+ (Math.abs(new Random().nextInt(99)) + 100);
-	private final String key2 = "ByteArrayBKeySMGetIrregularEflagTest2"
-			+ (Math.abs(new Random().nextInt(99)) + 100);
+  private final String key1 = "ByteArrayBKeySMGetIrregularEflagTest1"
+          + (Math.abs(new Random().nextInt(99)) + 100);
+  private final String key2 = "ByteArrayBKeySMGetIrregularEflagTest2"
+          + (Math.abs(new Random().nextInt(99)) + 100);
 
-	private final byte[] eFlag = { 1 };
+  private final byte[] eFlag = {1};
 
-	private final Object value = "valvalvalvalvalvalvalvalvalval";
+  private final Object value = "valvalvalvalvalvalvalvalvalval";
 
-	public void testGetAll_1() {
-		ArrayList<String> testKeyList = new ArrayList<String>();
-		testKeyList.add(key1);
-		testKeyList.add(key2);
-		
-		/* old SMGetIrregularEflagTest */
-		try {
-			mc.delete(key1).get();
-			mc.delete(key2).get();
+  public void testGetAll_1() {
+    ArrayList<String> testKeyList = new ArrayList<String>();
+    testKeyList.add(key1);
+    testKeyList.add(key2);
 
-			mc.asyncBopInsert(key1, new byte[] { 0 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key1, new byte[] { 3 }, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key1, new byte[] { 2 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+    /* old SMGetIrregularEflagTest */
+    try {
+      mc.delete(key1).get();
+      mc.delete(key2).get();
 
-			mc.asyncBopInsert(key2, new byte[] { 1 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key2, new byte[] { 5 }, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key2, new byte[] { 4 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+      mc.asyncBopInsert(key1, new byte[]{0}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key1, new byte[]{3}, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key1, new byte[]{2}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
-							testKeyList, new byte[] { 0 }, new byte[] { 10 },
-							ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
+      mc.asyncBopInsert(key2, new byte[]{1}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key2, new byte[]{5}, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key2, new byte[]{4}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			for (int i = 0; i < list.size(); i++) {
-				System.out.println(list.get(i));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		try {
-			mc.delete(key1).get();
-			mc.delete(key2).get();
+      List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
+              testKeyList, new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
 
-			mc.asyncBopInsert(key1, new byte[] { 0 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key1, new byte[] { 3 }, eFlag, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key1, new byte[] { 2 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+      for (int i = 0; i < list.size(); i++) {
+        System.out.println(list.get(i));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			mc.asyncBopInsert(key2, new byte[] { 1 }, eFlag, value + "0",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key2, new byte[] { 5 }, null, value + "1",
-					new CollectionAttributes()).get();
-			mc.asyncBopInsert(key2, new byte[] { 4 }, eFlag, value + "2",
-					new CollectionAttributes()).get();
+    try {
+      mc.delete(key1).get();
+      mc.delete(key2).get();
 
-			SMGetMode smgetMode = SMGetMode.UNIQUE;
-			List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
-							testKeyList, new byte[] { 0 }, new byte[] { 10 },
-							ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
+      mc.asyncBopInsert(key1, new byte[]{0}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key1, new byte[]{3}, eFlag, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key1, new byte[]{2}, eFlag, value + "2",
+              new CollectionAttributes()).get();
 
-			for (int i = 0; i < list.size(); i++) {
-				System.out.println(list.get(i));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      mc.asyncBopInsert(key2, new byte[]{1}, eFlag, value + "0",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key2, new byte[]{5}, null, value + "1",
+              new CollectionAttributes()).get();
+      mc.asyncBopInsert(key2, new byte[]{4}, eFlag, value + "2",
+              new CollectionAttributes()).get();
+
+      SMGetMode smgetMode = SMGetMode.UNIQUE;
+      List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
+              testKeyList, new byte[]{0}, new byte[]{10},
+              ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
+
+      for (int i = 0; i < list.size(); i++) {
+        System.out.println(list.get(i));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

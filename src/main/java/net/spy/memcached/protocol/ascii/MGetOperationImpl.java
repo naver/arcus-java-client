@@ -11,11 +11,11 @@ import java.util.HashSet;
  */
 public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
 
-	private static final String CMD="mget";
+  private static final String CMD = "mget";
 
-	public MGetOperationImpl(Collection<String> k, Callback c) {
-		super(CMD, c, new HashSet<String>(k));
-		setAPIType(APIType.MGET);
-	}
+  public MGetOperationImpl(Collection<String> k, Callback c) {
+    super(CMD, c, new HashSet<String>(k));
+    setAPIType(APIType.MGET);
+  }
 
 }

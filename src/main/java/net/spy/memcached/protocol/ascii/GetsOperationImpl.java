@@ -10,11 +10,11 @@ import net.spy.memcached.ops.GetsOperation;
  */
 class GetsOperationImpl extends BaseGetOpImpl implements GetsOperation {
 
-	private static final String CMD="gets";
+  private static final String CMD = "gets";
 
-	public GetsOperationImpl(String key, GetsOperation.Callback cb) {
-		super(CMD, cb, Collections.singleton(key));
-		setAPIType(APIType.GETS);
-	}
+  public GetsOperationImpl(String key, GetsOperation.Callback cb) {
+    super(CMD, cb, Collections.singleton(key));
+    setAPIType(APIType.GETS);
+  }
 
 }

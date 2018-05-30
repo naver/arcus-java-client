@@ -11,95 +11,97 @@ import net.spy.memcached.MemcachedNode;
  */
 public interface Operation {
 
-	/**
-	 * Has this operation been cancelled?
-	 */
-	boolean isCancelled();
+  /**
+   * Has this operation been cancelled?
+   */
+  boolean isCancelled();
 
-	/**
-	 * True if an error occurred while processing this operation.
-	 */
-	boolean hasErrored();
+  /**
+   * True if an error occurred while processing this operation.
+   */
+  boolean hasErrored();
 
-	/**
-	 * Get the exception that occurred (or null if no exception occurred).
-	 */
-	OperationException getException();
+  /**
+   * Get the exception that occurred (or null if no exception occurred).
+   */
+  OperationException getException();
 
-	/**
-	 * Get the callback for this get operation.
-	 */
-	OperationCallback getCallback();
+  /**
+   * Get the callback for this get operation.
+   */
+  OperationCallback getCallback();
 
-	/**
-	 * Cancel this operation.
-	 */
-	void cancel(String cause);
+  /**
+   * Cancel this operation.
+   */
+  void cancel(String cause);
 
-	/**
-	 * Get the cause of cancel.
-	 */
-	String getCancelCause();
+  /**
+   * Get the cause of cancel.
+   */
+  String getCancelCause();
 
-	/**
-	 * Get the current state of this operation.
-	 */
-	OperationState getState();
+  /**
+   * Get the current state of this operation.
+   */
+  OperationState getState();
 
-	/* ENABLE_REPLICATION if */
-	/**
-	 * reset operation state to WRITING
-	 */
-	void resetState();
+  /* ENABLE_REPLICATION if */
 
-	void setMoved(boolean s);
+  /**
+   * reset operation state to WRITING
+   */
+  void resetState();
 
-	/* ENABLE_REPLICATION end */
-	/**
-	 * Get the write buffer for this operation.
-	 */
-	ByteBuffer getBuffer();
+  void setMoved(boolean s);
 
-	/**
-	 * Invoked after having written all of the bytes from the supplied output
-	 * buffer.
-	 */
-	void writeComplete();
+  /* ENABLE_REPLICATION end */
 
-	/**
-	 * Initialize this operation.  This is used to prepare output byte buffers
-	 * and stuff.
-	 */
-	void initialize();
+  /**
+   * Get the write buffer for this operation.
+   */
+  ByteBuffer getBuffer();
 
-	/**
-	 * Read data from the given byte buffer and dispatch to the appropriate
-	 * read mechanism.
-	 */
-	void readFromBuffer(ByteBuffer data) throws IOException;
+  /**
+   * Invoked after having written all of the bytes from the supplied output
+   * buffer.
+   */
+  void writeComplete();
 
-	/**
-	 * Handle a raw data read.
-	 */
-	void handleRead(ByteBuffer data);
+  /**
+   * Initialize this operation.  This is used to prepare output byte buffers
+   * and stuff.
+   */
+  void initialize();
 
-	/**
-	 * Get the node that should've been handling this operation.
-	 */
-	MemcachedNode getHandlingNode();
+  /**
+   * Read data from the given byte buffer and dispatch to the appropriate
+   * read mechanism.
+   */
+  void readFromBuffer(ByteBuffer data) throws IOException;
 
-	/**
-	 * Set a reference to the node that will be/is handling this operation.
-	 *
-	 * @param to a memcached node
-	 */
-	void setHandlingNode(MemcachedNode to);
+  /**
+   * Handle a raw data read.
+   */
+  void handleRead(ByteBuffer data);
 
-	OperationType getOperationType();
+  /**
+   * Get the node that should've been handling this operation.
+   */
+  MemcachedNode getHandlingNode();
 
-	boolean isWriteOperation();
+  /**
+   * Set a reference to the node that will be/is handling this operation.
+   *
+   * @param to a memcached node
+   */
+  void setHandlingNode(MemcachedNode to);
 
-	boolean isReadOperation();
+  OperationType getOperationType();
 
-	APIType getAPIType();
+  boolean isWriteOperation();
+
+  boolean isReadOperation();
+
+  APIType getAPIType();
 }

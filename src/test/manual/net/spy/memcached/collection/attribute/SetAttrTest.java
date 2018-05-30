@@ -20,8 +20,8 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 
 public class SetAttrTest extends BaseIntegrationTest {
 
-	public void testSetAttr() throws Exception {
+  public void testSetAttr() throws Exception {
 
-	}
+  }
 
 }

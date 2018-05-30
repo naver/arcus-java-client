@@ -17,25 +17,25 @@
 package net.spy.memcached.collection;
 
 public class BTreeElement<K, V> {
-	private final K bkey;
-	private final V value;
-	private final byte[] eflag;
+  private final K bkey;
+  private final V value;
+  private final byte[] eflag;
 
-	public BTreeElement(K bkey, byte[] eflag, V value) {
-		this.bkey = bkey;
-		this.eflag = eflag;
-		this.value = value;
-	}
+  public BTreeElement(K bkey, byte[] eflag, V value) {
+    this.bkey = bkey;
+    this.eflag = eflag;
+    this.value = value;
+  }
 
-	public K getBkey() {
-		return bkey;
-	}
+  public K getBkey() {
+    return bkey;
+  }
 
-	public V getValue() {
-		return value;
-	}
+  public V getValue() {
+    return value;
+  }
 
-	public byte[] getEflag() {
-		return eflag;
-	}
+  public byte[] getEflag() {
+    return eflag;
+  }
 }

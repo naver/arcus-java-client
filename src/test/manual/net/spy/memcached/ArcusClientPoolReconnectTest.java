@@ -23,33 +23,37 @@ import org.junit.Ignore;
 @Ignore
 public class ArcusClientPoolReconnectTest extends BaseIntegrationTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		// do nothing
-	};
+  @Override
+  protected void setUp() throws Exception {
+    // do nothing
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		// do nothing
-	};
+  ;
 
-	public void testOpenAndWait() {
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		ArcusClientPool client = ArcusClient.createArcusClientPool(ZK_HOST,
-				ZK_SERVICE_ID, cfb, 2);
+  @Override
+  protected void tearDown() throws Exception {
+    // do nothing
+  }
 
-		try {
-			Thread.sleep(120000L);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+  ;
 
-		client.shutdown();
+  public void testOpenAndWait() {
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    ArcusClientPool client = ArcusClient.createArcusClientPool(ZK_HOST,
+            ZK_SERVICE_ID, cfb, 2);
 
-		try {
-			Thread.sleep(Long.MAX_VALUE);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+    try {
+      Thread.sleep(120000L);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    client.shutdown();
+
+    try {
+      Thread.sleep(Long.MAX_VALUE);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
 }

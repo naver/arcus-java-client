@@ -19,60 +19,60 @@ package net.spy.memcached.util;
 
 public class BTreeUtil {
 
-	private static final String HEXES = "0123456789ABCDEF";
+  private static final String HEXES = "0123456789ABCDEF";
 
-	public static String toHex(byte[] byteArray) {
-		if (byteArray == null)
-			return null;
+  public static String toHex(byte[] byteArray) {
+    if (byteArray == null)
+      return null;
 
-		final StringBuilder hex = new StringBuilder(2 * byteArray.length + 2);
+    final StringBuilder hex = new StringBuilder(2 * byteArray.length + 2);
 
-		hex.append("0x");
+    hex.append("0x");
 
-		for (final byte b : byteArray) {
-			hex.append(HEXES.charAt((b & 0xF0) >> 4));
-			hex.append(HEXES.charAt((b & 0x0F)));
-		}
+    for (final byte b : byteArray) {
+      hex.append(HEXES.charAt((b & 0xF0) >> 4));
+      hex.append(HEXES.charAt((b & 0x0F)));
+    }
 
-		return hex.toString();
-	}
+    return hex.toString();
+  }
 
-	public static byte[] hexStringToByteArrays(String str) {
-		if (str == null) {
-			return null;
-		}
-		
-		if (str.startsWith("0x")) {
-			str = str.substring(2);
-		}
-		
-		if (str.length() == 0) {
-			return new byte[0];
-		}
-		
-		if (str.length() % 2 != 0) {
-			throw new IllegalArgumentException("Invalid hex string.");
-		}
+  public static byte[] hexStringToByteArrays(String str) {
+    if (str == null) {
+      return null;
+    }
 
-		int len = str.length();
-		byte[] data = new byte[len / 2];
+    if (str.startsWith("0x")) {
+      str = str.substring(2);
+    }
 
-		for (int i = 0; i < len; i += 2) {
-			data[i / 2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) + Character
-					.digit(str.charAt(i + 1), 16));
-		}
-		
-		return data;
-	}
-	
-	public static int compareByteArraysInLexOrder(byte[] array1, byte[] array2) {
-		int diff;
-		for (int i = 0; i < array1.length && i < array2.length; i++) {
-			diff = (array1[i] & 0xFF) - (array2[i] & 0xFF);
-			if (diff != 0) {
-				return diff;
-			}
-		}
-		return array1.length - array2.length;
-	}	
+    if (str.length() == 0) {
+      return new byte[0];
+    }
+
+    if (str.length() % 2 != 0) {
+      throw new IllegalArgumentException("Invalid hex string.");
+    }
+
+    int len = str.length();
+    byte[] data = new byte[len / 2];
+
+    for (int i = 0; i < len; i += 2) {
+      data[i / 2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) + Character
+              .digit(str.charAt(i + 1), 16));
+    }
+
+    return data;
+  }
+
+  public static int compareByteArraysInLexOrder(byte[] array1, byte[] array2) {
+    int diff;
+    for (int i = 0; i < array1.length && i < array2.length; i++) {
+      diff = (array1[i] & 0xFF) - (array2[i] & 0xFF);
+      if (diff != 0) {
+        return diff;
+      }
+    }
+    return array1.length - array2.length;
+  }
 }

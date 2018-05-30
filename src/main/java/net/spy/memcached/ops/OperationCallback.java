@@ -7,15 +7,15 @@ package net.spy.memcached.ops;
  */
 public interface OperationCallback {
 
-	/**
-	 * Method invoked with the status when the operation is complete.
-	 *
-	 * @param status the result of the operation
-	 */
-	void receivedStatus(OperationStatus status);
+  /**
+   * Method invoked with the status when the operation is complete.
+   *
+   * @param status the result of the operation
+   */
+  void receivedStatus(OperationStatus status);
 
-	/**
-	 * Called whenever an operation completes.
-	 */
-	void complete();
+  /**
+   * Called whenever an operation completes.
+   */
+  void complete();
 }

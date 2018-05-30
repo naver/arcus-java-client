@@ -32,332 +32,332 @@ import net.spy.memcached.collection.ElementValueType;
 
 public class VariousTypeTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final long BKEY = 10;
-	private final CollectionAttributes ATTR = new CollectionAttributes();
+  private final String KEY = this.getClass().getSimpleName();
+  private final long BKEY = 10;
+  private final CollectionAttributes ATTR = new CollectionAttributes();
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testString() {
-		try {
-			String value = "VALUE";
+  public void testString() {
+    try {
+      String value = "VALUE";
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.STRING, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.STRING, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testLong() {
-		try {
-			long value = 1234567890L;
+  public void testLong() {
+    try {
+      long value = 1234567890L;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.LONG, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.LONG, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInteger() {
-		try {
-			int value = 1234567890;
+  public void testInteger() {
+    try {
+      int value = 1234567890;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.INTEGER, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.INTEGER, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testBoolean() {
-		try {
-			boolean value = false;
+  public void testBoolean() {
+    try {
+      boolean value = false;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.BOOLEAN, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.BOOLEAN, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testDate() {
-		try {
-			Date value = new Date();
+  public void testDate() {
+    try {
+      Date value = new Date();
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.DATE, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.DATE, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testByte() {
-		try {
-			byte value = 0x00;
+  public void testByte() {
+    try {
+      byte value = 0x00;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.BYTE, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.BYTE, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testFloat() {
-		try {
-			float value = 1234567890;
+  public void testFloat() {
+    try {
+      float value = 1234567890;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.FLOAT, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.FLOAT, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testDouble() {
-		try {
-			double value = 1234567890;
+  public void testDouble() {
+    try {
+      double value = 1234567890;
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.DOUBLE, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.DOUBLE, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertEquals(value, map.get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertEquals(value, map.get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testByteArray() {
-		try {
-			byte[] value = "value".getBytes();
+  public void testByteArray() {
+    try {
+      byte[] value = "value".getBytes();
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.BYTEARRAY, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.BYTEARRAY, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertTrue(Arrays.equals(value, (byte[]) map.get(BKEY)
-					.getValue()));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertTrue(Arrays.equals(value, (byte[]) map.get(BKEY)
+              .getValue()));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testOtherObjects() {
-		try {
-			UserDefinedClass value = new UserDefinedClass();
+  public void testOtherObjects() {
+    try {
+      UserDefinedClass value = new UserDefinedClass();
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.OTHERS, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.OTHERS, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertTrue(value.equals(map.get(BKEY).getValue()));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertTrue(value.equals(map.get(BKEY).getValue()));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testList() {
-		try {
-			List<String> value = new ArrayList<String>();
-			value.add("Hello");
-			value.add("Netspider");
+  public void testList() {
+    try {
+      List<String> value = new ArrayList<String>();
+      value.add("Hello");
+      value.add("Netspider");
 
-			// create empty
-			Boolean createResult = mc.asyncBopCreate(KEY,
-					ElementValueType.OTHERS, ATTR).get();
-			Assert.assertTrue(createResult);
+      // create empty
+      Boolean createResult = mc.asyncBopCreate(KEY,
+              ElementValueType.OTHERS, ATTR).get();
+      Assert.assertTrue(createResult);
 
-			// insert value
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-			Assert.assertTrue(insertResult);
+      // insert value
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
+      Assert.assertTrue(insertResult);
 
-			// get value
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      // get value
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
 
-			@SuppressWarnings("unchecked")
-			List<String> r = (List<String>) map.get(BKEY).getValue();
+      @SuppressWarnings("unchecked")
+      List<String> r = (List<String>) map.get(BKEY).getValue();
 
-			Assert.assertEquals(2, r.size());
-			Assert.assertEquals("Hello", r.get(0));
-			Assert.assertEquals("Netspider", r.get(1));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertEquals(2, r.size());
+      Assert.assertEquals("Hello", r.get(0));
+      Assert.assertEquals("Netspider", r.get(1));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	private static final class UserDefinedClass implements Serializable {
-		private static final long serialVersionUID = 8942558579188233740L;
+  private static final class UserDefinedClass implements Serializable {
+    private static final long serialVersionUID = 8942558579188233740L;
 
-		public int i;
-		public List<String> list;
+    public int i;
+    public List<String> list;
 
-		public UserDefinedClass() {
-			this.i = 100;
-			this.list = new ArrayList<String>();
-			this.list.add("Hello");
-			this.list.add("Netspider");
-		}
+    public UserDefinedClass() {
+      this.i = 100;
+      this.list = new ArrayList<String>();
+      this.list.add("Hello");
+      this.list.add("Netspider");
+    }
 
-		public boolean equals(Object o) {
-			if (!(o instanceof UserDefinedClass))
-				return false;
+    public boolean equals(Object o) {
+      if (!(o instanceof UserDefinedClass))
+        return false;
 
-			UserDefinedClass c = (UserDefinedClass) o;
+      UserDefinedClass c = (UserDefinedClass) o;
 
-			boolean eq = this.i == c.i;
+      boolean eq = this.i == c.i;
 
-			if (this.list == null && c.list == null)
-				return eq;
+      if (this.list == null && c.list == null)
+        return eq;
 
-			eq &= this.list.size() == c.list.size();
+      eq &= this.list.size() == c.list.size();
 
-			if (!eq)
-				return eq;
+      if (!eq)
+        return eq;
 
-			for (int i = 0; i < this.list.size(); i++) {
-				eq &= this.list.get(i).equals(c.list.get(i));
-				if (!eq)
-					return eq;
-			}
+      for (int i = 0; i < this.list.size(); i++) {
+        eq &= this.list.get(i).equals(c.list.get(i));
+        if (!eq)
+          return eq;
+      }
 
-			return eq;
-		}
-	}
+      return eq;
+    }
+  }
 }

@@ -18,26 +18,26 @@ package net.spy.memcached;
 
 public abstract class ArcusClientException extends RuntimeException {
 
-	private static final long serialVersionUID = -4658082759499319120L;
+  private static final long serialVersionUID = -4658082759499319120L;
 
-	public ArcusClientException(String message) {
-		super(message);
-	}
+  public ArcusClientException(String message) {
+    super(message);
+  }
 
-	public ArcusClientException(String message, Throwable e) {
-		super(message, e);
-	}
+  public ArcusClientException(String message, Throwable e) {
+    super(message, e);
+  }
 
-	public static class InitializeClientException extends ArcusClientException {
+  public static class InitializeClientException extends ArcusClientException {
 
-		private static final long serialVersionUID = 2001051171343419920L;
+    private static final long serialVersionUID = 2001051171343419920L;
 
-		public InitializeClientException(String message) {
-			super(message);
-		}
+    public InitializeClientException(String message) {
+      super(message);
+    }
 
-		public InitializeClientException(String message, Throwable e) {
-			super(message, e);
-		}
-	}
+    public InitializeClientException(String message, Throwable e) {
+      super(message, e);
+    }
+  }
 }

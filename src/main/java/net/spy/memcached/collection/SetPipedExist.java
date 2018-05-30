@@ -26,79 +26,79 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetPipedExist<T> extends CollectionObject {
 
-	public static final int MAX_PIPED_ITEM_COUNT = 500;
+  public static final int MAX_PIPED_ITEM_COUNT = 500;
 
-	private static final String COMMAND = "sop exist";
-	private static final String PIPE = "pipe";
+  private static final String COMMAND = "sop exist";
+  private static final String PIPE = "pipe";
 
-	private final String key;
-	private final List<T> values;
-	private final Transcoder<T> tc;
-	private int itemCount;
+  private final String key;
+  private final List<T> values;
+  private final Transcoder<T> tc;
+  private int itemCount;
 
-	protected int nextOpIndex = 0;
+  protected int nextOpIndex = 0;
 
-	/**
-	 * set next index of operation
-	 * that will be processed after when operation moved by switchover
-	 */
-	public void setNextOpIndex(int i) {
-		this.nextOpIndex = i;
-	}
+  /**
+   * set next index of operation
+   * that will be processed after when operation moved by switchover
+   */
+  public void setNextOpIndex(int i) {
+    this.nextOpIndex = i;
+  }
 
-	public List<T> getValues() {
-		return this.values;
-	}
+  public List<T> getValues() {
+    return this.values;
+  }
 
-	public int getItemCount() {
-		return this.itemCount;
-	}
+  public int getItemCount() {
+    return this.itemCount;
+  }
 
-	public SetPipedExist(String key, List<T> values, Transcoder<T> tc) {
-		this.key = key;
-		this.values = values;
-		this.tc = tc;
-		this.itemCount = values.size();
-	}
+  public SetPipedExist(String key, List<T> values, Transcoder<T> tc) {
+    this.key = key;
+    this.values = values;
+    this.tc = tc;
+    this.itemCount = values.size();
+  }
 
-	public ByteBuffer getAsciiCommand() {
-		int capacity = 0;
+  public ByteBuffer getAsciiCommand() {
+    int capacity = 0;
 
-		// decode values
-		List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
-		CachedData cd = null;
-		for (T each : values) {
-			cd = tc.encode(each);
-			encodedList.add(cd.getData());
-		}
+    // decode values
+    List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
+    CachedData cd = null;
+    for (T each : values) {
+      cd = tc.encode(each);
+      encodedList.add(cd.getData());
+    }
 
-		// estimate the buffer capacity
-		for (byte[] each : encodedList) {
-			capacity += KeyUtil.getKeyBytes(key).length;
-			capacity += each.length;
-			capacity += 64;
-		}
+    // estimate the buffer capacity
+    for (byte[] each : encodedList) {
+      capacity += KeyUtil.getKeyBytes(key).length;
+      capacity += each.length;
+      capacity += 64;
+    }
 
-		// allocate the buffer
-		ByteBuffer bb = ByteBuffer.allocate(capacity);
+    // allocate the buffer
+    ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-		// create ascii operation string
-		int eSize = encodedList.size();
-		for (int i = this.nextOpIndex; i < eSize; i++) {
-			byte[] each = encodedList.get(i);
+    // create ascii operation string
+    int eSize = encodedList.size();
+    for (int i = this.nextOpIndex; i < eSize; i++) {
+      byte[] each = encodedList.get(i);
 
-			setArguments(bb, COMMAND, key, each.length,
-					(i < eSize - 1) ? PIPE : "");
-			bb.put(each);
-			bb.put(CRLF);
-		}
-		// flip the buffer
-		bb.flip();
+      setArguments(bb, COMMAND, key, each.length,
+              (i < eSize - 1) ? PIPE : "");
+      bb.put(each);
+      bb.put(CRLF);
+    }
+    // flip the buffer
+    bb.flip();
 
-		return bb;
-	}
+    return bb;
+  }
 
-	public ByteBuffer getBinaryCommand() {
-		throw new RuntimeException("not supported in binary protocol yet.");
-	}
+  public ByteBuffer getBinaryCommand() {
+    throw new RuntimeException("not supported in binary protocol yet.");
+  }
 }

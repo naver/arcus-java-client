@@ -22,19 +22,19 @@ package net.spy.memcached;
  */
 public enum ReadPriority {
 
-	/**
-	 * Read on Master
-	 */
-	MASTER,
+  /**
+   * Read on Master
+   */
+  MASTER,
 
-	/**
-	 * Read on Slave
-	 */
-	SLAVE,
+  /**
+   * Read on Slave
+   */
+  SLAVE,
 
-	/**
-	 * Read RR(Round-robin) pattern.
-	 */
-	RR, 
+  /**
+   * Read RR(Round-robin) pattern.
+   */
+  RR,
 }
 /* ENABLE_REPLICATION end */

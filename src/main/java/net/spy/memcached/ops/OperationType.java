@@ -1,64 +1,64 @@
 package net.spy.memcached.ops;
 
 public enum OperationType {
-	/* 
-	 * only Ascii Operation have WRITE or READ, ETC OperationType
-	 * Binary Operation has only UNDEFIED OperationType
-	 * because Arcus Client don't use Binary Operation.
-	 */
-	
-	/*
-	 * StoreOperationImpl (add / replace / set / asyncSetBulk)
-	 * ConcatenationOperationImpl (append / prepend)
-	 * MutatorOperationImpl (asyncIncr / asyncDecr)
-	 * DeleteOperationImpl (delete)
-	 * CASOperationImpl (asyncCAS, cas)
-	 * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
-	 * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert)
-	 * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
-	 * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
-	 * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
-	 * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
-	 * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
-	 * CollectionUpsertOperationImpl (asyncBopUpsert)
-	 * CollectionUpdateOperationImpl (asyncBopUpdate)
-	 * CollectionMutateOperationImpl (asyncBopIncr / asyncBopDecr)
-	 * BtreeStoreAndGetOpeartionImpl (asynBopInsertAndGetTrimmed)
-	 * FlushOperationImpl / FlushByPrefixOperationImpl (flush)
-	 * SetAttrOperationImpl (asyncSetAttr)
-	 */
-	WRITE,
-	
-	/*
-	 * GetOperationImpl (asyncGet / asyncGetBulk)
-	 * GetsOperationImpl (asyncGets)
-	 * CollectionGetOperationImpl (asynBopGet / asyncLopGet / asyncSopGet) is READ, when withDelete is false.
-	 * CollectionExistOperationImpl (asyncSopExist)
-	 * CollectionPipedExistOperationImpl (asyncSopPipedExistBulk)
-	 * CollectionCountOperationImpl (asyncBopGetItemCount)
-	 * BTreeGetBulkOperationImpl (asyncBopGetBulk)
-	 * BTreeSortMergeGetOperationImpl (asyncBopSortMergeGet)
-	 * BTreeFindPositionOperationImpl (asyncBopFindPosition)
-	 * BTreeGetByPositionOperationImpl (asyncBopGetByPosition)
-	 * BTreeFindPositionWithGetOperationImpl (asyncBopFindPositionWithGet)
-	 * GetAttrOperationImpl (asyncGetAttr)
-	 */
-	READ,
-	
-	/* for Collection Get API (with delete, dropIfEmpty) */
-	RW,
-	
-	/*
-	 * StatsOperationImpl (getStats)
-	 * VersionOperationImpl (getVersions) 
-	 */
-	ETC,
-	
-	/*
-	 * When the type of an operation is undefined,
-	 * it has the operation type of UNDEFINED.
-	 */
-	UNDEFINED
+    /*
+     * only Ascii Operation have WRITE or READ, ETC OperationType
+     * Binary Operation has only UNDEFIED OperationType
+     * because Arcus Client don't use Binary Operation.
+     */
+
+  /*
+   * StoreOperationImpl (add / replace / set / asyncSetBulk)
+   * ConcatenationOperationImpl (append / prepend)
+   * MutatorOperationImpl (asyncIncr / asyncDecr)
+   * DeleteOperationImpl (delete)
+   * CASOperationImpl (asyncCAS, cas)
+   * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
+   * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert)
+   * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
+   * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
+   * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
+   * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
+   * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
+   * CollectionUpsertOperationImpl (asyncBopUpsert)
+   * CollectionUpdateOperationImpl (asyncBopUpdate)
+   * CollectionMutateOperationImpl (asyncBopIncr / asyncBopDecr)
+   * BtreeStoreAndGetOpeartionImpl (asynBopInsertAndGetTrimmed)
+   * FlushOperationImpl / FlushByPrefixOperationImpl (flush)
+   * SetAttrOperationImpl (asyncSetAttr)
+   */
+  WRITE,
+
+  /*
+   * GetOperationImpl (asyncGet / asyncGetBulk)
+   * GetsOperationImpl (asyncGets)
+   * CollectionGetOperationImpl (asynBopGet / asyncLopGet / asyncSopGet) is READ, when withDelete is false.
+   * CollectionExistOperationImpl (asyncSopExist)
+   * CollectionPipedExistOperationImpl (asyncSopPipedExistBulk)
+   * CollectionCountOperationImpl (asyncBopGetItemCount)
+   * BTreeGetBulkOperationImpl (asyncBopGetBulk)
+   * BTreeSortMergeGetOperationImpl (asyncBopSortMergeGet)
+   * BTreeFindPositionOperationImpl (asyncBopFindPosition)
+   * BTreeGetByPositionOperationImpl (asyncBopGetByPosition)
+   * BTreeFindPositionWithGetOperationImpl (asyncBopFindPositionWithGet)
+   * GetAttrOperationImpl (asyncGetAttr)
+   */
+  READ,
+
+  /* for Collection Get API (with delete, dropIfEmpty) */
+  RW,
+
+  /*
+   * StatsOperationImpl (getStats)
+   * VersionOperationImpl (getVersions)
+   */
+  ETC,
+
+  /*
+   * When the type of an operation is undefined,
+   * it has the operation type of UNDEFINED.
+   */
+  UNDEFINED
 }
 
 /* Operation Hierarchy (only ascii type)

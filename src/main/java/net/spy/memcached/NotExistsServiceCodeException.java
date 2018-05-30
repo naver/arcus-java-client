@@ -17,11 +17,11 @@
 package net.spy.memcached;
 
 public class NotExistsServiceCodeException extends RuntimeException {
-	
-	private static final long serialVersionUID = -1461409015284668292L;
 
-	public NotExistsServiceCodeException(String message) {
-		super(message);
-	}
-	
+  private static final long serialVersionUID = -1461409015284668292L;
+
+  public NotExistsServiceCodeException(String message) {
+    super(message);
+  }
+
 }

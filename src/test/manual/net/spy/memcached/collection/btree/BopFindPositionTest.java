@@ -26,160 +26,160 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class BopFindPositionTest extends BaseIntegrationTest {
 
-	private String key = "BopFindPositionTest";
-	private String invalidKey = "InvalidBopFindPositionTest";
-	private String kvKey = "KvBopFindPositionTest";
+  private String key = "BopFindPositionTest";
+  private String invalidKey = "InvalidBopFindPositionTest";
+  private String kvKey = "KvBopFindPositionTest";
 
-	private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L,
-			19L };
-	private byte[][] byteArrayBkeys = { new byte[] { 10 }, new byte[] { 11 },
-			new byte[] { 12 }, new byte[] { 13 }, new byte[] { 14 },
-			new byte[] { 15 }, new byte[] { 16 }, new byte[] { 17 },
-			new byte[] { 18 }, new byte[] { 19 } };
+  private long[] longBkeys = {10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L,
+          19L};
+  private byte[][] byteArrayBkeys = {new byte[]{10}, new byte[]{11},
+          new byte[]{12}, new byte[]{13}, new byte[]{14},
+          new byte[]{15}, new byte[]{16}, new byte[]{17},
+          new byte[]{18}, new byte[]{19}};
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
-	}
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
+  }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testLongBKeyAsc() throws Exception {
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (long each : longBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
-		}
+  public void testLongBKeyAsc() throws Exception {
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (long each : longBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-		// bop position
-		for (int i = 0; i < longBkeys.length; i++) {
-			CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
-					longBkeys[i], BTreeOrder.ASC);
-			Integer position = f.get();
-			assertNotNull(position);
-			assertEquals(CollectionResponse.OK, f.getOperationStatus()
-					.getResponse());
-			assertEquals(i, position.intValue());
-		}
-	}
+    // bop position
+    for (int i = 0; i < longBkeys.length; i++) {
+      CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
+              longBkeys[i], BTreeOrder.ASC);
+      Integer position = f.get();
+      assertNotNull(position);
+      assertEquals(CollectionResponse.OK, f.getOperationStatus()
+              .getResponse());
+      assertEquals(i, position.intValue());
+    }
+  }
 
-	public void testLongBKeyDesc() throws Exception {
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (long each : longBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
-		}
+  public void testLongBKeyDesc() throws Exception {
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (long each : longBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-		// bop position
-		for (int i = 0; i < longBkeys.length; i++) {
-			CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
-					longBkeys[i], BTreeOrder.DESC);
-			Integer position = f.get();
-			assertNotNull(position);
-			assertEquals(CollectionResponse.OK, f.getOperationStatus()
-					.getResponse());
-			assertEquals("invalid position", longBkeys.length - i - 1,
-					position.intValue());
-		}
-	}
+    // bop position
+    for (int i = 0; i < longBkeys.length; i++) {
+      CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
+              longBkeys[i], BTreeOrder.DESC);
+      Integer position = f.get();
+      assertNotNull(position);
+      assertEquals(CollectionResponse.OK, f.getOperationStatus()
+              .getResponse());
+      assertEquals("invalid position", longBkeys.length - i - 1,
+              position.intValue());
+    }
+  }
 
-	public void testByteArrayBKeyAsc() throws Exception {
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
-		}
+  public void testByteArrayBKeyAsc() throws Exception {
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (byte[] each : byteArrayBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-		// bop position
-		for (int i = 0; i < byteArrayBkeys.length; i++) {
-			CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
-					byteArrayBkeys[i], BTreeOrder.ASC);
-			Integer position = f.get();
-			assertNotNull(position);
-			assertEquals(CollectionResponse.OK, f.getOperationStatus()
-					.getResponse());
-			assertEquals(i, position.intValue());
-		}
-	}
+    // bop position
+    for (int i = 0; i < byteArrayBkeys.length; i++) {
+      CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
+              byteArrayBkeys[i], BTreeOrder.ASC);
+      Integer position = f.get();
+      assertNotNull(position);
+      assertEquals(CollectionResponse.OK, f.getOperationStatus()
+              .getResponse());
+      assertEquals(i, position.intValue());
+    }
+  }
 
-	public void testByteArrayBKeyDesc() throws Exception {
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
-		}
+  public void testByteArrayBKeyDesc() throws Exception {
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (byte[] each : byteArrayBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-		// bop position
-		for (int i = 0; i < byteArrayBkeys.length; i++) {
-			CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
-					byteArrayBkeys[i], BTreeOrder.DESC);
-			Integer position = f.get();
-			assertNotNull(position);
-			assertEquals(CollectionResponse.OK, f.getOperationStatus()
-					.getResponse());
-			assertEquals("invalid position", longBkeys.length - i - 1,
-					position.intValue());
-		}
-	}
+    // bop position
+    for (int i = 0; i < byteArrayBkeys.length; i++) {
+      CollectionFuture<Integer> f = mc.asyncBopFindPosition(key,
+              byteArrayBkeys[i], BTreeOrder.DESC);
+      Integer position = f.get();
+      assertNotNull(position);
+      assertEquals(CollectionResponse.OK, f.getOperationStatus()
+              .getResponse());
+      assertEquals("invalid position", longBkeys.length - i - 1,
+              position.intValue());
+    }
+  }
 
-	public void testUnsuccessfulResponses() throws Exception {
-		mc.delete(invalidKey).get();
-		mc.delete(kvKey).get();
+  public void testUnsuccessfulResponses() throws Exception {
+    mc.delete(invalidKey).get();
+    mc.delete(kvKey).get();
 
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setReadable(false);
-		for (byte[] each : byteArrayBkeys) {
-			mc.asyncBopInsert(key, each, null, "val", attrs).get();
-		}
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setReadable(false);
+    for (byte[] each : byteArrayBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-		// set a test key
-		mc.set(kvKey, 0, "value").get();
+    // set a test key
+    mc.set(kvKey, 0, "value").get();
 
-		CollectionFuture<Integer> f = null;
-		Integer position = null;
+    CollectionFuture<Integer> f = null;
+    Integer position = null;
 
-		// NOT_FOUND
-		f = mc.asyncBopFindPosition(invalidKey, byteArrayBkeys[0],
-				BTreeOrder.ASC);
-		position = f.get();
-		assertNull(position);
-		assertEquals(CollectionResponse.NOT_FOUND, f.getOperationStatus()
-				.getResponse());
+    // NOT_FOUND
+    f = mc.asyncBopFindPosition(invalidKey, byteArrayBkeys[0],
+            BTreeOrder.ASC);
+    position = f.get();
+    assertNull(position);
+    assertEquals(CollectionResponse.NOT_FOUND, f.getOperationStatus()
+            .getResponse());
 
-		// UNREADABLE
-		f = mc.asyncBopFindPosition(key, byteArrayBkeys[0], BTreeOrder.ASC);
-		position = f.get();
-		assertNull(position);
-		assertEquals(CollectionResponse.UNREADABLE, f.getOperationStatus()
-				.getResponse());
+    // UNREADABLE
+    f = mc.asyncBopFindPosition(key, byteArrayBkeys[0], BTreeOrder.ASC);
+    position = f.get();
+    assertNull(position);
+    assertEquals(CollectionResponse.UNREADABLE, f.getOperationStatus()
+            .getResponse());
 
-		attrs.setReadable(true);
-		mc.asyncSetAttr(key, attrs).get();
+    attrs.setReadable(true);
+    mc.asyncSetAttr(key, attrs).get();
 
-		// BKEY_MISMATCH
-		f = mc.asyncBopFindPosition(key, longBkeys[0], BTreeOrder.ASC);
-		position = f.get();
-		assertNull(position);
-		assertEquals(CollectionResponse.BKEY_MISMATCH, f.getOperationStatus()
-				.getResponse());
+    // BKEY_MISMATCH
+    f = mc.asyncBopFindPosition(key, longBkeys[0], BTreeOrder.ASC);
+    position = f.get();
+    assertNull(position);
+    assertEquals(CollectionResponse.BKEY_MISMATCH, f.getOperationStatus()
+            .getResponse());
 
-		// TYPE_MISMATCH
-		f = mc.asyncBopFindPosition(kvKey, byteArrayBkeys[0], BTreeOrder.ASC);
-		position = f.get();
-		assertNull(position);
-		assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus()
-				.getResponse());
+    // TYPE_MISMATCH
+    f = mc.asyncBopFindPosition(kvKey, byteArrayBkeys[0], BTreeOrder.ASC);
+    position = f.get();
+    assertNull(position);
+    assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus()
+            .getResponse());
 
-		// NOT_FOUND_ELEMENT
-		byte[] invalidBkey = new byte[] { 64 };
-		f = mc.asyncBopFindPosition(key, invalidBkey, BTreeOrder.ASC);
-		position = f.get();
-		assertNull(position);
-		assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, f
-				.getOperationStatus().getResponse());
-	}
+    // NOT_FOUND_ELEMENT
+    byte[] invalidBkey = new byte[]{64};
+    f = mc.asyncBopFindPosition(key, invalidBkey, BTreeOrder.ASC);
+    position = f.get();
+    assertNull(position);
+    assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, f
+            .getOperationStatus().getResponse());
+  }
 
 }

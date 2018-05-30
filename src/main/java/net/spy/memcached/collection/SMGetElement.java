@@ -20,111 +20,111 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
-	private String key;
-	private long bkey;
-	private byte[] bytebkey;
-	private T value;
+  private String key;
+  private long bkey;
+  private byte[] bytebkey;
+  private T value;
 
-	public SMGetElement(String key, long bkey, T value) {
-		this.key = key;
-		this.bkey = bkey;
-		this.bytebkey = null;
-		this.value = value;
-	}
-	
-	public SMGetElement(String key, byte[] bkey, T value) {
-		this.key = key;
-		this.bkey = -1;
-		this.bytebkey = bkey;
-		this.value = value;
-	}
+  public SMGetElement(String key, long bkey, T value) {
+    this.key = key;
+    this.bkey = bkey;
+    this.bytebkey = null;
+    this.value = value;
+  }
 
-	@Override
-	public String toString() {
-		return "SMGetElement {KEY:" + key + ", BKEY:"
-				+ ((bytebkey == null) ? bkey : BTreeUtil.toHex(bytebkey))
-				+ ", VALUE:" + value + "}";
-	}
+  public SMGetElement(String key, byte[] bkey, T value) {
+    this.key = key;
+    this.bkey = -1;
+    this.bytebkey = bkey;
+    this.value = value;
+  }
 
-	@Override
-	public int compareTo(SMGetElement<T> param) {
-		assert param != null;
-		
-		int comp;
-		/* compare bkey */
-		if (bytebkey == null)
-			comp = new Long(bkey).compareTo(param.getBkey());
-		else
-			comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-		
-		/* if bkey is equal, then compare key */
-		if (comp == 0)
-			comp = key.compareTo(param.getKey());
-		
-		return comp;
-	}
+  @Override
+  public String toString() {
+    return "SMGetElement {KEY:" + key + ", BKEY:"
+            + ((bytebkey == null) ? bkey : BTreeUtil.toHex(bytebkey))
+            + ", VALUE:" + value + "}";
+  }
 
-	public int compareBkeyTo(SMGetElement<T> param) {
-		assert param != null;
+  @Override
+  public int compareTo(SMGetElement<T> param) {
+    assert param != null;
 
-		/* compare bkey */
-		if (bytebkey == null)
-			return new Long(bkey).compareTo(param.getBkey());
-		else
-			return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-	}
+    int comp;
+        /* compare bkey */
+    if (bytebkey == null)
+      comp = new Long(bkey).compareTo(param.getBkey());
+    else
+      comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
 
-	public int compareKeyTo(SMGetElement<T> param) {
-		assert param != null;
+    /* if bkey is equal, then compare key */
+    if (comp == 0)
+      comp = key.compareTo(param.getKey());
 
-		/* compare key */
-		return key.compareTo(param.getKey());
-	}
+    return comp;
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public int compareBkeyTo(SMGetElement<T> param) {
+    assert param != null;
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    /* compare bkey */
+    if (bytebkey == null)
+      return new Long(bkey).compareTo(param.getBkey());
+    else
+      return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+  }
 
-	public long getBkey() {
-		if (bkey == -1) {
-			throw new IllegalStateException("This element has byte[] bkey. " + toString());
-		}
-		return bkey;
-	}
+  public int compareKeyTo(SMGetElement<T> param) {
+    assert param != null;
 
-	public byte[] getByteBkey() {
-		if (bytebkey == null) {
-			throw new IllegalStateException(
-					"This element has java.lang.Long type bkey. " + toString());
-		}
-		return bytebkey;
-	}
+    /* compare key */
+    return key.compareTo(param.getKey());
+  }
 
-	public Object getBkeyByObject() {
-		if (bytebkey != null) {
-			return bytebkey;
-		} else {
-			return bkey;
-		}
-	}
-	
-	public void setBkey(long bkey) {
-		this.bkey = bkey;
-	}
+  public String getKey() {
+    return key;
+  }
 
-	public T getValue() {
-		return value;
-	}
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-	public void setValue(T value) {
-		this.value = value;
-	}
+  public long getBkey() {
+    if (bkey == -1) {
+      throw new IllegalStateException("This element has byte[] bkey. " + toString());
+    }
+    return bkey;
+  }
 
-	public boolean hasByteArrayBkey() {
-		return bytebkey != null;
-	}
+  public byte[] getByteBkey() {
+    if (bytebkey == null) {
+      throw new IllegalStateException(
+              "This element has java.lang.Long type bkey. " + toString());
+    }
+    return bytebkey;
+  }
+
+  public Object getBkeyByObject() {
+    if (bytebkey != null) {
+      return bytebkey;
+    } else {
+      return bkey;
+    }
+  }
+
+  public void setBkey(long bkey) {
+    this.bkey = bkey;
+  }
+
+  public T getValue() {
+    return value;
+  }
+
+  public void setValue(T value) {
+    this.value = value;
+  }
+
+  public boolean hasByteArrayBkey() {
+    return bytebkey != null;
+  }
 }

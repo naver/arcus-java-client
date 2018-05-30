@@ -32,152 +32,152 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 
 public class BulkSetTest extends BaseIntegrationTest {
 
-	public void testZeroSizedKeys() {
-		try {
-			mc.asyncSetBulk(new ArrayList<String>(0), 60, "value");
-			Assert.fail();
-		} catch (IllegalArgumentException e) {
-			// should get here.
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
+  public void testZeroSizedKeys() {
+    try {
+      mc.asyncSetBulk(new ArrayList<String>(0), 60, "value");
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      // should get here.
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
 
-		try {
-			mc.asyncSetBulk(new ArrayList<String>(0), 60, new Object(), new CollectionTranscoder());
-			Assert.fail();
-		} catch (IllegalArgumentException e) {
-			// should get here.
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+    try {
+      mc.asyncSetBulk(new ArrayList<String>(0), 60, new Object(), new CollectionTranscoder());
+      Assert.fail();
+    } catch (IllegalArgumentException e) {
+      // should get here.
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 
-	public void testInsertAndGet2() {
-		int TEST_COUNT = 3;
+  public void testInsertAndGet2() {
+    int TEST_COUNT = 3;
 
-		try {
-			// SET null key
-			try {
-				mc.asyncSetBulk(null, 60);
-			} catch (Exception e) {
-				assertEquals("Map is null.", e.getMessage());
-			}
+    try {
+      // SET null key
+      try {
+        mc.asyncSetBulk(null, 60);
+      } catch (Exception e) {
+        assertEquals("Map is null.", e.getMessage());
+      }
 
-			for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
+      for (int keySize = 0; keySize < TEST_COUNT; keySize++) {
 
-				// generate key
-				Map<String, Object> o = new HashMap<String, Object>();
+        // generate key
+        Map<String, Object> o = new HashMap<String, Object>();
 
-				for (int i = 0; i < 600; i++) {
-					o.put("MyKey" + i, "MyValue" + i);
-				}
+        for (int i = 0; i < 600; i++) {
+          o.put("MyKey" + i, "MyValue" + i);
+        }
 
-				List<String> keys = new ArrayList<String>(o.keySet());
+        List<String> keys = new ArrayList<String>(o.keySet());
 
-				// REMOVE
-				for (String key : keys) {
-					mc.delete(key).get();
-				}
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key).get();
+        }
 
-				// SET
-				Future<Map<String, CollectionOperationStatus>> future = mc
-						.asyncSetBulk(o, 60);
+        // SET
+        Future<Map<String, CollectionOperationStatus>> future = mc
+                .asyncSetBulk(o, 60);
 
-				Map<String, CollectionOperationStatus> errorList;
-				try {
-					errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-					Assert.assertTrue("Error list is not empty.",
-							errorList.isEmpty());
-				} catch (TimeoutException e) {
-					future.cancel(true);
-					e.printStackTrace();
-				}
+        Map<String, CollectionOperationStatus> errorList;
+        try {
+          errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+          Assert.assertTrue("Error list is not empty.",
+                  errorList.isEmpty());
+        } catch (TimeoutException e) {
+          future.cancel(true);
+          e.printStackTrace();
+        }
 
-				// GET
-				int errorCount = 0;
-				String k, v;
-				for (int i = 0; i < keys.size(); i++) {
-					k = keys.get(i);
-					v = (String) mc.asyncGet(k).get();
+        // GET
+        int errorCount = 0;
+        String k, v;
+        for (int i = 0; i < keys.size(); i++) {
+          k = keys.get(i);
+          v = (String) mc.asyncGet(k).get();
 
-					if (!v.equals(o.get(k))) {
-						errorCount++;
-					}
+          if (!v.equals(o.get(k))) {
+            errorCount++;
+          }
 
-					mc.delete(k).get();
-				}
+          mc.delete(k).get();
+        }
 
-				Assert.assertEquals("Error count is greater than 0.", 0,
-						errorCount);
+        Assert.assertEquals("Error count is greater than 0.", 0,
+                errorCount);
 
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 
-	public void testInsertAndGet() {
-		String value = "MyValue";
+  public void testInsertAndGet() {
+    String value = "MyValue";
 
-		int TEST_COUNT = 64;
+    int TEST_COUNT = 64;
 
-		try {
-			// SET null key
-			try {
-				mc.asyncSetBulk(null, 60, value);
-			} catch (Exception e) {
-				assertEquals("Key list is null.", e.getMessage());
-			}
+    try {
+      // SET null key
+      try {
+        mc.asyncSetBulk(null, 60, value);
+      } catch (Exception e) {
+        assertEquals("Key list is null.", e.getMessage());
+      }
 
-			for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
-				// generate key
-				String[] keys = new String[keySize];
-				for (int i = 0; i < keys.length; i++) {
-					keys[i] = "MyKey" + i;
-				}
+      for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
+        // generate key
+        String[] keys = new String[keySize];
+        for (int i = 0; i < keys.length; i++) {
+          keys[i] = "MyKey" + i;
+        }
 
-				// REMOVE
-				for (String key : keys) {
-					mc.delete(key);
-				}
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key);
+        }
 
-				// SET
-				Future<Map<String, CollectionOperationStatus>> future = mc
-						.asyncSetBulk(Arrays.asList(keys), 60, value);
+        // SET
+        Future<Map<String, CollectionOperationStatus>> future = mc
+                .asyncSetBulk(Arrays.asList(keys), 60, value);
 
-				Map<String, CollectionOperationStatus> errorList;
-				try {
-					errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-					Assert.assertTrue("Error list is not empty.",
-							errorList.isEmpty());
-				} catch (TimeoutException e) {
-					future.cancel(true);
-					e.printStackTrace();
-				}
+        Map<String, CollectionOperationStatus> errorList;
+        try {
+          errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+          Assert.assertTrue("Error list is not empty.",
+                  errorList.isEmpty());
+        } catch (TimeoutException e) {
+          future.cancel(true);
+          e.printStackTrace();
+        }
 
-				// GET
-				int errorCount = 0;
-				for (String key : keys) {
-					String v = (String) mc.get(key);
-					if (!value.equals(v)) {
-						errorCount++;
-					}
-				}
+        // GET
+        int errorCount = 0;
+        for (String key : keys) {
+          String v = (String) mc.get(key);
+          if (!value.equals(v)) {
+            errorCount++;
+          }
+        }
 
-				Assert.assertEquals("Error count is greater than 0.", 0,
-						errorCount);
+        Assert.assertEquals("Error count is greater than 0.", 0,
+                errorCount);
 
-				// REMOVE
-				for (String key : keys) {
-					mc.delete(key);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 }

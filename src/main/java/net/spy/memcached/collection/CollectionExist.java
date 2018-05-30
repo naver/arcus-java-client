@@ -18,9 +18,11 @@ package net.spy.memcached.collection;
 
 public abstract class CollectionExist {
 
-	protected String str;
+  protected String str;
 
-	public abstract byte[] getAdditionalArgs();
-	public abstract String stringify();
-	public abstract String getCommand();
+  public abstract byte[] getAdditionalArgs();
+
+  public abstract String stringify();
+
+  public abstract String getCommand();
 }

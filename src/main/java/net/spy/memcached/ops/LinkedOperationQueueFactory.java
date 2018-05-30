@@ -9,11 +9,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class LinkedOperationQueueFactory implements OperationQueueFactory {
 
-	/* (non-Javadoc)
-	 * @see net.spy.memcached.ops.OperationQueueFactory#create()
-	 */
-	public BlockingQueue<Operation> create() {
-		return new LinkedBlockingQueue<Operation>();
-	}
+  /* (non-Javadoc)
+   * @see net.spy.memcached.ops.OperationQueueFactory#create()
+   */
+  public BlockingQueue<Operation> create() {
+    return new LinkedBlockingQueue<Operation>();
+  }
 
 }

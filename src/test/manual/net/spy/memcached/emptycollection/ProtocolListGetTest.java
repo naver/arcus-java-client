@@ -22,36 +22,36 @@ import net.spy.memcached.collection.ListGet;
 
 public class ProtocolListGetTest extends TestCase {
 
-	private static final int index = 10;
+  private static final int index = 10;
 
-	public void testStringfy() {
-		// default setting : dropIfEmpty = true
-		Assert.assertEquals("10 drop",
-				(new ListGet(index, true)).stringify());
-		Assert.assertEquals("10",
-				(new ListGet(index, false)).stringify());
+  public void testStringfy() {
+    // default setting : dropIfEmpty = true
+    Assert.assertEquals("10 drop",
+            (new ListGet(index, true)).stringify());
+    Assert.assertEquals("10",
+            (new ListGet(index, false)).stringify());
 
-		Assert.assertEquals("10 drop",
-				(new ListGet(index, true, true)).stringify());
-		Assert.assertEquals("10 delete", (new ListGet(index, true,
-				false)).stringify());
-		Assert.assertEquals("10",
-				(new ListGet(index, false, true)).stringify());
-		Assert.assertEquals("10",
-				(new ListGet(index, false, false)).stringify());
+    Assert.assertEquals("10 drop",
+            (new ListGet(index, true, true)).stringify());
+    Assert.assertEquals("10 delete", (new ListGet(index, true,
+            false)).stringify());
+    Assert.assertEquals("10",
+            (new ListGet(index, false, true)).stringify());
+    Assert.assertEquals("10",
+            (new ListGet(index, false, false)).stringify());
 
-		Assert.assertEquals("10..20 drop",
-				(new ListGet(10, 20, true)).stringify());
-		Assert.assertEquals("10..20",
-				(new ListGet(10, 20, false)).stringify());
+    Assert.assertEquals("10..20 drop",
+            (new ListGet(10, 20, true)).stringify());
+    Assert.assertEquals("10..20",
+            (new ListGet(10, 20, false)).stringify());
 
-		Assert.assertEquals("10..20 delete", (new ListGet(10, 20, true,
-				false)).stringify());
-		Assert.assertEquals("10..20 drop", (new ListGet(10, 20, true,
-				true)).stringify());
-		Assert.assertEquals("10..20",
-				(new ListGet(10, 20, false, true)).stringify());
-		Assert.assertEquals("10..20",
-				(new ListGet(10, 20, false, false)).stringify());
-	}
+    Assert.assertEquals("10..20 delete", (new ListGet(10, 20, true,
+            false)).stringify());
+    Assert.assertEquals("10..20 drop", (new ListGet(10, 20, true,
+            true)).stringify());
+    Assert.assertEquals("10..20",
+            (new ListGet(10, 20, false, true)).stringify());
+    Assert.assertEquals("10..20",
+            (new ListGet(10, 20, false, false)).stringify());
+  }
 }

@@ -24,95 +24,95 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 
 public class MutateWithDefaultTest extends BaseIntegrationTest {
 
-	private String key = "MutateWithDefaultTest";
+  private String key = "MutateWithDefaultTest";
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		try {
-			mc.delete(key);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+  protected void setUp() throws Exception {
+    super.setUp();
+    try {
+      mc.delete(key);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testIncr() {
-		try {
-			long v;
-			Future<Long> future = mc.asyncIncr(key, 1);
-			v = future.get(10000, TimeUnit.MILLISECONDS);
-			assertEquals(v, -1);
+  public void testIncr() {
+    try {
+      long v;
+      Future<Long> future = mc.asyncIncr(key, 1);
+      v = future.get(10000, TimeUnit.MILLISECONDS);
+      assertEquals(v, -1);
 
-			v = mc.incr(key, 1);
-			assertEquals(v, -1);
+      v = mc.incr(key, 1);
+      assertEquals(v, -1);
 
-			v = mc.incr(key, 10, 2);
-			assertEquals(v, 2);
+      v = mc.incr(key, 10, 2);
+      assertEquals(v, 2);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testDecr() {
-		try {
-			long v;
+  public void testDecr() {
+    try {
+      long v;
 
-			Future<Long> future = mc.asyncDecr(key, 1);
-			v = future.get(10000, TimeUnit.MILLISECONDS);
-			assertEquals(v, -1);
+      Future<Long> future = mc.asyncDecr(key, 1);
+      v = future.get(10000, TimeUnit.MILLISECONDS);
+      assertEquals(v, -1);
 
-			v = mc.decr(key, 1);
-			assertEquals(v, -1);
+      v = mc.decr(key, 1);
+      assertEquals(v, -1);
 
-			v = mc.decr(key, 10, 100);
-			assertEquals(v, 100);
+      v = mc.decr(key, 10, 100);
+      assertEquals(v, 100);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testIncrWithDefault() {
-		try {
+  public void testIncrWithDefault() {
+    try {
 
-			Future<Long> future = mc.asyncIncr(key, 1, 100, 10);
-			long v = future.get(10000, TimeUnit.MILLISECONDS);
+      Future<Long> future = mc.asyncIncr(key, 1, 100, 10);
+      long v = future.get(10000, TimeUnit.MILLISECONDS);
 
-			assertEquals(v, 100);
+      assertEquals(v, 100);
 
-			Future<Long> future2 = mc.asyncIncr(key, 1, 100, 10);
-			long v2 = future2.get(10000, TimeUnit.MILLISECONDS);
+      Future<Long> future2 = mc.asyncIncr(key, 1, 100, 10);
+      long v2 = future2.get(10000, TimeUnit.MILLISECONDS);
 
-			assertEquals(v2, 101);
+      assertEquals(v2, 101);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testDecrWithDefault() {
-		try {
+  public void testDecrWithDefault() {
+    try {
 
-			Future<Long> future = mc.asyncDecr(key, 1, 100, 10);
-			long v = future.get(10000, TimeUnit.MILLISECONDS);
+      Future<Long> future = mc.asyncDecr(key, 1, 100, 10);
+      long v = future.get(10000, TimeUnit.MILLISECONDS);
 
-			assertEquals(v, 100);
+      assertEquals(v, 100);
 
-			Future<Long> future2 = mc.asyncDecr(key, 1, 100, 10);
-			long v2 = future2.get(10000, TimeUnit.MILLISECONDS);
+      Future<Long> future2 = mc.asyncDecr(key, 1, 100, 10);
+      long v2 = future2.get(10000, TimeUnit.MILLISECONDS);
 
-			assertEquals(v2, 99);
+      assertEquals(v2, 99);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

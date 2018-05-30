@@ -26,96 +26,96 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class GetWithDropBTreeTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final long BKEY = 10L;
-	private final int VALUE = 1234567890;
+  private final String KEY = this.getClass().getSimpleName();
+  private final long BKEY = 10L;
+  private final int VALUE = 1234567890;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
 
-		boolean insertResult = mc.asyncBopInsert(KEY, BKEY, null, VALUE,
-				new CollectionAttributes()).get();
-		Assert.assertTrue(insertResult);
-	}
+    boolean insertResult = mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+            new CollectionAttributes()).get();
+    Assert.assertTrue(insertResult);
+  }
 
-	public void testGetWithoutDeleteAndDrop() {
-		try {
-			// check attr
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+  public void testGetWithoutDeleteAndDrop() {
+    try {
+      // check attr
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get value delete=false, drop=true
-			Assert.assertEquals(
-					VALUE,
-					mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
-							false, false).get().get(BKEY).getValue());
+      // get value delete=false, drop=true
+      Assert.assertEquals(
+              VALUE,
+              mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
+                      false, false).get().get(BKEY).getValue());
 
-			// check exists
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      // check exists
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get value again
-			Assert.assertEquals(
-					VALUE,
-					mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
-							false, false).get().get(BKEY).getValue());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get value again
+      Assert.assertEquals(
+              VALUE,
+              mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
+                      false, false).get().get(BKEY).getValue());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetWithtDeleteAndWithoutDrop() {
-		try {
-			// check attr
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+  public void testGetWithtDeleteAndWithoutDrop() {
+    try {
+      // check attr
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get value delete=true, drop=false
-			Assert.assertEquals(
-					VALUE,
-					mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
-							true, false).get().get(BKEY).getValue());
+      // get value delete=true, drop=false
+      Assert.assertEquals(
+              VALUE,
+              mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
+                      true, false).get().get(BKEY).getValue());
 
-			// check exists empty btree
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-			Assert.assertNotNull(attr);
-			Assert.assertEquals(new Long(0), attr.getCount());
+      // check exists empty btree
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      Assert.assertNotNull(attr);
+      Assert.assertEquals(new Long(0), attr.getCount());
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertNotNull(map);
-			Assert.assertTrue(map.isEmpty());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertNotNull(map);
+      Assert.assertTrue(map.isEmpty());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetWithtDeleteAndWithDrop() {
-		try {
-			// check attr
-			Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
-					.getCount());
+  public void testGetWithtDeleteAndWithDrop() {
+    try {
+      // check attr
+      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get value delete=true, drop=false
-			Assert.assertEquals(
-					VALUE,
-					mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
-							true, true).get().get(BKEY).getValue());
+      // get value delete=true, drop=false
+      Assert.assertEquals(
+              VALUE,
+              mc.asyncBopGet(KEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
+                      true, true).get().get(BKEY).getValue());
 
-			// check btree
-			CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-			Assert.assertNull(attr);
+      // check btree
+      CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
+      Assert.assertNull(attr);
 
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
-					ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-			Assert.assertNull(map);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
+              ElementFlagFilter.DO_NOT_FILTER, false, false).get();
+      Assert.assertNull(map);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

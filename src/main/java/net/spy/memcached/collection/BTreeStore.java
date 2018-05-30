@@ -18,18 +18,18 @@ package net.spy.memcached.collection;
 
 public class BTreeStore<T> extends CollectionStore<T> {
 
-	private static final String command = "bop insert";
-	
-	public BTreeStore() {
-		super();
-	}
-	
-	public BTreeStore(T value, byte[] eFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-		super(value, eFlag, createKeyIfNotExists, requestMode, attr);
-	}
-	
-	public String getCommand() {
-		return command;
-	}
+  private static final String command = "bop insert";
+
+  public BTreeStore() {
+    super();
+  }
+
+  public BTreeStore(T value, byte[] eFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+    super(value, eFlag, createKeyIfNotExists, requestMode, attr);
+  }
+
+  public String getCommand() {
+    return command;
+  }
 
 }

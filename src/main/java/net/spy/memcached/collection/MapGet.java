@@ -20,80 +20,80 @@ import java.util.List;
 
 public class MapGet extends CollectionGet {
 
-	private static final String command = "mop get";
+  private static final String command = "mop get";
 
-	protected List<String> mkeyList;
-	protected byte[] data;
-	private String spaceSeparatedKeys;
-	protected byte[] additionalArgs;
+  protected List<String> mkeyList;
+  protected byte[] data;
+  private String spaceSeparatedKeys;
+  protected byte[] additionalArgs;
 
-	public MapGet(List<String> mkeyList, boolean delete) {
-		this.headerCount = 2;
-		this.mkeyList = mkeyList;
-		this.delete = delete;
-		if (mkeyList.size() == 0) {
-			this.additionalArgs = null;
-		} else {
-			this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
-		}
-	}
+  public MapGet(List<String> mkeyList, boolean delete) {
+    this.headerCount = 2;
+    this.mkeyList = mkeyList;
+    this.delete = delete;
+    if (mkeyList.size() == 0) {
+      this.additionalArgs = null;
+    } else {
+      this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
+    }
+  }
 
-	public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
-		this(mkeyList, delete);
-		this.dropIfEmpty = dropIfEmpty;
-	}
+  public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
+    this(mkeyList, delete);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public String getSpaceSeparatedMkeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
-		}
+  public String getSpaceSeparatedMkeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
 
-		StringBuilder sb = new StringBuilder();
-		int numkeys = mkeyList.size();
-		for (int i = 0; i < numkeys; i++) {
-			sb.append(mkeyList.get(i));
-			if ((i + 1) < numkeys) {
-				sb.append(" ");
-			}
-		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
-	}
+    StringBuilder sb = new StringBuilder();
+    int numkeys = mkeyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(mkeyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(" ");
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
+  }
 
-	@Override
-	public byte[] getAddtionalArgs() {
-		return additionalArgs;
-	}
+  @Override
+  public byte[] getAddtionalArgs() {
+    return additionalArgs;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
+  public String stringify() {
+    if (str != null) return str;
 
-		StringBuilder b = new StringBuilder();
-		if (additionalArgs == null) {
-			b.append("0");
-		} else {
-			b.append(additionalArgs.length);
-		}
-		b.append(" ").append(mkeyList.size());
+    StringBuilder b = new StringBuilder();
+    if (additionalArgs == null) {
+      b.append("0");
+    } else {
+      b.append(additionalArgs.length);
+    }
+    b.append(" ").append(mkeyList.size());
 
-		if (delete && dropIfEmpty) {
-			b.append(" drop");
-		}
-		if (delete && !dropIfEmpty) {
-			b.append(" delete");
-		}
+    if (delete && dropIfEmpty) {
+      b.append(" drop");
+    }
+    if (delete && !dropIfEmpty) {
+      b.append(" delete");
+    }
 
-		str = b.toString();
-		return str;
-	}
+    str = b.toString();
+    return str;
+  }
 
-	public String getCommand() {
-		return command;
-	}
+  public String getCommand() {
+    return command;
+  }
 
-	public void decodeItemHeader(String itemHeader) {
-		String[] splited = itemHeader.split(" ");
-		this.subkey = splited[0];
-		this.dataLength = Integer.parseInt(splited[1]);
-	}
+  public void decodeItemHeader(String itemHeader) {
+    String[] splited = itemHeader.split(" ");
+    this.subkey = splited[0];
+    this.dataLength = Integer.parseInt(splited[1]);
+  }
 }

@@ -23,6 +23,6 @@ import net.spy.memcached.collection.CollectionCreate;
  */
 public interface CollectionCreateOperation extends KeyedOperation {
 
-	CollectionCreate getCreate();
+  CollectionCreate getCreate();
 
 }

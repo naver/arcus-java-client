@@ -30,91 +30,91 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
-	public void testInsertAndGet() {
-		String key = "testInsertAndGet";
-		String prefix = "MyValue";
+  public void testInsertAndGet() {
+    String key = "testInsertAndGet";
+    String prefix = "MyValue";
 
-		int valueCount = mc.getMaxPipedItemCount();
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = String.format("%s%d", prefix, i);
-		}
+    int valueCount = mc.getMaxPipedItemCount();
+    Object[] valueList = new Object[valueCount];
+    for (int i = 0; i < valueList.length; i++) {
+      valueList[i] = String.format("%s%d", prefix, i);
+    }
 
-		try {
-			// REMOVE
-			for (Object v : valueList) {
-				mc.asyncSopDelete(key, v, true).get();
-			}
+    try {
+      // REMOVE
+      for (Object v : valueList) {
+        mc.asyncSopDelete(key, v, true).get();
+      }
 
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						20000L, TimeUnit.MILLISECONDS);
-				Assert.assertTrue(errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				e.printStackTrace();
-			}
+      // SET
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
+                      new CollectionAttributes());
+      try {
+        Map<Integer, CollectionOperationStatus> errorList = future.get(
+                20000L, TimeUnit.MILLISECONDS);
+        Assert.assertTrue(errorList.isEmpty());
+      } catch (TimeoutException e) {
+        future.cancel(true);
+        e.printStackTrace();
+      }
 
-			// GET
-			int errorCount = 0;
-			Future<Set<Object>> f = mc.asyncSopGet(key, valueCount, false,
-					false);
-			Set<Object> list = null;
-			try {
-				list = f.get(10000L, TimeUnit.MILLISECONDS);
-			} catch (Exception e) {
-				f.cancel(true);
-				e.printStackTrace();
-			}
+      // GET
+      int errorCount = 0;
+      Future<Set<Object>> f = mc.asyncSopGet(key, valueCount, false,
+              false);
+      Set<Object> list = null;
+      try {
+        list = f.get(10000L, TimeUnit.MILLISECONDS);
+      } catch (Exception e) {
+        f.cancel(true);
+        e.printStackTrace();
+      }
 
-			Assert.assertNotNull("Cached list is null.", list);
-			Assert.assertTrue("Cached list is empty.", !list.isEmpty());
+      Assert.assertNotNull("Cached list is null.", list);
+      Assert.assertTrue("Cached list is empty.", !list.isEmpty());
 
-			for (Object o : list) {
-				if (!((String) o).startsWith(prefix)) {
-					errorCount++;
-				}
-			}
+      for (Object o : list) {
+        if (!((String) o).startsWith(prefix)) {
+          errorCount++;
+        }
+      }
 
-			Assert.assertEquals(valueCount, list.size());
-			Assert.assertEquals(0, errorCount);
+      Assert.assertEquals(valueCount, list.size());
+      Assert.assertEquals(0, errorCount);
 
-			// REMOVE
-			for (Object v : valueList) {
-				mc.asyncSopDelete(key, v, true).get();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+      // REMOVE
+      for (Object v : valueList) {
+        mc.asyncSopDelete(key, v, true).get();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 
-	public void testErrorCount() {
-		String key = "testErrorCount";
-		int valueCount = 1200;
-		Object[] valueList = new Object[valueCount];
-		for (int i = 0; i < valueList.length; i++) {
-			valueList[i] = "MyValue" + i;
-		}
+  public void testErrorCount() {
+    String key = "testErrorCount";
+    int valueCount = 1200;
+    Object[] valueList = new Object[valueCount];
+    for (int i = 0; i < valueList.length; i++) {
+      valueList[i] = "MyValue" + i;
+    }
 
-		try {
-			mc.delete(key).get();
+    try {
+      mc.delete(key).get();
 
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
-							null);
+      // SET
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncSopPipedInsertBulk(key, Arrays.asList(valueList),
+                      null);
 
-			Map<Integer, CollectionOperationStatus> map = future.get(2000L,
-					TimeUnit.MILLISECONDS);
-			assertEquals(valueCount, map.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+      Map<Integer, CollectionOperationStatus> map = future.get(2000L,
+              TimeUnit.MILLISECONDS);
+      assertEquals(valueCount, map.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 }

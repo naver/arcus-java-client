@@ -27,66 +27,66 @@ import org.junit.Ignore;
 @Ignore
 public class ArcusClientPoolShutdownTest extends BaseIntegrationTest {
 
-	@Override
-	protected void setUp() throws Exception {
-		// do nothing
-	}
+  @Override
+  protected void setUp() throws Exception {
+    // do nothing
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		// do nothing
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    // do nothing
+  }
 
-	public void testOpenAndWait() {
-		if (!USE_ZK) {
-			return;
-		}
+  public void testOpenAndWait() {
+    if (!USE_ZK) {
+      return;
+    }
 
-		ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-		ArcusClientPool client = ArcusClient.createArcusClientPool(ZK_HOST,
-				ZK_SERVICE_ID, cfb, 2);
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    ArcusClientPool client = ArcusClient.createArcusClientPool(ZK_HOST,
+            ZK_SERVICE_ID, cfb, 2);
 
-		// This threads must be stopped after client is shutdown.
-		List<String> threadNames = new ArrayList<String>();
-		threadNames.add("main-EventThread");
-		threadNames.add("main-SendThread(" + ZK_HOST + ")");
-		threadNames
-				.add("Cache Manager IO for " + ZK_SERVICE_ID + "@" + ZK_HOST);
+    // This threads must be stopped after client is shutdown.
+    List<String> threadNames = new ArrayList<String>();
+    threadNames.add("main-EventThread");
+    threadNames.add("main-SendThread(" + ZK_HOST + ")");
+    threadNames
+            .add("Cache Manager IO for " + ZK_SERVICE_ID + "@" + ZK_HOST);
 
-		// Check exists threads
-		List<String> currentThreads = new ArrayList<String>();
-		for (Thread t : Thread.getAllStackTraces().keySet()) {
-			currentThreads.add(t.getName());
-		}
-		for (String name : threadNames) {
-			Assert.assertTrue(currentThreads.contains(name));
-		}
+    // Check exists threads
+    List<String> currentThreads = new ArrayList<String>();
+    for (Thread t : Thread.getAllStackTraces().keySet()) {
+      currentThreads.add(t.getName());
+    }
+    for (String name : threadNames) {
+      Assert.assertTrue(currentThreads.contains(name));
+    }
 
-		// Sleep 1s
-		try {
-			Thread.sleep(1000L);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+    // Sleep 1s
+    try {
+      Thread.sleep(1000L);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
-		// Shutdown the client.
-		client.shutdown();
+    // Shutdown the client.
+    client.shutdown();
 
-		// Sleep 1s
-		try {
-			Thread.sleep(1000L);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+    // Sleep 1s
+    try {
+      Thread.sleep(1000L);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
-		// Check the threads after shutdown the client
-		currentThreads.clear();
-		for (Thread t : Thread.getAllStackTraces().keySet()) {
-			currentThreads.add(t.getName());
-		}
-		for (String name : threadNames) {
-			Assert.assertTrue("Thread '" + name + "' is exists.",
-					!currentThreads.contains(name));
-		}
-	}
+    // Check the threads after shutdown the client
+    currentThreads.clear();
+    for (Thread t : Thread.getAllStackTraces().keySet()) {
+      currentThreads.add(t.getName());
+    }
+    for (String name : threadNames) {
+      Assert.assertTrue("Thread '" + name + "' is exists.",
+              !currentThreads.contains(name));
+    }
+  }
 }

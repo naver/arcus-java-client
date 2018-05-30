@@ -8,15 +8,15 @@ import net.spy.memcached.ops.OperationCallback;
  */
 class NoopOperationImpl extends OperationImpl implements NoopOperation {
 
-	static final int CMD=10;
+  static final int CMD = 10;
 
-	public NoopOperationImpl(OperationCallback cb) {
-		super(CMD, generateOpaque(), cb);
-	}
+  public NoopOperationImpl(OperationCallback cb) {
+    super(CMD, generateOpaque(), cb);
+  }
 
-	@Override
-	public void initialize() {
-		prepareBuffer("", 0, EMPTY_BYTES);
-	}
+  @Override
+  public void initialize() {
+    prepareBuffer("", 0, EMPTY_BYTES);
+  }
 
 }

@@ -19,92 +19,92 @@ package net.spy.memcached.collection;
 import net.spy.memcached.util.BTreeUtil;
 
 public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
-	private String key;
-	private long bkey;
-	private byte[] bytebkey;
+  private String key;
+  private long bkey;
+  private byte[] bytebkey;
 
-	public SMGetTrimKey(String key, Object bkey) {
-		this.key = key;
-		if (bkey instanceof byte[]) {
-			this.bytebkey = new ByteArrayBKey((byte[])bkey).getBytes();
-			this.bkey = -1;
-		} else {
-			this.bkey = (Long)bkey;
-			this.bytebkey = null;
-		}
-		
-	}
-	
-	@Override
-	public String toString() {
-		return "SMGetElement {KEY:" + key + ", BKEY:"
-				+ ((bytebkey == null) ? bkey : BTreeUtil.toHex(bytebkey)) + "}";
-	}
+  public SMGetTrimKey(String key, Object bkey) {
+    this.key = key;
+    if (bkey instanceof byte[]) {
+      this.bytebkey = new ByteArrayBKey((byte[]) bkey).getBytes();
+      this.bkey = -1;
+    } else {
+      this.bkey = (Long) bkey;
+      this.bytebkey = null;
+    }
 
-	@Override
-	public int compareTo(SMGetTrimKey param) {
-		assert param != null;
-		
-		int comp;
-		/* compare bkey */
-		if (bytebkey == null)
-			comp = new Long(bkey).compareTo(param.getBkey());
-		else
-			comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-		
-		/* if bkey is equal, then compare key */
-		if (comp == 0)
-			comp = key.compareTo(param.getKey());
-		
-		return comp;
-	}
+  }
 
-	public int compareBkeyTo(SMGetTrimKey param) {
-		assert param != null;
-		
-		/* compare bkey */
-		if (bytebkey == null)
-			return new Long(bkey).compareTo(param.getBkey());
-		else
-			return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-	}
+  @Override
+  public String toString() {
+    return "SMGetElement {KEY:" + key + ", BKEY:"
+            + ((bytebkey == null) ? bkey : BTreeUtil.toHex(bytebkey)) + "}";
+  }
 
-	public String getKey() {
-		return key;
-	}
-	
-	public void setKey(String key) {
-		this.key = key;
-	}
-	
-	public long getBkey() {
-		if (bkey == -1) {
-			throw new IllegalStateException("This element has byte[] bkey. " + toString());
-		}
-		return bkey;
-	}
-	
-	public byte[] getByteBkey() {
-		if (bytebkey == null) {
-			throw new IllegalStateException(
-					"This element has java.lang.Long type bkey. " + toString());
-		}
-		return bytebkey;
-	}
-	
-	public Object getBkeyByObject() {
-		if (bytebkey != null) {
-			return bytebkey;
-		} else {
-			return bkey;
-		}
-	}
-	
-	public void setBkey(long bkey) {
-		this.bkey = bkey;
-	}
+  @Override
+  public int compareTo(SMGetTrimKey param) {
+    assert param != null;
 
-	public boolean hasByteArrayBkey() {
-		return bytebkey != null;
-	}
+    int comp;
+        /* compare bkey */
+    if (bytebkey == null)
+      comp = new Long(bkey).compareTo(param.getBkey());
+    else
+      comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+
+    /* if bkey is equal, then compare key */
+    if (comp == 0)
+      comp = key.compareTo(param.getKey());
+
+    return comp;
+  }
+
+  public int compareBkeyTo(SMGetTrimKey param) {
+    assert param != null;
+
+    /* compare bkey */
+    if (bytebkey == null)
+      return new Long(bkey).compareTo(param.getBkey());
+    else
+      return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public long getBkey() {
+    if (bkey == -1) {
+      throw new IllegalStateException("This element has byte[] bkey. " + toString());
+    }
+    return bkey;
+  }
+
+  public byte[] getByteBkey() {
+    if (bytebkey == null) {
+      throw new IllegalStateException(
+              "This element has java.lang.Long type bkey. " + toString());
+    }
+    return bytebkey;
+  }
+
+  public Object getBkeyByObject() {
+    if (bytebkey != null) {
+      return bytebkey;
+    } else {
+      return bkey;
+    }
+  }
+
+  public void setBkey(long bkey) {
+    this.bkey = bkey;
+  }
+
+  public boolean hasByteArrayBkey() {
+    return bytebkey != null;
+  }
 }

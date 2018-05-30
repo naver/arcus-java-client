@@ -18,18 +18,18 @@ package net.spy.memcached.collection;
 
 public class ListStore<T> extends CollectionStore<T> {
 
-	private static final String command = "lop insert";
-	
-	public ListStore() {
-		super();
-	}
+  private static final String command = "lop insert";
 
-	public ListStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-		super(value, null, createKeyIfNotExists, requestMode, attr);
-	}
-	
-	public String getCommand() {
-		return command;
-	}
-	
+  public ListStore() {
+    super();
+  }
+
+  public ListStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+    super(value, null, createKeyIfNotExists, requestMode, attr);
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
 }

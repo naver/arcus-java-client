@@ -29,53 +29,53 @@ import net.spy.memcached.ops.OperationType;
  * Arcus flush by prefix operation.
  */
 final class FlushByPrefixOperationImpl extends OperationImpl implements
-		FlushOperation {
+        FlushOperation {
 
-	private static final OperationStatus OK = new OperationStatus(true, "OK");
-	private static final OperationStatus NOT_FOUND = new OperationStatus(false, "NOT_FOUND");
+  private static final OperationStatus OK = new OperationStatus(true, "OK");
+  private static final OperationStatus NOT_FOUND = new OperationStatus(false, "NOT_FOUND");
 
-	private final String prefix;
-	private final int delay;
-	private final boolean noreply;
+  private final String prefix;
+  private final int delay;
+  private final boolean noreply;
 
-	public FlushByPrefixOperationImpl(String prefix, int delay,
-			boolean noreply, OperationCallback cb) {
-		super(cb);
-		this.prefix = prefix;
-		this.delay = delay;
-		this.noreply = noreply;
-		setAPIType(APIType.FLUSH);
-		setOperationType(OperationType.WRITE);
-	}
+  public FlushByPrefixOperationImpl(String prefix, int delay,
+                                    boolean noreply, OperationCallback cb) {
+    super(cb);
+    this.prefix = prefix;
+    this.delay = delay;
+    this.noreply = noreply;
+    setAPIType(APIType.FLUSH);
+    setOperationType(OperationType.WRITE);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		getLogger().debug("Flush completed successfully");
-		/* ENABLE_REPLICATION if */
-		if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-			receivedMoveOperations(line);
-			return;
-		}
+  @Override
+  public void handleLine(String line) {
+    getLogger().debug("Flush completed successfully");
+    /* ENABLE_REPLICATION if */
+    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+      receivedMoveOperations(line);
+      return;
+    }
 
-		/* ENABLE_REPLICATION end */
-		getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
-		transitionState(OperationState.COMPLETE);
-	}
+    /* ENABLE_REPLICATION end */
+    getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
+    transitionState(OperationState.COMPLETE);
+  }
 
-	@Override
-	public void initialize() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("flush_prefix ");
-		sb.append(prefix);
-		if (delay != -1)
-			sb.append(" ").append(delay);
-		if (noreply)
-			sb.append(" noreply");
-		sb.append("\r\n");
+  @Override
+  public void initialize() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("flush_prefix ");
+    sb.append(prefix);
+    if (delay != -1)
+      sb.append(" ").append(delay);
+    if (noreply)
+      sb.append(" noreply");
+    sb.append("\r\n");
 
-		ByteBuffer bb = ByteBuffer.allocate(sb.length());
-		bb.put(sb.toString().getBytes());
-		bb.flip();
-		setBuffer(bb);
-	}
+    ByteBuffer bb = ByteBuffer.allocate(sb.length());
+    bb.put(sb.toString().getBytes());
+    bb.flip();
+    setBuffer(bb);
+  }
 }

@@ -26,167 +26,167 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final byte[] BKEY = new byte[] { (byte) 1 };
-	private final byte[] BKEY2 = new byte[] { (byte) 2 };
+  private final String KEY = this.getClass().getSimpleName();
+  private final byte[] BKEY = new byte[]{(byte) 1};
+  private final byte[] BKEY2 = new byte[]{(byte) 2};
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testGetBKeyCountFromInvalidKey() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.GreaterThan, "1".getBytes());
+  public void testGetBKeyCountFromInvalidKey() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.GreaterThan, "1".getBytes());
 
-			CollectionFuture<Integer> future = mc.asyncBopGetItemCount(
-					"INVALIDKEY", BKEY, BKEY, filter);
-			Integer count = future.get();
-			Assert.assertNull(count);
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.NOT_FOUND, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      CollectionFuture<Integer> future = mc.asyncBopGetItemCount(
+              "INVALIDKEY", BKEY, BKEY, filter);
+      Integer count = future.get();
+      Assert.assertNull(count);
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.NOT_FOUND, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetBKeyCountFromInvalidType() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "eflag".getBytes());
+  public void testGetBKeyCountFromInvalidType() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "eflag".getBytes());
 
-			// insert value into set
-			Boolean insertResult = mc.asyncSopInsert(KEY, "value",
-					new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult);
+      // insert value into set
+      Boolean insertResult = mc.asyncSopInsert(KEY, "value",
+              new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult);
 
-			// get count from key
-			CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
-					BKEY, BKEY, filter);
-			Integer count = future.get();
-			Assert.assertNull(count);
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get count from key
+      CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
+              BKEY, BKEY, filter);
+      Integer count = future.get();
+      Assert.assertNull(count);
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetBKeyCountFromNotEmpty() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "eflag".getBytes());
+  public void testGetBKeyCountFromNotEmpty() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "eflag".getBytes());
 
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert two items
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					"eflag".getBytes(), "value", new CollectionAttributes())
-					.get();
-			Assert.assertTrue(insertResult);
+      // insert two items
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              "eflag".getBytes(), "value", new CollectionAttributes())
+              .get();
+      Assert.assertTrue(insertResult);
 
-			Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
-					"eflag".getBytes(), "value", new CollectionAttributes())
-					.get();
-			Assert.assertTrue(insertResult2);
+      Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
+              "eflag".getBytes(), "value", new CollectionAttributes())
+              .get();
+      Assert.assertTrue(insertResult2);
 
-			// check count in attributes
-			Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      // check count in attributes
+      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get btree item count
-			CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
-					BKEY, BKEY, filter);
-			Integer count = future.get();
-			Assert.assertNotNull(count);
-			Assert.assertEquals(new Integer(1), count);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get btree item count
+      CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
+              BKEY, BKEY, filter);
+      Integer count = future.get();
+      Assert.assertNotNull(count);
+      Assert.assertEquals(new Integer(1), count);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetBKeyCountFromNotEmpty2() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "eflag".getBytes());
+  public void testGetBKeyCountFromNotEmpty2() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "eflag".getBytes());
 
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert two items
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					"eflag".getBytes(), "value", new CollectionAttributes())
-					.get();
-			Assert.assertTrue(insertResult);
+      // insert two items
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              "eflag".getBytes(), "value", new CollectionAttributes())
+              .get();
+      Assert.assertTrue(insertResult);
 
-			Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2, null,
-					"value", new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult2);
+      Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2, null,
+              "value", new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult2);
 
-			// check count in attributes
-			Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      // check count in attributes
+      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get btree item count
-			CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
-					BKEY, BKEY2, filter);
-			Integer count = future.get();
-			Assert.assertNotNull(count);
-			Assert.assertEquals(new Integer(1), count);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // get btree item count
+      CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
+              BKEY, BKEY2, filter);
+      Integer count = future.get();
+      Assert.assertNotNull(count);
+      Assert.assertEquals(new Integer(1), count);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testGetBKeyCountFromNotEmpty3() {
-		try {
-			ElementFlagFilter filter = new ElementFlagFilter(
-					CompOperands.Equal, "eflag".getBytes());
+  public void testGetBKeyCountFromNotEmpty3() {
+    try {
+      ElementFlagFilter filter = new ElementFlagFilter(
+              CompOperands.Equal, "eflag".getBytes());
 
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert two items
-			Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-					"eflag".getBytes(), "value", new CollectionAttributes())
-					.get();
-			Assert.assertTrue(insertResult);
+      // insert two items
+      Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
+              "eflag".getBytes(), "value", new CollectionAttributes())
+              .get();
+      Assert.assertTrue(insertResult);
 
-			Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
-					"eflageflag".getBytes(), "value",
-					new CollectionAttributes()).get();
-			Assert.assertTrue(insertResult2);
+      Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
+              "eflageflag".getBytes(), "value",
+              new CollectionAttributes()).get();
+      Assert.assertTrue(insertResult2);
 
-			// check count in attributes
-			Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
-					.getCount());
+      // check count in attributes
+      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+              .getCount());
 
-			// get btree item count
-			CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
-					BKEY, BKEY, filter);
-			Integer count = future.get();
-			Assert.assertNotNull(count);
-			Assert.assertEquals(new Integer(1), count);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
-	
+      // get btree item count
+      CollectionFuture<Integer> future = mc.asyncBopGetItemCount(KEY,
+              BKEY, BKEY, filter);
+      Integer count = future.get();
+      Assert.assertNotNull(count);
+      Assert.assertEquals(new Integer(1), count);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
+
 }

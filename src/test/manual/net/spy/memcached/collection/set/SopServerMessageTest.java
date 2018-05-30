@@ -27,139 +27,139 @@ import net.spy.memcached.ops.OperationStatus;
 
 public class SopServerMessageTest extends BaseIntegrationTest {
 
-	private String key = "SopServerMessageTest";
+  private String key = "SopServerMessageTest";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.asyncSopDelete(key, "aaa", true);
-		mc.asyncSopDelete(key, "bbbb", true);
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.asyncSopDelete(key, "aaa", true);
+    mc.asyncSopDelete(key, "bbbb", true);
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testNotFound() throws Exception {
-		CollectionFuture<Set<Object>> future = mc.asyncSopGet(key, 1, false, false);
-		assertNull(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testNotFound() throws Exception {
+    CollectionFuture<Set<Object>> future = mc.asyncSopGet(key, 1, false, false);
+    assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("NOT_FOUND", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("NOT_FOUND", status.getMessage());
+  }
 
-	public void testCreatedStored() throws Exception {
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testCreatedStored() throws Exception {
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("CREATED_STORED", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("CREATED_STORED", status.getMessage());
+  }
 
-	public void testStored() throws Exception {
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testStored() throws Exception {
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncSopInsert(key, "bbbb",	new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("STORED", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("STORED", status.getMessage());
+  }
 
-	public void testOverflowed() throws Exception {
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testOverflowed() throws Exception {
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
-				.get(1000, TimeUnit.MILLISECONDS));
+    assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
+            .get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
-		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
+    future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
+    assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("OVERFLOWED", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("OVERFLOWED", status.getMessage());
+  }
 
-	public void testElementExists() throws Exception {
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testElementExists() throws Exception {
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
+    future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("ELEMENT_EXISTS", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("ELEMENT_EXISTS", status.getMessage());
+  }
 
-	public void testDeletedDropped() throws Exception {
-		// create
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testDeletedDropped() throws Exception {
+    // create
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// delete
-		future = mc.asyncSopDelete(key, "aaa", true);
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    // delete
+    future = mc.asyncSopDelete(key, "aaa", true);
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("DELETED_DROPPED", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("DELETED_DROPPED", status.getMessage());
+  }
 
-	public void testDeleted() throws Exception {
-		// create
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testDeleted() throws Exception {
+    // create
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// insert
-		future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    // insert
+    future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// delete
-		future = mc.asyncSopDelete(key, "aaa", false);
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    // delete
+    future = mc.asyncSopDelete(key, "aaa", false);
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("DELETED", status.getMessage());
-	}
+    OperationStatus status = future.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("DELETED", status.getMessage());
+  }
 
-	public void testDeletedDroppedAfterRetrieval() throws Exception {
-		// create
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testDeletedDroppedAfterRetrieval() throws Exception {
+    // create
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// get
-		CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, true);
-		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
+    // get
+    CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, true);
+    assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future2.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("DELETED_DROPPED", status.getMessage());
-	}
+    OperationStatus status = future2.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("DELETED_DROPPED", status.getMessage());
+  }
 
-	public void testDeletedAfterRetrieval() throws Exception {
-		// create
-		CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+  public void testDeletedAfterRetrieval() throws Exception {
+    // create
+    CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// insert
-		future = mc.asyncSopInsert(key, "bbbb",	new CollectionAttributes());
-		assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
+    // insert
+    future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
+    assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-		// get
-		CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, false);
-		assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
+    // get
+    CollectionFuture<Set<Object>> future2 = mc.asyncSopGet(key, 1, true, false);
+    assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
-		OperationStatus status = future2.getOperationStatus();
-		assertNotNull(status);
-		assertEquals("DELETED", status.getMessage());
-	}
+    OperationStatus status = future2.getOperationStatus();
+    assertNotNull(status);
+    assertEquals("DELETED", status.getMessage());
+  }
 
 }

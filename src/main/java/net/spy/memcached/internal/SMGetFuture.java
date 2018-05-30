@@ -31,56 +31,56 @@ import net.spy.memcached.ops.OperationState;
 
 public abstract class SMGetFuture<T> implements Future<T> {
 
-	private final Collection<Operation> ops;
-	private final long timeout;
+  private final Collection<Operation> ops;
+  private final long timeout;
 
-	public SMGetFuture(Collection<Operation> ops, long timeout) {
-		this.ops = ops;
-		this.timeout = timeout;
-	}
+  public SMGetFuture(Collection<Operation> ops, long timeout) {
+    this.ops = ops;
+    this.timeout = timeout;
+  }
 
-	@Override
-	public T get() throws InterruptedException, ExecutionException {
-		try {
-			return get(timeout, TimeUnit.MILLISECONDS);
-		} catch (TimeoutException e) {
-			throw new RuntimeException("Timed out waiting for smget operation", e);
-		}
-	}
+  @Override
+  public T get() throws InterruptedException, ExecutionException {
+    try {
+      return get(timeout, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException e) {
+      throw new RuntimeException("Timed out waiting for smget operation", e);
+    }
+  }
 
-	@Override
-	public boolean cancel(boolean ign) {
-		boolean rv = false;
-		for (Operation op : ops) {
-			op.cancel("by application.");
-			rv |= op.getState() == OperationState.WRITING;
-		}
-		return rv;
-	}
+  @Override
+  public boolean cancel(boolean ign) {
+    boolean rv = false;
+    for (Operation op : ops) {
+      op.cancel("by application.");
+      rv |= op.getState() == OperationState.WRITING;
+    }
+    return rv;
+  }
 
-	@Override
-	public boolean isCancelled() {
-		boolean rv = false;
-		for (Operation op : ops) {
-			rv |= op.isCancelled();
-		}
-		return rv;
-	}
+  @Override
+  public boolean isCancelled() {
+    boolean rv = false;
+    for (Operation op : ops) {
+      rv |= op.isCancelled();
+    }
+    return rv;
+  }
 
-	@Override
-	public boolean isDone() {
-		boolean rv = true;
-		for (Operation op : ops) {
-			rv &= op.getState() == OperationState.COMPLETE;
-		}
-		return rv || isCancelled();
-	}
+  @Override
+  public boolean isDone() {
+    boolean rv = true;
+    for (Operation op : ops) {
+      rv &= op.getState() == OperationState.COMPLETE;
+    }
+    return rv || isCancelled();
+  }
 
-	public abstract Map<String, CollectionOperationStatus> getMissedKeys();
+  public abstract Map<String, CollectionOperationStatus> getMissedKeys();
 
-	public abstract List<String> getMissedKeyList();
+  public abstract List<String> getMissedKeyList();
 
-	public abstract List<SMGetTrimKey> getTrimmedKeys();
-	
-	public abstract CollectionOperationStatus getOperationStatus();
+  public abstract List<SMGetTrimKey> getTrimmedKeys();
+
+  public abstract CollectionOperationStatus getOperationStatus();
 }

@@ -20,29 +20,29 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetExist<T> extends CollectionExist {
 
-	private static final String command = "sop exist";
+  private static final String command = "sop exist";
 
-	protected T value;
-	protected byte[] additionalArgs;
-	protected Transcoder<T> tc;
-	
-	public SetExist(T value, Transcoder<T> tc) {
-		this.value = value;
-		this.tc = tc;
-		this.additionalArgs = tc.encode(value).getData();
-	}
+  protected T value;
+  protected byte[] additionalArgs;
+  protected Transcoder<T> tc;
 
-	@Override
-	public byte[] getAdditionalArgs() {
-		return additionalArgs;
-	}
+  public SetExist(T value, Transcoder<T> tc) {
+    this.value = value;
+    this.tc = tc;
+    this.additionalArgs = tc.encode(value).getData();
+  }
 
-	public String stringify() {
-		return String.valueOf(additionalArgs.length);
-	}
+  @Override
+  public byte[] getAdditionalArgs() {
+    return additionalArgs;
+  }
 
-	public String getCommand() {
-		return command;
-	}
-	
+  public String stringify() {
+    return String.valueOf(additionalArgs.length);
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
 }

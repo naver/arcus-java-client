@@ -18,53 +18,53 @@ package net.spy.memcached.collection;
 
 public class ListDelete extends CollectionDelete {
 
-	private static final String command = "lop delete";
-	
-	public ListDelete(int index, boolean noreply) {
-		this.range = String.valueOf(index);
-		this.noreply = noreply;
-	}
+  private static final String command = "lop delete";
 
-	public ListDelete(int index, boolean noreply, boolean dropIfEmpty) {
-		this(index, noreply);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	public ListDelete(int from, int to, boolean noreply) {
-		this.range = String.valueOf(from) + ".." + String.valueOf(to);
-		this.noreply = noreply;
-	}
+  public ListDelete(int index, boolean noreply) {
+    this.range = String.valueOf(index);
+    this.noreply = noreply;
+  }
 
-	public ListDelete(int from, int to, boolean noreply, boolean dropIfEmpty) {
-		this(from, to, noreply);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	@Override
-	public byte[] getAdditionalArgs() {
-		return null;
-	}
+  public ListDelete(int index, boolean noreply, boolean dropIfEmpty) {
+    this(index, noreply);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public String stringify() {
-		if (str != null) return str;
-		
-		StringBuilder b = new StringBuilder();
-		b.append(range);
-		
-		if (dropIfEmpty) {
-			b.append(" drop");
-		}
-		
-		if (noreply) {
-			b.append(" noreply");
-		}
-		
-		str = b.toString();
-		return str;
-	}
-	
-	public String getCommand() {
-		return command;
-	}
+  public ListDelete(int from, int to, boolean noreply) {
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.noreply = noreply;
+  }
+
+  public ListDelete(int from, int to, boolean noreply, boolean dropIfEmpty) {
+    this(from, to, noreply);
+    this.dropIfEmpty = dropIfEmpty;
+  }
+
+  @Override
+  public byte[] getAdditionalArgs() {
+    return null;
+  }
+
+  public String stringify() {
+    if (str != null) return str;
+
+    StringBuilder b = new StringBuilder();
+    b.append(range);
+
+    if (dropIfEmpty) {
+      b.append(" drop");
+    }
+
+    if (noreply) {
+      b.append(" noreply");
+    }
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
 
 }

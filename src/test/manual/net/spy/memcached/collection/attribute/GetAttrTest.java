@@ -26,72 +26,72 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class GetAttrTest extends BaseIntegrationTest {
 
-	private final String[] list = { "hello1", "hello2", "hello3" };
+  private final String[] list = {"hello1", "hello2", "hello3"};
 
-	public void testGetAttr_KV() throws Exception {
-		String key = "testGetAttr_KV";
+  public void testGetAttr_KV() throws Exception {
+    String key = "testGetAttr_KV";
 
-		mc.set(key, 100, "v").get();
+    mc.set(key, 100, "v").get();
 
-		CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		assertNotNull(rattrs);
-		assertEquals(new Integer(0), rattrs.getFlags());
-		assertEquals(CollectionType.kv, rattrs.getType());
-	}
+    assertNotNull(rattrs);
+    assertEquals(new Integer(0), rattrs.getFlags());
+    assertEquals(CollectionType.kv, rattrs.getType());
+  }
 
-	public void testGetAttr_ModifiedAttribute() throws Exception {
-		String key = "getattr_modified_attribute";
+  public void testGetAttr_ModifiedAttribute() throws Exception {
+    String key = "getattr_modified_attribute";
 
-		addToList(key, list);
+    addToList(key, list);
 
-		// Set attributes
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(1000);
-		attrs.setExpireTime(10000);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set attributes
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(1000);
+    attrs.setExpireTime(10000);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// 3. Get attributes
-		CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
+    // 3. Get attributes
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		assertNotNull(rattrs);
-		assertEquals(attrs.getMaxCount(), rattrs.getMaxCount());
-		// assertEquals(attrs.getExpireTime(), rattrs.getExpireTime());
-		assertEquals(CollectionType.list, rattrs.getType());
+    assertNotNull(rattrs);
+    assertEquals(attrs.getMaxCount(), rattrs.getMaxCount());
+    // assertEquals(attrs.getExpireTime(), rattrs.getExpireTime());
+    assertEquals(CollectionType.list, rattrs.getType());
 
-		deleteList(key, list.length);
-	}
+    deleteList(key, list.length);
+  }
 
-	public void testGetAttr_DefaultAttribute() throws Exception {
-		String key = "getattr_default_attribute";
+  public void testGetAttr_DefaultAttribute() throws Exception {
+    String key = "getattr_default_attribute";
 
-		addToList(key, list);
+    addToList(key, list);
 
-		// Get attributes
-		CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
+    // Get attributes
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
 
-		assertEquals(CollectionAttributes.DEFAULT_FLAGS, rattrs.getFlags());
-		assertEquals(CollectionAttributes.DEFAULT_EXPIRETIME,
-				rattrs.getExpireTime());
-		assertEquals(CollectionAttributes.DEFAULT_MAXCOUNT,
-				rattrs.getMaxCount());
-		assertEquals(CollectionAttributes.DEFAULT_OVERFLOWACTION,
-				rattrs.getOverflowAction());
+    assertEquals(CollectionAttributes.DEFAULT_FLAGS, rattrs.getFlags());
+    assertEquals(CollectionAttributes.DEFAULT_EXPIRETIME,
+            rattrs.getExpireTime());
+    assertEquals(CollectionAttributes.DEFAULT_MAXCOUNT,
+            rattrs.getMaxCount());
+    assertEquals(CollectionAttributes.DEFAULT_OVERFLOWACTION,
+            rattrs.getOverflowAction());
 
-		deleteList(key, list.length);
-	}
+    deleteList(key, list.length);
+  }
 
-	public void testGetAttr_KeyNotFound() throws Exception {
-		CollectionFuture<CollectionAttributes> future = mc
-				.asyncGetAttr("NOT_EXISTS");
+  public void testGetAttr_KeyNotFound() throws Exception {
+    CollectionFuture<CollectionAttributes> future = mc
+            .asyncGetAttr("NOT_EXISTS");
 
-		CollectionAttributes rattrs = future.get(1000, TimeUnit.MILLISECONDS);
+    CollectionAttributes rattrs = future.get(1000, TimeUnit.MILLISECONDS);
 
-		assertNull(rattrs);
-		assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
-				.getResponse());
-	}
+    assertNull(rattrs);
+    assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
+            .getResponse());
+  }
 }

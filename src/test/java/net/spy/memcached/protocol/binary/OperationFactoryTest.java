@@ -5,9 +5,9 @@ import net.spy.memcached.OperationFactoryTestBase;
 
 public class OperationFactoryTest extends OperationFactoryTestBase {
 
-	@Override
-	protected OperationFactory getOperationFactory() {
-		return new BinaryOperationFactory();
-	}
+  @Override
+  protected OperationFactory getOperationFactory() {
+    return new BinaryOperationFactory();
+  }
 
 }

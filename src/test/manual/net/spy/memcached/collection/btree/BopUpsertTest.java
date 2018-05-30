@@ -22,30 +22,30 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class BopUpsertTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final long BKEY = 10;
+  private final String KEY = this.getClass().getSimpleName();
+  private final long BKEY = 10;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testUpsertNotExistsKey() {
-		try {
-			boolean result = mc.asyncBopUpsert(KEY, BKEY, "eflag".getBytes(),
-					"VALUE", new CollectionAttributes()).get();
+  public void testUpsertNotExistsKey() {
+    try {
+      boolean result = mc.asyncBopUpsert(KEY, BKEY, "eflag".getBytes(),
+              "VALUE", new CollectionAttributes()).get();
 
-			Assert.assertTrue("Upsert failed", result);
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue("Upsert failed", result);
+    } catch (Exception e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 }

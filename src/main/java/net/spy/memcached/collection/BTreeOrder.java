@@ -20,18 +20,17 @@ package net.spy.memcached.collection;
  * A type component for "bop position" and "bop gbp"
  */
 public enum BTreeOrder {
-	ASC("asc"),
-	DESC("desc")
-	;
-	
-	private String ascii;
-	
-	BTreeOrder(String ascii) {
-		this.ascii = ascii;
-	}
+  ASC("asc"),
+  DESC("desc");
 
-	public String getAscii() {
-		return ascii;
-	}
-	
+  private String ascii;
+
+  BTreeOrder(String ascii) {
+    this.ascii = ascii;
+  }
+
+  public String getAscii() {
+    return ascii;
+  }
+
 }

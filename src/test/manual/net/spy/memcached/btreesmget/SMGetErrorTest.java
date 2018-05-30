@@ -35,470 +35,470 @@ import net.spy.memcached.internal.SMGetFuture;
 
 public class SMGetErrorTest extends BaseIntegrationTest {
 
-	private static final List<String> KEY_LIST = new ArrayList<String>();
+  private static final List<String> KEY_LIST = new ArrayList<String>();
 
-	static {
-		String KEY = SMGetErrorTest.class.getSimpleName()
-				+ new Random().nextLong();
-		for (int i = 1; i <= 10; i++)
-			KEY_LIST.add(KEY + (i * 9));
-	}
+  static {
+    String KEY = SMGetErrorTest.class.getSimpleName()
+            + new Random().nextLong();
+    for (int i = 1; i <= 10; i++)
+      KEY_LIST.add(KEY + (i * 9));
+  }
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		for (String KEY : KEY_LIST) {
-			mc.delete(KEY).get();
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
-		}
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    for (String KEY : KEY_LIST) {
+      mc.delete(KEY).get();
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    }
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		for (String KEY : KEY_LIST) {
-			mc.delete(KEY).get();
-		}
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    for (String KEY : KEY_LIST) {
+      mc.delete(KEY).get();
+    }
+    super.tearDown();
+  }
 
-	public void testDuplicated() {
-		// insert test data
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
-					"VALUE", new CollectionAttributes()).get());
+  public void testDuplicated() {
+    // insert test data
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
+              "VALUE", new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), 1, null,
-					"VALUE", new CollectionAttributes()).get());
+      Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), 1, null,
+              "VALUE", new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), 2, null,
-					"VALUE", new CollectionAttributes()).get());
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-		
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(KEY_LIST, 0, 10,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(3, map.size());
-			Assert.assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+      Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), 2, null,
+              "VALUE", new CollectionAttributes()).get());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-		// sort merge get
-		SMGetMode smgetMode = SMGetMode.DUPLICATE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(KEY_LIST, 0, 10,
-						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(3, map.size());
-			Assert.assertEquals("DUPLICATED", future.getOperationStatus().getMessage());
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(KEY_LIST, 0, 10,
+                    ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(3, map.size());
+      Assert.assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    // sort merge get
+    SMGetMode smgetMode = SMGetMode.DUPLICATE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(KEY_LIST, 0, 10,
+                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(3, map.size());
+      Assert.assertEquals("DUPLICATED", future.getOperationStatus().getMessage());
 
-	public void testBkeyMismatch() {
-		// insert test data
-		try {
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setMaxCount(20);
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
-					.get();
+  public void testBkeyMismatch() {
+    // insert test data
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setMaxCount(20);
 
-			for (int i = 0; i < 20; i++) {
-				// trimmed
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0),
-						new byte[] { (byte) i }, null, "VALUE", attr).get());
+      mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
+              .get();
 
-				// not trimmed
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
-						"VALUE", new CollectionAttributes()).get());
-			}
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+      for (int i = 0; i < 20; i++) {
+        // trimmed
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0),
+                new byte[]{(byte) i}, null, "VALUE", attr).get());
 
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(KEY_LIST, 0, 15,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 20);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(0, map.size());
-			Assert.assertEquals("BKEY_MISMATCH", oldFuture.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		// sort merge get
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(KEY_LIST, 0, 15,
-						ElementFlagFilter.DO_NOT_FILTER, 20, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(0, map.size());
-			Assert.assertEquals("BKEY_MISMATCH", future.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+        // not trimmed
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
+                "VALUE", new CollectionAttributes()).get());
+      }
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-	public void testTrimmed() {
-		// insert test data
-		try {
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setMaxCount(10);
-			attr.setOverflowAction(CollectionOverflowAction.smallest_trim);
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(KEY_LIST, 0, 15,
+                    ElementFlagFilter.DO_NOT_FILTER, 0, 20);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(0, map.size());
+      Assert.assertEquals("BKEY_MISMATCH", oldFuture.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
-					.get();
+    // sort merge get
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(KEY_LIST, 0, 15,
+                    ElementFlagFilter.DO_NOT_FILTER, 20, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(0, map.size());
+      Assert.assertEquals("BKEY_MISMATCH", future.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr)
-					.get();
+  public void testTrimmed() {
+    // insert test data
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setMaxCount(10);
+      attr.setOverflowAction(CollectionOverflowAction.smallest_trim);
 
-			for (int i = 0; i < 30; i++) {
-				// trimmed
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), i, null,
-						"VALUE", attr).get());
-			}
+      mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
+              .get();
 
-			// not trimmed
-			for (int i = 0; i < 9; i++) {
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
-						"VALUE", attr).get());
-			}
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+      mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr)
+              .get();
 
-		// display current bkey list
-		try {
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY_LIST.get(0), 0,
-					10000, ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false,
-					false).get();
-			// System.out.println(KEY_LIST.get(0) + " => ");
-			// for (Entry<Long, Object> entry : map.entrySet()) {
-			// System.out.print(entry.getKey());
-			// System.out.print(" , ");
-			// }
-			// System.out.println("");
+      for (int i = 0; i < 30; i++) {
+        // trimmed
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), i, null,
+                "VALUE", attr).get());
+      }
 
-			map = mc.asyncBopGet(KEY_LIST.get(1), 0, 10000,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false, false)
-					.get();
-			// System.out.println(KEY_LIST.get(1) + " => ");
-			// for (Entry<Long, Object> entry : map.entrySet()) {
-			// System.out.print(entry.getKey());
-			// System.out.print(" , ");
-			// }
-			// System.out.println("");
+      // not trimmed
+      for (int i = 0; i < 9; i++) {
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
+                "VALUE", attr).get());
+      }
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+    // display current bkey list
+    try {
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY_LIST.get(0), 0,
+              10000, ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false,
+              false).get();
+      // System.out.println(KEY_LIST.get(0) + " => ");
+      // for (Entry<Long, Object> entry : map.entrySet()) {
+      // System.out.print(entry.getKey());
+      // System.out.print(" , ");
+      // }
+      // System.out.println("");
 
-		// sort merge get
-		long from = 20;
-		long to = 10;
-		long count = from - to;
-		
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(1, map.size());
-			Assert.assertEquals("TRIMMED", oldFuture.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(1, map.size());
-			Assert.assertEquals(1, future.getTrimmedKeys().size());
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      map = mc.asyncBopGet(KEY_LIST.get(1), 0, 10000,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false, false)
+              .get();
+      // System.out.println(KEY_LIST.get(1) + " => ");
+      // for (Entry<Long, Object> entry : map.entrySet()) {
+      // System.out.print(entry.getKey());
+      // System.out.print(" , ");
+      // }
+      // System.out.println("");
 
-	public void testOutOfRange() {
-		// insert test data
-		try {
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setMaxCount(10);
-			attr.setOverflowAction(CollectionOverflowAction.smallest_trim);
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
 
-			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
-					.get();
+    // sort merge get
+    long from = 20;
+    long to = 10;
+    long count = from - to;
 
-			mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr)
-					.get();
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(KEY_LIST, from, to,
+                    ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(1, map.size());
+      Assert.assertEquals("TRIMMED", oldFuture.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			for (int i = 0; i < 30; i++) {
-				// trimmed
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), i, null,
-						"VALUE", attr).get());
-			}
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(KEY_LIST, from, to,
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(1, map.size());
+      Assert.assertEquals(1, future.getTrimmedKeys().size());
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			// not trimmed
-			for (int i = 0; i < 9; i++) {
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
-						"VALUE", attr).get());
-			}
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+  public void testOutOfRange() {
+    // insert test data
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setMaxCount(10);
+      attr.setOverflowAction(CollectionOverflowAction.smallest_trim);
 
-		// display current bkey list
-		try {
-			Map<Long, Element<Object>> map = mc.asyncBopGet(KEY_LIST.get(0), 0,
-					10000, ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false,
-					false).get();
-			// System.out.println(KEY_LIST.get(0) + " => ");
-			// for (Entry<Long, Object> entry : map.entrySet()) {
-			// System.out.print(entry.getKey());
-			// System.out.print(" , ");
-			// }
-			// System.out.println("");
+      mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
+              .get();
 
-			map = mc.asyncBopGet(KEY_LIST.get(1), 0, 10000,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false, false)
-					.get();
-			// System.out.println(KEY_LIST.get(1) + " => ");
-			// for (Entry<Long, Object> entry : map.entrySet()) {
-			// System.out.print(entry.getKey());
-			// System.out.print(" , ");
-			// }
-			// System.out.println("");
+      mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr)
+              .get();
 
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+      for (int i = 0; i < 30; i++) {
+        // trimmed
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), i, null,
+                "VALUE", attr).get());
+      }
 
-		// sort merge get
-		long from = 10;
-		long to = 0;
-		long count = from - to;
-		
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(0, map.size());
-			Assert.assertEquals("OUT_OF_RANGE", oldFuture.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(KEY_LIST, from, to,
-						ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(9, map.size());
-			Assert.assertEquals("END", future.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // not trimmed
+      for (int i = 0; i < 9; i++) {
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(1), i, null,
+                "VALUE", attr).get());
+      }
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-	public void testDuplicated2() {
-		// insert test data
-		try {
-			Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
-					"VALUE", new CollectionAttributes()).get());
+    // display current bkey list
+    try {
+      Map<Long, Element<Object>> map = mc.asyncBopGet(KEY_LIST.get(0), 0,
+              10000, ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false,
+              false).get();
+      // System.out.println(KEY_LIST.get(0) + " => ");
+      // for (Entry<Long, Object> entry : map.entrySet()) {
+      // System.out.print(entry.getKey());
+      // System.out.print(" , ");
+      // }
+      // System.out.println("");
 
-			for (int bkey = 0; bkey < KEY_LIST.size() - 1; bkey++) {
-				Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(bkey), bkey,
-						null, "VALUE", new CollectionAttributes()).get());
-			}
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-		
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(KEY_LIST, 10, 0,
-						ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(10, map.size());
-			Assert.assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		// sort merge get
-		SMGetMode smgetMode = SMGetMode.DUPLICATE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(KEY_LIST, 10, 0,
-						ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(10, map.size());
-			Assert.assertEquals("DUPLICATED", future.getOperationStatus().getMessage());
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      map = mc.asyncBopGet(KEY_LIST.get(1), 0, 10000,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 10000, false, false)
+              .get();
+      // System.out.println(KEY_LIST.get(1) + " => ");
+      // for (Entry<Long, Object> entry : map.entrySet()) {
+      // System.out.print(entry.getKey());
+      // System.out.print(" , ");
+      // }
+      // System.out.println("");
 
-	public void testUnreadable() {
-		// insert test data
-		try {
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setReadable(false);
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
 
-			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
-					.get();
+    // sort merge get
+    long from = 10;
+    long to = 0;
+    long count = from - to;
 
-			mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
-			mc.asyncBopInsert(KEY_LIST.get(0), 1, null, "V", attr).get();
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(KEY_LIST, from, to,
+                    ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(0, map.size());
+      Assert.assertEquals("OUT_OF_RANGE", oldFuture.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			mc.asyncBopInsert(KEY_LIST.get(1), 0, null, "V", attr).get();
-			mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(KEY_LIST, from, to,
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(9, map.size());
+      Assert.assertEquals("END", future.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-		ArrayList<String> testKeyList = new ArrayList<String>();
-		testKeyList.add(KEY_LIST.get(0));
-		testKeyList.add(KEY_LIST.get(1));
-		
-		/* old SMGetErrorTest */
-		SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-				.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-		try {
-			List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(0, map.size());
-		} catch (Exception e) {
-			oldFuture.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-		
-		// sort merge get
-		SMGetMode smgetMode = SMGetMode.UNIQUE;
-		SMGetFuture<List<SMGetElement<Object>>> future = mc
-				.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
-		try {
-			List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-			Assert.assertEquals(0, map.size());
-		} catch (Exception e) {
-			future.cancel(true);
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+  public void testDuplicated2() {
+    // insert test data
+    try {
+      Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
+              "VALUE", new CollectionAttributes()).get());
 
-	public void testInvalidArgumentException() {
-		ArrayList<String> testKeyList = new ArrayList<String>();
-		testKeyList.add(KEY_LIST.get(0));
-		testKeyList.add(KEY_LIST.get(1));
+      for (int bkey = 0; bkey < KEY_LIST.size() - 1; bkey++) {
+        Assert.assertTrue(mc.asyncBopInsert(KEY_LIST.get(bkey), bkey,
+                null, "VALUE", new CollectionAttributes()).get());
+      }
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-		// insert test data
-		try {
-			CollectionAttributes attr = new CollectionAttributes();
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(KEY_LIST, 10, 0,
+                    ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(10, map.size());
+      Assert.assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-			mc.delete(KEY_LIST.get(0)).get();
-			mc.delete(KEY_LIST.get(1)).get();
+    // sort merge get
+    SMGetMode smgetMode = SMGetMode.DUPLICATE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(KEY_LIST, 10, 0,
+                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(10, map.size());
+      Assert.assertEquals("DUPLICATED", future.getOperationStatus().getMessage());
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr).get();
-			mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr).get();
+  public void testUnreadable() {
+    // insert test data
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setReadable(false);
 
-			mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
-			mc.asyncBopInsert(KEY_LIST.get(0), 2, null, "V", attr).get();
+      mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr)
+              .get();
 
-			mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
-			mc.asyncBopInsert(KEY_LIST.get(1), 3, null, "V", attr).get();
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+      mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
+      mc.asyncBopInsert(KEY_LIST.get(0), 1, null, "V", attr).get();
 
-		// keylist is null
-		try {
-			mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("Key list is empty.", e.getMessage());
-		}
+      mc.asyncBopInsert(KEY_LIST.get(1), 0, null, "V", attr).get();
+      mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
 
-		// keylist is empty
-		try {
-			mc.asyncBopSortMergeGet(new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("Key list is empty.", e.getMessage());
-		}
+    ArrayList<String> testKeyList = new ArrayList<String>();
+    testKeyList.add(KEY_LIST.get(0));
+    testKeyList.add(KEY_LIST.get(1));
 
-		// offset < 0
-		try {
-			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("Offset must be 0 or positive integer.", e.getMessage());
-		}
+    /* old SMGetErrorTest */
+    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
+            .asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+    try {
+      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(0, map.size());
+    } catch (Exception e) {
+      oldFuture.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-		// count == 0 
-		try {
-			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("Count must be larger than 0.", e.getMessage());
-		}
+    // sort merge get
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetFuture<List<SMGetElement<Object>>> future = mc
+            .asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+    try {
+      List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
+      Assert.assertEquals(0, map.size());
+    } catch (Exception e) {
+      future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-		// offset + count > 1000
-		try {
-			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
-		}
+  public void testInvalidArgumentException() {
+    ArrayList<String> testKeyList = new ArrayList<String>();
+    testKeyList.add(KEY_LIST.get(0));
+    testKeyList.add(KEY_LIST.get(1));
 
-		// duplicate keys
-		try {
-			// add duplicate key to testKeyList
-			testKeyList.add(KEY_LIST.get(1));
-			mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-			fail("This should be an exception");
-		} catch (Exception e) {
-			assertEquals("Duplicate keys exist in key list.", e.getMessage());
-		}
-	}
+    // insert test data
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+
+      mc.delete(KEY_LIST.get(0)).get();
+      mc.delete(KEY_LIST.get(1)).get();
+
+      mc.asyncBopCreate(KEY_LIST.get(0), ElementValueType.STRING, attr).get();
+      mc.asyncBopCreate(KEY_LIST.get(1), ElementValueType.STRING, attr).get();
+
+      mc.asyncBopInsert(KEY_LIST.get(0), 0, null, "V", attr).get();
+      mc.asyncBopInsert(KEY_LIST.get(0), 2, null, "V", attr).get();
+
+      mc.asyncBopInsert(KEY_LIST.get(1), 1, null, "V", attr).get();
+      mc.asyncBopInsert(KEY_LIST.get(1), 3, null, "V", attr).get();
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+
+    // keylist is null
+    try {
+      mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("Key list is empty.", e.getMessage());
+    }
+
+    // keylist is empty
+    try {
+      mc.asyncBopSortMergeGet(new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("Key list is empty.", e.getMessage());
+    }
+
+    // offset < 0
+    try {
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("Offset must be 0 or positive integer.", e.getMessage());
+    }
+
+    // count == 0
+    try {
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("Count must be larger than 0.", e.getMessage());
+    }
+
+    // offset + count > 1000
+    try {
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
+    }
+
+    // duplicate keys
+    try {
+      // add duplicate key to testKeyList
+      testKeyList.add(KEY_LIST.get(1));
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      fail("This should be an exception");
+    } catch (Exception e) {
+      assertEquals("Duplicate keys exist in key list.", e.getMessage());
+    }
+  }
 }

@@ -29,230 +29,232 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class SopPipedExistTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final String VALUE1 = "VALUE1";
-	private final String VALUE2 = "VALUE2";
-	private final String VALUE3 = "VALUE3";
-	private final String VALUE4 = "VALUE4";
-	private final String VALUE5 = "VALUE5";
-	private final String VALUE6 = "VALUE6";
+  private final String KEY = this.getClass().getSimpleName();
+  private final String VALUE1 = "VALUE1";
+  private final String VALUE2 = "VALUE2";
+  private final String VALUE3 = "VALUE3";
+  private final String VALUE4 = "VALUE4";
+  private final String VALUE5 = "VALUE5";
+  private final String VALUE6 = "VALUE6";
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	};
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testPipedExist() {
-		try {
-			Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
-					new CollectionAttributes()).get());
+  ;
 
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
-					new CollectionAttributes()).get());
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
-					new CollectionAttributes()).get());
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
-					new CollectionAttributes()).get());
+  public void testPipedExist() {
+    try {
+      Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
+              new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
-			Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
+              new CollectionAttributes()).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
+              new CollectionAttributes()).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
+              new CollectionAttributes()).get());
 
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
-			findValues.add(VALUE4);
-			findValues.add(VALUE2);
-			findValues.add(VALUE6);
-			findValues.add(VALUE3);
-			findValues.add(VALUE5);
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
+      Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
+      findValues.add(VALUE4);
+      findValues.add(VALUE2);
+      findValues.add(VALUE6);
+      findValues.add(VALUE3);
+      findValues.add(VALUE5);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(future.getOperationStatus().isSuccess());
+      Map<Object, Boolean> map = future.get();
 
-			Assert.assertTrue(map.get(VALUE1));
-			Assert.assertTrue(map.get(VALUE2));
-			Assert.assertTrue(map.get(VALUE3));
-			Assert.assertFalse(map.get(VALUE4));
-			Assert.assertFalse(map.get(VALUE5));
-			Assert.assertFalse(map.get(VALUE6));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(future.getOperationStatus().isSuccess());
 
-	public void testPipedExistWithOneValue() {
-		try {
-			Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
-					new CollectionAttributes()).get());
+      Assert.assertTrue(map.get(VALUE1));
+      Assert.assertTrue(map.get(VALUE2));
+      Assert.assertTrue(map.get(VALUE3));
+      Assert.assertFalse(map.get(VALUE4));
+      Assert.assertFalse(map.get(VALUE5));
+      Assert.assertFalse(map.get(VALUE6));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
-					new CollectionAttributes()).get());
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
-					new CollectionAttributes()).get());
-			Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
-					new CollectionAttributes()).get());
+  public void testPipedExistWithOneValue() {
+    try {
+      Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
+              new CollectionAttributes()).get());
 
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
-			Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
-			Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
+              new CollectionAttributes()).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
+              new CollectionAttributes()).get());
+      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
+              new CollectionAttributes()).get());
 
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
+      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
+      Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(future.getOperationStatus().isSuccess());
+      Map<Object, Boolean> map = future.get();
 
-			Assert.assertTrue(map.get(VALUE1));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Assert.assertTrue(future.getOperationStatus().isSuccess());
 
-	public void testMaxPipedExist() {
-		try {
-			List<Object> findValues = new ArrayList<Object>();
+      Assert.assertTrue(map.get(VALUE1));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			// insert items
-			for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
-				findValues.add("VALUE" + i);
+  public void testMaxPipedExist() {
+    try {
+      List<Object> findValues = new ArrayList<Object>();
 
-				if (i / 2 == 0)
-					continue;
-				Assert.assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i,
-						new CollectionAttributes()).get());
-			}
+      // insert items
+      for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
+        findValues.add("VALUE" + i);
 
-			// exist bulk
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+        if (i / 2 == 0)
+          continue;
+        Assert.assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i,
+                new CollectionAttributes()).get());
+      }
 
-			Map<Object, Boolean> map = future.get();
+      // exist bulk
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(future.getOperationStatus().isSuccess());
+      Map<Object, Boolean> map = future.get();
 
-			for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
-				if (i / 2 == 0) {
-					Assert.assertFalse(map.get("VALUE" + i));
-				} else {
-					Assert.assertTrue(map.get("VALUE" + i));
-				}
-			}
+      Assert.assertTrue(future.getOperationStatus().isSuccess());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
+        if (i / 2 == 0) {
+          Assert.assertFalse(map.get("VALUE" + i));
+        } else {
+          Assert.assertTrue(map.get("VALUE" + i));
+        }
+      }
 
-	public void testPipedExistNotExistsKey() {
-		try {
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
-			findValues.add(VALUE4);
-			findValues.add(VALUE2);
-			findValues.add(VALUE6);
-			findValues.add(VALUE3);
-			findValues.add(VALUE5);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+  public void testPipedExistNotExistsKey() {
+    try {
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
+      findValues.add(VALUE4);
+      findValues.add(VALUE2);
+      findValues.add(VALUE6);
+      findValues.add(VALUE3);
+      findValues.add(VALUE5);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(map.isEmpty());
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.NOT_FOUND, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Object, Boolean> map = future.get();
 
-	public void testPipedExistOneNotExistsKey() {
-		try {
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
+      Assert.assertTrue(map.isEmpty());
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.NOT_FOUND, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+  public void testPipedExistOneNotExistsKey() {
+    try {
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(map.isEmpty());
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.NOT_FOUND, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Object, Boolean> map = future.get();
 
-	public void testPipedExistTypeMismatchedKey() {
-		try {
-			Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
+      Assert.assertTrue(map.isEmpty());
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.NOT_FOUND, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
-			findValues.add(VALUE2);
-			findValues.add(VALUE6);
-			findValues.add(VALUE3);
-			findValues.add(VALUE5);
+  public void testPipedExistTypeMismatchedKey() {
+    try {
+      Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
+      findValues.add(VALUE2);
+      findValues.add(VALUE6);
+      findValues.add(VALUE3);
+      findValues.add(VALUE5);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(map.isEmpty());
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Object, Boolean> map = future.get();
 
-	public void testPipedExistOneTypeMismatchedKey() {
-		try {
-			Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
+      Assert.assertTrue(map.isEmpty());
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-			List<Object> findValues = new ArrayList<Object>();
-			findValues.add(VALUE1);
+  public void testPipedExistOneTypeMismatchedKey() {
+    try {
+      Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
 
-			CollectionFuture<Map<Object, Boolean>> future = mc
-					.asyncSopPipedExistBulk(KEY, findValues);
+      List<Object> findValues = new ArrayList<Object>();
+      findValues.add(VALUE1);
 
-			Map<Object, Boolean> map = future.get();
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
 
-			Assert.assertTrue(map.isEmpty());
-			Assert.assertFalse(future.getOperationStatus().isSuccess());
-			Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
-					.getOperationStatus().getResponse());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      Map<Object, Boolean> map = future.get();
+
+      Assert.assertTrue(map.isEmpty());
+      Assert.assertFalse(future.getOperationStatus().isSuccess());
+      Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
+              .getOperationStatus().getResponse());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

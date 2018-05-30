@@ -18,25 +18,25 @@
 package net.spy.memcached;
 
 public class MemcachedReplicaGroupROImpl extends MemcachedReplicaGroup {
-	public MemcachedReplicaGroupROImpl(final MemcachedReplicaGroup group) {
-		super(group.getGroupName());
-		this.masterNode = new MemcachedNodeROImpl(group.getMasterNode());
-		this.slaveNode = new MemcachedNodeROImpl(group.getSlaveNode());
-	}
+  public MemcachedReplicaGroupROImpl(final MemcachedReplicaGroup group) {
+    super(group.getGroupName());
+    this.masterNode = new MemcachedNodeROImpl(group.getMasterNode());
+    this.slaveNode = new MemcachedNodeROImpl(group.getSlaveNode());
+  }
 
-	@Override
-	public boolean setMemcachedNode(MemcachedNode node) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean setMemcachedNode(MemcachedNode node) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public boolean deleteMemcachedNode(MemcachedNode node) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean deleteMemcachedNode(MemcachedNode node) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public boolean changeRole() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean changeRole() {
+    throw new UnsupportedOperationException();
+  }
 }
 /* ENABLE_REPLICATION end */

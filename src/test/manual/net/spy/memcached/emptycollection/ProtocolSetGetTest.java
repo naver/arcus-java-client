@@ -22,23 +22,23 @@ import net.spy.memcached.collection.SetGet;
 
 public class ProtocolSetGetTest extends TestCase {
 
-	private static final int count = 10;
+  private static final int count = 10;
 
-	public void testStringfy() {
-		// default setting : dropIfEmpty = true
+  public void testStringfy() {
+    // default setting : dropIfEmpty = true
 
-		Assert.assertEquals("10 drop",
-				(new SetGet(count, true)).stringify());
-		Assert.assertEquals("10",
-				(new SetGet(count, false)).stringify());
+    Assert.assertEquals("10 drop",
+            (new SetGet(count, true)).stringify());
+    Assert.assertEquals("10",
+            (new SetGet(count, false)).stringify());
 
-		Assert.assertEquals("10 drop",
-				(new SetGet(count, true, true)).stringify());
-		Assert.assertEquals("10 delete",
-				(new SetGet(count, true, false)).stringify());
-		Assert.assertEquals("10",
-				(new SetGet(count, false, true)).stringify());
-		Assert.assertEquals("10",
-				(new SetGet(count, false, false)).stringify());
-	}
+    Assert.assertEquals("10 drop",
+            (new SetGet(count, true, true)).stringify());
+    Assert.assertEquals("10 delete",
+            (new SetGet(count, true, false)).stringify());
+    Assert.assertEquals("10",
+            (new SetGet(count, false, true)).stringify());
+    Assert.assertEquals("10",
+            (new SetGet(count, false, false)).stringify());
+  }
 }

@@ -31,41 +31,41 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
 
-	public void testBopGet_Overflow() throws Exception {
-		String key = "MyBopOverflowtestKey23";
-		String value = "MyValue";
+  public void testBopGet_Overflow() throws Exception {
+    String key = "MyBopOverflowtestKey23";
+    String value = "MyValue";
 
-		// delete b+tree
-		mc.asyncBopDelete(key, 0, 10000, ElementFlagFilter.DO_NOT_FILTER, 0,
-				true).get();
+    // delete b+tree
+    mc.asyncBopDelete(key, 0, 10000, ElementFlagFilter.DO_NOT_FILTER, 0,
+            true).get();
 
-		// Create a B+ Tree
-		mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    // Create a B+ Tree
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
 
-		int maxcount = 10;
+    int maxcount = 10;
 
-		// Set maxcount
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(maxcount);
-		attrs.setOverflowAction(CollectionOverflowAction.error);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(maxcount);
+    attrs.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// generate bkey
-		Map<Long, Object> bkeys = new TreeMap<Long, Object>();
-		for (int i = 1; i <= maxcount; i++) {
-			bkeys.put((long) i, value);
-		}
+    // generate bkey
+    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    for (int i = 1; i <= maxcount; i++) {
+      bkeys.put((long) i, value);
+    }
 
-		// SET
-		Future<Map<Integer, CollectionOperationStatus>> future = mc
-				.asyncBopPipedInsertBulk(key, bkeys, new CollectionAttributes());
-		try {
-			Map<Integer, CollectionOperationStatus> errorList = future.get(
-					20000L, TimeUnit.MILLISECONDS);
-			Assert.assertEquals("Failed count is not 1.", 1, errorList.size());
-		} catch (TimeoutException e) {
-			future.cancel(true);
-			e.printStackTrace();
-		}
-	}
+    // SET
+    Future<Map<Integer, CollectionOperationStatus>> future = mc
+            .asyncBopPipedInsertBulk(key, bkeys, new CollectionAttributes());
+    try {
+      Map<Integer, CollectionOperationStatus> errorList = future.get(
+              20000L, TimeUnit.MILLISECONDS);
+      Assert.assertEquals("Failed count is not 1.", 1, errorList.size());
+    } catch (TimeoutException e) {
+      future.cancel(true);
+      e.printStackTrace();
+    }
+  }
 }

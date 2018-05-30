@@ -20,10 +20,10 @@ import net.spy.memcached.collection.BTreeFindPosition;
 
 public interface BTreeFindPositionOperation extends KeyedOperation {
 
-	BTreeFindPosition getGet();
-	
-	interface Callback extends OperationCallback {
-		void gotData(int position);
-	}
-	
+  BTreeFindPosition getGet();
+
+  interface Callback extends OperationCallback {
+    void gotData(int position);
+  }
+
 }

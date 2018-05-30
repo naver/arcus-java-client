@@ -23,24 +23,24 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class BTreeGetResult<K, V> {
 
-	private final SortedMap<K, BTreeElement<K, V>> elements;
-	private final CollectionOperationStatus opStatus;
+  private final SortedMap<K, BTreeElement<K, V>> elements;
+  private final CollectionOperationStatus opStatus;
 
-	public BTreeGetResult(SortedMap<K, BTreeElement<K, V>> elements,
-			CollectionOperationStatus opStatus) {
-		this.elements = elements;
-		this.opStatus = opStatus;
-	}
+  public BTreeGetResult(SortedMap<K, BTreeElement<K, V>> elements,
+                        CollectionOperationStatus opStatus) {
+    this.elements = elements;
+    this.opStatus = opStatus;
+  }
 
-	public Map<K, BTreeElement<K, V>> getElements() {
-		return elements;
-	}
+  public Map<K, BTreeElement<K, V>> getElements() {
+    return elements;
+  }
 
-	public CollectionOperationStatus getCollectionResponse() {
-		return opStatus;
-	}
+  public CollectionOperationStatus getCollectionResponse() {
+    return opStatus;
+  }
 
-	public void addElement(BTreeElement<K, V> element) {
-		this.elements.put(element.getBkey(), element);
-	}
+  public void addElement(BTreeElement<K, V> element) {
+    this.elements.put(element.getBkey(), element);
+  }
 }

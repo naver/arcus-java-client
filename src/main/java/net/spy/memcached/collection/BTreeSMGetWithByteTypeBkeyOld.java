@@ -23,149 +23,149 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 
-	private static final String command = "bop smget";
+  private static final String command = "bop smget";
 
-	protected String str;
+  protected String str;
 
-	protected List<String> keyList;
-	private String spaceSeparatedKeys;
-	
-	protected int lenKeys;
+  protected List<String> keyList;
+  private String spaceSeparatedKeys;
 
-	protected String range;
-	protected int offset = -1;
-	protected int count;
-	protected Map<Integer, T> map;
+  protected int lenKeys;
 
-	protected boolean reverse;
+  protected String range;
+  protected int offset = -1;
+  protected int count;
+  protected Map<Integer, T> map;
 
-	public String key;
-	public int flag;
-	public byte[] subkey;
-	public int dataLength;
+  protected boolean reverse;
 
-	public byte[] eflag = null;
-	
-	private ElementFlagFilter eFlagFilter;
-	
-	public BTreeSMGetWithByteTypeBkeyOld(List<String> keyList, byte[] from,
-			byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
-		this.keyList = keyList;
-		this.range = BTreeUtil.toHex(from)  + ".." + BTreeUtil.toHex(to);
-		this.eFlagFilter = eFlagFilter;
-		this.offset = offset;
-		this.count = count;
-		this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
-	}
-	
-	public String getSpaceSeparatedKeys() {
-		if (spaceSeparatedKeys != null) {
-			return spaceSeparatedKeys;
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		int numkeys = keyList.size();
-		for (int i = 0; i < numkeys; i++) {
-			sb.append(keyList.get(i));
-			if ((i + 1) < numkeys) {
-				sb.append(" ");
-			}
-		}
-		spaceSeparatedKeys = sb.toString();
-		return spaceSeparatedKeys;
-	}
-	
-	public String getRepresentKey() {
-		if (keyList == null || keyList.isEmpty()) {
-			throw new IllegalStateException("Key list is empty.");
-		}
-		return keyList.get(0);
-	}
-	
-	public List<String> getKeyList() {
-		return keyList;
-	}
+  public String key;
+  public int flag;
+  public byte[] subkey;
+  public int dataLength;
 
-	public String stringify() {
-		if (str != null)
-			return str;
+  public byte[] eflag = null;
 
-		StringBuilder b = new StringBuilder();
+  private ElementFlagFilter eFlagFilter;
 
-		b.append(getSpaceSeparatedKeys().length());
-		b.append(" ").append(keyList.size());
-		b.append(" ").append(range);
-		
-		if (eFlagFilter != null)
-			b.append(" ").append(eFlagFilter.toString());
-		
-		if (offset > 0)
-			b.append(" ").append(offset);
+  public BTreeSMGetWithByteTypeBkeyOld(List<String> keyList, byte[] from,
+                                       byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+    this.keyList = keyList;
+    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+    this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
+  }
 
-		b.append(" ").append(count);
+  public String getSpaceSeparatedKeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
 
-		str = b.toString();
-		return str;
-	}
+    StringBuilder sb = new StringBuilder();
+    int numkeys = keyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(keyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(" ");
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
+  }
 
-	public String getCommand() {
-		return command;
-	}
+  public String getRepresentKey() {
+    if (keyList == null || keyList.isEmpty()) {
+      throw new IllegalStateException("Key list is empty.");
+    }
+    return keyList.get(0);
+  }
 
-	public boolean headerReady(int spaceCount) {
-		return headerCount == spaceCount;
-	}
+  public List<String> getKeyList() {
+    return keyList;
+  }
 
-	public String getKey() {
-		return key;
-	}
-	
-	public int getFlag() {
-		return flag;
-	}
-	
-	public byte[] getSubkey() {
-		return subkey;
-	}
+  public String stringify() {
+    if (str != null)
+      return str;
 
-	public int getDataLength() {
-		return dataLength;
-	}
+    StringBuilder b = new StringBuilder();
 
-	public boolean isReverse() {
-		return reverse;
-	}
-	
-	public boolean hasEflag() {
-		return eflag != null;
-	}
-	
-	public void decodeItemHeader(String itemHeader) {
-		String[] splited = itemHeader.split(" ");
-		
-		/*
-		with flag
-			VALUE 1
-			SMGetTest31 0 0x01 0x45464C4147 6 VALUE1
-			MISSED_KEYS 0
-			END
-		
-		without flag
-			VALUE 1
-			SMGetTest31 0 0x01 6 VALUE1
-			MISSED_KEYS 0
-			END
-		 */
-		this.key = splited[0];
-		this.flag = Integer.parseInt(splited[1]);
-		this.subkey = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
+    b.append(getSpaceSeparatedKeys().length());
+    b.append(" ").append(keyList.size());
+    b.append(" ").append(range);
 
-		if (splited[3].startsWith("0x")) {
-			this.eflag = BTreeUtil.hexStringToByteArrays(splited[3].substring(2));
-			this.dataLength = Integer.parseInt(splited[4]);
-		} else {
-			this.eflag = null;
-			this.dataLength = Integer.parseInt(splited[3]);
-		}
-	}
+    if (eFlagFilter != null)
+      b.append(" ").append(eFlagFilter.toString());
+
+    if (offset > 0)
+      b.append(" ").append(offset);
+
+    b.append(" ").append(count);
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public boolean headerReady(int spaceCount) {
+    return headerCount == spaceCount;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public int getFlag() {
+    return flag;
+  }
+
+  public byte[] getSubkey() {
+    return subkey;
+  }
+
+  public int getDataLength() {
+    return dataLength;
+  }
+
+  public boolean isReverse() {
+    return reverse;
+  }
+
+  public boolean hasEflag() {
+    return eflag != null;
+  }
+
+  public void decodeItemHeader(String itemHeader) {
+    String[] splited = itemHeader.split(" ");
+
+    /*
+    with flag
+      VALUE 1
+      SMGetTest31 0 0x01 0x45464C4147 6 VALUE1
+      MISSED_KEYS 0
+      END
+
+    without flag
+      VALUE 1
+      SMGetTest31 0 0x01 6 VALUE1
+      MISSED_KEYS 0
+      END
+     */
+    this.key = splited[0];
+    this.flag = Integer.parseInt(splited[1]);
+    this.subkey = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
+
+    if (splited[3].startsWith("0x")) {
+      this.eflag = BTreeUtil.hexStringToByteArrays(splited[3].substring(2));
+      this.dataLength = Integer.parseInt(splited[4]);
+    } else {
+      this.eflag = null;
+      this.dataLength = Integer.parseInt(splited[3]);
+    }
+  }
 }

@@ -24,60 +24,60 @@ import java.util.Map;
 
 public class PartitionedMap<K, V> extends AbstractList<Map<K, V>> {
 
-	private final List<Map<K, V>> mapList;
+  private final List<Map<K, V>> mapList;
 
-	public PartitionedMap(Map<K, V> map, int size) {
-		int expectSize = (map.size() + size - 1) / size;
-		int splitBy = size;
-		int parsedSize = 0;
+  public PartitionedMap(Map<K, V> map, int size) {
+    int expectSize = (map.size() + size - 1) / size;
+    int splitBy = size;
+    int parsedSize = 0;
 
-		int mapSize = map.size();
-		int counter = 0;
-		int listIndex = 0;
+    int mapSize = map.size();
+    int counter = 0;
+    int listIndex = 0;
 
-		mapList = new ArrayList<Map<K, V>>(expectSize);
-		for (int i = 0; i < expectSize; i++) {
-			mapList.add(new HashMap<K, V>());
-		}
+    mapList = new ArrayList<Map<K, V>>(expectSize);
+    for (int i = 0; i < expectSize; i++) {
+      mapList.add(new HashMap<K, V>());
+    }
 
-		for (Map.Entry<K, V> entry : map.entrySet()) {
-			parsedSize++;
-			counter++;
+    for (Map.Entry<K, V> entry : map.entrySet()) {
+      parsedSize++;
+      counter++;
 
-			mapList.get(listIndex).put(entry.getKey(), entry.getValue());
+      mapList.get(listIndex).put(entry.getKey(), entry.getValue());
 
-			if (parsedSize == splitBy || counter == mapSize) {
-				parsedSize = 0;
-				listIndex++;
-			}
-		}
-	}
+      if (parsedSize == splitBy || counter == mapSize) {
+        parsedSize = 0;
+        listIndex++;
+      }
+    }
+  }
 
-	@Override
-	public Map<K, V> get(int index) {
-		int listSize = size();
+  @Override
+  public Map<K, V> get(int index) {
+    int listSize = size();
 
-		if (listSize < 0)
-			throw new IllegalArgumentException("negative size: " + listSize);
-	
-		if (index < 0)
-			throw new IndexOutOfBoundsException("index " + index
-					+ " must not be negative");
-		
-		if (index >= listSize)
-			throw new IndexOutOfBoundsException("index " + index
-					+ " must be less than size " + listSize);
+    if (listSize < 0)
+      throw new IllegalArgumentException("negative size: " + listSize);
 
-		return mapList.get(index);
-	}
+    if (index < 0)
+      throw new IndexOutOfBoundsException("index " + index
+              + " must not be negative");
 
-	@Override
-	public int size() {
-		return mapList.size();
-	}
+    if (index >= listSize)
+      throw new IndexOutOfBoundsException("index " + index
+              + " must be less than size " + listSize);
 
-	@Override
-	public boolean isEmpty() {
-		return mapList.isEmpty();
-	}
+    return mapList.get(index);
+  }
+
+  @Override
+  public int size() {
+    return mapList.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return mapList.isEmpty();
+  }
 }

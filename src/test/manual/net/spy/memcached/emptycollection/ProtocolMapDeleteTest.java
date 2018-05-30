@@ -25,39 +25,39 @@ import java.util.ArrayList;
 
 public class ProtocolMapDeleteTest extends TestCase {
 
-	public void testStringfy() {
-		List<String> mkeyList = new ArrayList<String>();
-		mkeyList.add("mkey");
+  public void testStringfy() {
+    List<String> mkeyList = new ArrayList<String>();
+    mkeyList.add("mkey");
 
-		List<String> mkeyList2 = new ArrayList<String>();
-		mkeyList2.add("mkey1");
-		mkeyList2.add("mkey2");
-		// default setting : dropIfEmpty = true
+    List<String> mkeyList2 = new ArrayList<String>();
+    mkeyList2.add("mkey1");
+    mkeyList2.add("mkey2");
+    // default setting : dropIfEmpty = true
 
-		Assert.assertEquals("4 1 drop",
-				(new MapDelete(mkeyList, false)).stringify());
+    Assert.assertEquals("4 1 drop",
+            (new MapDelete(mkeyList, false)).stringify());
 
-		Assert.assertEquals("4 1",
-				(new MapDelete(mkeyList, false, false)).stringify());
-		Assert.assertEquals("4 1 drop",
-				(new MapDelete(mkeyList, false, true)).stringify());
+    Assert.assertEquals("4 1",
+            (new MapDelete(mkeyList, false, false)).stringify());
+    Assert.assertEquals("4 1 drop",
+            (new MapDelete(mkeyList, false, true)).stringify());
 
-		Assert.assertEquals("11 2", (new MapDelete(mkeyList2, false,
-				false)).stringify());
-		Assert.assertEquals("11 2 drop", (new MapDelete(mkeyList2,
-				false, true)).stringify());
+    Assert.assertEquals("11 2", (new MapDelete(mkeyList2, false,
+            false)).stringify());
+    Assert.assertEquals("11 2 drop", (new MapDelete(mkeyList2,
+            false, true)).stringify());
 
-		Assert.assertEquals("4 1 drop noreply",
-				(new MapDelete(mkeyList, true)).stringify());
+    Assert.assertEquals("4 1 drop noreply",
+            (new MapDelete(mkeyList, true)).stringify());
 
-		Assert.assertEquals("4 1 noreply", (new MapDelete(mkeyList, true,
-				false)).stringify());
-		Assert.assertEquals("4 1 drop noreply", (new MapDelete(mkeyList,
-				true, true)).stringify());
+    Assert.assertEquals("4 1 noreply", (new MapDelete(mkeyList, true,
+            false)).stringify());
+    Assert.assertEquals("4 1 drop noreply", (new MapDelete(mkeyList,
+            true, true)).stringify());
 
-		Assert.assertEquals("11 2 noreply", (new MapDelete(mkeyList2,
-				true, false)).stringify());
-		Assert.assertEquals("11 2 drop noreply", (new MapDelete(mkeyList2,
-				true, true)).stringify());
-	}
+    Assert.assertEquals("11 2 noreply", (new MapDelete(mkeyList2,
+            true, false)).stringify());
+    Assert.assertEquals("11 2 drop noreply", (new MapDelete(mkeyList2,
+            true, true)).stringify());
+  }
 }

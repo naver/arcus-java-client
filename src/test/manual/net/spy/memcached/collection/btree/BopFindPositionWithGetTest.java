@@ -30,261 +30,265 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 
-	private String key = "BopFindPositionWithGetTest";
-	private String invalidKey = "InvalidBopFindPositionWithGetTest";
-	private String kvKey = "KvBopFindPositionWithGetTest";
+  private String key = "BopFindPositionWithGetTest";
+  private String invalidKey = "InvalidBopFindPositionWithGetTest";
+  private String kvKey = "KvBopFindPositionWithGetTest";
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
-	}
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
+  }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+  protected void tearDown() throws Exception {
+    super.tearDown();
+  }
 
-	public void testLongBKeyAsc() throws Exception {
-		long longBkey, resultBkey;
-		int  totCount = 100;
-		int  pwgCount = 10; 
-		int  rstCount;
-		int  position, i;
+  public void testLongBKeyAsc() throws Exception {
+    long longBkey, resultBkey;
+    int totCount = 100;
+    int pwgCount = 10;
+    int rstCount;
+    int position, i;
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (i = 0; i < totCount; i++) {
-			longBkey = (long)i;
-			mc.asyncBopInsert(key, longBkey, null, "val", attrs).get();
-		}
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (i = 0; i < totCount; i++) {
+      longBkey = (long) i;
+      mc.asyncBopInsert(key, longBkey, null, "val", attrs).get();
+    }
 
-		for (i = 0; i < totCount; i++) {
-			longBkey = (long)i;
-			CollectionFuture<Map<Integer, Element<Object>>> f = mc
-					.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, pwgCount);
-			Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+    for (i = 0; i < totCount; i++) {
+      longBkey = (long) i;
+      CollectionFuture<Map<Integer, Element<Object>>> f = mc
+              .asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, pwgCount);
+      Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
 
-			if (i >= pwgCount && i < (totCount-pwgCount)) {
-				rstCount = pwgCount + 1 + pwgCount;
-			} else {
-				if (i < pwgCount) 
-					rstCount = i + 1 + pwgCount;
-				else
-					rstCount = pwgCount + 1 + ((totCount-1)-i);
-			}
-			assertEquals(rstCount, result.size());
-			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+      if (i >= pwgCount && i < (totCount - pwgCount)) {
+        rstCount = pwgCount + 1 + pwgCount;
+      } else {
+        if (i < pwgCount)
+          rstCount = i + 1 + pwgCount;
+        else
+          rstCount = pwgCount + 1 + ((totCount - 1) - i);
+      }
+      assertEquals(rstCount, result.size());
+      assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-			if (i < pwgCount) {
-				position = 0;
-			} else {
-				position = i - pwgCount;
-			}
-			resultBkey = position;  
-			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
-				assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
-				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; resultBkey++;
-			}
-		}
-	}
+      if (i < pwgCount) {
+        position = 0;
+      } else {
+        position = i - pwgCount;
+      }
+      resultBkey = position;
+      for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+        assertEquals("invalid position", position, each.getKey().intValue());
+        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
+        assertEquals("invalid value", "val", each.getValue().getValue());
+        position++;
+        resultBkey++;
+      }
+    }
+  }
 
-	public void testLongBKeyDesc() throws Exception {
-		long longBkey, resultBkey;
-		int  totCount = 100;
-		int  pwgCount = 10;
-		int  rstCount;
-		int  position, i;
+  public void testLongBKeyDesc() throws Exception {
+    long longBkey, resultBkey;
+    int totCount = 100;
+    int pwgCount = 10;
+    int rstCount;
+    int position, i;
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (i = 0; i < totCount; i++) {
-			longBkey = (long)i;
-			mc.asyncBopInsert(key, longBkey, null, "val", attrs).get();
-		}
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (i = 0; i < totCount; i++) {
+      longBkey = (long) i;
+      mc.asyncBopInsert(key, longBkey, null, "val", attrs).get();
+    }
 
-		for (i = 0; i < totCount; i++) {
-			longBkey = (long)i;
-			CollectionFuture<Map<Integer, Element<Object>>> f = mc
-					.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.DESC, pwgCount);
-			Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+    for (i = 0; i < totCount; i++) {
+      longBkey = (long) i;
+      CollectionFuture<Map<Integer, Element<Object>>> f = mc
+              .asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.DESC, pwgCount);
+      Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
 
-			if (i >= pwgCount && i < (totCount-pwgCount)) {
-				rstCount = pwgCount + 1 + pwgCount;
-			} else {
-				if (i < pwgCount) 
-					rstCount = pwgCount + 1 + i;
-				else
-					rstCount = ((totCount-1)-i) + 1 + pwgCount;
-			}
-			assertEquals(rstCount, result.size());
-			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+      if (i >= pwgCount && i < (totCount - pwgCount)) {
+        rstCount = pwgCount + 1 + pwgCount;
+      } else {
+        if (i < pwgCount)
+          rstCount = pwgCount + 1 + i;
+        else
+          rstCount = ((totCount - 1) - i) + 1 + pwgCount;
+      }
+      assertEquals(rstCount, result.size());
+      assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-			if (i > ((totCount-1)-pwgCount)) {
-				position = 0;
-			} else {
-				position = ((totCount-1)-pwgCount-i);
-			}
-			resultBkey = (totCount-1) - position;
-			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
-				assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
-				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; resultBkey--;
-			}
-		}
-	}
+      if (i > ((totCount - 1) - pwgCount)) {
+        position = 0;
+      } else {
+        position = ((totCount - 1) - pwgCount - i);
+      }
+      resultBkey = (totCount - 1) - position;
+      for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+        assertEquals("invalid position", position, each.getKey().intValue());
+        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
+        assertEquals("invalid value", "val", each.getValue().getValue());
+        position++;
+        resultBkey--;
+      }
+    }
+  }
 
-	public void testByteArrayBKeyAsc() throws Exception {
-		byte[] byteBkey, resultBkey;
-		int  totCount = 100;
-		int  pwgCount = 10; 
-		int  rstCount;
-		int  position, i, bkey;
+  public void testByteArrayBKeyAsc() throws Exception {
+    byte[] byteBkey, resultBkey;
+    int totCount = 100;
+    int pwgCount = 10;
+    int rstCount;
+    int position, i, bkey;
 
-		byteBkey = new byte[1];
-		resultBkey = new byte[1];
+    byteBkey = new byte[1];
+    resultBkey = new byte[1];
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (i = 0; i < totCount; i++) {
-			byteBkey[0] = (byte)i;
-			mc.asyncBopInsert(key, byteBkey, null, "val", attrs).get();
-		}
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (i = 0; i < totCount; i++) {
+      byteBkey[0] = (byte) i;
+      mc.asyncBopInsert(key, byteBkey, null, "val", attrs).get();
+    }
 
-		for (i = 0; i < totCount; i++) {
-			byteBkey[0] = (byte)i;
-			CollectionFuture<Map<Integer, Element<Object>>> f = mc
-					.asyncBopFindPositionWithGet(key, byteBkey, BTreeOrder.ASC, pwgCount);
-			Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+    for (i = 0; i < totCount; i++) {
+      byteBkey[0] = (byte) i;
+      CollectionFuture<Map<Integer, Element<Object>>> f = mc
+              .asyncBopFindPositionWithGet(key, byteBkey, BTreeOrder.ASC, pwgCount);
+      Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
 
-			if (i >= pwgCount && i < (totCount-pwgCount)) {
-				rstCount = pwgCount + 1 + pwgCount;
-			} else {
-				if (i < pwgCount)
-					rstCount = i + 1 + pwgCount;
-				else
-					rstCount = pwgCount + 1 + ((totCount-1)-i);
-			}
-			assertEquals(rstCount, result.size());
-			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+      if (i >= pwgCount && i < (totCount - pwgCount)) {
+        rstCount = pwgCount + 1 + pwgCount;
+      } else {
+        if (i < pwgCount)
+          rstCount = i + 1 + pwgCount;
+        else
+          rstCount = pwgCount + 1 + ((totCount - 1) - i);
+      }
+      assertEquals(rstCount, result.size());
+      assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-			if (i < pwgCount) {
-				position = 0;
-			} else {
-				position = i - pwgCount;
-			}
-			bkey = position;
-			resultBkey[0] = (byte)bkey;
-			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
-				assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
-				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; bkey++;
-				resultBkey[0] = (byte)bkey;
-			}
-		}
-	}
+      if (i < pwgCount) {
+        position = 0;
+      } else {
+        position = i - pwgCount;
+      }
+      bkey = position;
+      resultBkey[0] = (byte) bkey;
+      for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+        assertEquals("invalid position", position, each.getKey().intValue());
+        assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
+        assertEquals("invalid value", "val", each.getValue().getValue());
+        position++;
+        bkey++;
+        resultBkey[0] = (byte) bkey;
+      }
+    }
+  }
 
-	public void testByteArrayBKeyDesc() throws Exception {
-		byte[] byteBkey, resultBkey;
-		int  totCount = 100;
-		int  pwgCount = 10; 
-		int  rstCount;
-		int  position, i, bkey;
-       
-		byteBkey = new byte[1];
-		resultBkey = new byte[1];
+  public void testByteArrayBKeyDesc() throws Exception {
+    byte[] byteBkey, resultBkey;
+    int totCount = 100;
+    int pwgCount = 10;
+    int rstCount;
+    int position, i, bkey;
 
-		CollectionAttributes attrs = new CollectionAttributes();
-		for (i = 0; i < totCount; i++) {
-			byteBkey[0] = (byte)i;
-			mc.asyncBopInsert(key, byteBkey, null, "val", attrs).get();
-		}
+    byteBkey = new byte[1];
+    resultBkey = new byte[1];
 
-		for (i = 0; i < totCount; i++) {
-			byteBkey[0] = (byte)i;
-			CollectionFuture<Map<Integer, Element<Object>>> f = mc
-					.asyncBopFindPositionWithGet(key, byteBkey, BTreeOrder.DESC, pwgCount);
-			Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (i = 0; i < totCount; i++) {
+      byteBkey[0] = (byte) i;
+      mc.asyncBopInsert(key, byteBkey, null, "val", attrs).get();
+    }
 
-			if (i >= pwgCount && i < (totCount-pwgCount)) {
-				rstCount = pwgCount + 1 + pwgCount;
-			} else {
-				if (i < pwgCount)
-					rstCount = pwgCount + 1 + i;
-				else
-					rstCount = ((totCount-1)-i) + 1 + pwgCount;
-			}
-			assertEquals(rstCount, result.size());
-			assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+    for (i = 0; i < totCount; i++) {
+      byteBkey[0] = (byte) i;
+      CollectionFuture<Map<Integer, Element<Object>>> f = mc
+              .asyncBopFindPositionWithGet(key, byteBkey, BTreeOrder.DESC, pwgCount);
+      Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
 
-			if (i > ((totCount-1)-pwgCount)) {
-				position = 0;
-			} else {
-				position = ((totCount-1)-pwgCount-i);
-			}
-			bkey = (totCount-1) - position;
-			resultBkey[0] = (byte)bkey;
-			for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-				assertEquals("invalid position", position, each.getKey().intValue());
-				assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
-				assertEquals("invalid value", "val", each.getValue().getValue());
-				position++; bkey--;
-				resultBkey[0] = (byte)bkey;
-			}
-		}
-	}
+      if (i >= pwgCount && i < (totCount - pwgCount)) {
+        rstCount = pwgCount + 1 + pwgCount;
+      } else {
+        if (i < pwgCount)
+          rstCount = pwgCount + 1 + i;
+        else
+          rstCount = ((totCount - 1) - i) + 1 + pwgCount;
+      }
+      assertEquals(rstCount, result.size());
+      assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-	public void testUnsuccessfulResponses() throws Exception {
-		mc.delete(invalidKey).get();
-		mc.delete(kvKey).get();
+      if (i > ((totCount - 1) - pwgCount)) {
+        position = 0;
+      } else {
+        position = ((totCount - 1) - pwgCount - i);
+      }
+      bkey = (totCount - 1) - position;
+      resultBkey[0] = (byte) bkey;
+      for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+        assertEquals("invalid position", position, each.getKey().intValue());
+        assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
+        assertEquals("invalid value", "val", each.getValue().getValue());
+        position++;
+        bkey--;
+        resultBkey[0] = (byte) bkey;
+      }
+    }
+  }
 
-		// insert
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setReadable(false);
-		for (long i = 0; i < 100; i++) {
-			mc.asyncBopInsert(key, i, null, "val", attrs).get();
-		}
+  public void testUnsuccessfulResponses() throws Exception {
+    mc.delete(invalidKey).get();
+    mc.delete(kvKey).get();
 
-		// set a test key
-		mc.set(kvKey, 0, "value").get();
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setReadable(false);
+    for (long i = 0; i < 100; i++) {
+      mc.asyncBopInsert(key, i, null, "val", attrs).get();
+    }
 
-		CollectionFuture<Map<Integer, Element<Object>>> f = null;
-		Map<Integer, Element<Object>> result = null;
+    // set a test key
+    mc.set(kvKey, 0, "value").get();
 
-		// NOT_FOUND
-		long longBkey = 10;
-		f = mc.asyncBopFindPositionWithGet(invalidKey, longBkey, BTreeOrder.ASC, 0);
-		result = f.get();
-		assertNull(result);
-		assertEquals(CollectionResponse.NOT_FOUND, f.getOperationStatus().getResponse());
+    CollectionFuture<Map<Integer, Element<Object>>> f = null;
+    Map<Integer, Element<Object>> result = null;
 
-		// UNREADABLE
-		f = mc.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, 0);
-		result = f.get();
-		assertNull(result);
-		assertEquals(CollectionResponse.UNREADABLE, f.getOperationStatus().getResponse());
+    // NOT_FOUND
+    long longBkey = 10;
+    f = mc.asyncBopFindPositionWithGet(invalidKey, longBkey, BTreeOrder.ASC, 0);
+    result = f.get();
+    assertNull(result);
+    assertEquals(CollectionResponse.NOT_FOUND, f.getOperationStatus().getResponse());
 
-		attrs.setReadable(true);
-		mc.asyncSetAttr(key, attrs).get();
+    // UNREADABLE
+    f = mc.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, 0);
+    result = f.get();
+    assertNull(result);
+    assertEquals(CollectionResponse.UNREADABLE, f.getOperationStatus().getResponse());
 
-		// TYPE_MISMATCH
-		f = mc.asyncBopFindPositionWithGet(kvKey, longBkey, BTreeOrder.ASC, 0);
-		result = f.get();
-		assertNull(result);
-		assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus().getResponse());
+    attrs.setReadable(true);
+    mc.asyncSetAttr(key, attrs).get();
 
-		// NOT_FOUND_ELEMENT
-		longBkey = 200;
-		f = mc.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, 0);
-		result = f.get();
-		assertNull(result);
-		assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, f.getOperationStatus().getResponse());
+    // TYPE_MISMATCH
+    f = mc.asyncBopFindPositionWithGet(kvKey, longBkey, BTreeOrder.ASC, 0);
+    result = f.get();
+    assertNull(result);
+    assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus().getResponse());
 
-		// BKEY_MISMATCH
-		byte[] byteBkey = new byte[1];
-		byteBkey[0] = (byte)1;
-		f = mc.asyncBopFindPositionWithGet(kvKey, byteBkey, BTreeOrder.ASC, 0);
-		result = f.get();
-		assertNull(result);
-		assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus().getResponse());
-	}
+    // NOT_FOUND_ELEMENT
+    longBkey = 200;
+    f = mc.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, 0);
+    result = f.get();
+    assertNull(result);
+    assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, f.getOperationStatus().getResponse());
+
+    // BKEY_MISMATCH
+    byte[] byteBkey = new byte[1];
+    byteBkey[0] = (byte) 1;
+    f = mc.asyncBopFindPositionWithGet(kvKey, byteBkey, BTreeOrder.ASC, 0);
+    result = f.get();
+    assertNull(result);
+    assertEquals(CollectionResponse.TYPE_MISMATCH, f.getOperationStatus().getResponse());
+  }
 }

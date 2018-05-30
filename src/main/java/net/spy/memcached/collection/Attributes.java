@@ -19,82 +19,82 @@ package net.spy.memcached.collection;
 import net.spy.memcached.compat.SpyObject;
 
 public class Attributes extends SpyObject {
-	public static final Integer DEFAULT_FLAGS = 0;
-	public static final Integer DEFAULT_EXPIRETIME = 0;
+  public static final Integer DEFAULT_FLAGS = 0;
+  public static final Integer DEFAULT_EXPIRETIME = 0;
 
-	protected Integer flags;
-	protected Integer expireTime;
-	protected CollectionType type;
+  protected Integer flags;
+  protected Integer expireTime;
+  protected CollectionType type;
 
-	private String str;
+  private String str;
 
-	public Attributes() {
-	}
+  public Attributes() {
+  }
 
-	public Attributes(Integer expireTime) {
-		this.expireTime = expireTime;
-	}
+  public Attributes(Integer expireTime) {
+    this.expireTime = expireTime;
+  }
 
-	protected String stringify() {
-		StringBuilder b = new StringBuilder();
+  protected String stringify() {
+    StringBuilder b = new StringBuilder();
 
-		if (flags != null)
-			b.append(" flags=").append(flags);
+    if (flags != null)
+      b.append(" flags=").append(flags);
 
-		if (expireTime != null)
-			b.append(" expiretime=").append(expireTime);
+    if (expireTime != null)
+      b.append(" expiretime=").append(expireTime);
 
-		if (type != null)
-			b.append(" type=").append(type.getStringValue());
+    if (type != null)
+      b.append(" type=").append(type.getStringValue());
 
-		str = (b.length() < 1) ? "" : b.substring(1);
+    str = (b.length() < 1) ? "" : b.substring(1);
 
-		return str;
-	}
+    return str;
+  }
 
-	@Override
-	public String toString() {
-		return (str == null) ? stringify() : str;
-	}
+  @Override
+  public String toString() {
+    return (str == null) ? stringify() : str;
+  }
 
-	public int getLength() {
-		return (str == null) ? stringify().length() : str.length();
-	}
+  public int getLength() {
+    return (str == null) ? stringify().length() : str.length();
+  }
 
-	public void setAttribute(String attribute) {
-		String[] splited = attribute.split("=");
-		assert splited.length == 2 : "An attribute should be given in \"name=value\" format.";
+  public void setAttribute(String attribute) {
+    String[] splited = attribute.split("=");
+    assert splited.length == 2 : "An attribute should be given in \"name=value\" format.";
 
-		String name = splited[0];
-		String value = splited[1];
+    String name = splited[0];
+    String value = splited[1];
 
-		try {
-			if ("flags".equals(name)) {
-				flags = Integer.parseInt(value);
-			} else if ("expiretime".equals(name)) {
-				expireTime = Integer.parseInt(value);
-			} else if ("type".equals(name)) {
-				type = CollectionType.find(value);
-			}
-		} catch (Exception e) {
-			getLogger().info(e, e);
-			assert false : "Unexpected value.";
-		}
-	}
+    try {
+      if ("flags".equals(name)) {
+        flags = Integer.parseInt(value);
+      } else if ("expiretime".equals(name)) {
+        expireTime = Integer.parseInt(value);
+      } else if ("type".equals(name)) {
+        type = CollectionType.find(value);
+      }
+    } catch (Exception e) {
+      getLogger().info(e, e);
+      assert false : "Unexpected value.";
+    }
+  }
 
-	public void setExpireTime(Integer expireTime) {
-		this.expireTime = expireTime;
-	}
+  public void setExpireTime(Integer expireTime) {
+    this.expireTime = expireTime;
+  }
 
-	public Integer getFlags() {
-		return flags;
-	}
+  public Integer getFlags() {
+    return flags;
+  }
 
-	public Integer getExpireTime() {
-		return expireTime;
-	}
+  public Integer getExpireTime() {
+    return expireTime;
+  }
 
-	public CollectionType getType() {
-		return type;
-	}
+  public CollectionType getType() {
+    return type;
+  }
 }

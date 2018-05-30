@@ -24,83 +24,83 @@ import net.spy.memcached.internal.OperationFuture;
 
 public class FlushByPrefixTest extends BaseIntegrationTest {
 
-	private final String PREFIX = "prefix";
-	private final String DELIMITER = ":";
-	private final String KEY = this.getClass().getSimpleName();
-	private final String VALUE = "value";
+  private final String PREFIX = "prefix";
+  private final String DELIMITER = ":";
+  private final String KEY = this.getClass().getSimpleName();
+  private final String VALUE = "value";
 
-	public void testFlushByPrefix() {
-		try {
-			Boolean setResult = mc.set(PREFIX + DELIMITER + KEY, 60, VALUE)
-					.get();
-			assertTrue(setResult);
-			Object object = mc.asyncGet(PREFIX + DELIMITER + KEY).get();
-			assertEquals(VALUE, object);
+  public void testFlushByPrefix() {
+    try {
+      Boolean setResult = mc.set(PREFIX + DELIMITER + KEY, 60, VALUE)
+              .get();
+      assertTrue(setResult);
+      Object object = mc.asyncGet(PREFIX + DELIMITER + KEY).get();
+      assertEquals(VALUE, object);
 
-			Boolean flushResult = mc.flush("prefix").get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-			assertTrue(flushResult);
+      Boolean flushResult = mc.flush("prefix").get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+      assertTrue(flushResult);
 
-			Object object2 = mc.asyncGet(PREFIX + DELIMITER + KEY).get();
-			assertNull(object2);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
+      Object object2 = mc.asyncGet(PREFIX + DELIMITER + KEY).get();
+      assertNull(object2);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
 
-	public void testFlushByPrefix1Depth() {
-		try {
-			for (int i = 0; i < 10; i++) {
-				Boolean setResult = mc.set(PREFIX + DELIMITER + KEY + i, 60,
-						VALUE).get();
-				assertTrue(setResult);
-				Object object = mc.asyncGet(PREFIX + DELIMITER + KEY + i).get();
-				assertEquals(VALUE, object);
-			}
+  public void testFlushByPrefix1Depth() {
+    try {
+      for (int i = 0; i < 10; i++) {
+        Boolean setResult = mc.set(PREFIX + DELIMITER + KEY + i, 60,
+                VALUE).get();
+        assertTrue(setResult);
+        Object object = mc.asyncGet(PREFIX + DELIMITER + KEY + i).get();
+        assertEquals(VALUE, object);
+      }
 
-			Boolean flushResult = mc.flush("prefix").get();
-			assertTrue(flushResult);
+      Boolean flushResult = mc.flush("prefix").get();
+      assertTrue(flushResult);
 
-			for (int i = 0; i < 10; i++) {
-				Object object2 = mc.asyncGet(PREFIX + DELIMITER + KEY + i)
-						.get();
-				assertNull(object2);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
+      for (int i = 0; i < 10; i++) {
+        Object object2 = mc.asyncGet(PREFIX + DELIMITER + KEY + i)
+                .get();
+        assertNull(object2);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
 
-	public void testFlushByMultiPrefix() {
-		try {
-			for (int i = 0; i < 10; i++) {
-				for (int prefix2 = 0; prefix2 < 10; prefix2++) {
-					Boolean setResult = mc.set(
-							PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i,
-							60, VALUE).get();
-					assertTrue(setResult);
-					Object object = mc.asyncGet(
-							PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i)
-							.get();
-					assertEquals(VALUE, object);
-				}
-			}
+  public void testFlushByMultiPrefix() {
+    try {
+      for (int i = 0; i < 10; i++) {
+        for (int prefix2 = 0; prefix2 < 10; prefix2++) {
+          Boolean setResult = mc.set(
+                  PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i,
+                  60, VALUE).get();
+          assertTrue(setResult);
+          Object object = mc.asyncGet(
+                  PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i)
+                  .get();
+          assertEquals(VALUE, object);
+        }
+      }
 
-			Boolean flushResult = mc.flush("prefix").get();
-			assertTrue(flushResult);
+      Boolean flushResult = mc.flush("prefix").get();
+      assertTrue(flushResult);
 
-			for (int i = 0; i < 10; i++) {
-				for (int prefix2 = 0; prefix2 < 10; prefix2++) {
-					Object object2 = mc.asyncGet(
-							PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i)
-							.get();
-					assertNull(object2);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
+      for (int i = 0; i < 10; i++) {
+        for (int prefix2 = 0; prefix2 < 10; prefix2++) {
+          Object object2 = mc.asyncGet(
+                  PREFIX + DELIMITER + prefix2 + DELIMITER + KEY + i)
+                  .get();
+          assertNull(object2);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
 }

@@ -27,46 +27,46 @@ import net.spy.memcached.transcoders.LongTranscoder;
 
 public class BopGetExceptionTest extends BaseIntegrationTest {
 
-	private String key = "BopGetExceptionTest";
+  private String key = "BopGetExceptionTest";
 
-	private Long[] items10 = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L };
+  private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
-	protected void setUp() {
-		try {
-			super.setUp();
-			mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0,
-					true).get(1000, TimeUnit.MILLISECONDS);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+  protected void setUp() {
+    try {
+      super.setUp();
+      mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0,
+              true).get(1000, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	public void testBopGet_OutOfBound() throws Exception {
-		// Create a list and add 10 items in it
-		addToBTree(key, items10);
+  public void testBopGet_OutOfBound() throws Exception {
+    // Create a list and add 10 items in it
+    addToBTree(key, items10);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Get item with offset and index
-		Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 20, 100,
-				ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    // Get item with offset and index
+    Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 20, 100,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
 
-		// The result should not be null
-		assertNotNull(rmap);
-	}
+    // The result should not be null
+    assertNotNull(rmap);
+  }
 
-	public void testBopGet_NoKey() throws Exception {
-		// Querying to non-existing collection
-		Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
-				ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+  public void testBopGet_NoKey() throws Exception {
+    // Querying to non-existing collection
+    Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
 
-		// The result should be null
-		assertNull(rmap);
-	}
+    // The result should be null
+    assertNull(rmap);
+  }
 
 }

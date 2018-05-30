@@ -19,76 +19,76 @@ import net.spy.memcached.internal.BasicThreadFactory;
  */
 public class TranscodeService extends SpyObject {
 
-	private final ThreadPoolExecutor pool;
+  private final ThreadPoolExecutor pool;
 
-	public TranscodeService(boolean daemon) {
-		pool = new ThreadPoolExecutor(1, 10, 60L,
-			TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100),
-			new BasicThreadFactory("transcoder", daemon),
-			new ThreadPoolExecutor.DiscardPolicy());
-	}
+  public TranscodeService(boolean daemon) {
+    pool = new ThreadPoolExecutor(1, 10, 60L,
+            TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(100),
+            new BasicThreadFactory("transcoder", daemon),
+            new ThreadPoolExecutor.DiscardPolicy());
+  }
 
-	/**
-	 * Perform a decode.
-	 */
-	public <T> Future<T> decode(final Transcoder<T> tc,
-			final CachedData cachedData) {
+  /**
+   * Perform a decode.
+   */
+  public <T> Future<T> decode(final Transcoder<T> tc,
+                              final CachedData cachedData) {
 
-		assert !pool.isShutdown() : "Pool has already shut down.";
+    assert !pool.isShutdown() : "Pool has already shut down.";
 
-		TranscodeService.Task<T> task = new TranscodeService.Task<T>(
-				new Callable<T>() {
-					public T call() {
-						return tc.decode(cachedData);
-					}
-				});
+    TranscodeService.Task<T> task = new TranscodeService.Task<T>(
+            new Callable<T>() {
+              public T call() {
+                return tc.decode(cachedData);
+              }
+            });
 
-		if (tc.asyncDecode(cachedData)) {
-			this.pool.execute(task);
-		}
-		return task;
-	}
+    if (tc.asyncDecode(cachedData)) {
+      this.pool.execute(task);
+    }
+    return task;
+  }
 
-	/**
-	 * Shut down the pool.
-	 */
-	public void shutdown() {
-		pool.shutdown();
-	}
+  /**
+   * Shut down the pool.
+   */
+  public void shutdown() {
+    pool.shutdown();
+  }
 
-	/**
-	 * Ask whether this service has been shut down.
-	 */
-	public boolean isShutdown() {
-		return pool.isShutdown();
-	}
+  /**
+   * Ask whether this service has been shut down.
+   */
+  public boolean isShutdown() {
+    return pool.isShutdown();
+  }
 
-	private static class Task<T> extends FutureTask<T> {
-		private final AtomicBoolean isRunning = new AtomicBoolean(false);
+  private static class Task<T> extends FutureTask<T> {
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
-		public Task(Callable<T> callable) {
-			super(callable);
-		}
+    public Task(Callable<T> callable) {
+      super(callable);
+    }
 
-		@Override
-		public T get() throws InterruptedException, ExecutionException {
-			this.run();
-			return super.get();
-		}
+    @Override
+    public T get() throws InterruptedException, ExecutionException {
+      this.run();
+      return super.get();
+    }
 
-		@Override
-		public T get(long timeout, TimeUnit unit) throws InterruptedException,
-				ExecutionException, TimeoutException {
-			this.run();
-			return super.get(timeout, unit);
-		}
+    @Override
+    public T get(long timeout, TimeUnit unit) throws InterruptedException,
+            ExecutionException, TimeoutException {
+      this.run();
+      return super.get(timeout, unit);
+    }
 
-		@Override
-		public void run() {
-			if (this.isRunning.compareAndSet(false, true)) {
-				super.run();
-			}
-		}
-	}
+    @Override
+    public void run() {
+      if (this.isRunning.compareAndSet(false, true)) {
+        super.run();
+      }
+    }
+  }
 
 }

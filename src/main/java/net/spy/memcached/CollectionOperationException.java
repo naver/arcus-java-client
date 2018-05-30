@@ -18,13 +18,13 @@ package net.spy.memcached;
 
 public class CollectionOperationException extends RuntimeException {
 
-	private static final long serialVersionUID = 8715298251738556350L;
+  private static final long serialVersionUID = 8715298251738556350L;
 
-	public CollectionOperationException(String message) {
-		super(message);
-	}
+  public CollectionOperationException(String message) {
+    super(message);
+  }
 
-	public CollectionOperationException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public CollectionOperationException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

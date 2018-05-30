@@ -24,55 +24,55 @@ import java.util.Set;
  */
 public enum CollectionType {
 
-	/**
-	 * Key-value
-	 */
-	kv("kv", null),
-	/**
-	 * List collection
-	 */
-	list("list", EnumSet.of(CollectionOverflowAction.error,
-							CollectionOverflowAction.head_trim,
-							CollectionOverflowAction.tail_trim)),
-	/**
-	 * Set collection
-	 */
-	set("set", EnumSet.of(CollectionOverflowAction.error)),
-	/**
-	 * Map collection
-	 */
-	map("map", EnumSet.of(CollectionOverflowAction.error)),
-	/**
-	 * B+ tree collection
-	 */
-	btree("b+tree", EnumSet.of(CollectionOverflowAction.error,
-								CollectionOverflowAction.smallest_silent_trim,
-								CollectionOverflowAction.smallest_trim,
-								CollectionOverflowAction.largest_silent_trim,
-								CollectionOverflowAction.largest_trim)),
-	;
+  /**
+   * Key-value
+   */
+  kv("kv", null),
+  /**
+   * List collection
+   */
+  list("list", EnumSet.of(CollectionOverflowAction.error,
+          CollectionOverflowAction.head_trim,
+          CollectionOverflowAction.tail_trim)),
+  /**
+   * Set collection
+   */
+  set("set", EnumSet.of(CollectionOverflowAction.error)),
+  /**
+   * Map collection
+   */
+  map("map", EnumSet.of(CollectionOverflowAction.error)),
+  /**
+   * B+ tree collection
+   */
+  btree("b+tree", EnumSet.of(CollectionOverflowAction.error,
+          CollectionOverflowAction.smallest_silent_trim,
+          CollectionOverflowAction.smallest_trim,
+          CollectionOverflowAction.largest_silent_trim,
+          CollectionOverflowAction.largest_trim)),;
 
-	private Set<CollectionOverflowAction> availableOverflowAction;
-	String stringValue;
-	CollectionType(String stringValue, Set<CollectionOverflowAction> available) {
-		this.stringValue = stringValue;
-		this.availableOverflowAction = available;
-	}
-	
-	public String getStringValue() {
-		return stringValue;
-	}
-	
-	public static CollectionType find(String value) {
-		for (CollectionType each : CollectionType.values()) {
-			if (each.stringValue.equals(value)) {
-				return each;
-			}
-		}
-		return null;
-	}
+  private Set<CollectionOverflowAction> availableOverflowAction;
+  String stringValue;
 
-	public boolean isAvailableOverflowAction(CollectionOverflowAction overflowAction) {
-		return availableOverflowAction.contains(overflowAction);
-	}
+  CollectionType(String stringValue, Set<CollectionOverflowAction> available) {
+    this.stringValue = stringValue;
+    this.availableOverflowAction = available;
+  }
+
+  public String getStringValue() {
+    return stringValue;
+  }
+
+  public static CollectionType find(String value) {
+    for (CollectionType each : CollectionType.values()) {
+      if (each.stringValue.equals(value)) {
+        return each;
+      }
+    }
+    return null;
+  }
+
+  public boolean isAvailableOverflowAction(CollectionOverflowAction overflowAction) {
+    return availableOverflowAction.contains(overflowAction);
+  }
 }

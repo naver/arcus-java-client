@@ -24,70 +24,70 @@ import net.spy.memcached.collection.CollectionAttributes;
 
 public class InsertSetWithAttrTest extends BaseIntegrationTest {
 
-	private final String KEY = this.getClass().getSimpleName();
-	private final int EXPIRE_TIME_IN_SEC = 1;
+  private final String KEY = this.getClass().getSimpleName();
+  private final int EXPIRE_TIME_IN_SEC = 1;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
-	}
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testInsertWithAttribute() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithAttribute() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert with create option
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setExpireTime(EXPIRE_TIME_IN_SEC);
-			attr.setMaxCount(3333);
+      // insert with create option
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setExpireTime(EXPIRE_TIME_IN_SEC);
+      attr.setMaxCount(3333);
 
-			Boolean insertResult = mc.asyncSopInsert(KEY, "value", attr).get();
-			Assert.assertTrue(insertResult);
+      Boolean insertResult = mc.asyncSopInsert(KEY, "value", attr).get();
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			Assert.assertEquals(new Long(3333),
-					collectionAttributes.getMaxCount());
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      Assert.assertEquals(new Long(3333),
+              collectionAttributes.getMaxCount());
 
-			// check expire time
-			Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
-			Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
-			Assert.assertNull(set);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check expire time
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
+      Assert.assertNull(set);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testInsertWithDefaultAttribute() {
-		try {
-			// check not exists
-			Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  public void testInsertWithDefaultAttribute() {
+    try {
+      // check not exists
+      Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-			// insert with create option
-			CollectionAttributes attr = new CollectionAttributes();
+      // insert with create option
+      CollectionAttributes attr = new CollectionAttributes();
 
-			Boolean insertResult = mc.asyncSopInsert(KEY, "value", attr).get();
-			Assert.assertTrue(insertResult);
+      Boolean insertResult = mc.asyncSopInsert(KEY, "value", attr).get();
+      Assert.assertTrue(insertResult);
 
-			// check attribute
-			CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
-					.get();
-			Assert.assertEquals(new Long(4000),
-					collectionAttributes.getMaxCount());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+      // check attribute
+      CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
+              .get();
+      Assert.assertEquals(new Long(4000),
+              collectionAttributes.getMaxCount());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 }

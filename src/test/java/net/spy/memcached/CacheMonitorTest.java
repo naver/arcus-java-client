@@ -32,136 +32,136 @@ import org.jmock.MockObjectTestCase;
 
 public class CacheMonitorTest extends MockObjectTestCase {
 
-	private Mock watcher;
-	private Mock listener;
-	private ZooKeeper zooKeeper;
-	private CacheMonitor cacheMonitor;
-	private List<String> children;
-	private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
-	
-	private static final String serviceCode = "dev";
-	
-	@Override
-	public void setUp() throws Exception {
-		listener = mock(CacheMonitorListener.class);
-		watcher = mock(Watcher.class);
-		zooKeeper = new ZooKeeper("", 15000, (Watcher)watcher.proxy()); // can't mock
-		children = new ArrayList<String>();
-		
-		cacheMonitor = new CacheMonitor(zooKeeper, ARCUS_BASE_CACHE_LIST_ZPATH, 
-				serviceCode, (CacheMonitorListener) listener.proxy());
-	}
-	
-	@Override
-	public void tearDown() throws Exception {
-		zooKeeper.close();
-	}
-	
-	public void testProcessResult() {
-		// when
-		children.add("0.0.0.0:11211");
-		listener.expects(once()).method("commandNodeChange").with(eq(children));
-		
-		// test
-		cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-		
-		// then
-		assertEquals(children, ((CacheMonitorListener)listener).getPrevChildren());
-	}
-	
-	public void testProcessResult_emptyChildren() {
-		List<String> fakeChildren = new ArrayList<String>();
-		fakeChildren.add("0.0.0.0:23456");
-		
-		// when : empty children
-		listener.expects(once()).method("commandNodeChange").with(eq(fakeChildren));
-		
-		// test
-		cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-		
-		// then
-		assertEquals(fakeChildren, ((CacheMonitorListener)listener).getPrevChildren());
-	}
-	
-	public void testProcessResult_otherEvents() {
-		children.add("127.0.0.1:11211");
-		listener.expects(never()).method("commandNodeChange");
+  private Mock watcher;
+  private Mock listener;
+  private ZooKeeper zooKeeper;
+  private CacheMonitor cacheMonitor;
+  private List<String> children;
+  private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
-		Code code;
-		
-		code = Code.NONODE;
-		{
-			cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-			// do nothing
-		}
-		
-		code = Code.SESSIONEXPIRED;
-		{
-			listener.expects(once()).method("closing");
-			cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-			assertTrue(cacheMonitor.dead);
-		}
-		
-		code = Code.NOAUTH;
-		{
-			listener.expects(once()).method("closing");
-			cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-			assertTrue(cacheMonitor.dead);
-		}
-		
-		code = Code.CONNECTIONLOSS;
-		{
-			cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-		}
-		
-		code = Code.SESSIONMOVED;
-		{
-			cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-		}
-	}
-	
-	public void testProcess_syncConnected() throws Exception {
-		// when
-		WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.SyncConnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
-		
-		// test
-		cacheMonitor.process(event);
-		
-		// then
-		// do nothing
-	}
-	
-	public void testProcess_disconnected() throws Exception {
-		// when
-		WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.Disconnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
-		
-		// test
-		cacheMonitor.process(event);
-		
-		// then
-		// do nothing
-	}
-	
-	public void testProcess_expired() throws Exception {
-		// when
-		WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.Expired, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
-		listener.expects(once()).method("closing");
-		
-		// test
-		cacheMonitor.process(event);
-		
-		// then
-		assertTrue(cacheMonitor.dead);
-	}
-	
-	public void testProcess_nodeChildrenChanged() throws Exception {
-		// when
-		WatchedEvent event = new WatchedEvent(EventType.NodeChildrenChanged, KeeperState.SyncConnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
-		
-		// test
-		cacheMonitor.process(event);
-		
-		// then
-		// do nothing		
-	}
+  private static final String serviceCode = "dev";
+
+  @Override
+  public void setUp() throws Exception {
+    listener = mock(CacheMonitorListener.class);
+    watcher = mock(Watcher.class);
+    zooKeeper = new ZooKeeper("", 15000, (Watcher) watcher.proxy()); // can't mock
+    children = new ArrayList<String>();
+
+    cacheMonitor = new CacheMonitor(zooKeeper, ARCUS_BASE_CACHE_LIST_ZPATH,
+            serviceCode, (CacheMonitorListener) listener.proxy());
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+    zooKeeper.close();
+  }
+
+  public void testProcessResult() {
+    // when
+    children.add("0.0.0.0:11211");
+    listener.expects(once()).method("commandNodeChange").with(eq(children));
+
+    // test
+    cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+
+    // then
+    assertEquals(children, ((CacheMonitorListener) listener).getPrevChildren());
+  }
+
+  public void testProcessResult_emptyChildren() {
+    List<String> fakeChildren = new ArrayList<String>();
+    fakeChildren.add("0.0.0.0:23456");
+
+    // when : empty children
+    listener.expects(once()).method("commandNodeChange").with(eq(fakeChildren));
+
+    // test
+    cacheMonitor.processResult(Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+
+    // then
+    assertEquals(fakeChildren, ((CacheMonitorListener) listener).getPrevChildren());
+  }
+
+  public void testProcessResult_otherEvents() {
+    children.add("127.0.0.1:11211");
+    listener.expects(never()).method("commandNodeChange");
+
+    Code code;
+
+    code = Code.NONODE;
+    {
+      cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+      // do nothing
+    }
+
+    code = Code.SESSIONEXPIRED;
+    {
+      listener.expects(once()).method("closing");
+      cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+      assertTrue(cacheMonitor.dead);
+    }
+
+    code = Code.NOAUTH;
+    {
+      listener.expects(once()).method("closing");
+      cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+      assertTrue(cacheMonitor.dead);
+    }
+
+    code = Code.CONNECTIONLOSS;
+    {
+      cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+    }
+
+    code = Code.SESSIONMOVED;
+    {
+      cacheMonitor.processResult(code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+    }
+  }
+
+  public void testProcess_syncConnected() throws Exception {
+    // when
+    WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.SyncConnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
+
+    // test
+    cacheMonitor.process(event);
+
+    // then
+    // do nothing
+  }
+
+  public void testProcess_disconnected() throws Exception {
+    // when
+    WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.Disconnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
+
+    // test
+    cacheMonitor.process(event);
+
+    // then
+    // do nothing
+  }
+
+  public void testProcess_expired() throws Exception {
+    // when
+    WatchedEvent event = new WatchedEvent(EventType.None, KeeperState.Expired, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
+    listener.expects(once()).method("closing");
+
+    // test
+    cacheMonitor.process(event);
+
+    // then
+    assertTrue(cacheMonitor.dead);
+  }
+
+  public void testProcess_nodeChildrenChanged() throws Exception {
+    // when
+    WatchedEvent event = new WatchedEvent(EventType.NodeChildrenChanged, KeeperState.SyncConnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
+
+    // test
+    cacheMonitor.process(event);
+
+    // then
+    // do nothing
+  }
 }

@@ -14,35 +14,35 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  */
 public class PlainCallbackHandler implements CallbackHandler {
 
-	private final String username;
-	private final char[] password;
+  private final String username;
+  private final char[] password;
 
-	/**
-	 * Construct a plain callback handler with the given username and password.
-	 *
-	 * @param u the username
-	 * @param p the password
-	 */
-	public PlainCallbackHandler(String u, String p) {
-		username=u;
-		password=p.toCharArray();
-	}
+  /**
+   * Construct a plain callback handler with the given username and password.
+   *
+   * @param u the username
+   * @param p the password
+   */
+  public PlainCallbackHandler(String u, String p) {
+    username = u;
+    password = p.toCharArray();
+  }
 
-	public void handle(Callback[] callbacks) throws IOException,
-			UnsupportedCallbackException {
-		for(Callback cb : callbacks) {
-			if(cb instanceof TextOutputCallback) {
-				// Not implementing this one yet...
-			} else if(cb instanceof NameCallback) {
-				NameCallback nc=(NameCallback)cb;
-				nc.setName(username);
-			} else if(cb instanceof PasswordCallback) {
-				PasswordCallback pc=(PasswordCallback)cb;
-				pc.setPassword(password);
-			} else {
-				throw new UnsupportedCallbackException(cb);
-			}
-		}
-	}
+  public void handle(Callback[] callbacks) throws IOException,
+          UnsupportedCallbackException {
+    for (Callback cb : callbacks) {
+      if (cb instanceof TextOutputCallback) {
+        // Not implementing this one yet...
+      } else if (cb instanceof NameCallback) {
+        NameCallback nc = (NameCallback) cb;
+        nc.setName(username);
+      } else if (cb instanceof PasswordCallback) {
+        PasswordCallback pc = (PasswordCallback) cb;
+        pc.setPassword(password);
+      } else {
+        throw new UnsupportedCallbackException(cb);
+      }
+    }
+  }
 
 }

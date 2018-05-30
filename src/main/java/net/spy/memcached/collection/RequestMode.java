@@ -21,16 +21,16 @@ package net.spy.memcached.collection;
  */
 public enum RequestMode {
 
-	NO_REPLY("noreply"), PIPE("pipe"), GET_TRIM("getrim");
+  NO_REPLY("noreply"), PIPE("pipe"), GET_TRIM("getrim");
 
-	private final String ascii;
+  private final String ascii;
 
-	RequestMode(String ascii) {
-		this.ascii = ascii;
-	}
+  RequestMode(String ascii) {
+    this.ascii = ascii;
+  }
 
-	public String getAscii() {
-		return ascii;
-	}
+  public String getAscii() {
+    return ascii;
+  }
 
 }

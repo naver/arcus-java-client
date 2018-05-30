@@ -34,246 +34,246 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class BopPipeUpdateTest extends BaseIntegrationTest {
 
-	private static final String KEY = BopPipeUpdateTest.class.getSimpleName();
-	private static final int elementCount = 1200;
+  private static final String KEY = BopPipeUpdateTest.class.getSimpleName();
+  private static final int elementCount = 1200;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		mc.delete(KEY).get();
-		Assert.assertNull(mc.asyncGetAttr(KEY).get());
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(KEY).get();
+    Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-		List<Element<Object>> elements = new ArrayList<Element<Object>>();
+    List<Element<Object>> elements = new ArrayList<Element<Object>>();
 
-		for (int i = 0; i < elementCount; i++) {
-			elements.add(new Element<Object>(i, "value" + i, new byte[] { 1, 1,
-					1, 1 }));
-		}
+    for (int i = 0; i < elementCount; i++) {
+      elements.add(new Element<Object>(i, "value" + i, new byte[]{1, 1,
+              1, 1}));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionAttributes attr = new CollectionAttributes();
-			attr.setMaxCount(10000L);
+      CollectionAttributes attr = new CollectionAttributes();
+      attr.setMaxCount(10000L);
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncBopPipedInsertBulk(KEY, elements, attr);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncBopPipedInsertBulk(KEY, elements, attr);
 
-			Map<Integer, CollectionOperationStatus> map = future.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map = future.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(System.currentTimeMillis() - start + "ms");
 
-			Assert.assertTrue(map.isEmpty());
+      Assert.assertTrue(map.isEmpty());
 
-			Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
-					ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
+      Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
+              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
 
-			Assert.assertEquals(elementCount, map3.size());
+      Assert.assertEquals(elementCount, map3.size());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	@Override
-	protected void tearDown() throws Exception {
-		mc.delete(KEY).get();
-		super.tearDown();
-	}
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(KEY).get();
+    super.tearDown();
+  }
 
-	public void testBopPipeUpdateValue() {
+  public void testBopPipeUpdateValue() {
 
-		List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
-		for (int i = 0; i < elementCount; i++) {
-			updateElements.add(new Element<Object>(i, "updated" + i,
-					new ElementFlagUpdate(new byte[] { 1, 1, 1, 1 })));
-		}
+    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    for (int i = 0; i < elementCount; i++) {
+      updateElements.add(new Element<Object>(i, "updated" + i,
+              new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncBopPipedUpdateBulk(KEY, updateElements);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncBopPipedUpdateBulk(KEY, updateElements);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
-			// System.out.println(map2.size());
-			Assert.assertTrue(map2.isEmpty());
+      // System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(map2.size());
+      Assert.assertTrue(map2.isEmpty());
 
-			for (int i = 0; i < elementCount; i++) {
-				assertEquals(
-						"updated" + i,
-						mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
-								false, false).get(1000L, TimeUnit.MILLISECONDS)
-								.get(new Long(i)).getValue());
-			}
+      for (int i = 0; i < elementCount; i++) {
+        assertEquals(
+                "updated" + i,
+                mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
+                        false, false).get(1000L, TimeUnit.MILLISECONDS)
+                        .get(new Long(i)).getValue());
+      }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-	}
+  }
 
-	public void testBopPipeUpdateEFlags() {
+  public void testBopPipeUpdateEFlags() {
 
-		byte[] NEW_BYTE_EFLAG = new byte[] { 1, 1 };
+    byte[] NEW_BYTE_EFLAG = new byte[]{1, 1};
 
-		List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
-		for (int i = 0; i < elementCount; i++) {
-			updateElements.add(new Element<Object>(i, null,
-					new ElementFlagUpdate(1, BitWiseOperands.AND,
-							NEW_BYTE_EFLAG)));
-		}
+    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    for (int i = 0; i < elementCount; i++) {
+      updateElements.add(new Element<Object>(i, null,
+              new ElementFlagUpdate(1, BitWiseOperands.AND,
+                      NEW_BYTE_EFLAG)));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncBopPipedUpdateBulk(KEY, updateElements);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncBopPipedUpdateBulk(KEY, updateElements);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
-			// System.out.println(map2.size());
-			Assert.assertTrue(map2.isEmpty());
+      // System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(map2.size());
+      Assert.assertTrue(map2.isEmpty());
 
-			for (int i = 0; i < elementCount; i++) {
-				Element<Object> element = mc
-						.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
-								false, false).get(1000L, TimeUnit.MILLISECONDS)
-						.get(new Long(i));
+      for (int i = 0; i < elementCount; i++) {
+        Element<Object> element = mc
+                .asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
+                        false, false).get(1000L, TimeUnit.MILLISECONDS)
+                .get(new Long(i));
 
-				// System.out.println(element.getFlagByHex());
-				assertEquals("value" + i, element.getValue());
-				assertEquals("0x01010101", element.getFlagByHex());
-			}
+        // System.out.println(element.getFlagByHex());
+        assertEquals("value" + i, element.getValue());
+        assertEquals("0x01010101", element.getFlagByHex());
+      }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testBopPipeUpdateEFlagsReset() {
+  public void testBopPipeUpdateEFlagsReset() {
 
-		List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
-		for (int i = 0; i < elementCount; i++) {
-			updateElements.add(new Element<Object>(i, null,
-					ElementFlagUpdate.RESET_FLAG));
-		}
+    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    for (int i = 0; i < elementCount; i++) {
+      updateElements.add(new Element<Object>(i, null,
+              ElementFlagUpdate.RESET_FLAG));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncBopPipedUpdateBulk(KEY, updateElements);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncBopPipedUpdateBulk(KEY, updateElements);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
-			// System.out.println(map2.size());
-			Assert.assertTrue(map2.isEmpty());
+      // System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(map2.size());
+      Assert.assertTrue(map2.isEmpty());
 
-			for (int i = 0; i < elementCount; i++) {
-				Element<Object> element = mc
-						.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
-								false, false).get(1000L, TimeUnit.MILLISECONDS)
-						.get(new Long(i));
+      for (int i = 0; i < elementCount; i++) {
+        Element<Object> element = mc
+                .asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
+                        false, false).get(1000L, TimeUnit.MILLISECONDS)
+                .get(new Long(i));
 
-				// System.out.println(element.getFlagByHex());
-				assertEquals("value" + i, element.getValue());
-				assertEquals("", element.getFlagByHex());
-			}
+        // System.out.println(element.getFlagByHex());
+        assertEquals("value" + i, element.getValue());
+        assertEquals("", element.getFlagByHex());
+      }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	public void testBopPipeUpdateNotFoundElement() {
+  public void testBopPipeUpdateNotFoundElement() {
 
-		try {
-			assertTrue(mc.asyncBopDelete(KEY, 0L, 1000L,
-					ElementFlagFilter.DO_NOT_FILTER, 600, false).get(1000L,
-					TimeUnit.MILLISECONDS));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+    try {
+      assertTrue(mc.asyncBopDelete(KEY, 0L, 1000L,
+              ElementFlagFilter.DO_NOT_FILTER, 600, false).get(1000L,
+              TimeUnit.MILLISECONDS));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-		List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
-		for (int i = 0; i < elementCount; i++) {
-			updateElements.add(new Element<Object>(i, "updated" + i,
-					new ElementFlagUpdate(new byte[] { 1, 1, 1, 1 })));
-		}
+    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    for (int i = 0; i < elementCount; i++) {
+      updateElements.add(new Element<Object>(i, "updated" + i,
+              new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncBopPipedUpdateBulk(KEY, updateElements);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncBopPipedUpdateBulk(KEY, updateElements);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(System.currentTimeMillis() - start + "ms");
 
-			assertEquals(600, map2.size());
-			assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, map2.get(0)
-					.getResponse());
+      assertEquals(600, map2.size());
+      assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, map2.get(0)
+              .getResponse());
 
-			for (int i = 600; i < elementCount; i++) {
-				assertEquals(
-						"updated" + i,
-						mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
-								false, false).get(1000L, TimeUnit.MILLISECONDS)
-								.get(new Long(i)).getValue());
-			}
+      for (int i = 600; i < elementCount; i++) {
+        assertEquals(
+                "updated" + i,
+                mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
+                        false, false).get(1000L, TimeUnit.MILLISECONDS)
+                        .get(new Long(i)).getValue());
+      }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-	}
+  }
 
-	public void testBopPipeUpdateNotFoundKey() {
+  public void testBopPipeUpdateNotFoundKey() {
 
-		String key2 = "NEW_BopPipeUpdateTest";
+    String key2 = "NEW_BopPipeUpdateTest";
 
-		List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
-		for (int i = 0; i < elementCount; i++) {
-			updateElements.add(new Element<Object>(i, "updated" + i,
-					new ElementFlagUpdate(new byte[] { 1, 1, 1, 1 })));
-		}
+    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    for (int i = 0; i < elementCount; i++) {
+      updateElements.add(new Element<Object>(i, "updated" + i,
+              new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
+    }
 
-		try {
-			// long start = System.currentTimeMillis();
+    try {
+      // long start = System.currentTimeMillis();
 
-			CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
-					.asyncBopPipedUpdateBulk(key2, updateElements);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 = mc
+              .asyncBopPipedUpdateBulk(key2, updateElements);
 
-			Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
-					TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2 = future2.get(5000L,
+              TimeUnit.MILLISECONDS);
 
-			// System.out.println(System.currentTimeMillis() - start + "ms");
+      // System.out.println(System.currentTimeMillis() - start + "ms");
 
-			assertEquals(elementCount, map2.size());
-			assertEquals(CollectionResponse.NOT_FOUND, map2.get(0)
-					.getResponse());
+      assertEquals(elementCount, map2.size());
+      assertEquals(CollectionResponse.NOT_FOUND, map2.get(0)
+              .getResponse());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-	}
+  }
 }

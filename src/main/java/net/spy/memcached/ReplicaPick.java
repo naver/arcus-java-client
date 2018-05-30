@@ -22,19 +22,19 @@ package net.spy.memcached;
  */
 enum ReplicaPick {
 
-	/**
-	 * Pick Master node.
-	 */
-	MASTER,
+  /**
+   * Pick Master node.
+   */
+  MASTER,
 
-	/**
-	 * Pick Slave node.
-	 */
-	SLAVE,
+  /**
+   * Pick Slave node.
+   */
+  SLAVE,
 
-	/**
-	 * Pick any node RR(Round-robin) pattern.
-	 */
-	RR
+  /**
+   * Pick any node RR(Round-robin) pattern.
+   */
+  RR
 }
 /* ENABLE_REPLICATION end */

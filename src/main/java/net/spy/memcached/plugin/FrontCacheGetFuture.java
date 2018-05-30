@@ -31,42 +31,42 @@ import net.sf.ehcache.Element;
  * @param <T> Type of object returned from the get
  */
 public class FrontCacheGetFuture<T> implements Future<T> {
-	
-	Element element;
-	
-	public FrontCacheGetFuture(Element element) {
-		this.element = element;
-	}
 
-	@Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
-		return false;
-	}
+  Element element;
 
-	@Override
-	public T get() throws InterruptedException, ExecutionException {
-		return getValue();
-	}
+  public FrontCacheGetFuture(Element element) {
+    this.element = element;
+  }
 
-	@SuppressWarnings("unchecked")
-	private T getValue() {
-		return (T) this.element.getObjectValue();
-	}
+  @Override
+  public boolean cancel(boolean mayInterruptIfRunning) {
+    return false;
+  }
 
-	@Override
-	public T get(long timeout, TimeUnit unit) throws InterruptedException,
-			ExecutionException, TimeoutException {
-		return getValue();
-	}
+  @Override
+  public T get() throws InterruptedException, ExecutionException {
+    return getValue();
+  }
 
-	@Override
-	public boolean isCancelled() {
-		return false;
-	}
+  @SuppressWarnings("unchecked")
+  private T getValue() {
+    return (T) this.element.getObjectValue();
+  }
 
-	@Override
-	public boolean isDone() {
-		return false;
-	}
-	
+  @Override
+  public T get(long timeout, TimeUnit unit) throws InterruptedException,
+          ExecutionException, TimeoutException {
+    return getValue();
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return false;
+  }
+
+  @Override
+  public boolean isDone() {
+    return false;
+  }
+
 }

@@ -23,159 +23,153 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class ElementFlagFilter {
 
-	/**
-	 * Do not filter.
-	 */
-	public static final ElementFlagFilter DO_NOT_FILTER = null;
+  /**
+   * Do not filter.
+   */
+  public static final ElementFlagFilter DO_NOT_FILTER = null;
 
-	/**
-	 * Empty element flag.
-	 */
-	public static final byte[] EMPTY_ELEMENT_FLAG = null;
+  /**
+   * Empty element flag.
+   */
+  public static final byte[] EMPTY_ELEMENT_FLAG = null;
 
-	/**
-	 * Max element flag length.
-	 */
-	public static final int MAX_EFLAG_LENGTH = 31;
+  /**
+   * Max element flag length.
+   */
+  public static final int MAX_EFLAG_LENGTH = 31;
 
-	// compare offset
-	protected int fwhere = 0;
+  // compare offset
+  protected int fwhere = 0;
 
-	// bitwise comparison (optional)
-	protected BitWiseOperands bitOp = null;
-	protected byte[] bitCompValue = null;
+  // bitwise comparison (optional)
+  protected BitWiseOperands bitOp = null;
+  protected byte[] bitCompValue = null;
 
-	// comparison
-	protected CompOperands compOp;
-	protected byte[] compValue;
+  // comparison
+  protected CompOperands compOp;
+  protected byte[] compValue;
 
-	public ElementFlagFilter() {
-	}
-	
-	/**
-	 * create element flag filter
-	 * 
-	 * @param compOperand
-	 *            comparison operand
-	 * @param compValue
-	 *            comparison value
-	 */
-	public ElementFlagFilter(CompOperands compOperand, byte[] compValue) {
-		if (compOperand == null || compValue == null) {
-			throw new NullPointerException("Invalid compOperand and compValue.");
-		}
+  public ElementFlagFilter() {
+  }
 
-		if (compValue.length == 0) {
-			throw new IllegalArgumentException(
-					"Length of comparison value must be larger than 0.");
-		}
+  /**
+   * create element flag filter
+   *
+   * @param compOperand comparison operand
+   * @param compValue   comparison value
+   */
+  public ElementFlagFilter(CompOperands compOperand, byte[] compValue) {
+    if (compOperand == null || compValue == null) {
+      throw new NullPointerException("Invalid compOperand and compValue.");
+    }
 
-		if (compValue.length > MAX_EFLAG_LENGTH) {
-			throw new IllegalArgumentException(
-					"Length of comparison value must be less than " + MAX_EFLAG_LENGTH);
-		}
+    if (compValue.length == 0) {
+      throw new IllegalArgumentException(
+              "Length of comparison value must be larger than 0.");
+    }
 
-		this.compOp = compOperand;
-		this.compValue = compValue;
-	}
+    if (compValue.length > MAX_EFLAG_LENGTH) {
+      throw new IllegalArgumentException(
+              "Length of comparison value must be less than " + MAX_EFLAG_LENGTH);
+    }
 
-	/**
-	 * set bitwise compare
-	 * 
-	 * @param bitOp
-	 *            bitwise operand
-	 * @param bitCompValue
-	 *            bitwise comparison value
-	 * @return element flag filter
-	 */
-	public ElementFlagFilter setBitOperand(BitWiseOperands bitOp,
-			byte[] bitCompValue) {
-		if (bitOp == null || bitCompValue == null) {
-			throw new NullPointerException("Invalid compOperand and compValue.");
-		}
+    this.compOp = compOperand;
+    this.compValue = compValue;
+  }
 
-		if (bitCompValue.length == 0) {
-			throw new IllegalArgumentException(
-					"Length of bit comparison value must be larger than 0.");
-		}
+  /**
+   * set bitwise compare
+   *
+   * @param bitOp        bitwise operand
+   * @param bitCompValue bitwise comparison value
+   * @return element flag filter
+   */
+  public ElementFlagFilter setBitOperand(BitWiseOperands bitOp,
+                                         byte[] bitCompValue) {
+    if (bitOp == null || bitCompValue == null) {
+      throw new NullPointerException("Invalid compOperand and compValue.");
+    }
 
-		if (bitCompValue.length > MAX_EFLAG_LENGTH) {
-			throw new IllegalArgumentException(
-					"Length of bit comparison value must be less than " + MAX_EFLAG_LENGTH);
-		}
+    if (bitCompValue.length == 0) {
+      throw new IllegalArgumentException(
+              "Length of bit comparison value must be larger than 0.");
+    }
 
-		this.bitOp = bitOp;
-		this.bitCompValue = bitCompValue;
-		return this;
-	}
+    if (bitCompValue.length > MAX_EFLAG_LENGTH) {
+      throw new IllegalArgumentException(
+              "Length of bit comparison value must be less than " + MAX_EFLAG_LENGTH);
+    }
 
-	/**
-	 * set bitwise compare offset
-	 * 
-	 * @param offset
-	 *            0-base offset. this value must less than length of exists
-	 *            element flag.
-	 * @return element flag filter
-	 */
-	public ElementFlagFilter setCompareOffset(int offset) {
-		this.fwhere = offset;
-		return this;
-	}
+    this.bitOp = bitOp;
+    this.bitCompValue = bitCompValue;
+    return this;
+  }
 
-	protected boolean isBitWiseOpEnabled() {
-		return bitOp != null && bitCompValue != null;
-	}
+  /**
+   * set bitwise compare offset
+   *
+   * @param offset 0-base offset. this value must less than length of exists
+   *               element flag.
+   * @return element flag filter
+   */
+  public ElementFlagFilter setCompareOffset(int offset) {
+    this.fwhere = offset;
+    return this;
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
+  protected boolean isBitWiseOpEnabled() {
+    return bitOp != null && bitCompValue != null;
+  }
 
-		sb.append(fwhere).append(" ");
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
 
-		if (isBitWiseOpEnabled()) {
-			sb.append(bitOp).append(" ");
-			sb.append(BTreeUtil.toHex(bitCompValue)).append(" ");
-		}
+    sb.append(fwhere).append(" ");
 
-		sb.append(compOp).append(" ");
-		sb.append(BTreeUtil.toHex(compValue));
+    if (isBitWiseOpEnabled()) {
+      sb.append(bitOp).append(" ");
+      sb.append(BTreeUtil.toHex(bitCompValue)).append(" ");
+    }
 
-		return sb.toString();
-	}
+    sb.append(compOp).append(" ");
+    sb.append(BTreeUtil.toHex(compValue));
 
-	/**
-	 * Comparison Operands
-	 */
-	public enum CompOperands {
-		Equal("EQ"), NotEqual("NE"), LessThan("LT"), LessOrEqual("LE"), GreaterThan(
-				"GT"), GreaterOrEqual("GE");
+    return sb.toString();
+  }
 
-		private String op;
+  /**
+   * Comparison Operands
+   */
+  public enum CompOperands {
+    Equal("EQ"), NotEqual("NE"), LessThan("LT"), LessOrEqual("LE"), GreaterThan(
+            "GT"), GreaterOrEqual("GE");
 
-		CompOperands(String operand) {
-			op = operand;
-		}
+    private String op;
 
-		public String toString() {
-			return op;
-		}
-	}
+    CompOperands(String operand) {
+      op = operand;
+    }
 
-	/**
-	 * Bitwise comparison operands
-	 * 
-	 */
-	public enum BitWiseOperands {
-		AND("&"), OR("|"), XOR("^");
+    public String toString() {
+      return op;
+    }
+  }
 
-		private String op;
+  /**
+   * Bitwise comparison operands
+   */
+  public enum BitWiseOperands {
+    AND("&"), OR("|"), XOR("^");
 
-		BitWiseOperands(String operand) {
-			op = operand;
-		}
+    private String op;
 
-		public String toString() {
-			return op;
-		}
-	}
+    BitWiseOperands(String operand) {
+      op = operand;
+    }
+
+    public String toString() {
+      return op;
+    }
+  }
 }

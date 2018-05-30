@@ -34,74 +34,74 @@ import net.spy.memcached.ops.OperationType;
  */
 class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
-	private static final String CMD = "getattr";
+  private static final String CMD = "getattr";
 
-	private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
-			false, "collection canceled", CollectionResponse.CANCELED);
+  private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
+          false, "collection canceled", CollectionResponse.CANCELED);
 
-	private static final OperationStatus END = new CollectionOperationStatus(
-			true, "END", CollectionResponse.END);
-	private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
-			false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-	private static final OperationStatus ATTR_ERROR_NOT_FOUND = new CollectionOperationStatus(
-			false, "ATTR_ERROR not found",
-			CollectionResponse.ATTR_ERROR_NOT_FOUND);
+  private static final OperationStatus END = new CollectionOperationStatus(
+          true, "END", CollectionResponse.END);
+  private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
+          false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+  private static final OperationStatus ATTR_ERROR_NOT_FOUND = new CollectionOperationStatus(
+          false, "ATTR_ERROR not found",
+          CollectionResponse.ATTR_ERROR_NOT_FOUND);
 
-	protected final String key;
-	protected final GetAttrOperation.Callback cb;
+  protected final String key;
+  protected final GetAttrOperation.Callback cb;
 
-	public GetAttrOperationImpl(String key, GetAttrOperation.Callback cb) {
-		super(cb);
-		this.key = key;
-		this.cb = cb;
-		setAPIType(APIType.GETATTR);
-		setOperationType(OperationType.READ);
-	}
+  public GetAttrOperationImpl(String key, GetAttrOperation.Callback cb) {
+    super(cb);
+    this.key = key;
+    this.cb = cb;
+    setAPIType(APIType.GETATTR);
+    setOperationType(OperationType.READ);
+  }
 
-	@Override
-	public void handleLine(String line) {
-		if (line.startsWith("ATTR ")) {
-			getLogger().debug("Got line %s", line);
+  @Override
+  public void handleLine(String line) {
+    if (line.startsWith("ATTR ")) {
+      getLogger().debug("Got line %s", line);
 
-			String[] stuff = line.split(" ");
+      String[] stuff = line.split(" ");
 
-			assert stuff.length == 2;
-			assert stuff[0].equals("ATTR");
+      assert stuff.length == 2;
+      assert stuff[0].equals("ATTR");
 
-			cb.gotAttribute(key, stuff[1]);
-		} else {
-			OperationStatus status = matchStatus(line, END, NOT_FOUND,
-					ATTR_ERROR_NOT_FOUND);
-			if (getLogger().isDebugEnabled()) {
-				getLogger().debug(status);
-			}
-			getCallback().receivedStatus(status);
-			transitionState(OperationState.COMPLETE);
-		}
-	}
+      cb.gotAttribute(key, stuff[1]);
+    } else {
+      OperationStatus status = matchStatus(line, END, NOT_FOUND,
+              ATTR_ERROR_NOT_FOUND);
+      if (getLogger().isDebugEnabled()) {
+        getLogger().debug(status);
+      }
+      getCallback().receivedStatus(status);
+      transitionState(OperationState.COMPLETE);
+    }
+  }
 
-	@Override
-	public void initialize() {
-		int size = CMD.length() + KeyUtil.getKeyBytes(key).length + 16;
-		ByteBuffer bb = ByteBuffer.allocate(size);
-		setArguments(bb, CMD, key);
-		bb.flip();
-		setBuffer(bb);
+  @Override
+  public void initialize() {
+    int size = CMD.length() + KeyUtil.getKeyBytes(key).length + 16;
+    ByteBuffer bb = ByteBuffer.allocate(size);
+    setArguments(bb, CMD, key);
+    bb.flip();
+    setBuffer(bb);
 
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug("Request in ascii protocol: "
-					+ (new String(bb.array())).replace("\r\n", "\\r\\n"));
-		}
-	}
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Request in ascii protocol: "
+              + (new String(bb.array())).replace("\r\n", "\\r\\n"));
+    }
+  }
 
-	@Override
-	protected void wasCancelled() {
-		getCallback().receivedStatus(ATTR_CANCELED);
-	}
+  @Override
+  protected void wasCancelled() {
+    getCallback().receivedStatus(ATTR_CANCELED);
+  }
 
-	@Override
-	public Collection<String> getKeys() {
-		return Collections.singleton(key);
-	}
+  @Override
+  public Collection<String> getKeys() {
+    return Collections.singleton(key);
+  }
 
 }

@@ -10,30 +10,31 @@ import net.spy.memcached.CachedData;
  */
 public interface Transcoder<T> {
 
-	/**
-	 * Should the transcoder be run asyncronously.
-     * @return True if the CachedData should be decoded Asyncronously
-	 */
-	boolean asyncDecode(CachedData d);
+  /**
+   * Should the transcoder be run asyncronously.
+   *
+   * @return True if the CachedData should be decoded Asyncronously
+   */
+  boolean asyncDecode(CachedData d);
 
-	/**
-	 * Encode the given object for storage.
-	 *
-	 * @param o the object
-	 * @return the CachedData representing what should be sent
-	 */
-	CachedData encode(T o);
+  /**
+   * Encode the given object for storage.
+   *
+   * @param o the object
+   * @return the CachedData representing what should be sent
+   */
+  CachedData encode(T o);
 
-	/**
-	 * Decode the cached object into the object it represents.
-	 *
-	 * @param d the data
-	 * @return the return value
-	 */
-	T decode(CachedData d);
+  /**
+   * Decode the cached object into the object it represents.
+   *
+   * @param d the data
+   * @return the return value
+   */
+  T decode(CachedData d);
 
-	/**
-	 * Get the maximum size of objects handled by this transcoder.
-	 */
-	int getMaxSize();
+  /**
+   * Get the maximum size of objects handled by this transcoder.
+   */
+  int getMaxSize();
 }

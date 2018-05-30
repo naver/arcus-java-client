@@ -25,24 +25,24 @@ import java.util.List;
 
 public class ProtocolMapGetTest extends TestCase {
 
-	private final String MKEY = "mkey";
+  private final String MKEY = "mkey";
 
-	public void testStringfy() {
-		// default setting : dropIfEmpty = true
+  public void testStringfy() {
+    // default setting : dropIfEmpty = true
 
-		List<String> mkeyList = new ArrayList<String>();
-		mkeyList.add(MKEY);
-		Assert.assertEquals("4 1 drop",
-				(new MapGet(mkeyList, true)).stringify());
-		Assert.assertEquals("4 1",
-				(new MapGet(mkeyList, false)).stringify());
-		Assert.assertEquals("4 1 drop",
-				(new MapGet(mkeyList, true, true)).stringify());
-		Assert.assertEquals("4 1 delete",
-				(new MapGet(mkeyList, true, false)).stringify());
-		Assert.assertEquals("4 1",
-				(new MapGet(mkeyList, false, true)).stringify());
-		Assert.assertEquals("4 1",
-				(new MapGet(mkeyList, false, false)).stringify());
-	}
+    List<String> mkeyList = new ArrayList<String>();
+    mkeyList.add(MKEY);
+    Assert.assertEquals("4 1 drop",
+            (new MapGet(mkeyList, true)).stringify());
+    Assert.assertEquals("4 1",
+            (new MapGet(mkeyList, false)).stringify());
+    Assert.assertEquals("4 1 drop",
+            (new MapGet(mkeyList, true, true)).stringify());
+    Assert.assertEquals("4 1 delete",
+            (new MapGet(mkeyList, true, false)).stringify());
+    Assert.assertEquals("4 1",
+            (new MapGet(mkeyList, false, true)).stringify());
+    Assert.assertEquals("4 1",
+            (new MapGet(mkeyList, false, false)).stringify());
+  }
 }

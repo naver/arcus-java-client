@@ -30,89 +30,89 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
-	public void testInsertAndGet() {
-		String key = "MyMopKey32";
-		String value = "MyValue";
+  public void testInsertAndGet() {
+    String key = "MyMopKey32";
+    String value = "MyValue";
 
-		int elementSize = 500;
-		Map<String, Object> elements = new TreeMap<String, Object>();
-		for (int i = 0; i < elementSize; i++) {
-			elements.put(String.valueOf(i), value);
-		}
+    int elementSize = 500;
+    Map<String, Object> elements = new TreeMap<String, Object>();
+    for (int i = 0; i < elementSize; i++) {
+      elements.put(String.valueOf(i), value);
+    }
 
-		try {
-			// REMOVE
-			mc.asyncMopDelete(key, true);
+    try {
+      // REMOVE
+      mc.asyncMopDelete(key, true);
 
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, elements,
-							new CollectionAttributes());
-			try {
-				Map<Integer, CollectionOperationStatus> errorList = future.get(
-						20000L, TimeUnit.MILLISECONDS);
+      // SET
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, elements,
+                      new CollectionAttributes());
+      try {
+        Map<Integer, CollectionOperationStatus> errorList = future.get(
+                20000L, TimeUnit.MILLISECONDS);
 
-				Assert.assertTrue("Error list is not empty.",
-						errorList.isEmpty());
-			} catch (TimeoutException e) {
-				future.cancel(true);
-				e.printStackTrace();
-			}
+        Assert.assertTrue("Error list is not empty.",
+                errorList.isEmpty());
+      } catch (TimeoutException e) {
+        future.cancel(true);
+        e.printStackTrace();
+      }
 
-			// GET
-			int errorCount = 0;
-			for (Entry<String, Object> entry : elements.entrySet()) {
-				Future<Map<String, Object>> f = mc.asyncMopGet(key,
-						entry.getKey(), false, false);
-				Map<String, Object> map = null;
-				try {
-					map = f.get();
-				} catch (Exception e) {
-					f.cancel(true);
-					e.printStackTrace();
-				}
-				Object value2 = map.entrySet().iterator().next().getValue();
-				if (!value.equals(value2)) {
-					errorCount++;
-				}
-			}
-			Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      // GET
+      int errorCount = 0;
+      for (Entry<String, Object> entry : elements.entrySet()) {
+        Future<Map<String, Object>> f = mc.asyncMopGet(key,
+                entry.getKey(), false, false);
+        Map<String, Object> map = null;
+        try {
+          map = f.get();
+        } catch (Exception e) {
+          f.cancel(true);
+          e.printStackTrace();
+        }
+        Object value2 = map.entrySet().iterator().next().getValue();
+        if (!value.equals(value2)) {
+          errorCount++;
+        }
+      }
+      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
 
-			// REMOVE
-			for (Entry<String, Object> entry : elements.entrySet()) {
-				mc.asyncMopDelete(key, entry.getKey(), true).get();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+      // REMOVE
+      for (Entry<String, Object> entry : elements.entrySet()) {
+        mc.asyncMopDelete(key, entry.getKey(), true).get();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 
-	public void testErrorCount() {
-		String key = "MyMopKeyErrorCount";
-		String value = "MyValue";
+  public void testErrorCount() {
+    String key = "MyMopKeyErrorCount";
+    String value = "MyValue";
 
-		int elementSize = 1200;
-		Map<String, Object> elements = new TreeMap<String, Object>();
-		for (int i = 0; i < elementSize; i++) {
-			elements.put(String.valueOf(i), value);
-		}
+    int elementSize = 1200;
+    Map<String, Object> elements = new TreeMap<String, Object>();
+    for (int i = 0; i < elementSize; i++) {
+      elements.put(String.valueOf(i), value);
+    }
 
-		try {
-			mc.delete(key).get();
+    try {
+      mc.delete(key).get();
 
-			// SET
-			Future<Map<Integer, CollectionOperationStatus>> future = mc
-					.asyncMopPipedInsertBulk(key, elements, null);
+      // SET
+      Future<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncMopPipedInsertBulk(key, elements, null);
 
-			Map<Integer, CollectionOperationStatus> map = future.get(2000L,
-					TimeUnit.MILLISECONDS);
-			assertEquals(elementSize, map.size());
+      Map<Integer, CollectionOperationStatus> map = future.get(2000L,
+              TimeUnit.MILLISECONDS);
+      assertEquals(elementSize, map.size());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 
 }

@@ -10,18 +10,18 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLStepOperation;
 
 public class SASLStepOperationImpl extends SASLBaseOperationImpl
-	implements SASLStepOperation {
+        implements SASLStepOperation {
 
-	private final static int CMD = 0x22;
+  private final static int CMD = 0x22;
 
-	public SASLStepOperationImpl(String[] m, byte[] ch, String s,
-			Map<String, ?> p, CallbackHandler h, OperationCallback c) {
-		super(CMD, m, ch, s, p, h, c);
-	}
+  public SASLStepOperationImpl(String[] m, byte[] ch, String s,
+                               Map<String, ?> p, CallbackHandler h, OperationCallback c) {
+    super(CMD, m, ch, s, p, h, c);
+  }
 
-	@Override
-	protected byte[] buildResponse(SaslClient sc) throws SaslException {
-		return sc.evaluateChallenge(challenge);
+  @Override
+  protected byte[] buildResponse(SaslClient sc) throws SaslException {
+    return sc.evaluateChallenge(challenge);
 
-	}
+  }
 }

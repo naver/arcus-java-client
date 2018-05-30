@@ -20,54 +20,54 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetDelete<T> extends CollectionDelete {
 
-	private static final String command = "sop delete";
-	
-	protected T value;
-	protected byte[] additionalArgs;
-	protected Transcoder<T> tc;
-	
-	public SetDelete(T value, boolean noreply, Transcoder<T> tc) {
-		this.value = value;
-		this.noreply = noreply;
-		this.tc = tc;
-		this.additionalArgs = tc.encode(value).getData();
-	}
+  private static final String command = "sop delete";
 
-	public SetDelete(T value, boolean noreply, boolean dropIfEmpty, Transcoder<T> tc) {
-		this(value, noreply, tc);
-		this.dropIfEmpty = dropIfEmpty;
-	}
-	
-	public T getValue() {
-		return value;
-	}
+  protected T value;
+  protected byte[] additionalArgs;
+  protected Transcoder<T> tc;
 
-	public void setValue(T value) {
-		this.value = value;
-	}
-	
-	public byte[] getAdditionalArgs() {
-		return additionalArgs;
-	}
+  public SetDelete(T value, boolean noreply, Transcoder<T> tc) {
+    this.value = value;
+    this.noreply = noreply;
+    this.tc = tc;
+    this.additionalArgs = tc.encode(value).getData();
+  }
 
-	public String stringify() {
-		StringBuilder b = new StringBuilder();
-		b.append(additionalArgs.length);
-		
-		if (dropIfEmpty) {
-			b.append(" drop");
-		}
-		
-		if (noreply) {
-			b.append(" noreply");
-		}
-		
-		str = b.toString();
-		return str;
-	}
+  public SetDelete(T value, boolean noreply, boolean dropIfEmpty, Transcoder<T> tc) {
+    this(value, noreply, tc);
+    this.dropIfEmpty = dropIfEmpty;
+  }
 
-	public String getCommand() {
-		return command;
-	}
+  public T getValue() {
+    return value;
+  }
+
+  public void setValue(T value) {
+    this.value = value;
+  }
+
+  public byte[] getAdditionalArgs() {
+    return additionalArgs;
+  }
+
+  public String stringify() {
+    StringBuilder b = new StringBuilder();
+    b.append(additionalArgs.length);
+
+    if (dropIfEmpty) {
+      b.append(" drop");
+    }
+
+    if (noreply) {
+      b.append(" noreply");
+    }
+
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
 
 }

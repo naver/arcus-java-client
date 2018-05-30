@@ -29,57 +29,57 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
-	private static class MyBean implements Serializable {
-		private static final long serialVersionUID = -5977830942924286134L;
+  private static class MyBean implements Serializable {
+    private static final long serialVersionUID = -5977830942924286134L;
 
-		private String name;
+    private String name;
 
-		public MyBean(String name) {
-			this.name = name;
-		}
+    public MyBean(String name) {
+      this.name = name;
+    }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof MyBean) {
-				return this.name.equals(((MyBean) obj).name);
-			}
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof MyBean) {
+        return this.name.equals(((MyBean) obj).name);
+      }
+      return false;
+    }
+  }
 
-	public void testInsertAndGet() {
-		Object[] valueList = { 1.0, 1000, 1000L, "String",
-				new MyBean("beanName") };
-		String keyPrefix = "TypeTestKey";
+  public void testInsertAndGet() {
+    Object[] valueList = {1.0, 1000, 1000L, "String",
+            new MyBean("beanName")};
+    String keyPrefix = "TypeTestKey";
 
-		try {
-			for (int i = 0; i < valueList.length; i++) {
-				String[] key = new String[] { keyPrefix + i };
-				// REMOVE
-				mc.delete(key[0]);
+    try {
+      for (int i = 0; i < valueList.length; i++) {
+        String[] key = new String[]{keyPrefix + i};
+        // REMOVE
+        mc.delete(key[0]);
 
-				// SET
-				Future<Map<String, CollectionOperationStatus>> future = mc
-						.asyncSetBulk(Arrays.asList(key), 60, valueList[i]);
+        // SET
+        Future<Map<String, CollectionOperationStatus>> future = mc
+                .asyncSetBulk(Arrays.asList(key), 60, valueList[i]);
 
-				Map<String, CollectionOperationStatus> errorList;
-				try {
-					errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-					Assert.assertTrue("Error list is not empty.",
-							errorList.isEmpty());
-				} catch (TimeoutException e) {
-					future.cancel(true);
-					Assert.fail(e.toString());
-				}
+        Map<String, CollectionOperationStatus> errorList;
+        try {
+          errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+          Assert.assertTrue("Error list is not empty.",
+                  errorList.isEmpty());
+        } catch (TimeoutException e) {
+          future.cancel(true);
+          Assert.fail(e.toString());
+        }
 
-				// GET
-				Object v = mc.get(key[0]);
-				Assert.assertEquals(String.format("K=%s, V=%s", key, v),
-						valueList[i], v);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-	}
+        // GET
+        Object v = mc.get(key[0]);
+        Assert.assertEquals(String.format("K=%s, V=%s", key, v),
+                valueList[i], v);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
 }

@@ -23,10 +23,10 @@ import net.spy.memcached.collection.CollectionPipedUpdate;
  */
 public interface CollectionPipedUpdateOperation extends KeyedOperation {
 
-	CollectionPipedUpdate<?> getUpdate();
+  CollectionPipedUpdate<?> getUpdate();
 
-	interface Callback extends OperationCallback {
-		void gotStatus(Integer index, OperationStatus status);
-	}
+  interface Callback extends OperationCallback {
+    void gotStatus(Integer index, OperationStatus status);
+  }
 
 }

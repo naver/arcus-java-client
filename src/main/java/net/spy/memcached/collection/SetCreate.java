@@ -18,18 +18,18 @@ package net.spy.memcached.collection;
 
 public class SetCreate extends CollectionCreate {
 
-	private static final String command = "sop create";
-	
-	public SetCreate() {
-		super();
-	}
-	
-	public SetCreate(int flags, Integer expTime, Long maxCount, Boolean readable, boolean noreply) {
-		super(flags, expTime, maxCount, null, readable, noreply);
-	}
-	
-	public String getCommand() {
-		return command;
-	}
+  private static final String command = "sop create";
+
+  public SetCreate() {
+    super();
+  }
+
+  public SetCreate(int flags, Integer expTime, Long maxCount, Boolean readable, boolean noreply) {
+    super(flags, expTime, maxCount, null, readable, noreply);
+  }
+
+  public String getCommand() {
+    return command;
+  }
 
 }

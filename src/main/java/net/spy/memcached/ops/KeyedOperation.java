@@ -7,9 +7,9 @@ import java.util.Collection;
  */
 public interface KeyedOperation extends Operation {
 
-	/**
-	 * Get the keys requested in this GetOperation.
-	 */
-	Collection<String> getKeys();
+  /**
+   * Get the keys requested in this GetOperation.
+   */
+  Collection<String> getKeys();
 
 }

@@ -24,32 +24,33 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 /**
  * Future object that contains an b+tree element object
+ *
  * @param <T>
  */
 public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
 
-	private Element<E> element;
+  private Element<E> element;
 
-	public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout) {
-		this(l, new AtomicReference<T>(null), opTimeout);
-	}
-	
-	public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref,
-			long opTimeout) {
-		super(l, oref, opTimeout);
-	}
-	
-	public void set(T o, CollectionOperationStatus status) {
-		objRef.set(o);
-		opStatus = status;
-	}
+  public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout) {
+    this(l, new AtomicReference<T>(null), opTimeout);
+  }
 
-	public Element<E> getElement() {
-		return element;
-	}
+  public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref,
+                                long opTimeout) {
+    super(l, oref, opTimeout);
+  }
 
-	public void setElement(Element<E> element) {
-		this.element = element;
-	}
+  public void set(T o, CollectionOperationStatus status) {
+    objRef.set(o);
+    opStatus = status;
+  }
+
+  public Element<E> getElement() {
+    return element;
+  }
+
+  public void setElement(Element<E> element) {
+    this.element = element;
+  }
 
 }

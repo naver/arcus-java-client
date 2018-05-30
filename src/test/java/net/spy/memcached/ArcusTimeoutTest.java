@@ -73,7 +73,7 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
   @Override
   public void tearDown() throws Exception {
     // override teardown to avoid the flush phase
-    if(mc != null) {
+    if (mc != null) {
       mc.shutdown();
     }
   }
@@ -225,7 +225,7 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     }
 
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncBopInsertBulk(
-            Arrays.asList(keys), bkey, new byte[]{0,0,1,1}, value, new CollectionAttributes());
+            Arrays.asList(keys), bkey, new byte[]{0, 0, 1, 1}, value, new CollectionAttributes());
     future.get(1L, TimeUnit.MILLISECONDS);
   }
 
@@ -266,8 +266,8 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
       keyList.add(KEY + i);
     }
 
-    byte[] from = new byte[] { (byte) 0 };
-    byte[] to = new byte[] { (byte) 1000 };
+    byte[] from = new byte[]{(byte) 0};
+    byte[] to = new byte[]{(byte) 1000};
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
@@ -282,8 +282,8 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
       keyList.add(KEY + i);
     }
 
-    byte[] from = new byte[] { (byte) 0 };
-    byte[] to = new byte[] { (byte) 1000 };
+    byte[] from = new byte[]{(byte) 0};
+    byte[] to = new byte[]{(byte) 1000};
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
 

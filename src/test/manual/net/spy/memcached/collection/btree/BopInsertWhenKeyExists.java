@@ -32,111 +32,111 @@ import net.spy.memcached.transcoders.LongTranscoder;
 
 public class BopInsertWhenKeyExists extends BaseIntegrationTest {
 
-	private String key = "BopInsertWhenKeyExists";
+  private String key = "BopInsertWhenKeyExists";
 
-	private Long[] items9 = { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
+  private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
-	protected void tearDown() {
-		try {
-			mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
-					true).get(1000, TimeUnit.MILLISECONDS);
-			mc.delete(key).get();
-			super.tearDown();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+  protected void tearDown() {
+    try {
+      mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
+              true).get(1000, TimeUnit.MILLISECONDS);
+      mc.delete(key).get();
+      super.tearDown();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-	public void testBopInsert_unreadable_largestTrim() throws Exception {
-		// insert with unreadable
-		CollectionAttributes attr = new CollectionAttributes();
-		attr.setReadable(false);
-		attr.setOverflowAction(CollectionOverflowAction.largest_trim);
+  public void testBopInsert_unreadable_largestTrim() throws Exception {
+    // insert with unreadable
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setReadable(false);
+    attr.setOverflowAction(CollectionOverflowAction.largest_trim);
 
-		// insert
-		Boolean result = mc.asyncBopInsert(key, 0L, null, "value", attr).get();
-		Assert.assertTrue(result);
+    // insert
+    Boolean result = mc.asyncBopInsert(key, 0L, null, "value", attr).get();
+    Assert.assertTrue(result);
 
-		// get attr
-		CollectionAttributes attr2 = mc.asyncGetAttr(key).get();
-		Assert.assertFalse(attr2.getReadable());
-		Assert.assertEquals(CollectionOverflowAction.largest_trim,
-				attr2.getOverflowAction());
+    // get attr
+    CollectionAttributes attr2 = mc.asyncGetAttr(key).get();
+    Assert.assertFalse(attr2.getReadable());
+    Assert.assertEquals(CollectionOverflowAction.largest_trim,
+            attr2.getOverflowAction());
 
-		// get element
-		CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
-				key, 0L, ElementFlagFilter.DO_NOT_FILTER, false, false);
-		Assert.assertNull(future.get());
+    // get element
+    CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
+            key, 0L, ElementFlagFilter.DO_NOT_FILTER, false, false);
+    Assert.assertNull(future.get());
 
-		Assert.assertEquals(CollectionResponse.UNREADABLE, future
-				.getOperationStatus().getResponse());
-	}
+    Assert.assertEquals(CollectionResponse.UNREADABLE, future
+            .getOperationStatus().getResponse());
+  }
 
-	public void testBopInsert_Normal() throws Exception {
-		// Create a list and add it 9 items
-		addToBTree(key, items9);
+  public void testBopInsert_Normal() throws Exception {
+    // Create a list and add it 9 items
+    addToBTree(key, items9);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Insert one item
-		assertTrue(mc.asyncBopInsert(key, 20, null, 10L,
-				new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
+    // Insert one item
+    assertTrue(mc.asyncBopInsert(key, 20, null, 10L,
+            new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
 
-		// Check inserted item
-		Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
-				ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
-		assertEquals(10, rmap.size());
-		assertEquals((Long) 10L, rmap.get(20L).getValue());
+    // Check inserted item
+    Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(10, rmap.size());
+    assertEquals((Long) 10L, rmap.get(20L).getValue());
 
-		// Check list attributes
-		CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
-				TimeUnit.MILLISECONDS);
-		assertEquals(10, rattrs.getCount().intValue());
-	}
+    // Check list attributes
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000,
+            TimeUnit.MILLISECONDS);
+    assertEquals(10, rattrs.getCount().intValue());
+  }
 
-	public void testBopInsert_SameItem() throws Exception {
-		// Create a list and add it 9 items
-		addToBTree(key, items9);
+  public void testBopInsert_SameItem() throws Exception {
+    // Create a list and add it 9 items
+    addToBTree(key, items9);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Insert an item same to the last item
-		mc.asyncBopInsert(key, 10, null, 9L, new CollectionAttributes()).get(
-				1000, TimeUnit.MILLISECONDS);
+    // Insert an item same to the last item
+    mc.asyncBopInsert(key, 10, null, 9L, new CollectionAttributes()).get(
+            1000, TimeUnit.MILLISECONDS);
 
-		// Check that item is inserted
-		Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
-				ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
-		assertEquals(10, rmap.size());
-	}
+    // Check that item is inserted
+    Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(10, rmap.size());
+  }
 
-	public void testBopInsert_SameBkey() throws Exception {
-		// Create a list and add it 9 items
-		addToBTree(key, items9);
+  public void testBopInsert_SameBkey() throws Exception {
+    // Create a list and add it 9 items
+    addToBTree(key, items9);
 
-		// Set maxcount to 10
-		CollectionAttributes attrs = new CollectionAttributes();
-		attrs.setMaxCount(10);
-		assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
+    // Set maxcount to 10
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
-		// Insert an item same to the last item
-		mc.asyncBopInsert(key, 8, null, 10L, new CollectionAttributes()).get(
-				1000, TimeUnit.MILLISECONDS);
+    // Insert an item same to the last item
+    mc.asyncBopInsert(key, 8, null, 10L, new CollectionAttributes()).get(
+            1000, TimeUnit.MILLISECONDS);
 
-		// Check that item is inserted
-		Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
-				ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
-				new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
+    // Check that item is inserted
+    Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false,
+            new LongTranscoder()).get(1000, TimeUnit.MILLISECONDS);
 
-		assertEquals(9, rmap.size());
-	}
+    assertEquals(9, rmap.size());
+  }
 
 }
