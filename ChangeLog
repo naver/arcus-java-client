@@ -1,7 +1,13 @@
-2018-05-04 [version 1.11.1-SNAPSHOT]
-	* [Fix] flush_by_prefix method return false when prefix does not exist.
+2018-06-08 [version 1.11.1]
+	* [Fix] CacheManager shutdown by exceptions while reconnect ZooKeeper.
+	* [FIX] ZkInitLatch countDown bug when reconnect with ZK session timeout.
+	* [Fix] Instance version comparsion bug for using MGetOperation.
 	* [Fix] ClassCastException error when optimize the new mget operation.
-	* [Fix] Issue in version checking mget is compatible with arcus-memcached.
+	* [Fix] flush_by_prefix method return false when prefix does not exist.
+	* [ENHANCE] throw exception when can't create the znode of client info.
+	* [DOC] Describe the differences of old and new smget API.
+	* [DOC] Describe that the frontcache is not deleted by the flush command.
+	* [OTHER] Adjust code indentation.
 
 2017-09-23 [version 1.11.0] UNSTABLE
 	* [Feature] Support long key. MAX_KEY_LENGTH(250 => 32000).
@@ -16,36 +22,47 @@
 	     - The version check is OK for arcus-memcacehd version 1.10.X.
 	     - The version check is preblematic for version 1.9 and below.
 	   - ClassCastException error when optimize the new mget operation.
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
-2017-07-28 [version 1.10.1]
+2017-07-28 [version 1.10.1] UNSTABLE
 	* [Fix] Fix connection latch count calculation mistake.
 	* [Fix] Fix the asyncBopDecr mistake of ArcusClientPool.
 	* [Fix] Add the missed response handling in asyncBopExtendedGet.
 	   - Add default handling for error response such as OUT_OF_RANGE.
 	* [Feature] Add the validation checking on prefix string.
 	* [Enhance] Add the time unit in operation timeout messages.
+	* [UNSTABLE] See the below issues
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
-2017-03-24 [version 1.10.0]
+2017-03-24 [version 1.10.0] UNSTABLE
 	* [Feature] Add a map collection type.
 	* [Cleanup] Separate CacheMonitor ZK watcher from CacheManager.
 	* [Cleanup] Refactor method call of updateConnection to task execution.
 	* [Cleanup] Combine timeout tests into a single test.
 	* [Cleanup] Remove duplicate test codes.
 	* [Test] Add unit tests for SMGet with ElementMultiFlagsFilter.
+	* [UNSTABLE] See the below issues
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
-2017-03-24 [version 1.9.8]
+2017-03-24 [version 1.9.8] UNSTABLE
 	* [Fix] Add bad command log message
 	* [Fix] Add local cache hit debug log message
+	* [UNSTABLE] See the below issues
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
-2017-02-27 [version 1.9.7] stable
+2017-02-27 [version 1.9.7] UNSTABLE
 	* [Fix] Fix bopGetBulk reverse scan bug.
 	* [Feature] Deprecate repl setting methods of cfb.
 	   - Replication cloud is internally determined by checking
 	     ZK directories for the given service code.
 	   - The service code must be unique in each ZK ensemble.
+	* [UNSTABLE] See the below issues
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
-2016-12-09 [version 1.9.6] stable
+2016-12-09 [version 1.9.6] UNSTABLE
 	* [Fix] Fix bopGetBulk deserialization bug.
+	* [UNSTABLE] See the below issues
+	   - CacheManager stops by reconnect timeout after ZK sesssion timeout.
 
 2016-08-31 [version 1.9.5] stable
 	* [Fix] Add overflowAction availability check logic to collection APIs.
