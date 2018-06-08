@@ -246,11 +246,11 @@ public class CacheManager extends SpyThread implements Watcher,
     if (event.getType() == Event.EventType.None) {
       switch (event.getState()) {
         case SyncConnected:
+          zkInitLatch.countDown();
           getLogger().info("Connected to Arcus admin. (%s@%s)", serviceCode, hostPort);
           if (cacheMonitor != null) {
             getLogger().warn("Reconnected to the Arcus admin. " + getInfo());
           } else {
-            zkInitLatch.countDown();
             getLogger().debug("cm is null, servicecode : %s, state:%s, type:%s",
                     serviceCode, event.getState(), event.getType());
           }
