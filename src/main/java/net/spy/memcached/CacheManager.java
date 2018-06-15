@@ -169,6 +169,7 @@ public class CacheManager extends SpyThread implements Watcher,
 				String path = getClientInfo();
 				if (path.isEmpty()) {
 					getLogger().fatal("Can't create the znode of client info (" + path + ")");
+					throw new InitializeClientException("Can't create client info");
 				} else {
 					if (zk.exists(path, false) == null) {
 						zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
@@ -178,6 +179,9 @@ public class CacheManager extends SpyThread implements Watcher,
 				shutdownZooKeeperClient();
 				throw e;
 			} catch (NotExistsServiceCodeException e) {
+				shutdownZooKeeperClient();
+				throw e;
+			} catch (InitializeClientException e) {
 				shutdownZooKeeperClient();
 				throw e;
 			} catch (InterruptedException ie) {
