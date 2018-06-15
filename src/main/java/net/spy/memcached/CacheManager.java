@@ -269,15 +269,11 @@ public class CacheManager extends SpyThread implements Watcher,
 		try {
 			synchronized (this) {
 				while (!shutdownRequested) {
-					if (zk == null) {
-						getLogger().info("Arcus admin connection is not established. (%s@%s)", serviceCode, hostPort);
-						initZooKeeperClient();
-					}
-					
 					if (!cacheMonitor.dead) {
 						wait();
 					} else {
-						getLogger().warn("Unexpected disconnection from Arcus admin. Trying to reconnect to Arcus admin.");
+						getLogger().warn("Unexpected disconnection from Arcus admin. " +
+										"Trying to reconnect to Arcus admin. CacheList =" + prevChildren);
 						try {
 							shutdownZooKeeperClient();
 							initZooKeeperClient();
@@ -293,8 +289,13 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 		} catch (InterruptedException e) {
 			getLogger().warn("current arcus admin is interrupted : %s",
-					e.getMessage());
+							e.getMessage());
 		} finally {
+			if (shutdownRequested) {
+				getLogger().info("Close cache manager.");
+			} else {
+				getLogger().error("Close cache manager. But, there was no shutdown request.");
+			}
 			shutdownZooKeeperClient();
 		}
 	}
