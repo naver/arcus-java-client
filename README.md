@@ -1,4 +1,4 @@
-## arcus-java-client: Arcus Java Client
+## arcus-java-client: Arcus Java Client [![Build Status](https://travis-ci.org/naver/arcus-java-client.svg?branch=develop)](https://travis-ci.org/naver/arcus-java-client)
 
 This is a fork of [spymemcached][spymemcached] with the following modifications
 to support Arcus memcached cloud.
