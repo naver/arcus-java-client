@@ -1,3 +1,9 @@
+2018-06-18 [version 1.11.0.1]
+	* [FIX] errors related to MGetOperation
+	* [FIX] throw exception when can't create the znode of client info
+	* [FIX] ZkInitLatch countDown and abnormal shutdown of CacheManager
+	* [FIX] fix travis-ci test error due to memcached port conflict
+
 2017-09-23 [version 1.11.0]
 	* [Feature] Support long key. MAX_KEY_LENGTH(250 => 32000).
 	* [Fix]     Fix the trimmed/duplicated bugs of bop smget.
