@@ -15,7 +15,7 @@ public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
 
 	public MGetOperationImpl(Collection<String> k, Callback c) {
 		super(CMD, c, new HashSet<String>(k));
-		setAPIType(APIType.GET);
+		setAPIType(APIType.MGET);
 	}
 
 }

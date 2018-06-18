@@ -66,6 +66,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private CountDownLatch authLatch;
 	private ArrayList<Operation> reconnectBlocked;
 	private String version=null;
+	private boolean isAsciiProtocol=true;
 	private boolean enabledMGetOp=false;
 
 	// operation Future.get timeout counter
@@ -129,7 +130,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public TCPMemcachedNodeImpl(SocketAddress sa, SocketChannel c,
 			int bufSize, BlockingQueue<Operation> rq,
 			BlockingQueue<Operation> wq, BlockingQueue<Operation> iq,
-			long opQueueMaxBlockTime, boolean waitForAuth) {
+			long opQueueMaxBlockTime, boolean waitForAuth, boolean asciiProtocol) {
 		super();
 		assert sa != null : "No SocketAddress";
 		assert c != null : "No SocketChannel";
@@ -158,6 +159,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		addOpCount=0;
 		this.opQueueMaxBlockTime = opQueueMaxBlockTime;
 		shouldAuth = waitForAuth;
+		isAsciiProtocol = asciiProtocol;
 		setupForAuth("init authentication");
 
 		// is this a fake node?
@@ -564,13 +566,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	 * @see net.spy.memcached.MemcachedNode#setEnableMGetOp(java.lang.Boolean)
 	 */
 	private final void setEnableMGetOp() {
-		StringTokenizer tokens = new StringTokenizer(version,".");
-		String makedVersion = tokens.nextToken()+"."+tokens.nextToken();
-		double versionStandard = Double.parseDouble(makedVersion);
-		if (version.contains("E")) {
-			enabledMGetOp = versionStandard >= 0.7;
-		} else {
-			enabledMGetOp = versionStandard >= 1.11;
+		if (isAsciiProtocol) {
+			StringTokenizer tokens = new StringTokenizer(version, ".");
+			int majorVersion = Integer.parseInt(tokens.nextToken());
+			int minorVersion = Integer.parseInt(tokens.nextToken());
+			if (version.contains("E")) {
+				enabledMGetOp = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
+			} else {
+				enabledMGetOp = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
+			}
 		}
 	}
 
