@@ -1,3 +1,9 @@
+2018-06-18 [version 1.10.0.1]
+	* [FIX] throw exception when can't create the znode of client info
+	* [FIX] ZkInitLatch countDown and abnormal shutdown of CacheManager
+	* [FIX] add asyncBopExtendedGet status response default case
+	* [FIX] fix travis-ci test error due to memcached port conflict
+
 2017-03-24 [version 1.10.0]
 	* [Feature] Add a map collection type.
 	* [Cleanup] Separate CacheMonitor ZK watcher from CacheManager.
