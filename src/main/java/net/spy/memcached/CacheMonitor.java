@@ -137,9 +137,11 @@ public class CacheMonitor extends SpyObject implements Watcher,
 	 * Shutdown the CacheMonitor.
 	 */
 	public void shutdown() {
-		getLogger().info("Shutting down the CacheMonitor. " + getInfo());
-		dead = true;
-		listener.closing();
+		if (!dead) {
+			getLogger().info("Shutting down the CacheMonitor. " + getInfo());
+			dead = true;
+			listener.closing();
+		}
 	}
 	
 	private String getInfo() {

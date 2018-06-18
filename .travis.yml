@@ -2,7 +2,7 @@ language: java
 
 cache:
   directories:
-  - $HOME/arcus 
+  - $HOME/arcus
   - $HOME/.m2
 
 before_install:
@@ -10,9 +10,10 @@ before_install:
   - bash install-arcus-memcached.sh develop
 
 script:
-  - mvn test -DUSE_ZK=false && mvn test -DUSE_ZK=true
+  - mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212 && mvn test -DUSE_ZK=true
 
 notifications:
   email:
-    - wooseok.son@jam2in.com
-    - whchoi83@jam2in.com
+    - junhyun.park@jam2in.com
+    - minkikim89@jam2in.com
+    - alsdn653@jam2in.com
