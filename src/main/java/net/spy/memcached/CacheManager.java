@@ -210,34 +210,43 @@ public class CacheManager extends SpyThread implements Watcher,
   private String getClientInfo() {
     String path = "";
 
+    // create the ephemeral znode
+    // "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
+    } else {
+      path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
+    }
+    /* ENABLE_REPLICATION else */
+    /*
+    path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
+    */
+    /* ENABLE_REPLICATION end */
+
+    /* get host info */
+    try {
+      path = path + InetAddress.getLocalHost().getHostName() + "_"
+                  + InetAddress.getLocalHost().getHostAddress() + "_";
+    } catch (Exception e) {
+      getLogger().fatal("Can't get client host info.", e);
+      path = path + "unknown-host_0.0.0.0_";
+    }
+
+    path = path + this.poolSize + "_java_" + ArcusClient.VERSION + "_";
+
+    /* get time and zk session id */
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
       Date currentTime = new Date();
 
-      // create the ephemeral znode
-      // "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
-      /* ENABLE_REPLICATION if */
-      if (arcusReplEnabled) {
-        path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
-      } else {
-        path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
-      }
-      /* ENABLE_REPLICATION else */
-      /*
-      path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
-      */
-      /* ENABLE_REPLICATION end */
-      path = path
-              + InetAddress.getLocalHost().getHostName() + "_"
-              + InetAddress.getLocalHost().getHostAddress() + "_"
-              + this.poolSize + "_java_" + ArcusClient.VERSION + "_"
-              + simpleDateFormat.format(currentTime) + "_"
-              + zk.getSessionId();
-
+      path = path + simpleDateFormat.format(currentTime) + "_"
+                  + zk.getSessionId();
     } catch (Exception e) {
-      getLogger().fatal("Can't get client info.", e);
-      return "";
+      getLogger().fatal("Can't get time and zk session id.", e);
+      path = path + "00000000000000_0";
     }
+
     return path;
   }
 
