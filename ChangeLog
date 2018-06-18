@@ -1,3 +1,8 @@
+2018-06-18 [version 1.9.8.1]
+	* [FIX] throw exception when can't create the znode of client info
+	* [FIX] abnormal shutdown of CacheManager
+	* [FIX] fix travis-ci test error due to memcached port conflict
+
 2017-03-24 [version 1.9.8]
 	* [Fix] Add bad command log message
 	* [Fix] Add local cache hit debug log message
