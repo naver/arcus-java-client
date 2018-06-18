@@ -3211,6 +3211,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 										k, cstatus);
 							}
 							break;
+						default:
+							rv.set(null, cstatus);
+							if (getLogger().isDebugEnabled()) {
+								getLogger().debug("Key(%s) Unknown response : %s",
+										k, cstatus);
+							}
+							break;
 						}
 					}
 
