@@ -1,3 +1,8 @@
+2018-06-18 [version 1.11.1-SNAPSHOT]
+	* [FIX] throw exception when can't create the znode of client info
+	* [FIX] ZkInitLatch countDown and abnormal shutdown of CacheManager
+	* [FIX] fix travis-ci test error due to memcached port conflict
+
 2018-05-04 [version 1.11.1-SNAPSHOT]
 	* [Fix] flush_by_prefix method return false when prefix does not exist.
 	* [Fix] ClassCastException error when optimize the new mget operation.
