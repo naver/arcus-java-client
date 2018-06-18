@@ -30,10 +30,14 @@ public class ExcessivelyLargeGetTest extends SpyObject implements Runnable {
 	private final Collection<String> keys;
 	private final byte[] value = new byte[4096];
 
+	protected static String ARCUS_HOST = System
+					.getProperty("ARCUS_HOST",
+							"127.0.0.1:11211");
+
 	public ExcessivelyLargeGetTest() throws Exception {
 		client = new MemcachedClient(new ConnectionFactoryBuilder()
 				.setProtocol(Protocol.BINARY).setOpTimeout(15000).build(),
-				AddrUtil.getAddresses("127.0.0.1:11211"));
+				AddrUtil.getAddresses(ARCUS_HOST));
 		keys = new ArrayList<String>(N);
 		new Random().nextBytes(value);
 	}
