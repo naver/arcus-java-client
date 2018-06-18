@@ -167,6 +167,7 @@ public class CacheManager extends SpyThread implements Watcher,
 				String path = getClientInfo();
 				if (path.isEmpty()) {
 					getLogger().fatal("Can't create the znode of client info (" + path + ")");
+					throw new InitializeClientException("Can't create client info");
 				} else {
 					if (zk.exists(path, false) == null) {
 						zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
@@ -176,6 +177,9 @@ public class CacheManager extends SpyThread implements Watcher,
 				shutdownZooKeeperClient();
 				throw e;
 			} catch (NotExistsServiceCodeException e) {
+				shutdownZooKeeperClient();
+				throw e;
+			} catch (InitializeClientException e) {
 				shutdownZooKeeperClient();
 				throw e;
 			} catch (InterruptedException ie) {
@@ -265,15 +269,11 @@ public class CacheManager extends SpyThread implements Watcher,
 		try {
 			synchronized (this) {
 				while (!shutdownRequested) {
-					if (zk == null) {
-						getLogger().info("Arcus admin connection is not established. (%s@%s)", serviceCode, hostPort);
-						initZooKeeperClient();
-					}
-					
 					if (!cacheMonitor.dead) {
 						wait();
 					} else {
-						getLogger().warn("Unexpected disconnection from Arcus admin. Trying to reconnect to Arcus admin.");
+						getLogger().warn("Unexpected disconnection from Arcus admin. " +
+										"Trying to reconnect to Arcus admin. CacheList =" + prevChildren);
 						try {
 							shutdownZooKeeperClient();
 							initZooKeeperClient();
@@ -289,8 +289,13 @@ public class CacheManager extends SpyThread implements Watcher,
 			}
 		} catch (InterruptedException e) {
 			getLogger().warn("current arcus admin is interrupted : %s",
-					e.getMessage());
+							e.getMessage());
 		} finally {
+			if (shutdownRequested) {
+				getLogger().info("Close cache manager.");
+			} else {
+				getLogger().error("Close cache manager. But, there was no shutdown request.");
+			}
 			shutdownZooKeeperClient();
 		}
 	}
