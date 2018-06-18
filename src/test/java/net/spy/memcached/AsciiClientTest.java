@@ -34,7 +34,7 @@ public class AsciiClientTest extends ProtocolBaseCase {
 
 	@Override
 	protected String getExpectedVersionSource() {
-		return "/127.0.0.1:11211";
+		return "/"+ARCUS_HOST;
 	}
 
 }
