@@ -1,3 +1,8 @@
+2018-06-18 [version 1.10.1-SNAPSHOT]
+	* [FIX] throw exception when can't create the znode of client info
+	* [FIX] ZkInitLatch countDown and abnormal shutdown of CacheManager
+	* [FIX] fix travis-ci test error due to memcached port conflict
+
 2017-05-15 [version 1.10.1-SNAPSHOT]
 	* [Fix] Add the missed response handling in asyncBopExtendedGet.
 	   - Add default handling for error response such as OUT_OF_RANGE.
