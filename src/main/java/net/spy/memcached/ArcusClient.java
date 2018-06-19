@@ -173,7 +173,7 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
 
-	static String VERSION;
+	static String VERSION = "1.9.7.1";
 	static Logger arcusLogger = LoggerFactory.getLogger("net.spy.memcached");
 	static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
 	public boolean dead;
