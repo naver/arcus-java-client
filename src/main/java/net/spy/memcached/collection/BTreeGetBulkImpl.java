@@ -25,6 +25,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   private static final String command = "bop mget";
 
+  private String keySeparator;
   private String spaceSeparatedKeys;
 
   protected String str;
@@ -67,6 +68,10 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.reverse = (from > to);
   }
 
+  public void setKeySeparator(String keySeparator) {
+    this.keySeparator = keySeparator;
+  }
+
   public String getSpaceSeparatedKeys() {
     if (spaceSeparatedKeys != null) {
       return spaceSeparatedKeys;
@@ -77,7 +82,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     for (int i = 0; i < numkeys; i++) {
       sb.append(keyList.get(i));
       if ((i + 1) < numkeys) {
-        sb.append(" ");
+        sb.append(keySeparator);
       }
     }
     spaceSeparatedKeys = sb.toString();

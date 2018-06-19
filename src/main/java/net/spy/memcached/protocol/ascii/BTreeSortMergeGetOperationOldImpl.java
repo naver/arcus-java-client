@@ -279,6 +279,11 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 
   public void initialize() {
     String cmd = smGet.getCommand();
+    if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+      smGet.setKeySeparator(" ");
+    } else {
+      smGet.setKeySeparator(",");
+    }
     String args = smGet.stringify();
 
     ByteBuffer bb = ByteBuffer.allocate(cmd.length() + args.length()
