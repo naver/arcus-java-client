@@ -68,6 +68,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	private String version=null;
 	private boolean isAsciiProtocol=true;
 	private boolean enabledMGetOp=false;
+	private boolean enabledSpaceSeparate = false;
 
 	// operation Future.get timeout counter
 	private final AtomicInteger continuousTimeout = new AtomicInteger(0);
@@ -555,6 +556,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 	public final void setVersion(String vr) {
 		version = vr;
 		setEnableMGetOp();
+		setEnableSpaceSeparate();
 	}
 
 	/* (non-javadoc)
@@ -578,10 +580,33 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 		}
 	}
 
+
+	/* (non-javadoc)
+     * @see net.spy.memcached.MemcachedNode#setEnableSpaceSeparate(java.lang.Boolean)
+     */
+	private final void setEnableSpaceSeparate() {
+		if (isAsciiProtocol) {
+			StringTokenizer tokens = new StringTokenizer(version, ".");
+			int majorVersion = Integer.parseInt(tokens.nextToken());
+			int minorVersion = Integer.parseInt(tokens.nextToken());
+			if (version.contains("E")) {
+				enabledSpaceSeparate = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
+			} else {
+				enabledSpaceSeparate = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
+			}
+		}
+	}
+
 	/* (non-javadoc)
 	 * @see net.spy.memcached.MemcachedNode#enabledMGetOp()
 	 */
 	public final boolean enabledMGetOp() { return enabledMGetOp; }
+
+
+	/* (non-javadoc)
+     * @see net.spy.memcached.MemcachedNode#enabledSpaceSeparate()
+     */
+	public final boolean enabledSpaceSeparate() { return enabledSpaceSeparate; }
 
 	/* (non-Javadoc)
 	 * @see net.spy.memcached.MemcachedNode#getBytesRemainingInBuffer()
@@ -757,13 +782,13 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
 	public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
 		for (Operation op : allOp) {
+			op.setHandlingNode(this);
 			if (op.getState() == OperationState.WRITING && op.getBuffer() != null) {
 				op.getBuffer().reset(); // buffer offset reset
 			} else {
 				op.initialize(); // write completed or not yet initialized
 				op.resetState(); // reset operation state
 			}
-			op.setHandlingNode(this);
 			op.setMoved(true);
 		}
 		addOpCount += allOp.size();

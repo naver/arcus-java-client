@@ -99,6 +99,14 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 	@Override
 	public void initialize() {
 		String cmd = collectionDelete.getCommand();
+		if (collectionDelete instanceof MapDelete) {
+			MapDelete mapDelete = (MapDelete)collectionDelete;
+			if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+				mapDelete.setKeySeparator(" ");
+			} else {
+				mapDelete.setKeySeparator(",");
+			}
+		}
 		String args = collectionDelete.stringify();
 		byte[] additionalArgs = collectionDelete.getAdditionalArgs();
 
