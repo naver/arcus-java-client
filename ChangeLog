@@ -1,3 +1,6 @@
+2018-06-20 [version 1.11.1.1]
+	* [FIX] select separator depending on node version
+
 2018-06-08 [version 1.11.1]
 	* [Fix] CacheManager shutdown by exceptions while reconnect ZooKeeper.
 	* [FIX] ZkInitLatch countDown bug when reconnect with ZK session timeout.
