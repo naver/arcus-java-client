@@ -200,6 +200,11 @@ public interface MemcachedNode {
   boolean enabledMGetOp();
 
   /**
+   * Check the enable SpaceSeparate operation.
+   */
+  boolean enabledSpaceSeparate();
+
+  /**
    * Get the number of bytes remaining to write.
    */
   int getBytesRemainingToWrite();

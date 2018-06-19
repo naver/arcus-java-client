@@ -35,29 +35,29 @@ public class ProtocolMapDeleteTest extends TestCase {
     // default setting : dropIfEmpty = true
 
     Assert.assertEquals("4 1 drop",
-            (new MapDelete(mkeyList, false)).stringify());
+            (new MapDelete(mkeyList, false, false)).stringify());
 
     Assert.assertEquals("4 1",
-            (new MapDelete(mkeyList, false, false)).stringify());
+            (new MapDelete(mkeyList, false, false, false)).stringify());
     Assert.assertEquals("4 1 drop",
-            (new MapDelete(mkeyList, false, true)).stringify());
+            (new MapDelete(mkeyList, false, false,  true)).stringify());
 
-    Assert.assertEquals("11 2", (new MapDelete(mkeyList2, false,
+    Assert.assertEquals("11 2", (new MapDelete(mkeyList2, false, false,
             false)).stringify());
     Assert.assertEquals("11 2 drop", (new MapDelete(mkeyList2,
-            false, true)).stringify());
+            false, false,  true)).stringify());
 
     Assert.assertEquals("4 1 drop noreply",
-            (new MapDelete(mkeyList, true)).stringify());
+            (new MapDelete(mkeyList, true, false)).stringify());
 
-    Assert.assertEquals("4 1 noreply", (new MapDelete(mkeyList, true,
+    Assert.assertEquals("4 1 noreply", (new MapDelete(mkeyList, true, false,
             false)).stringify());
     Assert.assertEquals("4 1 drop noreply", (new MapDelete(mkeyList,
-            true, true)).stringify());
+            true, false,  true)).stringify());
 
     Assert.assertEquals("11 2 noreply", (new MapDelete(mkeyList2,
-            true, false)).stringify());
+            true, false,  false)).stringify());
     Assert.assertEquals("11 2 drop noreply", (new MapDelete(mkeyList2,
-            true, true)).stringify());
+            true, false,  true)).stringify());
   }
 }

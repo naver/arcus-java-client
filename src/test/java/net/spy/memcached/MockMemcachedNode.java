@@ -174,6 +174,10 @@ public class MockMemcachedNode implements MemcachedNode {
     return false;
   }
 
+  public boolean enabledSpaceSeparate() {
+    return false;
+  }
+
   public int getBytesRemainingToWrite() {
     return 0;
   }

@@ -69,6 +69,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private String version = null;
   private boolean isAsciiProtocol = true;
   private boolean enabledMGetOp = false;
+  private boolean enabledSpaceSeparate = false;
 
   // operation Future.get timeout counter
   private final AtomicInteger continuousTimeout = new AtomicInteger(0);
@@ -556,6 +557,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void setVersion(String vr) {
     version = vr;
     setEnableMGetOp();
+    setEnableSpaceSeparate();
   }
 
   /* (non-javadoc)
@@ -581,11 +583,31 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
+  private final void setEnableSpaceSeparate() {
+    if (isAsciiProtocol) {
+      StringTokenizer tokens = new StringTokenizer(version, ".");
+      int majorVersion = Integer.parseInt(tokens.nextToken());
+      int minorVersion = Integer.parseInt(tokens.nextToken());
+      if (version.contains("E")) {
+        enabledSpaceSeparate = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 7));
+      } else {
+        enabledSpaceSeparate = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 11));
+      }
+    }
+  }
+
   /* (non-javadoc)
    * @see net.spy.memcached.MemcachedNode#enabledMGetOp()
    */
   public final boolean enabledMGetOp() {
     return enabledMGetOp;
+  }
+
+  /* (non-javadoc)
+ * @see net.spy.memcached.MemcachedNode#enabledMGetOp()
+ */
+  public final boolean enabledSpaceSeparate() {
+    return enabledSpaceSeparate;
   }
 
   /* (non-Javadoc)

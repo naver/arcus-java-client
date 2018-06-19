@@ -25,7 +25,8 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   private static final String command = "bop mget";
 
-  private String spaceSeparatedKeys;
+  private String separatedKeys;
+  private boolean spaceSeparate;
 
   protected String str;
   protected int lenKeys;
@@ -46,7 +47,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   public byte[] eflag = null;
 
   protected BTreeGetBulkImpl(List<String> keyList, byte[] from, byte[] to,
-                             ElementFlagFilter eFlagFilter, int offset, int count) {
+                             ElementFlagFilter eFlagFilter, int offset, int count, boolean spaceSeparate) {
 
     this.keyList = keyList;
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
@@ -54,10 +55,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.offset = offset;
     this.count = count;
     this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
+    this.spaceSeparate = spaceSeparate;
   }
 
   protected BTreeGetBulkImpl(List<String> keyList, long from, long to,
-                             ElementFlagFilter eFlagFilter, int offset, int count) {
+                             ElementFlagFilter eFlagFilter, int offset, int count, boolean spaceSeparate) {
 
     this.keyList = keyList;
     this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
@@ -65,11 +67,19 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.offset = offset;
     this.count = count;
     this.reverse = (from > to);
+    this.spaceSeparate = spaceSeparate;
   }
 
-  public String getSpaceSeparatedKeys() {
-    if (spaceSeparatedKeys != null) {
-      return spaceSeparatedKeys;
+  public String getSeparatedKeys() {
+    if (separatedKeys != null) {
+      return separatedKeys;
+    }
+
+    String separator = null;
+    if (spaceSeparate) {
+      separator = " ";
+    } else {
+      separator = ",";
     }
 
     StringBuilder sb = new StringBuilder();
@@ -77,11 +87,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     for (int i = 0; i < numkeys; i++) {
       sb.append(keyList.get(i));
       if ((i + 1) < numkeys) {
-        sb.append(" ");
+        sb.append(separator);
       }
     }
-    spaceSeparatedKeys = sb.toString();
-    return spaceSeparatedKeys;
+    separatedKeys = sb.toString();
+    return separatedKeys;
   }
 
   public String getRepresentKey() {
@@ -109,7 +119,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
     StringBuilder b = new StringBuilder();
 
-    b.append(getSpaceSeparatedKeys().length());
+    b.append(getSeparatedKeys().length());
     b.append(" ").append(keyList.size());
     b.append(" ").append(range);
 

@@ -23,8 +23,8 @@ import net.spy.memcached.util.BTreeUtil;
 public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
   public BTreeGetBulkWithLongTypeBkey(List<String> keyList, long from, long to,
-                                      ElementFlagFilter eFlagFilter, int offset, int count) {
-    super(keyList, from, to, eFlagFilter, offset, count);
+                                      ElementFlagFilter eFlagFilter, int offset, int count, boolean spaceSeparate) {
+    super(keyList, from, to, eFlagFilter, offset, count, spaceSeparate);
   }
 
   public Long getSubkey() {
