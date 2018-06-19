@@ -24,6 +24,7 @@ public class MapGet extends CollectionGet {
 
 	protected List<String> mkeyList;
 	protected byte[] data;
+	private String keySeparator;
 	private String spaceSeparatedKeys;
 	protected byte[] additionalArgs;
 
@@ -31,16 +32,15 @@ public class MapGet extends CollectionGet {
 		this.headerCount = 2;
 		this.mkeyList = mkeyList;
 		this.delete = delete;
-		if (mkeyList.size() == 0) {
-			this.additionalArgs = null;
-		} else {
-			this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
-		}
 	}
 
 	public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
 		this(mkeyList, delete);
 		this.dropIfEmpty = dropIfEmpty;
+	}
+
+	public void setKeySeparator(String keySeparator) {
+		this.keySeparator = keySeparator;
 	}
 
 	public String getSpaceSeparatedMkeys() {
@@ -53,7 +53,7 @@ public class MapGet extends CollectionGet {
 		for (int i = 0; i < numkeys; i++) {
 			sb.append(mkeyList.get(i));
 			if ((i + 1) < numkeys) {
-				sb.append(" ");
+				sb.append(keySeparator);
 			}
 		}
 		spaceSeparatedKeys = sb.toString();
@@ -67,6 +67,12 @@ public class MapGet extends CollectionGet {
 
 	public String stringify() {
 		if (str != null) return str;
+
+		if (mkeyList.size() == 0) {
+			additionalArgs = null;
+		} else {
+			additionalArgs = getSpaceSeparatedMkeys().getBytes();
+		}
 
 		StringBuilder b = new StringBuilder();
 		if (additionalArgs == null) {

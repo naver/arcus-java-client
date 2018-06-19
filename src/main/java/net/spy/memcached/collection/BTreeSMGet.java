@@ -21,7 +21,9 @@ import java.util.List;
 public interface BTreeSMGet<T> {
 
 	public int headerCount = 4;
-	
+
+	public void setKeySeparator(String keySeparator);
+
 	public String getSpaceSeparatedKeys();
 
 	public String getRepresentKey();
