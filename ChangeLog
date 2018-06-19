@@ -1,5 +1,6 @@
 2018-06-20 [version 1.11.1.1]
 	* [FIX] select separator depending on node version
+	* [TEST] fix travis-ci test error due to memcached port conflict
 
 2018-06-08 [version 1.11.1]
 	* [Fix] CacheManager shutdown by exceptions while reconnect ZooKeeper.
