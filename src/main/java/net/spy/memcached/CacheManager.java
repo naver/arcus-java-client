@@ -225,27 +225,30 @@ public class CacheManager extends SpyThread implements Watcher,
     /* ENABLE_REPLICATION end */
 
     /* get host info */
+    String hostInfo;
     try {
-      path = path + InetAddress.getLocalHost().getHostName() + "_"
-                  + InetAddress.getLocalHost().getHostAddress() + "_";
+      hostInfo = InetAddress.getLocalHost().getHostName() + "_"
+               + InetAddress.getLocalHost().getHostAddress() + "_";
     } catch (Exception e) {
       getLogger().fatal("Can't get client host info.", e);
-      path = path + "unknown-host_0.0.0.0_";
+      hostInfo = "unknown-host_0.0.0.0_";
     }
-
-    path = path + this.poolSize + "_java_" + ArcusClient.VERSION + "_";
+    path = path + hostInfo 
+         + this.poolSize + "_java_" + ArcusClient.VERSION + "_";
 
     /* get time and zk session id */
+    String restInfo;
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
       Date currentTime = new Date();
 
-      path = path + simpleDateFormat.format(currentTime) + "_"
-                  + zk.getSessionId();
+      restInfo = simpleDateFormat.format(currentTime) + "_"
+               + zk.getSessionId();
     } catch (Exception e) {
       getLogger().fatal("Can't get time and zk session id.", e);
-      path = path + "00000000000000_0";
+      restInfo = "00000000000000_0";
     }
+    path = path + restInfo;
 
     return path;
   }
