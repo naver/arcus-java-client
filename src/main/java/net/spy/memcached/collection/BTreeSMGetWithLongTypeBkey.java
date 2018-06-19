@@ -29,7 +29,8 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
   protected String str;
 
   protected List<String> keyList;
-  private String spaceSeparatedKeys;
+  private String separatedKeys;
+  private boolean spaceSeparate;
 
   protected int lenKeys;
 
@@ -51,7 +52,8 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
   private ElementFlagFilter eFlagFilter;
 
   public BTreeSMGetWithLongTypeBkey(List<String> keyList, long from, long to,
-                                    ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
+                                    ElementFlagFilter eFlagFilter, int count,
+                                    SMGetMode smgetMode, boolean spaceSeparate) {
     this.keyList = keyList;
 
     this.range = String.valueOf(from)
@@ -61,11 +63,19 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
     this.count = count;
     this.smgetMode = smgetMode;
     this.reverse = (from > to);
+    this.spaceSeparate = spaceSeparate;
   }
 
-  public String getSpaceSeparatedKeys() {
-    if (spaceSeparatedKeys != null) {
-      return spaceSeparatedKeys;
+  public String getSeparatedKeys() {
+    if (separatedKeys != null) {
+      return separatedKeys;
+    }
+
+    String separator = null;
+    if (spaceSeparate) {
+      separator = " ";
+    } else {
+      separator = ",";
     }
 
     StringBuilder sb = new StringBuilder();
@@ -73,11 +83,11 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
     for (int i = 0; i < numkeys; i++) {
       sb.append(keyList.get(i));
       if ((i + 1) < numkeys) {
-        sb.append(" ");
+        sb.append(separator);
       }
     }
-    spaceSeparatedKeys = sb.toString();
-    return spaceSeparatedKeys;
+    separatedKeys = sb.toString();
+    return separatedKeys;
   }
 
   public String getRepresentKey() {
@@ -97,7 +107,7 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 
     StringBuilder b = new StringBuilder();
 
-    b.append(getSpaceSeparatedKeys().length());
+    b.append(getSeparatedKeys().length());
     b.append(" ").append(keyList.size());
     b.append(" ").append(range);
 

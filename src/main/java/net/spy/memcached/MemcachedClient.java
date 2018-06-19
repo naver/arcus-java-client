@@ -335,6 +335,52 @@ public class MemcachedClient extends SpyThread
     return broadcastOp(of, nodes, true);
   }
 
+  protected MemcachedNode getPrimaryNode(String key) {
+    NodeLocator locator = getMemcachedConnection().getLocator();
+           /* ENABLE_REPLICATION if */
+    boolean arcusReplEnabled = getMemcachedConnection().getArcusReplEnabled();
+    final MemcachedNode primaryNode = arcusReplEnabled
+            ? ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getMemcachedConnection().getReplicaPick())
+            : locator.getPrimary(key);
+      /* ENABLE_REPLICATION else */
+      /*
+      final MemcachedNode primaryNode=locator.getPrimary(key);
+      */
+      /* ENABLE_REPLICATION end */
+    MemcachedNode node = null;
+    // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
+    if (primaryNode.isActive()) {
+      node = primaryNode;
+    } else {
+        /* ENABLE_REPLICATION if */
+      Iterator<MemcachedNode> iter = arcusReplEnabled
+              ? ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getMemcachedConnection().getReplicaPick())
+              : locator.getSequence(key);
+      for (; node == null && iter.hasNext(); ) {
+        MemcachedNode n = iter.next();
+        if (n.isActive()) {
+          node = n;
+        }
+      }
+        /* ENABLE_REPLICATION else */
+        /*
+        for(Iterator<MemcachedNode> i=locator.getSequence(key);
+          node == null && i.hasNext();) {
+          MemcachedNode n=i.next();
+          if(n.isActive()) {
+            node=n;
+          }
+        }
+        */
+        /* ENABLE_REPLICATION end */
+      if (node == null) {
+        node = primaryNode;
+      }
+    }
+    assert node != null : "Didn't find a node for " + key;
+    return node;
+  }
+
   private CountDownLatch broadcastOp(BroadcastOpFactory of,
                                      Collection<MemcachedNode> nodes,
                                      boolean checkShuttingDown) {
@@ -1090,47 +1136,8 @@ public class MemcachedClient extends SpyThread
 
       tc_map.put(key, tc);
       validateKey(key);
-      /* ENABLE_REPLICATION if */
-      boolean arcusReplEnabled = conn.getArcusReplEnabled();
-      final MemcachedNode primaryNode = arcusReplEnabled
-              ? ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, conn.getReplicaPick())
-              : locator.getPrimary(key);
-      /* ENABLE_REPLICATION else */
-      /*
-      final MemcachedNode primaryNode=locator.getPrimary(key);
-      */
-      /* ENABLE_REPLICATION end */
-      MemcachedNode node = null;
-      // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
-      if (primaryNode.isActive()) {
-        node = primaryNode;
-      } else {
-        /* ENABLE_REPLICATION if */
-        Iterator<MemcachedNode> iter = arcusReplEnabled
-                ? ((ArcusReplKetamaNodeLocator) locator).getSequence(key, conn.getReplicaPick())
-                : locator.getSequence(key);
-        for (; node == null && iter.hasNext(); ) {
-          MemcachedNode n = iter.next();
-          if (n.isActive()) {
-            node = n;
-          }
-        }
-        /* ENABLE_REPLICATION else */
-        /*
-        for(Iterator<MemcachedNode> i=locator.getSequence(key);
-          node == null && i.hasNext();) {
-          MemcachedNode n=i.next();
-          if(n.isActive()) {
-            node=n;
-          }
-        }
-        */
-        /* ENABLE_REPLICATION end */
-        if (node == null) {
-          node = primaryNode;
-        }
-      }
-      assert node != null : "Didn't find a node for " + key;
+
+      MemcachedNode node = getPrimaryNode(key);
       List<Collection<String>> lks = chunks.get(node);
       if (lks == null) {
         lks = new ArrayList<Collection<String>>();

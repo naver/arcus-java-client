@@ -24,28 +24,37 @@ public class MapGet extends CollectionGet {
 
   protected List<String> mkeyList;
   protected byte[] data;
-  private String spaceSeparatedKeys;
+  private String separatedKeys;
+  private boolean spaceSeparate;
   protected byte[] additionalArgs;
 
-  public MapGet(List<String> mkeyList, boolean delete) {
+  public MapGet(List<String> mkeyList, boolean delete, boolean spaceSeparate) {
     this.headerCount = 2;
     this.mkeyList = mkeyList;
     this.delete = delete;
+    this.spaceSeparate = spaceSeparate;
     if (mkeyList.size() == 0) {
       this.additionalArgs = null;
     } else {
-      this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
+      this.additionalArgs = getSeparatedMkeys().getBytes();
     }
   }
 
-  public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
-    this(mkeyList, delete);
+  public MapGet(List<String> mkeyList, boolean delete, boolean spaceSeparate, boolean dropIfEmpty) {
+    this(mkeyList, delete, spaceSeparate);
     this.dropIfEmpty = dropIfEmpty;
   }
 
-  public String getSpaceSeparatedMkeys() {
-    if (spaceSeparatedKeys != null) {
-      return spaceSeparatedKeys;
+  public String getSeparatedMkeys() {
+    if (separatedKeys != null) {
+      return separatedKeys;
+    }
+
+    String separator = null;
+    if (spaceSeparate) {
+      separator = " ";
+    } else {
+      separator = ",";
     }
 
     StringBuilder sb = new StringBuilder();
@@ -53,11 +62,11 @@ public class MapGet extends CollectionGet {
     for (int i = 0; i < numkeys; i++) {
       sb.append(mkeyList.get(i));
       if ((i + 1) < numkeys) {
-        sb.append(" ");
+        sb.append(separator);
       }
     }
-    spaceSeparatedKeys = sb.toString();
-    return spaceSeparatedKeys;
+    separatedKeys = sb.toString();
+    return separatedKeys;
   }
 
   @Override

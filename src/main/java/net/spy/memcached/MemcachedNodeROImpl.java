@@ -155,6 +155,10 @@ class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  public boolean enabledSpaceSeparate() {
+    throw new UnsupportedOperationException();
+  }
+
   public void setupResend(boolean cancelWrite, String cause) {
     throw new UnsupportedOperationException();
   }

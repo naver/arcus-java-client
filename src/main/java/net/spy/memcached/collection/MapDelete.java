@@ -22,27 +22,36 @@ public class MapDelete extends CollectionDelete {
   private static final String command = "mop delete";
 
   protected List<String> mkeyList;
-  private String spaceSeparatedKeys;
+  private String separatedKeys;
+  private boolean spaceSeparate;
   protected byte[] additionalArgs;
 
-  public MapDelete(List<String> mkeyList, boolean noreply) {
+  public MapDelete(List<String> mkeyList, boolean noreply, boolean spaceSeparate) {
     this.mkeyList = mkeyList;
     this.noreply = noreply;
+    this.spaceSeparate = spaceSeparate;
     if (mkeyList.size() == 0) {
       this.additionalArgs = null;
     } else {
-      this.additionalArgs = getSpaceSeparatedMkeys().getBytes();
+      this.additionalArgs = getSeparatedMkeys().getBytes();
     }
   }
 
-  public MapDelete(List<String> mkeyList, boolean noreply, boolean dropIfEmpty) {
-    this(mkeyList, noreply);
+  public MapDelete(List<String> mkeyList, boolean noreply, boolean spaceSeparate, boolean dropIfEmpty) {
+    this(mkeyList, noreply, spaceSeparate);
     this.dropIfEmpty = dropIfEmpty;
   }
 
-  public String getSpaceSeparatedMkeys() {
-    if (spaceSeparatedKeys != null) {
-      return spaceSeparatedKeys;
+  public String getSeparatedMkeys() {
+    if (separatedKeys != null) {
+      return separatedKeys;
+    }
+
+    String separator = null;
+    if (spaceSeparate) {
+      separator = " ";
+    } else {
+      separator = ",";
     }
 
     StringBuilder sb = new StringBuilder();
@@ -50,11 +59,11 @@ public class MapDelete extends CollectionDelete {
     for (int i = 0; i < numkeys; i++) {
       sb.append(mkeyList.get(i));
       if ((i + 1) < numkeys) {
-        sb.append(" ");
+        sb.append(separator);
       }
     }
-    spaceSeparatedKeys = sb.toString();
-    return spaceSeparatedKeys;
+    separatedKeys = sb.toString();
+    return separatedKeys;
   }
 
   public byte[] getAdditionalArgs() {

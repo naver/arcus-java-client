@@ -2186,7 +2186,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
+      MemcachedNode node = getPrimaryNode(v.get(0));
+      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count,
+              smgetMode, node.enabledSpaceSeparate()));
     }
     return smget(smGetList, count, (from > to),
             collectionTranscoder, smgetMode);
@@ -3965,10 +3967,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
+      MemcachedNode node = getPrimaryNode(v.get(0));
       if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, 0, offset + count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, 0, offset + count, node.enabledSpaceSeparate()));
       } else {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, offset, count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, offset, count, node.enabledSpaceSeparate()));
       }
     }
 
@@ -3999,7 +4002,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
+      MemcachedNode node = getPrimaryNode(v.get(0));
+      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count,
+              smgetMode, node.enabledSpaceSeparate()));
     }
 
     return smget(smGetList, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
@@ -4445,8 +4450,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             rearrangedKeys.size());
 
     for (Entry<String, List<String>> entry : rearrangedKeys.entrySet()) {
-      getBulkList.add(new BTreeGetBulkWithLongTypeBkey<T>(entry
-              .getValue(), from, to, eFlagFilter, offset, count));
+      MemcachedNode node = getPrimaryNode(entry.getValue().get(0));
+        getBulkList.add(new BTreeGetBulkWithLongTypeBkey<T>(entry
+                .getValue(), from, to, eFlagFilter, offset, count, node.enabledSpaceSeparate()));
+
     }
 
     return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
@@ -4490,8 +4497,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             rearrangedKeys.size());
 
     for (Entry<String, List<String>> entry : rearrangedKeys.entrySet()) {
+      MemcachedNode node = getPrimaryNode(entry.getValue().get(0));
       getBulkList.add(new BTreeGetBulkWithByteTypeBkey<T>(entry
-              .getValue(), from, to, eFlagFilter, offset, count));
+              .getValue(), from, to, eFlagFilter, offset, count, node.enabledSpaceSeparate()));
     }
 
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;

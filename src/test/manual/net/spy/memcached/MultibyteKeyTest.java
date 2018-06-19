@@ -241,7 +241,7 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationImplTest() {
     try {
       opFact.bopsmget(new BTreeSMGetWithLongTypeBkey<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,
-              0, SMGetMode.UNIQUE), new BTreeSortMergeGetOperation.Callback() {
+              0, SMGetMode.UNIQUE, true), new BTreeSortMergeGetOperation.Callback() {
         @Override
         public void gotData(String key, Object subkey, int flags, byte[] data) {
         }
@@ -461,7 +461,7 @@ public class MultibyteKeyTest {
   public void BTreeGetBulkOperationImplTest() {
     try {
       opFact.bopGetBulk(new BTreeGetBulkWithLongTypeBkey<Integer>(keyList, 0L, 10L, ElementFlagFilter.DO_NOT_FILTER,
-              0, 0), new BTreeGetBulkOperation.Callback<Integer>() {
+              0, 0, true), new BTreeGetBulkOperation.Callback<Integer>() {
         @Override
         public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
         }
