@@ -1,3 +1,9 @@
+2018-06-20 [version 1.11.2-SNAPSHOT]
+	* [Fix] Select separator depending on node version.
+	* [ENHANCE] Gen client info string even if an exception occur.
+	* [ENHANCE] Print current cache list when reconnect to ZK.
+	* [TEST] Fix travis-ci test error due to memcached port conflict.
+
 2018-06-08 [version 1.11.1]
 	* [Fix] CacheManager shutdown by exceptions while reconnect ZooKeeper.
 	* [FIX] ZkInitLatch countDown bug when reconnect with ZK session timeout.
