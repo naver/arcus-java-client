@@ -71,9 +71,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
     /**
      * The existing children of the node has changed.
      */
-    void commandNodeChange(List<String> children);
+    void commandCacheListChange(List<String> children);
 
-    List<String> getPrevChildren();
+    List<String> getPrevCacheList();
 
     /**
      * The ZooKeeper session is no longer valid.
@@ -96,7 +96,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
                             List<String> children) {
     switch (Code.get(rc)) {
       case OK:
-        listener.commandNodeChange(children);
+        listener.commandCacheListChange(children);
         return;
       case NONODE:
         getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());

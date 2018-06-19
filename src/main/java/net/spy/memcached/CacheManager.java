@@ -84,7 +84,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private CountDownLatch zkInitLatch;
 
-  private List<String> prevChildren;
+  private List<String> prevCacheList;
 
   /**
    * The locator class of the spymemcached has an assumption
@@ -289,7 +289,7 @@ public class CacheManager extends SpyThread implements Watcher,
             wait();
           } else {
             getLogger().warn("Unexpected disconnection from Arcus admin. " +
-                    "Trying to reconnect to Arcus admin. CacheList =" + prevChildren);
+                    "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
             try {
               shutdownZooKeeperClient();
               initZooKeeperClient();
@@ -331,7 +331,7 @@ public class CacheManager extends SpyThread implements Watcher,
    * @param children
    *            new children node list
    */
-  public void commandNodeChange(List<String> children) {
+  public void commandCacheListChange(List<String> children) {
     // If there's no children, add a fake server node to the list.
     if (children.size() == 0) {
       getLogger().error("Cannot find any cache nodes for your service code. " +
@@ -341,14 +341,14 @@ public class CacheManager extends SpyThread implements Watcher,
       children.add(CacheManager.FAKE_SERVER_NODE);
     }
 
-    if (!children.equals(prevChildren)) {
-      getLogger().warn("Cache list has been changed : From=" + prevChildren + ", To=" + children + ", " +
+    if (!children.equals(prevCacheList)) {
+      getLogger().warn("Cache list has been changed : From=" + prevCacheList + ", To=" + children + ", " +
               "[serviceCode=" + serviceCode + ", addminSessionId=0x" +
               Long.toHexString(zk.getSessionId()));
     }
 
     // Store the current children.
-    prevChildren = children;
+    prevCacheList = children;
 
     /* ENABLE_REPLICATION if */
     // children is the current list of znodes in the cache_list directory
@@ -385,8 +385,8 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
-  public List<String> getPrevChildren() {
-    return this.prevChildren;
+  public List<String> getPrevCacheList() {
+    return this.prevCacheList;
   }
 
   private String getInfo() {
