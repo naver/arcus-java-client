@@ -1153,9 +1153,9 @@ public final class MemcachedConnection extends SpyObject {
 		final CountDownLatch latch=new CountDownLatch(locator.getAll().size());
 		for(MemcachedNode node : nodes) {
 			Operation op = of.newOp(node, latch);
+			op.setHandlingNode(node);
 			op.initialize();
 			node.addOp(op);
-			op.setHandlingNode(node);
 			addedQueue.offer(node);
 		}
 		Selector s=selector.wakeup();

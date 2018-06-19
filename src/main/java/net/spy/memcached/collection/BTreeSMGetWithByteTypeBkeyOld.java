@@ -28,6 +28,7 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 	protected String str;
 
 	protected List<String> keyList;
+	private String keySeparator;
 	private String spaceSeparatedKeys;
 	
 	protected int lenKeys;
@@ -57,6 +58,10 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 		this.count = count;
 		this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 	}
+
+	public void setKeySeparator(String keySeparator) {
+		this.keySeparator = keySeparator;
+	}
 	
 	public String getSpaceSeparatedKeys() {
 		if (spaceSeparatedKeys != null) {
@@ -68,7 +73,7 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 		for (int i = 0; i < numkeys; i++) {
 			sb.append(keyList.get(i));
 			if ((i + 1) < numkeys) {
-				sb.append(" ");
+				sb.append(keySeparator);
 			}
 		}
 		spaceSeparatedKeys = sb.toString();
