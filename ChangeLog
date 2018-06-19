@@ -1,4 +1,5 @@
-2018-06-18 [version 1.11.1-SNAPSHOT]
+2018-06-20 [version 1.11.1-SNAPSHOT]
+	* [FIX] select separator depending on node version
 	* [FIX] throw exception when can't create the znode of client info
 	* [FIX] ZkInitLatch countDown and abnormal shutdown of CacheManager
 	* [FIX] fix travis-ci test error due to memcached port conflict
