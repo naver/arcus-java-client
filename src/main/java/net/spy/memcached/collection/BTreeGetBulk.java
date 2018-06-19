@@ -19,7 +19,9 @@ package net.spy.memcached.collection;
 import java.util.List;
 
 public interface BTreeGetBulk<T> {
-	
+
+	public void setKeySeparator(String keySeparator);
+
 	public String getSpaceSeparatedKeys();
 
 	public String getRepresentKey();

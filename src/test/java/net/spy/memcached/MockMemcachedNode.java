@@ -114,6 +114,9 @@ public class MockMemcachedNode implements MemcachedNode {
 	}
 	public String getVersion() {return null;}
 	public boolean enabledMGetOp() {return false;}
+	public boolean enabledSpaceSeparate() {
+		return false;
+	}
 	public int getBytesRemainingToWrite() {return 0;}
 	public int writeSome() throws IOException {return 0;}
 	public void fixupOps() {
