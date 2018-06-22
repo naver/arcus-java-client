@@ -93,7 +93,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
       for (byte[] each : encodedList) {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += each.length;
-        capacity += 64;
+        capacity += 128;
       }
 
       // allocate the buffer
@@ -164,7 +164,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
       for (byte[] each : encodedList) {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += each.length;
-        capacity += 64;
+        capacity += 128;
       }
 
       // allocate the buffer
@@ -237,7 +237,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes(String.valueOf(eachBkey)).length;
         capacity += decodedList.get(i++).length;
-        capacity += 64;
+        capacity += 128;
       }
 
       // allocate the buffer
@@ -317,7 +317,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
                 .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
         capacity += KeyUtil.getKeyBytes(each.getFlagByHex()).length;
         capacity += decodedList.get(i++).length;
-        capacity += 64;
+        capacity += 128;
       }
 
       // allocate the buffer
@@ -411,7 +411,7 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes(eachMkey).length;
         capacity += encodedList.get(i++).length;
-        capacity += 64;
+        capacity += 128;
       }
 
       // allocate the buffer
