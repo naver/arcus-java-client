@@ -105,7 +105,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       // estimate the buffer capacity
       int eachExtraSize = bkey.length()
               + ((eflag != null) ? eflag.length() : 0)
-              + cachedData.getData().length + 64;
+              + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -188,7 +188,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
       // estimate the buffer capacity
       int eachExtraSize = KeyUtil.getKeyBytes(mkey).length
-              + cachedData.getData().length + 64;
+              + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -267,7 +267,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       int capacity = 0;
 
       // estimate the buffer capacity
-      int eachExtraSize = cachedData.getData().length + 64;
+      int eachExtraSize = cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -347,7 +347,7 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
 
       // estimate the buffer capacity
       int eachExtraSize = String.valueOf(index).length()
-              + cachedData.getData().length + 64;
+              + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
