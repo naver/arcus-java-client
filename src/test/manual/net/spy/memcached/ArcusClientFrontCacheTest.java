@@ -78,7 +78,7 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
 
       Assert.assertNull(client.get("test:key"));
     } catch (Exception e) {
-      // TODO: handle exception
+      Assert.fail(e.getMessage());
     }
   }
 }

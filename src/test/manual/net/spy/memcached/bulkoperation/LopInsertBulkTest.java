@@ -56,6 +56,7 @@ public class LopInsertBulkTest extends BaseIntegrationTest {
                 errorList.isEmpty());
       } catch (TimeoutException e) {
         future.cancel(true);
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -67,6 +68,7 @@ public class LopInsertBulkTest extends BaseIntegrationTest {
           cachedList = f.get();
         } catch (Exception e) {
           f.cancel(true);
+          Assert.fail(e.getMessage());
         }
         Object value2 = cachedList.get(0);
         if (!value.equals(value2)) {

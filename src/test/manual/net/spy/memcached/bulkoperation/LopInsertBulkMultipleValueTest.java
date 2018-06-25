@@ -39,6 +39,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       super.tearDown();
     } catch (Exception e) {
       e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -66,6 +67,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -78,6 +80,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (Exception e) {
         f.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       Assert.assertNotNull("List is null.", list);

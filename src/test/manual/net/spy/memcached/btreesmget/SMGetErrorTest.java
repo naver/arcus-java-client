@@ -210,7 +210,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
       // System.out.println("");
 
     } catch (Exception e) {
-      // TODO: handle exception
+      Assert.fail(e.getMessage());
     }
 
     // sort merge get
@@ -298,7 +298,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
       // System.out.println("");
 
     } catch (Exception e) {
-      // TODO: handle exception
+      Assert.fail(e.getMessage());
     }
 
     // sort merge get

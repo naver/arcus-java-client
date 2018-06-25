@@ -58,6 +58,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -70,6 +71,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
         } catch (Exception e) {
           f.cancel(true);
           e.printStackTrace();
+          Assert.fail(e.getMessage());
         }
 
         Assert.assertTrue("Cached list is empty.",

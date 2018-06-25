@@ -520,6 +520,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
       // System.out.println("result size=" + map.size());
     } catch (TimeoutException e) {
       oldFuture.cancel(true);
+      fail(e.getMessage());
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
@@ -537,6 +538,7 @@ public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
       // System.out.println("result size=" + map.size());
     } catch (TimeoutException e) {
       future.cancel(true);
+      fail(e.getMessage());
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();

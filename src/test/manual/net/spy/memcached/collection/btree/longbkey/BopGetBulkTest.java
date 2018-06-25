@@ -283,7 +283,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 10);
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {
-
+        // test success
       }
 
       // max count list
@@ -293,7 +293,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 1000);
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {
-
+        // test success
       }
     } catch (Exception e) {
       e.printStackTrace();

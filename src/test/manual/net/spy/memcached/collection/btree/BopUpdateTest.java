@@ -71,8 +71,10 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(eflag), null).get());
     } catch (InterruptedException e) {
       e.printStackTrace();
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -89,8 +91,10 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(eflag), null).get());
     } catch (InterruptedException e) {
       e.printStackTrace();
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -106,8 +110,9 @@ public class BopUpdateTest extends BaseIntegrationTest {
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
               new ElementFlagUpdate(eflag), null).get());
     } catch (IllegalArgumentException e) {
-
+      // test success
     } catch (Exception e) {
+      e.printStackTrace();
       Assert.fail(e.getMessage());
     }
   }

@@ -472,8 +472,9 @@ public class SMGetTest extends BaseIntegrationTest {
                 TimeUnit.MILLISECONDS);
       }
     } catch (TimeoutException e) {
-
+      Assert.fail(e.getMessage());
     } catch (Exception e) {
+      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -488,6 +489,7 @@ public class SMGetTest extends BaseIntegrationTest {
       // System.out.println((System.currentTimeMillis() - start) + "ms");
     } catch (TimeoutException e) {
       oldFuture.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
@@ -503,6 +505,7 @@ public class SMGetTest extends BaseIntegrationTest {
       // System.out.println((System.currentTimeMillis() - start) + "ms");
     } catch (TimeoutException e) {
       future.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
