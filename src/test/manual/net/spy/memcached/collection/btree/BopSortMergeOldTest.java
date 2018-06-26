@@ -261,23 +261,37 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
       result5 = future5.get(1000L, TimeUnit.MILLISECONDS);
       result3 = future3.get(1000L, TimeUnit.MILLISECONDS);
       result1 = future1.get(1000L, TimeUnit.MILLISECONDS);
-      assertEquals(6, result10.size());
+      assertTrue(result10.size() == 5 || result10.size() == 6);
       // expected value set
+      // the result in case that server version >= 1.11.0
       // key1 5
       // key0 5
       // key1 4
       // key0 4
-      // key1 3
+      // key1 3 (trim)
       // key0 3
+      // the result in case that server version < 1.11.0
+      // key1 5
+      // key0 5
+      // key1 4
+      // key0 4
+      // key1 3 (trim)
 
-      assertEquals(6, result6.size());
+      assertTrue(result6.size() == 5 || result6.size() == 6);
       // expected value set
+      // the result in case that server version >= 1.11.0
       // key1 5
       // key0 5
       // key1 4
       // key0 4
-      // key1 3
+      // key1 3 (trim)
       // key0 3
+      // the result in case that server version < 1.11.0
+      // key1 5
+      // key0 5
+      // key1 4
+      // key0 4
+      // key1 3 (trim)
 
       assertEquals(5, result5.size());
       // expected value set
@@ -317,7 +331,8 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
        * response
        */
       assertEquals(CollectionResponse.DUPLICATED_TRIMMED, future10.getOperationStatus().getResponse());
-      assertEquals(CollectionResponse.DUPLICATED, future6.getOperationStatus().getResponse());
+      assertTrue(CollectionResponse.DUPLICATED == future6.getOperationStatus().getResponse()           /* the result in case that server version >= 1.11.0 */
+              || CollectionResponse.DUPLICATED_TRIMMED == future6.getOperationStatus().getResponse()); /* the result in case that server version  1.11.0 */
       assertEquals(CollectionResponse.DUPLICATED, future5.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future3.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.END, future1.getOperationStatus().getResponse());
