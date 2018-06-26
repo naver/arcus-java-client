@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.navercorp.arcus</groupId>
 	<artifactId>arcus-java-client</artifactId>
-	<version>1.11.2-SNAPSHOT</version>
+	<version>1.11.2</version>
 	<name>Arcus Java Client</name>
 	<description>Java client for Arcus memcached</description>
 	<packaging>jar</packaging>

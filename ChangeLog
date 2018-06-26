@@ -1,4 +1,4 @@
-2018-06-22 [version 1.11.2-SNAPSHOT]
+2018-06-26 [version 1.11.2]
 	* [Fix] bulk and pipe operation buffer overhead changed from 64 to 128
 	* [Fix] Select separator depending on node version.
 	* [ENHANCE] Gen client info string even if an exception occur.
