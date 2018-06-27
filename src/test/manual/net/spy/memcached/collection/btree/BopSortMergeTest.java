@@ -99,7 +99,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     try {
       future = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -137,8 +137,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -183,7 +186,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     try {
       future = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -224,8 +227,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -280,7 +286,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
       future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -379,12 +385,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -439,7 +448,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
       future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -540,12 +549,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -590,7 +602,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     try {
       future = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -628,8 +640,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -674,7 +689,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     try {
       future = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -715,8 +730,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -771,7 +789,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
       future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -870,12 +888,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -930,7 +951,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
       future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -1033,12 +1054,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -1073,7 +1097,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
       future2 = mc.asyncBopSortMergeGet(keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future1);
@@ -1125,9 +1149,12 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     } catch (InterruptedException e) {
       future1.cancel(true);
       future2.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future1.cancel(true);
       future2.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 
@@ -1162,7 +1189,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
       future2 = mc.asyncBopSortMergeGet(keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
     } catch (IllegalStateException e) {
-      // handle exception
+      Assert.fail(e.getMessage());
     }
 
     assertNotNull(future1);
@@ -1214,9 +1241,12 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     } catch (InterruptedException e) {
       future1.cancel(true);
       future2.cancel(true);
+      Assert.fail(e.getMessage());
     } catch (ExecutionException e) {
       future1.cancel(true);
       future2.cancel(true);
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
     }
   }
 }

@@ -58,6 +58,7 @@ public class ElementFlagFilterTest extends TestCase {
     } catch (IllegalArgumentException e) {
       return;
     } catch (Exception e) {
+      e.printStackTrace();
       fail(e.toString());
     }
     fail("Oops. Something's going wrong.");
@@ -73,6 +74,7 @@ public class ElementFlagFilterTest extends TestCase {
     } catch (IllegalArgumentException e) {
       return;
     } catch (Exception e) {
+      e.printStackTrace();
       fail(e.toString());
     }
     fail("Oops. Something's going wrong.");

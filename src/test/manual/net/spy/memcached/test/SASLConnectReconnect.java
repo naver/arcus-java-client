@@ -9,6 +9,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import junit.framework.Assert;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
@@ -143,6 +144,7 @@ public class SASLConnectReconnect {
     } catch (Exception ex) {
       System.err.println("Bailing out " + ex.toString() + "\n");
       ex.printStackTrace();
+      Assert.fail(ex.getMessage());
     }
   }
 }

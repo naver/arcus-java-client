@@ -57,6 +57,7 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -69,6 +70,7 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (Exception e) {
         f.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       Assert.assertNotNull("Cached list is null.", list);

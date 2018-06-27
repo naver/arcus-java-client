@@ -269,7 +269,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 ElementFlagFilter.DO_NOT_FILTER, 0, 10);
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {
-
+        // test success
       }
 
       // max count list
@@ -278,7 +278,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 ElementFlagFilter.DO_NOT_FILTER, 0, 1000);
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {
-
+        // test success
       }
     } catch (Exception e) {
       e.printStackTrace();

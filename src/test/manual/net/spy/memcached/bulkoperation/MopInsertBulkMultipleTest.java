@@ -57,6 +57,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -70,6 +71,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
         } catch (Exception e) {
           f.cancel(true);
           e.printStackTrace();
+          Assert.fail(e.getMessage());
         }
         Object value2 = map.entrySet().iterator().next().getValue();
         if (!value.equals(value2)) {

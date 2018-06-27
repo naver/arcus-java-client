@@ -57,6 +57,7 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
                 errorList.isEmpty());
       } catch (TimeoutException e) {
         future.cancel(true);
+        Assert.fail(e.getMessage());
       }
 
       // GET
@@ -68,6 +69,7 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
           cachedMap = f.get();
         } catch (Exception e) {
           f.cancel(true);
+          Assert.fail(e.getMessage());
         }
         Object value2 = cachedMap.get(MKEY);
         if (!value.equals(value2)) {

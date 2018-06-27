@@ -469,8 +469,9 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                 TimeUnit.MILLISECONDS);
       }
     } catch (TimeoutException e) {
-
+      fail(e.getMessage());
     } catch (Exception e) {
+      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -485,6 +486,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
       // System.out.println((System.currentTimeMillis() - start) + "ms");
     } catch (TimeoutException e) {
       oldFuture.cancel(true);
+      fail(e.getMessage());
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
@@ -500,6 +502,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
       // System.out.println((System.currentTimeMillis() - start) + "ms");
     } catch (TimeoutException e) {
       future.cancel(true);
+      fail(e.getMessage());
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();

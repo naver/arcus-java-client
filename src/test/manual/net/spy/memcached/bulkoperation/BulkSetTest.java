@@ -93,6 +93,7 @@ public class BulkSetTest extends BaseIntegrationTest {
         } catch (TimeoutException e) {
           future.cancel(true);
           e.printStackTrace();
+          Assert.fail(e.getMessage());
         }
 
         // GET
@@ -156,6 +157,7 @@ public class BulkSetTest extends BaseIntegrationTest {
         } catch (TimeoutException e) {
           future.cancel(true);
           e.printStackTrace();
+          Assert.fail(e.getMessage());
         }
 
         // GET
