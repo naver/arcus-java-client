@@ -233,7 +233,7 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().fatal("Can't get client host info.", e);
       hostInfo = "unknown-host_0.0.0.0_";
     }
-    path = path + hostInfo 
+    path = path + hostInfo
          + this.poolSize + "_java_" + ArcusClient.VERSION + "_";
 
     /* get time and zk session id */
