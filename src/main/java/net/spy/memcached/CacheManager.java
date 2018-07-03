@@ -325,6 +325,19 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
+  private String getAddressListString(List<String> children) {
+    String addrs = "";
+    for (int i = 0; i < children.size(); i++) {
+      String[] temp = children.get(i).split("-");
+      if (i != 0) {
+        addrs = addrs + "," + temp[0];
+      } else {
+        addrs = temp[0];
+      }
+    }
+    return addrs;
+  }
+
   /**
    * If there's no children in the znode, make a fake server node.
    *
@@ -366,15 +379,7 @@ public class CacheManager extends SpyThread implements Watcher,
     // by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
 
     /* ENABLE_REPLICATION end */
-    String addrs = "";
-    for (int i = 0; i < children.size(); i++) {
-      String[] temp = children.get(i).split("-");
-      if (i != 0) {
-        addrs = addrs + "," + temp[0];
-      } else {
-        addrs = temp[0];
-      }
-    }
+    String addrs = getAddressListString(children);
 
     if (client == null) {
       createArcusClient(addrs);
