@@ -285,38 +285,46 @@ public class CacheManager extends SpyThread implements Watcher,
   }
 
   public void run() {
-    try {
-      synchronized (this) {
-        while (!shutdownRequested) {
-          if (!cacheMonitor.dead) {
+    synchronized (this) {
+      while (!shutdownRequested) {
+        if (!cacheMonitor.dead) {
+          try {
             wait();
-          } else {
+          } catch (InterruptedException e) {
+              getLogger().warn("Cache mananger thread is interrupted while wait: %s",
+                               e.getMessage());
+          }
+        } else {
+          long retrySleepTime = 0;
+          try {
             getLogger().warn("Unexpected disconnection from Arcus admin. " +
                     "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
+            shutdownZooKeeperClient();
+            initZooKeeperClient();
+          } catch (AdminConnectTimeoutException e) {
+            retrySleepTime = 1000L; // 1 second
+          } catch (NotExistsServiceCodeException e) {
+            retrySleepTime = 5000L; // 5 second
+          } catch (InitializeClientException e) {
+            retrySleepTime = 5000L; // 5 second
+          } catch (Exception e) {
+            retrySleepTime = 1000L; // 1 second
+            getLogger().warn("upexpected exception is caught while reconnet to Arcus admin: %s",
+                             e.getMessage());
+          }
+          if (retrySleepTime > 0) { // retry is needed
             try {
-              shutdownZooKeeperClient();
-              initZooKeeperClient();
-            } catch (AdminConnectTimeoutException e) {
-              Thread.sleep(5000L);
-            } catch (NotExistsServiceCodeException e) {
-              Thread.sleep(5000L);
-            } catch (InitializeClientException e) {
-              Thread.sleep(5000L);
+              Thread.sleep(retrySleepTime);
+            } catch (InterruptedException e) {
+              getLogger().warn("Cache mananger thread is interrupted while sleep: %s",
+                               e.getMessage());
             }
           }
         }
       }
-    } catch (InterruptedException e) {
-      getLogger().warn("current arcus admin is interrupted : %s",
-              e.getMessage());
-    } finally {
-      if (shutdownRequested) {
-        getLogger().info("Close cache manager.");
-      } else {
-        getLogger().error("Close cache manager. But, there was no shutdown request.");
-      }
-      shutdownZooKeeperClient();
     }
+    getLogger().info("Close cache manager.");
+    shutdownZooKeeperClient();
   }
 
   public void closing() {
