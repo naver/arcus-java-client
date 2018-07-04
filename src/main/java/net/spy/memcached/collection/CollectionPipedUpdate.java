@@ -37,6 +37,14 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
   protected int itemCount;
   protected int nextOpIndex = 0;
 
+  /**
+   * set next index of operation
+   * that will be processed after when operation moved by switchover
+   */
+  public void setNextOpIndex(int i) {
+    this.nextOpIndex = i;
+  }
+
   public abstract ByteBuffer getAsciiCommand();
 
   public abstract ByteBuffer getBinaryCommand();
