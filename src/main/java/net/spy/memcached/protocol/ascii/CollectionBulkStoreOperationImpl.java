@@ -99,10 +99,23 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
     }
 
     /* ENABLE_REPLICATION end */
-    if (line.startsWith("END") || store.getItemCount() == 1) {
-      cb.receivedStatus((successAll) ? END : FAILED_END);
+    if (store.getItemCount() == 1) {
+      OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
+              NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+              TYPE_MISMATCH, BKEY_MISMATCH);
+      if (status.isSuccess()) {
+        cb.receivedStatus(END);
+      } else {
+        cb.gotStatus(index, status);
+        cb.receivedStatus(FAILED_END);
+      }
       transitionState(OperationState.COMPLETE);
       return;
+    }
+
+    if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      cb.receivedStatus((successAll) ? END : FAILED_END);
+      transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 
