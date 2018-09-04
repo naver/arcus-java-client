@@ -41,6 +41,7 @@ import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.RangeGet;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -80,6 +81,7 @@ import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.RangeGetOperation;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
 import net.spy.memcached.ops.SASLStepOperation;
@@ -256,6 +258,12 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   public FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb) {
     throw new RuntimeException(
             "Flush by prefix operation is not supported in binary protocol yet.");
+  }
+
+  @Override
+  public RangeGetOperation rangeget(RangeGet rangeGet, OperationCallback cb) {
+    throw new RuntimeException(
+            "RangeGetOperation is not supported in binary protocol yet.");
   }
 
   @Override

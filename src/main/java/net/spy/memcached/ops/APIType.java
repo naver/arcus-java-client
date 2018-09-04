@@ -61,6 +61,7 @@ public enum APIType {
   BOP_DELETE(OperationType.WRITE),
 
   // Attribute API Type
+  RNG_GET(OperationType.READ),
   SETATTR(OperationType.WRITE), GETATTR(OperationType.READ),
 
   // Other API

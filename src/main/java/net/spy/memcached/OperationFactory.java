@@ -40,6 +40,7 @@ import net.spy.memcached.collection.CollectionPipedStore;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.RangeGet;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -75,6 +76,8 @@ import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.RangeGetOperation;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
 import net.spy.memcached.ops.SASLStepOperation;
@@ -371,6 +374,8 @@ public interface OperationFactory {
    * @return a new FlushOperation
    */
   FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb);
+
+  RangeGetOperation rangeget(RangeGet rangeGet, OperationCallback cb);
 
   /**
    * SMGet(Sort-Merge Get) operation for multiple b+tree items.
