@@ -244,8 +244,8 @@ ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 
 ##### Logger 설정
 
-Arcus client 사용 시에 ArcusClient 자체 logger(DefaultLogger), log4j, JDK logger 등
-3가지 종류의 Logger를 사용할 수 있다.
+Arcus client 사용 시에 ArcusClient 자체 logger(DefaultLogger), log4j, slf4j, JDK logger 등
+4가지 종류의 Logger를 사용할 수 있다.
 사용할 logger를 지정하지 않으면 ArcusClient는 DefaultLogger를 기본으로 사용하며,
 DefaultLogger는 INFO level 이상의 로그를 stderr (System.err) 로 출력한다. (변경 불가)
 
@@ -330,6 +330,45 @@ Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](
 ```
 
 기타 log4j의 자세한 설정 방법은 [log4j 설정 방법](http://logging.apache.org/log4j/1.2/manual.html)을 확인하기 바란다. 
+
+##### SLF4JLogger 사용시 유의 사항
+
+slf4j와 호환되는 log4j 이외의 라이브러리(logback, log4j2, ...)를 쓸 경우, net.spy.memcached.compat.log.SLF4JLogger 클래스를 사용할 것이다. 이 클래스를 사용하기 전에 필수적으로 해야 하는 작업이 있다. (SLF4JLogger와 log4j를 조합해서 사용한다면 하지 않아도 된다.)
+
+ArcusClient는 기본적으로 Zookeeper에 의해서 slf4j의 구현 라이브러리인 slf4j-log4j12를 기본 dependency로 가진다. 따라서 log4j 이외의 라이브러리를 SLF4JLogger와 조합해서 사용하려면 ArcusClient dependency의 exclusion에 slf4j-log4j12를 추가해야 한다. 
+
+예를 들어 ArcusClient 사용자가 SLF4JLogger와 logback을 조합해서 사용할 경우 dependency 설정을 다음과 같이 해야 한다.
+
+```
+<dependency>
+    <groupId>com.navercorp.arcus</groupId>
+    <artifactId>arcus-java-client</artifactId>
+    <version>${arcus-java-client.version}</version>
+    <exclusions>
+        <exclusion>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+	<groupId>ch.qos.logback</groupId>
+	<artifactId>logback-classic</artifactId>
+	<version>${logback.version}</version>
+</dependency>
+<dependency>
+	<groupId>ch.qos.logback</groupId>
+	<artifactId>logback-core</artifactId>
+	<version>${logback.version}</version>
+</dependency>
+```
+
+2개 이상의 slf4j의 구현 라이브러리(logback-classic, slf4j-log4j12, ...)들이 같은 classpath에 존재할 경우, SLF4J에서 [multiple binding error](http://www.slf4j.org/codes.html#multiple_bindings)가 발생하므로 반드시 exclusion 키워드를 이용해 slf4j 구현 라이브러리가 하나만 존재하도록 하여야 한다.
+
+```
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+```
 
 ##### Transparent Front Cache 사용
 
