@@ -1,3 +1,10 @@
+2018-09-28 [version 1.11.3]
+	* [FEATURE] Adding support for SLF4J logging
+	* [FIX] Set next operation index of pipedUpdateOp during switchover
+	* [ENHANCE] CacheManager thread do not stop until shutdown is requested
+	* [TEST] Check unit test exception handling
+	* [TEST] Smget test modification for subversion
+
 2018-06-26 [version 1.11.2]
 	* [Fix] bulk and pipe operation buffer overhead changed from 64 to 128
 	* [Fix] Select separator depending on node version.
