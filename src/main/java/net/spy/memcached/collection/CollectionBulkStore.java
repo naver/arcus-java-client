@@ -48,9 +48,19 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
     this.nextOpIndex = i;
   }
 
+  /* ENABLE_MIGRATION if */
+  public int getNextOpIndex() {
+    return this.nextOpIndex;
+  }
+  /* ENABLE_MIGRATION end */
+
   public abstract ByteBuffer getAsciiCommand();
 
   public abstract ByteBuffer getBinaryCommand();
+
+  /* ENABLE_MIGRATION if */
+  public abstract CollectionBulkStore<T> makeSingleStore(List<String> singleKeyList);
+  /* ENABLE_MIGRATION end */
 
   /**
    *
@@ -98,6 +108,31 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
+
+    /* ENABLE_MIGRAETION if */
+    public BTreeBulkStore(List<String> keyList, String bkey, String eflag,
+                          T value, CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) {
+        CollectionOverflowAction overflowAction = attr.getOverflowAction();
+        if (overflowAction != null && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+          throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+      }
+      this.keyList = keyList;
+      this.bkey = bkey;
+      this.eflag = eflag;
+      this.value = value;
+      this.attribute = attr;
+      this.tc = tc;
+      this.itemCount = keyList.size();
+      this.createKeyIfNotExists = (attr != null);
+      this.cachedData = tc.encode(value);
+    }
+
+    @Override
+    public CollectionBulkStore<T> makeSingleStore(List<String> singleKeyList) {
+      return new BTreeBulkStore<T>(singleKeyList, this.bkey, this.eflag, this.value, this.attribute, this.tc);
+    }
+    /* ENABLE_MIGRATION end */
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
@@ -183,6 +218,13 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkStore<T> makeSingleStore(List<String> singleKeyList) {
+      return new MapBulkStore<T>(singleKeyList, this.mkey, this.value, this.attribute, this.tc);
+    }
+    /* ENABLE_MIGRATION end */
+
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
@@ -263,6 +305,13 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkStore<T> makeSingleStore(List<String> singleKeyList) {
+      return new SetBulkStore<T>(singleKeyList, this.value, this.attribute, this.tc);
+    }
+    /* ENABLE_MIGRATION end */
+
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
@@ -341,6 +390,13 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
+
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkStore<T> makeSingleStore(List<String> singleKeyList) {
+      return new ListBulkStore<T>(singleKeyList, this.index, this.value, this.attribute, this.tc);
+    }
+    /* ENABLE_MIGRATION end */
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;

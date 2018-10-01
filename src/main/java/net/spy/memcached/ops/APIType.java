@@ -67,6 +67,9 @@ public enum APIType {
   FLUSH(OperationType.WRITE),
   STATS(OperationType.ETC),
   VERSION(OperationType.ETC),
+  /* ENABLE_MIGRATION if */
+  CLUSTER(OperationType.ETC),
+  /* ENABLE_MIGRATION end */
 
   // undefined API
   UNDEFINED(OperationType.UNDEFINED);

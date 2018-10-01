@@ -70,6 +70,9 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
   protected int count;
   protected int index = 0;
   protected boolean successAll = true;
+  /* ENABLE_MIGRATION if */
+  protected boolean migrating = false;
+  /* ENABLE_MIGRATION end */
 
   public CollectionPipedUpdateOperationImpl(String key,
                                             CollectionPipedUpdate<?> update, OperationCallback cb) {
@@ -98,9 +101,28 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
 
     /* ENABLE_REPLICATION end */
     if (update.getItemCount() == 1) {
+      /* ENABLE_MIGRATION if */
+      if (line.startsWith("NOT_MY_KEY ")) {
+        this.update.setNextOpIndex(index);
+        receivedMigrateOperations(line, true);
+      } else {
+        OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
+                NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
+                BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
+        if (status.isSuccess()) {
+          cb.receivedStatus(END);
+        } else {
+          cb.gotStatus(index, status);
+          cb.receivedStatus(FAILED_END);
+        }
+        transitionState(OperationState.COMPLETE);
+      }
+      return;
+      /* else */
+      /*
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
-              NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
-              BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
+          NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
+          BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
       if (status.isSuccess()) {
         cb.receivedStatus(END);
       } else {
@@ -109,11 +131,31 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       }
       transitionState(OperationState.COMPLETE);
       return;
+      */
+      /* ENABLE_MIGRATION end */
     }
 
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (migrating) {
+        transitionState(OperationState.MIGRATING);
+        migrating = false;
+      } else {
+        cb.receivedStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.COMPLETE);
+      }
+      /* else */
+      /*
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
+      */
+      /* ENABLE_MIGRATION end */
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      this.update.setNextOpIndex(index);
+      receivedMigrateOperations(line, false);
+      migrating = true;
+    /* ENABLE_MIGRATION end */
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 

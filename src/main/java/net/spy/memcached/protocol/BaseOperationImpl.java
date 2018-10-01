@@ -18,6 +18,9 @@ package net.spy.memcached.protocol;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
@@ -53,6 +56,9 @@ public abstract class BaseOperationImpl extends SpyObject {
   /* ENABLE_REPLICATION if */
   private boolean moved = false;
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+  protected List<String> mgResponse = null;
+  /* ENABLE_MIGRATION end */
 
   public BaseOperationImpl() {
     super();
@@ -124,6 +130,20 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
   /* ENABLE_REPLICATION end */
 
+  /* ENABLE_MIGRATION if */
+  protected final void receivedMigrateOperations(String cause, boolean changeState) {
+    /* FIXME::MWJIN_DEBUG */
+    getLogger().debug("%s message received by %s operation from %s", cause, this, handlingNode);
+    if (mgResponse == null) {
+      mgResponse = new ArrayList<String>();
+    }
+    mgResponse.add(cause);
+    if (changeState) {
+      transitionState(OperationState.MIGRATING);
+    }
+  }
+  /* ENABLE_MIGRATION end */
+
   public final ByteBuffer getBuffer() {
     return cmd;
   }
@@ -136,6 +156,16 @@ public abstract class BaseOperationImpl extends SpyObject {
     cmd = to;
     cmd.mark();
   }
+
+  /* ENABLE_MIGRATION if */
+  public final String getMgResponse(int index) {
+    return mgResponse.get(index);
+  }
+
+  public final int getMgResponseSize() {
+    return mgResponse.size();
+  }
+  /* ENABLE_MIGRATION end */
 
   /**
    * Transition the state of this operation to the given state.
@@ -231,4 +261,22 @@ public abstract class BaseOperationImpl extends SpyObject {
   public void setAPIType(APIType type) {
     this.apiType = type;
   }
+
+  /* ENABLE_MIGRATION if */
+  public void setMigratingCount(int count) {
+    assert false;
+  }
+
+  public void decrMigratingCount(String line) {
+    assert false;
+  }
+
+  public void decrMigratingCount(String key, String line) {
+    assert false;
+  }
+
+  public Map<String, Object> getArguments() {
+    return null;
+  }
+  /* ENABLE_MIGRATION end */
 }

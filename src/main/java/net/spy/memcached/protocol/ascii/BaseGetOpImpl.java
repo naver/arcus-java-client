@@ -11,6 +11,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.Operation;
 
 /**
  * Base class for get and gets handlers.
@@ -27,6 +28,11 @@ abstract class BaseGetOpImpl extends OperationImpl {
   private byte[] data = null;
   private int readOffset = 0;
   private byte lookingFor = '\0';
+  /* ENABLE_MIGRATION if */
+  private Operation parentOperation = null;
+  private int migratingCount = 0;
+  private boolean migrating = false;
+  /* ENABLE_MIGRATION end */
 
   public BaseGetOpImpl(String c,
                        OperationCallback cb, Collection<String> k) {
@@ -35,6 +41,17 @@ abstract class BaseGetOpImpl extends OperationImpl {
     keys = k;
     setOperationType(OperationType.READ);
   }
+
+  /* ENABLE_MIGRATION if */
+  public BaseGetOpImpl(String c,
+                       OperationCallback cb, Collection<String> k, Operation p) {
+    super(cb);
+    cmd = c;
+    keys = k;
+    parentOperation = p;
+    setOperationType(OperationType.READ);
+  }
+  /* ENABLE_MIGRATION end */
 
   /**
    * Get the keys this GetOperation is looking for.
@@ -46,10 +63,36 @@ abstract class BaseGetOpImpl extends OperationImpl {
   @Override
   public final void handleLine(String line) {
     if (line.equals("END")) {
+      /* ENABLE_MIGRATION if */
+      if (migrating) {
+        /**
+         * If the migrating flag is set,
+         * it is completed when the migrated operation
+         * of the child operation completes.
+         */
+        transitionState(OperationState.MIGRATING);
+        migrating = false;
+      } else {
+        getLogger().debug("Get complete!");
+        getCallback().receivedStatus(END);
+        transitionState(OperationState.COMPLETE);
+        if (parentOperation != null) {
+          parentOperation.decrMigratingCount(line);
+        }
+      }
+      /* else */
+      /*
       getLogger().debug("Get complete!");
       getCallback().receivedStatus(END);
       transitionState(OperationState.COMPLETE);
+      */
+      /* ENABLE_MIGRATION end */
       data = null;
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, false);
+      migrating = true;
+    /* ENABLE_MIGRATION end */
     } else if (line.startsWith("VALUE ")) {
       getLogger().debug("Got line %s", line);
       String[] stuff = line.split(" ");
@@ -174,6 +217,23 @@ abstract class BaseGetOpImpl extends OperationImpl {
     b.flip();
     setBuffer(b);
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public void setMigratingCount(int count) {
+    migratingCount = count;
+  }
+
+  @Override
+  public void decrMigratingCount(String line) {
+    migratingCount -= 1;
+    if (migratingCount == 0) {
+      getLogger().debug("ParentOp Get complete!");
+      getCallback().receivedStatus(END);
+      transitionState(OperationState.COMPLETE);
+    }
+  }
+  /* ENABLE_MIGRATION end */
 
   private String generateKeysString() {
     StringBuilder keyString = new StringBuilder();

@@ -19,14 +19,20 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.NavigableSet;
+import java.util.NavigableMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.internal.MigrationMode;
 import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
 public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {

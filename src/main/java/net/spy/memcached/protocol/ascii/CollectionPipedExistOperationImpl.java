@@ -60,6 +60,9 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
   protected int count;
   protected int index = 0;
   protected boolean successAll = true;
+  /* ENABLE_MIGRATION if */
+  protected boolean migrating = false;
+  /* ENABLE_MIGRATION end */
 
   public CollectionPipedExistOperationImpl(String key,
                                            SetPipedExist<?> collectionExist, OperationCallback cb) {
@@ -78,17 +81,51 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
             + "'' when in " + getState() + " state";
 
     if (setPipedExist.getItemCount() == 1) {
+      /* ENABLE_MIGRATION if */
+      if (line.startsWith("NOT_MY_KEY ")) {
+        this.setPipedExist.setNextOpIndex(index);
+        receivedMigrateOperations(line, true);
+      } else {
+        OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
+                NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+        cb.gotStatus(index, status);
+        cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
+        transitionState(OperationState.COMPLETE);
+      }
+      return;
+      /* else */
+      /*
       OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
-              NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+          NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
       cb.gotStatus(index, status);
       cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
+      */
+      /* ENABLE_MIGRATION end */
     }
 
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (migrating) {
+        transitionState(OperationState.MIGRATING);
+        migrating = false;
+      } else {
+        cb.receivedStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.COMPLETE);
+      }
+      /* else */
+      /*
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
+      */
+      /* ENABLE_MIGRATION end */
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY ")) {
+      this.setPipedExist.setNextOpIndex(index);
+      receivedMigrateOperations(line, false);
+      migrating = true;
+    /* ENABLE_MIGRATION end */
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 

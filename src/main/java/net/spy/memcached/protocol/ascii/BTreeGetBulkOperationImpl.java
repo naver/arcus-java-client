@@ -19,6 +19,7 @@ package net.spy.memcached.protocol.ascii;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.Map;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetBulk;
@@ -30,6 +31,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.Operation;
 
 /**
  * Operation to retrieve b+tree data with multiple keys
@@ -70,6 +72,11 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
   protected int spaceCount = 0;
+  /* ENABLE_MIGRATION if */
+  protected Operation parentOperation = null;
+  protected int migratingCount = 0;
+  protected boolean migrating = false;
+  /* ENABLE_MIGRATION end */
 
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);
@@ -78,9 +85,44 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     setOperationType(OperationType.READ);
   }
 
+  /* ENABLE_MIGRATION if */
+  public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb, Operation p) {
+    super(cb);
+    this.getBulk = getBulk;
+    this.parentOperation = p;
+    setAPIType(APIType.BOP_GET);
+    setOperationType(OperationType.READ);
+  }
+  /* ENABLE_MIGRATION end */
+
   public void handleLine(String line) {
     getLogger().debug("Got line %s", line);
 
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("VALUE ")) {
+      readKey(line);
+      setReadType(OperationReadType.DATA);
+    } else {
+      if (migrating) {
+        /**
+         * If the migrating flag is set,
+         * it is completed when the migrated operation
+         * of the child operation completes.
+         */
+        transitionState(OperationState.MIGRATING);
+      } else {
+        OperationStatus status = matchStatus(line, END);
+        getLogger().debug(status);
+        getCallback().receivedStatus(status);
+        transitionState(OperationState.COMPLETE);
+        if (parentOperation != null) {
+          parentOperation.decrMigratingCount(line);
+        }
+      }
+      return;
+    }
+    /* else */
+    /*
     if (line.startsWith("VALUE ")) {
       readKey(line);
       setReadType(OperationReadType.DATA);
@@ -93,6 +135,9 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       transitionState(OperationState.COMPLETE);
       return;
     }
+    */
+    /* ENABLE_MIGRATION end */
+
   }
 
   @Override
@@ -104,14 +149,42 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     // protocol : VALUE key OK flag count
     String[] chunk = line.split(" ");
 
+    /* ENABLE_MIGRATION if */
+    if (chunk[2].equals("NOT_MY_KEY")) {
+      /* rebuild NOT_MY_KEY response
+       * before : VALUE key NOT_MY_KEY ownerName
+       * after  : NOT_MY_KEY key ownerName
+       */
+      String str = "";
+      str += chunk[2];
+      str += " ";
+      str += chunk[1];
+      str += " ";
+      str += chunk[3];
+      receivedMigrateOperations(str, false);
+      migrating = true;
+    } else {
+      OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
+              NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
+              UNREADABLE);
+
+      getBulk.decodeKeyHeader(line);
+
+      BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
+      cb.gotKey(chunk[1], (chunk.length > 3) ? Integer.valueOf(chunk[4]) : -1, status);
+    }
+    /* else */
+    /*
     OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
-            NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
-            UNREADABLE);
+        NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
+        UNREADABLE);
 
     getBulk.decodeKeyHeader(line);
 
     BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
     cb.gotKey(chunk[1], (chunk.length > 3) ? Integer.valueOf(chunk[4]) : -1, status);
+    */
+    /* ENABLE_MIGRATION end */
   }
 
   private final void readValue(ByteBuffer bb) {
@@ -156,6 +229,29 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
             byteBuffer.reset();
             spaceCount = 0;
             continue;
+          /* ENABLE_MIGRATION if */
+          } else {
+            if (migrating) {
+              /**
+               * If the migrating flag is set,
+               * it is completed when the migrated operation
+               * of the child operation completes.
+               */
+              transitionState(OperationState.MIGRATING);
+            } else {
+              OperationStatus status = matchStatus(line, END);
+              getLogger().debug(status);
+              getCallback().receivedStatus(status);
+              transitionState(OperationState.COMPLETE);
+              if (parentOperation != null) {
+                parentOperation.decrMigratingCount(line);
+              }
+            }
+            data = null;
+            break;
+          }
+          /* else */
+          /*
           } else {
             OperationStatus status = matchStatus(line, END);
             getCallback().receivedStatus(status);
@@ -163,6 +259,8 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
             data = null;
             break;
           }
+          */
+          /* ENABLE_MIGRATION end */
         }
         byteBuffer.write(b);
       }
@@ -249,6 +347,31 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
                       .replace("\r\n", "\\r\\n"));
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public void setMigratingCount(int count) {
+    migratingCount = count;
+  }
+
+  @Override
+  public void decrMigratingCount(String line) {
+    migratingCount -= 1;
+    if (migratingCount == 0) {
+      OperationStatus status = matchStatus(line, END);
+
+      getLogger().debug(status);
+      getCallback().receivedStatus(status);
+
+      transitionState(OperationState.COMPLETE);
+    }
+  }
+
+  @Override
+  public Map<String, Object> getArguments() {
+    return getBulk.getArgument();
+  }
+  /* ENABLE_MIGRATION end */
 
   @Override
   protected void wasCancelled() {

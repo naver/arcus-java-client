@@ -27,6 +27,13 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(keyList, from, to, eFlagFilter, offset, count);
   }
 
+  /* ENABLE_MIGRATION if */
+  public BTreeGetBulkWithLongTypeBkey(List<String> keyList, String range,
+                                      ElementFlagFilter eFlagFilter, int offset, int count, boolean reverse) {
+    super(keyList, range, eFlagFilter, offset, count, reverse);
+  }
+  /* ENABLE_MIGRATION end */
+
   public Long getSubkey() {
     return (Long) subkey;
   }

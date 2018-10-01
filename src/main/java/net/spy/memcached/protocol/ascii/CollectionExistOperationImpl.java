@@ -73,6 +73,12 @@ public class CollectionExistOperationImpl extends OperationImpl
   public void handleLine(String line) {
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY ")) {
+      receivedMigrateOperations(line, true);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(
             matchStatus(line, EXIST, NOT_EXIST, NOT_FOUND, NOT_FOUND,
                     TYPE_MISMATCH, UNREADABLE));

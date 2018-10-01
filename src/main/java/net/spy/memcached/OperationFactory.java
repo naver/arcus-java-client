@@ -83,6 +83,9 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
+/* ENABLE_MIGRATION if */
+import net.spy.memcached.ops.ClusterOperation;
+/* ENABLE_MIGRATION end */
 
 /**
  * Factory that builds operations for protocol handlers.
@@ -151,6 +154,29 @@ public interface OperationFactory {
    * @return a new GetOperation
    */
   GetOperation mget(Collection<String> keys, GetOperation.Callback cb);
+
+  /* ENABLE_MIGRATION if */
+
+  /**
+   * Create a get operation.
+   *
+   * @param keys     the collection of keys to get
+   * @param cb       the callback that will contain the results
+   * @param parentOp the parent operation of migrated
+   * @return a new GetOperation
+   */
+  GetOperation get(Collection<String> keys, GetOperation.Callback cb, Operation parentOp);
+
+  /**
+   * Create a mget operation.
+   *
+   * @param keys     the collection of keys to get
+   * @param cb       the callback that will contain the results
+   * @param parentOp the parent operation of migrated
+   * @return a new GetOperation
+   */
+  GetOperation mget(Collection<String> keys, GetOperation.Callback cb, Operation parentOp);
+  /* ENABLE_MIGRATION end */
 
   /**
    * Create a mutator operation.
@@ -461,6 +487,21 @@ public interface OperationFactory {
   CollectionBulkStoreOperation collectionBulkStore(List<String> key,
                                                    CollectionBulkStore<?> store, OperationCallback cb);
 
+  /* ENABLE_MIGRATION if */
+
+  /**
+   * Bulk store operation for collection items.
+   *
+   * @param key      collection item's key
+   * @param store    operation parameters (element values, and so on)
+   * @param cb       the status callback
+   * @param parentOp the parent operation of migrated
+   * @return a new CollectionBulkStoreOperation
+   */
+  CollectionBulkStoreOperation collectionBulkStore(List<String> key,
+                                                   CollectionBulkStore<?> store, OperationCallback cb, Operation parentOp);
+  /* enable_migration end */
+
   /**
    * Bulk get opearation for b+tree items.
    *
@@ -469,6 +510,19 @@ public interface OperationFactory {
    * @return a new BTreeGetBulkOperation
    */
   BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get, BTreeGetBulkOperation.Callback<?> cb);
+
+  /* ENABLE_MIGRATION if */
+
+  /**
+   * Bulk get opearation for b+tree items.
+   *
+   * @param get      operation parameters (item key, element key range, and so on)
+   * @param cb       the callback that will contain the results
+   * @param parentOp the parent operation of migrated
+   * @return a new BTreeGetBulkOperation
+   */
+  BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get, BTreeGetBulkOperation.Callback<?> cb, Operation parentOp);
+  /* ENABLE_MIGRATION end */
 
   /**
    * Get operation for b+tree items using positions.
@@ -511,4 +565,15 @@ public interface OperationFactory {
   BTreeStoreAndGetOperation bopStoreAndGet(String key,
                                            BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb);
 
+  /* ENABLE_MIGRATION if */
+
+  /**
+   * Cluster operation on a given state.
+   *
+   * @param version cluster version
+   * @param cb      the status callback
+   * @return a new ClusterOperation
+   */
+  ClusterOperation cluster(long version, OperationCallback cb);
+  /* ENABLE_MIGRATION end */
 }

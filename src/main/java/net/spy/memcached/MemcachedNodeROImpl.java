@@ -231,5 +231,19 @@ class MemcachedNodeROImpl implements MemcachedNode {
   public int moveOperations(final MemcachedNode toNode) {
     throw new UnsupportedOperationException();
   }
+
   /* ENABLE_REPLICATION end */
+  /* ENABLE_MIGRATION if */
+  public void makeMoveOperation(Operation op) {
+    throw new UnsupportedOperationException();
+  }
+
+  public void moveOperation(Operation op, final MemcachedNode toNode) {
+    throw new UnsupportedOperationException();
+  }
+
+  public void addMovesOp(Operation op) {
+    throw new UnsupportedOperationException();
+  }
+  /* ENABLE_MIGRATION end */
 }
