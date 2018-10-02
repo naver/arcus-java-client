@@ -538,6 +538,9 @@ public interface ArcusClientIF {
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
 
+  public CollectionFuture<List<Object>> asyncRangeGet(String frkey, String tokey,
+                                                      int count);
+
   /**
    * Retrieves an item on given index in the list.
    *

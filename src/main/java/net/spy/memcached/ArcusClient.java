@@ -108,6 +108,7 @@ import net.spy.memcached.collection.MapDelete;
 import net.spy.memcached.collection.MapGet;
 import net.spy.memcached.collection.MapStore;
 import net.spy.memcached.collection.MapUpdate;
+import net.spy.memcached.collection.RangeGet;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -141,6 +142,7 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.RangeGetOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.FrontCacheMemcachedClient;
 import net.spy.memcached.transcoders.CollectionTranscoder;
@@ -471,6 +473,56 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     });
     rv.setOperation(op);
     addOp(key, op);
+    return rv;
+  }
+
+  private <T> CollectionFuture<List<T>> asyncRangeGet(final RangeGet rangeGet,
+                                                      final Transcoder<T> tc) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final CollectionFuture<List<T>> rv = new CollectionFuture<List<T>>(
+            latch, operationTimeout);
+
+    Operation op = opFact.rangeget(rangeGet,
+            new RangeGetOperation.Callback() {
+              List<T> list = new ArrayList<T>();
+
+              public void receivedStatus(OperationStatus status) {
+                CollectionOperationStatus cstatus;
+                if (status instanceof CollectionOperationStatus) {
+                  cstatus = (CollectionOperationStatus) status;
+                } else {
+                  getLogger().warn("Unhandled state: " + status);
+                  cstatus = new CollectionOperationStatus(status);
+                }
+                if (cstatus.isSuccess()) {
+                  rv.set(list, cstatus);
+                  return;
+                }
+                switch (cstatus.getResponse()) {
+                  case NOT_FOUND:
+                    rv.set(null, cstatus);
+                    if (getLogger().isDebugEnabled()) {
+                      getLogger().debug("rangeGet(%s) not found : %s",
+                              rangeGet.getRange(), cstatus);
+                    }
+                    break;
+                  case UNREADABLE:
+                    rv.set(null, cstatus);
+                    if (getLogger().isDebugEnabled()) {
+                      getLogger().debug("rangeGet(%s) is not readable : %s",
+                              rangeGet.getRange(), cstatus);
+                    }
+                    break;
+                }
+              }
+              public void complete() { latch.countDown();}
+
+              public void gotData(byte[] key) {
+                list.add(tc.decode(new CachedData(0, key, tc.getMaxSize())));
+              }
+            });
+    rv.setOperation(op);
+    addOp(rangeGet.getFrkey(), op);
     return rv;
   }
 
@@ -1531,6 +1583,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
     MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
     return asyncMopGet(key, get, tc);
+  }
+
+  @Override
+  public CollectionFuture<List<Object>> asyncRangeGet(String frkey, String tokey,
+                                                      int count) {
+    RangeGet rangeGet = new RangeGet(frkey, tokey, count);
+    return asyncRangeGet(rangeGet, collectionTranscoder);
   }
 
   /*

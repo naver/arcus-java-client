@@ -519,6 +519,13 @@ public class ArcusClientPool implements ArcusClientIF {
   }
 
   @Override
+  public CollectionFuture<List<Object>> asyncRangeGet(String frkey, String tokey,
+                                                      int count) {
+    return this.getClient()
+            .asyncRangeGet(frkey, tokey, count);
+  }
+
+  @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
                                                     boolean withDelete, boolean dropIfEmpty) {
     return this.getClient()
