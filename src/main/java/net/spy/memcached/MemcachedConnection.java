@@ -581,6 +581,7 @@ public final class MemcachedConnection extends SpyObject {
         // FIXME.  Do we ever execute this path?
         // This method does not call observer.connectionEstablished.
         qa.connected();
+        setVersionInfo(qa);
       } else {
         getLogger().info("new memcached node added %s to connect queue", qa);
         ops = SelectionKey.OP_CONNECT;
@@ -593,7 +594,6 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("new memcached socket error on initial connect");
       queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
     }
-    prepareVersionInfo(qa, sa);
     return qa;
   }
 
@@ -617,7 +617,9 @@ public final class MemcachedConnection extends SpyObject {
       if (versions.containsKey(node.getSocketAddress())) {
         node.setVersion(versions.remove(node.getSocketAddress()));
       } else {
-        prepareVersionInfo(node, node.getSocketAddress());
+        if (node.isActive() && locator.getAll().contains(node)) {
+          prepareVersionInfo(node, node.getSocketAddress());
+        }
       }
     }
   }
@@ -740,6 +742,7 @@ public final class MemcachedConnection extends SpyObject {
         if (channel.finishConnect()) {
           connected(qa);
           addedQueue.offer(qa);
+          setVersionInfo(qa);
           if (qa.getWbuf().hasRemaining()) {
             handleWrites(sk, qa);
           }
