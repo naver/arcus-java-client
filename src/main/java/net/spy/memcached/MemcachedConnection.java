@@ -568,6 +568,7 @@ public final class MemcachedConnection extends SpyObject {
     // and keep failing/reconnecting.
     if (qa.isFake()) {
       // Locator assumes non-null selectionkey.  So add a dummy one...
+      ops = SelectionKey.OP_CONNECT;
       qa.setSk(ch.register(selector, ops, qa));
       getLogger().info("new fake memcached node added %s to connect queue", qa);
       return qa;

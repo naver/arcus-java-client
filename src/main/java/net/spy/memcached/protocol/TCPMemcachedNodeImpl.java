@@ -168,7 +168,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     if (sa instanceof InetSocketAddress) {
       InetSocketAddress inetSockAddr = (InetSocketAddress) sa;
       String ipport = inetSockAddr.getAddress() + ":" + inetSockAddr.getPort();
-      isFake = CacheManager.FAKE_SERVER_NODE.equals(ipport);
+      isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(ipport);
     }
   }
 
