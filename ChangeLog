@@ -1,3 +1,7 @@
+2018-11-08 [version 1.11.4]
+	* [FIX] change FAKE_SERVER_NODE check method
+	* [FIX] do not cancel an operation already canceled in setupResend
+
 2018-09-28 [version 1.11.3]
 	* [FEATURE] Adding support for SLF4J logging
 	* [FIX] Set next operation index of pipedUpdateOp during switchover
