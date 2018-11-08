@@ -219,17 +219,22 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     // First, reset the current write op, or cancel it if we should
     // be authenticating
     Operation op = getCurrentWriteOp();
-    if ((cancelWrite || shouldAuth) && op != null) {
-      op.cancel(cause);
-    } else if (op != null) {
-      ByteBuffer buf = op.getBuffer();
-      if (buf != null) {
-        buf.reset();
+    if (op != null) {
+      if (shouldAuth) {
+        op.cancel(cause);
+      } else if (cancelWrite) {
+        /* do nothing */
       } else {
-        getLogger().info("No buffer for current write op, removing");
-        removeCurrentWriteOp();
+        ByteBuffer buf = op.getBuffer();
+        if (buf != null) {
+          buf.reset();
+        } else {
+          getLogger().info("No buffer for current write op, removing");
+          removeCurrentWriteOp();
+        }
       }
     }
+
     // Now cancel all the pending read operations.  Might be better to
     // to requeue them.
     while (hasReadOp()) {
@@ -245,7 +250,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       getLogger().warn("Discarding partially completed op: %s", op);
       op.cancel(cause);
     }
-
 
     getWbuf().clear();
     getRbuf().clear();
