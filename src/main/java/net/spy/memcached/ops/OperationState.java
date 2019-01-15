@@ -32,14 +32,10 @@ public enum OperationState {
    * State indicating this operation is complete.
    */
   COMPLETE,
-  /**
-   * State indicating this operation timed out without completing.
-   */
-  TIMEDOUT
   /* ENABLE_REPLICATION if */
   /**
    * State indicating this operation will be moved by switchover or failover
    */
-  , MOVING
+  MOVING
   /* ENABLE_REPLICATION end */
 }
