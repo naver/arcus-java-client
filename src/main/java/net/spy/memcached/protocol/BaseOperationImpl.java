@@ -154,10 +154,6 @@ public abstract class BaseOperationImpl extends SpyObject {
       /* ENABLE_REPLICATION end */
       callback.complete();
     }
-    if (state == OperationState.TIMEDOUT) {
-      cmd = null;
-      callback.complete();
-    }
   }
 
   public final void writeComplete() {
