@@ -4433,7 +4433,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
     }
     if (offset < 0) {
-      throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+      throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
     if (count > MAX_GETBULK_ELEMENT_COUNT) {
       throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
@@ -4478,7 +4478,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
     }
     if (offset < 0) {
-      throw new IllegalArgumentException("Offset must be 0 or positive integet.");
+      throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
     if (count > MAX_GETBULK_ELEMENT_COUNT) {
       throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
