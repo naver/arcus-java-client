@@ -46,16 +46,6 @@ public class BopGetBulkTest extends BaseIntegrationTest {
     }
   };
 
-  private final List<String> keyList2 = new ArrayList<String>() {
-    private static final long serialVersionUID = -4044682425313432602L;
-
-    {
-      for (int i = 1; i < 500; i++) {
-        add("BopGetBulkTest" + i);
-      }
-    }
-  };
-
   private final byte[] eFlag = {1, 8, 16, 32, 64};
 
   private final String value = String.valueOf(new Random().nextLong());
@@ -262,15 +252,6 @@ public class BopGetBulkTest extends BaseIntegrationTest {
               ElementFlagFilter.DO_NOT_FILTER, 0, 10);
       results = f.get(1000L, TimeUnit.MILLISECONDS);
       Assert.assertEquals(0, results.size());
-
-      // max key list
-      try {
-        f = mc.asyncBopGetBulk(keyList2, 0, 10,
-                ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-        results = f.get(1000L, TimeUnit.MILLISECONDS);
-      } catch (IllegalArgumentException e) {
-        // test success
-      }
 
       // max count list
       try {
