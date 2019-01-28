@@ -192,7 +192,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   static final int BOPGET_BULK_CHUNK_SIZE = 200;
   static final int NON_PIPED_BULK_INSERT_CHUNK_SIZE = 500;
 
-  static final int MAX_GETBULK_KEY_COUNT = 200;
   static final int MAX_GETBULK_ELEMENT_COUNT = 50;
   static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
   private static final int MAX_MKEY_LENGTH = 250;
@@ -4429,9 +4428,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
     }
-    if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-      throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
-    }
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
@@ -4473,9 +4469,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           Transcoder<T> tc) {
     if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
-    }
-    if (keyList.size() > MAX_GETBULK_KEY_COUNT) {
-      throw new IllegalArgumentException("Key count must not exceed a maximum of " + MAX_GETBULK_KEY_COUNT + ".");
     }
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
