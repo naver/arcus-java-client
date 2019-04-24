@@ -1236,7 +1236,7 @@ not null     | CollectionResponse.END                 | Element 조회, No dupli
 not null     | CollectionResponse.DUPLICATED          | Element 조회, Duplicate bkey 존재
 null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
 null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.ATTR_MISMATCH       | sort-merge get에 참여한 b+tree의 속성이 서로 다름
+null         | CollectionResponse.ATTR_MISMATCH       | sort-merge get에 참여한 b+tree의 속성이 서로 다름, arcus-memcached 1.11.3 이후 속성 제약이 사라짐
 
 
 B+tree element sort-merge 조회하는 예제는 아래와 같다.
