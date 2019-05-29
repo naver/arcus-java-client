@@ -77,7 +77,7 @@ public class BTreeMutate extends CollectionMutate {
     StringBuilder b = new StringBuilder();
     b.append(by);
 
-    if (initial > 0) b.append(" ").append(initial);
+    if (initial >= 0) b.append(" ").append(initial);
     if (elementFlag != null) b.append(" ").append(getElementFlagByHex());
 
     str = b.toString();
