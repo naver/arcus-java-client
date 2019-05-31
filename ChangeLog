@@ -1,3 +1,10 @@
+2019-06-05 [version 1.11.5]
+	* [FIX] asyncBopIncr,asyncBopDecr command initial range problem
+	* [CLEANUP] remove TIMEDOUT state of operation
+	* [CLEANUP] remove the limitation of bopGetBulk key size
+	* [DOC] Changed ATTR_MISMATCH response description
+			according to spec change of 'bop smget'
+
 2018-11-08 [version 1.11.4]
 	* [FIX] change FAKE_SERVER_NODE check method
 	* [FIX] do not cancel an operation already canceled in setupResend
