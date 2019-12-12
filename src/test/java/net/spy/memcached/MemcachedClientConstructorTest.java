@@ -21,6 +21,9 @@ public class MemcachedClientConstructorTest extends TestCase {
           .getProperty("ARCUS_HOST",
                   "127.0.0.1:11211");
 
+  protected static boolean USE_ZK = Boolean.valueOf(System.getProperty(
+          "USE_ZK", "false"));
+
   @Override
   protected void tearDown() throws Exception {
     if (client != null) {
@@ -51,12 +54,14 @@ public class MemcachedClientConstructorTest extends TestCase {
   }
 
   public void testVarargConstructor() throws Exception {
-    String tokens[] = ARCUS_HOST.split(":");
-    String ip = tokens[0];
-    int port  = Integer.valueOf(tokens[1]);
-    client = new MemcachedClient(
-            new InetSocketAddress(InetAddress.getByName(ip), port));
-    assertWorking();
+    if (!USE_ZK) {
+      String tokens[] = ARCUS_HOST.split(":");
+      String ip = tokens[0];
+      int port = Integer.valueOf(tokens[1]);
+      client = new MemcachedClient(
+              new InetSocketAddress(InetAddress.getByName(ip), port));
+      assertWorking();
+    }
   }
 
   public void testEmptyVarargConstructor() throws Exception {
