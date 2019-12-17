@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -1862,6 +1863,8 @@ public class MemcachedClient extends SpyThread
       } catch (ClosedSelectorException e) {
         logRunException(e);
       } catch (IllegalStateException e) {
+        logRunException(e);
+      } catch (ConcurrentModificationException e) {
         logRunException(e);
       }
     }
