@@ -146,7 +146,7 @@ public interface ConnectionFactory {
   public HashAlgorithm getHashAlg();
 
   /**
-   * Maximum number of milliseconds to wait between reconnect attempts.
+   * Maximum number of seconds to wait between reconnect attempts.
    */
   long getMaxReconnectDelay();
 
