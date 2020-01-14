@@ -43,7 +43,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -92,7 +91,7 @@ public final class MemcachedConnection extends SpyObject {
 
   private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
   private final ConnectionFactory f;
-  private Map<SocketAddress, String> versions = new ConcurrentHashMap<SocketAddress, String>();
+  private Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled;
@@ -177,6 +176,19 @@ public final class MemcachedConnection extends SpyObject {
   public void handleIO() throws IOException {
     if (shutDown) {
       throw new IOException("No IO while shut down");
+    }
+
+    // input versionOp to the node that need it.
+    Iterator<MemcachedNode> it = nodesNeedVersionOp.iterator();
+    while (it.hasNext()) {
+      MemcachedNode qa = it.next();
+      try {
+        prepareVersionInfo(qa);
+      } catch (IllegalStateException e) {
+        // queue overflow occurs. retry later
+        continue;
+      }
+      it.remove();
     }
 
     // Deal with all of the stuff that's been added, but may not be marked
@@ -594,33 +606,29 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("new memcached socket error on initial connect");
       queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
     }
-    prepareVersionInfo(qa, sa);
+    prepareVersionInfo(qa);
     return qa;
   }
 
-  private void prepareVersionInfo(final MemcachedNode node, final SocketAddress sa) {
+  private void prepareVersionInfo(final MemcachedNode node) {
     Operation op = opFact.version(new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        versions.put(sa, status.getMessage());
+        if (status.isSuccess()) {
+          node.setVersion(status.getMessage());
+        } else {
+          getLogger().warn("VersionOp failed : " + status.getMessage());
+        }
       }
 
       @Override
       public void complete() {
-        setVersionInfo(node);
+        if (node.getVersion() == null) {
+          nodesNeedVersionOp.add(node);
+        }
       }
     });
     addOperation(node, op);
-  }
-
-  private void setVersionInfo(MemcachedNode node) {
-    if (node.getVersion() == null) {
-      if (versions.containsKey(node.getSocketAddress())) {
-        node.setVersion(versions.remove(node.getSocketAddress()));
-      } else {
-        prepareVersionInfo(node, node.getSocketAddress());
-      }
-    }
   }
 
   public void putMemcachedQueue(String addrs) {
