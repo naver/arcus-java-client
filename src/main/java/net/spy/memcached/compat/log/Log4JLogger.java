@@ -23,15 +23,16 @@
 
 package net.spy.memcached.compat.log;
 
+import org.apache.logging.log4j.message.ObjectMessage;
+import org.apache.logging.log4j.spi.ExtendedLoggerWrapper;
+
 /**
  * Logging implementation using
- * <a href="http://jakarta.apache.org/log4j/docs/">log4j</a>.
+ * <a href="https://logging.apache.org/log4j/2.x/">log4j</a>.
  */
 public class Log4JLogger extends AbstractLogger {
 
-  // Can't really import this without confusion as there's another thing
-  // by this name in here.
-  private final org.apache.log4j.Logger l4jLogger;
+  private final ExtendedLoggerWrapper logger;
 
   /**
    * Get an instance of Log4JLogger.
@@ -40,7 +41,8 @@ public class Log4JLogger extends AbstractLogger {
     super(name);
 
     // Get the log4j logger instance.
-    l4jLogger = org.apache.log4j.Logger.getLogger(name);
+    org.apache.logging.log4j.Logger l4jLogger = org.apache.logging.log4j.LogManager.getLogger(name);
+    logger = new ExtendedLoggerWrapper((org.apache.logging.log4j.spi.AbstractLogger) l4jLogger, l4jLogger.getName(), l4jLogger.getMessageFactory());
   }
 
   /**
@@ -48,7 +50,7 @@ public class Log4JLogger extends AbstractLogger {
    */
   @Override
   public boolean isTraceEnabled() {
-    return (l4jLogger.isTraceEnabled());
+    return (logger.isTraceEnabled());
   }
 
   /**
@@ -56,7 +58,7 @@ public class Log4JLogger extends AbstractLogger {
    */
   @Override
   public boolean isDebugEnabled() {
-    return (l4jLogger.isDebugEnabled());
+    return (logger.isDebugEnabled());
   }
 
   /**
@@ -64,7 +66,7 @@ public class Log4JLogger extends AbstractLogger {
    */
   @Override
   public boolean isInfoEnabled() {
-    return (l4jLogger.isInfoEnabled());
+    return (logger.isInfoEnabled());
   }
 
   /**
@@ -76,36 +78,41 @@ public class Log4JLogger extends AbstractLogger {
    */
   @Override
   public void log(Level level, Object message, Throwable e) {
-    org.apache.log4j.Level pLevel = org.apache.log4j.Level.DEBUG;
+    org.apache.logging.log4j.Level pLevel;
 
     switch (level == null ? Level.FATAL : level) {
       case TRACE:
-        pLevel = org.apache.log4j.Level.TRACE;
+        pLevel = org.apache.logging.log4j.Level.TRACE;
         break;
       case DEBUG:
-        pLevel = org.apache.log4j.Level.DEBUG;
+        pLevel = org.apache.logging.log4j.Level.DEBUG;
         break;
       case INFO:
-        pLevel = org.apache.log4j.Level.INFO;
+        pLevel = org.apache.logging.log4j.Level.INFO;
         break;
       case WARN:
-        pLevel = org.apache.log4j.Level.WARN;
+        pLevel = org.apache.logging.log4j.Level.WARN;
         break;
       case ERROR:
-        pLevel = org.apache.log4j.Level.ERROR;
+        pLevel = org.apache.logging.log4j.Level.ERROR;
         break;
       case FATAL:
-        pLevel = org.apache.log4j.Level.FATAL;
+        pLevel = org.apache.logging.log4j.Level.FATAL;
         break;
       default:
         // I don't know what this is, so consider it fatal
-        pLevel = org.apache.log4j.Level.FATAL;
-        l4jLogger.log("net.spy.compat.log.AbstractLogger", pLevel,
+        pLevel = org.apache.logging.log4j.Level.FATAL;
+        logger.logIfEnabled("net.spy.memcached.compat.log.AbstractLogger",
+                pLevel,
+                null,
                 "Unhandled log level:  " + level
-                        + " for the following message", null);
+                        + " for the following message");
     }
 
-    l4jLogger.log("net.spy.compat.log.AbstractLogger", pLevel, message, e);
+    logger.logIfEnabled("net.spy.memcached.compat.log.AbstractLogger",
+            pLevel,
+            null,
+            new ObjectMessage(message), e);
   }
 
 }
