@@ -16,9 +16,17 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.ops.Operation;
 
+import org.junit.Ignore;
+
 /**
  * Test queue overflow.
  */
+
+/**
+ * The code has been modified so that no overflow occurs.
+ * So this test is no longer necessary.
+ */
+@Ignore
 public class QueueOverflowTest extends ClientBaseCase {
 
   @Override
