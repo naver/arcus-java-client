@@ -307,7 +307,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
             optimize();
           }
 
-          o = getCurrentWriteOp();
+          if (readQ.remainingCapacity() > 0) {
+            o = getCurrentWriteOp();
+          } else {
+            o = null;
+          }
         }
         toWrite += bytesToCopy;
       }
