@@ -70,7 +70,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   public boolean cancel(boolean ign) {
     boolean rv = false;
     for (Operation op : ops) {
-      rv |= op.getState() == OperationState.WRITING;
+      rv |= op.getState() == OperationState.WRITE_QUEUED;
       op.cancel("by application.");
     }
     for (Future<T> v : rvMap.values()) {

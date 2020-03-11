@@ -32,14 +32,14 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
   public void testSingleOperation() {
     Operation op = buildOp(11211);
     assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing node: localhost:11211 [WRITING] [MOCK_STATE]",
+                    + ": test - failing node: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]",
             new CheckedOperationTimeoutException("test", op).toString());
   }
 
   public void testNullNode() {
     Operation op = new TestOperation();
     assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing node: <unknown> [WRITING]",
+                    + ": test - failing node: <unknown> [WRITE_QUEUED]",
             new CheckedOperationTimeoutException("test", op).toString());
   }
 
@@ -56,7 +56,7 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));
     assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing nodes: localhost:11211 [WRITING] [MOCK_STATE], localhost:64212 [WRITING] [MOCK_STATE]",
+                    + ": test - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE], localhost:64212 [WRITE_QUEUED] [MOCK_STATE]",
             new CheckedOperationTimeoutException("test", ops).toString());
   }
 

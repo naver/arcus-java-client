@@ -49,7 +49,7 @@ public interface Operation {
   /* ENABLE_REPLICATION if */
 
   /**
-   * reset operation state to WRITING
+   * reset operation state to WRITE_QUEUED
    */
   void resetState();
 
@@ -61,6 +61,12 @@ public interface Operation {
    * Get the write buffer for this operation.
    */
   ByteBuffer getBuffer();
+
+  /**
+   * Invoked when we start writing all of the bytes from this operation to
+   * the sockets write buffer.
+   */
+  void writing();
 
   /**
    * Invoked after having written all of the bytes from the supplied output
