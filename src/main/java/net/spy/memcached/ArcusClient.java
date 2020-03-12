@@ -1111,7 +1111,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             throw new ExecutionException(op.getException());
           }
 
-          if (op.isCancelled()) {
+          if (op != null && op.isCancelled()) {
             throw new ExecutionException(new RuntimeException(op.getCancelCause()));
           }
         }
@@ -2453,7 +2453,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             throw new ExecutionException(op.getException());
           }
 
-          if (op.isCancelled()) {
+          if (op != null && op.isCancelled()) {
             throw new ExecutionException(new RuntimeException(
                     op.getCancelCause()));
           }
@@ -2711,7 +2711,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             throw new ExecutionException(op.getException());
           }
 
-          if (op.isCancelled()) {
+          if (op != null && op.isCancelled()) {
             throw new ExecutionException(new RuntimeException(op.getCancelCause()));
           }
         }
@@ -4114,7 +4114,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             throw new ExecutionException(op.getException());
           }
 
-          if (op.isCancelled()) {
+          if (op != null && op.isCancelled()) {
             throw new ExecutionException(new RuntimeException(op.getCancelCause()));
           }
         }
@@ -4391,7 +4391,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             throw new ExecutionException(op.getException());
           }
 
-          if (op.isCancelled()) {
+          if (op != null && op.isCancelled()) {
             throw new ExecutionException(new RuntimeException(op.getCancelCause()));
           }
         }
