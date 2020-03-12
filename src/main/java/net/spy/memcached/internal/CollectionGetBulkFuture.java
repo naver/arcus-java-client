@@ -82,7 +82,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
     boolean rv = false;
     for (Operation op : ops) {
       op.cancel("by application.");
-      rv |= op.getState() == OperationState.WRITING;
+      rv |= op.getState() == OperationState.WRITE_QUEUED;
     }
     return rv;
   }

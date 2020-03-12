@@ -201,7 +201,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     writeQ.drainTo(rv);
     if (resend) {
       for (Operation o : rv) {
-        if (o.getState() == OperationState.WRITING && o.getBuffer() != null) {
+        if ((o.getState() == OperationState.WRITE_QUEUED ||
+             o.getState() == OperationState.WRITING) && o.getBuffer() != null) {
           o.getBuffer().reset(); // buffer offset reset
         } else {
           o.initialize(); // write completed or not yet initialized
@@ -278,7 +279,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void fillWriteBuffer(boolean shouldOptimize) {
     if (toWrite == 0 && readQ.remainingCapacity() > 0) {
       getWbuf().clear();
-      Operation o = getCurrentWriteOp();
+      Operation o = getNextWritableOp();
       while (o != null && toWrite < getWbuf().capacity()) {
         assert o.getState() == OperationState.WRITING;
         // This isn't the most optimal way to do this, but it hints
@@ -308,7 +309,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
           }
 
           if (readQ.remainingCapacity() > 0) {
-            o = getCurrentWriteOp();
+            o = getNextWritableOp();
           } else {
             o = null;
           }
@@ -359,6 +360,25 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
    */
   public final Operation getCurrentWriteOp() {
     return optimizedOp == null ? writeQ.peek() : optimizedOp;
+  }
+
+  /* (non-Javadoc)
+   * @see net.spy.memcached.MemcachedNode#getNextWritableOp
+   */
+  private Operation getNextWritableOp() {
+    Operation o = getCurrentWriteOp();
+    while (o != null && o.getState() == OperationState.WRITE_QUEUED) {
+      if (o.isCancelled()) {
+        getLogger().debug("Not writing cancelled op.");
+        Operation cancelledOp = removeCurrentWriteOp();
+        assert o == cancelledOp;
+      } else {
+        o.writing();
+        return o;
+      }
+      o = getCurrentWriteOp();
+    }
+    return o;
   }
 
   /* (non-Javadoc)
@@ -794,7 +814,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
     for (Operation op : allOp) {
       op.setHandlingNode(this);
-      if (op.getState() == OperationState.WRITING && op.getBuffer() != null) {
+      if ((op.getState() == OperationState.WRITE_QUEUED ||
+           op.getState() == OperationState.WRITING) && op.getBuffer() != null) {
         op.getBuffer().reset(); // buffer offset reset
       } else {
         op.initialize(); // write completed or not yet initialized

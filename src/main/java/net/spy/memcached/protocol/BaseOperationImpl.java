@@ -40,7 +40,7 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
-  private OperationState state = OperationState.WRITING;
+  private OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
   private boolean cancelled = false;
   private String cancelCause = null;
@@ -108,10 +108,10 @@ public abstract class BaseOperationImpl extends SpyObject {
   /* ENABLE_REPLICATION if */
 
   /**
-   * reset operation state to WRITING
+   * reset operation state to WRITE_QUEUED
    */
   public final void resetState() {
-    transitionState(OperationState.WRITING);
+    transitionState(OperationState.WRITE_QUEUED);
   }
 
   public final void setMoved(boolean m) {
@@ -144,7 +144,8 @@ public abstract class BaseOperationImpl extends SpyObject {
     getLogger().debug("Transitioned state from %s to %s", state, newState);
     state = newState;
     // Discard our buffer when we no longer need it.
-    if (state != OperationState.WRITING) {
+    if (state != OperationState.WRITE_QUEUED &&
+        state != OperationState.WRITING) {
       cmd = null;
     }
     if (state == OperationState.COMPLETE) {
@@ -154,6 +155,10 @@ public abstract class BaseOperationImpl extends SpyObject {
       /* ENABLE_REPLICATION end */
       callback.complete();
     }
+  }
+
+  public final void writing() {
+    transitionState(OperationState.WRITING);
   }
 
   public final void writeComplete() {
