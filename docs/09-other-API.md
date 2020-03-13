@@ -2,7 +2,7 @@
 
 본 절에서는 아래의 나머지 API들을 설명한다.
 
-- [Flush](08-other-API.md#flush)
+- [Flush](09-other-API.md#flush)
 
 ### Flush
 
