@@ -1,4 +1,4 @@
-## Arcus Java Client
+﻿## Arcus Java Client
 
 - [Arcus Client 기본 사용법](02-arcus-java-client.md#arcus-client-%EA%B8%B0%EB%B3%B8-%EC%82%AC%EC%9A%A9%EB%B2%95) 
 - [Arcus Client 생성, 소멸, 관리](02-arcus-java-client.md#arcus-client-%EC%83%9D%EC%84%B1-%EC%86%8C%EB%A9%B8-%EA%B4%80%EB%A6%AC) 
@@ -22,47 +22,47 @@ import net.spy.memcached.ConnectionFactoryBuilder;
 
 public class HelloArcus { 
 
-	private static final String ARCUS_ADMIN = "10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181"; 
-	private static final String SERVICE_CODE = "test"; 
-	private final ArcusClient arcusClient; 
+    private static final String ARCUS_ADMIN = "10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181"; 
+    private static final String SERVICE_CODE = "test"; 
+    private final ArcusClient arcusClient; 
 
-	public static void main(String[] args) { 
-		HelloArcus hello = new HelloArcus(); 
-		System.out.printf("hello.setTest() result=%b", hello.setTest()); 
-		hello.closeArcusConnection(); 
-	} 
+    public static void main(String[] args) { 
+        HelloArcus hello = new HelloArcus(); 
+        System.out.printf("hello.setTest() result=%b", hello.setTest()); 
+        hello.closeArcusConnection(); 
+    } 
 
-	public HelloArcus() { 
-		arcusClient = ArcusClient.createArcusClient(ARCUS_ADMIN, SERVICE_CODE, 
-				new ConnectionFactoryBuilder()); // (1) 
-	} 
+    public HelloArcus() { 
+        arcusClient = ArcusClient.createArcusClient(ARCUS_ADMIN, SERVICE_CODE, 
+                new ConnectionFactoryBuilder()); // (1) 
+    } 
 
-	public boolean setTest() { 
-		Future<Boolean> future = null; 
-		try { 
-			future = arcusClient.set("sample:testKey", 10, "testValue"); // (2) 
-		} catch (IllegalStateException e) { 
-			// client operation queue 문제로 요청이 등록되지 않았을 때 예외처리. 
-		} 
+    public boolean setTest() { 
+        Future<Boolean> future = null; 
+        try { 
+            future = arcusClient.set("sample:testKey", 10, "testValue"); // (2) 
+        } catch (IllegalStateException e) { 
+            // client operation queue 문제로 요청이 등록되지 않았을 때 예외처리. 
+        } 
 
-		if (future == null) return false; 
+        if (future == null) return false; 
 
-		try { 
-			return future.get(500L, TimeUnit.MILLISECONDS); // (3) 
-		} catch (TimeoutException te) { // (4) 
-			future.cancel(true); 
-		} catch (ExecutionException re) { // (5) 
-			future.cancel(true); 
-		} catch (InterruptedException ie) { // (6) 
-			future.cancel(true); 
-		} 
+        try { 
+            return future.get(500L, TimeUnit.MILLISECONDS); // (3) 
+        } catch (TimeoutException te) { // (4) 
+            future.cancel(true); 
+        } catch (ExecutionException re) { // (5) 
+            future.cancel(true); 
+        } catch (InterruptedException ie) { // (6) 
+            future.cancel(true); 
+        } 
 
-		return false; 
-	} 
+        return false; 
+    } 
 
-	public void closeArcusConnection() { 
-		arcusClient.shutdown(); // (7) 
-	} 
+    public void closeArcusConnection() { 
+        arcusClient.shutdown(); // (7) 
+    } 
 } 
 ```
 
@@ -244,126 +244,172 @@ ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 
 ##### Logger 설정
 
-Arcus client 사용 시에 ArcusClient 자체 logger(DefaultLogger), log4j, slf4j, JDK logger 등
-4가지 종류의 Logger를 사용할 수 있다.
+Arcus client 사용 시에 default(DefaultLogger), log4j(Log4JLogger), slf4j(SLF4JLogger), jdk(SunLogger) 등 4가지 종류의 Logger를 사용할 수 있다.
 사용할 logger를 지정하지 않으면 ArcusClient는 DefaultLogger를 기본으로 사용하며,
 DefaultLogger는 INFO level 이상의 로그를 stderr (System.err) 로 출력한다. (변경 불가)
 
-log4j를 사용하여 ArcusClient 로그를 관리하려면, 아래 옵션을 WAS나 자바 프로세스 옵션에 추가하여
-JVM 구동시 System property를 지정한다. (log4j 라이브러리가 클래스 패스에 있어야 오류가 발생하지 않는다.)
+log4j를 사용하여 ArcusClient 로그를 관리하려면, 아래 옵션을 WAS나 자바 프로세스 옵션에 추가하여 JVM 구동시 System property를 지정한다. 
+
 ```
 -Dnet.spy.log.LoggerImpl=net.spy.memcached.compat.log.Log4JLogger
 ```
+
 또는, 소스 코드에서 ArcusClient / ArcusClientPool을 사용하기 전에 직접 System property를 설정하여 사용할 수 있다. (programmatic configuration)
 
 ```java
-System.setProperty(“net.spy.log.LoggerImpl”, “net.spy.memcached.compat.log.Log4JLogger”);
+System.setProperty("net.spy.log.LoggerImpl", "net.spy.memcached.compat.log.Log4JLogger");
 ...
 ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
 ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 ```
+
 Arcus Java client에서는 Log를 기록할 때 Class의 이름(```clazz.getName()```)을 기준으로 Logger를 구분하여 사용하며,
 class의 이름과 정확히 일치하는 로거가 없다면 logger tree 상의 상위 logger 를 사용한다.
 
 아래의 예제는 ```root``` logger 의 level을 ```WARN```으로 설정하여 WARN level 이상의 로그는 항상 기록하고, ```net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl``` class의 로그만 DEBUG level 이상의 로그를 기록하도록 한 예제이다.
 ```xml
-<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
-  <level value="DEBUG" />
-  <appender-ref ref="console" />
-</logger>
-<root>
-  <level value="WARN" />
-  <appender-ref ref="console" />
-</root>
+<Root level="WARN">
+    <AppenderRef ref="console" />
+</Root>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false" level="DEBUG">
+    <AppenderRef ref="console" />
+</Logger>
 ```
 Application을 디버깅해야 할 때 Arcus client에서 Arcus server로 전송하는 ascii protocol 문자열이 궁금할 때가 있다. Arcus Java Client에서 Arcus server로 전송하는 protocol을 로그로 살펴보려면 아래와 같이 logger를 설정하면 된다.
 예제에 나열된 logger를 모두 설정하면 요청(get, set 등..)별로 모든 로그가 남게 되니 필요한 요청에 해당하는 logger만 설정하면 편리하다.
 Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](https://github.com/naver/arcus-memcached/blob/master/doc/arcus-ascii-protocol.md) 문서를 참고하기 바란다.
 ```xml
 <!-- collection update -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
-  <level value="DEBUG" />
-  <appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection piped exist -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionPipedExistOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionPipedExistOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- set attributes -->
-<logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection insert -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection get -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection upsert -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection update -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 
 <!-- collection count -->
-<logger name="net.spy.memcached.protocol.ascii.CollectionCountOperationImpl" additivity="false">
-<level value="DEBUG" />
-<appender-ref ref="console" />
-</logger>
+<Logger name="net.spy.memcached.protocol.ascii.CollectionCountOperationImpl" level="DEBUG" additivity="false">
+    <AppenderRef ref="console" />
+</Logger>
 ```
 
-기타 log4j의 자세한 설정 방법은 [log4j 설정 방법](http://logging.apache.org/log4j/1.2/manual.html)을 확인하기 바란다. 
+기타 log4j의 자세한 설정 방법은 [log4j 설정 방법](http://logging.apache.org/log4j/2.x/manual/configuration.html)을 확인하기 바란다. 
+
+##### Log4JLogger 사용시 유의사항
+
+log4j 1.2 이하 버전에서 보안 취약점이 존재하여, Arcus client의 1.11.5 버전부터 Log4JLogger를 사용하려면 log4j2 라이브러리가 요구된다. 이를 위해 응용 의존성에 아래와 같이 log4j2 라이브러리를 추가한다.
+
+```xml
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>2.8.2</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-api</artifactId>
+    <version>2.8.2</version>
+</dependency>
+```
+
+만약 아래와 같은 예외가 발생되면, log4j2 라이브러리가 클래스패스에 존재하지 않은 것이다. log4j2 라이브러리가 응용 의존성에 제대로 추가가 됐는지 확인하도록 한다.
+
+```
+Warning:  net.spy.memcached.compat.log.Log4JLogger not found while initializing net.spy.compat.log.LoggerFactory
+java.lang.NoClassDefFoundError: org/apache/logging/log4j/spi/ExtendedLogger
+    at java.base/java.lang.Class.forName0(Native Method)
+    at java.base/java.lang.Class.forName(Class.java:315)
+    at net.spy.memcached.compat.log.LoggerFactory.getConstructor(LoggerFactory.java:134)
+    at net.spy.memcached.compat.log.LoggerFactory.getNewInstance(LoggerFactory.java:119)
+    at net.spy.memcached.compat.log.LoggerFactory.internalGetLogger(LoggerFactory.java:100)
+    at net.spy.memcached.compat.log.LoggerFactory.getLogger(LoggerFactory.java:89)
+    at net.spy.memcached.ArcusClient.<clinit>(ArcusClient.java:183)
+    at Main.main(Main.java:10)
+  ```
 
 ##### SLF4JLogger 사용시 유의 사항
 
-slf4j와 호환되는 log4j 이외의 라이브러리(logback, log4j2, ...)를 쓸 경우, net.spy.memcached.compat.log.SLF4JLogger 클래스를 사용할 것이다. 이 클래스를 사용하기 전에 필수적으로 해야 하는 작업이 있다. (SLF4JLogger와 log4j를 조합해서 사용한다면 하지 않아도 된다.)
-
-ArcusClient는 기본적으로 Zookeeper에 의해서 slf4j의 구현 라이브러리인 slf4j-log4j12를 기본 dependency로 가진다. 따라서 log4j 이외의 라이브러리를 SLF4JLogger와 조합해서 사용하려면 ArcusClient dependency의 exclusion에 slf4j-log4j12를 추가해야 한다. 
-
-예를 들어 ArcusClient 사용자가 SLF4JLogger와 logback을 조합해서 사용할 경우 dependency 설정을 다음과 같이 해야 한다.
+slf4j를 사용하는 경우, Arcus client의 SLF4JLogger 클래스를 사용할 것이다. 이 클래스를 사용하려면 slf4j를 구현한 로깅 라이브러리가 응용 의존성에 추가되어야 한다. 만약 추가하지 않을 경우 아래의 예외 메시지가 발생한다.
 
 ```
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+```
+
+log4j, logback과 같은 대표적인 자바의 로그 라이브러리들은 slf4j api를 구현한 구현 라이브러리를 제공하고 있다. 해당 라이브러리를 사용할 경우 아래와 같이 응용 의존성에 추가하도록 한다. 자세한 내용은 [slf4j](http://www.slf4j.org/manual.html#swapping) 문서를 참고한다. 
+
+```xml
+<!-- slf4j + log4j 사용시 -->
 <dependency>
     <groupId>com.navercorp.arcus</groupId>
     <artifactId>arcus-java-client</artifactId>
     <version>${arcus-java-client.version}</version>
-    <exclusions>
-        <exclusion>
-             <groupId>org.slf4j</groupId>
-             <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-    </exclusions>
 </dependency>
 <dependency>
-	<groupId>ch.qos.logback</groupId>
-	<artifactId>logback-classic</artifactId>
-	<version>${logback.version}</version>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>${log4j.version}</version>
 </dependency>
 <dependency>
-	<groupId>ch.qos.logback</groupId>
-	<artifactId>logback-core</artifactId>
-	<version>${logback.version}</version>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-api</artifactId>
+    <version>${log4j.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j-impl</artifactId>
+    <version>${log4j.version}</version>
 </dependency>
 ```
 
-2개 이상의 slf4j의 구현 라이브러리(logback-classic, slf4j-log4j12, ...)들이 같은 classpath에 존재할 경우, SLF4J에서 [multiple binding error](http://www.slf4j.org/codes.html#multiple_bindings)가 발생하므로 반드시 exclusion 키워드를 이용해 slf4j 구현 라이브러리가 하나만 존재하도록 하여야 한다.
+```xml
+<!-- slf4j + logback 사용시 -->
+<dependency>
+    <groupId>com.navercorp.arcus</groupId>
+    <artifactId>arcus-java-client</artifactId>
+    <version>${arcus-java-client.version}</version>
+</dependency>
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>${logback.version}</version>
+</dependency>
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-core</artifactId>
+    <version>${logback.version}</version>
+</dependency>
+```
+
+또한 2개 이상의 slf4j의 구현 라이브러리(log4j-slf4j-impl, logback-classic, ...)들이 같은 클래스패스에 존재할 경우, SLF4J에서 [multiple binding error](http://www.slf4j.org/codes.html#multiple_bindings)가 발생하므로 반드시 exclusion 키워드를 이용해 slf4j 구현 라이브러리가 하나만 존재하도록 하여야 한다.
 
 ```
 SLF4J: Class path contains multiple SLF4J bindings.
