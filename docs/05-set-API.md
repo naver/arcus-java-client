@@ -5,7 +5,7 @@ Set item은 하나의 key에 대해 unique value의 집합을 저장한다.
 
 **제약 조건**
 - 저장 가능한 최대 element 개수 : 디폴트 4,000개 (attribute 설정으로 최대 50,000개 확장 가능)
-- 각 element에서 value 최대 크기 : 4KB
+- 각 element에서 value 최대 크기 : 16KB
 - Element 값의 중복을 허용하지 않는다.
 
 Set item에 수행가능한 기본 연산들은 다음과 같다.

@@ -29,14 +29,16 @@ public class CollectionTranscoder extends SerializingTranscoder implements
 
   /**
    * Maximum element size allowed by memcached collections.
+   * The cache server's default setting of max_element_bytes is 16KB
+   * and it can be changed up to 32KB
    */
-  public static final int MAX_SIZE = 4 * 1024;
+  public static final int MAX_ELEMENT_BYTES = 32 * 1024;
 
   /**
    * Get a serializing transcoder with the default max data size.
    */
   public CollectionTranscoder() {
-    this(MAX_SIZE);
+    this(MAX_ELEMENT_BYTES);
   }
 
   /**

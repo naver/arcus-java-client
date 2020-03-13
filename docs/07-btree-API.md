@@ -4,7 +4,7 @@ B+tree item은 하나의 key에 대해 b+tree 구조 기반으로 b+tree key(bke
 
 **제약 조건**
 - 저장 가능한 최대 element 개수 : 디폴트 4,000개 (attribute 설정으로 최대 50,000개 확장 가능)
-- 각 element에서 value 최대 크기 : 4KB
+- 각 element에서 value 최대 크기 : 16KB
 - 하나의 b+tree 내에서 모든 element는 동일한 bkey 유형을 가져야 한다.
   즉, long bkey 유형과 byte array bkey 유형이 혼재할 수 없다.
 
