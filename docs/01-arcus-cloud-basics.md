@@ -11,7 +11,7 @@ Arcus cache server의 key-value 모델은 아래의 기본 제약 사항을 가�
   - Value의 최대 크기는 1MB이다.
 - Collection 제약 사항
   - 하나의 collection이 가지는 최대 element 개수는 50,000개이다.
-  - Collection element가 저장하는 value의 최대 크기는 4KB이다.
+  - Collection element가 저장하는 value의 최대 크기는 16KB이다.
 
 아래에서 Arcus cloud를 이해하는 데 있어 기본 사항들을 기술한다.
 

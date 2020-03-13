@@ -5,7 +5,7 @@ List collection은 하나의 key에 대해 여러 value들을 double linked list
 
 **제약 조건**
 - 저장 가능한 최대 element 개수 : 디폴트 4,000개 (attribute 설정으로 최대 50,000개 확장 가능)
-- 각 element에서 value 최대 크기 : 4KB
+- 각 element에서 value 최대 크기 : 16KB
 - List의 앞, 뒤에서 element를 삽입/삭제하기를 권한다. 임의의 index 위치에서 element 삽입/삭제가 가능하지만,
   임의의 index 위치를 신속히 찾아가기 위한 자료구조가 현재 없는 상태라서 비용이 많이 든다.
 
