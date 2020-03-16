@@ -1,3 +1,25 @@
+2020-03-16 [version 1.12.0]
+	* [FEATURE] change max element bytes
+	* [FIX] ConcurrentModificationException in foreach loop of
+	        SelectionKey in handleIO
+	* [FIX] May produce NullPointerException when checking
+	        the operation has been canceled
+	* [ENHANCE] Skip the cancelled operation has not been
+	            written to buffer
+	* [CLEANUP] convert log4j configuration file format from
+	            properties to xml
+	* [CLEANUP] convert tab to space in pom.xml
+	* [CLEANUP] remove readQ overflow
+	* [CLEANUP] refactor version operation handling
+	* [CLEANUP] edit getMaxReconnectDelay method comment
+	* [TEST] fix travis failed test case when USE_ZK is true
+	* [TEST] ignore ConsistentHashingTest
+	* [DOC] fix broken link of flush in other API
+	* [DOC] update description of logging
+	* [DOC] remove bold on link in btree API
+	* [OTHER] upgrade log4j version for security vulnerabilities
+	* [OTHER] upgrade zookeeper version 3.4.5=>3.4.14
+
 2019-06-05 [version 1.11.5]
 	* [FIX] asyncBopIncr,asyncBopDecr command initial range problem
 	* [CLEANUP] remove TIMEDOUT state of operation
