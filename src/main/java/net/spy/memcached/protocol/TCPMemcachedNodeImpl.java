@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2020 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +39,6 @@ import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
-import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -813,18 +813,22 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
     for (Operation op : allOp) {
-      op.setHandlingNode(this);
-      if ((op.getState() == OperationState.WRITE_QUEUED ||
-           op.getState() == OperationState.WRITING) && op.getBuffer() != null) {
-        op.getBuffer().reset(); // buffer offset reset
+      if (inputQueue.remainingCapacity() == 0) {
+        op.cancel("by moving operations");
       } else {
-        op.initialize(); // write completed or not yet initialized
-        op.resetState(); // reset operation state
+        op.setHandlingNode(this);
+        if ((op.getState() == OperationState.WRITE_QUEUED ||
+             op.getState() == OperationState.WRITING) && op.getBuffer() != null) {
+          op.getBuffer().reset(); // buffer offset reset
+        } else {
+          op.initialize(); // write completed or not yet initialized
+          op.resetState(); // reset operation state
+        }
+        op.setMoved(true);
       }
-      op.setMoved(true);
+      addOpCount++;
+      inputQueue.offer(op);
     }
-    addOpCount += allOp.size();
-    allOp.drainTo(inputQueue);
   }
 
   public int moveOperations(final MemcachedNode toNode) {
