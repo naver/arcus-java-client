@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2020 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +71,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
   protected int spaceCount = 0;
+  protected int elementCount = 0;
 
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);
@@ -83,7 +85,9 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
     if (line.startsWith("VALUE ")) {
       readKey(line);
-      setReadType(OperationReadType.DATA);
+      if (elementCount > 0) {
+        setReadType(OperationReadType.DATA);
+      }
     } else {
       OperationStatus status = matchStatus(line, END);
 
@@ -91,17 +95,22 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       getCallback().receivedStatus(status);
 
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 
   @Override
   public final void handleRead(ByteBuffer bb) {
     readValue(bb);
+    if (elementCount == 0) {
+      setReadType(OperationReadType.LINE);
+    }
   }
 
   private final void readKey(String line) {
-    // protocol : VALUE key OK flag count
+    /*
+     * VALUE <key> <status> [<flags> <ecount>]
+     * flags and ecount exist when status is "OK"
+     */
     String[] chunk = line.split(" ");
 
     OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
@@ -109,9 +118,10 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
             UNREADABLE);
 
     getBulk.decodeKeyHeader(line);
+    elementCount = (chunk.length > 3) ? Integer.parseInt(chunk[4]) : 0;
 
     BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
-    cb.gotKey(chunk[1], (chunk.length > 3) ? Integer.valueOf(chunk[4]) : -1, status);
+    cb.gotKey(chunk[1], elementCount, status);
   }
 
   private final void readValue(ByteBuffer bb) {
@@ -142,28 +152,6 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
           }
         }
 
-        // Ready to finish.
-        if (b == '\r') {
-          continue;
-        }
-
-        // Finish the operation.
-        if (b == '\n') {
-          String line = byteBuffer.toString();
-
-          if (line.startsWith("VALUE")) {
-            readKey(line);
-            byteBuffer.reset();
-            spaceCount = 0;
-            continue;
-          } else {
-            OperationStatus status = matchStatus(line, END);
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
-            data = null;
-            break;
-          }
-        }
         byteBuffer.write(b);
       }
       return;
@@ -219,6 +207,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       if (lookingFor == '\0') {
         data = null;
         readOffset = 0;
+        elementCount--;
       }
     }
   }
