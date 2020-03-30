@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2020 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +20,6 @@ package net.spy.memcached;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.internal.BasicThreadFactory;
-import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
@@ -56,14 +56,11 @@ class BulkService extends SpyObject {
   <T> Future<Map<String, CollectionOperationStatus>> setBulk(
           List<String> keys, int exp, T value, Transcoder<T> transcoder,
           ArcusClient[] client) {
-    if (keys == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    }
     assert !executor.isShutdown() : "Pool has already shut down.";
     BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
             client, singleOpTimeout);
-    BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
-            w);
+    BulkService.Task<Map<String, CollectionOperationStatus>> task =
+            new BulkService.Task<Map<String, CollectionOperationStatus>>(w);
     executor.submit(task);
     return task;
   }
@@ -71,14 +68,11 @@ class BulkService extends SpyObject {
   <T> Future<Map<String, CollectionOperationStatus>> setBulk(
           Map<String, T> o, int exp, Transcoder<T> transcoder,
           ArcusClient[] client) {
-    if (o == null) {
-      throw new IllegalArgumentException("Map is null.");
-    }
     assert !executor.isShutdown() : "Pool has already shut down.";
     BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder, client,
             singleOpTimeout);
-    BulkService.Task<Map<String, CollectionOperationStatus>> task = new BulkService.Task<Map<String, CollectionOperationStatus>>(
-            w);
+    BulkService.Task<Map<String, CollectionOperationStatus>> task =
+            new BulkService.Task<Map<String, CollectionOperationStatus>>(w);
     executor.submit(task);
     return task;
   }
@@ -93,11 +87,11 @@ class BulkService extends SpyObject {
   }
 
   private static class Task<T> extends FutureTask<T> {
-    private final BulkWorker worker;
+    private final BulkWorker<T> worker;
 
     public Task(Callable<T> callable) {
       super(callable);
-      this.worker = (BulkWorker) callable;
+      this.worker = (BulkWorker<T>) callable;
     }
 
     @Override
@@ -110,30 +104,22 @@ class BulkService extends SpyObject {
    * Bulk operation worker
    */
   private abstract static class BulkWorker<T> extends SpyObject implements
-          Callable<Map<String, CollectionOperationStatus>> {
+          Callable<T> {
 
     protected final ArcusClient[] clientList;
     protected final ArrayList<Future<Boolean>> future;
     protected final long operationTimeout;
     protected final AtomicBoolean isRunnable = new AtomicBoolean(true);
-    protected final Map<String, CollectionOperationStatus> errorList;
+    protected T errorList = null;
 
-    protected final int totalCount;
-    protected final int fromIndex;
-    protected final int toIndex;
+    protected final int keyCount;
 
     public BulkWorker(Collection keys, long timeout, ArcusClient[] clientList) {
-      if (keys.size() < 1) {
-        throw new IllegalArgumentException("Keys size must be greater than 0");
-      }
       this.future = new ArrayList<Future<Boolean>>(keys.size());
       this.operationTimeout = timeout;
-      this.clientList = getOptimalClients(clientList);
-      this.errorList = new HashMap<String, CollectionOperationStatus>();
+      this.clientList = clientList;
 
-      fromIndex = 0;
-      toIndex = keys.size() - 1;
-      totalCount = toIndex - fromIndex + 1;
+      keyCount = keys.size();
     }
 
     public boolean cancel() {
@@ -158,37 +144,22 @@ class BulkService extends SpyObject {
           getLogger().debug("Cancel the future. " + f);
         }
       }
-      getLogger().info("Cancel, bulk set worker.");
       return ret;
-    }
-
-    private ArcusClient[] getOptimalClients(ArcusClient[] clientList) {
-      return clientList;
     }
 
     protected boolean isRunnable() {
       return isRunnable.get() && !Thread.currentThread().isInterrupted();
     }
 
-    protected void setErrorOpStatus(String key, int indexOfFuture) {
-      errorList.put(key,
-              ((CollectionFuture<Boolean>) future.get(indexOfFuture))
-                      .getOperationStatus());
-    }
+    protected abstract Future<Boolean> processItem(int index);
 
-    public abstract Future<Boolean> processItem(int index);
+    protected abstract void awaitProcessResult(int index);
 
-    public abstract void awaitProcessResult(int index);
+    public T call() throws Exception {
+      int numActiveOperations = 0;
+      int posResponseReceived = 0;
 
-    public Map<String, CollectionOperationStatus> call() throws Exception {
-      for (int pos = fromIndex; isRunnable() && pos <= toIndex; pos++) {
-        if ((pos - fromIndex) > 0
-                && (pos - fromIndex) % DEFAULT_LOOP_LIMIT == 0) {
-          for (int i = pos - DEFAULT_LOOP_LIMIT; isRunnable()
-                  && i < pos; i++) {
-            awaitProcessResult(i);
-          }
-        }
+      for (int pos = 0; isRunnable() && pos < keyCount; pos++) {
         try {
           if (isRunnable()) {
             future.add(pos, processItem(pos));
@@ -200,12 +171,19 @@ class BulkService extends SpyObject {
             throw e;
           }
         }
+        numActiveOperations++;
+
+        if (numActiveOperations >= DEFAULT_LOOP_LIMIT) {
+          awaitProcessResult(posResponseReceived);
+          posResponseReceived++;
+          numActiveOperations--;
+        }
       }
-      for (int i = toIndex
-              - (totalCount % DEFAULT_LOOP_LIMIT == 0 ? DEFAULT_LOOP_LIMIT
-              : totalCount % DEFAULT_LOOP_LIMIT) + 1; isRunnable()
-                   && i <= toIndex; i++) {
-        awaitProcessResult(i);
+
+      while (numActiveOperations > 0) {
+        awaitProcessResult(posResponseReceived);
+        posResponseReceived++;
+        numActiveOperations--;
       }
       return errorList;
     }
@@ -214,7 +192,7 @@ class BulkService extends SpyObject {
   /**
    * Bulk set operation worker
    */
-  private static class BulkSetWorker<T> extends BulkWorker<T> {
+  private static class BulkSetWorker<T> extends BulkWorker<Map<String, CollectionOperationStatus>> {
     private final List<String> keys;
     private final int exp;
     private final int cntCos;
@@ -229,6 +207,7 @@ class BulkService extends SpyObject {
       this.cos = new ArrayList<CachedData>();
       this.cos.add(transcoder.encode(value));
       this.cntCos = 1;
+      this.errorList = new HashMap<String, CollectionOperationStatus>();
     }
 
     public BulkSetWorker(Map<String, T> o, int exp,
@@ -244,6 +223,7 @@ class BulkService extends SpyObject {
         this.cos.add(transcoder.encode(o.get(key)));
       }
       this.cntCos = this.cos.size();
+      this.errorList = new HashMap<String, CollectionOperationStatus>();
     }
 
     @Override
