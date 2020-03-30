@@ -22,11 +22,12 @@ import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeStore;
+import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionStore;
 import net.spy.memcached.collection.ListStore;
-import net.spy.memcached.collection.SetStore;
 import net.spy.memcached.collection.MapStore;
+import net.spy.memcached.collection.SetStore;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionStoreOperation;
@@ -50,6 +51,8 @@ public class CollectionStoreOperationImpl extends OperationImpl
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
   private static final OperationStatus STORED = new CollectionOperationStatus(
           true, "STORED", CollectionResponse.STORED);
+  private static final OperationStatus REPLACED = new CollectionOperationStatus(
+          true, "REPLACED", CollectionResponse.REPLACED);
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
           false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
   private static final OperationStatus ELEMENT_EXISTS = new CollectionOperationStatus(
@@ -83,6 +86,8 @@ public class CollectionStoreOperationImpl extends OperationImpl
       setAPIType(APIType.MOP_INSERT);
     else if (this.collectionStore instanceof BTreeStore)
       setAPIType(APIType.BOP_INSERT);
+    else if (this.collectionStore instanceof BTreeUpsert)
+      setAPIType(APIType.BOP_UPSERT);
     setOperationType(OperationType.WRITE);
   }
 
@@ -98,8 +103,9 @@ public class CollectionStoreOperationImpl extends OperationImpl
 
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(
-            matchStatus(line, STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS,
-                    OVERFLOWED, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH));
+            matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
+                    ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+                    TYPE_MISMATCH, BKEY_MISMATCH));
     transitionState(OperationState.COMPLETE);
   }
 

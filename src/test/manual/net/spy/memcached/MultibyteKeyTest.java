@@ -214,21 +214,6 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionUpsertOperationImplTest() {
-    try {
-      opFact.collectionUpsert(MULTIBYTE_KEY, "",
-              new CollectionStore<Integer>() {
-                @Override
-                public String getCommand() {
-                  return "CollectionStoreCommand";
-                }
-              }, testData, genericCallback).initialize();
-    } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
-    }
-  }
-
-  @Test
   public void MutatorOperationImplTest() {
     try {
       opFact.mutate(Mutator.incr, MULTIBYTE_KEY, 1, 1L, 0, genericCallback).initialize();

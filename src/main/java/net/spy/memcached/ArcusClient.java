@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -2756,7 +2755,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUpsert<Object> bTreeStore = new BTreeUpsert<Object>(value,
             elementFlag, (attributesForCreate != null), null, attributesForCreate);
 
-    return asyncCollectionUpsert(key, String.valueOf(bkey), bTreeStore,
+    return asyncCollectionStore(key, String.valueOf(bkey), bTreeStore,
             collectionTranscoder);
   }
 
@@ -2772,51 +2771,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUpsert<T> bTreeStore = new BTreeUpsert<T>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
 
-    return asyncCollectionUpsert(key, String.valueOf(bkey), bTreeStore, tc);
-  }
-
-  private <T> CollectionFuture<Boolean> asyncCollectionUpsert(
-          final String key, final String subkey,
-          final CollectionStore<T> collectionStore, Transcoder<T> tc) {
-
-    CachedData co = tc.encode(collectionStore.getValue());
-    collectionStore.setFlags(co.getFlags());
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
-            latch, operationTimeout);
-    Operation op = opFact.collectionUpsert(key, subkey, collectionStore,
-            co.getData(), new OperationCallback() {
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Insertion to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionStore.getClass()
-                                  .getName() + ", key=" + key
-                                  + ", subkey=" + subkey + ", value="
-                                  + collectionStore.getValue() + ")");
-                }
-              }
-
-              public void complete() {
-                latch.countDown();
-              }
-            });
-    rv.setOperation(op);
-    addOp(key, op);
-    return rv;
+    return asyncCollectionStore(key, String.valueOf(bkey), bTreeStore, tc);
   }
 
   /*
@@ -3764,7 +3719,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   CollectionAttributes attributesForCreate) {
     BTreeUpsert<Object> bTreeStore = new BTreeUpsert<Object>(value,
             elementFlag, (attributesForCreate != null), null, attributesForCreate);
-    return asyncCollectionUpsert(key, BTreeUtil.toHex(bkey), bTreeStore,
+    return asyncCollectionStore(key, BTreeUtil.toHex(bkey), bTreeStore,
             collectionTranscoder);
   }
 
@@ -3778,7 +3733,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate, Transcoder<T> tc) {
     BTreeUpsert<T> bTreeStore = new BTreeUpsert<T>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
-    return asyncCollectionUpsert(key, BTreeUtil.toHex(bkey), bTreeStore,
+    return asyncCollectionStore(key, BTreeUtil.toHex(bkey), bTreeStore,
             tc);
   }
 

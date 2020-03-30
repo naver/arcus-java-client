@@ -253,9 +253,6 @@ public class HelloArcus {
         <Logger name="net.spy.memcached.protocol.ascii.SetAttrOperationImpl" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" level="DEBUG" additivity="false">
-            <AppenderRef ref="console" />
-        </Logger>
         <Logger name="net.spy.memcached.protocol.ascii.StoreOperationImpl" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>

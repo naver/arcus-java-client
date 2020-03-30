@@ -304,11 +304,6 @@ Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](
     <AppenderRef ref="console" />
 </Logger>
 
-<!-- collection upsert -->
-<Logger name="net.spy.memcached.protocol.ascii.CollectionUpsertOperationImpl" level="DEBUG" additivity="false">
-    <AppenderRef ref="console" />
-</Logger>
-
 <!-- collection update -->
 <Logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" level="DEBUG" additivity="false">
     <AppenderRef ref="console" />

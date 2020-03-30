@@ -63,7 +63,6 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
-import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -232,14 +231,6 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
                                              BTreeSortMergeGetOperation.Callback cb) {
     return new BTreeSortMergeGetOperationImpl(smGet, cb);
-  }
-
-  @Override
-  public CollectionUpsertOperation collectionUpsert(String key, String subkey,
-                                                    CollectionStore<?> collectionStore, byte[] data,
-                                                    OperationCallback cb) {
-    return new CollectionUpsertOperationImpl(key, subkey, collectionStore,
-            data, cb);
   }
 
   @Override
