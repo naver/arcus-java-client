@@ -14,13 +14,12 @@ public enum OperationType {
    * DeleteOperationImpl (delete)
    * CASOperationImpl (asyncCAS, cas)
    * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
-   * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert)
+   * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert / asyncBopUpsert)
    * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
    * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
    * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
    * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
    * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
-   * CollectionUpsertOperationImpl (asyncBopUpsert)
    * CollectionUpdateOperationImpl (asyncBopUpdate)
    * CollectionMutateOperationImpl (asyncBopIncr / asyncBopDecr)
    * BtreeStoreAndGetOpeartionImpl (asynBopInsertAndGetTrimmed)
@@ -106,11 +105,9 @@ public enum OperationType {
        │   ├── CollectionPipedUpdateOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionPipedUpdateOperationImpl.java-extends[OperationImpl]-implements[CollectionPipedUpdateOperation]
        │   ├── CollectionStoreOperation.java-Interface-extends[KeyedOperation]
-       │   │   ├── CollectionStoreOperationImpl.java-extends[OperationImpl]-implements[CollectionStoreOperation]
-       │   │   └── CollectionUpsertOperationImpl.java-extends[OpeartionImpl]-implements[CollectionStoreOperation]
+       │   │   └── CollectionStoreOperationImpl.java-extends[OperationImpl]-implements[CollectionStoreOperation]
        │   ├── CollectionUpdateOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionUpdateOperationImpl.java-extends[OperationImpl]-implements[OperationUpdateOperation]
-       │   ├── CollectionUpsertOperation.java-Interface-extends[KeyedOperation]
        │   ├── ConcatenationOperation.java-Interface-extends[KeyedOperation]
        │   │   └── ConcatenationOperationImpl.java-extends[BaseStoreOperationImpl]-implements[ConcatenationOperation]
        │   ├── DeleteOperation.java-Interface-extends[KeyedOperation]

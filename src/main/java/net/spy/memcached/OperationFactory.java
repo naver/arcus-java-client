@@ -61,7 +61,6 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
-import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -389,19 +388,6 @@ public interface OperationFactory {
    * @return a new BTreeSortMergeGetOperation
    */
   BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet, BTreeSortMergeGetOperation.Callback cb);
-
-  /**
-   * Upsert(Update or Insert) operation for collection items (b+tree items).
-   *
-   * @param key             collection item's key
-   * @param subkey          element key (b+tree bkey)
-   * @param collectionStore operation parameters (value, eflag, and so on)
-   * @param data            the serialized value
-   * @param cb              the status callback
-   * @return a new CollectionStoreOperation
-   */
-  CollectionUpsertOperation collectionUpsert(String key, String subkey,
-                                             CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
 
   /**
    * Update operation for collection items.

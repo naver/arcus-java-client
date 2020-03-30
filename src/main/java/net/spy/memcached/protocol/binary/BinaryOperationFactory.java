@@ -63,7 +63,6 @@ import net.spy.memcached.ops.CollectionPipedStoreOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.CollectionStoreOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
-import net.spy.memcached.ops.CollectionUpsertOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.DeleteOperation;
@@ -270,14 +269,6 @@ public class BinaryOperationFactory extends BaseOperationFactory {
                                              BTreeSortMergeGetOperation.Callback cb) {
     throw new RuntimeException(
             "B+ tree sort merge get operation is not supported in binary protocol yet.");
-  }
-
-  @Override
-  public CollectionUpsertOperation collectionUpsert(String key, String subkey,
-                                                    CollectionStore<?> collectionStore, byte[] data,
-                                                    OperationCallback cb) {
-    throw new RuntimeException(
-            "B+ tree upsert operation is not supported in binary protocol yet.");
   }
 
   @Override
