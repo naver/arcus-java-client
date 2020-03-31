@@ -52,6 +52,13 @@ public interface MemcachedNode {
   Collection<Operation> destroyWriteQueue(boolean resend);
 
   /**
+   * Extract all queued items for this node destructively.
+   *
+   * This is useful for redistributing items.
+   */
+  Collection<Operation> destroyReadQueue(boolean resend);
+
+  /**
    * Clear the queue of currently processing operations by either cancelling
    * them or setting them up to be reapplied after a reconnect.
    *

@@ -528,9 +528,11 @@ public final class MemcachedConnection extends SpyObject {
       }
       String cause = "node removed.";
       if (failureMode == FailureMode.Cancel) {
+        cancelOperations(node.destroyReadQueue(false), cause);
         cancelOperations(node.destroyWriteQueue(false), cause);
         cancelOperations(node.destroyInputQueue(), cause);
       } else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
+        redistributeOperations(node.destroyReadQueue(true), cause);
         redistributeOperations(node.destroyWriteQueue(true), cause);
         redistributeOperations(node.destroyInputQueue(), cause);
       }
