@@ -25,6 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Queue;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -194,11 +195,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#destroyWriteQueue()
+   * @see net.spy.memcached.MemcachedNode#destroyQueue()
    */
-  public Collection<Operation> destroyWriteQueue(boolean resend) {
+  private Collection<Operation> destroyQueue(BlockingQueue<Operation> queue, boolean resend) {
     Collection<Operation> rv = new ArrayList<Operation>();
-    writeQ.drainTo(rv);
+    queue.drainTo(rv);
     if (resend) {
       for (Operation o : rv) {
         if ((o.getState() == OperationState.WRITE_QUEUED ||
@@ -211,6 +212,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
 
     return rv;
+  }
+
+  /* (non-Javadoc)
+   * @see net.spy.memcached.MemcachedNode#destroyWriteQueue()
+   */
+  public Collection<Operation> destroyWriteQueue(boolean resend) {
+    return destroyQueue(writeQ, resend);
+  }
+
+  /* (non-Javadoc)
+   * @see net.spy.memcached.MemcachedNode#destroyReadQueue()
+   */
+  public Collection<Operation> destroyReadQueue(boolean resend) {
+    return destroyQueue(readQ, resend);
   }
 
   /* (non-Javadoc)

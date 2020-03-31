@@ -179,6 +179,10 @@ class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  public Collection<Operation> destroyReadQueue(boolean resend) {
+    throw new UnsupportedOperationException();
+  }
+
   public void authComplete() {
     throw new UnsupportedOperationException();
   }

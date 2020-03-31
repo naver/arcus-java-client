@@ -198,6 +198,10 @@ public class MockMemcachedNode implements MemcachedNode {
     return null;
   }
 
+  public Collection<Operation> destroyReadQueue(boolean resend) {
+    return null;
+  }
+
   public void authComplete() {
     // noop
   }
