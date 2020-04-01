@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,7 +33,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
 public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
-  TreeMap<Long, MemcachedNode> ketamaNodes;
+  TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
   Collection<MemcachedNode> allNodes;
 
   HashAlgorithm hashAlg;
@@ -48,7 +50,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     super();
     allNodes = nodes;
     hashAlg = alg;
-    ketamaNodes = new TreeMap<Long, MemcachedNode>();
+    ketamaNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     config = conf;
 
     int numReps = config.getNodeRepetitions();
@@ -58,15 +60,20 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         updateHash(node, false);
       } else {
         for (int i = 0; i < numReps; i++) {
-          ketamaNodes.put(
-                  hashAlg.hash(config.getKeyForNode(node, i)), node);
+          long nodeHashKey = hashAlg.hash(config.getKeyForNode(node, i));
+          SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(nodeHashKey);
+          if (nodeSet == null) {
+            nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+            ketamaNodes.put(nodeHashKey, nodeSet);
+          }
+          nodeSet.add(node);
         }
       }
     }
     assert ketamaNodes.size() == numReps * nodes.size();
   }
 
-  private ArcusKetamaNodeLocator(TreeMap<Long, MemcachedNode> smn,
+  private ArcusKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedNode>> smn,
                                  Collection<MemcachedNode> an, HashAlgorithm alg,
                                  ArcusKetamaNodeLocatorConfiguration conf) {
     super();
@@ -113,7 +120,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         }
         */
       }
-      rv = ketamaNodes.get(hash);
+      rv = ketamaNodes.get(hash).first();
     } catch (RuntimeException e) {
       throw e;
     } finally {
@@ -127,16 +134,21 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public NodeLocator getReadonlyCopy() {
-    TreeMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
-            ketamaNodes);
+    TreeMap<Long, SortedSet<MemcachedNode>> smn =
+            new TreeMap<Long, SortedSet<MemcachedNode>>(ketamaNodes);
     Collection<MemcachedNode> an = new ArrayList<MemcachedNode>(
             allNodes.size());
 
     lock.lock();
     try {
       // Rewrite the values a copy of the map.
-      for (Map.Entry<Long, MemcachedNode> me : smn.entrySet()) {
-        me.setValue(new MemcachedNodeROImpl(me.getValue()));
+      for (Map.Entry<Long, SortedSet<MemcachedNode>> me : smn.entrySet()) {
+        SortedSet<MemcachedNode> nodeROSet =
+                new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+        for (MemcachedNode mn : me.getValue()) {
+          nodeROSet.add(new MemcachedNodeROImpl(mn));
+        }
+        me.setValue(nodeROSet);
       }
       // Copy the allNodes collection.
       for (MemcachedNode n : allNodes) {
@@ -197,10 +209,19 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
                 | ((long) (digest[1 + h * 4] & 0xFF) << 8)
                 | (digest[h * 4] & 0xFF);
 
+        SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
         if (remove) {
-          ketamaNodes.remove(k);
+          assert nodeSet != null;
+          nodeSet.remove(node);
+          if (nodeSet.size() == 0) {
+            ketamaNodes.remove(k);
+          }
         } else {
-          ketamaNodes.put(k, node);
+          if (nodeSet == null) {
+            nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+            ketamaNodes.put(k, nodeSet);
+          }
+          nodeSet.add(node);
         }
       }
     }

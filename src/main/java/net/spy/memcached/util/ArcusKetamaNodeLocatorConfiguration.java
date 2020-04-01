@@ -17,6 +17,9 @@
 package net.spy.memcached.util;
 
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedNodeROImpl;
+
+import java.util.Comparator;
 
 public class ArcusKetamaNodeLocatorConfiguration extends
         DefaultKetamaNodeLocatorConfiguration {
@@ -39,4 +42,26 @@ public class ArcusKetamaNodeLocatorConfiguration extends
     super.socketAddresses.remove(node);
   }
 
+  public class NodeNameComparator implements Comparator<MemcachedNode> {
+    /**
+     * compares lexicographically the two socket address string of MemcachedNode node1 and node2.
+     * @param node1
+     * @param node2
+     * @return return the value 0 if the node2 is equal to node1;
+     * a value less than 0 if node1 is lexicographically less than node2;
+     * and a value greater than 0 if node1 is lexicographically greater than the node2.
+     */
+    @Override
+    public int compare(MemcachedNode node1, MemcachedNode node2) {
+      if (node1 instanceof MemcachedNodeROImpl) {
+        node1 = ((MemcachedNodeROImpl)node1).getMemcachedNode();
+      }
+      if (node2 instanceof MemcachedNodeROImpl) {
+        node2 = ((MemcachedNodeROImpl)node2).getMemcachedNode();
+      }
+      String name1 = socketAddresses.get(node1);
+      String name2 = socketAddresses.get(node2);
+      return name1.compareTo(name2);
+    }
+  }
 }
