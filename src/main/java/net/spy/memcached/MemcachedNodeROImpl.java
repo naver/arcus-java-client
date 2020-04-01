@@ -29,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.ops.Operation;
 
-class MemcachedNodeROImpl implements MemcachedNode {
+public class MemcachedNodeROImpl implements MemcachedNode {
 
   private final MemcachedNode root;
 
@@ -42,6 +42,8 @@ class MemcachedNodeROImpl implements MemcachedNode {
   public String toString() {
     return root.toString();
   }
+
+  public MemcachedNode getMemcachedNode() { return root; }
 
   public void addOp(Operation op) {
     throw new UnsupportedOperationException();
