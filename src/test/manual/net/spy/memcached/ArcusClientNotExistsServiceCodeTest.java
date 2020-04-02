@@ -16,34 +16,22 @@
  */
 package net.spy.memcached;
 
+import junit.framework.TestCase;
 import org.junit.Ignore;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
 @Ignore
-public class ArcusClientNotExistsServiceCodeTest extends BaseIntegrationTest {
-
-  @Override
-  protected void setUp() throws Exception {
-    // do nothing
-  }
-
-  ;
-
-  @Override
-  protected void tearDown() throws Exception {
-    // do nothing
-  }
-
-  ;
+public class ArcusClientNotExistsServiceCodeTest extends TestCase {
 
   public void testNotExistsServiceCode() {
-    if (!USE_ZK)
+    if (!BaseIntegrationTest.USE_ZK)
       return;
 
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     try {
-      ArcusClient.createArcusClient(ZK_HOST, "NOT_EXISTS_SVC_CODE", cfb);
+      ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+              "NOT_EXISTS_SVC_CODE", cfb);
     } catch (NotExistsServiceCodeException e) {
       return;
     }

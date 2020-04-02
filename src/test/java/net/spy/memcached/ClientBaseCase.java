@@ -35,18 +35,26 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class ClientBaseCase extends TestCase {
 
-  protected static String ZK_HOST = System.getProperty("ZK_HOST",
+  public static String ZK_HOST = System.getProperty("ZK_HOST",
           "127.0.0.1:2181");
 
-  protected static String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
+  public static String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
           "test");
 
-  protected static String ARCUS_HOST = System
+  public static String ARCUS_HOST = System
           .getProperty("ARCUS_HOST",
                   "127.0.0.1:11211");
 
-  protected static boolean USE_ZK = Boolean.valueOf(System.getProperty(
+  public static boolean USE_ZK = Boolean.valueOf(System.getProperty(
           "USE_ZK", "false"));
+
+  public static Collection<String> stringify(Collection<?> c) {
+    Collection<String> rv = new ArrayList<String>();
+    for (Object o : c) {
+      rv.add(String.valueOf(o));
+    }
+    return rv;
+  }
 
   protected static boolean SHUTDOWN_AFTER_EACH_TEST = USE_ZK;
 
@@ -296,14 +304,6 @@ public abstract class ClientBaseCase extends TestCase {
 
   protected void openDirect(ConnectionFactory cf) throws Exception {
     client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
-  }
-
-  protected Collection<String> stringify(Collection<?> c) {
-    Collection<String> rv = new ArrayList<String>();
-    for (Object o : c) {
-      rv.add(String.valueOf(o));
-    }
-    return rv;
   }
 
   @Override

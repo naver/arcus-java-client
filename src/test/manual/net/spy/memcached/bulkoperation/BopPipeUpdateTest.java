@@ -50,31 +50,25 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
               1, 1}));
     }
 
-    try {
-      // long start = System.currentTimeMillis();
+    // long start = System.currentTimeMillis();
 
-      CollectionAttributes attr = new CollectionAttributes();
-      attr.setMaxCount(10000L);
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setMaxCount(10000L);
 
-      CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-              .asyncBopPipedInsertBulk(KEY, elements, attr);
+    CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+            .asyncBopPipedInsertBulk(KEY, elements, attr);
 
-      Map<Integer, CollectionOperationStatus> map = future.get(5000L,
-              TimeUnit.MILLISECONDS);
+    Map<Integer, CollectionOperationStatus> map = future.get(5000L,
+            TimeUnit.MILLISECONDS);
 
-      // System.out.println(System.currentTimeMillis() - start + "ms");
+    // System.out.println(System.currentTimeMillis() - start + "ms");
 
-      Assert.assertTrue(map.isEmpty());
+    Assert.assertTrue(map.isEmpty());
 
-      Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
-              ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
+    Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
+            ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
 
-      Assert.assertEquals(elementCount, map3.size());
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      Assert.fail(e.getMessage());
-    }
+    Assert.assertEquals(elementCount, map3.size());
   }
 
   @Override

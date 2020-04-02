@@ -24,7 +24,8 @@ public class LoggingTest extends TestCase {
    * Set up logging.
    */
   @Override
-  public void setUp() {
+  public void setUp() throws Exception {
+    super.setUp();
     logger = LoggerFactory.getLogger(getClass());
   }
 

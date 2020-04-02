@@ -37,15 +37,21 @@ public class LocalCacheManagerTest extends TestCase {
   String[] keys = {"key0", "key1", "key2", "key3", "key4", "key5", "key6",
           "key7", "key8", "key9"};
 
+  @Override
   protected void setUp() throws Exception {
+    super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setFrontCacheExpireTime(5);
     cfb.setMaxFrontCacheElements(10);
     client = ArcusClient.createArcusClient("127.0.0.1:2181", "test", cfb);
   }
 
+  @Override
   protected void tearDown() throws Exception {
-    client.shutdown();
+    if (client != null) {
+      client.shutdown();
+    }
+    super.tearDown();
   }
 
   public void testGet() throws Exception {

@@ -16,7 +16,7 @@
  */
 package net.spy.memcached;
 
-import net.spy.memcached.collection.BaseIntegrationTest;
+import junit.framework.TestCase;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
@@ -45,17 +45,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @RunWith(JUnit4ClassRunner.class)
-public class ArcusTimeoutTest extends BaseIntegrationTest {
+public class ArcusTimeoutTest extends TestCase {
+  private ArcusClient mc = null;
+
   private final String KEY = this.getClass().getSimpleName();
 
   @Before
   @Override
   public void setUp() throws Exception {
-    Assume.assumeTrue(!USE_ZK);
+    super.setUp();
     initClient();
   }
 
-  protected void initClient() throws IOException {
+  private void initClient() throws IOException {
     mc = new ArcusClient(new DefaultConnectionFactory() {
       @Override
       public long getOperationTimeout() {
@@ -76,6 +78,7 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
     if (mc != null) {
       mc.shutdown();
     }
+    super.tearDown();
   }
 
   @Test(expected = TimeoutException.class)
@@ -91,8 +94,10 @@ public class ArcusTimeoutTest extends BaseIntegrationTest {
   public void testBulkSetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
     // recreate arcus client with BulkServiceThreadCount 6
+    if (mc != null) {
+      mc.shutdown();
+    }
     try {
-      tearDown();
       mc = new ArcusClient(new DefaultConnectionFactory() {
         @Override
         public int getBulkServiceThreadCount() {

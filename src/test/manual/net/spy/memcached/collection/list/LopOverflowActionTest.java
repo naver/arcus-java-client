@@ -32,14 +32,11 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
   private String key = "LopOverflowActionTest";
   private List<String> keyList = new ArrayList<String>();
 
-  protected void setUp() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
     keyList.add(key);
-    try {
-      super.setUp();
-      mc.delete(key).get();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    mc.delete(key).get();
   }
 
   public void testLopGet_Maxcount() throws Exception {

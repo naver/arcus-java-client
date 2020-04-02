@@ -39,6 +39,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
     return mc.getMaxPipedItemCount();
   }
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     for (long i = 0; i < getValueCount(); i++) {
@@ -47,10 +48,6 @@ public class MopBulkAPITest extends BaseIntegrationTest {
       updateMap.put("mkey" + String.valueOf(i),
               "newvalue" + String.valueOf(i));
     }
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
   }
 
   public void testBulk() throws Exception {

@@ -64,21 +64,15 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    try {
-      for (int i = 0; i < keyList.size(); i++) {
-        mc.delete(keyList.get(i)).get();
-        mc.asyncBopInsert(keyList.get(i), new byte[]{0}, null,
-                value + "0", new CollectionAttributes()).get();
-        mc.asyncBopInsert(keyList.get(i), new byte[]{1}, eFlag,
-                value + "1", new CollectionAttributes()).get();
-        mc.asyncBopInsert(keyList.get(i), new byte[]{2}, null,
-                value + "2", new CollectionAttributes()).get();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      Assert.fail(e.getMessage());
+    for (int i = 0; i < keyList.size(); i++) {
+      mc.delete(keyList.get(i)).get();
+      mc.asyncBopInsert(keyList.get(i), new byte[]{0}, null,
+              value + "0", new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(i), new byte[]{1}, eFlag,
+              value + "1", new CollectionAttributes()).get();
+      mc.asyncBopInsert(keyList.get(i), new byte[]{2}, null,
+              value + "2", new CollectionAttributes()).get();
     }
-
   }
 
   public void testGetBulkLongBkeyGetAll() {

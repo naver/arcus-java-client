@@ -31,14 +31,11 @@ public class BopGetExceptionTest extends BaseIntegrationTest {
 
   private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
-  protected void setUp() {
-    try {
-      super.setUp();
-      mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0,
-              true).get(1000, TimeUnit.MILLISECONDS);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0,
+            true).get(1000, TimeUnit.MILLISECONDS);
   }
 
   public void testBopGet_OutOfBound() throws Exception {

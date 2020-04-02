@@ -17,6 +17,7 @@
 package net.spy.memcached;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import org.junit.After;
 import org.junit.Before;
@@ -27,20 +28,14 @@ import org.junit.runner.RunWith;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnit4ClassRunner.class)
-public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
+public class ArcusClientFrontCacheTest extends TestCase {
 
   @Before
   @Override
   public void setUp() throws Exception {
+    super.setUp();
     // This test assumes we use ZK
-    assumeTrue(USE_ZK);
-    openFromZK();
-  }
-
-  @After
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
+    assumeTrue(BaseIntegrationTest.USE_ZK);
   }
 
   @Test
@@ -49,7 +44,8 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
+    ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
   }
 
   @Test
@@ -58,7 +54,8 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient.createArcusClientPool(ZK_HOST, ZK_SERVICE_ID, cfb, 4);
+    ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb, 4);
   }
 
   @Test
@@ -67,8 +64,8 @@ public class ArcusClientFrontCacheTest extends BaseIntegrationTest {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-            ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
 
     try {
       Assert.assertTrue(client.set("test:key", 100, "value").get());

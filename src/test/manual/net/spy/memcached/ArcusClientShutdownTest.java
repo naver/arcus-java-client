@@ -20,36 +20,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import net.spy.memcached.collection.BaseIntegrationTest;
 
 import org.junit.Ignore;
 
 @Ignore
-public class ArcusClientShutdownTest extends BaseIntegrationTest {
-
-  @Override
-  protected void setUp() throws Exception {
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-  }
+public class ArcusClientShutdownTest extends TestCase {
 
   public void testOpenAndWait() {
-    if (!USE_ZK) {
+    if (!BaseIntegrationTest.USE_ZK) {
       return;
     }
 
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-            ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
 
     // This threads must be stopped after client is shutdown.
     List<String> threadNames = new ArrayList<String>();
     threadNames.add("main-EventThread");
-    threadNames.add("main-SendThread(" + ZK_HOST + ")");
+    threadNames.add("main-SendThread(" + BaseIntegrationTest.ZK_HOST + ")");
     threadNames
-            .add("Cache Manager IO for " + ZK_SERVICE_ID + "@" + ZK_HOST);
+            .add("Cache Manager IO for " + BaseIntegrationTest.ZK_SERVICE_ID +
+                    "@" + BaseIntegrationTest.ZK_HOST);
 
     // Check exists threads
     List<String> currentThreads = new ArrayList<String>();

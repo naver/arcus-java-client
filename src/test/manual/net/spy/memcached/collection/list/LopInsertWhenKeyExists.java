@@ -30,12 +30,10 @@ public class LopInsertWhenKeyExists extends BaseIntegrationTest {
   private Long[] items8 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L};
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
-  protected void tearDown() {
-    try {
-      deleteList(key, 1000);
-      super.tearDown();
-    } catch (Exception e) {
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    deleteList(key, 1000);
+    super.tearDown();
   }
 
   public void testLopInsert_Normal() throws Exception {

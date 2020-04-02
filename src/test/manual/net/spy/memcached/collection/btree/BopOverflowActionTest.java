@@ -36,16 +36,13 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   private String key = "BopGetBoundaryTest";
   private List<String> keyList = new ArrayList<String>();
 
-  protected void setUp() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
     keyList.add(key);
-    try {
-      super.setUp();
-      mc.delete(key);
+    mc.delete(key);
       // mc.asyncBopDelete(key, 0, 20000, ElementFlagFilter.DO_NOT_FILTER,
       // 0, true).get(1000, TimeUnit.MILLISECONDS);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   public void testBopGet_Maxcount() throws Exception {

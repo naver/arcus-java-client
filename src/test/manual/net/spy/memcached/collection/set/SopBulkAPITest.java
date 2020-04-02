@@ -38,15 +38,12 @@ public class SopBulkAPITest extends BaseIntegrationTest {
     return mc.getMaxPipedItemCount();
   }
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     for (long i = 0; i < getValueCount(); i++) {
       valueList.add("value" + String.valueOf(i));
     }
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
   }
 
   public void testBulk() throws Exception {

@@ -1,5 +1,7 @@
 package net.spy.memcached;
 
+import junit.framework.TestCase;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,18 +13,35 @@ import java.util.concurrent.TimeoutException;
 /**
  * Base class for cancellation tests.
  */
-public abstract class CancellationBaseCase extends ClientBaseCase {
+public abstract class CancellationBaseCase extends TestCase {
+  String serverList = "127.0.0.1:64213";
+  private MemcachedClient client = null;
 
   @Override
-  protected void tearDown() throws Exception {
-    // override teardown to avoid the flush phase
-    client.shutdown();
+  protected void setUp() throws Exception {
+    super.setUp();
+    initClient();
   }
 
   @Override
+  protected void tearDown() throws Exception {
+    if (client != null) {
+      client.shutdown();
+    }
+    super.tearDown();
+  }
+
+  protected void initClient() throws Exception {
+    initClient(new DefaultConnectionFactory() {
+      @Override
+      public FailureMode getFailureMode() {
+        return FailureMode.Retry;
+      }
+    });
+  }
+
   protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf,
-            AddrUtil.getAddresses("127.0.0.1:64213"));
+    client = new MemcachedClient(cf, AddrUtil.getAddresses(serverList));
   }
 
   private void tryCancellation(Future<?> f) throws Exception {
@@ -47,7 +66,7 @@ public abstract class CancellationBaseCase extends ClientBaseCase {
     client.asyncGet("x");
     assertEquals(new ArrayList<String>(
                     Collections.singleton("/127.0.0.1:64213")),
-            stringify(client.getUnavailableServers()));
+            ClientBaseCase.stringify(client.getUnavailableServers()));
   }
 
   private void tryTimeout(Future<?> f) throws Exception {

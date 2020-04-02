@@ -32,13 +32,10 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
   private String key = "MopOverflowActionTest";
   private List<String> keyList = new ArrayList<String>();
 
-  protected void setUp() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
     keyList.add(key);
-    try {
-      super.setUp();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   public void testMopGet_Maxcount() throws Exception {

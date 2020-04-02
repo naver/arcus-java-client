@@ -33,10 +33,6 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     }
   };
 
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
-
   public void testKV_Long() throws Exception {
     // KV Set
     assertTrue(mc.set(keys.get(0), 10, "value1").get());

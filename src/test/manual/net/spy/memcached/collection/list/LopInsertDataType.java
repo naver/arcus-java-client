@@ -29,12 +29,10 @@ public class LopInsertDataType extends BaseIntegrationTest {
   private String key = "LopInsertDataType";
   private Random rand = new Random(new Date().getTime());
 
-  protected void tearDown() {
-    try {
-      deleteList(key, 1000);
-      super.tearDown();
-    } catch (Exception e) {
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    deleteList(key, 1000);
+    super.tearDown();
   }
 
   public void testLopInsert_ElementCountLimit() throws Exception {
