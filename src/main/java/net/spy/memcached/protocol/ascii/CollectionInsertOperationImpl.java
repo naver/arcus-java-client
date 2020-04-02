@@ -20,11 +20,17 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.spy.memcached.collection.CollectionPipedStore;
+import net.spy.memcached.KeyUtil;
+import net.spy.memcached.collection.BTreeInsert;
+import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.CollectionInsert;
+import net.spy.memcached.collection.ListInsert;
+import net.spy.memcached.collection.MapInsert;
+import net.spy.memcached.collection.SetInsert;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.CollectionPipedStoreOperation;
+import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -33,21 +39,20 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public class CollectionPipedStoreOperationImpl extends OperationImpl
-        implements CollectionPipedStoreOperation {
+public class CollectionInsertOperationImpl extends OperationImpl
+        implements CollectionInsertOperation {
+
+  private static final int OVERHEAD = 32;
 
   private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
           false, "collection canceled", CollectionResponse.CANCELED);
-
-  private static final OperationStatus END = new CollectionOperationStatus(
-          true, "END", CollectionResponse.END);
-  private static final OperationStatus FAILED_END = new CollectionOperationStatus(
-          false, "END", CollectionResponse.END);
 
   private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
   private static final OperationStatus STORED = new CollectionOperationStatus(
           true, "STORED", CollectionResponse.STORED);
+  private static final OperationStatus REPLACED = new CollectionOperationStatus(
+          true, "REPLACED", CollectionResponse.REPLACED);
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
           false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
   private static final OperationStatus ELEMENT_EXISTS = new CollectionOperationStatus(
@@ -62,29 +67,27 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
   protected final String key;
-  protected final CollectionPipedStore<?> store;
-  protected final CollectionPipedStoreOperation.Callback cb;
+  protected final String subkey;    // e.g.) 0 or 0x00
+  protected final CollectionInsert<?> collectionInsert;
+  protected final byte[] data;
 
-  protected int count;
-  protected int index = 0;
-  protected boolean successAll = true;
-
-  public CollectionPipedStoreOperationImpl(String key,
-                                           CollectionPipedStore<?> store, OperationCallback cb) {
+  public CollectionInsertOperationImpl(String key, String subkey,
+                                       CollectionInsert<?> collectionInsert, byte[] data, OperationCallback cb) {
     super(cb);
     this.key = key;
-    this.store = store;
-    this.cb = (Callback) cb;
-    if (this.store instanceof CollectionPipedStore.ListPipedStore)
+    this.subkey = subkey;
+    this.collectionInsert = collectionInsert;
+    this.data = data;
+    if (this.collectionInsert instanceof ListInsert)
       setAPIType(APIType.LOP_INSERT);
-    else if (this.store instanceof CollectionPipedStore.SetPipedStore)
+    else if (this.collectionInsert instanceof SetInsert)
       setAPIType(APIType.SOP_INSERT);
-    else if (this.store instanceof CollectionPipedStore.MapPipedStore)
+    else if (this.collectionInsert instanceof MapInsert)
       setAPIType(APIType.MOP_INSERT);
-    else if (this.store instanceof CollectionPipedStore.BTreePipedStore)
+    else if (this.collectionInsert instanceof BTreeInsert)
       setAPIType(APIType.BOP_INSERT);
-    else if (this.store instanceof CollectionPipedStore.ByteArraysBTreePipedStore)
-      setAPIType(APIType.BOP_INSERT);
+    else if (this.collectionInsert instanceof BTreeUpsert)
+      setAPIType(APIType.BOP_UPSERT);
     setOperationType(OperationType.WRITE);
   }
 
@@ -92,63 +95,39 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
   public void handleLine(String line) {
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
-
     /* ENABLE_REPLICATION if */
     if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-      this.store.setNextOpIndex(index);
       receivedMoveOperations(line);
       return;
     }
 
     /* ENABLE_REPLICATION end */
-    if (store.getItemCount() == 1) {
-      OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
-              NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-              TYPE_MISMATCH, BKEY_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus(END);
-      } else {
-        cb.gotStatus(index, status);
-        cb.receivedStatus(FAILED_END);
-      }
-      transitionState(OperationState.COMPLETE);
-      return;
-    }
-
-    if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
-    } else if (line.startsWith("RESPONSE ")) {
-      getLogger().debug("Got line %s", line);
-
-      // TODO server should be fixed
-      line = line.replace("   ", " ");
-      line = line.replace("  ", " ");
-
-      String[] stuff = line.split(" ");
-      assert "RESPONSE".equals(stuff[0]);
-      count = Integer.parseInt(stuff[1]);
-    } else {
-      OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
-              NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-              TYPE_MISMATCH, BKEY_MISMATCH);
-
-      if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
-        successAll = false;
-      }
-      index++;
-    }
+    getCallback().receivedStatus(
+            matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
+                    ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+                    TYPE_MISMATCH, BKEY_MISMATCH));
+    transitionState(OperationState.COMPLETE);
   }
 
   @Override
   public void initialize() {
-    ByteBuffer buffer = store.getAsciiCommand();
-    setBuffer(buffer);
+    String args = collectionInsert.stringify();
+    ByteBuffer bb = ByteBuffer.allocate(data.length
+            + KeyUtil.getKeyBytes(key).length
+            + KeyUtil.getKeyBytes(subkey).length
+            + KeyUtil.getKeyBytes(collectionInsert.getElementFlagByHex()).length
+            + args.length()
+            + OVERHEAD);
+    setArguments(bb, collectionInsert.getCommand(), key, subkey,
+            collectionInsert.getElementFlagByHex(), data.length, args);
+    bb.put(data);
+    bb.put(CRLF);
+    bb.flip();
+    setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: \n"
-              + (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
+      getLogger().debug("Request in ascii protocol: "
+              + (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 
@@ -161,8 +140,16 @@ public class CollectionPipedStoreOperationImpl extends OperationImpl
     return Collections.singleton(key);
   }
 
-  public CollectionPipedStore<?> getStore() {
-    return store;
+  public String getSubKey() {
+    return subkey;
+  }
+
+  public CollectionInsert<?> getInsert() {
+    return collectionInsert;
+  }
+
+  public byte[] getData() {
+    return data;
   }
 
 }

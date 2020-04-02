@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.util.BTreeUtil;
 
-public abstract class CollectionStore<T> {
+public abstract class CollectionInsert<T> {
 
   protected boolean createKeyIfNotExists = false;
   protected int flags = 0;
@@ -31,23 +31,23 @@ public abstract class CollectionStore<T> {
 
   protected String str;
 
-  public CollectionStore() {
+  public CollectionInsert() {
   }
 
-  public CollectionStore(T value, byte[] elementFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+  public CollectionInsert(T value, byte[] elementFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
     if (attr != null) {
       CollectionOverflowAction overflowAction = attr.getOverflowAction();
       if (overflowAction != null) {
-        if ((this instanceof SetStore) &&
+        if ((this instanceof SetInsert) &&
                 !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
-        } else if ((this instanceof MapStore) &&
+        } else if ((this instanceof MapInsert) &&
                 !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
-        } else if ((this instanceof ListStore) &&
+        } else if ((this instanceof ListInsert) &&
                 !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-        } else if (((this instanceof BTreeStore) || (this instanceof BTreeUpsert) || (this instanceof BTreeStoreAndGet)) &&
+        } else if (((this instanceof BTreeInsert) || (this instanceof BTreeUpsert) || (this instanceof BTreeInsertAndGet)) &&
                 !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(overflowAction + " is available overflow action in " + CollectionType.btree + ".");
         }

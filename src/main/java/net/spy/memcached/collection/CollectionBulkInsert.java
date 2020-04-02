@@ -24,7 +24,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
 
-public abstract class CollectionBulkStore<T> extends CollectionObject {
+public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   public static final String PIPE = "pipe";
   public static final int MAX_PIPED_ITEM_COUNT = 500;
@@ -55,15 +55,15 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class BTreeBulkStore<T> extends CollectionBulkStore<T> {
+  public static class BTreeBulkInsert<T> extends CollectionBulkInsert<T> {
 
     private static final String COMMAND = "bop insert";
 
     private final String bkey;
     private final String eflag;
 
-    public BTreeBulkStore(List<String> keyList, long bkey, byte[] eflag,
-                          T value, CollectionAttributes attr, Transcoder<T> tc) {
+    public BTreeBulkInsert(List<String> keyList, long bkey, byte[] eflag,
+                           T value, CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
@@ -80,9 +80,9 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
-    public BTreeBulkStore(List<String> keyList, byte[] bkey,
-                          byte[] eflag, T value, CollectionAttributes attr,
-                          Transcoder<T> tc) {
+    public BTreeBulkInsert(List<String> keyList, byte[] bkey,
+                           byte[] eflag, T value, CollectionAttributes attr,
+                           Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
@@ -161,13 +161,13 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
     }
   }
 
-  public static class MapBulkStore<T> extends CollectionBulkStore<T> {
+  public static class MapBulkInsert<T> extends CollectionBulkInsert<T> {
 
     private static final String COMMAND = "mop insert";
     private final String mkey;
 
-    public MapBulkStore(List<String> keyList, String mkey, T value,
-                        CollectionAttributes attr, Transcoder<T> tc) {
+    public MapBulkInsert(List<String> keyList, String mkey, T value,
+                         CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null && !CollectionType.map.isAvailableOverflowAction(overflowAction))
@@ -243,12 +243,12 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
     }
   }
 
-  public static class SetBulkStore<T> extends CollectionBulkStore<T> {
+  public static class SetBulkInsert<T> extends CollectionBulkInsert<T> {
 
     private static final String COMMAND = "sop insert";
 
-    public SetBulkStore(List<String> keyList, T value,
-                        CollectionAttributes attr, Transcoder<T> tc) {
+    public SetBulkInsert(List<String> keyList, T value,
+                         CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null && !CollectionType.set.isAvailableOverflowAction(overflowAction))
@@ -320,13 +320,13 @@ public abstract class CollectionBulkStore<T> extends CollectionObject {
     }
   }
 
-  public static class ListBulkStore<T> extends CollectionBulkStore<T> {
+  public static class ListBulkInsert<T> extends CollectionBulkInsert<T> {
 
     private static final String COMMAND = "lop insert";
     private int index;
 
-    public ListBulkStore(List<String> keyList, int index, T value,
-                         CollectionAttributes attr, Transcoder<T> tc) {
+    public ListBulkInsert(List<String> keyList, int index, T value,
+                          CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null && !CollectionType.list.isAvailableOverflowAction(overflowAction))

@@ -16,17 +16,15 @@
  */
 package net.spy.memcached.ops;
 
-import net.spy.memcached.collection.CollectionBulkStore;
+import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.BTreeInsertAndGet;
 
-/**
- * Operation that represents collection object storage.
- */
-public interface CollectionBulkStoreOperation extends KeyedOperation {
+public interface BTreeInsertAndGetOperation extends KeyedOperation {
 
-  CollectionBulkStore<?> getStore();
+  BTreeInsertAndGet<?> getGet();
 
   interface Callback extends OperationCallback {
-    void gotStatus(Integer index, OperationStatus status);
+    void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
   }
 
 }

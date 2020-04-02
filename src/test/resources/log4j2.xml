@@ -20,10 +20,10 @@
         <Logger name="net.spy.memcached.protocol.ascii.BTreeGetBulkOperationImpl" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="net.spy.memcached.protocol.ascii.CollectionStoreOperationImpl" level="DEBUG" additivity="false">
+        <Logger name="net.spy.memcached.protocol.ascii.CollectionInsertOperationImpl" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
-        <Logger name="net.spy.memcached.protocol.ascii.CollectionPipedStoreOperationImpl" level="DEBUG" additivity="false">
+        <Logger name="net.spy.memcached.protocol.ascii.CollectionPipedInsertOperationImpl" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
         </Logger>
         <Logger name="net.spy.memcached.protocol.ascii.CollectionGetOperationImpl" level="DEBUG" additivity="false">

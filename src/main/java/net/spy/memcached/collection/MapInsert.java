@@ -1,6 +1,6 @@
 /*
  * arcus-java-client : Arcus Java client
- * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2016 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.ops;
+package net.spy.memcached.collection;
 
-import net.spy.memcached.collection.BKeyObject;
-import net.spy.memcached.collection.BTreeStoreAndGet;
+public class MapInsert<T> extends CollectionInsert<T> {
 
-public interface BTreeStoreAndGetOperation extends KeyedOperation {
+  private static final String command = "mop insert";
 
-  BTreeStoreAndGet<?> getGet();
+  public MapInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+    super(value, null, createKeyIfNotExists, requestMode, attr);
+  }
 
-  interface Callback extends OperationCallback {
-    void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
+  public String getCommand() {
+    return command;
   }
 
 }

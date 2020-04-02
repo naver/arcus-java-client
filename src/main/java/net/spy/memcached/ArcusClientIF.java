@@ -26,7 +26,6 @@ import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;

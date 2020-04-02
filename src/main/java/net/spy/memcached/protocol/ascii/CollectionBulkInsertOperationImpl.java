@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.spy.memcached.collection.CollectionBulkStore;
+import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.CollectionBulkStoreOperation;
+import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -34,8 +34,8 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public class CollectionBulkStoreOperationImpl extends OperationImpl
-        implements CollectionBulkStoreOperation {
+public class CollectionBulkInsertOperationImpl extends OperationImpl
+        implements CollectionBulkInsertOperation {
 
   private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
           false, "collection canceled", CollectionResponse.CANCELED);
@@ -63,26 +63,26 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
   protected final String key;
-  protected final CollectionBulkStore<?> store;
-  protected final CollectionBulkStoreOperation.Callback cb;
+  protected final CollectionBulkInsert<?> insert;
+  protected final CollectionBulkInsertOperation.Callback cb;
 
   protected int count;
   protected int index = 0;
   protected boolean successAll = true;
 
-  public CollectionBulkStoreOperationImpl(List<String> keyList,
-                                          CollectionBulkStore<?> store, OperationCallback cb) {
+  public CollectionBulkInsertOperationImpl(List<String> keyList,
+                                           CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);
     this.key = keyList.get(0);
-    this.store = store;
+    this.insert = insert;
     this.cb = (Callback) cb;
-    if (this.store instanceof CollectionBulkStore.ListBulkStore)
+    if (this.insert instanceof CollectionBulkInsert.ListBulkInsert)
       setAPIType(APIType.LOP_INSERT);
-    else if (this.store instanceof CollectionBulkStore.SetBulkStore)
+    else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert)
       setAPIType(APIType.SOP_INSERT);
-    else if (this.store instanceof CollectionBulkStore.MapBulkStore)
+    else if (this.insert instanceof CollectionBulkInsert.MapBulkInsert)
       setAPIType(APIType.MOP_INSERT);
-    else if (this.store instanceof CollectionBulkStore.BTreeBulkStore)
+    else if (this.insert instanceof CollectionBulkInsert.BTreeBulkInsert)
       setAPIType(APIType.BOP_INSERT);
     setOperationType(OperationType.WRITE);
   }
@@ -93,13 +93,13 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
             : "Read ``" + line + "'' when in " + getState() + " state";
     /* ENABLE_REPLICATION if */
     if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
-      this.store.setNextOpIndex(index);
+      this.insert.setNextOpIndex(index);
       receivedMoveOperations(line);
       return;
     }
 
     /* ENABLE_REPLICATION end */
-    if (store.getItemCount() == 1) {
+    if (insert.getItemCount() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
@@ -142,7 +142,7 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
 
   @Override
   public void initialize() {
-    ByteBuffer buffer = store.getAsciiCommand();
+    ByteBuffer buffer = insert.getAsciiCommand();
     setBuffer(buffer);
 
     if (getLogger().isDebugEnabled()) {
@@ -160,8 +160,8 @@ public class CollectionBulkStoreOperationImpl extends OperationImpl
     return Collections.singleton(key);
   }
 
-  public CollectionBulkStore<?> getStore() {
-    return store;
+  public CollectionBulkInsert<?> getInsert() {
+    return insert;
   }
 
 }

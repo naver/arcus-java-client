@@ -33,7 +33,7 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
 /**
- * Operation to store collection data in a memcached server.
+ * Operation to update collection data in a memcached server.
  */
 public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
         CollectionPipedUpdateOperation {

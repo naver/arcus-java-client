@@ -16,16 +16,16 @@
  */
 package net.spy.memcached.collection;
 
-public class BTreeStore<T> extends CollectionStore<T> {
+public class ListInsert<T> extends CollectionInsert<T> {
 
-  private static final String command = "bop insert";
+  private static final String command = "lop insert";
 
-  public BTreeStore() {
+  public ListInsert() {
     super();
   }
 
-  public BTreeStore(T value, byte[] eFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-    super(value, eFlag, createKeyIfNotExists, requestMode, attr);
+  public ListInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+    super(value, null, createKeyIfNotExists, requestMode, attr);
   }
 
   public String getCommand() {

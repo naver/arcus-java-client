@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection;
 
-public class BTreeUpsert<T> extends CollectionStore<T> {
+public class BTreeUpsert<T> extends CollectionInsert<T> {
 
   private static final String command = "bop upsert";
 

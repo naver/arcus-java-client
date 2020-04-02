@@ -73,9 +73,9 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void collectionStoreOperationImplTest() {
+  public void collectionInsertOperationImplTest() {
     try {
-      opFact.collectionStore(MULTIBYTE_KEY, MULTIBYTE_KEY, new CollectionStore<Integer>() {
+      opFact.collectionInsert(MULTIBYTE_KEY, MULTIBYTE_KEY, new CollectionInsert<Integer>() {
         @Override
         public String getCommand() {
           return null;
@@ -279,8 +279,8 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionPipedStoreOperationImplTest() {
-    CollectionPipedStoreOperation.Callback cpsCallback = new CollectionPipedStoreOperation.Callback() {
+  public void CollectionPipedInsertOperationImplTest() {
+    CollectionPipedInsertOperation.Callback cpsCallback = new CollectionPipedInsertOperation.Callback() {
       @Override
       public void gotStatus(Integer index, OperationStatus status) {
       }
@@ -298,11 +298,11 @@ public class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       elements.add(new Element<Integer>(Long.valueOf(i), new Random().nextInt(), new byte[]{1, 1}));
     }
-    CollectionPipedStore<Integer> store = new CollectionPipedStore.ByteArraysBTreePipedStore<Integer>(
+    CollectionPipedInsert<Integer> insert = new CollectionPipedInsert.ByteArraysBTreePipedInsert<Integer>(
             MULTIBYTE_KEY, elements, false, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
-      opFact.collectionPipedStore(MULTIBYTE_KEY, store, cpsCallback).initialize();
+      opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -311,11 +311,11 @@ public class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       elementsMap.put(Long.valueOf(i), new Random().nextInt());
     }
-    store = new CollectionPipedStore.BTreePipedStore<Integer>(
+    insert = new CollectionPipedInsert.BTreePipedInsert<Integer>(
             MULTIBYTE_KEY, elementsMap, false, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
-      opFact.collectionPipedStore(MULTIBYTE_KEY, store, cpsCallback).initialize();
+      opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -324,11 +324,11 @@ public class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       elementsList.add(new Random().nextInt());
     }
-    store = new CollectionPipedStore.ListPipedStore<Integer>(
+    insert = new CollectionPipedInsert.ListPipedInsert<Integer>(
             MULTIBYTE_KEY, 0, elementsList, false, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
-      opFact.collectionPipedStore(MULTIBYTE_KEY, store, cpsCallback).initialize();
+      opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -337,10 +337,10 @@ public class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       elementsSet.add(new Random().nextInt());
     }
-    store = new CollectionPipedStore.SetPipedStore<Integer>(
+    insert = new CollectionPipedInsert.SetPipedInsert<Integer>(
             MULTIBYTE_KEY, elementsSet, false, new CollectionAttributes(), new IntegerTranscoder());
     try {
-      opFact.collectionPipedStore(MULTIBYTE_KEY, store, cpsCallback).initialize();
+      opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -400,9 +400,9 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionBulkStoreOperationImplTest() {
-    CollectionBulkStore<Integer> store = null;
-    CollectionBulkStoreOperation.Callback cbsCallback = new CollectionBulkStoreOperation.Callback() {
+  public void CollectionBulkInsertOperationImplTest() {
+    CollectionBulkInsert<Integer> insert = null;
+    CollectionBulkInsertOperation.Callback cbsCallback = new CollectionBulkInsertOperation.Callback() {
       @Override
       public void gotStatus(Integer index, OperationStatus status) {
       }
@@ -416,27 +416,27 @@ public class MultibyteKeyTest {
       }
     };
 
-    store = new CollectionBulkStore.BTreeBulkStore<Integer>(keyList, 1L, new byte[]{0, 0},
+    insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(keyList, 1L, new byte[]{0, 0},
             new Random().nextInt(), new CollectionAttributes(), new IntegerTranscoder());
     try {
-      opFact.collectionBulkStore(store.getKeyList(), store, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
 
-    store = new CollectionBulkStore.ListBulkStore<Integer>(keyList, 0, new Random().nextInt(),
+    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(keyList, 0, new Random().nextInt(),
             new CollectionAttributes(), new IntegerTranscoder());
 
     try {
-      opFact.collectionBulkStore(store.getKeyList(), store, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
 
-    store = new CollectionBulkStore.SetBulkStore<Integer>(keyList, new Random().nextInt(),
+    insert = new CollectionBulkInsert.SetBulkInsert<Integer>(keyList, new Random().nextInt(),
             new CollectionAttributes(), new IntegerTranscoder());
     try {
-      opFact.collectionBulkStore(store.getKeyList(), store, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -579,12 +579,12 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeStoreAndGetOperationImplTest() {
+  public void BTreeInsertAndGetOperationImplTest() {
     try {
-      opFact.bopStoreAndGet(MULTIBYTE_KEY,
-              new BTreeStoreAndGet<Integer>(BTreeStoreAndGet.Command.INSERT, 1L, new byte[]{0, 0},
+      opFact.bopInsertAndGet(MULTIBYTE_KEY,
+              new BTreeInsertAndGet<Integer>(BTreeInsertAndGet.Command.INSERT, 1L, new byte[]{0, 0},
                       new Random().nextInt(), new CollectionAttributes()),
-              testData, new BTreeStoreAndGetOperation.Callback() {
+              testData, new BTreeInsertAndGetOperation.Callback() {
                 @Override
                 public void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {
                 }

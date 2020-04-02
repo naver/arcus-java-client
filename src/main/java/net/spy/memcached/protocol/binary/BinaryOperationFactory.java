@@ -29,17 +29,17 @@ import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
-import net.spy.memcached.collection.BTreeStoreAndGet;
-import net.spy.memcached.collection.CollectionBulkStore;
+import net.spy.memcached.collection.BTreeInsertAndGet;
+import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionMutate;
-import net.spy.memcached.collection.CollectionPipedStore;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
-import net.spy.memcached.collection.CollectionStore;
+import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
@@ -48,10 +48,10 @@ import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
-import net.spy.memcached.ops.BTreeStoreAndGetOperation;
+import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BaseOperationFactory;
 import net.spy.memcached.ops.CASOperation;
-import net.spy.memcached.ops.CollectionBulkStoreOperation;
+import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionCountOperation;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionDeleteOperation;
@@ -59,9 +59,9 @@ import net.spy.memcached.ops.CollectionExistOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionMutateOperation;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
-import net.spy.memcached.ops.CollectionPipedStoreOperation;
+import net.spy.memcached.ops.CollectionPipedInsertOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
-import net.spy.memcached.ops.CollectionStoreOperation;
+import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
@@ -201,24 +201,24 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "GetAttrOperation is not supported in binary protocol yet.");
   }
 
-  public CollectionStoreOperation collectionStore(String key, String subkey,
-                                                  CollectionStore<?> collectionStore, byte[] data,
-                                                  OperationCallback cb) {
+  public CollectionInsertOperation collectionInsert(String key, String subkey,
+                                                    CollectionInsert<?> collectionInsert, byte[] data,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
-            "CollectionStoreOperation is not supported in binary protocol yet.");
+            "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
-  public CollectionStoreOperation collectionStore(String key, byte[] subkey,
-                                                  CollectionStore<?> collectionStore, byte[] data,
-                                                  OperationCallback cb) {
+  public CollectionInsertOperation collectionInsert(String key, byte[] subkey,
+                                                    CollectionInsert<?> collectionInsert, byte[] data,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
-            "CollectionStoreOperation is not supported in binary protocol yet.");
+            "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
-  public CollectionPipedStoreOperation collectionPipedStore(String key,
-                                                            CollectionPipedStore<?> store, OperationCallback cb) {
+  public CollectionPipedInsertOperation collectionPipedInsert(String key,
+                                                              CollectionPipedInsert<?> insert, OperationCallback cb) {
     throw new RuntimeException(
-            "CollectionPipedStoreOperation is not supported in binary protocol yet.");
+            "CollectionPipedInsertOperation is not supported in binary protocol yet.");
   }
 
   public CollectionGetOperation collectionGet(String key,
@@ -283,7 +283,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   public CollectionPipedUpdateOperation collectionPipedUpdate(String key,
                                                               CollectionPipedUpdate<?> update, OperationCallback cb) {
     throw new RuntimeException(
-            "CollectionPipedStoreOperation is not supported in binary protocol yet.");
+            "CollectionPipedUpdateOperation is not supported in binary protocol yet.");
   }
 
   @Override
@@ -301,11 +301,11 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionBulkStoreOperation collectionBulkStore(
-          List<String> key, CollectionBulkStore<?> store,
+  public CollectionBulkInsertOperation collectionBulkInsert(
+          List<String> key, CollectionBulkInsert<?> insert,
           OperationCallback cb) {
     throw new RuntimeException(
-            "Collection piped store2 operation is not supported in binary protocol yet.");
+            "Collection piped insert2 operation is not supported in binary protocol yet.");
   }
 
   @Override
@@ -337,10 +337,10 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public BTreeStoreAndGetOperation bopStoreAndGet(String key,
-                                                  BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb) {
+  public BTreeInsertAndGetOperation bopInsertAndGet(String key,
+                                                    BTreeInsertAndGet<?> get, byte[] dataToInsert, OperationCallback cb) {
     throw new RuntimeException(
-            "BTree store and get operation is not supported in binary protocol yet.");
+            "BTree insert and get operation is not supported in binary protocol yet.");
   }
 
 }

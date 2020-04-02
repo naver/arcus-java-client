@@ -23,18 +23,18 @@ import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetByPosition;
-import net.spy.memcached.collection.BTreeStoreAndGet;
+import net.spy.memcached.collection.BTreeInsertAndGet;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
-import net.spy.memcached.ops.BTreeStoreAndGetOperation;
+import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
-        BTreeStoreAndGetOperation {
+public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
+        BTreeInsertAndGetOperation {
 
   private static final int OVERHEAD = 32;
 
@@ -77,7 +77,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
   private static final OperationStatus[] STORE_AND_GET_ON_DATA = {TRIMMED};
 
   protected final String key;
-  protected final BTreeStoreAndGet<?> get;
+  protected final BTreeInsertAndGet<?> get;
   protected final byte[] dataToStore;
 
   protected int flags = 0;
@@ -89,21 +89,21 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 
   private Boolean hasEFlag = null;
 
-  public BTreeStoreAndGetOperationImpl(String key, BTreeStoreAndGet<?> get,
-                                       byte[] dataToStore, OperationCallback cb) {
+  public BTreeInsertAndGetOperationImpl(String key, BTreeInsertAndGet<?> get,
+                                        byte[] dataToStore, OperationCallback cb) {
     super(cb);
     this.key = key;
     this.get = get;
     this.dataToStore = dataToStore;
-    if (get.getCmd() == BTreeStoreAndGet.Command.INSERT)
+    if (get.getCmd() == BTreeInsertAndGet.Command.INSERT)
       setAPIType(APIType.BOP_INSERT);
-    else if (get.getCmd() == BTreeStoreAndGet.Command.UPSERT)
+    else if (get.getCmd() == BTreeInsertAndGet.Command.UPSERT)
       setAPIType(APIType.BOP_UPSERT);
     setOperationType(OperationType.WRITE);
   }
 
   @Override
-  public BTreeStoreAndGet<?> getGet() {
+  public BTreeInsertAndGet<?> getGet() {
     return get;
   }
 
@@ -238,7 +238,7 @@ public class BTreeStoreAndGetOperationImpl extends OperationImpl implements
 
     if (lookingFor == '\0' && readOffset == data.length) {
       // put an element data.
-      BTreeStoreAndGetOperation.Callback cb = (BTreeStoreAndGetOperation.Callback) getCallback();
+      BTreeInsertAndGetOperation.Callback cb = (BTreeInsertAndGetOperation.Callback) getCallback();
       cb.gotData(key, flags, get.getBkeyObject(), get.getElementFlag(), data);
 
       lookingFor = '\r';
