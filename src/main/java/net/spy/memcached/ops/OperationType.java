@@ -14,15 +14,15 @@ public enum OperationType {
    * DeleteOperationImpl (delete)
    * CASOperationImpl (asyncCAS, cas)
    * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
-   * CollectionStoreOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert / asyncBopUpsert)
+   * CollectionInsertOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert / asyncBopUpsert)
    * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
    * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
-   * CollectionBulkStoreOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
-   * CollectionPipedStoreOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
+   * CollectionBulkInsertOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
+   * CollectionPipedInsertOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
    * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
    * CollectionUpdateOperationImpl (asyncBopUpdate)
    * CollectionMutateOperationImpl (asyncBopIncr / asyncBopDecr)
-   * BtreeStoreAndGetOpeartionImpl (asynBopInsertAndGetTrimmed)
+   * BTreeInsertAndGetOperationImpl (asynBopInsertAndGetTrimmed)
    * FlushOperationImpl / FlushByPrefixOperationImpl (flush)
    * SetAttrOperationImpl (asyncSetAttr)
    */
@@ -79,13 +79,13 @@ public enum OperationType {
        │   ├── BTreeGetByPositionOperation.java-Interface-extends[KeyedOperation]
        │   │   └── BTreeGetByPositionOperationImpl.java-extends[OperationImpl]-implements[KeyedOpeartion]
        │   ├── BTreeSortMergeGetOperation.java-Interface-extends[KeyedOpeartion]
-       │   │   └── BTreeSortMergeGetOperationImpl.java-extends[OperationImpl]-implements[BtreeSortMergeGetOperation]
-       │   ├── BTreeStoreAndGetOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── BTreeStoreAndGetOperationImpl.java-extends[OperationImpl]-implements[BtreeStoreAndGetOperation]
+       │   │   └── BTreeSortMergeGetOperationImpl.java-extends[OperationImpl]-implements[BTreeSortMergeGetOperation]
+       │   ├── BTreeInsertAndGetOperation.java-Interface-extends[KeyedOperation]
+       │   │   └── BTreeInsertAndGetOperationImpl.java-extends[OperationImpl]-implements[BTreeInsertAndGetOperation]
        │   ├── CASOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CASOperationImpl.java-extends[OpeartionImpl]-implements[CASOperation]
-       │   ├── CollectionBulkStoreOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── CollectionBulkStoreOperationImpl.java-extends[OpeartionImpl]-implements[CollectionBulkStoreOperation]
+       │   ├── CollectionBulkInsertOperation.java-Interface-extends[KeyedOperation]
+       │   │   └── CollectionBulkInsertOperationImpl.java-extends[OpeartionImpl]-implements[CollectionBulkInsertOperation]
        │   ├── CollectionCountOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionCountOperationImpl.java-extends[OperationImpl]-implements[CollectionCountOperation]
        │   ├── CollectionCreateOperation.java-Interface-extends[KeyedOperation]
@@ -100,12 +100,12 @@ public enum OperationType {
        │   │   └── CollectionMutateOperationImpl.java-extends[OperationImpl]-implements[CollectionMutateOperation]
        │   ├── CollectionPipedExistOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionPipedExistOperationImpl.java-extends[OperationImpl]-implements[CollectionPipedExist]
-       │   ├── CollectionPipedStoreOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── CollectionPipedStoreOperationImpl.java-extends[OperationImpl]-implements[CollectionPipedStore]
+       │   ├── CollectionPipedInsertOperation.java-Interface-extends[KeyedOperation]
+       │   │   └── CollectionPipedInsertOperationImpl.java-extends[OperationImpl]-implements[CollectionPipedInsert]
        │   ├── CollectionPipedUpdateOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionPipedUpdateOperationImpl.java-extends[OperationImpl]-implements[CollectionPipedUpdateOperation]
-       │   ├── CollectionStoreOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── CollectionStoreOperationImpl.java-extends[OperationImpl]-implements[CollectionStoreOperation]
+       │   ├── CollectionInsertOperation.java-Interface-extends[KeyedOperation]
+       │   │   └── CollectionInsertOperationImpl.java-extends[OperationImpl]-implements[CollectionInsertOperation]
        │   ├── CollectionUpdateOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionUpdateOperationImpl.java-extends[OperationImpl]-implements[OperationUpdateOperation]
        │   ├── ConcatenationOperation.java-Interface-extends[KeyedOperation]

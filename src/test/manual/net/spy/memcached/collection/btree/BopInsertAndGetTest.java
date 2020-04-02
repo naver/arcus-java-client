@@ -27,7 +27,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 
-public class BopStoreAndGetTest extends BaseIntegrationTest {
+public class BopInsertAndGetTest extends BaseIntegrationTest {
 
   private String key = "BopStoreAndGetTest";
   private String invalidKey = "InvalidBopStoreAndGetTest";

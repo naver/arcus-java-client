@@ -31,8 +31,7 @@ import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.CollectionOverflowAction;
-import net.spy.memcached.collection.CollectionPipedStore;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
@@ -423,7 +422,7 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public int getMaxPipedItemCount() {
-    return CollectionPipedStore.MAX_PIPED_ITEM_COUNT;
+    return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
   }
 
   @Override

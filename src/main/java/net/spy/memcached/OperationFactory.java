@@ -28,17 +28,17 @@ import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeSMGet;
-import net.spy.memcached.collection.BTreeStoreAndGet;
-import net.spy.memcached.collection.CollectionBulkStore;
+import net.spy.memcached.collection.BTreeInsertAndGet;
+import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionExist;
 import net.spy.memcached.collection.CollectionGet;
 import net.spy.memcached.collection.CollectionMutate;
-import net.spy.memcached.collection.CollectionPipedStore;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
-import net.spy.memcached.collection.CollectionStore;
+import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
@@ -47,9 +47,9 @@ import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
-import net.spy.memcached.ops.BTreeStoreAndGetOperation;
+import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.CASOperation;
-import net.spy.memcached.ops.CollectionBulkStoreOperation;
+import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionCountOperation;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionDeleteOperation;
@@ -57,9 +57,9 @@ import net.spy.memcached.ops.CollectionExistOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionMutateOperation;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
-import net.spy.memcached.ops.CollectionPipedStoreOperation;
+import net.spy.memcached.ops.CollectionPipedInsertOperation;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
-import net.spy.memcached.ops.CollectionStoreOperation;
+import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.CollectionUpdateOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
@@ -259,28 +259,28 @@ public interface OperationFactory {
   GetAttrOperation getAttr(String key, GetAttrOperation.Callback cb);
 
   /**
-   * Store operation for collection items.
+   * Insert operation for collection items.
    *
    * @param key             collection item's key
    * @param subkey          element key (list index, b+tree bkey)
-   * @param collectionStore operation parameters (value, eflags, attributes, and so on)
+   * @param collectionInsert operation parameters (value, eflags, attributes, and so on)
    * @param data            the serialized value
    * @param cb              the status callback
-   * @return a new CollectionStoreOperation
+   * @return a new CollectionInsertOperation
    */
-  CollectionStoreOperation collectionStore(String key, String subkey,
-                                           CollectionStore<?> collectionStore, byte[] data, OperationCallback cb);
+  CollectionInsertOperation collectionInsert(String key, String subkey,
+                                             CollectionInsert<?> collectionInsert, byte[] data, OperationCallback cb);
 
   /**
-   * Pipelined store operation for collection items.
+   * Pipelined insert operation for collection items.
    *
-   * @param key   collection item's key
-   * @param store operation parameters (values, attributes, and so on)
-   * @param cb    the status callback
-   * @return a new CollectionPipedStoreOperation
+   * @param key    collection item's key
+   * @param insert operation parameters (values, attributes, and so on)
+   * @param cb     the status callback
+   * @return a new CollectionPipedInsertOperation
    */
-  CollectionPipedStoreOperation collectionPipedStore(String key,
-                                                     CollectionPipedStore<?> store, OperationCallback cb);
+  CollectionPipedInsertOperation collectionPipedInsert(String key,
+                                                       CollectionPipedInsert<?> insert, OperationCallback cb);
 
   /**
    * Get operation for collection items.
@@ -437,15 +437,15 @@ public interface OperationFactory {
                                                      SetPipedExist<?> exist, OperationCallback cb);
 
   /**
-   * Bulk store operation for collection items.
+   * Bulk insert operation for collection items.
    *
-   * @param key   collection item's key
-   * @param store operation parameters (element values, and so on)
-   * @param cb    the status callback
-   * @return a new CollectionBulkStoreOperation
+   * @param key    collection item's key
+   * @param insert operation parameters (element values, and so on)
+   * @param cb     the status callback
+   * @return a new CollectionBulkInsertOperation
    */
-  CollectionBulkStoreOperation collectionBulkStore(List<String> key,
-                                                   CollectionBulkStore<?> store, OperationCallback cb);
+  CollectionBulkInsertOperation collectionBulkInsert(List<String> key,
+                                                     CollectionBulkInsert<?> insert, OperationCallback cb);
 
   /**
    * Bulk get opearation for b+tree items.
@@ -492,9 +492,9 @@ public interface OperationFactory {
    * @param key b+tree item's key
    * @param get operation parameters (element key and so on)
    * @param cb  the callback that will contain the results
-   * @return a new BTreeStoreAndGetOperation
+   * @return a new BTreeInsertAndGetOperation
    */
-  BTreeStoreAndGetOperation bopStoreAndGet(String key,
-                                           BTreeStoreAndGet<?> get, byte[] dataToStore, OperationCallback cb);
+  BTreeInsertAndGetOperation bopInsertAndGet(String key,
+                                            BTreeInsertAndGet<?> get, byte[] dataToInsert, OperationCallback cb);
 
 }

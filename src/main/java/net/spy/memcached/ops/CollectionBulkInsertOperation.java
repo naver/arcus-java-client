@@ -14,22 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.collection;
+package net.spy.memcached.ops;
 
-public class ListStore<T> extends CollectionStore<T> {
+import net.spy.memcached.collection.CollectionBulkInsert;
 
-  private static final String command = "lop insert";
+/**
+ * Operation that represents collection object storage.
+ */
+public interface CollectionBulkInsertOperation extends KeyedOperation {
 
-  public ListStore() {
-    super();
-  }
+  CollectionBulkInsert<?> getInsert();
 
-  public ListStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-    super(value, null, createKeyIfNotExists, requestMode, attr);
-  }
-
-  public String getCommand() {
-    return command;
+  interface Callback extends OperationCallback {
+    void gotStatus(Integer index, OperationStatus status);
   }
 
 }

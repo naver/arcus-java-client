@@ -79,10 +79,10 @@ public abstract class BaseOperationFactory implements OperationFactory {
       GetAttrOperation c = (GetAttrOperation) op;
       rv.add(getAttr(first(c.getKeys()),
               (GetAttrOperation.Callback) c.getCallback()));
-    } else if (op instanceof CollectionStoreOperation) {
-      CollectionStoreOperation c = (CollectionStoreOperation) op;
-      rv.add(collectionStore(first(c.getKeys()), c.getSubKey(),
-              c.getStore(), c.getData(), c.getCallback()));
+    } else if (op instanceof CollectionInsertOperation) {
+      CollectionInsertOperation c = (CollectionInsertOperation) op;
+      rv.add(collectionInsert(first(c.getKeys()), c.getSubKey(),
+              c.getInsert(), c.getData(), c.getCallback()));
     } else if (op instanceof CollectionGetOperation) {
       CollectionGetOperation c = (CollectionGetOperation) op;
       rv.add(collectionGet(first(c.getKeys()), c.getGet(),

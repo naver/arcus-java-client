@@ -1,6 +1,6 @@
 /*
  * arcus-java-client : Arcus Java client
- * Copyright 2016 JaM2in Co., Ltd.
+ * Copyright 2010-2014 NAVER Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.collection;
+package net.spy.memcached.ops;
 
-public class MapStore<T> extends CollectionStore<T> {
+import net.spy.memcached.collection.CollectionPipedInsert;
 
-  private static final String command = "mop insert";
+/**
+ * Operation that represents collection object storage.
+ */
+public interface CollectionPipedInsertOperation extends KeyedOperation {
 
-  public MapStore(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
-    super(value, null, createKeyIfNotExists, requestMode, attr);
-  }
+  CollectionPipedInsert<?> getInsert();
 
-  public String getCommand() {
-    return command;
+  interface Callback extends OperationCallback {
+    void gotStatus(Integer index, OperationStatus status);
   }
 
 }

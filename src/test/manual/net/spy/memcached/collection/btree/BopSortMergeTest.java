@@ -18,7 +18,6 @@ package net.spy.memcached.collection.btree;
 
 import junit.framework.Assert;
 import net.spy.memcached.collection.*;
-import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 

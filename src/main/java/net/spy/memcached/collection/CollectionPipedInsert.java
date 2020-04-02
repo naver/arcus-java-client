@@ -26,7 +26,7 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
 
-public abstract class CollectionPipedStore<T> extends CollectionObject {
+public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
   public static final String PIPE = "pipe";
   public static final int MAX_PIPED_ITEM_COUNT = 500;
@@ -55,14 +55,14 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class ListPipedStore<T> extends CollectionPipedStore<T> {
+  public static class ListPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "lop insert";
     private Collection<T> list;
     private int index;
 
-    public ListPipedStore(String key, int index, Collection<T> list,
-                          boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+    public ListPipedInsert(String key, int index, Collection<T> list,
+                           boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
@@ -128,13 +128,13 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class SetPipedStore<T> extends CollectionPipedStore<T> {
+  public static class SetPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "sop insert";
     private Collection<T> set;
 
-    public SetPipedStore(String key, Collection<T> set, boolean createKeyIfNotExists,
-                         CollectionAttributes attr, Transcoder<T> tc) {
+    public SetPipedInsert(String key, Collection<T> set, boolean createKeyIfNotExists,
+                          CollectionAttributes attr, Transcoder<T> tc) {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
@@ -199,13 +199,13 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class BTreePipedStore<T> extends CollectionPipedStore<T> {
+  public static class BTreePipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "bop insert";
     private Map<Long, T> map;
 
-    public BTreePipedStore(String key, Map<Long, T> map, boolean createKeyIfNotExists,
-                           CollectionAttributes attr, Transcoder<T> tc) {
+    public BTreePipedInsert(String key, Map<Long, T> map, boolean createKeyIfNotExists,
+                            CollectionAttributes attr, Transcoder<T> tc) {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
@@ -275,15 +275,15 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class ByteArraysBTreePipedStore<T> extends
-          CollectionPipedStore<T> {
+  public static class ByteArraysBTreePipedInsert<T> extends
+          CollectionPipedInsert<T> {
 
     private static final String COMMAND = "bop insert";
     private List<Element<T>> elements;
 
-    public ByteArraysBTreePipedStore(String key, List<Element<T>> elements,
-                                     boolean createKeyIfNotExists, CollectionAttributes attr,
-                                     Transcoder<T> tc) {
+    public ByteArraysBTreePipedInsert(String key, List<Element<T>> elements,
+                                      boolean createKeyIfNotExists, CollectionAttributes attr,
+                                      Transcoder<T> tc) {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
@@ -373,13 +373,13 @@ public abstract class CollectionPipedStore<T> extends CollectionObject {
   /**
    *
    */
-  public static class MapPipedStore<T> extends CollectionPipedStore<T> {
+  public static class MapPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "mop insert";
     private Map<String, T> map;
 
-    public MapPipedStore(String key, Map<String, T> map,
-                         boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
+    public MapPipedInsert(String key, Map<String, T> map,
+                          boolean createKeyIfNotExists, CollectionAttributes attr, Transcoder<T> tc) {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
