@@ -34,13 +34,10 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   private String invalidKey = "InvalidBopFindPositionWithGetTest";
   private String kvKey = "KvBopFindPositionWithGetTest";
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
   }
 
   public void testLongBKeyAsc() throws Exception {

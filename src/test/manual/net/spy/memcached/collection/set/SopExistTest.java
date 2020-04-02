@@ -28,6 +28,7 @@ public class SopExistTest extends BaseIntegrationTest {
   String key = "SopExistTest";
   String value = "value";
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get();

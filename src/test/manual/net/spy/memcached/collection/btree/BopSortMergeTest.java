@@ -40,21 +40,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     add("key1");
   }};
 
+  @Override
   protected void setUp() throws Exception {
-    try {
-      super.setUp();
-      for (int i = 0; i < keyList3.size(); i++) {
-        mc.delete(keyList3.get(i));
-      }
-      for (int i = 0; i < keyList2.size(); i++) {
-        mc.delete(keyList2.get(i));
-      }
-    } catch (Exception ignored) {
+    super.setUp();
+    for (int i = 0; i < keyList3.size(); i++) {
+      mc.delete(keyList3.get(i));
     }
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
+    for (int i = 0; i < keyList2.size(); i++) {
+      mc.delete(keyList2.get(i));
+    }
   }
 
   public void testBopSortMergeAscDuplicate1() throws Exception {

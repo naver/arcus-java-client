@@ -31,13 +31,10 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
   private String key = "SopOverflowActionTest";
   private List<String> keyList = new ArrayList<String>();
 
-  protected void setUp() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
     keyList.add(key);
-    try {
-      super.setUp();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   public void testSopGet_Maxcount() throws Exception {

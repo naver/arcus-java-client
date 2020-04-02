@@ -16,31 +16,22 @@
  */
 package net.spy.memcached;
 
+import junit.framework.TestCase;
 import org.junit.Ignore;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
 @Ignore
-public class ArcusClientReconnectTest extends BaseIntegrationTest {
-
-  @Override
-  protected void setUp() throws Exception {
-    // do nothing
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    // do nothing
-  }
+public class ArcusClientReconnectTest extends TestCase {
 
   public void testOpenAndWait() {
-    if (!USE_ZK) {
+    if (!BaseIntegrationTest.USE_ZK) {
       return;
     }
 
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-            ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
 
     try {
       Thread.sleep(120000L);

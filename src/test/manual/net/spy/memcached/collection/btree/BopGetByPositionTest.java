@@ -50,11 +50,13 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
           21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
           31};
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
   }

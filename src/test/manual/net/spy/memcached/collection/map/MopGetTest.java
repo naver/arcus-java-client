@@ -30,6 +30,7 @@ public class MopGetTest extends BaseIntegrationTest {
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
 
@@ -41,12 +42,10 @@ public class MopGetTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @Override
   protected void tearDown() throws Exception {
-    try {
-      deleteMap(key);
-      super.tearDown();
-    } catch (Exception e) {
-    }
+    deleteMap(key);
+    super.tearDown();
   }
 
   public void testMopGet_NoKey() throws Exception {

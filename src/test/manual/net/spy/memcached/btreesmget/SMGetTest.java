@@ -41,21 +41,13 @@ public class SMGetTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    try {
-      mc.delete(KEY).get();
-    } catch (Exception e) {
-
-    }
+    mc.delete(KEY).get();
     Assert.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
   @Override
   protected void tearDown() throws Exception {
-    try {
-      mc.delete(KEY).get();
-    } catch (Exception e) {
-
-    }
+    mc.delete(KEY).get();
     super.tearDown();
   }
 

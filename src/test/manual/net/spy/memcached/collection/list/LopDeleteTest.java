@@ -28,6 +28,7 @@ public class LopDeleteTest extends BaseIntegrationTest {
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
 
@@ -39,12 +40,10 @@ public class LopDeleteTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @Override
   protected void tearDown() throws Exception {
-    try {
-      deleteList(key, 1000);
-      super.tearDown();
-    } catch (Exception e) {
-    }
+    deleteList(key, 1000);
+    super.tearDown();
   }
 
   public void testLopDelete_NoKey() throws Exception {

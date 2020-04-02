@@ -16,9 +16,8 @@
  */
 package net.spy.memcached;
 
-import junit.framework.Assert;
+import junit.framework.TestCase;
 import net.spy.memcached.collection.BaseIntegrationTest;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.JUnit4ClassRunner;
@@ -27,27 +26,21 @@ import org.junit.runner.RunWith;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(JUnit4ClassRunner.class)
-public class ArcusClientConnectTest extends BaseIntegrationTest {
+public class ArcusClientConnectTest extends TestCase {
 
   @Before
   @Override
   public void setUp() throws Exception {
+    super.setUp();
     // This test assumes we use ZK
-    assumeTrue(USE_ZK);
-    openFromZK();
-  }
-
-  @After
-  @Override
-  public void tearDown() throws Exception {
-    // do nothing
+    assumeTrue(BaseIntegrationTest.USE_ZK);
   }
 
   @Test
   public void testOpenAndWait() {
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    ArcusClient client = ArcusClient.createArcusClient(ZK_HOST,
-            ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
+            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
     client.shutdown();
   }
 }

@@ -36,11 +36,6 @@ public class SopServerMessageTest extends BaseIntegrationTest {
     mc.asyncSopDelete(key, "bbbb", true);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-
   public void testNotFound() throws Exception {
     CollectionFuture<Set<Object>> future = mc.asyncSopGet(key, 1, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));

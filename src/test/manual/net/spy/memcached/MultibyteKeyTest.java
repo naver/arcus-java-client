@@ -1,7 +1,19 @@
 /*
- * Copyright (c) 2015. aiceru@gmail.com
+ * arcus-java-client : Arcus Java client
+ * Copyright 2015 JaM2in Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package net.spy.memcached;
 
 import junit.framework.Assert;
@@ -11,15 +23,10 @@ import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
-
-/**
- * Created by iceru on 2015. 12. 30..
- */
 
 public class MultibyteKeyTest {
   private static final String MULTIBYTE_KEY = "아커스프리픽스:아커스멀티바이트키스트링";
@@ -45,10 +52,6 @@ public class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       keyList.add(MULTIBYTE_KEY + String.valueOf(i));
     }
-  }
-
-  @After
-  public void tearDown() throws Exception {
   }
 
   @Test

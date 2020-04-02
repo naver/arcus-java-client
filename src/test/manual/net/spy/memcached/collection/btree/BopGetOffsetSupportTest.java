@@ -31,13 +31,10 @@ public class BopGetOffsetSupportTest extends BaseIntegrationTest {
 
   private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
-  protected void tearDown() {
-    try {
-      deleteBTree(key, items10);
-      super.tearDown();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    deleteBTree(key, items10);
+    super.tearDown();
   }
 
   public void testBopGetOffset_Normal() throws Exception {

@@ -37,13 +37,10 @@ public class BopFindPositionTest extends BaseIntegrationTest {
           new byte[]{15}, new byte[]{16}, new byte[]{17},
           new byte[]{18}, new byte[]{19}};
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
   }
 
   public void testLongBKeyAsc() throws Exception {

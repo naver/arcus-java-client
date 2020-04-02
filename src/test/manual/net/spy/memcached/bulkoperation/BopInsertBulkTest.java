@@ -34,11 +34,6 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
 
   private static final byte[] EFLAG = new byte[]{0, 0, 1, 1};
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
-
   public void testInsertAndGet() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;

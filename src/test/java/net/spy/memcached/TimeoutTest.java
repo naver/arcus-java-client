@@ -1,15 +1,13 @@
 package net.spy.memcached;
 
-public class TimeoutTest extends ClientBaseCase {
+import junit.framework.TestCase;
+
+public class TimeoutTest extends TestCase {
+  private MemcachedClient client = null;
 
   @Override
-  protected void tearDown() throws Exception {
-    // override teardown to avoid the flush phase
-    client.shutdown();
-  }
-
-  @Override
-  protected void initClient() throws Exception {
+  protected void setUp() throws Exception {
+    super.setUp();
     client = new MemcachedClient(new DefaultConnectionFactory() {
       @Override
       public long getOperationTimeout() {
@@ -22,6 +20,14 @@ public class TimeoutTest extends ClientBaseCase {
       }
     },
             AddrUtil.getAddresses("127.0.0.1:64213"));
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    if (client != null) {
+      client.shutdown();
+    }
+    super.tearDown();
   }
 
   private void tryTimeout(String name, Runnable r) {

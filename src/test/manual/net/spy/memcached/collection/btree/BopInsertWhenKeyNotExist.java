@@ -28,12 +28,10 @@ public class BopInsertWhenKeyNotExist extends BaseIntegrationTest {
   private String[] items9 = {"value0", "value1", "value2", "value3",
           "value4", "value5", "value6", "value7", "value8",};
 
-  protected void tearDown() {
-    try {
-      deleteBTree(key, items9);
-      super.tearDown();
-    } catch (Exception e) {
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    deleteBTree(key, items9);
+    super.tearDown();
   }
 
   /**

@@ -37,11 +37,6 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     mc.delete(key).get();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-
   public void testNotFound() throws Exception {
     CollectionFuture<Map<String, Object>> future = (CollectionFuture<Map<String, Object>>) mc
             .asyncMopGet(key, false, false);

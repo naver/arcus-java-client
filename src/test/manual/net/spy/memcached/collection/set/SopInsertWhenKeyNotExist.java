@@ -25,12 +25,10 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   private String key = "SopInsertWhenKeyNotExist";
 
-  protected void tearDown() {
-    try {
-      mc.delete(key).get();
-      super.tearDown();
-    } catch (Exception e) {
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    mc.delete(key).get();
+    super.tearDown();
   }
 
   /**

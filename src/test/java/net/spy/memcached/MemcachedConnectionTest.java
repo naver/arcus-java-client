@@ -33,6 +33,7 @@ public class MemcachedConnectionTest extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
+    super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     ConnectionFactory cf = cfb.build();
     List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
@@ -44,6 +45,7 @@ public class MemcachedConnectionTest extends TestCase {
   @Override
   protected void tearDown() throws Exception {
     conn.shutdown();
+    super.tearDown();
   }
 
   public void testDebugBuffer() throws Exception {

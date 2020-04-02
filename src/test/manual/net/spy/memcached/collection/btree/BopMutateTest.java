@@ -32,12 +32,10 @@ public class BopMutateTest extends BaseIntegrationTest {
   private String[] items9 = {"1", "2", "3", "4", "5", "6", "7", "8", "9",
           "a"};
 
-  protected void setUp() {
-    try {
-      super.setUp();
-      mc.delete(key);
-    } catch (Exception ignored) {
-    }
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    mc.delete(key);
   }
 
   public void testBopIncrDecr_Basic() throws Exception {

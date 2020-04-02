@@ -48,11 +48,6 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     mc.delete(kvKey).get();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-
   public void testInsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();

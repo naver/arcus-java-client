@@ -49,11 +49,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 
   @Override
   protected void tearDown() throws Exception {
-    try {
-      mc.delete(KEY).get();
-    } catch (Exception e) {
-
-    }
+    mc.delete(KEY).get();
     super.tearDown();
   }
 

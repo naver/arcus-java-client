@@ -35,11 +35,6 @@ public class LopServerMessageTest extends BaseIntegrationTest {
     mc.delete(key).get();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-  }
-
   public void testNotFound() throws Exception {
     CollectionFuture<List<Object>> future = mc.asyncLopGet(key, 0, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));

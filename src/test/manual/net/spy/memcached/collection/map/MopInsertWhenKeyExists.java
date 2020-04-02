@@ -29,14 +29,11 @@ public class MopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
-  protected void tearDown() {
-    try {
-      mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
-      mc.delete(key).get();
-      super.tearDown();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  @Override
+  protected void tearDown() throws Exception {
+    mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
+    mc.delete(key).get();
+    super.tearDown();
   }
 
   public void testMopInsert_Normal() throws Exception {

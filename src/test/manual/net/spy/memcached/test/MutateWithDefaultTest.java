@@ -26,17 +26,10 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
 
   private String key = "MutateWithDefaultTest";
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
-    try {
-      mc.delete(key);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  protected void tearDown() throws Exception {
-    super.tearDown();
+    mc.delete(key);
   }
 
   public void testIncr() {

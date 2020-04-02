@@ -33,14 +33,9 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
   private String key = "LopInsertBulkMultipleValueTest";
 
   @Override
-  protected void tearDown() {
-    try {
-      mc.delete(key).get();
-      super.tearDown();
-    } catch (Exception e) {
-      e.printStackTrace();
-      Assert.fail(e.getMessage());
-    }
+  protected void tearDown() throws Exception {
+    mc.delete(key).get();
+    super.tearDown();
   }
 
   public void testInsertAndGet() {

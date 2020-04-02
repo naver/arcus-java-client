@@ -43,6 +43,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
 
   @Override
   public void setUp() throws Exception {
+    super.setUp();
     listener = mock(CacheMonitorListener.class);
     watcher = mock(Watcher.class);
     zooKeeper = new ZooKeeper("", 15000, (Watcher) watcher.proxy()); // can't mock
@@ -55,6 +56,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
   @Override
   public void tearDown() throws Exception {
     zooKeeper.close();
+    super.tearDown();
   }
 
   public void testProcessResult() {

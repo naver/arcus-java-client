@@ -1,42 +1,31 @@
 package net.spy.memcached;
 
+import junit.framework.TestCase;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class CancelFailureModeTest extends ClientBaseCase {
-  private String serverList;
+public class CancelFailureModeTest extends TestCase {
+  private String serverList= "127.0.0.1:11311";
+  private MemcachedClient client = null;
 
   @Override
   protected void setUp() throws Exception {
-    serverList = ARCUS_HOST + " 127.0.0.1:11311";
     super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    // override teardown to avoid the flush phase
-    serverList = ARCUS_HOST;
-    client.shutdown();
-  }
-
-  @Override
-  protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(serverList));
-  }
-
-  @Override
-  protected void initClient() throws Exception {
-    initClient(new DefaultConnectionFactory() {
+    client = new MemcachedClient(new DefaultConnectionFactory() {
       @Override
       public FailureMode getFailureMode() {
         return FailureMode.Cancel;
       }
-    });
+    }, AddrUtil.getAddresses(serverList));
   }
 
   @Override
-  protected void flushPause() throws InterruptedException {
-    Thread.sleep(100);
+  protected void tearDown() throws Exception {
+    if (client != null) {
+      client.shutdown();
+    }
+    super.tearDown();
   }
 
   public void testQueueingToDownServer() throws Exception {
