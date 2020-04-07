@@ -97,9 +97,6 @@ public class CollectionGetOperationImpl extends OperationImpl
       setOperationType(OperationType.READ);
   }
 
-  /**
-   * VALUE <flag> <count>\r\n
-   */
   public void handleLine(String line) {
     /* ENABLE_REPLICATION if */
     if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
@@ -108,6 +105,12 @@ public class CollectionGetOperationImpl extends OperationImpl
     }
 
     /* ENABLE_REPLICATION end */
+    /*
+      VALUE <flag> <count>\r\n
+      <collection_data>\r\n
+      [ ... ]
+      END|TRIMMED|DELETED|DELETED_DROPPED\r\n
+     */
     if (line.startsWith("VALUE ")) {
       // Response header
       getLogger().debug("Got line %s", line);
@@ -141,6 +144,12 @@ public class CollectionGetOperationImpl extends OperationImpl
         if (b == ' ') {
           spaceCount++;
           if (collectionGet.headerReady(spaceCount)) {
+            /*
+              btree: <bkey> [<eflag>] <bytes> <data>\r\n
+              list:  <bytes> <data>\r\n
+              set:   <bytes> <data>\r\n
+              map:   <field> <bytes> <data>\r\n
+             */
             collectionGet.decodeItemHeader(new String(byteBuffer.toByteArray()));
             byteBuffer.reset();
 

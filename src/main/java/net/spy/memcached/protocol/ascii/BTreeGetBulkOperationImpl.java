@@ -83,6 +83,12 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   public void handleLine(String line) {
     getLogger().debug("Got line %s", line);
 
+    /*
+      VALUE <key> <status> [<flags> <ecount>]\r\n
+      ELEMENT <bkey> [<eflag>] <bytes> <data>\r\n
+      [ ... ]
+      END\r\n
+    */
     if (line.startsWith("VALUE ")) {
       readKey(line);
       if (elementCount > 0) {
@@ -107,10 +113,6 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   }
 
   private final void readKey(String line) {
-    /*
-     * VALUE <key> <status> [<flags> <ecount>]
-     * flags and ecount exist when status is "OK"
-     */
     String[] chunk = line.split(" ");
 
     OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
@@ -125,7 +127,6 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   }
 
   private final void readValue(ByteBuffer bb) {
-    // protocol : ELEMENT bkey [eflag] len value
     if (lookingFor == '\0' && data == null) {
       for (int i = 0; bb.remaining() > 0; i++) {
         byte b = bb.get();
@@ -137,6 +138,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
           String l = new String(byteBuffer.toByteArray());
 
           if (l.startsWith("ELEMENT")) {
+            // ELEMENT <bkey> [<eflag>] <bytes> <data>\r\n
             if (getBulk.elementHeaderReady(spaceCount)) {
               if (spaceCount == 3 && l.split(" ")[2].startsWith("0x")) {
                 byteBuffer.write(b);
