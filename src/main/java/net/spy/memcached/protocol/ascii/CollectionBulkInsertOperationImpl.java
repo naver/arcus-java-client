@@ -113,6 +113,13 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       return;
     }
 
+    /*
+      RESPONSE <count>\r\n
+      <status of the 1st pipelined command>\r\n
+      [ ... ]
+      <status of the last pipelined command>\r\n
+      END|PIPE_ERROR <error_string>\r\n
+    */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);

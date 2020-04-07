@@ -65,11 +65,9 @@ public class CollectionCountOperationImpl extends OperationImpl implements
     setOperationType(OperationType.READ);
   }
 
-  /**
-   * VALUE <flag> <count>\r\n
-   */
   public void handleLine(String line) {
     if (line.startsWith("COUNT=")) {
+      // COUNT=<count>\r\n
       getLogger().debug("Got line %s", line);
 
       String[] stuff = line.split("=");

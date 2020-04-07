@@ -89,8 +89,13 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
       getLogger().debug("Got line %s", line);
     }
 
+    /*
+      VALUE <position> <flags> <count> <index>\r\n
+      <bkey> [<eflag>] <bytes> <data>\r\n
+      [ ... ]
+      END\r\n
+     */
     if (line.startsWith("VALUE ")) {
-      // VALUE <position> <flags> <count> <index>\r\n
       String[] stuff = line.split(" ");
       assert stuff.length == 5;
 
@@ -140,6 +145,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
           // FIXME this is not cool... please fix this :-(
           int spaceReduced = (hasEFlag != null && hasEFlag) ? 1 : 0;
           if (get.headerReady(spaceCount - spaceReduced)) {
+            // <bkey> [<eflag>] <bytes> <data>\r\n
             get.decodeItemHeader(new String(byteBuffer.toByteArray()));
             data = new byte[get.getDataLength()];
             byteBuffer.reset();

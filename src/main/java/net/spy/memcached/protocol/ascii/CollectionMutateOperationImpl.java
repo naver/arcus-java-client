@@ -75,9 +75,6 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     setOperationType(OperationType.WRITE);
   }
 
-  /**
-   * <result value>\r\n
-   */
   public void handleLine(String line) {
 
     OperationStatus status = null;
@@ -90,6 +87,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
 
     /* ENABLE_REPLICATION end */
     try {
+      // <result value>\r\n
       Long.valueOf(line);
       getCallback().receivedStatus(new OperationStatus(true, line));
     } catch (NumberFormatException e) {

@@ -87,7 +87,7 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
 
       // FIXME exception-based conversion.
       try {
-        // expected : POSITION=<position> : 0 or positive integer
+        // POSITION=<position>\r\n
         position = Integer.parseInt(stuff[1]);
         BTreeFindPositionOperation.Callback cb = (BTreeFindPositionOperation.Callback) getCallback();
         cb.gotData(position);
