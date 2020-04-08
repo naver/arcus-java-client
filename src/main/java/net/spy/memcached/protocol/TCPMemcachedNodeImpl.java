@@ -235,19 +235,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     // First, reset the current write op, or cancel it if we should
     // be authenticating
     Operation op = getCurrentWriteOp();
-    if (op != null) {
-      if (shouldAuth) {
-        op.cancel(cause);
-      } else if (cancelWrite) {
-        /* do nothing */
+    if ((cancelWrite || shouldAuth) && op != null) {
+      /*
+       * Do not cancel the operation.
+       * There is no reason to cancel it first
+       * and it will be cancelled in the code below.
+       */
+    } else if (op != null) {
+      ByteBuffer buf = op.getBuffer();
+      if (buf != null) {
+        buf.reset();
       } else {
-        ByteBuffer buf = op.getBuffer();
-        if (buf != null) {
-          buf.reset();
-        } else {
-          getLogger().info("No buffer for current write op, removing");
-          removeCurrentWriteOp();
-        }
+        /* This case cannot happen. */
+        getLogger().warn("No buffer for current write op, removing");
+        removeCurrentWriteOp();
       }
     }
 
