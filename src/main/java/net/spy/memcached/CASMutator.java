@@ -8,7 +8,7 @@ import net.spy.memcached.transcoders.Transcoder;
  *
  * <p>Example usage (reinventing incr):</p>
  *
- * <pre>
+ * <pre>{@code
  * // Get or create a client.
  * MemcachedClient client=[...];
  *
@@ -16,10 +16,10 @@ import net.spy.memcached.transcoders.Transcoder;
  * Transcoder<Long> tc = new LongTranscoder();
  *
  * // Get a mutator instance that uses that client.
- * CASMutator&lt;Long&gt; mutator=new CASMutator&lt;Long&gt;(client, tc);
+ * CASMutator<Long> mutator=new CASMutator<Long>(client, tc);
  *
  * // Get a mutation that knows what to do when a value is found.
- * CASMutation&lt;Long&gt; mutation=new CASMutation&lt;Long&gt;() {
+ * CASMutation<Long> mutation=new CASMutation<Long>() {
  *     public Long getNewValue(Long current) {
  *         return current + 1;
  *     }
@@ -27,7 +27,7 @@ import net.spy.memcached.transcoders.Transcoder;
  *
  * // Do a mutation.
  * long currentValue=mutator.cas(someKey, 0L, 0, mutation);
- * </pre>
+ * }</pre>
  */
 public class CASMutator<T> extends SpyObject {
 

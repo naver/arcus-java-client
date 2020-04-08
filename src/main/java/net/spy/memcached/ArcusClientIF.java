@@ -93,10 +93,10 @@ public interface ArcusClientIF {
    * Set an object in the cache on each key.
    *
    * <h2>Basic usage</h2>
-   * <pre>
+   * <pre>{@code
    * 	ArcusClient c = getClientFromPool();
    *
-   * 	List&lt;String&gt; keys = new ArrayList();
+   * 	List<String> keys = new ArrayList();
    * 	keys.add("KEY1");
    * 	keys.add("KEY2");
    *
@@ -108,7 +108,7 @@ public interface ArcusClientIF {
    *
    * 	// Store a value (async) on each keys for one hour using multiple memcached client.
    * 	c.setBulk(keys, 3600, value, transcoder);
-   * 	</pre>
+   * 	}</pre>
    *
    * @param <T>
    * @param key the key list which this object should be added
@@ -156,16 +156,16 @@ public interface ArcusClientIF {
    * Delete an object in the cache on each key.
    *
    * <h2>Basic usage</h2>
-   * <pre>
+   * <pre>{@code
    *	ArcusClient c = getClientFromPool();
    *
-   *	List&lt;String&gt; keys = new ArrayList();
+   *	List<String> keys = new ArrayList();
    *	keys.add("KEY1");
    *	keys.add("KEY2");
    *
    *	// Delete a value (async) on each keys for one hour using multiple memcached client.
    *	c.asyncDeleteBulk(keys);
-   *	</pre>
+   *	}</pre>
    *
    * @param key the key list which this object should be deleted
    * @return a future that will hold the list of failed
@@ -278,18 +278,18 @@ public interface ArcusClientIF {
    *
    * <h2>Basic usage</h2>
    *
-   * <pre>
+   * <pre>{@code
    * 	ArcusClient client = getClientFromPool();
    *
-   * 	List&lt;String&gt; keyList = getKeyListShouldHaveValue();
+   * 	List<String> keyList = getKeyListShouldHaveValue();
    * 	String value = "Some-value";
    * 	int index = 0;
    * 	boolean createKeyIfNotExists = true;
    *
-   * 	Future&lt;Map&lt;String, CollectionOperationStatus&gt;&gt; future = client.asyncLopInsertBulk(keyList,
+   * 	Future<Map<String, CollectionOperationStatus>> future = client.asyncLopInsertBulk(keyList,
    * 			index, value, createKeyIfNotExists);
    *
-   * 	Map&lt;String, CollectionOperationStatus&gt; failedList = null;
+   * 	Map<String, CollectionOperationStatus> failedList = null;
    * 	try {
    * 		failedList = future.get(1000L, TimeUnit.MILLISECONDS);
    *    } catch (TimeoutException e) {
@@ -303,7 +303,7 @@ public interface ArcusClientIF {
    * 		// Handle error here
    *    }
    * 	handleFailure(failedList);
-   * </pre>
+   * }</pre>
    *
    * @param keyList             a key list of the list
    * @param index               list index (the item will be inserted before the element with the given index)
@@ -332,17 +332,17 @@ public interface ArcusClientIF {
    *
    * <h2>Basic usage</h2>
    *
-   * <pre>
+   * <pre>{@code
    * 	ArcusClient client = getClientFromPool();
    *
-   * 	List&lt;String&gt; keyList = getKeyListShouldHaveValue();
+   * 	List<String> keyList = getKeyListShouldHaveValue();
    * 	String value = "Some-value";
    * 	boolean createKeyIfNotExists = true;
    *
-   * 	Future&lt;Map&lt;String, CollectionOperationStatus&gt;&gt; future = client.asyncSopInsertBulk(keyList,
+   * 	Future<Map<String, CollectionOperationStatus>> future = client.asyncSopInsertBulk(keyList,
    * 			value, createKeyIfNotExists);
    *
-   * 	Map&lt;String, CollectionOperationStatus&gt; failedList = null;
+   * 	Map<String, CollectionOperationStatus> failedList = null;
    * 	try {
    * 		failedList = future.get(1000L, TimeUnit.MILLISECONDS);
    *    } catch (TimeoutException e) {
@@ -356,7 +356,7 @@ public interface ArcusClientIF {
    * 		// Handle error here
    *    }
    * 	handleFailure(failedList);
-   * </pre>
+   * }</pre>
    *
    * @param keyList             a key list of set
    * @param value               a value to insert into each set
