@@ -58,7 +58,7 @@ class BulkService extends SpyObject {
           ArcusClient[] client) {
     assert !executor.isShutdown() : "Pool has already shut down.";
     BulkSetWorker<T> w = new BulkSetWorker<T>(keys, exp, value, transcoder,
-            client, singleOpTimeout);
+            singleOpTimeout, client);
     BulkService.Task<Map<String, CollectionOperationStatus>> task =
             new BulkService.Task<Map<String, CollectionOperationStatus>>(w);
     executor.submit(task);
@@ -69,7 +69,8 @@ class BulkService extends SpyObject {
           Map<String, T> o, int exp, Transcoder<T> transcoder,
           ArcusClient[] client) {
     assert !executor.isShutdown() : "Pool has already shut down.";
-    BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder,client, singleOpTimeout);
+    BulkSetWorker<T> w = new BulkSetWorker<T>(o, exp, transcoder,
+            singleOpTimeout, client);
     BulkService.Task<Map<String, CollectionOperationStatus>> task =
             new BulkService.Task<Map<String, CollectionOperationStatus>>(w);
     executor.submit(task);
@@ -79,7 +80,7 @@ class BulkService extends SpyObject {
   <T> Future<Map<String, CollectionOperationStatus>> deleteBulk(
           List<String> keys, ArcusClient[] client) {
     assert !executor.isShutdown() : "Pool has already shut down.";
-    BulkDeleteWorker<T> w = new BulkDeleteWorker<T>(keys, client, singleOpTimeout);
+    BulkDeleteWorker<T> w = new BulkDeleteWorker<T>(keys, singleOpTimeout, client);
     BulkService.Task<Map<String, CollectionOperationStatus>> task =
             new BulkService.Task<Map<String, CollectionOperationStatus>>(w);
     executor.submit(task);
@@ -208,8 +209,7 @@ class BulkService extends SpyObject {
     private List<CachedData> cos;
 
     public BulkSetWorker(List<String> keys, int exp, T value,
-                         Transcoder<T> transcoder, ArcusClient[] clientList,
-                         long timeout) {
+                         Transcoder<T> transcoder, long timeout, ArcusClient[] clientList) {
       super(keys, timeout, clientList);
       this.keys = keys;
       this.exp = exp;
@@ -220,7 +220,7 @@ class BulkService extends SpyObject {
     }
 
     public BulkSetWorker(Map<String, T> o, int exp,
-                         Transcoder<T> transcoder, ArcusClient[] clientList, long timeout) {
+                         Transcoder<T> transcoder, long timeout, ArcusClient[] clientList) {
 
       super(o.keySet(), timeout, clientList);
 
@@ -267,7 +267,7 @@ class BulkService extends SpyObject {
   private static class BulkDeleteWorker<T> extends BulkWorker<Map<String, CollectionOperationStatus>> {
     private final List<String> keys;
 
-    public BulkDeleteWorker(List<String> keys, ArcusClient[] clientList, long timeout) {
+    public BulkDeleteWorker(List<String> keys, long timeout, ArcusClient[] clientList) {
       super(keys, timeout, clientList);
       this.keys = keys;
       this.errorList = new HashMap<String, CollectionOperationStatus>();
