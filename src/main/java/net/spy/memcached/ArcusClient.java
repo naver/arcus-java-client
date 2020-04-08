@@ -152,18 +152,18 @@ import net.spy.memcached.util.BTreeUtil;
  *
  * <h2>Basic usage</h2>
  *
- * <pre>
- * final static String arcusAdminAddrs = &quot;127.0.0.1:2181&quot;;
- * final static String serviceCode = &quot;cafe&quot;;
+ * <pre>{@code
+ * final static String arcusAdminAddrs = "127.0.0.1:2181";
+ * final static String serviceCode = "cafe";
  *
  * ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
  *
  * ArcusClient c = ArcusClient.createArcusClient(arcusAdminAddrs, serviceCode, cfb);
  *
  * // Store a value (async) for one hour
- * c.set(&quot;someKey&quot;, 3600, someObject);
+ * c.set("someKey", 3600, someObject);
  * // Retrieve a value.
- * Future&lt;Object&gt; myFuture = c.asyncGet(&quot;someKey&quot;);
+ * Future<Object> myFuture = c.asyncGet("someKey");
  *
  * If pool style is needed, it will be used as follows
  *
@@ -171,11 +171,11 @@ import net.spy.memcached.util.BTreeUtil;
  * ArcusClientPool pool = ArcusClient.createArcusClientPool(arcusAdminAddrs, serviceCode, cfb, poolSize);
  *
  * // Store a value
- * pool.set(&quot;someKey&quot;, 3600, someObject);
+ * pool.set("someKey", 3600, someObject);
  * // Retrieve a value
- * Future&lt;Object&gt; myFuture = pool.asyncGet(&quot;someKey&quot;);
+ * Future<Object> myFuture = pool.asyncGet("someKey");
  *
- * </pre>
+ * }</pre>
  */
 public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
 

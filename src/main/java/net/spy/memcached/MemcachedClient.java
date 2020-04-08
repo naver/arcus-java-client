@@ -75,7 +75,7 @@ import net.spy.memcached.transcoders.Transcoder;
  *
  * <h2>Basic usage</h2>
  *
- * <pre>
+ * <pre>{@code
  * 	MemcachedClient c=new MemcachedClient(
  * 		new InetSocketAddress("hostname", portNum));
  *
@@ -83,7 +83,7 @@ import net.spy.memcached.transcoders.Transcoder;
  * 	c.set("someKey", 3600, someObject);
  * 	// Retrieve a value.
  * 	Object myObject=c.get("someKey");
- * 	</pre>
+ * }</pre>
  *
  * <h2>Advanced Usage</h2>
  *
@@ -97,7 +97,7 @@ import net.spy.memcached.transcoders.Transcoder;
  * operation to the server.
  * </p>
  *
- * <pre>
+ * <pre>{@code
  *      // Get a memcached client connected to several servers
  *      // over the binary protocol
  *      MemcachedClient c = new MemcachedClient(new BinaryConnectionFactory(),
@@ -106,7 +106,7 @@ import net.spy.memcached.transcoders.Transcoder;
  *      // Try to get a value, for up to 5 seconds, and cancel if it
  *      // doesn't return
  *      Object myObj = null;
- *      Future&lt;Object&gt; f = c.asyncGet("someKey");
+ *      Future<Object> f = c.asyncGet("someKey");
  *      try {
  *          myObj = f.get(5, TimeUnit.SECONDS);
  *      // throws expecting InterruptedException, ExecutionException
@@ -118,7 +118,7 @@ import net.spy.memcached.transcoders.Transcoder;
  *          f.cancel(true);
  *          // Do other timeout related stuff
  *      }
- * </pre>
+ * }</pre>
  */
 public class MemcachedClient extends SpyThread
         implements MemcachedClientIF, ConnectionObserver {
