@@ -139,6 +139,47 @@ public class ArcusTimeoutTest extends TestCase {
   }
 
   @Test(expected = TimeoutException.class)
+  public void testBulkDeleteTimeout()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    // recreate arcus client with BulkServiceThreadCount 6
+    try {
+      tearDown();
+      mc = new ArcusClient(new DefaultConnectionFactory() {
+        @Override
+        public int getBulkServiceThreadCount() {
+          return 6;
+        }
+      }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
+    } catch (Exception e) {
+      fail(e.getMessage());
+    }
+
+    int keySize = 100000;
+
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyKey" + i;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncDeleteBulk(keys);
+    future.get(1L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test(expected = TimeoutException.class)
+  public void testBulkDeleteTimeoutUsingSingleThread()
+          throws InterruptedException, ExecutionException, TimeoutException {
+    int keySize = 100000;
+
+    String[] keys = new String[keySize];
+    for (int i = 0; i < keys.length; i++) {
+      keys[i] = "MyKey" + i;
+    }
+
+    Future<Map<String, CollectionOperationStatus>> future = mc.asyncDeleteBulk(keys);
+    future.get(1L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test(expected = TimeoutException.class)
   public void testSopPipedInsertBulkTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
     String key = "testTimeout";

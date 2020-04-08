@@ -357,6 +357,18 @@ public class ArcusClientPool implements ArcusClientIF {
   }
 
   @Override
+  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+          List<String> key) {
+    return this.getClient().asyncDeleteBulk(key);
+  }
+
+  @Override
+  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+          String... key) {
+    return this.getClient().asyncDeleteBulk(key);
+  }
+
+  @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
           List<String> keyList, long bkey, byte[] eFlag, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
