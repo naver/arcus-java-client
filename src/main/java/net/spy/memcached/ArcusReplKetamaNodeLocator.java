@@ -93,8 +93,10 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         }
       }
     }
-
-    assert ketamaGroups.size() == (numReps * allGroups.size());
+    assert ketamaGroups.size() <= (numReps * allGroups.size());
+    /* ketamaGroups.size() can be smaller than numReps*AllGroups.size()
+     * because of hash collision
+     */
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
