@@ -164,7 +164,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     String key = "this-is-my-key";
     assertSame("Expected error CASing with no existing value.",
             CASResponse.NOT_FOUND,
-            client.cas(key, 9223372036854775807l, "bad value"));
+            client.cas(key, 9223372036854775807L, "bad value"));
   }
 
   public void testExtendedUTF8Key() throws Exception {
