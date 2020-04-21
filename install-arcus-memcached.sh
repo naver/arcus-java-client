@@ -30,8 +30,9 @@ if [ ! -x "$HOME/arcus/bin/memcached" ] || [ ! -x "$HOME/arcus/zookeeper/bin/zkS
 then
   echo "No arcus installation! running clone and build..."
   git clone --recursive git://github.com/computerphilosopher/arcus.git $HOME/arcus
+  cd $HOME/arcus/scripts
   git checkout bspark/markupsafe
-  cd $HOME/arcus/scripts && ./build.sh
+  ./build.sh
 
   if [ "$TARGET_SERVER_BR" != "master" ]; then
     echo "Changing server branch to $TARGET_SERVER_BR"
