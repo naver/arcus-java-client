@@ -23,9 +23,7 @@
 
     <!-- Miscellaneous                                      -->
     <!-- https://checkstyle.sourceforge.io/config_misc.html -->
-    <!--
     <module name="NewlineAtEndOfFile"/>
-    -->
 
     <!-- Size Violations                                         -->
     <!-- see https://checkstyle.sourceforge.io/config_sizes.html -->
