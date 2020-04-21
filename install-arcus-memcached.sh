@@ -29,7 +29,8 @@ checkBranch() {
 if [ ! -x "$HOME/arcus/bin/memcached" ] || [ ! -x "$HOME/arcus/zookeeper/bin/zkServer.sh" ]
 then
   echo "No arcus installation! running clone and build..."
-  git clone --recursive git://github.com/naver/arcus.git $HOME/arcus
+  git clone --recursive git://github.com/computerphilosopher/arcus.git $HOME/arcus
+  git checkout bspark/markupsafe
   cd $HOME/arcus/scripts && ./build.sh
 
   if [ "$TARGET_SERVER_BR" != "master" ]; then
