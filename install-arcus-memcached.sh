@@ -31,8 +31,7 @@ then
   echo "No arcus installation! running clone and build..."
   git clone --recursive git://github.com/computerphilosopher/arcus.git $HOME/arcus
   cd $HOME/arcus/scripts
-  git checkout bspark/markupsafe
-  ./build.sh
+  git checkout bspark/markupsafe && ./build.sh
 
   if [ "$TARGET_SERVER_BR" != "master" ]; then
     echo "Changing server branch to $TARGET_SERVER_BR"
