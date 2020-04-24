@@ -269,8 +269,11 @@
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
+                    <violationSeverity>warning</violationSeverity>
                     <linkXRef>false</linkXRef>
+                    <includeResources>true</includeResources>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <includeTestResources>true</includeTestResources>
                 </configuration>
                 <executions>
                     <execution>
