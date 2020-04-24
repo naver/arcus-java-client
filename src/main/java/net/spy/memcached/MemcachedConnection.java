@@ -322,6 +322,10 @@ public final class MemcachedConnection extends SpyObject {
               /* The old slave has disappeared. */
               removeNodes.add(oldGroup.getSlaveNode());
 
+              if (!oldGroup.isWritable() && oldGroup.getSlaveNode().getWriteOpCount() > 0) {
+                taskList.add(new SetupResendTask(oldGroup.getSlaveNode(), false, "Discarded all pending reading state operation to move operations."));
+              }
+
               /* move operation slave -> master
                * Slave node have only read operations, then don't need call setupResend
                */
@@ -345,6 +349,10 @@ public final class MemcachedConnection extends SpyObject {
               taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
               taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
+              if (!oldGroup.isWritable() && oldGroup.getSlaveNode().getWriteOpCount() > 0) {
+                taskList.add(new SetupResendTask(oldGroup.getSlaveNode(), false, "Discarded all pending reading state operation to move operations."));
+              }
+
               /* move operation old slave -> new master
                * Slave node have only read operations, then don't need call setupResend
                */
@@ -362,9 +370,13 @@ public final class MemcachedConnection extends SpyObject {
               changeRoleGroups.add(oldGroup);
               attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
-              /* move operation old master -> new master */
-              taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+              if (!oldGroup.isWritable() && oldGroup.getMasterNode().getWriteOpCount() > 0) {
+                // move operation task is delayed until there is no write operation in readQ or receiving switchover response.
+              } else {
+                /* move operation old master -> new master */
+                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+              }
             } else {
               MemcachedNode newMasterNode;
               /* Old master has gone away. And, new group has appeared. */
@@ -386,10 +398,15 @@ public final class MemcachedConnection extends SpyObject {
                 removeNodes.add(oldGroup.getSlaveNode());
                 attachNodes.add(newSlaveNode = attachMemcachedNode(newGroupAddrs.get(1)));
 
-                /* move operation old slave -> new slave
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+                if (!oldGroup.isWritable() && oldGroup.getSlaveNode().getWriteOpCount() > 0) {
+                  taskList.add(new SetupResendTask(oldGroup.getSlaveNode(), false, "Discarded all pending reading state operation to move operations."));
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+                } else {
+                  /* move operation old slave -> new slave
+                   * Slave node have only read operations, then don't need call setupResend
+                   */
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+                }
               }
             } else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
               if (newGroupAddrs.get(1).getIPPort().equals(oldMasterAddr.getIPPort())) {
@@ -403,8 +420,13 @@ public final class MemcachedConnection extends SpyObject {
                  *
                  * because moves all operations
                  */
-                taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
-                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                if (oldGroup.getMasterNode().getWriteOpCount() > 0) {
+                  // move operation task is delayed until there is no write operation in readQ or receiving switchover response.
+                  oldGroup.disableWrite();
+                } else {
+                  taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+                  taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                }
               } else {
                 /* Failover. And, new slave has appeared */
                 removeNodes.add(oldGroup.getMasterNode());
@@ -424,14 +446,23 @@ public final class MemcachedConnection extends SpyObject {
                 changeRoleGroups.add(oldGroup);
                 attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
-                /* move operation old master -> new master */
-                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+                if (!oldGroup.isWritable() && oldGroup.getMasterNode().getWriteOpCount() > 0) {
+                  // move operation task is delayed until there is no write operation in readQ or receiving switchover response.
+                } else {
+                  /* move operation old master -> new master */
+                  taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                  taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
+                }
 
-                /* move operation old slave -> old master(slave)
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+                if (!oldGroup.isWritable() && oldGroup.getSlaveNode().getWriteOpCount() > 0) {
+                  taskList.add(new SetupResendTask(oldGroup.getSlaveNode(), false, "Discarded all pending reading state operation to move operations."));
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newMasterNode));
+                } else {
+                  /* move operation old slave -> old master(slave)
+                   * Slave node have only read operations, then don't need call setupResend
+                   */
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+                }
               } else if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
                 MemcachedNode newMasterNode;
                 /* Only old master has disappeared. */
@@ -454,10 +485,15 @@ public final class MemcachedConnection extends SpyObject {
                 taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
                 taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
-                /* move operation old slave -> new slave
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+                if (!oldGroup.isWritable() && oldGroup.getSlaveNode().getWriteOpCount() > 0) {
+                  taskList.add(new SetupResendTask(oldGroup.getSlaveNode(), false, "Discarded all pending reading state operation to move operations."));
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newMasterNode));
+                } else {
+                  /* move operation old slave -> new slave
+                   * Slave node have only read operations, then don't need call setupResend
+                   */
+                  taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), newSlaveNode));
+                }
               }
             }
           }
@@ -800,6 +836,13 @@ public final class MemcachedConnection extends SpyObject {
 
   private void handleWrites(SelectionKey sk, MemcachedNode qa)
           throws IOException {
+    /* ENABLE_REPLICATION if */
+    MemcachedReplicaGroup group = qa.getReplicaGroup();
+    if (group != null && !group.isWritable()) {
+      return;
+    }
+    /* ENABLE_REPLICATION end */
+
     qa.fillWriteBuffer(shouldOptimize);
     boolean canWriteMore = qa.getBytesRemainingToWrite() > 0;
     while (canWriteMore) {
@@ -830,11 +873,29 @@ public final class MemcachedConnection extends SpyObject {
           Operation op = qa.removeCurrentReadOp();
           assert op == currentOp
                   : "Expected to pop " + currentOp + " got " + op;
+          /* ENABLE_REPLICATION if */
+          MemcachedReplicaGroup group = qa.getReplicaGroup();
+          if (group != null && !group.isWritable() &&
+              !((ArcusReplNodeAddress) qa.getSocketAddress()).master &&
+              qa.getWriteOpCount() == 0) {
+            rbuf.clear();
+            switchoverMemcachedReplGroup(qa);
+            return;
+          }
+          /* ENABLE_REPLICATION end */
           currentOp = qa.getCurrentReadOp();
         }
         /* ENABLE_REPLICATION if */
         else if (currentOp.getState() == OperationState.MOVING) {
-          break;
+          MemcachedReplicaGroup group = qa.getReplicaGroup();
+          if (group != null && !group.isWritable() &&
+              ((ArcusReplNodeAddress) qa.getSocketAddress()).master) {
+            // no need to move operation.
+            // because master is already switch overed before.
+            currentOp = qa.getCurrentReadOp();
+          } else {
+            break;
+          }
         }
         /* ENABLE_REPLICATION end */
       }
