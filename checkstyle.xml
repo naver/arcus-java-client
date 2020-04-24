@@ -111,7 +111,9 @@
         <!-- see https://checkstyle.sourceforge.io/config_coding.html -->
         <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>
+        <!--
         <module name="EqualsHashCode"/>
+        -->
         <module name="FallThrough"/>
         <module name="IllegalTokenText">
             <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
@@ -129,8 +131,8 @@
         <!--
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="SimplifyBooleanExpression"/>
-        -->
         <module name="StringLiteralEquality"/>
+        -->
         <module name="SuperClone"/>
         <!--
         <module name="VariableDeclarationUsageDistance"/>
@@ -272,23 +274,23 @@
             <message key="name.invalidPattern"
                      value="Member name ''{0}'' must match pattern ''{1}''."/>
         </module>
-        -->
         <module name="MethodName">
             <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
             <message key="name.invalidPattern"
                      value="Method name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        -->
         <module name="MethodTypeParameterName">
             <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
             <message key="name.invalidPattern"
                      value="Method type name ''{0}'' must match pattern ''{1}''."/>
         </module>
+        <!--
         <module name="PackageName">
             <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
             <message key="name.invalidPattern"
                      value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
-        <!--
         <module name="ParameterName">
             <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
             <message key="name.invalidPattern"
@@ -356,8 +358,8 @@
             <property name="tokens" value="PACKAGE_DEF, IMPORT, STATIC_IMPORT"/>
         </module>
         <module name="NoWhitespaceAfter"/>
-        <module name="NoWhitespaceBefore"/>
         <!--
+        <module name="NoWhitespaceBefore"/>
         <module name="OperatorWrap">
             <property name="option" value="NL"/>
             <property name="tokens"
@@ -372,6 +374,7 @@
                       LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_WHILE, METHOD_CALL,
                       METHOD_DEF, QUESTION, RESOURCE_SPECIFICATION, SUPER_CTOR_CALL, LAMBDA"/>
         </module>
+        <!--
         <module name="SeparatorWrap">
             <property name="id" value="SeparatorWrapDot"/>
             <property name="tokens" value="DOT"/>
@@ -397,11 +400,12 @@
             <property name="tokens" value="METHOD_REF"/>
             <property name="option" value="nl"/>
         </module>
+        -->
         <module name="TypecastParenPad"/>
-        <module name="WhitespaceAfter">
-            <property name="tokens" value="COMMA, SEMI"/>
-        </module>
         <!--
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="COMMA, SEMI "/>
+        </module>
         <module name="WhitespaceAround">
             <property name="allowEmptyConstructors" value="true"/>
             <property name="allowEmptyLambdas" value="true"/>
