@@ -27,16 +27,20 @@ import java.util.concurrent.TimeUnit;
 
 public class BopSortMergeOldTest extends BaseIntegrationTest {
 
-  private List<String> keyList3 = new ArrayList<String>() {{
-    add("key0");
-    add("key1");
-    add("key2");
-  }};
+  private List<String> keyList3 = new ArrayList<String>() {
+    {
+      add("key0");
+      add("key1");
+      add("key2");
+    }
+  };
 
-  private List<String> keyList2 = new ArrayList<String>() {{
-    add("key0");
-    add("key1");
-  }};
+  private List<String> keyList2 = new ArrayList<String>() {
+    {
+      add("key0");
+      add("key1");
+    }
+  };
 
   @Override
   protected void setUp() throws Exception {

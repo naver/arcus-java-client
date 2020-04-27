@@ -37,11 +37,11 @@ public class TranscodeService extends SpyObject {
     assert !pool.isShutdown() : "Pool has already shut down.";
 
     TranscodeService.Task<T> task = new TranscodeService.Task<T>(
-            new Callable<T>() {
-              public T call() {
-                return tc.decode(cachedData);
-              }
-            });
+        new Callable<T>() {
+          public T call() {
+            return tc.decode(cachedData);
+          }
+        });
 
     if (tc.asyncDecode(cachedData)) {
       this.pool.execute(task);

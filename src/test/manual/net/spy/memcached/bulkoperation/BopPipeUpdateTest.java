@@ -46,8 +46,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
     List<Element<Object>> elements = new ArrayList<Element<Object>>();
 
     for (int i = 0; i < elementCount; i++) {
-      elements.add(new Element<Object>(i, "value" + i, new byte[]{1, 1,
-              1, 1}));
+      elements.add(new Element<Object>(i, "value" + i, new byte[]{1, 1, 1, 1}));
     }
 
     // long start = System.currentTimeMillis();

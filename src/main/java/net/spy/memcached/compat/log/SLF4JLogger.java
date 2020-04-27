@@ -77,27 +77,27 @@ public class SLF4JLogger extends AbstractLogger {
     }
 
     switch(level) {
-    case TRACE:
-      logger.trace(message.toString(), e);
-      break;
-    case DEBUG:
-      logger.debug(message.toString(), e);
-      break;
-    case INFO:
-      logger.info(message.toString(), e);
-      break;
-    case WARN:
-      logger.warn(message.toString(), e);
-      break;
-    case ERROR:
-      logger.error(message.toString(), e);
-      break;
-    case FATAL:
-      logger.error(message.toString(), e);
-      break;
-    default:
-      logger.error("Unhandled Logging Level: " + level
-        + " with log message: " + message.toString(), e);
+      case TRACE:
+        logger.trace(message.toString(), e);
+        break;
+      case DEBUG:
+        logger.debug(message.toString(), e);
+        break;
+      case INFO:
+        logger.info(message.toString(), e);
+        break;
+      case WARN:
+        logger.warn(message.toString(), e);
+        break;
+      case ERROR:
+        logger.error(message.toString(), e);
+        break;
+      case FATAL:
+        logger.error(message.toString(), e);
+        break;
+      default:
+        logger.error("Unhandled Logging Level: " + level
+            + " with log message: " + message.toString(), e);
     }
   }
 

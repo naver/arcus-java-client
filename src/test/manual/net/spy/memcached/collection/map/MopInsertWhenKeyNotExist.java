@@ -25,8 +25,10 @@ public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   private String key = "MopInsertWhenKeyNotExist";
 
-  private String[] items9 = {"value0", "value1", "value2", "value3",
-          "value4", "value5", "value6", "value7", "value8",};
+  private String[] items9 = {
+      "value0", "value1", "value2", "value3",
+      "value4", "value5", "value6", "value7", "value8"
+  };
 
   @Override
   protected void tearDown() throws Exception {

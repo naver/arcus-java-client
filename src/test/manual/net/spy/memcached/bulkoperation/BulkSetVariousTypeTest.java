@@ -49,7 +49,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
   public void testInsertAndGet() {
     Object[] valueList = {1.0, 1000, 1000L, "String",
-            new MyBean("beanName")};
+        new MyBean("beanName")};
     String keyPrefix = "TypeTestKey";
 
     try {
