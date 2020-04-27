@@ -488,71 +488,71 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
-            new CollectionGetOperation.Callback() {
-              List<T> list = new ArrayList<T>();
+        new CollectionGetOperation.Callback() {
+          List<T> list = new ArrayList<T>();
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(list, cstatus);
+              return;
+            }
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k,
+                          cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(list, cstatus);
-                  return;
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(list, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s",
+                          k, cstatus);
                 }
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) not found : %s", k,
-                              cstatus);
-                    }
-                    break;
-                  case NOT_FOUND_ELEMENT:
-                    rv.set(list, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case OUT_OF_RANGE:
-                    rv.set(list, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found in condition : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case UNREADABLE:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) is not readable : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) unknown status : %s",
-                              k, cstatus);
-                    }
-                    break;
+                break;
+              case OUT_OF_RANGE:
+                rv.set(list, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found in condition : %s",
+                          k, cstatus);
                 }
-              }
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) is not readable : %s",
+                          k, cstatus);
+                }
+                break;
+              default:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) unknown status : %s",
+                          k, cstatus);
+                }
+                break;
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, String subkey, int flags,
-                                  byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                list.add(tc.decode(new CachedData(flags, data, tc
-                        .getMaxSize())));
-              }
-            });
+          public void gotData(String key, String subkey, int flags,
+                              byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            list.add(tc.decode(new CachedData(flags, data, tc
+                    .getMaxSize())));
+          }
+        });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -592,65 +592,65 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
-            new CollectionGetOperation.Callback() {
-              Set<T> set = new HashSet<T>();
+        new CollectionGetOperation.Callback() {
+          Set<T> set = new HashSet<T>();
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(set, cstatus);
+              return;
+            }
+
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k,
+                          cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(set, cstatus);
-                  return;
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(set, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s",
+                          k, cstatus);
                 }
-
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) not found : %s", k,
-                              cstatus);
-                    }
-                    break;
-                  case NOT_FOUND_ELEMENT:
-                    rv.set(set, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case UNREADABLE:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Collection(%s) is not readable : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) unknown status : %s",
-                              k, cstatus);
-                    }
-                    break;
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Collection(%s) is not readable : %s",
+                          k, cstatus);
                 }
-              }
+                break;
+              default:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) unknown status : %s",
+                          k, cstatus);
+                }
+                break;
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, String subkey, int flags,
-                                  byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                set.add(tc.decode(new CachedData(flags, data, tc
-                        .getMaxSize())));
-              }
-            });
+          public void gotData(String key, String subkey, int flags,
+                              byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            set.add(tc.decode(new CachedData(flags, data, tc
+                    .getMaxSize())));
+          }
+        });
 
     rv.setOperation(op);
     addOp(k, op);
@@ -673,69 +673,69 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<Map<Long, Element<T>>> rv = new CollectionFuture<Map<Long, Element<T>>>(
             latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
-            new CollectionGetOperation.Callback() {
-              TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
-                      (reverse) ? Collections.reverseOrder() : null);
+        new CollectionGetOperation.Callback() {
+          TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
+                  (reverse) ? Collections.reverseOrder() : null);
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(map, cstatus);
+              return;
+            }
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k,
+                          cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(map, cstatus);
-                  return;
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(map, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s",
+                          k, cstatus);
                 }
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) not found : %s", k,
-                              cstatus);
-                    }
-                    break;
-                  case NOT_FOUND_ELEMENT:
-                    rv.set(map, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case UNREADABLE:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) is not readable : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) Unknown response : %s",
-                              k, cstatus);
-                    }
-                    break;
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) is not readable : %s",
+                          k, cstatus);
                 }
-              }
+                break;
+              default:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) Unknown response : %s",
+                          k, cstatus);
+                }
+                break;
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, String subkey, int flags,
-                                  byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                long longSubkey = Long.parseLong(subkey);
-                map.put(longSubkey,
-                        new Element<T>(longSubkey, tc
-                                .decode(new CachedData(flags, data, tc
-                                        .getMaxSize())), collectionGet
-                                .getElementFlag()));
-              }
-            });
+          public void gotData(String key, String subkey, int flags,
+                              byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            long longSubkey = Long.parseLong(subkey);
+            map.put(longSubkey,
+                    new Element<T>(longSubkey, tc
+                            .decode(new CachedData(flags, data, tc
+                                    .getMaxSize())), collectionGet
+                            .getElementFlag()));
+          }
+        });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -755,64 +755,64 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<Map<String, T>> rv = new CollectionFuture<Map<String, T>>(
             latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
-            new CollectionGetOperation.Callback() {
-              HashMap<String, T> map = new HashMap<String, T>();
+        new CollectionGetOperation.Callback() {
+          HashMap<String, T> map = new HashMap<String, T>();
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(map, cstatus);
+              return;
+            }
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k,
+                          cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(map, cstatus);
-                  return;
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(map, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s",
+                          k, cstatus);
                 }
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) not found : %s", k,
-                              cstatus);
-                    }
-                    break;
-                  case NOT_FOUND_ELEMENT:
-                    rv.set(map, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case UNREADABLE:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) is not readable : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) Unknown response : %s",
-                              k, cstatus);
-                    }
-                    break;
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) is not readable : %s",
+                          k, cstatus);
                 }
-              }
+                break;
+              default:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) Unknown response : %s",
+                          k, cstatus);
+                }
+                break;
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, String subkey, int flags,
-                                  byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                map.put(subkey, tc.decode(new CachedData(flags, data, tc
-                        .getMaxSize())));
-              }
-            });
+          public void gotData(String key, String subkey, int flags,
+                              byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            map.put(subkey, tc.decode(new CachedData(flags, data, tc
+                    .getMaxSize())));
+          }
+        });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -908,34 +908,34 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             new CollectionFuture<Map<Integer, CollectionOperationStatus>>(latch, operationTimeout);
 
     Operation op = opFact.collectionPipedInsert(key, insert,
-            new CollectionPipedInsertOperation.Callback() {
-              Map<Integer, CollectionOperationStatus> result =
-                      new TreeMap<Integer, CollectionOperationStatus>();
+        new CollectionPipedInsertOperation.Callback() {
+          Map<Integer, CollectionOperationStatus> result =
+                  new TreeMap<Integer, CollectionOperationStatus>();
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(result, cstatus);
-              }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            rv.set(result, cstatus);
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotStatus(Integer index, OperationStatus status) {
-                if (status instanceof CollectionOperationStatus) {
-                  result.put(index, (CollectionOperationStatus) status);
-                } else {
-                  result.put(index, new CollectionOperationStatus(status));
-                }
-              }
-            });
+          public void gotStatus(Integer index, OperationStatus status) {
+            if (status instanceof CollectionOperationStatus) {
+              result.put(index, (CollectionOperationStatus) status);
+            } else {
+              result.put(index, new CollectionOperationStatus(status));
+            }
+          }
+        });
 
     rv.setOperation(op);
     addOp(key, op);
@@ -967,35 +967,35 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionPipedUpdate(key, update,
-            new CollectionPipedUpdateOperation.Callback() {
-              Map<Integer, CollectionOperationStatus> result = new TreeMap<Integer, CollectionOperationStatus>();
+        new CollectionPipedUpdateOperation.Callback() {
+          Map<Integer, CollectionOperationStatus> result = new TreeMap<Integer, CollectionOperationStatus>();
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(result, cstatus);
-              }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            rv.set(result, cstatus);
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotStatus(Integer index, OperationStatus status) {
-                if (status instanceof CollectionOperationStatus) {
-                  result.put(index,
-                          (CollectionOperationStatus) status);
-                } else {
-                  result.put(index, new CollectionOperationStatus(
-                          status));
-                }
-              }
-            });
+          public void gotStatus(Integer index, OperationStatus status) {
+            if (status instanceof CollectionOperationStatus) {
+              result.put(index,
+                      (CollectionOperationStatus) status);
+            } else {
+              result.put(index, new CollectionOperationStatus(
+                      status));
+            }
+          }
+        });
 
     rv.setOperation(op);
     addOp(key, op);
@@ -1026,42 +1026,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       final int idx = i;
 
       Operation op = opFact.collectionPipedUpdate(key, update,
-              new CollectionPipedUpdateOperation.Callback() {
-                // each result status
-                public void receivedStatus(OperationStatus status) {
-                  CollectionOperationStatus cstatus;
+          new CollectionPipedUpdateOperation.Callback() {
+            // each result status
+            public void receivedStatus(OperationStatus status) {
+              CollectionOperationStatus cstatus;
 
-                  if (status instanceof CollectionOperationStatus) {
-                    cstatus = (CollectionOperationStatus) status;
-                  } else {
-                    getLogger().warn("Unhandled state: " + status);
-                    cstatus = new CollectionOperationStatus(status);
-                  }
-                  mergedOperationStatus.add(cstatus);
-                }
+              if (status instanceof CollectionOperationStatus) {
+                cstatus = (CollectionOperationStatus) status;
+              } else {
+                getLogger().warn("Unhandled state: " + status);
+                cstatus = new CollectionOperationStatus(status);
+              }
+              mergedOperationStatus.add(cstatus);
+            }
 
-                // complete
-                public void complete() {
-                  latch.countDown();
-                }
+            // complete
+            public void complete() {
+              latch.countDown();
+            }
 
-                // got status
-                public void gotStatus(Integer index,
-                                      OperationStatus status) {
-                  if (status instanceof CollectionOperationStatus) {
-                    mergedResult
-                            .put(index
-                                            + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                    (CollectionOperationStatus) status);
-                  } else {
-                    mergedResult
-                            .put(index
-                                            + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                    new CollectionOperationStatus(
-                                            status));
-                  }
-                }
-              });
+            // got status
+            public void gotStatus(Integer index,
+                                  OperationStatus status) {
+              if (status instanceof CollectionOperationStatus) {
+                mergedResult
+                        .put(index
+                                        + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                                (CollectionOperationStatus) status);
+              } else {
+                mergedResult
+                        .put(index
+                                        + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                                new CollectionOperationStatus(
+                                        status));
+              }
+            }
+          });
       addOp(key, op);
       ops.add(op);
     }
@@ -1145,33 +1145,33 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
             latch, operationTimeout);
     Operation op = opFact.collectionDelete(key, collectionDelete,
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+        new OperationCallback() {
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Deletion to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionDelete.getClass()
-                                  .getName() + ", key=" + key
-                                  + ")");
-                }
-              }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            rv.set(cstatus.isSuccess(), cstatus);
+            if (!cstatus.isSuccess()
+                    && getLogger().isDebugEnabled()) {
+              getLogger().debug(
+                      "Deletion to the collection failed : "
+                              + cstatus.getMessage()
+                              + " (type="
+                              + collectionDelete.getClass()
+                              .getName() + ", key=" + key
+                              + ")");
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -1193,35 +1193,35 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
             latch, operationTimeout);
     Operation op = opFact.collectionExist(key, subkey, collectionExist,
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+        new OperationCallback() {
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                boolean isExist = (CollectionResponse.EXIST == cstatus
-                        .getResponse()) ? true : false;
-                rv.set(isExist, cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Exist command to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionExist.getClass()
-                                  .getName() + ", key=" + key
-                                  + ", subkey=" + subkey + ")");
-                }
-              }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            boolean isExist = (CollectionResponse.EXIST == cstatus
+                    .getResponse()) ? true : false;
+            rv.set(isExist, cstatus);
+            if (!cstatus.isSuccess()
+                    && getLogger().isDebugEnabled()) {
+              getLogger().debug(
+                      "Exist command to the collection failed : "
+                              + cstatus.getMessage()
+                              + " (type="
+                              + collectionExist.getClass()
+                              .getName() + ", key=" + key
+                              + ", subkey=" + subkey + ")");
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -1374,38 +1374,38 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionCreate(key, collectionCreate,
-            new OperationCallback() {
-              @Override
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+        new OperationCallback() {
+          @Override
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger()
-                          .debug("Insertion to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionCreate.getClass()
-                                  .getName()
-                                  + ", key="
-                                  + key
-                                  + ", attribute="
-                                  + collectionCreate.toString() + ")");
-                }
-              }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            rv.set(cstatus.isSuccess(), cstatus);
+            if (!cstatus.isSuccess()
+                    && getLogger().isDebugEnabled()) {
+              getLogger()
+                      .debug("Insertion to the collection failed : "
+                              + cstatus.getMessage()
+                              + " (type="
+                              + collectionCreate.getClass()
+                              .getName()
+                              + ", key="
+                              + key
+                              + ", attribute="
+                              + collectionCreate.toString() + ")");
+            }
+          }
 
-              @Override
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          @Override
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -1738,34 +1738,34 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionCount(k, collectionCount,
-            new OperationCallback() {
+        new OperationCallback() {
 
-              @Override
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
+          @Override
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
 
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
 
-                if (cstatus.isSuccess()) {
-                  rv.set(new Integer(cstatus.getMessage()),
-                          new CollectionOperationStatus(
-                                  new OperationStatus(true, "END")));
-                  return;
-                }
+            if (cstatus.isSuccess()) {
+              rv.set(new Integer(cstatus.getMessage()),
+                      new CollectionOperationStatus(
+                              new OperationStatus(true, "END")));
+              return;
+            }
 
-                rv.set(null, cstatus);
-              }
+            rv.set(null, cstatus);
+          }
 
-              @Override
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          @Override
+          public void complete() {
+            latch.countDown();
+          }
+        });
 
     rv.setOperation(op);
     addOp(k, op);
@@ -2073,15 +2073,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       public Operation newOp(final MemcachedNode n,
                              final CountDownLatch latch) {
         Operation op = opFact.flush(prefix, delay, false,
-                new OperationCallback() {
-                  public void receivedStatus(OperationStatus s) {
-                    flushResult.set(s.isSuccess());
-                  }
+            new OperationCallback() {
+              public void receivedStatus(OperationStatus s) {
+                flushResult.set(s.isSuccess());
+              }
 
-                  public void complete() {
-                    latch.countDown();
-                  }
-                });
+              public void complete() {
+                latch.countDown();
+              }
+            });
         ops.add(op);
         return op;
       }
@@ -3117,68 +3117,68 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
-            new CollectionGetOperation.Callback() {
-              TreeMap<ByteArrayBKey, Element<T>> map = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
-                      (reverse) ? Collections.reverseOrder() : null);
+        new CollectionGetOperation.Callback() {
+          TreeMap<ByteArrayBKey, Element<T>> map = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
+                  (reverse) ? Collections.reverseOrder() : null);
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(map, cstatus);
+              return;
+            }
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k,
+                          cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(map, cstatus);
-                  return;
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(map, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s",
+                          k, cstatus);
                 }
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) not found : %s", k,
-                              cstatus);
-                    }
-                    break;
-                  case NOT_FOUND_ELEMENT:
-                    rv.set(map, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Element(%s) not found : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  case UNREADABLE:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Collection(%s) is not readable : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    rv.set(null, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Key(%s) Unknown response : %s",
-                              k, cstatus);
-                    }
-                    break;
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Collection(%s) is not readable : %s",
+                          k, cstatus);
                 }
-              }
+                break;
+              default:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) Unknown response : %s",
+                          k, cstatus);
+                }
+                break;
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, String subkey,
-                                  int flags, byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                byte[] bkey = BTreeUtil.hexStringToByteArrays(subkey);
-                Element<T> element = new Element<T>(bkey, tc
-                        .decode(new CachedData(flags, data, tc
-                                .getMaxSize())), collectionGet.getElementFlag());
-                map.put(new ByteArrayBKey(bkey), element);
-              }
-            });
+          public void gotData(String key, String subkey,
+                              int flags, byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            byte[] bkey = BTreeUtil.hexStringToByteArrays(subkey);
+            Element<T> element = new Element<T>(bkey, tc
+                    .decode(new CachedData(flags, data, tc
+                            .getMaxSize())), collectionGet.getElementFlag());
+            map.put(new ByteArrayBKey(bkey), element);
+          }
+        });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -3629,50 +3629,50 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.bopInsertAndGet(k, get, co.getData(),
-            new BTreeInsertAndGetOperation.Callback() {
-              Element<E> element = null;
+        new BTreeInsertAndGetOperation.Callback() {
+          Element<E> element = null;
 
-              public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            if (cstatus.isSuccess()) {
+              rv.set(true, cstatus);
+              rv.setElement(element);
+              return;
+            }
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+              case ELEMENT_EXISTS:
+              case OVERFLOWED:
+              case OUT_OF_RANGE:
+              case TYPE_MISMATCH:
+              case BKEY_MISMATCH:
+                rv.set(false, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Request for \"%s\" was not successful : %s",
+                          k, cstatus);
                 }
-                if (cstatus.isSuccess()) {
-                  rv.set(true, cstatus);
-                  rv.setElement(element);
-                  return;
-                }
-                switch (cstatus.getResponse()) {
-                  case NOT_FOUND:
-                  case ELEMENT_EXISTS:
-                  case OVERFLOWED:
-                  case OUT_OF_RANGE:
-                  case TYPE_MISMATCH:
-                  case BKEY_MISMATCH:
-                    rv.set(false, cstatus);
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug("Request for \"%s\" was not successful : %s",
-                              k, cstatus);
-                    }
-                    break;
-                  default:
-                    getLogger().warn("Unhandled state: " + status);
-                }
-              }
+                break;
+              default:
+                getLogger().warn("Unhandled state: " + status);
+            }
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotData(String key, int flags, BKeyObject bkeyObject,
-                                  byte[] eflag, byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
-              }
-            });
+          public void gotData(String key, int flags, BKeyObject bkeyObject,
+                              byte[] eflag, byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
+          }
+        });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -3821,57 +3821,57 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionPipedExist(key, exist,
-            new CollectionPipedExistOperation.Callback() {
+        new CollectionPipedExistOperation.Callback() {
 
-              Map<T, Boolean> result = new HashMap<T, Boolean>();
+          Map<T, Boolean> result = new HashMap<T, Boolean>();
 
-              boolean hasAnError = false;
+          boolean hasAnError = false;
 
-              public void receivedStatus(OperationStatus status) {
-                if (hasAnError)
-                  return;
+          public void receivedStatus(OperationStatus status) {
+            if (hasAnError)
+              return;
 
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
-                rv.set(result, cstatus);
-              }
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
+            }
+            rv.set(result, cstatus);
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
+          public void complete() {
+            latch.countDown();
+          }
 
-              public void gotStatus(Integer index, OperationStatus status) {
-                CollectionOperationStatus cstatus;
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  cstatus = new CollectionOperationStatus(status);
-                }
+          public void gotStatus(Integer index, OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              cstatus = new CollectionOperationStatus(status);
+            }
 
-                switch (cstatus.getResponse()) {
-                  case EXIST:
-                  case NOT_EXIST:
-                    result.put(exist.getValues().get(index),
-                            (CollectionResponse.EXIST.equals(cstatus
-                                    .getResponse())));
-                    break;
-                  case UNREADABLE:
-                  case TYPE_MISMATCH:
-                  case NOT_FOUND:
-                    hasAnError = true;
-                    rv.set(new HashMap<T, Boolean>(0),
-                            (CollectionOperationStatus) status);
-                    break;
-                  default:
-                    getLogger().warn("Unhandled state: " + status);
-                }
-              }
-            });
+            switch (cstatus.getResponse()) {
+              case EXIST:
+              case NOT_EXIST:
+                result.put(exist.getValues().get(index),
+                        (CollectionResponse.EXIST.equals(cstatus
+                                .getResponse())));
+                break;
+              case UNREADABLE:
+              case TYPE_MISMATCH:
+              case NOT_FOUND:
+                hasAnError = true;
+                rv.set(new HashMap<T, Boolean>(0),
+                        (CollectionOperationStatus) status);
+                break;
+              default:
+                getLogger().warn("Unhandled state: " + status);
+            }
+          }
+        });
 
     rv.setOperation(op);
     addOp(key, op);
@@ -4007,42 +4007,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       final int idx = i;
 
       Operation op = opFact.collectionPipedInsert(key, insert,
-              new CollectionPipedInsertOperation.Callback() {
-                // each result status
-                public void receivedStatus(OperationStatus status) {
-                  CollectionOperationStatus cstatus;
+          new CollectionPipedInsertOperation.Callback() {
+            // each result status
+            public void receivedStatus(OperationStatus status) {
+              CollectionOperationStatus cstatus;
 
-                  if (status instanceof CollectionOperationStatus) {
-                    cstatus = (CollectionOperationStatus) status;
-                  } else {
-                    getLogger().warn("Unhandled state: " + status);
-                    cstatus = new CollectionOperationStatus(status);
-                  }
-                  mergedOperationStatus.add(cstatus);
-                }
+              if (status instanceof CollectionOperationStatus) {
+                cstatus = (CollectionOperationStatus) status;
+              } else {
+                getLogger().warn("Unhandled state: " + status);
+                cstatus = new CollectionOperationStatus(status);
+              }
+              mergedOperationStatus.add(cstatus);
+            }
 
-                // complete
-                public void complete() {
-                  latch.countDown();
-                }
+            // complete
+            public void complete() {
+              latch.countDown();
+            }
 
-                // got status
-                public void gotStatus(Integer index,
-                                      OperationStatus status) {
-                  if (status instanceof CollectionOperationStatus) {
-                    mergedResult
-                            .put(index
-                                            + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                    (CollectionOperationStatus) status);
-                  } else {
-                    mergedResult
-                            .put(index
-                                            + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                    new CollectionOperationStatus(
-                                            status));
-                  }
-                }
-              });
+            // got status
+            public void gotStatus(Integer index,
+                                  OperationStatus status) {
+              if (status instanceof CollectionOperationStatus) {
+                mergedResult
+                        .put(index
+                                        + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                                (CollectionOperationStatus) status);
+              } else {
+                mergedResult
+                        .put(index
+                                        + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                                new CollectionOperationStatus(
+                                        status));
+              }
+            }
+          });
       addOp(key, op);
       ops.add(op);
     }
@@ -4650,30 +4650,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             operationTimeout);
 
     Operation op = opFact.collectionMutate(k, subkey, collectionMutate,
-            new OperationCallback() {
+        new OperationCallback() {
 
-              @Override
-              public void receivedStatus(OperationStatus status) {
-                if (status.isSuccess()) {
-                  try {
-                    rv.set(new Long(status.getMessage()),
-                            new CollectionOperationStatus(
-                                    new OperationStatus(true, "END")));
-                  } catch (NumberFormatException e) {
-                    rv.set(null, new CollectionOperationStatus(
-                            new OperationStatus(false,
-                                    status.getMessage())));
-
-                    if (getLogger().isDebugEnabled()) {
-                      getLogger().debug(
-                              "Key(%s), Bkey(%s) Unknown response : %s",
-                              k, subkey, status);
-                    }
-                  }
-                  return;
-                }
-
-                rv.set(null, new CollectionOperationStatus(status));
+          @Override
+          public void receivedStatus(OperationStatus status) {
+            if (status.isSuccess()) {
+              try {
+                rv.set(new Long(status.getMessage()),
+                        new CollectionOperationStatus(
+                                new OperationStatus(true, "END")));
+              } catch (NumberFormatException e) {
+                rv.set(null, new CollectionOperationStatus(
+                        new OperationStatus(false,
+                                status.getMessage())));
 
                 if (getLogger().isDebugEnabled()) {
                   getLogger().debug(
@@ -4681,12 +4670,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                           k, subkey, status);
                 }
               }
+              return;
+            }
 
-              @Override
-              public void complete() {
-                latch.countDown();
-              }
-            });
+            rv.set(null, new CollectionOperationStatus(status));
+
+            if (getLogger().isDebugEnabled()) {
+              getLogger().debug(
+                      "Key(%s), Bkey(%s) Unknown response : %s",
+                      k, subkey, status);
+            }
+          }
+
+          @Override
+          public void complete() {
+            latch.countDown();
+          }
+        });
 
     rv.setOperation(op);
     addOp(k, op);

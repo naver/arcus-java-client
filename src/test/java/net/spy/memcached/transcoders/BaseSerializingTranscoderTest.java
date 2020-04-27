@@ -71,9 +71,9 @@ public class BaseSerializingTranscoderTest extends TestCase {
 
   public void testUndeserializable() throws Exception {
     byte[] data = {
-            -84, -19, 0, 5, 115, 114, 0, 4, 84, 101, 115, 116, 2, 61, 102,
-            -87, -28, 17, 52, 30, 2, 0, 1, 73, 0, 9, 115, 111, 109, 101,
-            116, 104, 105, 110, 103, 120, 112, 0, 0, 0, 5
+      -84, -19, 0, 5, 115, 114, 0, 4, 84, 101, 115, 116, 2, 61, 102,
+      -87, -28, 17, 52, 30, 2, 0, 1, 73, 0, 9, 115, 111, 109, 101,
+      116, 104, 105, 110, 103, 120, 112, 0, 0, 0, 5
     };
     assertNull(ex.deserialize(data));
   }

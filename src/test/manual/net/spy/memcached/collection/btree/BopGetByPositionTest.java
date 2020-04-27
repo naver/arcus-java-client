@@ -36,19 +36,23 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
 
   /* bkey values larger than maximum value of 4 bytes integer */
   private long[] longBkeys = {9000000000L,
-          9000000001L, 9000000002L, 9000000003L,
-          9000000004L, 9000000005L, 9000000006L,
-          9000000007L, 9000000008L, 9000000009L};
-  private byte[][] byteArrayBkeys = {new byte[]{10}, new byte[]{11},
-          new byte[]{12}, new byte[]{13}, new byte[]{14},
-          new byte[]{15}, new byte[]{16}, new byte[]{17},
-          new byte[]{18}, new byte[]{19}};
+      9000000001L, 9000000002L, 9000000003L,
+      9000000004L, 9000000005L, 9000000006L,
+      9000000007L, 9000000008L, 9000000009L
+  };
+  private byte[][] byteArrayBkeys = {
+      new byte[]{10}, new byte[]{11},
+      new byte[]{12}, new byte[]{13}, new byte[]{14},
+      new byte[]{15}, new byte[]{16}, new byte[]{17},
+      new byte[]{18}, new byte[]{19}
+  };
 
   private byte[] eflag = new byte[]{
-          1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-          11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-          21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-          31};
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+      31
+  };
 
   @Override
   protected void setUp() throws Exception {

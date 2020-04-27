@@ -29,8 +29,7 @@ public class BopMutateTest extends BaseIntegrationTest {
 
   private String key = "BopMutate";
 
-  private String[] items9 = {"1", "2", "3", "4", "5", "6", "7", "8", "9",
-          "a"};
+  private String[] items9 = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a"};
 
   @Override
   protected void setUp() throws Exception {

@@ -27,7 +27,7 @@ public class MemcachedClientConstructorTest extends TestCase {
   @Override
   protected void tearDown() throws Exception {
     if (client != null) {
-        client.shutdown();
+      client.shutdown();
     }
     super.tearDown();
   }

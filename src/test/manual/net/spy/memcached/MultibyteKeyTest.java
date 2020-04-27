@@ -152,8 +152,8 @@ public class MultibyteKeyTest {
   public void BTreeFindPositionWithGetOperationImplTest() {
     try {
       opFact.bopFindPositionWithGet(MULTIBYTE_KEY,
-              new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
-              genericCallback).initialize();
+          new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
+          genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -164,12 +164,12 @@ public class MultibyteKeyTest {
     try {
       Transcoder<Object> tc = new CollectionTranscoder();
       opFact.collectionExist(MULTIBYTE_KEY, "",
-              new SetExist<Object>(new Random().nextInt(), tc) {
-                @Override
-                public String getCommand() {
-                  return "CollectionExistCommand";
-                }
-              }, genericCallback).initialize();
+          new SetExist<Object>(new Random().nextInt(), tc) {
+            @Override
+            public String getCommand() {
+              return "CollectionExistCommand";
+            }
+          }, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -179,17 +179,17 @@ public class MultibyteKeyTest {
   public void CollectionMutateOperationImplTest() {
     try {
       opFact.collectionMutate(MULTIBYTE_KEY, "",
-              new CollectionMutate() {
-                @Override
-                public String stringify() {
-                  return "CollectionMutateString";
-                }
+          new CollectionMutate() {
+            @Override
+            public String stringify() {
+              return "CollectionMutateString";
+            }
 
-                @Override
-                public String getCommand() {
-                  return "CollectionMutateCommand";
-                }
-              }, genericCallback).initialize();
+            @Override
+            public String getCommand() {
+              return "CollectionMutateCommand";
+            }
+          }, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -228,28 +228,29 @@ public class MultibyteKeyTest {
   @Test
   public void BTreeSortMergeGetOperationImplTest() {
     try {
-      opFact.bopsmget(new BTreeSMGetWithLongTypeBkey<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,
-              0, SMGetMode.UNIQUE), new BTreeSortMergeGetOperation.Callback() {
-        @Override
-        public void gotData(String key, Object subkey, int flags, byte[] data) {
-        }
+      opFact.bopsmget(
+          new BTreeSMGetWithLongTypeBkey<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, SMGetMode.UNIQUE),
+          new BTreeSortMergeGetOperation.Callback() {
+            @Override
+            public void gotData(String key, Object subkey, int flags, byte[] data) {
+            }
 
-        @Override
-        public void gotMissedKey(String key, OperationStatus cause) {
-        }
+            @Override
+            public void gotMissedKey(String key, OperationStatus cause) {
+            }
 
-        @Override
-        public void gotTrimmedKey(String key, Object subkey) {
-        }
+            @Override
+            public void gotTrimmedKey(String key, Object subkey) {
+            }
 
-        @Override
-        public void receivedStatus(OperationStatus status) {
-        }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-        @Override
-        public void complete() {
-        }
-      }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -258,24 +259,25 @@ public class MultibyteKeyTest {
   @Test
   public void BTreeSortMergeGetOperationOldImplTest() {
     try {
-      opFact.bopsmget(new BTreeSMGetWithLongTypeBkeyOld<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,
-              0, 0), new BTreeSortMergeGetOperationOld.Callback() {
-        @Override
-        public void gotData(String key, Object subkey, int flags, byte[] data) {
-        }
+      opFact.bopsmget(
+          new BTreeSMGetWithLongTypeBkeyOld<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, 0),
+          new BTreeSortMergeGetOperationOld.Callback() {
+            @Override
+            public void gotData(String key, Object subkey, int flags, byte[] data) {
+            }
 
-        @Override
-        public void gotMissedKey(byte[] data) {
-        }
+            @Override
+            public void gotMissedKey(byte[] data) {
+            }
 
-        @Override
-        public void receivedStatus(OperationStatus status) {
-        }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-        @Override
-        public void complete() {
-        }
-      }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -364,20 +366,20 @@ public class MultibyteKeyTest {
     byte[] to = new byte[]{10, 10};
     try {
       opFact.collectionGet(MULTIBYTE_KEY,
-              new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
-              new CollectionGetOperation.Callback() {
-                @Override
-                public void gotData(String key, String subkey, int flags, byte[] data) {
-                }
+          new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
+          new CollectionGetOperation.Callback() {
+            @Override
+            public void gotData(String key, String subkey, int flags, byte[] data) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -387,16 +389,16 @@ public class MultibyteKeyTest {
   public void CollectionDeleteOperationImplTest() {
     try {
       opFact.collectionDelete(MULTIBYTE_KEY,
-              new BTreeDelete(1L, false),
-              new OperationCallback() {
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+          new BTreeDelete(1L, false),
+          new OperationCallback() {
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -448,24 +450,27 @@ public class MultibyteKeyTest {
   @Test
   public void BTreeGetBulkOperationImplTest() {
     try {
-      opFact.bopGetBulk(new BTreeGetBulkWithLongTypeBkey<Integer>(keyList, 0L, 10L, ElementFlagFilter.DO_NOT_FILTER,
-              0, 0), new BTreeGetBulkOperation.Callback<Integer>() {
-        @Override
-        public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
-        }
+      opFact.bopGetBulk(
+          new BTreeGetBulkWithLongTypeBkey<Integer>(
+              keyList, 0L, 10L, ElementFlagFilter.DO_NOT_FILTER,0, 0
+          ),
+          new BTreeGetBulkOperation.Callback<Integer>() {
+            @Override
+            public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+            }
 
-        @Override
-        public void gotKey(String key, int elementCount, OperationStatus status) {
-        }
+            @Override
+            public void gotKey(String key, int elementCount, OperationStatus status) {
+            }
 
-        @Override
-        public void receivedStatus(OperationStatus status) {
-        }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-        @Override
-        public void complete() {
-        }
-      }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -475,20 +480,20 @@ public class MultibyteKeyTest {
   public void BTreeGetByPositionOperationImplTest() {
     try {
       opFact.bopGetByPosition(MULTIBYTE_KEY,
-              new BTreeGetByPosition(BTreeOrder.ASC, 0),
-              new BTreeGetByPositionOperation.Callback() {
-                @Override
-                public void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data) {
-                }
+          new BTreeGetByPosition(BTreeOrder.ASC, 0),
+          new BTreeGetByPositionOperation.Callback() {
+            @Override
+            public void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -513,20 +518,20 @@ public class MultibyteKeyTest {
     }
     try {
       opFact.collectionPipedUpdate(MULTIBYTE_KEY,
-              new CollectionPipedUpdate.BTreePipedUpdate<Integer>(MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
-              new CollectionPipedUpdateOperation.Callback() {
-                @Override
-                public void gotStatus(Integer index, OperationStatus status) {
-                }
+          new CollectionPipedUpdate.BTreePipedUpdate<Integer>(MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
+          new CollectionPipedUpdateOperation.Callback() {
+            @Override
+            public void gotStatus(Integer index, OperationStatus status) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -562,20 +567,20 @@ public class MultibyteKeyTest {
     }
     try {
       opFact.collectionPipedExist(MULTIBYTE_KEY,
-              new SetPipedExist<Integer>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
-              new CollectionPipedExistOperation.Callback() {
-                @Override
-                public void gotStatus(Integer index, OperationStatus status) {
-                }
+          new SetPipedExist<Integer>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
+          new CollectionPipedExistOperation.Callback() {
+            @Override
+            public void gotStatus(Integer index, OperationStatus status) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -585,21 +590,21 @@ public class MultibyteKeyTest {
   public void BTreeInsertAndGetOperationImplTest() {
     try {
       opFact.bopInsertAndGet(MULTIBYTE_KEY,
-              new BTreeInsertAndGet<Integer>(BTreeInsertAndGet.Command.INSERT, 1L, new byte[]{0, 0},
-                      new Random().nextInt(), new CollectionAttributes()),
-              testData, new BTreeInsertAndGetOperation.Callback() {
-                @Override
-                public void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {
-                }
+          new BTreeInsertAndGet<Integer>(BTreeInsertAndGet.Command.INSERT, 1L, new byte[]{0, 0},
+                  new Random().nextInt(), new CollectionAttributes()),
+          testData, new BTreeInsertAndGetOperation.Callback() {
+            @Override
+            public void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -618,20 +623,20 @@ public class MultibyteKeyTest {
   public void BTreeFindPositionOperationImplTest() {
     try {
       opFact.bopFindPosition(MULTIBYTE_KEY,
-              new BTreeFindPosition(1L, BTreeOrder.ASC),
-              new BTreeFindPositionOperation.Callback() {
-                @Override
-                public void gotData(int position) {
-                }
+          new BTreeFindPosition(1L, BTreeOrder.ASC),
+          new BTreeFindPositionOperation.Callback() {
+            @Override
+            public void gotData(int position) {
+            }
 
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              }).initialize();
+            @Override
+            public void complete() {
+            }
+          }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }

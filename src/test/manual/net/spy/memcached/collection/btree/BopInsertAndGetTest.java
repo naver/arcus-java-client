@@ -33,12 +33,13 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   private String invalidKey = "InvalidBopStoreAndGetTest";
   private String kvKey = "KvBopStoreAndGetTest";
 
-  private long[] longBkeys = {10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L,
-          19L};
-  private byte[][] byteArrayBkeys = {new byte[]{10}, new byte[]{11},
-          new byte[]{12}, new byte[]{13}, new byte[]{14},
-          new byte[]{15}, new byte[]{16}, new byte[]{17},
-          new byte[]{18}, new byte[]{19}};
+  private long[] longBkeys = {10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L};
+  private byte[][] byteArrayBkeys = {
+      new byte[]{10}, new byte[]{11},
+      new byte[]{12}, new byte[]{13}, new byte[]{14},
+      new byte[]{15}, new byte[]{16}, new byte[]{17},
+      new byte[]{18}, new byte[]{19}
+  };
 
   @Override
   protected void setUp() throws Exception {

@@ -379,15 +379,15 @@ public class MemcachedClient extends SpyThread
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);
     Operation op = opFact.cat(catType, cas, key, co.getData(),
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus val) {
-                rv.set(val.isSuccess());
-              }
+        new OperationCallback() {
+          public void receivedStatus(OperationStatus val) {
+            rv.set(val.isSuccess());
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -866,27 +866,27 @@ public class MemcachedClient extends SpyThread
     final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout);
 
     Operation op = opFact.get(key,
-            new GetOperation.Callback() {
-              private Future<T> val = null;
+        new GetOperation.Callback() {
+          private Future<T> val = null;
 
-              public void receivedStatus(OperationStatus status) {
-                rv.set(val);
-              }
+          public void receivedStatus(OperationStatus status) {
+            rv.set(val);
+          }
 
-              public void gotData(String k, int flags, byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                val = tcService.decode(tc,
-                        new CachedData(flags, data, tc.getMaxSize()));
-              }
+          public void gotData(String k, int flags, byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            val = tcService.decode(tc,
+                    new CachedData(flags, data, tc.getMaxSize()));
+          }
 
-              public void complete() {
-                // FIXME weird...
-                if (localCacheManager != null) {
-                  localCacheManager.put(key, val, operationTimeout);
-                }
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            // FIXME weird...
+            if (localCacheManager != null) {
+              localCacheManager.put(key, val, operationTimeout);
+            }
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -923,24 +923,24 @@ public class MemcachedClient extends SpyThread
             new OperationFuture<CASValue<T>>(latch, operationTimeout);
 
     Operation op = opFact.gets(key,
-            new GetsOperation.Callback() {
-              private CASValue<T> val = null;
+        new GetsOperation.Callback() {
+          private CASValue<T> val = null;
 
-              public void receivedStatus(OperationStatus status) {
-                rv.set(val);
-              }
+          public void receivedStatus(OperationStatus status) {
+            rv.set(val);
+          }
 
-              public void gotData(String k, int flags, long cas, byte[] data) {
-                assert key.equals(k) : "Wrong key returned";
-                assert cas > 0 : "CAS was less than zero:  " + cas;
-                val = new CASValue<T>(cas, tc.decode(
-                        new CachedData(flags, data, tc.getMaxSize())));
-              }
+          public void gotData(String k, int flags, long cas, byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            assert cas > 0 : "CAS was less than zero:  " + cas;
+            val = new CASValue<T>(cas, tc.decode(
+                    new CachedData(flags, data, tc.getMaxSize())));
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -1334,15 +1334,15 @@ public class MemcachedClient extends SpyThread
                              final CountDownLatch latch) {
         final SocketAddress sa = n.getSocketAddress();
         return opFact.version(
-                new OperationCallback() {
-                  public void receivedStatus(OperationStatus s) {
-                    rv.put(sa, s.getMessage());
-                  }
+            new OperationCallback() {
+              public void receivedStatus(OperationStatus s) {
+                rv.put(sa, s.getMessage());
+              }
 
-                  public void complete() {
-                    latch.countDown();
-                  }
-                });
+              public void complete() {
+                latch.countDown();
+              }
+            });
       }
     });
     try {
@@ -1383,22 +1383,22 @@ public class MemcachedClient extends SpyThread
         final SocketAddress sa = n.getSocketAddress();
         rv.put(sa, new HashMap<String, String>());
         return opFact.stats(arg,
-                new StatsOperation.Callback() {
-                  public void gotStat(String name, String val) {
-                    rv.get(sa).put(name, val);
-                  }
+            new StatsOperation.Callback() {
+              public void gotStat(String name, String val) {
+                rv.get(sa).put(name, val);
+              }
 
-                  public void receivedStatus(OperationStatus status) {
-                    if (!status.isSuccess()) {
-                      getLogger().warn("Unsuccessful stat fetch:	%s",
-                              status);
-                    }
-                  }
+              public void receivedStatus(OperationStatus status) {
+                if (!status.isSuccess()) {
+                  getLogger().warn("Unsuccessful stat fetch:	%s",
+                          status);
+                }
+              }
 
-                  public void complete() {
-                    latch.countDown();
-                  }
-                });
+              public void complete() {
+                latch.countDown();
+              }
+            });
       }
     });
     try {
@@ -1551,15 +1551,15 @@ public class MemcachedClient extends SpyThread
     final OperationFuture<Long> rv = new OperationFuture<Long>(
             latch, operationTimeout);
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus s) {
-                rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"));
-              }
+        new OperationCallback() {
+          public void receivedStatus(OperationStatus s) {
+            rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"));
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            }));
+          public void complete() {
+            latch.countDown();
+          }
+        }));
     rv.setOperation(op);
     return rv;
   }
@@ -1692,15 +1692,15 @@ public class MemcachedClient extends SpyThread
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);
     DeleteOperation op = opFact.delete(key,
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus s) {
-                rv.set(s.isSuccess());
-              }
+        new OperationCallback() {
+          public void receivedStatus(OperationStatus s) {
+            rv.set(s.isSuccess());
+          }
 
-              public void complete() {
-                latch.countDown();
-              }
-            });
+          public void complete() {
+            latch.countDown();
+          }
+        });
     rv.setOperation(op);
     addOp(key, op);
     return rv;
@@ -1930,16 +1930,16 @@ public class MemcachedClient extends SpyThread
       public Operation newOp(final MemcachedNode n,
                              final CountDownLatch latch) {
         return opFact.noop(
-                new OperationCallback() {
-                  public void complete() {
-                    latch.countDown();
-                  }
+            new OperationCallback() {
+              public void complete() {
+                latch.countDown();
+              }
 
-                  public void receivedStatus(OperationStatus s) {
-                    // Nothing special when receiving status, only
-                    // necessary to complete the interface
-                  }
-                });
+              public void receivedStatus(OperationStatus s) {
+                // Nothing special when receiving status, only
+                // necessary to complete the interface
+              }
+            });
       }
     }, conn.getLocator().getAll(), false);
     try {

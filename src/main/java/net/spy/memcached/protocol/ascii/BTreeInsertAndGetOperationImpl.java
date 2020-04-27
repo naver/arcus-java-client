@@ -67,12 +67,14 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
           false, "UNDEFINED_OPERATION", CollectionResponse.UNDEFINED);
 
   private static final OperationStatus[] INSERT_AND_GET_STATUS_ON_LINE = {
-          STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED,
-          OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH};
+      STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED,
+      OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH
+  };
 
   private static final OperationStatus[] UPSERT_AND_GET_STATUS_ON_LINE = {
-          STORED, CREATED_STORED, REPLACED, NOT_FOUND, OVERFLOWED,
-          OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH};
+      STORED, CREATED_STORED, REPLACED, NOT_FOUND, OVERFLOWED,
+      OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH
+  };
 
   private static final OperationStatus[] STORE_AND_GET_ON_DATA = {TRIMMED};
 

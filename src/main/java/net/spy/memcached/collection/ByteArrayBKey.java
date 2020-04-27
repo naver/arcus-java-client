@@ -25,12 +25,13 @@ public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
   public static final byte[] MIN = new byte[]{(byte) 0};
 
   public static final byte[] MAX = new byte[]{(byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
-          (byte) 255, (byte) 255, (byte) 255, (byte) 255};
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255
+  };
 
   private final byte[] bkey;
 

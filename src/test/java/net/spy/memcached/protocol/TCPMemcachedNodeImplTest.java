@@ -58,36 +58,36 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     final DefaultConnectionFactory factory = new DefaultConnectionFactory(inputQueueSize, 4096);
 
     TCPMemcachedNodeImpl fromNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
-      InetSocketAddress.createUnresolved("127.0.0.1", 11211),
-      SocketChannel.open(),
-     4096
+        InetSocketAddress.createUnresolved("127.0.0.1", 11211),
+        SocketChannel.open(),
+        4096
     );
 
     TCPMemcachedNodeImpl toNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
-      InetSocketAddress.createUnresolved("127.0.0.2", 11211),
-      SocketChannel.open(),
-      4096
+        InetSocketAddress.createUnresolved("127.0.0.2", 11211),
+        SocketChannel.open(),
+        4096
     );
 
     List<Operation> fromOperations = new LinkedList<Operation>() {{
-      for (int i = 0; i < fromAllOpCount; i++) {
-        Operation op = factory.getOperationFactory().get("cacheKey=" + i, new GetOperation.Callback() {
-          @Override
-          public void receivedStatus(OperationStatus status) {
-          }
+        for (int i = 0; i < fromAllOpCount; i++) {
+          Operation op = factory.getOperationFactory().get("cacheKey=" + i, new GetOperation.Callback() {
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-          @Override
-          public void gotData(String key, int flags, byte[] data) {
-          }
+            @Override
+            public void gotData(String key, int flags, byte[] data) {
+            }
 
-          @Override
-          public void complete() {
-          }
-        });
-        op.initialize();
-        add(op);
-      }
-    }};
+            @Override
+            public void complete() {
+            }
+          });
+          op.initialize();
+          add(op);
+        }}
+    };
 
     for (int i = 0; i < fromAllOpCount; i++) {
       if (fromNode.getReadQueueSize() < fromReadOpCount) {

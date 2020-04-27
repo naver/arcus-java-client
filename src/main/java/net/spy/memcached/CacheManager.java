@@ -291,8 +291,8 @@ public class CacheManager extends SpyThread implements Watcher,
           try {
             wait();
           } catch (InterruptedException e) {
-              getLogger().warn("Cache mananger thread is interrupted while wait: %s",
-                               e.getMessage());
+            getLogger().warn("Cache mananger thread is interrupted while wait: %s",
+                e.getMessage());
           }
         } else {
           long retrySleepTime = 0;
