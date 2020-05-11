@@ -92,6 +92,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   /* ENABLE_REPLICATION if */
   private MemcachedReplicaGroup replicaGroup;
+  private int writeOpCount = 0;   /* count of write operation in read queue */
 
   /* ENABLE_REPLICATION end */
   public boolean isFake() {
@@ -303,6 +304,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         // if in the bowels of the client.
         // In practice, readQ should be small, however.
         if (!readQ.contains(o)) {
+          /* ENABLE_REPLICATION if */
+          if (o.isWriteOperation()) {
+            writeOpCount++;
+          }
+          /* ENABLE_REPLICATION end */
           readQ.add(o);
         }
 
@@ -368,7 +374,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
    * @see net.spy.memcached.MemcachedNode#removeCurrentReadOp()
    */
   public final Operation removeCurrentReadOp() {
-    return readQ.remove();
+    Operation op = readQ.remove();
+    /* ENABLE_REPLICATION if */
+    if (op.isWriteOperation()) {
+      if (--writeOpCount == 0 && replicaGroup != null) {
+        replicaGroup.enableWrite();
+      }
+    }
+    /* ENABLE_REPLICATION end */
+    return op;
   }
 
   /* (non-Javadoc)
@@ -806,6 +820,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
     if (hasReadOp()) {
       readQ.drainTo(allOp);
+      /* ENABLE_REPLICATION if */
+      writeOpCount = 0;
+      if (replicaGroup != null) {
+        replicaGroup.enableWrite();
+      }
+      /* ENABLE_REPLICATION end */
     }
 
     while (hasWriteOp()) {
@@ -857,6 +877,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
 
     return opCount;
+  }
+
+  public int getWriteOpCount() {
+    return writeOpCount;
   }
   /* ENABLE_REPLICATION end */
 }

@@ -261,5 +261,10 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
     return 0;
   }
+
+  @Override
+  public int getWriteOpCount() {
+    return 0;
+  }
   /* ENABLE_REPLICATION end */
 }

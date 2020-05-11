@@ -237,5 +237,10 @@ public class MemcachedNodeROImpl implements MemcachedNode {
   public int moveOperations(final MemcachedNode toNode) {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  public int getWriteOpCount() {
+    return root.getWriteOpCount();
+  }
   /* ENABLE_REPLICATION end */
 }

@@ -284,5 +284,7 @@ public interface MemcachedNode {
   void addAllOpToInputQ(BlockingQueue<Operation> allOp);
 
   int moveOperations(final MemcachedNode toNode);
+
+  int getWriteOpCount();
   /* ENABLE_REPLICATION end */
 }

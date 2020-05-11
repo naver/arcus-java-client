@@ -24,6 +24,7 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   protected MemcachedNode masterNode;
   protected MemcachedNode slaveNode;
   private boolean prevMasterPick;
+  private boolean writable = true;
 
   protected MemcachedReplicaGroup(final String groupName) {
     if (groupName == null)
@@ -87,6 +88,18 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
 
   public static String getGroupNameForNode(final MemcachedNode node) {
     return ((ArcusReplNodeAddress) node.getSocketAddress()).getGroupName();
+  }
+
+  public boolean isWritable() {
+    return writable;
+  }
+
+  public void enableWrite() {
+    this.writable = true;
+  }
+
+  public void disableWrite() {
+    this.writable = false;
   }
 }
 /* ENABLE_REPLICATION end */
