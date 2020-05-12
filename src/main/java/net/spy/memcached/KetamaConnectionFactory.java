@@ -36,9 +36,6 @@ public class KetamaConnectionFactory extends DefaultConnectionFactory {
             DEFAULT_OP_QUEUE_MAX_BLOCK_TIME);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createLocator(java.util.List)
-   */
   @Override
   public NodeLocator createLocator(List<MemcachedNode> nodes) {
     return new KetamaNodeLocator(nodes, getHashAlg());

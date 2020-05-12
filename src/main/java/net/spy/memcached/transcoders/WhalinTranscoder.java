@@ -48,9 +48,6 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
     super(CachedData.MAX_SIZE);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.Transcoder#decode(net.spy.memcached.CachedData)
-   */
   public Object decode(CachedData d) {
     byte[] data = d.getData();
     Object rv = null;

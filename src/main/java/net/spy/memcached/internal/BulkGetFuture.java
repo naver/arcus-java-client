@@ -88,12 +88,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see net.spy.memcached.internal.BulkFuture#getSome(long,
-   * java.util.concurrent.TimeUnit)
-   */
   public Map<String, T> getSome(long to, TimeUnit unit)
           throws InterruptedException, ExecutionException {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
