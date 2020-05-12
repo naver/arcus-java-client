@@ -173,9 +173,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#copyInputQueue()
-   */
   public final void copyInputQueue() {
     Collection<Operation> tmp = new ArrayList<Operation>();
 
@@ -185,18 +182,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     writeQ.addAll(tmp);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#destroyInputQueue()
-   */
   public Collection<Operation> destroyInputQueue() {
     Collection<Operation> rv = new ArrayList<Operation>();
     inputQueue.drainTo(rv);
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#destroyQueue()
-   */
   private Collection<Operation> destroyQueue(BlockingQueue<Operation> queue, boolean resend) {
     Collection<Operation> rv = new ArrayList<Operation>();
     queue.drainTo(rv);
@@ -214,23 +205,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#destroyWriteQueue()
-   */
   public Collection<Operation> destroyWriteQueue(boolean resend) {
     return destroyQueue(writeQ, resend);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#destroyReadQueue()
-   */
   public Collection<Operation> destroyReadQueue(boolean resend) {
     return destroyQueue(readQ, resend);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#setupResend()
-   */
   public final void setupResend(boolean cancelWrite, String cause) {
     // First, reset the current write op, or cancel it if we should
     // be authenticating
@@ -289,9 +271,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return nextOp != null;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#fillWriteBuffer(boolean)
-   */
   public final void fillWriteBuffer(boolean shouldOptimize) {
     if (toWrite == 0 && readQ.remainingCapacity() > 0) {
       getWbuf().clear();
@@ -343,44 +322,26 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#transitionWriteItem()
-   */
   public final void transitionWriteItem() {
     Operation op = removeCurrentWriteOp();
     assert op != null : "There is no write item to transition";
     getLogger().debug("Finished writing %s", op);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#optimize()
-   */
   protected abstract void optimize();
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getCurrentReadOp()
-   */
   public final Operation getCurrentReadOp() {
     return readQ.peek();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#removeCurrentReadOp()
-   */
   public final Operation removeCurrentReadOp() {
     return readQ.remove();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getCurrentWriteOp()
-   */
   public final Operation getCurrentWriteOp() {
     return optimizedOp == null ? writeQ.peek() : optimizedOp;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getNextWritableOp
-   */
   private Operation getNextWritableOp() {
     Operation o = getCurrentWriteOp();
     while (o != null && o.getState() == OperationState.WRITE_QUEUED) {
@@ -397,9 +358,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return o;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#removeCurrentWriteOp()
-   */
   public final Operation removeCurrentWriteOp() {
     Operation rv = optimizedOp;
     if (rv == null) {
@@ -410,23 +368,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#hasReadOp()
-   */
   public final boolean hasReadOp() {
     return !readQ.isEmpty();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#hasWriteOp()
-   */
   public final boolean hasWriteOp() {
     return !(optimizedOp == null && writeQ.isEmpty());
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#addOp(net.spy.memcached.ops.Operation)
-   */
   public final void addOp(Operation op) {
     try {
       if (!authLatch.await(1, TimeUnit.SECONDS)) {
@@ -452,9 +401,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#insertOp(net.spy.memcached.ops.Operation)
-   */
   public final void insertOp(Operation op) {
     ArrayList<Operation> tmp = new ArrayList<Operation>(
             inputQueue.size() + 1);
@@ -464,9 +410,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     addOpCount += 1;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getSelectionOps()
-   */
   public final int getSelectionOps() {
     int rv = 0;
     if (getChannel().isConnected()) {
@@ -482,63 +425,39 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getRbuf()
-   */
   public final ByteBuffer getRbuf() {
     return rbuf;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getWbuf()
-   */
   public final ByteBuffer getWbuf() {
     return wbuf;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getSocketAddress()
-   */
   public final SocketAddress getSocketAddress() {
     return socketAddress;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#isActive()
-   */
   public final boolean isActive() {
     return !isFake && reconnectAttempt == 0
             && getChannel() != null && getChannel().isConnected();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#reconnecting()
-   */
   public final void reconnecting() {
     reconnectAttempt++;
     continuousTimeout.set(0);
     resetTimeoutRatioCount();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#connected()
-   */
   public final void connected() {
     reconnectAttempt = 0;
     continuousTimeout.set(0);
     resetTimeoutRatioCount();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getReconnectCount()
-   */
   public final int getReconnectCount() {
     return reconnectAttempt;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#toString()
-   */
   @Override
   public final String toString() {
     int sops = 0;
@@ -557,63 +476,39 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
             + ", interested=" + sops + "}";
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#registerChannel(java.nio.channels.SocketChannel, java.nio.channels.SelectionKey)
-   */
   public final void registerChannel(SocketChannel ch, SelectionKey skey) {
     setChannel(ch);
     setSk(skey);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#setChannel(java.nio.channels.SocketChannel)
-   */
   public final void setChannel(SocketChannel to) {
     assert channel == null || !channel.isOpen()
             : "Attempting to overwrite channel";
     channel = to;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getChannel()
-   */
   public final SocketChannel getChannel() {
     return channel;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#setSk(java.nio.channels.SelectionKey)
-   */
   public final void setSk(SelectionKey to) {
     sk = to;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getSk()
-   */
   public final SelectionKey getSk() {
     return sk;
   }
 
-  /* (non-javadoc)
-   * @see net.spy.memcached.MemcachedNode#setVersion(java.lang.String)
-   */
   public final void setVersion(String vr) {
     version = vr;
     setEnableMGetOp();
     setEnableSpaceSeparate();
   }
 
-  /* (non-javadoc)
-   * @see net.spy.memcached.MemcachedNode#getVersion()
-   */
   public final String getVersion() {
     return version;
   }
 
-  /* (non-javadoc)
-   * @see net.spy.memcached.MemcachedNode#setEnableMGetOp(java.lang.Boolean)
-   */
   private final void setEnableMGetOp() {
     if (isAsciiProtocol) {
       StringTokenizer tokens = new StringTokenizer(version, ".");
@@ -627,9 +522,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-javadoc)
- * @see net.spy.memcached.MemcachedNode#setEnableSpaceSeparate(java.lang.Boolean)
- */
   private final void setEnableSpaceSeparate() {
     if (isAsciiProtocol) {
       StringTokenizer tokens = new StringTokenizer(version, ".");
@@ -643,28 +535,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-javadoc)
-   * @see net.spy.memcached.MemcachedNode#enabledMGetOp()
-   */
   public final boolean enabledMGetOp() {
     return enabledMGetOp;
   }
 
-  /* (non-javadoc)
-   * @see net.spy.memcached.MemcachedNode#enabledSpaceSeparate()
-   */
   public final boolean enabledSpaceSeparate() { return enabledSpaceSeparate; }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getBytesRemainingInBuffer()
-   */
   public final int getBytesRemainingToWrite() {
     return toWrite;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#writeSome()
-   */
   public final int writeSome() throws IOException {
     int wrote = channel.write(wbuf);
     assert wrote >= 0 : "Wrote negative bytes?";
@@ -676,10 +556,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return wrote;
   }
 
-
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#setContinuousTimeout
-   */
   public void setContinuousTimeout(boolean timedOut) {
     if (isActive()) {
       addTimeoutRatioCount(timedOut);
@@ -691,25 +567,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getContinuousTimeout
-   */
   public int getContinuousTimeout() {
     return continuousTimeout.get();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#enableTimeoutRatio
-   */
   public void enableTimeoutRatio() {
     toRatioEnabled = true;
     toCountArray = new int[MAX_TOCOUNT];
     resetTimeoutRatioCount();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.MemcachedNode#getTimeoutRatioNow
-   */
   public int getTimeoutRatioNow() {
     int ratio = -1; // invalid
     if (toRatioEnabled) {

@@ -232,46 +232,28 @@ public class DefaultConnectionFactory extends SpyObject
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createConnection(java.util.List)
-   */
   public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
           throws IOException {
     return new MemcachedConnection(getReadBufSize(), this, addrs,
             getInitialObservers(), getFailureMode(), getOperationFactory());
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getFailureMode()
-   */
   public FailureMode getFailureMode() {
     return DEFAULT_FAILURE_MODE;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createOperationQueue()
-   */
   public BlockingQueue<Operation> createOperationQueue() {
     return new ArrayBlockingQueue<Operation>(getOpQueueLen());
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createReadOperationQueue()
-   */
   public BlockingQueue<Operation> createReadOperationQueue() {
     return new LinkedBlockingQueue<Operation>();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createWriteOperationQueue()
-   */
   public BlockingQueue<Operation> createWriteOperationQueue() {
     return new LinkedBlockingQueue<Operation>();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#createLocator(java.util.List)
-   */
   public NodeLocator createLocator(List<MemcachedNode> nodes) {
     return new ArrayModNodeLocator(nodes, getHashAlg());
   }
@@ -291,197 +273,111 @@ public class DefaultConnectionFactory extends SpyObject
     return DEFAULT_OP_QUEUE_MAX_BLOCK_TIME;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getReadBufSize()
-   */
   public int getReadBufSize() {
     return readBufSize;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getHashAlg()
-   */
   public HashAlgorithm getHashAlg() {
     return hashAlg;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getOperationFactory()
-   */
   public OperationFactory getOperationFactory() {
     return new AsciiOperationFactory();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getOperationTimeout()
-   */
   public long getOperationTimeout() {
     return DEFAULT_OPERATION_TIMEOUT;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#isDaemon()
-   */
   public boolean isDaemon() {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getInitialObservers()
-   */
   public Collection<ConnectionObserver> getInitialObservers() {
     return Collections.emptyList();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getDefaultTranscoder()
-   */
   public Transcoder<Object> getDefaultTranscoder() {
     return new SerializingTranscoder();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getDefaultCollectionTranscoder()
-   */
   public Transcoder<Object> getDefaultCollectionTranscoder() {
     return new CollectionTranscoder();
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#useNagleAlgorithm()
-   */
   public boolean useNagleAlgorithm() {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#shouldOptimize()
-   */
   public boolean shouldOptimize() {
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getMaxReconnectDelay()
-   */
   public long getMaxReconnectDelay() {
     return DEFAULT_MAX_RECONNECT_DELAY;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getAuthDescriptor()
-   */
   public AuthDescriptor getAuthDescriptor() {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getTimeoutExceptionThreshold()
-   */
   public int getTimeoutExceptionThreshold() {
     return DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getTimeoutRatioThreshold()
-   */
   public int getTimeoutRatioThreshold() {
     return DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getMaxFrontCacheElements()
-   */
   public int getMaxFrontCacheElements() {
     return DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getFrontCacheExpireTime()
-   */
   public int getFrontCacheExpireTime() {
     return DEFAULT_FRONTCACHE_EXPIRETIME;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getFrontCacheName()
-   */
   @Override
   public String getFrontCacheName() {
     return DEFAULT_FRONT_CACHE_NAME;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnRead()
-   */
   @Override
   public boolean getFrontCacheCopyOnRead() {
     return DEFAULT_FRONT_CACHE_COPY_ON_READ;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getFrontCacheCopyOnWrite()
-   */
   @Override
   public boolean getFrontCacheCopyOnWrite() {
     return DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getBulkServiceThreadCount()
-   */
   @Override
   public int getBulkServiceThreadCount() {
     return DEFAULT_BULKSERVICE_THREAD_COUNT;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getBulkServiceLoopLimit()
-   */
   @Override
   public int getBulkServiceLoopLimit() {
     return DEFAULT_BULKSERVICE_LOOP_LIMIT;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getBulkServiceSingleOpTimeout()
-   */
   @Override
   public long getBulkServiceSingleOpTimeout() {
     return DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getDefaultMaxSMGetKeyChunkSize()
-   */
   @Override
   public int getDefaultMaxSMGetKeyChunkSize() {
     return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getDelimiter()
-   */
   @Override
   public byte getDelimiter() {
     return DEFAULT_DELIMITER;
   }
 
   /* ENABLE_REPLICATION if */
-
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ConnectionFactory#getReadPriority()
-   */
   public ReadPriority getReadPriority() {
     return DEFAULT_READ_PRIORITY;
   }

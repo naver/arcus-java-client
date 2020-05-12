@@ -73,11 +73,6 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     return flags;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see net.spy.memcached.Transcoder#decode(net.spy.memcached.CachedData)
-   */
   public Object decode(CachedData d) {
     byte[] data = d.getData();
     Object rv = null;
@@ -119,11 +114,6 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     return rv;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see net.spy.memcached.Transcoder#encode(java.lang.Object)
-   */
   public CachedData encode(Object o) {
     byte[] b = null;
     int flags = 0;

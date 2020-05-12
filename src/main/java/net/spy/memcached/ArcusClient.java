@@ -353,9 +353,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#shutdown()
-   */
   @Override
   public void shutdown() {
     super.shutdown();
@@ -408,9 +405,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSetAttr(java.lang.String, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncSetAttr(String key,
                                                 Attributes attrs) {
@@ -436,9 +430,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncGetAttr(java.lang.String)
-   */
   @Override
   public CollectionFuture<CollectionAttributes> asyncGetAttr(final String key) {
     final CountDownLatch latch = new CountDownLatch(1);
@@ -558,9 +549,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSopExist(java.lang.String, T, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncSopExist(String key, T value,
                                                      Transcoder<T> tc) {
@@ -568,9 +556,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionExist(key, "", exist, tc);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSopExist(java.lang.String, java.lang.Object)
-   */
   @Override
   public CollectionFuture<Boolean> asyncSopExist(String key, Object value) {
     SetExist<Object> exist = new SetExist<Object>(value, collectionTranscoder);
@@ -1227,9 +1212,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.List, int, T, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, T o, Transcoder<T> tc) {
     if (key == null) {
@@ -1240,17 +1222,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return bulkService.setBulk(key, exp, o, tc, new ArcusClient[]{this});
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.List, int, java.lang.Object)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, Object o) {
     return asyncSetBulk(key, exp, o, transcoder);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.Map, int, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, T> o, int exp, Transcoder<T> tc) {
     if (o == null) {
@@ -1261,17 +1237,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return bulkService.setBulk(o, exp, tc, new ArcusClient[]{this});
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.Map, int)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o, int exp) {
     return asyncSetBulk(o, exp, transcoder);
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncDeleteBulk(java.util.List)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key) {
     if (key == null) {
@@ -1282,9 +1252,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return bulkService.deleteBulk(key, new ArcusClient[]{this});
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.ArcusClient#asyncDeleteBulk(java.util.String)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key) {
     if (key == null) {
@@ -1293,19 +1260,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return bulkService.deleteBulk(Arrays.asList(key), new ArcusClient[]{this});
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#getMaxPipedItemCount()
-   */
   @Override
   public int getMaxPipedItemCount() {
     return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopCreate(java.lang.String, net.spy.memcached.collection.ElementValueType, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopCreate(String key,
                                                   ElementValueType valueType, CollectionAttributes attributes) {
@@ -1317,10 +1276,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionCreate(key, bTreeCreate);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopCreate(java.lang.String, net.spy.memcached.collection.ElementValueType, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncMopCreate(String key,
                                                   ElementValueType type, CollectionAttributes attributes) {
@@ -1331,10 +1286,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionCreate(key, mapCreate);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopCreate(java.lang.String, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncSopCreate(String key,
                                                   ElementValueType type, CollectionAttributes attributes) {
@@ -1345,10 +1296,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionCreate(key, setCreate);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopCreate(java.lang.String, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncLopCreate(String key,
                                                   ElementValueType type, CollectionAttributes attributes) {
@@ -1411,10 +1358,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, long, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
                                                                   long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty) {
@@ -1422,10 +1365,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, false, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, long, long, int, int, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
                                                                   long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
@@ -1436,10 +1375,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, reverse, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, long, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
                                                                  long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1447,10 +1382,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, false, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, long, long, int, int, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
                                                                  long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
@@ -1461,10 +1392,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, reverse, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            boolean withDelete, boolean dropIfEmpty) {
@@ -1473,11 +1400,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.lang.String, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            String mkey, boolean withDelete, boolean dropIfEmpty) {
@@ -1491,10 +1413,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.util.List, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
@@ -1508,10 +1426,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1520,10 +1434,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.lang.String, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1537,10 +1447,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopGet(java.lang.String, java.util.List, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1554,10 +1460,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopGet(java.lang.String, int, boolean, boolean)
-   */
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
                                                     boolean withDelete, boolean dropIfEmpty) {
@@ -1565,10 +1467,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopGet(java.lang.String, int, int, boolean, boolean)
-   */
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
                                                     int to, boolean withDelete, boolean dropIfEmpty) {
@@ -1576,10 +1474,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopGet(java.lang.String, int, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
                                                    boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1587,10 +1481,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopGet(java.lang.String, int, int, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from,
                                                    int to, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1598,10 +1488,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopGet(java.lang.String, int, boolean, boolean)
-   */
   @Override
   public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
                                                    boolean withDelete, boolean dropIfEmpty) {
@@ -1609,10 +1495,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncSopGet(key, get, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopGet(java.lang.String, int, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
                                                   boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1620,10 +1502,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncSopGet(key, get, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopDelete(java.lang.String, long, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
                                                   ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
@@ -1632,10 +1510,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopDelete(java.lang.String, long, long, int, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
                                                   long to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
@@ -1644,10 +1518,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopDelete(java.lang.String, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncMopDelete(String key,
                                                   boolean dropIfEmpty) {
@@ -1657,10 +1527,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopDelete(java.lang.String, java.lang.String, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncMopDelete(String key, String mkey,
                                                   boolean dropIfEmpty) {
@@ -1675,10 +1541,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopDelete(java.lang.String, int, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
                                                   boolean dropIfEmpty) {
@@ -1687,10 +1549,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopDelete(java.lang.String, int, int, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int from,
                                                   int to, boolean dropIfEmpty) {
@@ -1699,10 +1557,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopDelete(java.lang.String, java.lang.Object, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncSopDelete(String key, Object value,
                                                   boolean dropIfEmpty) {
@@ -1711,10 +1565,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopDelete(java.lang.String, java.lang.Object, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncSopDelete(String key, T value,
                                                       boolean dropIfEmpty, Transcoder<T> tc) {
@@ -1772,10 +1622,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetItemCount(java.lang.String, long, long)
-   */
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
                                                         long from, long to, ElementFlagFilter eFlagFilter) {
@@ -1783,10 +1629,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionCount(key, collectionCount);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsert(java.lang.String, byte[], long, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
                                                   byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
@@ -1796,11 +1638,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopInsert(java.lang.String, java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
                                                   Object value, CollectionAttributes attributesForCreate) {
@@ -1811,10 +1648,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopInsert(java.lang.String, int, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncLopInsert(String key, int index,
                                                   Object value, CollectionAttributes attributesForCreate) {
@@ -1824,10 +1657,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopInsert(java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncSopInsert(String key, Object value,
                                                   CollectionAttributes attributesForCreate) {
@@ -1836,10 +1665,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, "", setInsert, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsert(java.lang.String, long, byte[], java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
                                                       byte[] eFlag, T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
@@ -1848,10 +1673,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopInsert(java.lang.String, java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
                                                       T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
@@ -1861,10 +1682,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, mkey, mapInsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopInsert(java.lang.String, int, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncLopInsert(String key, int index,
                                                       T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
@@ -1873,10 +1690,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, String.valueOf(index), listInsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopInsert(java.lang.String, java.lang.Object, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncSopInsert(String key, T value,
                                                       CollectionAttributes attributesForCreate, Transcoder<T> tc) {
@@ -1885,10 +1698,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, "", setInsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
           String key, Map<Long, Object> elements,
@@ -1897,10 +1706,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
           String key, Map<String, Object> elements,
@@ -1909,10 +1714,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopPipedInsertBulk(java.lang.String, int, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncLopPipedInsertBulk(
           String key, int index, List<Object> valueList, CollectionAttributes attributesForCreate) {
@@ -1920,10 +1721,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncSopPipedInsertBulk(
           String key, List<Object> valueList, CollectionAttributes attributesForCreate) {
@@ -1931,10 +1728,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
           String key, Map<Long, T> elements,
@@ -1959,10 +1752,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopPipedInsertBulk(java.lang.String, java.util.Map, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
           String key, Map<String, T> elements,
@@ -1990,10 +1779,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopPipedInsertBulk(java.lang.String, int, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncLopPipedInsertBulk(
           String key, int index, List<T> valueList,
@@ -2020,10 +1805,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncSopPipedInsertBulk(
           String key, List<T> valueList,
@@ -2050,19 +1831,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#flush(java.lang.String)
-   */
   @Override
   public OperationFuture<Boolean> flush(final String prefix) {
     return flush(prefix, -1);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#flush(java.lang.String, int)
-   */
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
     final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(
@@ -2149,10 +1922,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, int)
-   */
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count) {
@@ -2184,10 +1953,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, long, long, int, int, boolean)
-   */
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
@@ -2769,10 +2534,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpsert(java.lang.String, long, java.lang.Object, byte[], boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
                                                   byte[] elementFlag, Object value, CollectionAttributes attributesForCreate) {
@@ -2784,10 +2545,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpsert(java.lang.String, long, java.lang.Object, byte[], boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
                                                       byte[] elementFlag, T value, CollectionAttributes attributesForCreate,
@@ -2799,10 +2556,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeUpsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpdate(java.lang.String, long, java.lang.Object, net.spy.memcached.collection.ElementFlagUpdate)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
                                                   ElementFlagUpdate eFlagUpdate, Object value) {
@@ -2812,10 +2565,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionUpdate, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpdate(java.lang.String, long, java.lang.Object, net.spy.memcached.collection.ElementFlagUpdate, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
                                                       ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc) {
@@ -2825,10 +2574,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionUpdate, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpdate(java.lang.String, byte[], net.spy.memcached.collection.ElementFlagUpdate, java.lang.Object)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopUpdate(String key,
                                                   byte[] bkey, ElementFlagUpdate eFlagUpdate, Object value) {
@@ -2838,10 +2583,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionUpdate, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpdate(java.lang.String, byte[], net.spy.memcached.collection.ElementFlagUpdate, java.lang.Object, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
                                                       byte[] bkey, ElementFlagUpdate eFlagUpdate, T value,
@@ -2852,10 +2593,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionUpdate, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String, java.lang.String, java.lang.Object)
-   */
   @Override
   public CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
                                                   Object value) {
@@ -2866,10 +2603,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionUpdate, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String, java.lang.String, java.lang.Objeat, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
                                                       T value, Transcoder<T> tc) {
@@ -2937,13 +2670,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpdate(java.lang.String,
-   * byte[], net.spy.memcached.collection.ElementFlagUpdate, java.lang.Object,
-   * net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
           String key, List<Element<Object>> elements) {
@@ -2974,12 +2700,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see net.spy.memcached.ArcusClientIF#asyncMopUpdate(java.lang.String,
-   * java.util.Map, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
           String key, Map<String, Object> elements) {
@@ -3014,10 +2734,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsert(java.lang.String, byte[], java.lang.Object, byte[], boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, byte[] bkey,
                                                   byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
@@ -3028,10 +2744,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsert(java.lang.String, byte[], java.lang.Object, byte[], boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key,
                                                       byte[] bkey, byte[] eFlag, T value,
@@ -3042,10 +2754,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             BTreeUtil.toHex(bkey), bTreeInsert, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, byte[], byte[], int, int, boolean, boolean, net.spy.memcached.collection.ElementFlagFilter)
-   */
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
@@ -3055,10 +2763,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, false, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, byte[], net.spy.memcached.collection.ElementFlagFilter, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
@@ -3068,10 +2772,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, false, tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, byte[], byte[], int, int, boolean, boolean, net.spy.memcached.collection.ElementFlagFilter)
-   */
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(String key,
                                                                            byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
@@ -3084,10 +2784,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, reverse, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGet(java.lang.String, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int, boolean, boolean, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
           String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
@@ -3710,10 +3406,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return element;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopDelete(java.lang.String, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] from,
                                                   byte[] to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
@@ -3722,10 +3414,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopDelete(java.lang.String, byte[], net.spy.memcached.collection.ElementFlagFilter, boolean)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key,
                                                   byte[] bkey, ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
@@ -3734,10 +3422,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpsert(java.lang.String, byte[], byte[], java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                   byte[] bkey, byte[] elementFlag, Object value,
@@ -3748,10 +3432,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopUpsert(java.lang.String, byte[], byte[], java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                       byte[] bkey, byte[] elementFlag, T value,
@@ -3762,10 +3442,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetItemCount(java.lang.String, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter)
-   */
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
                                                         byte[] from, byte[] to, ElementFlagFilter eFlagFilter) {
@@ -3773,10 +3449,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionCount(key, collectionCount);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopPipedExistBulk(java.lang.String, java.util.List)
-   */
   @Override
   public CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(String key,
                                                                        List<Object> values) {
@@ -3785,10 +3457,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncSetPipedExist(key, exist);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopPipedExistBulk(java.lang.String, java.util.List, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<T, Boolean>> asyncSopPipedExistBulk(String key,
                                                                       List<T> values, Transcoder<T> tc) {
@@ -3878,10 +3546,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
           String key, List<Element<Object>> elements,
@@ -3890,10 +3554,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopPipedInsertBulk(java.lang.String, java.util.List, boolean, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
           String key, List<Element<T>> elements,
@@ -3920,10 +3580,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int)
-   */
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
@@ -3953,10 +3609,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopSortMergeGet(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int, boolean)
-   */
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
@@ -4113,10 +3765,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsertBulk(java.util.List, long, byte[], java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
           List<String> keyList, long bkey, byte[] eFlag, Object value,
@@ -4126,10 +3774,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             attributesForCreate, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopInsertBulk(java.util.List, long, byte[], java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
           List<String> keyList, long bkey, byte[] eFlag, T value,
@@ -4174,10 +3818,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsertBulk2(insertList);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopInsertBulk(java.util.List, java.lang.String, java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
           List<String> keyList, String mkey, Object value,
@@ -4187,10 +3827,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             attributesForCreate, collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncMopInsertBulk(java.util.List, java.lang.String, java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
           List<String> keyList, String mkey, T value,
@@ -4210,10 +3846,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsertBulk2(insertList);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopInsertBulk(java.util.List, java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSopInsertBulk(
           List<String> keyList, Object value,
@@ -4223,10 +3855,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncSopInsertBulk(java.util.List, java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSopInsertBulk(
           List<String> keyList, T value,
@@ -4244,10 +3872,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsertBulk2(insertList);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopInsertBulk(java.util.List, int, java.lang.Object, net.spy.memcached.collection.CollectionAttributes)
-   */
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncLopInsertBulk(
           List<String> keyList, int index, Object value,
@@ -4257,10 +3881,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncLopInsertBulk(java.util.List, int, java.lang.Object, net.spy.memcached.collection.CollectionAttributes, net.spy.memcached.transcoders.Transcoder)
-   */
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncLopInsertBulk(
           List<String> keyList, int index, T value,
@@ -4384,10 +4004,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetBulk(java.util.List, long, long, net.spy.memcached.collection.ElementFlagFilter, int, int)
-   */
   public CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> asyncBopGetBulk(
           List<String> keyList, long from, long to,
           ElementFlagFilter eFlagFilter, int offset, int count) {
@@ -4395,10 +4011,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetBulk(java.util.List, long, long, net.spy.memcached.collection.ElementFlagFilter, int, int, net.spy.memcached.transcoders.Transcoder)
-   */
   public <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>> asyncBopGetBulk(
           List<String> keyList, long from, long to,
           ElementFlagFilter eFlagFilter, int offset, int count,
@@ -4426,10 +4038,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetBulk(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int)
-   */
   public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> asyncBopGetBulk(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count) {
@@ -4437,10 +4045,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             collectionTranscoder);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see net.spy.memcached.ArcusClientIF#asyncBopGetBulk(java.util.List, byte[], byte[], net.spy.memcached.collection.ElementFlagFilter, int, int, net.spy.memcached.transcoders.Transcoder)
-   */
   public <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>> asyncBopGetBulk(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count,

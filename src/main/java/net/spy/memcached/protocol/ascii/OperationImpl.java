@@ -74,9 +74,6 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     return rv;
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.protocol.ascii.Operation#getReadType()
-   */
   protected final OperationReadType getReadType() {
     return readType;
   }
@@ -158,8 +155,5 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     }
   }
 
-  /* (non-Javadoc)
-   * @see net.spy.memcached.protocol.ascii.Operation#handleLine(java.lang.String)
-   */
   public abstract void handleLine(String line);
 }
