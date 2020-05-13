@@ -50,7 +50,8 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     this(nodes, alg, new DefaultKetamaNodeLocatorConfiguration());
   }
 
-  public KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg, KetamaNodeLocatorConfiguration conf) {
+  public KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg,
+                           KetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
     hashAlg = alg;
@@ -83,7 +84,8 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   private KetamaNodeLocator(TreeMap<Long, MemcachedNode> smn,
-                            Collection<MemcachedNode> an, HashAlgorithm alg, KetamaNodeLocatorConfiguration conf) {
+                            Collection<MemcachedNode> an, HashAlgorithm alg,
+                            KetamaNodeLocatorConfiguration conf) {
     super();
     ketamaNodes = smn;
     allNodes = an;

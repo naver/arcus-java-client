@@ -172,7 +172,8 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   public SASLAuthOperation saslAuth(String[] mech, String serverName,
-                                    Map<String, ?> props, CallbackHandler cbh, OperationCallback cb) {
+                                    Map<String, ?> props, CallbackHandler cbh,
+                                    OperationCallback cb) {
     return new SASLAuthOperationImpl(mech, serverName, props, cbh, cb);
   }
 
@@ -202,52 +203,59 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   public CollectionInsertOperation collectionInsert(String key, String subkey,
-                                                    CollectionInsert<?> collectionInsert, byte[] data,
+                                                    CollectionInsert<?> collectionInsert,
+                                                    byte[] data,
                                                     OperationCallback cb) {
     throw new RuntimeException(
             "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
   public CollectionInsertOperation collectionInsert(String key, byte[] subkey,
-                                                    CollectionInsert<?> collectionInsert, byte[] data,
+                                                    CollectionInsert<?> collectionInsert,
+                                                    byte[] data,
                                                     OperationCallback cb) {
     throw new RuntimeException(
             "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
   public CollectionPipedInsertOperation collectionPipedInsert(String key,
-                                                              CollectionPipedInsert<?> insert, OperationCallback cb) {
+                                                              CollectionPipedInsert<?> insert,
+                                                              OperationCallback cb) {
     throw new RuntimeException(
             "CollectionPipedInsertOperation is not supported in binary protocol yet.");
   }
 
   public CollectionGetOperation collectionGet(String key,
                                               CollectionGet collectionGet,
-                                              net.spy.memcached.ops.CollectionGetOperation.Callback cb) {
+                                              CollectionGetOperation.Callback cb) {
     throw new RuntimeException(
             "CollectionGetOperation is not supported in binary protocol yet.");
   }
 
   public CollectionDeleteOperation collectionDelete(String key,
-                                                    CollectionDelete collectionDelete, OperationCallback cb) {
+                                                    CollectionDelete collectionDelete,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
             "CollectionDeleteOperation is not supported in binary protocol yet.");
   }
 
   public CollectionExistOperation collectionExist(String key, String subkey,
-                                                  CollectionExist collectionExist, OperationCallback cb) {
+                                                  CollectionExist collectionExist,
+                                                  OperationCallback cb) {
     throw new RuntimeException(
             "CollectionExistOperation is not supported in binary protocol yet.");
   }
 
   public CollectionCreateOperation collectionCreate(String key,
-                                                    CollectionCreate collectionCreate, OperationCallback cb) {
+                                                    CollectionCreate collectionCreate,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
             "CollectionCreateOperation is not supported in binary protocol yet.");
   }
 
   public CollectionCountOperation collectionCount(String key,
-                                                  CollectionCount collectionCount, OperationCallback cb) {
+                                                  CollectionCount collectionCount,
+                                                  OperationCallback cb) {
     throw new RuntimeException(
             "CollectionCountOperation is not supported in binary protocol yet.");
   }
@@ -273,7 +281,9 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionUpdateOperation collectionUpdate(String key,
-                                                    String subkey, CollectionUpdate<?> collectionUpdate, byte[] data,
+                                                    String subkey,
+                                                    CollectionUpdate<?> collectionUpdate,
+                                                    byte[] data,
                                                     OperationCallback cb) {
     throw new RuntimeException(
             "Collection update operation is not supported in binary protocol yet.");
@@ -281,21 +291,25 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionPipedUpdateOperation collectionPipedUpdate(String key,
-                                                              CollectionPipedUpdate<?> update, OperationCallback cb) {
+                                                              CollectionPipedUpdate<?> update,
+                                                              OperationCallback cb) {
     throw new RuntimeException(
             "CollectionPipedUpdateOperation is not supported in binary protocol yet.");
   }
 
   @Override
   public CollectionMutateOperation collectionMutate(String key,
-                                                    String subkey, CollectionMutate collectionMutate, OperationCallback cb) {
+                                                    String subkey,
+                                                    CollectionMutate collectionMutate,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
             "Collection mutate(incr/decr) operation is not supported in binary protocol yet.");
   }
 
   @Override
   public CollectionPipedExistOperation collectionPipedExist(String key,
-                                                            SetPipedExist<?> exist, OperationCallback cb) {
+                                                            SetPipedExist<?> exist,
+                                                            OperationCallback cb) {
     throw new RuntimeException(
             "Collection piped exist operation is not supported in binary protocol yet.");
   }
@@ -317,7 +331,8 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public BTreeGetByPositionOperation bopGetByPosition(String key,
-                                                      BTreeGetByPosition get, OperationCallback cb) {
+                                                      BTreeGetByPosition get,
+                                                      OperationCallback cb) {
     throw new RuntimeException(
             "BTree get by position operation is not supported in binary protocol yet.");
   }
@@ -331,14 +346,16 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-                                                                  BTreeFindPositionWithGet get, OperationCallback cb) {
+                                                                  BTreeFindPositionWithGet get,
+                                                                  OperationCallback cb) {
     throw new RuntimeException(
             "BTree find position with get operation is not supported in binary protocol yet.");
   }
 
   @Override
   public BTreeInsertAndGetOperation bopInsertAndGet(String key,
-                                                    BTreeInsertAndGet<?> get, byte[] dataToInsert, OperationCallback cb) {
+                                                    BTreeInsertAndGet<?> get, byte[] dataToInsert,
+                                                    OperationCallback cb) {
     throw new RuntimeException(
             "BTree insert and get operation is not supported in binary protocol yet.");
   }

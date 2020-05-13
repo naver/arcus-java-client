@@ -51,8 +51,8 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
 
   private ElementFlagFilter eFlagFilter;
 
-  public BTreeSMGetWithByteTypeBkey(List<String> keyList, byte[] from,
-                                    byte[] to, ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
+  public BTreeSMGetWithByteTypeBkey(List<String> keyList, byte[] from, byte[] to,
+                                    ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
     this.keyList = keyList;
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
     this.eFlagFilter = eFlagFilter;

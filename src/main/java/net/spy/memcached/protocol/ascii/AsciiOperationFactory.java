@@ -170,7 +170,8 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   public SASLAuthOperation saslAuth(String[] mech, String serverName,
-                                    Map<String, ?> props, CallbackHandler cbh, OperationCallback cb) {
+                                    Map<String, ?> props, CallbackHandler cbh,
+                                    OperationCallback cb) {
     throw new UnsupportedOperationException();
   }
 
@@ -184,38 +185,45 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   public CollectionInsertOperation collectionInsert(String key, String subkey,
-                                                    CollectionInsert<?> collectionInsert, byte[] data, OperationCallback cb) {
+                                                    CollectionInsert<?> collectionInsert,
+                                                    byte[] data, OperationCallback cb) {
     return new CollectionInsertOperationImpl(key, subkey,
             collectionInsert, data, cb);
   }
 
   public CollectionPipedInsertOperation collectionPipedInsert(String key,
-                                                              CollectionPipedInsert<?> insert, OperationCallback cb) {
+                                                              CollectionPipedInsert<?> insert,
+                                                              OperationCallback cb) {
     return new CollectionPipedInsertOperationImpl(key, insert, cb);
   }
 
   public CollectionGetOperation collectionGet(String key,
-                                              CollectionGet collectionGet, CollectionGetOperation.Callback cb) {
+                                              CollectionGet collectionGet,
+                                              CollectionGetOperation.Callback cb) {
     return new CollectionGetOperationImpl(key, collectionGet, cb);
   }
 
   public CollectionDeleteOperation collectionDelete(String key,
-                                                    CollectionDelete collectionDelete, OperationCallback cb) {
+                                                    CollectionDelete collectionDelete,
+                                                    OperationCallback cb) {
     return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
   }
 
   public CollectionExistOperation collectionExist(String key, String subkey,
-                                                  CollectionExist collectionExist, OperationCallback cb) {
+                                                  CollectionExist collectionExist,
+                                                  OperationCallback cb) {
     return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
   }
 
   public CollectionCreateOperation collectionCreate(String key,
-                                                    CollectionCreate collectionCreate, OperationCallback cb) {
+                                                    CollectionCreate collectionCreate,
+                                                    OperationCallback cb) {
     return new CollectionCreateOperationImpl(key, collectionCreate, cb);
   }
 
   public CollectionCountOperation collectionCount(String key,
-                                                  CollectionCount collectionCount, OperationCallback cb) {
+                                                  CollectionCount collectionCount,
+                                                  OperationCallback cb) {
     return new CollectionCountOperationImpl(key, collectionCount, cb);
   }
 
@@ -235,7 +243,9 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionUpdateOperation collectionUpdate(String key,
-                                                    String subkey, CollectionUpdate<?> collectionUpdate, byte[] data,
+                                                    String subkey,
+                                                    CollectionUpdate<?> collectionUpdate,
+                                                    byte[] data,
                                                     OperationCallback cb) {
     return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
             data, cb);
@@ -243,19 +253,22 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionPipedUpdateOperation collectionPipedUpdate(String key,
-                                                              CollectionPipedUpdate<?> update, OperationCallback cb) {
+                                                              CollectionPipedUpdate<?> update,
+                                                              OperationCallback cb) {
     return new CollectionPipedUpdateOperationImpl(key, update, cb);
   }
 
   @Override
   public CollectionPipedExistOperation collectionPipedExist(String key,
-                                                            SetPipedExist<?> exist, OperationCallback cb) {
+                                                            SetPipedExist<?> exist,
+                                                            OperationCallback cb) {
     return new CollectionPipedExistOperationImpl(key, exist, cb);
   }
 
   @Override
   public CollectionBulkInsertOperation collectionBulkInsert(List<String> key,
-                                                            CollectionBulkInsert<?> insert, OperationCallback cb) {
+                                                            CollectionBulkInsert<?> insert,
+                                                            OperationCallback cb) {
     return new CollectionBulkInsertOperationImpl(key, insert, cb);
   }
 
@@ -267,32 +280,37 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionMutateOperation collectionMutate(String key,
-                                                    String subkey, CollectionMutate collectionMutate,
+                                                    String subkey,
+                                                    CollectionMutate collectionMutate,
                                                     OperationCallback cb) {
     return new CollectionMutateOperationImpl(key, subkey, collectionMutate, cb);
   }
 
   @Override
   public BTreeGetByPositionOperation bopGetByPosition(String key,
-                                                      BTreeGetByPosition get, OperationCallback cb) {
+                                                      BTreeGetByPosition get,
+                                                      OperationCallback cb) {
     return new BTreeGetByPositionOperationImpl(key, get, cb);
   }
 
   @Override
   public BTreeFindPositionOperation bopFindPosition(String key,
-                                                    BTreeFindPosition get, OperationCallback cb) {
+                                                    BTreeFindPosition get,
+                                                    OperationCallback cb) {
     return new BTreeFindPositionOperationImpl(key, get, cb);
   }
 
   @Override
   public BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key,
-                                                                  BTreeFindPositionWithGet get, OperationCallback cb) {
+                                                                  BTreeFindPositionWithGet get,
+                                                                  OperationCallback cb) {
     return new BTreeFindPositionWithGetOperationImpl(key, get, cb);
   }
 
   @Override
   public BTreeInsertAndGetOperation bopInsertAndGet(String key,
-                                                    BTreeInsertAndGet<?> get, byte[] dataToInsert, OperationCallback cb) {
+                                                    BTreeInsertAndGet<?> get, byte[] dataToInsert,
+                                                    OperationCallback cb) {
     return new BTreeInsertAndGetOperationImpl(key, get, dataToInsert, cb);
   }
 

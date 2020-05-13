@@ -269,7 +269,8 @@ public interface OperationFactory {
    * @return a new CollectionInsertOperation
    */
   CollectionInsertOperation collectionInsert(String key, String subkey,
-                                             CollectionInsert<?> collectionInsert, byte[] data, OperationCallback cb);
+                                             CollectionInsert<?> collectionInsert, byte[] data,
+                                             OperationCallback cb);
 
   /**
    * Pipelined insert operation for collection items.
@@ -280,7 +281,8 @@ public interface OperationFactory {
    * @return a new CollectionPipedInsertOperation
    */
   CollectionPipedInsertOperation collectionPipedInsert(String key,
-                                                       CollectionPipedInsert<?> insert, OperationCallback cb);
+                                                       CollectionPipedInsert<?> insert,
+                                                       OperationCallback cb);
 
   /**
    * Get operation for collection items.
@@ -291,7 +293,8 @@ public interface OperationFactory {
    * @return a new CollectionGetOperation
    */
   CollectionGetOperation collectionGet(String key,
-                                       CollectionGet collectionGet, CollectionGetOperation.Callback cb);
+                                       CollectionGet collectionGet,
+                                       CollectionGetOperation.Callback cb);
 
   /**
    * Delete operation for collection items.
@@ -302,7 +305,8 @@ public interface OperationFactory {
    * @return a new CollectionDeleteOperation
    */
   CollectionDeleteOperation collectionDelete(String key,
-                                             CollectionDelete collectionDelete, OperationCallback cb);
+                                             CollectionDelete collectionDelete,
+                                             OperationCallback cb);
 
   /**
    * Existence operation for collection items.
@@ -347,7 +351,8 @@ public interface OperationFactory {
    * @return a new CollectionCreateOperation
    */
   CollectionCreateOperation collectionCreate(String key,
-                                             CollectionCreate collectionCreate, OperationCallback cb);
+                                             CollectionCreate collectionCreate,
+                                             OperationCallback cb);
 
   /**
    * Count operation for collection items.
@@ -378,7 +383,8 @@ public interface OperationFactory {
    * @param cb    the callback that will contain the results
    * @return a new BTreeSortMergeGetOperation
    */
-  BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet, BTreeSortMergeGetOperationOld.Callback cb);
+  BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
+                                         BTreeSortMergeGetOperationOld.Callback cb);
 
   /**
    * SMGet(Sort-Merge Get) operation for multiple b+tree items.
@@ -400,7 +406,8 @@ public interface OperationFactory {
    * @return a new CollectionUpdateOperation
    */
   CollectionUpdateOperation collectionUpdate(String key, String subkey,
-                                             CollectionUpdate<?> collectionUpdate, byte[] data, OperationCallback cb);
+                                             CollectionUpdate<?> collectionUpdate, byte[] data,
+                                             OperationCallback cb);
 
   /**
    * Pipelined update operation for collection items.
@@ -411,7 +418,8 @@ public interface OperationFactory {
    * @return a new CollectionPipedUpdateOperation
    */
   CollectionPipedUpdateOperation collectionPipedUpdate(String key,
-                                                       CollectionPipedUpdate<?> update, OperationCallback cb);
+                                                       CollectionPipedUpdate<?> update,
+                                                       OperationCallback cb);
 
   /**
    * Increment/Decrement operation for collection items (b+tree items).
@@ -423,7 +431,8 @@ public interface OperationFactory {
    * @return a new CollectionMutateOperation
    */
   CollectionMutateOperation collectionMutate(String key, String subkey,
-                                             CollectionMutate collectionMutate, OperationCallback cb);
+                                             CollectionMutate collectionMutate,
+                                             OperationCallback cb);
 
   /**
    * Pipelined existence operation for collection items (set items)
@@ -445,7 +454,8 @@ public interface OperationFactory {
    * @return a new CollectionBulkInsertOperation
    */
   CollectionBulkInsertOperation collectionBulkInsert(List<String> key,
-                                                     CollectionBulkInsert<?> insert, OperationCallback cb);
+                                                     CollectionBulkInsert<?> insert,
+                                                     OperationCallback cb);
 
   /**
    * Bulk get opearation for b+tree items.
@@ -464,7 +474,8 @@ public interface OperationFactory {
    * @param cb  the callback that will contain the results
    * @return a new BTreeGetByPositionOperation
    */
-  BTreeGetByPositionOperation bopGetByPosition(String key, BTreeGetByPosition get, OperationCallback cb);
+  BTreeGetByPositionOperation bopGetByPosition(String key, BTreeGetByPosition get,
+                                               OperationCallback cb);
 
   /**
    * Find-position operation for b+tree items.
@@ -474,7 +485,8 @@ public interface OperationFactory {
    * @param cb  the callback that will contain the results
    * @return a new BTreeFindPositionOperation
    */
-  BTreeFindPositionOperation bopFindPosition(String key, BTreeFindPosition get, OperationCallback cb);
+  BTreeFindPositionOperation bopFindPosition(String key, BTreeFindPosition get,
+                                             OperationCallback cb);
 
   /**
    * Find-position-with-get operation for b+tree items.
@@ -484,7 +496,8 @@ public interface OperationFactory {
    * @param cb  the callback that will contain the results
    * @return a new BTreeFindPositionWithGetOperation
    */
-  BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key, BTreeFindPositionWithGet get, OperationCallback cb);
+  BTreeFindPositionWithGetOperation bopFindPositionWithGet(String key, BTreeFindPositionWithGet get,
+                                                           OperationCallback cb);
 
   /**
    * Insert/upsert and get the trimmed element for b+tree items.
@@ -495,6 +508,7 @@ public interface OperationFactory {
    * @return a new BTreeInsertAndGetOperation
    */
   BTreeInsertAndGetOperation bopInsertAndGet(String key,
-                                            BTreeInsertAndGet<?> get, byte[] dataToInsert, OperationCallback cb);
+                                             BTreeInsertAndGet<?> get, byte[] dataToInsert,
+                                             OperationCallback cb);
 
 }

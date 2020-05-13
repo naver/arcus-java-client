@@ -54,7 +54,8 @@ public class LocalCacheManager {
     this.cache = CacheManager.getInstance().getCache(name);
   }
 
-  public LocalCacheManager(String name, int max, int exptime, boolean copyOnRead, boolean copyOnWrite) {
+  public LocalCacheManager(String name, int max, int exptime, boolean copyOnRead,
+                           boolean copyOnWrite) {
     this.cache = CacheManager.getInstance().getCache(name);
     if (cache == null) {
       CacheConfiguration config =
@@ -66,7 +67,8 @@ public class LocalCacheManager {
                       .timeToLiveSeconds(exptime)
                       .timeToIdleSeconds(exptime)
                       .diskExpiryThreadIntervalSeconds(60)
-                      .persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.NONE));
+                      .persistence(new PersistenceConfiguration().strategy(
+                          PersistenceConfiguration.Strategy.NONE));
       this.cache = new Cache(config, null, null);
       CacheManager.getInstance().addCache(cache);
 

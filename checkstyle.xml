@@ -15,6 +15,13 @@
 
     <property name="fileExtensions" value="java, properties, xml"/>
 
+    <!-- Filters                                                       -->
+    <!-- see https://checkstyle.sourceforge.io/config_filters.html -->
+    <module name="SuppressionFilter">
+        <property name="file" value="checkstyle-suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+
     <!-- File Filters                                                  -->
     <!-- see https://checkstyle.sourceforge.io/config_filefilters.html -->
     <module name="BeforeExecutionExclusionFileFilter">
@@ -31,12 +38,12 @@
     <module name="FileLength">
         <property name="max" value="2500"/>
     </module>
+    -->
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
         <property name="max" value="100"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
-    -->
 
     <!-- Whitespace                                                   -->
     <!-- see https://checkstyle.sourceforge.io/config_whitespace.html -->

@@ -264,7 +264,8 @@ class BulkService extends SpyObject {
   /**
    * Bulk delete operation worker
    */
-  private static class BulkDeleteWorker<T> extends BulkWorker<Map<String, CollectionOperationStatus>> {
+  private static class BulkDeleteWorker<T>
+      extends BulkWorker<Map<String, CollectionOperationStatus>> {
     private final List<String> keys;
 
     public BulkDeleteWorker(List<String> keys, long timeout, ArcusClient[] clientList) {

@@ -100,7 +100,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
-                                     HashMap<String, MemcachedReplicaGroup> ag, Collection<MemcachedNode> an,
+                                     HashMap<String, MemcachedReplicaGroup> ag,
+                                     Collection<MemcachedNode> an,
                                      HashAlgorithm alg,
                                      ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
@@ -199,8 +200,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       // Rewrite the values a copy of the map
       for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> mge : smg.entrySet()) {
         SortedSet<MemcachedReplicaGroup> groupROSet =
-                new TreeSet<MemcachedReplicaGroup>(
-                        new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
+            new TreeSet<MemcachedReplicaGroup>(
+                new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
         for (MemcachedReplicaGroup mrg : mge.getValue()) {
           groupROSet.add(new MemcachedReplicaGroupROImpl(mrg));
         }

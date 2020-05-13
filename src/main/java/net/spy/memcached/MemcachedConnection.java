@@ -218,7 +218,8 @@ public final class MemcachedConnection extends SpyObject {
             getLogger().info("%s has a ready op, handling IO", sk);
             handleIO(sk);
           } else {
-            lostConnection((MemcachedNode) sk.attachment(), ReconnDelay.DEFAULT, "too many empty selects");
+            lostConnection((MemcachedNode) sk.attachment(),
+                ReconnDelay.DEFAULT, "too many empty selects");
           }
         }
         assert emptySelects < EXCESSIVE_EMPTY
@@ -314,7 +315,8 @@ public final class MemcachedConnection extends SpyObject {
               attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
               /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
+              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                  "Discarded all pending reading state operation to move operations."));
               taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
             }
           } else { /* Old group has both a master node and a slave node. */
@@ -325,15 +327,18 @@ public final class MemcachedConnection extends SpyObject {
               /* move operation slave -> master
                * Slave node have only read operations, then don't need call setupResend
                */
-              taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+              taskList.add(new MoveOperationTask(
+                  oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
             } else if (newGroupAddrs.get(0).getIPPort().equals(oldSlaveAddr.getIPPort())) {
               /* The old slave has failovered to the master with new slave */
               removeNodes.add(oldGroup.getMasterNode());
               changeRoleGroups.add(oldGroup);
 
               /* move operation master -> slave */
-              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                  "Discarded all pending reading state operation to move operations."));
+              taskList.add(new MoveOperationTask(
+                  oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
             } else {
               MemcachedNode newMasterNode;
               /* All nodes of old group have gone away. And, new master has appeared. */
@@ -342,7 +347,8 @@ public final class MemcachedConnection extends SpyObject {
               attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
               /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
+              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                  "Discarded all pending reading state operation to move operations."));
               taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
               /* move operation old slave -> new master
@@ -363,7 +369,8 @@ public final class MemcachedConnection extends SpyObject {
               attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
               /* move operation old master -> new master */
-              taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+              taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE,
+                  "Discarded all pending reading state operation to move operations."));
               taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
             } else {
               MemcachedNode newMasterNode;
@@ -373,7 +380,8 @@ public final class MemcachedConnection extends SpyObject {
               attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
 
               /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
+              taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                  "Discarded all pending reading state operation to move operations."));
               taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
             }
           } else { /* Old group has both a master node and a slave node. */
@@ -403,8 +411,10 @@ public final class MemcachedConnection extends SpyObject {
                  *
                  * because moves all operations
                  */
-                taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
-                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                taskList.add(new MoveOperationTask(
+                    oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE,
+                    "Discarded all pending reading state operation to move operations."));
               } else {
                 /* Failover. And, new slave has appeared */
                 removeNodes.add(oldGroup.getMasterNode());
@@ -412,8 +422,10 @@ public final class MemcachedConnection extends SpyObject {
                 attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
 
                 /* move operation old master -> old slave */
-                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
+                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                    "Discarded all pending reading state operation to move operations."));
+                taskList.add(new MoveOperationTask(
+                    oldGroup.getMasterNode(), oldGroup.getSlaveNode()));
               }
             } else {
               /* A completely new master has appered. */
@@ -425,13 +437,15 @@ public final class MemcachedConnection extends SpyObject {
                 attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
                 /* move operation old master -> new master */
-                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations."));
+                taskList.add(new QueueReconnectTask(oldGroup.getMasterNode(), ReconnDelay.IMMEDIATE,
+                    "Discarded all pending reading state operation to move operations."));
                 taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
                 /* move operation old slave -> old master(slave)
                  * Slave node have only read operations, then don't need call setupResend
                  */
-                taskList.add(new MoveOperationTask(oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
+                taskList.add(new MoveOperationTask(
+                    oldGroup.getSlaveNode(), oldGroup.getMasterNode()));
               } else if (newGroupAddrs.get(1).getIPPort().equals(oldSlaveAddr.getIPPort())) {
                 MemcachedNode newMasterNode;
                 /* Only old master has disappeared. */
@@ -439,7 +453,8 @@ public final class MemcachedConnection extends SpyObject {
                 attachNodes.add(newMasterNode = attachMemcachedNode(newGroupAddrs.get(0)));
 
                 /* move operation old master -> new master */
-                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
+                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                    "Discarded all pending reading state operation to move operations."));
                 taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
               } else {
                 MemcachedNode newMasterNode;
@@ -451,7 +466,8 @@ public final class MemcachedConnection extends SpyObject {
                 attachNodes.add(newSlaveNode = attachMemcachedNode(newGroupAddrs.get(1)));
 
                 /* move operation old master -> new master */
-                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false, "Discarded all pending reading state operation to move operations."));
+                taskList.add(new SetupResendTask(oldGroup.getMasterNode(), false,
+                    "Discarded all pending reading state operation to move operations."));
                 taskList.add(new MoveOperationTask(oldGroup.getMasterNode(), newMasterNode));
 
                 /* move operation old slave -> new slave
@@ -558,7 +574,8 @@ public final class MemcachedConnection extends SpyObject {
         node.moveOperations(group.getMasterNode());
         addedQueue.offer(group.getMasterNode());
       }
-      queueReconnect(node, ReconnDelay.IMMEDIATE, "Discarded all pending reading state operation to move operations.");
+      queueReconnect(node, ReconnDelay.IMMEDIATE,
+          "Discarded all pending reading state operation to move operations.");
     } else {
       getLogger().warn("Delay switchover because invalid group state : " + group);
     }
@@ -1233,7 +1250,8 @@ public final class MemcachedConnection extends SpyObject {
       }
       MemcachedNode node = op.getHandlingNode();
       if (node == null) {
-        LoggerFactory.getLogger(MemcachedConnection.class).debug("handling node for operation is not set");
+        LoggerFactory.getLogger(MemcachedConnection.class).debug(
+            "handling node for operation is not set");
       } else {
         if (isTimeout || !op.isCancelled())
           node.setContinuousTimeout(isTimeout);

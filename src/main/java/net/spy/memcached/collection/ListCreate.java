@@ -24,7 +24,8 @@ public class ListCreate extends CollectionCreate {
     super();
   }
 
-  public ListCreate(int flags, Integer expTime, Long maxCount, CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
+  public ListCreate(int flags, Integer expTime, Long maxCount,
+                    CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
     super(flags, expTime, maxCount, overflowAction, readable, noreply);
   }
 

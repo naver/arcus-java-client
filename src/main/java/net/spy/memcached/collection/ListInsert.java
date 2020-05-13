@@ -24,7 +24,8 @@ public class ListInsert<T> extends CollectionInsert<T> {
     super();
   }
 
-  public ListInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+  public ListInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode,
+                    CollectionAttributes attr) {
     super(value, null, createKeyIfNotExists, requestMode, attr);
   }
 

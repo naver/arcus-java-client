@@ -72,7 +72,8 @@ public class CollectionInsertOperationImpl extends OperationImpl
   protected final byte[] data;
 
   public CollectionInsertOperationImpl(String key, String subkey,
-                                       CollectionInsert<?> collectionInsert, byte[] data, OperationCallback cb) {
+                                       CollectionInsert<?> collectionInsert, byte[] data,
+                                       OperationCallback cb) {
     super(cb);
     this.key = key;
     this.subkey = subkey;

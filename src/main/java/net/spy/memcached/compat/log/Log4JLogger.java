@@ -42,7 +42,9 @@ public class Log4JLogger extends AbstractLogger {
 
     // Get the log4j logger instance.
     org.apache.logging.log4j.Logger l4jLogger = org.apache.logging.log4j.LogManager.getLogger(name);
-    logger = new ExtendedLoggerWrapper((org.apache.logging.log4j.spi.AbstractLogger) l4jLogger, l4jLogger.getName(), l4jLogger.getMessageFactory());
+    logger = new ExtendedLoggerWrapper(
+        (org.apache.logging.log4j.spi.AbstractLogger) l4jLogger, l4jLogger.getName(),
+        l4jLogger.getMessageFactory());
   }
 
   /**

@@ -79,7 +79,8 @@ public class CollectionCountOperationImpl extends OperationImpl implements
                       String.valueOf(count))));
       transitionState(OperationState.COMPLETE);
     } else {
-      OperationStatus status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
+      OperationStatus status = matchStatus(
+          line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);

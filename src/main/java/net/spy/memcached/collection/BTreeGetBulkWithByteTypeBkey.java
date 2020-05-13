@@ -22,8 +22,8 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
-  public BTreeGetBulkWithByteTypeBkey(List<String> keyList, byte[] from,
-                                      byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+  public BTreeGetBulkWithByteTypeBkey(List<String> keyList, byte[] from, byte[] to,
+                                      ElementFlagFilter eFlagFilter, int offset, int count) {
     super(keyList, from, to, eFlagFilter, offset, count);
   }
 
