@@ -121,6 +121,7 @@ import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.internal.BulkOperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -184,7 +185,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
   public boolean dead;
 
-  final BulkService bulkService;
+  // final BulkService bulkService;
   final Transcoder<Object> collectionTranscoder;
 
   final int smgetKeyChunkSize;
@@ -322,8 +323,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, addrs);
-    bulkService = new BulkService(cf.getBulkServiceLoopLimit(),
-            cf.getBulkServiceThreadCount(), cf.getBulkServiceSingleOpTimeout());
+    // bulkService = new BulkService(cf.getBulkServiceLoopLimit(),
+    //         cf.getBulkServiceThreadCount(), cf.getBulkServiceSingleOpTimeout());
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean();
@@ -364,9 +365,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       cacheManager.shutdown();
     }
     dead = true;
-    if (bulkService != null) {
-      bulkService.shutdown();
-    }
+    // if (bulkService != null) {
+    //  bulkService.shutdown();
+    // }
   }
 
   private void validateMKey(String mkey) {
@@ -1231,20 +1232,46 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.List, int, T, net.spy.memcached.transcoders.Transcoder)
    */
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, T o, Transcoder<T> tc) {
+  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
+                                                                         final int exp, final T o,
+                                                                         Transcoder<T> tc) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     } else if (key.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
-    return bulkService.setBulk(key, exp, o, tc, new ArcusClient[]{this});
+
+    final CachedData co = transcoder.encode(o);
+
+    final CountDownLatch blatch = new CountDownLatch(key.size());
+
+    return new BulkOperationFuture(key, blatch, operationTimeout) {
+      @Override
+      public Operation createOp(final String k) {
+        Operation op = opFact.store(StoreType.set, k, co.getFlags(),
+                exp, co.getData(), new OperationCallback() {
+                  public void receivedStatus(OperationStatus val) {
+                    if (!val.isSuccess())
+                      failedResult.put(k, new CollectionOperationStatus(false, String
+                              .valueOf(val.isSuccess()), CollectionResponse.END));
+                  }
+
+                  public void complete() {
+                    blatch.countDown();
+                  }
+                });
+        addOp(k, op);
+        return op;
+      }
+    };
   }
 
   /* (non-Javadoc)
    * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.List, int, java.lang.Object)
    */
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, Object o) {
+  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key,
+                                                                     int exp, Object o) {
     return asyncSetBulk(key, exp, o, transcoder);
   }
 
@@ -1252,20 +1279,45 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.Map, int, net.spy.memcached.transcoders.Transcoder)
    */
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, T> o, int exp, Transcoder<T> tc) {
+  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final Map<String, T> o,
+                                                                         final int exp,
+                                                                         Transcoder<T> tc) {
     if (o == null) {
       throw new IllegalArgumentException("Map is null.");
     } else if (o.isEmpty()) {
       throw new IllegalArgumentException("Map is empty.");
     }
-    return bulkService.setBulk(o, exp, tc, new ArcusClient[]{this});
+
+    final CountDownLatch blatch = new CountDownLatch(o.size());
+
+    return new BulkOperationFuture(o.keySet(), blatch, operationTimeout) {
+      @Override
+      public Operation createOp(final String k) {
+        CachedData co = transcoder.encode(o.get(k));
+        Operation op = opFact.store(StoreType.set, k, co.getFlags(),
+                exp, co.getData(), new OperationCallback() {
+                  public void receivedStatus(OperationStatus val) {
+                    if (!val.isSuccess())
+                      failedResult.put(k, new CollectionOperationStatus(false, String
+                              .valueOf(val.isSuccess()), CollectionResponse.END));
+                  }
+
+                  public void complete() {
+                    blatch.countDown();
+                  }
+                });
+        addOp(k, op);
+        return op;
+      }
+    };
   }
 
   /* (non-Javadoc)
    * @see net.spy.memcached.ArcusClient#asyncSetBulk(java.util.Map, int)
    */
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o, int exp) {
+  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o,
+                                                                     int exp) {
     return asyncSetBulk(o, exp, transcoder);
   }
 
@@ -1279,7 +1331,27 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     } else if (key.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
-    return bulkService.deleteBulk(key, new ArcusClient[]{this});
+
+    final CountDownLatch blatch = new CountDownLatch(key.size());
+
+    return new BulkOperationFuture(key, blatch, operationTimeout) {
+      @Override
+      public Operation createOp(final String k) {
+        Operation op = opFact.delete(k, new OperationCallback() {
+          public void receivedStatus(OperationStatus val) {
+            if (!val.isSuccess())
+              failedResult.put(k, new CollectionOperationStatus(false, String
+                      .valueOf(val.isSuccess()), CollectionResponse.NOT_FOUND));
+          }
+
+          public void complete() {
+            blatch.countDown();
+          }
+        });
+        addOp(k, op);
+        return op;
+      }
+    };
   }
 
   /* (non-Javadoc)
@@ -1290,7 +1362,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     }
-    return bulkService.deleteBulk(Arrays.asList(key), new ArcusClient[]{this});
+    return asyncDeleteBulk(Arrays.asList(key));
   }
 
   /*
