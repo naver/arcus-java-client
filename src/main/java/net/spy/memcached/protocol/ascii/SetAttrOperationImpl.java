@@ -43,11 +43,14 @@ class SetAttrOperationImpl extends OperationImpl
   private static final OperationStatus OK =
           new CollectionOperationStatus(true, "OK", CollectionResponse.OK);
   private static final OperationStatus NOT_FOUND =
-          new CollectionOperationStatus(false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
+          new CollectionOperationStatus(
+              false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
   private static final OperationStatus ATTR_ERROR_NOT_FOUND =
-          new CollectionOperationStatus(false, "ATTR_ERROR not found", CollectionResponse.ATTR_ERROR_NOT_FOUND);
+          new CollectionOperationStatus(
+              false, "ATTR_ERROR not found", CollectionResponse.ATTR_ERROR_NOT_FOUND);
   private static final OperationStatus ATTR_ERROR_BAD_VALUE =
-          new CollectionOperationStatus(false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
+          new CollectionOperationStatus(
+              false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
 
   protected final String key;
   protected final Attributes attrs;

@@ -24,7 +24,8 @@ public class BTreeInsert<T> extends CollectionInsert<T> {
     super();
   }
 
-  public BTreeInsert(T value, byte[] eFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+  public BTreeInsert(T value, byte[] eFlag, boolean createKeyIfNotExists, RequestMode requestMode,
+                     CollectionAttributes attr) {
     super(value, eFlag, createKeyIfNotExists, requestMode, attr);
   }
 

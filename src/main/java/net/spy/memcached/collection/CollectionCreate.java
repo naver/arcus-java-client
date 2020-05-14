@@ -29,20 +29,26 @@ public abstract class CollectionCreate {
   public CollectionCreate() {
   }
 
-  public CollectionCreate(int flags, Integer expTime, Long maxCount, CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
+  public CollectionCreate(int flags, Integer expTime, Long maxCount,
+                          CollectionOverflowAction overflowAction, Boolean readable,
+                          boolean noreply) {
     if (overflowAction != null) {
       if ((this instanceof SetCreate) &&
               !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+        throw new IllegalArgumentException(
+            overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
       } else if ((this instanceof ListCreate) &&
               !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+        throw new IllegalArgumentException(
+            overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
       } else if ((this instanceof MapCreate) &&
               !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in" + CollectionType.map + ".");
+        throw new IllegalArgumentException(
+            overflowAction + " is unavailable overflow action in" + CollectionType.map + ".");
       } else if ((this instanceof BTreeCreate) &&
               !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+        throw new IllegalArgumentException(
+            overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
       }
     }
     this.flags = flags;

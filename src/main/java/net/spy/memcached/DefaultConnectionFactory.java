@@ -125,7 +125,8 @@ public class DefaultConnectionFactory extends SpyObject
   /**
    * Default front cache name
    */
-  private static final String DEFAULT_FRONT_CACHE_NAME = "ArcusFrontCache" + new Object().hashCode();
+  private static final String DEFAULT_FRONT_CACHE_NAME =
+      "ArcusFrontCache" + new Object().hashCode();
 
   /**
    * Default copyOnRead : false
@@ -172,7 +173,8 @@ public class DefaultConnectionFactory extends SpyObject
 
   /* ENABLE_REPLICATION if */
   public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
-  private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<APIType, ReadPriority>();
+  private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST =
+      new HashMap<APIType, ReadPriority>();
 
   /* ENABLE_REPLICATION end */
 

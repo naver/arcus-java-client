@@ -23,7 +23,8 @@ public class SetInsert<T> extends CollectionInsert<T> {
   public SetInsert() {
   }
 
-  public SetInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+  public SetInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode,
+                   CollectionAttributes attr) {
     super(value, null, createKeyIfNotExists, requestMode, attr);
   }
 

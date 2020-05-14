@@ -24,7 +24,8 @@ public class BTreeCreate extends CollectionCreate {
     super();
   }
 
-  public BTreeCreate(int flags, Integer expTime, Long maxCount, CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
+  public BTreeCreate(int flags, Integer expTime, Long maxCount,
+                     CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
     super(flags, expTime, maxCount, overflowAction, readable, noreply);
   }
 

@@ -33,7 +33,8 @@ public class BTreeGet extends CollectionGet {
     this.delete = delete;
   }
 
-  public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
+  public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty,
+                  ElementFlagFilter elementFlagFilter) {
     this(bkey, delete);
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
@@ -47,13 +48,15 @@ public class BTreeGet extends CollectionGet {
     this.delete = delete;
   }
 
-  public BTreeGet(long from, long to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
+  public BTreeGet(long from, long to, int offset, int count, boolean delete,
+                  boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
     this(from, to, offset, count, delete);
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
   }
 
-  public BTreeGet(byte[] from, byte[] to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
+  public BTreeGet(byte[] from, byte[] to, int offset, int count, boolean delete,
+                  boolean dropIfEmpty, ElementFlagFilter elementFlagFilter) {
     this.headerCount = 2;
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
     this.offset = offset;
@@ -63,13 +66,15 @@ public class BTreeGet extends CollectionGet {
     this.elementFlagFilter = elementFlagFilter;
   }
 
-  public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty, ElementMultiFlagsFilter elementMultiFlagsFilter) {
+  public BTreeGet(long bkey, boolean delete, boolean dropIfEmpty,
+                  ElementMultiFlagsFilter elementMultiFlagsFilter) {
     this(bkey, delete);
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
   }
 
-  public BTreeGet(long from, long to, int offset, int count, boolean delete, boolean dropIfEmpty, ElementMultiFlagsFilter elementMultiFlagsFilter) {
+  public BTreeGet(long from, long to, int offset, int count, boolean delete, boolean dropIfEmpty,
+                  ElementMultiFlagsFilter elementMultiFlagsFilter) {
     this(from, to, offset, count, delete);
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;

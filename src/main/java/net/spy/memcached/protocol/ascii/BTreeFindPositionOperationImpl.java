@@ -89,7 +89,8 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
       try {
         // POSITION=<position>\r\n
         position = Integer.parseInt(stuff[1]);
-        BTreeFindPositionOperation.Callback cb = (BTreeFindPositionOperation.Callback) getCallback();
+        BTreeFindPositionOperation.Callback cb =
+            (BTreeFindPositionOperation.Callback) getCallback();
         cb.gotData(position);
         getCallback().receivedStatus(POSITION);
       } catch (Exception e) {

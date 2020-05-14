@@ -36,7 +36,8 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   private final CountDownLatch latch;
   private final T result;
 
-  public CollectionGetBulkFuture(CountDownLatch latch, Collection<Operation> ops, T result, long timeout) {
+  public CollectionGetBulkFuture(CountDownLatch latch, Collection<Operation> ops, T result,
+                                 long timeout) {
     this.latch = latch;
     this.ops = ops;
     this.result = result;
@@ -53,12 +54,14 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   }
 
   @Override
-  public T get(long duration, TimeUnit units) throws InterruptedException, TimeoutException, ExecutionException {
+  public T get(long duration, TimeUnit units)
+      throws InterruptedException, TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
       for (Operation op : ops) {
         MemcachedConnection.opTimedOut(op);
       }
-      throw new CheckedOperationTimeoutException("Timed out waiting for b+tree get bulk operation", ops);
+      throw new CheckedOperationTimeoutException(
+          "Timed out waiting for b+tree get bulk operation", ops);
     } else {
       for (Operation op : ops) {
         MemcachedConnection.opSucceeded(op);

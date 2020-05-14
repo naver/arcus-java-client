@@ -34,22 +34,28 @@ public abstract class CollectionInsert<T> {
   public CollectionInsert() {
   }
 
-  public CollectionInsert(T value, byte[] elementFlag, boolean createKeyIfNotExists, RequestMode requestMode, CollectionAttributes attr) {
+  public CollectionInsert(T value, byte[] elementFlag, boolean createKeyIfNotExists,
+                          RequestMode requestMode, CollectionAttributes attr) {
     if (attr != null) {
       CollectionOverflowAction overflowAction = attr.getOverflowAction();
       if (overflowAction != null) {
         if ((this instanceof SetInsert) &&
                 !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+          throw new IllegalArgumentException(
+              overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
         } else if ((this instanceof MapInsert) &&
                 !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
+          throw new IllegalArgumentException(
+              overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
         } else if ((this instanceof ListInsert) &&
                 !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-        } else if (((this instanceof BTreeInsert) || (this instanceof BTreeUpsert) || (this instanceof BTreeInsertAndGet)) &&
-                !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(overflowAction + " is available overflow action in " + CollectionType.btree + ".");
+          throw new IllegalArgumentException(
+              overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+        } else if (((this instanceof BTreeInsert) || (this instanceof BTreeUpsert)
+            || (this instanceof BTreeInsertAndGet))
+            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
+          throw new IllegalArgumentException(
+              overflowAction + " is available overflow action in " + CollectionType.btree + ".");
         }
       }
     }
@@ -76,11 +82,11 @@ public abstract class CollectionInsert<T> {
       b.append("create ").append(flags);
       if (attribute != null) {
         b.append(" ")
-                .append((attribute.getExpireTime() == null) ? CollectionAttributes.DEFAULT_EXPIRETIME
-                        : attribute.getExpireTime());
+                .append((attribute.getExpireTime() == null) ?
+                    CollectionAttributes.DEFAULT_EXPIRETIME : attribute.getExpireTime());
         b.append(" ")
-                .append((attribute.getMaxCount() == null) ? CollectionAttributes.DEFAULT_MAXCOUNT
-                        : attribute.getMaxCount());
+                .append((attribute.getMaxCount() == null) ?
+                    CollectionAttributes.DEFAULT_MAXCOUNT : attribute.getMaxCount());
 
         if (null != attribute.getOverflowAction()) {
           b.append(" ").append(attribute.getOverflowAction());

@@ -67,7 +67,8 @@ public class ConnectionFactoryBuilder {
   private AuthDescriptor authDescriptor = null;
   private long opQueueMaxBlockTime = -1;
 
-  //private int timeoutExceptionThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
+  // private int timeoutExceptionThreshold =
+  //     DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
   private int timeoutExceptionThreshold = 10;
   private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
 
@@ -75,11 +76,13 @@ public class ConnectionFactoryBuilder {
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
   private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
   private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
-  private boolean frontCacheCopyOnWrite = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+  private boolean frontCacheCopyOnWrite =
+      DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
 
   private int bulkServiceThreadCount = DefaultConnectionFactory.DEFAULT_BULKSERVICE_THREAD_COUNT;
   private int bulkServiceLoopLimit = DefaultConnectionFactory.DEFAULT_BULKSERVICE_LOOP_LIMIT;
-  private long bulkServiceSingleOpTimeout = DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
+  private long bulkServiceSingleOpTimeout =
+      DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
 
   private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;

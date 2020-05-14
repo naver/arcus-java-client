@@ -211,7 +211,8 @@ public class CacheManager extends SpyThread implements Watcher,
     String path = "";
 
     // create the ephemeral znode
-    // "/arcus/client_list/{service_code}/{client hostname}_{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
+    // /arcus/client_list/{service_code}/{client hostname}
+    //    _{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
@@ -366,9 +367,11 @@ public class CacheManager extends SpyThread implements Watcher,
     }
 
     if (!children.equals(prevCacheList)) {
-      getLogger().warn("Cache list has been changed : From=" + prevCacheList + ", To=" + children + ", " +
-              "[serviceCode=" + serviceCode + ", addminSessionId=0x" +
-              Long.toHexString(zk.getSessionId()));
+      getLogger().warn("Cache list has been changed : "
+          + "From=" + prevCacheList + ", "
+          + "To=" + children + ", "
+          + "[serviceCode=" + serviceCode + ", addminSessionId=0x"
+          + Long.toHexString(zk.getSessionId()));
     }
 
     // Store the current children.

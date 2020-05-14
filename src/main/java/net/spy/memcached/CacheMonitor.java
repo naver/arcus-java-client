@@ -99,7 +99,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
         listener.commandCacheListChange(children);
         return;
       case NONODE:
-        getLogger().fatal("Cannot find your service code. Please contact Arcus support to solve this problem. " + getInfo());
+        getLogger().fatal(
+            "Cannot find your service code. Please contact Arcus support to solve this problem. "
+            + getInfo());
         return;
       case SESSIONEXPIRED:
         getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
@@ -114,7 +116,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
         asyncGetCacheList();
         return;
       default:
-        getLogger().warn("Ignoring an unexpected event from the Arcus admin. code=" + Code.get(rc) + ", " + getInfo());
+        getLogger().warn(
+            "Ignoring an unexpected event from the Arcus admin. code="
+            + Code.get(rc) + ", " + getInfo());
         asyncGetCacheList();
         return;
     }

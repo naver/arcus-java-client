@@ -213,7 +213,8 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
     }
 
     if (lookingFor == '\0' && readOffset == data.length) {
-      BTreeSortMergeGetOperationOld.Callback cb = (BTreeSortMergeGetOperationOld.Callback) getCallback();
+      BTreeSortMergeGetOperationOld.Callback cb =
+          (BTreeSortMergeGetOperationOld.Callback) getCallback();
       cb.gotData(smGet.getKey(), smGet.getSubkey(), smGet.getFlag(), data);
       lookingFor = '\r';
     }

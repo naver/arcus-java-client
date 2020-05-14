@@ -206,7 +206,8 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
 
     if (lookingFor == '\0' && readOffset == data.length) {
       // put an element data.
-      BTreeGetByPositionOperation.Callback cb = (BTreeGetByPositionOperation.Callback) getCallback();
+      BTreeGetByPositionOperation.Callback cb =
+          (BTreeGetByPositionOperation.Callback) getCallback();
       cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
 
       // next position.

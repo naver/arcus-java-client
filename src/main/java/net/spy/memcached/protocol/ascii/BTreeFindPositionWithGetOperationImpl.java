@@ -200,7 +200,8 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
 
     if (lookingFor == '\0' && readOffset == data.length) {
       // put an element data.
-      BTreeFindPositionWithGetOperation.Callback cb = (BTreeFindPositionWithGetOperation.Callback) getCallback();
+      BTreeFindPositionWithGetOperation.Callback cb =
+          (BTreeFindPositionWithGetOperation.Callback) getCallback();
       cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
 
       // next position.
@@ -246,7 +247,8 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: " + (new String(bb.array())).replace("\r\n", "\\r\\n"));
+      getLogger().debug("Request in ascii protocol: "
+          + (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 

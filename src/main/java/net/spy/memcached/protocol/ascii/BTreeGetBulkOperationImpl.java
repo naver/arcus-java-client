@@ -183,7 +183,8 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
     if (lookingFor == '\0' && readOffset == data.length) {
       BTreeGetBulkOperation.Callback cb = (BTreeGetBulkOperation.Callback) getCallback();
-      cb.gotElement(getBulk.getKey(), getBulk.getSubkey(), getBulk.getFlag(), getBulk.getEFlag(), data);
+      cb.gotElement(
+          getBulk.getKey(), getBulk.getSubkey(), getBulk.getFlag(), getBulk.getEFlag(), data);
       lookingFor = '\r';
     }
 

@@ -21,7 +21,8 @@ import net.spy.memcached.util.BTreeUtil;
 public class CollectionAttributes extends Attributes {
 
   public static final Long DEFAULT_MAXCOUNT = 4000L;
-  public static final CollectionOverflowAction DEFAULT_OVERFLOWACTION = CollectionOverflowAction.tail_trim;
+  public static final CollectionOverflowAction DEFAULT_OVERFLOWACTION =
+      CollectionOverflowAction.tail_trim;
 
   private Long count;
   private Long maxCount;
