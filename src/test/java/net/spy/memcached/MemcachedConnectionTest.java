@@ -38,7 +38,8 @@ public class MemcachedConnectionTest extends TestCase {
     ConnectionFactory cf = cfb.build();
     List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
-    conn = new MemcachedConnection(1024, cf, addrs, cf.getInitialObservers(), cf.getFailureMode(), cf.getOperationFactory());
+    conn = new MemcachedConnection(1024, cf, addrs,
+        cf.getInitialObservers(), cf.getFailureMode(), cf.getOperationFactory());
     locator = (ArcusKetamaNodeLocator) conn.getLocator();
   }
 

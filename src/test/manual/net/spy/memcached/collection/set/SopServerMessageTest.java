@@ -70,8 +70,9 @@ public class SopServerMessageTest extends BaseIntegrationTest {
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-    assertTrue(mc.asyncSetAttr(key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
-            .get(1000, TimeUnit.MILLISECONDS));
+    assertTrue(mc.asyncSetAttr(
+        key, new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
+        .get(1000, TimeUnit.MILLISECONDS));
 
     future = mc.asyncSopInsert(key, "bbbb", new CollectionAttributes());
     assertFalse(future.get(1000, TimeUnit.MILLISECONDS));

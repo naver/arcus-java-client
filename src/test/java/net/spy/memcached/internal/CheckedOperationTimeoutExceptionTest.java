@@ -56,7 +56,8 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));
     assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE], localhost:64212 [WRITE_QUEUED] [MOCK_STATE]",
+                    + ": test - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE], "
+                    + "localhost:64212 [WRITE_QUEUED] [MOCK_STATE]",
             new CheckedOperationTimeoutException("test", ops).toString());
   }
 
