@@ -36,7 +36,7 @@ import net.spy.memcached.ops.OperationState;
  */
 public class OperationFuture<T> implements Future<T> {
 
-  private final CountDownLatch latch;
+  protected final CountDownLatch latch;
   private final AtomicReference<T> objRef;
   private final long timeout;
   private Operation op;

@@ -51,12 +51,6 @@ public class BulkDeleteTest extends BaseIntegrationTest {
     } catch (Exception e) {
       assertEquals("Key list is empty.", e.getMessage());
     }
-    try {
-      String[] keys = new String[1];
-      mc.asyncDeleteBulk(keys);
-    } catch (Exception e) {
-      assertEquals("Key list is empty.", e.getMessage());
-    }
   }
 
   public void testInsertAndDelete() {
