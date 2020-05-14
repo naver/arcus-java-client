@@ -82,7 +82,8 @@ public class BopMutateTest extends BaseIntegrationTest {
       assertTrue(mc.asyncBopIncr(key, 12L, 2, 6L, new byte[]{})
               .get(1000, TimeUnit.MILLISECONDS).equals(6L));
     } catch (Exception e) {
-      assertEquals("length of eFlag must be between 1 and " + ElementFlagFilter.MAX_EFLAG_LENGTH + ".", e.getMessage());
+      assertEquals("length of eFlag must be between 1 and "
+          + ElementFlagFilter.MAX_EFLAG_LENGTH + ".", e.getMessage());
     }
 
     ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal,
@@ -135,8 +136,8 @@ public class BopMutateTest extends BaseIntegrationTest {
       System.out.println(response3.toString());
     } catch (Exception e) {
       assertEquals(
-              "OperationException: CLIENT: CLIENT_ERROR cannot increment or decrement non-numeric value",
-              e.getMessage());
+          "OperationException: CLIENT: "
+              + "CLIENT_ERROR cannot increment or decrement non-numeric value", e.getMessage());
     }
   }
 }

@@ -98,11 +98,16 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
     List<SMGetElement<Object>> result1;
 
     try {
-      future10 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-      future6 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 6);
-      future5 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 5);
-      future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 3);
-      future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 1);
+      future10 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      future6 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 6);
+      future5 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 5);
+      future3 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 3);
+      future1 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 1);
     } catch (IllegalStateException e) {
       Assert.fail(e.getMessage());
     }
@@ -174,7 +179,8 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
       /*
        * response
        */
-      assertEquals(CollectionResponse.DUPLICATED_TRIMMED, future10.getOperationStatus().getResponse());
+      assertEquals(CollectionResponse.DUPLICATED_TRIMMED,
+          future10.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future6.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future5.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future3.getOperationStatus().getResponse());
@@ -241,11 +247,16 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
     List<SMGetElement<Object>> result1;
 
     try {
-      future10 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-      future6 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 6);
-      future5 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 5);
-      future3 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 3);
-      future1 = mc.asyncBopSortMergeGet(keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 1);
+      future10 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      future6 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 6);
+      future5 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 5);
+      future3 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 3);
+      future1 = mc.asyncBopSortMergeGet(
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 1);
     } catch (IllegalStateException e) {
       Assert.fail(e.getMessage());
     }
@@ -331,9 +342,13 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
       /*
        * response
        */
-      assertEquals(CollectionResponse.DUPLICATED_TRIMMED, future10.getOperationStatus().getResponse());
-      assertTrue(CollectionResponse.DUPLICATED == future6.getOperationStatus().getResponse()           /* the result in case that server version >= 1.11.0 */
-              || CollectionResponse.DUPLICATED_TRIMMED == future6.getOperationStatus().getResponse()); /* the result in case that server version  1.11.0 */
+      assertEquals(
+          CollectionResponse.DUPLICATED_TRIMMED, future10.getOperationStatus().getResponse());
+      assertTrue(
+          /* the result in case that server version >= 1.11.0 */
+          CollectionResponse.DUPLICATED == future6.getOperationStatus().getResponse()
+          /* the result in case that server version  1.11.0 */
+          || CollectionResponse.DUPLICATED_TRIMMED == future6.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future5.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.DUPLICATED, future3.getOperationStatus().getResponse());
       assertEquals(CollectionResponse.END, future1.getOperationStatus().getResponse());
@@ -386,7 +401,8 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
     List<SMGetElement<Object>> result;
 
     try {
-      future = mc.asyncBopSortMergeGet(keyList2, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
+      future = mc.asyncBopSortMergeGet(
+          keyList2, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
     } catch (IllegalStateException e) {
       Assert.fail(e.getMessage());
     }
@@ -458,10 +474,14 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
     List<SMGetElement<Object>> result4;
 
     try {
-      future1 = mc.asyncBopSortMergeGet(keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 5, 100);
-      future2 = mc.asyncBopSortMergeGet(keyList2, 22, 20, ElementFlagFilter.DO_NOT_FILTER, 5, 100);
-      future3 = mc.asyncBopSortMergeGet(keyList2, 50, 40, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
-      future4 = mc.asyncBopSortMergeGet(keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
+      future1 = mc.asyncBopSortMergeGet(
+          keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 5, 100);
+      future2 = mc.asyncBopSortMergeGet(
+          keyList2, 22, 20, ElementFlagFilter.DO_NOT_FILTER, 5, 100);
+      future3 = mc.asyncBopSortMergeGet(
+          keyList2, 50, 40, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
+      future4 = mc.asyncBopSortMergeGet(
+          keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 0, 100);
     } catch (IllegalStateException e) {
       Assert.fail(e.getMessage());
     }

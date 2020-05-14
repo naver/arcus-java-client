@@ -36,7 +36,8 @@ import java.util.Queue;
 public class TCPMemcachedNodeImplTest extends TestCase {
 
   @SuppressWarnings("unchecked")
-  private Queue<Operation> getQueue(String queueFieldName, TCPMemcachedNodeImpl node) throws Exception {
+  private Queue<Operation> getQueue(String queueFieldName, TCPMemcachedNodeImpl node)
+      throws Exception {
     Field queueField = TCPMemcachedNodeImpl.class.getDeclaredField(queueFieldName);
     queueField.setAccessible(true);
 
@@ -71,19 +72,21 @@ public class TCPMemcachedNodeImplTest extends TestCase {
 
     List<Operation> fromOperations = new LinkedList<Operation>() {{
         for (int i = 0; i < fromAllOpCount; i++) {
-          Operation op = factory.getOperationFactory().get("cacheKey=" + i, new GetOperation.Callback() {
-            @Override
-            public void receivedStatus(OperationStatus status) {
-            }
+          Operation op = factory.getOperationFactory().get(
+              "cacheKey=" + i,
+              new GetOperation.Callback() {
+                @Override
+                public void receivedStatus(OperationStatus status) {
+                }
 
-            @Override
-            public void gotData(String key, int flags, byte[] data) {
-            }
+                @Override
+                public void gotData(String key, int flags, byte[] data) {
+                }
 
-            @Override
-            public void complete() {
-            }
-          });
+                @Override
+                public void complete() {
+                }
+              });
           op.initialize();
           add(op);
         }}

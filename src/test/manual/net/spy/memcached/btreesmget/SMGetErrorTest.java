@@ -415,8 +415,8 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
     // sort merge get
     SMGetMode smgetMode = SMGetMode.UNIQUE;
-    SMGetFuture<List<SMGetElement<Object>>> future = mc
-            .asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
+        testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       Assert.assertEquals(0, map.size());
@@ -461,7 +461,8 @@ public class SMGetErrorTest extends BaseIntegrationTest {
 
     // keylist is empty
     try {
-      mc.asyncBopSortMergeGet(new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+      mc.asyncBopSortMergeGet(
+          new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is empty.", e.getMessage());
@@ -488,7 +489,8 @@ public class SMGetErrorTest extends BaseIntegrationTest {
       mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
       fail("This should be an exception");
     } catch (Exception e) {
-      assertEquals("The sum of offset and count must not exceed a maximum of 1000.", e.getMessage());
+      assertEquals("The sum of offset and count must not exceed a maximum of 1000.",
+          e.getMessage());
     }
 
     // duplicate keys

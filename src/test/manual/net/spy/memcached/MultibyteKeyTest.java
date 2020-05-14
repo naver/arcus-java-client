@@ -141,7 +141,8 @@ public class MultibyteKeyTest {
   @Test
   public void ConcatenationOperationTest() {
     try {
-      opFact.cat(ConcatenationType.append, 1L, MULTIBYTE_KEY, testData, genericCallback).initialize();
+      opFact.cat(ConcatenationType.append, 1L, MULTIBYTE_KEY, testData, genericCallback)
+          .initialize();
       //BaseStoreOperationImpl.initialize()
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -229,7 +230,8 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkey<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, SMGetMode.UNIQUE),
+          new BTreeSMGetWithLongTypeBkey<Object>(
+              keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, SMGetMode.UNIQUE),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
             public void gotData(String key, Object subkey, int flags, byte[] data) {
@@ -260,7 +262,8 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationOldImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkeyOld<Object>(keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, 0),
+          new BTreeSMGetWithLongTypeBkeyOld<Object>(
+              keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER,0, 0),
           new BTreeSortMergeGetOperationOld.Callback() {
             @Override
             public void gotData(String key, Object subkey, int flags, byte[] data) {
@@ -285,25 +288,27 @@ public class MultibyteKeyTest {
 
   @Test
   public void CollectionPipedInsertOperationImplTest() {
-    CollectionPipedInsertOperation.Callback cpsCallback = new CollectionPipedInsertOperation.Callback() {
-      @Override
-      public void gotStatus(Integer index, OperationStatus status) {
-      }
+    CollectionPipedInsertOperation.Callback cpsCallback =
+        new CollectionPipedInsertOperation.Callback() {
+          @Override
+          public void gotStatus(Integer index, OperationStatus status) {
+          }
 
-      @Override
-      public void receivedStatus(OperationStatus status) {
-      }
+          @Override
+          public void receivedStatus(OperationStatus status) {
+          }
 
-      @Override
-      public void complete() {
-      }
-    };
+          @Override
+          public void complete() {
+          }
+        };
 
     List<Element<Integer>> elements = new ArrayList<Element<Integer>>();
     for (int i = 0; i < 10; i++) {
       elements.add(new Element<Integer>(Long.valueOf(i), new Random().nextInt(), new byte[]{1, 1}));
     }
-    CollectionPipedInsert<Integer> insert = new CollectionPipedInsert.ByteArraysBTreePipedInsert<Integer>(
+    CollectionPipedInsert<Integer> insert =
+        new CollectionPipedInsert.ByteArraysBTreePipedInsert<Integer>(
             MULTIBYTE_KEY, elements, false, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
@@ -407,19 +412,20 @@ public class MultibyteKeyTest {
   @Test
   public void CollectionBulkInsertOperationImplTest() {
     CollectionBulkInsert<Integer> insert = null;
-    CollectionBulkInsertOperation.Callback cbsCallback = new CollectionBulkInsertOperation.Callback() {
-      @Override
-      public void gotStatus(Integer index, OperationStatus status) {
-      }
+    CollectionBulkInsertOperation.Callback cbsCallback =
+        new CollectionBulkInsertOperation.Callback() {
+          @Override
+          public void gotStatus(Integer index, OperationStatus status) {
+          }
 
-      @Override
-      public void receivedStatus(OperationStatus status) {
-      }
+          @Override
+          public void receivedStatus(OperationStatus status) {
+          }
 
-      @Override
-      public void complete() {
-      }
-    };
+          @Override
+          public void complete() {
+          }
+        };
 
     insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(keyList, 1L, new byte[]{0, 0},
             new Random().nextInt(), new CollectionAttributes(), new IntegerTranscoder());
@@ -456,7 +462,8 @@ public class MultibyteKeyTest {
           ),
           new BTreeGetBulkOperation.Callback<Integer>() {
             @Override
-            public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+            public void gotElement(String key, Object subkey,
+                                   int flags, byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -483,7 +490,8 @@ public class MultibyteKeyTest {
           new BTreeGetByPosition(BTreeOrder.ASC, 0),
           new BTreeGetByPositionOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, int pos, BKeyObject bkey, byte[] eflag, byte[] data) {
+            public void gotData(String key, int flags, int pos, BKeyObject bkey,
+                                byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -514,11 +522,13 @@ public class MultibyteKeyTest {
   public void CollectionPipedUpdateOperationImplTest() {
     List<Element<Integer>> elementsList = new ArrayList<Element<Integer>>();
     for (int i = 0; i < 10; i++) {
-      elementsList.add(new Element<Integer>(Long.valueOf(i), new Random().nextInt(), ElementFlagUpdate.RESET_FLAG));
+      elementsList.add(new Element<Integer>(
+          Long.valueOf(i), new Random().nextInt(), ElementFlagUpdate.RESET_FLAG));
     }
     try {
       opFact.collectionPipedUpdate(MULTIBYTE_KEY,
-          new CollectionPipedUpdate.BTreePipedUpdate<Integer>(MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
+          new CollectionPipedUpdate.BTreePipedUpdate<Integer>(
+              MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
           new CollectionPipedUpdateOperation.Callback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
@@ -594,7 +604,8 @@ public class MultibyteKeyTest {
                   new Random().nextInt(), new CollectionAttributes()),
           testData, new BTreeInsertAndGetOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {
+            public void gotData(String key, int flags, BKeyObject bkeyObject,
+                                byte[] elementFlag, byte[] data) {
             }
 
             @Override
