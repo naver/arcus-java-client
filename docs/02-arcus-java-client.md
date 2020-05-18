@@ -576,14 +576,3 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
   Operation을 요청할 때 비동기식으로 Operation queue에 등록하여 작업을 요청하게 되어 있는데,
   이 옵션은 Queue가 모두 꽉 찬 상태가 되었을 때 최대 기다리는 시간을 의미한다.
   단위는 millisecond 이고, 기본값은 10000ms이다.
-  
-- setBulkServiceLoopLimit(int limit)
-
-  Bulk insert는 Client에서 입력된 아이템을 서버로 전송한다.
-  이때 한꺼번에 몇 개의 아이템을 서버에 insert하고 결과를 기다릴지 지정한다.
-  기본값은 1이다. 즉, 100개 아이템을 bulk insert하면 서버로 한 개씩 요청한다.
-  
-- setBulkServiceSingleOpTimeout(long timeout)
-
-  Bulk insert의 각 insert timeout을 설정한다. 단위는 millisecond이다.
-

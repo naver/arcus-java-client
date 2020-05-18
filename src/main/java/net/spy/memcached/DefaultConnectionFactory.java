@@ -355,21 +355,6 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   @Override
-  public int getBulkServiceThreadCount() {
-    return DEFAULT_BULKSERVICE_THREAD_COUNT;
-  }
-
-  @Override
-  public int getBulkServiceLoopLimit() {
-    return DEFAULT_BULKSERVICE_LOOP_LIMIT;
-  }
-
-  @Override
-  public long getBulkServiceSingleOpTimeout() {
-    return DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
-  }
-
-  @Override
   public int getDefaultMaxSMGetKeyChunkSize() {
     return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   }

@@ -229,21 +229,6 @@ public abstract class ClientBaseCase extends TestCase {
         }
 
         @Override
-        public int getBulkServiceThreadCount() {
-          return inner.getBulkServiceThreadCount();
-        }
-
-        @Override
-        public int getBulkServiceLoopLimit() {
-          return inner.getBulkServiceLoopLimit();
-        }
-
-        @Override
-        public long getBulkServiceSingleOpTimeout() {
-          return inner.getBulkServiceSingleOpTimeout();
-        }
-
-        @Override
         public int getDefaultMaxSMGetKeyChunkSize() {
           return inner.getDefaultMaxSMGetKeyChunkSize();
         }
