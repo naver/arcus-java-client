@@ -193,21 +193,6 @@ public interface ConnectionFactory {
   boolean getFrontCacheCopyOnWrite();
 
   /**
-   * Bulk service thread count
-   */
-  int getBulkServiceThreadCount();
-
-  /**
-   * Bulk service loop limit
-   */
-  int getBulkServiceLoopLimit();
-
-  /**
-   * Bulk service single operation timeout
-   */
-  long getBulkServiceSingleOpTimeout();
-
-  /**
    * get max smget key chunk size
    */
   int getDefaultMaxSMGetKeyChunkSize();

@@ -93,21 +93,6 @@ public class ArcusTimeoutTest extends TestCase {
   @Test(expected = TimeoutException.class)
   public void testBulkSetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    // recreate arcus client with BulkServiceThreadCount 6
-    if (mc != null) {
-      mc.shutdown();
-    }
-    try {
-      mc = new ArcusClient(new DefaultConnectionFactory() {
-        @Override
-        public int getBulkServiceThreadCount() {
-          return 6;
-        }
-      }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
     int keySize = 100000;
 
     String[] keys = new String[keySize];
@@ -141,19 +126,6 @@ public class ArcusTimeoutTest extends TestCase {
   @Test(expected = TimeoutException.class)
   public void testBulkDeleteTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    // recreate arcus client with BulkServiceThreadCount 6
-    try {
-      tearDown();
-      mc = new ArcusClient(new DefaultConnectionFactory() {
-        @Override
-        public int getBulkServiceThreadCount() {
-          return 6;
-        }
-      }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
     int keySize = 100000;
 
     String[] keys = new String[keySize];

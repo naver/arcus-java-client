@@ -79,11 +79,6 @@ public class ConnectionFactoryBuilder {
   private boolean frontCacheCopyOnWrite =
       DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
 
-  private int bulkServiceThreadCount = DefaultConnectionFactory.DEFAULT_BULKSERVICE_THREAD_COUNT;
-  private int bulkServiceLoopLimit = DefaultConnectionFactory.DEFAULT_BULKSERVICE_LOOP_LIMIT;
-  private long bulkServiceSingleOpTimeout =
-      DefaultConnectionFactory.DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT;
-
   private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
 
@@ -349,27 +344,24 @@ public class ConnectionFactoryBuilder {
   /**
    * Set bulk service default thread count
    */
+  @Deprecated
   public ConnectionFactoryBuilder setBulkServiceThreadCount(int to) {
-    assert to > 0 : "Bulk service's thread count must be a positive number";
-    bulkServiceThreadCount = to;
     return this;
   }
 
   /**
    * Set bulk service loop limit count
    */
+  @Deprecated
   public ConnectionFactoryBuilder setBulkServiceLoopLimit(int to) {
-    assert to > 0 : "Bulk service's loop limit must be a positive number";
-    bulkServiceLoopLimit = to;
     return this;
   }
 
   /**
    * Set bulk service each operation timeout
    */
+  @Deprecated
   public ConnectionFactoryBuilder setBulkServiceSingleOpTimeout(long to) {
-    assert to > 0 : "Bulk service's single operation timeout must be a positive number";
-    bulkServiceSingleOpTimeout = to;
     return this;
   }
 
@@ -615,21 +607,6 @@ public class ConnectionFactoryBuilder {
       @Override
       public boolean getFrontCacheCopyOnWrite() {
         return frontCacheCopyOnWrite;
-      }
-
-      @Override
-      public int getBulkServiceThreadCount() {
-        return bulkServiceThreadCount;
-      }
-
-      @Override
-      public int getBulkServiceLoopLimit() {
-        return bulkServiceLoopLimit;
-      }
-
-      @Override
-      public long getBulkServiceSingleOpTimeout() {
-        return bulkServiceSingleOpTimeout;
       }
 
       @Override
