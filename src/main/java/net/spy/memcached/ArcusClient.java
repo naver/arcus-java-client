@@ -169,7 +169,8 @@ import net.spy.memcached.util.BTreeUtil;
  * If pool style is needed, it will be used as follows
  *
  * int poolSize = 4;
- * ArcusClientPool pool = ArcusClient.createArcusClientPool(arcusAdminAddrs, serviceCode, cfb, poolSize);
+ * ArcusClientPool pool =
+ *     ArcusClient.createArcusClientPool(arcusAdminAddrs, serviceCode, cfb, poolSize);
  *
  * // Store a value
  * pool.set("someKey", 3600, someObject);
@@ -265,7 +266,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return multiple ArcusClient
    */
   private static ArcusClientPool createArcusClient(String hostPorts, String serviceCode,
-                                                   ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
+                                                   ConnectionFactoryBuilder cfb, int poolSize,
+                                                   int waitTimeForConnect) {
 
     if (hostPorts == null) {
       throw new NullPointerException("Arcus admin address required.");
@@ -474,7 +476,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return future holding the fetched value
    */
   private <T> CollectionFuture<List<T>> asyncLopGet(final String k,
-                                                    final CollectionGet collectionGet, final Transcoder<T> tc) {
+                                                    final CollectionGet collectionGet,
+                                                    final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<List<T>> rv = new CollectionFuture<List<T>>(
             latch, operationTimeout);
@@ -572,7 +575,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return future holding the fetched value
    */
   private <T> CollectionFuture<Set<T>> asyncSopGet(final String k,
-                                                   final CollectionGet collectionGet, final Transcoder<T> tc) {
+                                                   final CollectionGet collectionGet,
+                                                   final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Set<T>> rv = new CollectionFuture<Set<T>>(latch,
             operationTimeout);
@@ -805,7 +809,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic insert operation for collection items. Public methods for collection items call this method.
+   * Generic insert operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key             collection item's key
    * @param subkey          element key (list index, b+tree bkey)
@@ -814,14 +819,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return future holding the success/failure of the operation
    */
   private <T> CollectionFuture<Boolean> asyncCollectionInsert(String key,
-                                                              String subkey, CollectionInsert<T> collectionInsert, Transcoder<T> tc) {
+                                                              String subkey,
+                                                              CollectionInsert<T> collectionInsert,
+                                                              Transcoder<T> tc) {
     CachedData co = tc.encode(collectionInsert.getValue());
     collectionInsert.setFlags(co.getFlags());
     return asyncCollectionInsert(key, subkey, collectionInsert, co);
   }
 
   /**
-   * Generic insert operation for collection items. Public methods for collection items call this method.
+   * Generic insert operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key             collection item's key
    * @param subkey          element key (list index, b+tree bkey)
@@ -830,7 +838,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return future holding the success/failure of the operation
    */
   <T> CollectionFuture<Boolean> asyncCollectionInsert(final String key,
-                                                      final String subkey, final CollectionInsert<T> collectionInsert,
+                                                      final String subkey,
+                                                      final CollectionInsert<T> collectionInsert,
                                                       final CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
@@ -870,7 +879,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic pipelined insert operation for collection items. Public methods for collection items call this method.
+   * Generic pipelined insert operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key   collection item's key
    * @param insert operation parameters (values, attributes, and so on)
@@ -929,7 +939,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic pipelined update operation for collection items. Public methods for collection items call this method.
+   * Generic pipelined update operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key    collection item's key
    * @param update operation parameters (values and so on)
@@ -949,12 +960,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, CollectionOperationStatus>> rv = new CollectionFuture<Map<Integer, CollectionOperationStatus>>(
-            latch, operationTimeout);
+    final CollectionFuture<Map<Integer, CollectionOperationStatus>> rv =
+        new CollectionFuture<Map<Integer, CollectionOperationStatus>>(latch, operationTimeout);
 
     Operation op = opFact.collectionPipedUpdate(key, update,
         new CollectionPipedUpdateOperation.Callback() {
-          Map<Integer, CollectionOperationStatus> result = new TreeMap<Integer, CollectionOperationStatus>();
+          Map<Integer, CollectionOperationStatus> result =
+              new TreeMap<Integer, CollectionOperationStatus>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -989,7 +1001,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic pipelined update operation for collection items. Public methods for collection items call this method.
+   * Generic pipelined update operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key        collection item's key
    * @param updateList list of operation parameters (values and so on)
@@ -1005,7 +1018,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final List<OperationStatus> mergedOperationStatus = Collections
             .synchronizedList(new ArrayList<OperationStatus>(1));
 
-    final Map<Integer, CollectionOperationStatus> mergedResult = new ConcurrentHashMap<Integer, CollectionOperationStatus>();
+    final Map<Integer, CollectionOperationStatus> mergedResult =
+        new ConcurrentHashMap<Integer, CollectionOperationStatus>();
 
     for (int i = 0; i < updateList.size(); i++) {
       final CollectionPipedUpdate<T> update = updateList.get(i);
@@ -1076,8 +1090,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units) throws InterruptedException,
-              TimeoutException, ExecutionException {
+                                                         TimeUnit units)
+          throws InterruptedException, TimeoutException, ExecutionException {
 
         if (!latch.await(duration, units)) {
           for (Operation op : ops) {
@@ -1119,7 +1133,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic delete operation for collection items. Public methods for collection items call this method.
+   * Generic delete operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key              collection item's key
    * @param collectionDelete operation parameters (element index/key, value, and so on)
@@ -1164,7 +1179,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic existence operation for collection items. Public methods for collection items call this method.
+   * Generic existence operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key             collection item's key
    * @param subkey          element key (list index, b+tree bkey)
@@ -1339,7 +1355,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncBopCreate(String key,
-                                                  ElementValueType valueType, CollectionAttributes attributes) {
+                                                  ElementValueType valueType,
+                                                  CollectionAttributes attributes) {
     int flag = CollectionTranscoder.examineFlags(valueType);
     boolean noreply = false;
     CollectionCreate bTreeCreate = new BTreeCreate(flag,
@@ -1350,27 +1367,30 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncMopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     int flag = CollectionTranscoder.examineFlags(type);
     boolean noreply = false;
     CollectionCreate mapCreate = new MapCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
+        attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
     return asyncCollectionCreate(key, mapCreate);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncSopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     int flag = CollectionTranscoder.examineFlags(type);
     boolean noreply = false;
     CollectionCreate setCreate = new SetCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
+        attributes.getExpireTime(), attributes.getMaxCount(), attributes.getReadable(), noreply);
     return asyncCollectionCreate(key, setCreate);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncLopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     int flag = CollectionTranscoder.examineFlags(type);
     boolean noreply = false;
     CollectionCreate listCreate = new ListCreate(flag,
@@ -1380,7 +1400,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic create operation for collection items. Public methods for collection items call this method.
+   * Generic create operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key              collection item's key
    * @param collectionCreate operation parameters (flags, expiration time, and so on)
@@ -1432,15 +1453,21 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty) {
+                                                                  long bkey,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  boolean withDelete,
+                                                                  boolean dropIfEmpty) {
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopGet(key, get, false, collectionTranscoder);
   }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
-                                                                  boolean withDelete, boolean dropIfEmpty) {
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count,
+                                                                  boolean withDelete,
+                                                                  boolean dropIfEmpty) {
     BTreeGet get = new BTreeGet(from, to, offset, count,
             withDelete, dropIfEmpty, eFlagFilter);
     boolean reverse = from > to;
@@ -1449,15 +1476,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                                 long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc) {
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopGet(key, get, false, tc);
   }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
-                                                                 boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc) {
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete,
             dropIfEmpty, eFlagFilter);
     boolean reverse = from > to;
@@ -1466,7 +1501,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           boolean withDelete, boolean dropIfEmpty) {
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     List<String> mkeyList = new ArrayList<String>();
     MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
     return asyncMopGet(key, get, collectionTranscoder);
@@ -1474,7 +1510,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           String mkey, boolean withDelete, boolean dropIfEmpty) {
+                                                           String mkey,
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     if (mkey == null) {
       throw new IllegalArgumentException("mkey is null");
     }
@@ -1487,7 +1525,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
+                                                           List<String> mkeyList,
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     if (mkeyList == null) {
       throw new IllegalArgumentException("mkeyList is null");
     }
@@ -1500,7 +1540,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     List<String> mkeyList = new ArrayList<String>();
     MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
     return asyncMopGet(key, get, tc);
@@ -1508,7 +1549,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                          String mkey,
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     if (mkey == null) {
       throw new IllegalArgumentException("mkey is null");
     }
@@ -1521,7 +1564,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                          List<String> mkeyList,
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     if (mkeyList == null) {
       throw new IllegalArgumentException("mkeyList is null");
     }
@@ -1540,22 +1585,26 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
-                                                    int to, boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<List<Object>> asyncLopGet(String key,
+                                                    int from, int to,
+                                                    boolean withDelete, boolean dropIfEmpty) {
     ListGet get = new ListGet(from, to, withDelete, dropIfEmpty);
     return asyncLopGet(key, get, collectionTranscoder);
   }
 
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
-                                                   boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                   boolean withDelete, boolean dropIfEmpty,
+                                                   Transcoder<T> tc) {
     ListGet get = new ListGet(index, withDelete, dropIfEmpty);
     return asyncLopGet(key, get, tc);
   }
 
   @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from,
-                                                   int to, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key,
+                                                   int from, int to,
+                                                   boolean withDelete, boolean dropIfEmpty,
+                                                   Transcoder<T> tc) {
     ListGet get = new ListGet(from, to, withDelete, dropIfEmpty);
     return asyncLopGet(key, get, tc);
   }
@@ -1569,22 +1618,26 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
-                                                  boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                  boolean withDelete, boolean dropIfEmpty,
+                                                  Transcoder<T> tc) {
     SetGet get = new SetGet(count, withDelete, dropIfEmpty);
     return asyncSopGet(key, get, tc);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
-                                                  ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
+                                                  ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty) {
     BTreeDelete delete = new BTreeDelete(bkey, false,
             dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
   }
 
   @Override
-  public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
-                                                  long to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
+  public CollectionFuture<Boolean> asyncBopDelete(String key,
+                                                  long from, long to,
+                                                  ElementFlagFilter eFlagFilter, int count,
+                                                  boolean dropIfEmpty) {
     BTreeDelete delete = new BTreeDelete(from, to, count,
             false, dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
@@ -1645,7 +1698,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic count operation for collection items. Public methods for collection items call this method.
+   * Generic count operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param k               collection item's key
    * @param collectionCount operation parameters (element key range, eflags, and so on)
@@ -1696,14 +1750,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        long from, long to, ElementFlagFilter eFlagFilter) {
+                                                        long from, long to,
+                                                        ElementFlagFilter eFlagFilter) {
     CollectionCount collectionCount = new BTreeCount(from, to, eFlagFilter);
     return asyncCollectionCount(key, collectionCount);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                  byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
+                                                  byte[] eFlag, Object value,
+                                                  CollectionAttributes attributesForCreate) {
     BTreeInsert<Object> bTreeInsert = new BTreeInsert<Object>(value,
             eFlag, (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert,
@@ -1712,7 +1768,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                  Object value, CollectionAttributes attributesForCreate) {
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate) {
     validateMKey(mkey);
     MapInsert<Object> mapInsert = new MapInsert<Object>(value,
             (attributesForCreate != null), null, attributesForCreate);
@@ -1722,7 +1779,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                  Object value, CollectionAttributes attributesForCreate) {
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate) {
     ListInsert<Object> listInsert = new ListInsert<Object>(value,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, String.valueOf(index), listInsert,
@@ -1739,7 +1797,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                      byte[] eFlag, T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      byte[] eFlag, T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     BTreeInsert<T> bTreeInsert = new BTreeInsert<T>(value, eFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert, tc);
@@ -1747,7 +1807,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                      T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     validateMKey(mkey);
     MapInsert<T> mapInsert = new MapInsert<T>(value,
             (attributesForCreate != null), null, attributesForCreate);
@@ -1756,7 +1818,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                      T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     ListInsert<T> listInsert = new ListInsert<T>(value, (attributesForCreate != null),
             null, attributesForCreate);
     return asyncCollectionInsert(key, String.valueOf(index), listInsert, tc);
@@ -1764,7 +1828,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncSopInsert(String key, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     SetInsert<T> setInsert = new SetInsert<T>(value, (attributesForCreate != null),
             null, attributesForCreate);
     return asyncCollectionInsert(key, "", setInsert, tc);
@@ -1996,7 +2061,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count) {
+          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+          int offset, int count) {
     if (keyList == null || keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
@@ -2016,9 +2082,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
       if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(v, from, to, eFlagFilter, 0, offset + count));
+        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(
+            v, from, to, eFlagFilter, 0, offset + count));
       } else {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(v, from, to, eFlagFilter, offset, count));
+        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(
+            v, from, to, eFlagFilter, offset, count));
       }
     }
     return smget(smGetList, offset, count, (from > to),
@@ -2044,14 +2112,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
+      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(
+          v, from, to, eFlagFilter, count, smgetMode));
     }
     return smget(smGetList, count, (from > to),
             collectionTranscoder, smgetMode);
   }
 
   /**
-   * Turn the list of keys into groups of keys.  All keys in a group belong to the same memcached server.
+   * Turn the list of keys into groups of keys.
+   * All keys in a group belong to the same memcached server.
    *
    * @param keyList   list of keys
    * @param groupSize max size of the key group (number of keys)
@@ -2154,16 +2224,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final List<String> missedKeyList = Collections.synchronizedList(new ArrayList<String>());
     final Map<String, CollectionOperationStatus> missedKeys =
             Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
-    final List<SMGetTrimKey> mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
+    final List<SMGetTrimKey> mergedTrimmedKeys =
+        Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
     final int totalResultElementCount = count + offset;
 
-    final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
+    final List<SMGetElement<T>> mergedResult =
+        Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
 
     final ReentrantLock lock = new ReentrantLock();
 
-    final List<OperationStatus> resultOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
+    final List<OperationStatus> resultOperationStatus =
+        Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
-    final List<OperationStatus> failedOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
+    final List<OperationStatus> failedOperationStatus =
+        Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
     // if processedSMGetCount is 0, then all smget is done.
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
@@ -2272,9 +2346,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             return;
 
           if (subkey instanceof Long) {
-            eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(
+                new CachedData(flags, data, tc.getMaxSize()))));
           } else if (subkey instanceof byte[]) {
-            eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, tc.decode(
+                new CachedData(flags, data, tc.getMaxSize()))));
           }
         }
 
@@ -2366,14 +2442,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
     final int totalResultElementCount = count;
 
-    final List<SMGetElement<T>> mergedResult = Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
-    final List<SMGetTrimKey> mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
+    final List<SMGetElement<T>> mergedResult =
+        Collections.synchronizedList(new ArrayList<SMGetElement<T>>(totalResultElementCount));
+    final List<SMGetTrimKey> mergedTrimmedKeys =
+        Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 
     final ReentrantLock lock = new ReentrantLock();
 
-    final List<OperationStatus> resultOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
+    final List<OperationStatus> resultOperationStatus =
+        Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
-    final List<OperationStatus> failedOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
+    final List<OperationStatus> failedOperationStatus =
+        Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
     final AtomicBoolean stopCollect = new AtomicBoolean(false);
     // if processedSMGetCount is 0, then all smget is done.
@@ -2519,9 +2599,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             return;
 
           if (subkey instanceof Long) {
-            eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(
+                new CachedData(flags, data, tc.getMaxSize()))));
           } else if (subkey instanceof byte[]) {
-            eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, tc.decode(
+                new CachedData(flags, data, tc.getMaxSize()))));
           }
         }
 
@@ -2608,7 +2690,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
-                                                  byte[] elementFlag, Object value, CollectionAttributes attributesForCreate) {
+                                                  byte[] elementFlag, Object value,
+                                                  CollectionAttributes attributesForCreate) {
 
     BTreeUpsert<Object> bTreeUpsert = new BTreeUpsert<Object>(value,
             elementFlag, (attributesForCreate != null), null, attributesForCreate);
@@ -2619,7 +2702,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
-                                                      byte[] elementFlag, T value, CollectionAttributes attributesForCreate,
+                                                      byte[] elementFlag, T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
 
     BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<T>(value, elementFlag,
@@ -2639,7 +2723,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
-                                                      ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc) {
+                                                      ElementFlagUpdate eFlagUpdate, T value,
+                                                      Transcoder<T> tc) {
     BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value,
             eFlagUpdate, false);
     return asyncCollectionUpdate(key, String.valueOf(bkey),
@@ -2648,7 +2733,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncBopUpdate(String key,
-                                                  byte[] bkey, ElementFlagUpdate eFlagUpdate, Object value) {
+                                                  byte[] bkey, ElementFlagUpdate eFlagUpdate,
+                                                  Object value) {
     BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(
             value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, BTreeUtil.toHex(bkey),
@@ -2657,7 +2743,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
-                                                      byte[] bkey, ElementFlagUpdate eFlagUpdate, T value,
+                                                      byte[] bkey,
+                                                      ElementFlagUpdate eFlagUpdate, T value,
                                                       Transcoder<T> tc) {
     BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value,
             eFlagUpdate, false);
@@ -2685,7 +2772,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic update operation for collection items. Public methods for collection items call this method.
+   * Generic update operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key              collection item's key
    * @param subkey           element key (list index, b+tree bkey)
@@ -2760,8 +2848,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
               elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
-      List<CollectionPipedUpdate<T>> collectionPipedUpdateList = new ArrayList<CollectionPipedUpdate<T>>(
-              list.size());
+      List<CollectionPipedUpdate<T>> collectionPipedUpdateList =
+          new ArrayList<CollectionPipedUpdate<T>>(list.size());
 
       for (int i = 0; i < list.size(); i++) {
         collectionPipedUpdateList.add(new BTreePipedUpdate<T>(key, list
@@ -2794,8 +2882,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       PartitionedMap<String, T> list = new PartitionedMap<String, T>(
               elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
-      List<CollectionPipedUpdate<T>> collectionPipedUpdateList = new ArrayList<CollectionPipedUpdate<T>>(
-              list.size());
+      List<CollectionPipedUpdate<T>> collectionPipedUpdateList =
+          new ArrayList<CollectionPipedUpdate<T>>(list.size());
 
       for (int i = 0; i < list.size(); i++) {
         collectionPipedUpdateList.add(new MapPipedUpdate<T>(key, list
@@ -2808,7 +2896,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, byte[] bkey,
-                                                  byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
+                                                  byte[] eFlag, Object value,
+                                                  CollectionAttributes attributesForCreate) {
     BTreeInsert<Object> bTreeInsert = new BTreeInsert<Object>(value,
             eFlag, (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key,
@@ -2819,7 +2908,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key,
                                                       byte[] bkey, byte[] eFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     BTreeInsert<T> bTreeInsert = new BTreeInsert<T>(value, eFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key,
@@ -2845,9 +2935,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(String key,
-                                                                           byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
-                                                                           int count, boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+      String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+      int offset, int count, boolean withDelete, boolean dropIfEmpty) {
     BTreeGet get = new BTreeGet(from, to,
             offset, count, withDelete, dropIfEmpty, eFlagFilter);
 
@@ -2868,7 +2958,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic get operation for b+tree items using byte-array type bkeys. Public methods for b+tree items call this method.
+   * Generic get operation for b+tree items using byte-array type bkeys.
+   * Public methods for b+tree items call this method.
    *
    * @param k             b+tree item's key
    * @param collectionGet operation parameters (element key and so on)
@@ -2881,8 +2972,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<ByteArrayBKey, Element<T>>> rv = new CollectionFuture<Map<ByteArrayBKey, Element<T>>>(
-            latch, operationTimeout);
+    final CollectionFuture<Map<ByteArrayBKey, Element<T>>> rv =
+        new CollectionFuture<Map<ByteArrayBKey, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -2985,7 +3076,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic get operation for b+tree items using positions. Public methods for b+tree items call this method.
+   * Generic get operation for b+tree items using positions.
+   * Public methods for b+tree items call this method.
    *
    * @param k       b+tree item's key
    * @param get     operation parameters (element position and so on)
@@ -3005,8 +3097,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, Element<T>>> rv = new CollectionFuture<Map<Integer, Element<T>>>(
-            latch, operationTimeout);
+    final CollectionFuture<Map<Integer, Element<T>>> rv =
+        new CollectionFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.bopGetByPosition(k, get, new BTreeGetByPositionOperation.Callback() {
 
@@ -3063,7 +3155,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         latch.countDown();
       }
 
-      public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+      public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag,
+                          byte[] data) {
         assert key.equals(k) : "Wrong key returned";
         Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
 
@@ -3098,13 +3191,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic find-position operation for b+tree items. Public methods for b+tree items call this method.
+   * Generic find-position operation for b+tree items.
+   * Public methods for b+tree items call this method.
    *
    * @param k   b+tree item's key
    * @param get operation parameters (element key and so on)
    * @return future holding the element's position
    */
-  private CollectionFuture<Integer> asyncBopFindPosition(final String k, final BTreeFindPosition get) {
+  private CollectionFuture<Integer> asyncBopFindPosition(final String k,
+                                                         final BTreeFindPosition get) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Integer> rv = new CollectionFuture<Integer>(latch, operationTimeout);
 
@@ -3208,7 +3303,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
 
   /**
-   * Generic find position with get operation for b+tree items. Public methods for b+tree items call this method.
+   * Generic find position with get operation for b+tree items.
+   * Public methods for b+tree items call this method.
    *
    * @param k   b+tree item's key
    * @param get operation parameters (element key and so on)
@@ -3225,74 +3321,77 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, Element<T>>> rv = new CollectionFuture<Map<Integer, Element<T>>>(
-            latch, operationTimeout);
+    final CollectionFuture<Map<Integer, Element<T>>> rv =
+        new CollectionFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
 
-    Operation op = opFact.bopFindPositionWithGet(k, get, new BTreeFindPositionWithGetOperation.Callback() {
+    Operation op = opFact.bopFindPositionWithGet(k, get,
+        new BTreeFindPositionWithGetOperation.Callback() {
 
-      TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
+          TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
 
-      public void receivedStatus(OperationStatus status) {
-        CollectionOperationStatus cstatus;
-        if (status instanceof CollectionOperationStatus) {
-          cstatus = (CollectionOperationStatus) status;
-        } else {
-          getLogger().warn("Unhandled state: " + status);
-          cstatus = new CollectionOperationStatus(status);
-        }
-        if (cstatus.isSuccess()) {
-          rv.set(map, cstatus);
-          return;
-        }
-        switch (cstatus.getResponse()) {
-          case NOT_FOUND:
-            rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s) not found : %s", k, cstatus);
+          public void receivedStatus(OperationStatus status) {
+            CollectionOperationStatus cstatus;
+            if (status instanceof CollectionOperationStatus) {
+              cstatus = (CollectionOperationStatus) status;
+            } else {
+              getLogger().warn("Unhandled state: " + status);
+              cstatus = new CollectionOperationStatus(status);
             }
-            break;
-          case NOT_FOUND_ELEMENT:
-            rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Element(%s) not found : %s", k, cstatus);
+            if (cstatus.isSuccess()) {
+              rv.set(map, cstatus);
+              return;
             }
-            break;
-          case UNREADABLE:
-            rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-            }
-            break;
-          case BKEY_MISMATCH:
-            rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) has wrong bkey : %s(%s)",
+            switch (cstatus.getResponse()) {
+              case NOT_FOUND:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
+                }
+                break;
+              case NOT_FOUND_ELEMENT:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
+                }
+                break;
+              case UNREADABLE:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
+                }
+                break;
+              case BKEY_MISMATCH:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Collection(%s) has wrong bkey : %s(%s)",
                       k, cstatus, get.getBkeyObject().getType());
+                }
+                break;
+              case TYPE_MISMATCH:
+                rv.set(null, cstatus);
+                if (getLogger().isDebugEnabled()) {
+                  getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
+                }
+                break;
+              default:
+                getLogger().warn("Unhandled state: " + status);
             }
-            break;
-          case TYPE_MISMATCH:
-            rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
+          }
+
+          public void complete() {
+            latch.countDown();
+          }
+
+          public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag,
+                              byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
+            if (element != null) {
+              map.put(pos, element);
             }
-            break;
-          default:
-            getLogger().warn("Unhandled state: " + status);
+          }
         }
-      }
-
-      public void complete() {
-        latch.countDown();
-      }
-
-      public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
-        assert key.equals(k) : "Wrong key returned";
-        Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
-        if (element != null) {
-          map.put(pos, element);
-        }
-      }
-    });
+    );
     rv.setOperation(op);
     addOp(k, op);
     return rv;
@@ -3458,7 +3557,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return element object containing all the parameters and transcoded value
    */
   private <T> Element<T> makeBTreeElement(String key, int flags,
-                                          BKeyObject bkey, byte[] eflag, byte[] data, Transcoder<T> tc) {
+                                          BKeyObject bkey, byte[] eflag, byte[] data,
+                                          Transcoder<T> tc) {
     Element<T> element = null;
     T value = tc.decode(new CachedData(flags, data, tc.getMaxSize()));
 
@@ -3479,8 +3579,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] from,
-                                                  byte[] to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty) {
+  public CollectionFuture<Boolean> asyncBopDelete(String key,
+                                                  byte[] from, byte[] to,
+                                                  ElementFlagFilter eFlagFilter, int count,
+                                                  boolean dropIfEmpty) {
     BTreeDelete delete = new BTreeDelete(from, to, count,
             false, dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
@@ -3488,7 +3590,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key,
-                                                  byte[] bkey, ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
+                                                  byte[] bkey, ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty) {
     BTreeDelete delete = new BTreeDelete(bkey, false,
             dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
@@ -3507,7 +3610,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                       byte[] bkey, byte[] elementFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<T>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeUpsert,
@@ -3516,7 +3620,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        byte[] from, byte[] to, ElementFlagFilter eFlagFilter) {
+                                                        byte[] from, byte[] to,
+                                                        ElementFlagFilter eFlagFilter) {
     CollectionCount collectionCount = new BTreeCount(from, to, eFlagFilter);
     return asyncCollectionCount(key, collectionCount);
   }
@@ -3531,7 +3636,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> CollectionFuture<Map<T, Boolean>> asyncSopPipedExistBulk(String key,
-                                                                      List<T> values, Transcoder<T> tc) {
+                                                                      List<T> values,
+                                                                      Transcoder<T> tc) {
     SetPipedExist<T> exist = new SetPipedExist<T>(key, values, tc);
     return asyncSetPipedExist(key, exist);
   }
@@ -3654,7 +3760,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count) {
+          List<String> keyList, byte[] from, byte[] to,
+          ElementFlagFilter eFlagFilter, int offset, int count) {
     if (keyList == null || keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
@@ -3671,9 +3778,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
       if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, 0, offset + count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(
+            v, from, to, eFlagFilter, 0, offset + count));
       } else {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(v, from, to, eFlagFilter, offset, count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(
+            v, from, to, eFlagFilter, offset, count));
       }
     }
 
@@ -3700,7 +3809,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
     for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(v, from, to, eFlagFilter, count, smgetMode));
+      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(
+          v, from, to, eFlagFilter, count, smgetMode));
     }
 
     return smget(smGetList, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
@@ -3708,7 +3818,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic pipelined insert operation for collection items. Public methods for collection items call this method.
+   * Generic pipelined insert operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param key       collection item's key
    * @param insertList list of operation parameters (element values and so on)
@@ -3724,7 +3835,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final List<OperationStatus> mergedOperationStatus = Collections
             .synchronizedList(new ArrayList<OperationStatus>(1));
 
-    final Map<Integer, CollectionOperationStatus> mergedResult = new ConcurrentHashMap<Integer, CollectionOperationStatus>();
+    final Map<Integer, CollectionOperationStatus> mergedResult =
+        new ConcurrentHashMap<Integer, CollectionOperationStatus>();
 
     for (int i = 0; i < insertList.size(); i++) {
       final CollectionPipedInsert<T> insert = insertList.get(i);
@@ -3795,7 +3907,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units) throws InterruptedException,
+                                                         TimeUnit units)
+          throws InterruptedException,
               TimeoutException, ExecutionException {
 
         if (!latch.await(duration, units)) {
@@ -3971,7 +4084,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic bulk insert operation for collection items. Public methods for collection items call this method.
+   * Generic bulk insert operation for collection items.
+   * Public methods for collection items call this method.
    *
    * @param insertList list of operation parameters (item keys, element values, and so on)
    * @return future holding the map of item key and the result of the insert operation on that key
@@ -3981,7 +4095,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
-    final Map<String, CollectionOperationStatus> failedResult = new ConcurrentHashMap<String, CollectionOperationStatus>();
+    final Map<String, CollectionOperationStatus> failedResult =
+        new ConcurrentHashMap<String, CollectionOperationStatus>();
 
     final CountDownLatch latch = new CountDownLatch(insertList.size());
 
@@ -4094,7 +4209,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
     if (count > MAX_GETBULK_ELEMENT_COUNT) {
-      throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
+      throw new IllegalArgumentException("Count must not exceed a maximum of "
+          + MAX_GETBULK_ELEMENT_COUNT + ".");
     }
 
     Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
@@ -4110,7 +4226,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
   }
 
-  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> asyncBopGetBulk(
+  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
+      asyncBopGetBulk(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count) {
     return asyncBopGetBulk(keyList, from, to, eFlagFilter, offset, count,
@@ -4128,7 +4245,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
     if (count > MAX_GETBULK_ELEMENT_COUNT) {
-      throw new IllegalArgumentException("Count must not exceed a maximum of " + MAX_GETBULK_ELEMENT_COUNT + ".");
+      throw new IllegalArgumentException("Count must not exceed a maximum of "
+          + MAX_GETBULK_ELEMENT_COUNT + ".");
     }
 
     Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
@@ -4162,7 +4280,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-    final Map<String, BTreeGetResult<Long, T>> result = new ConcurrentHashMap<String, BTreeGetResult<Long, T>>();
+    final Map<String, BTreeGetResult<Long, T>> result =
+        new ConcurrentHashMap<String, BTreeGetResult<Long, T>>();
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback<T>() {
@@ -4196,11 +4315,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       addOp(getBulk.getRepresentKey(), op);
     }
 
-    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>>(latch, ops, result, operationTimeout);
+    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>>(
+        latch, ops, result, operationTimeout);
   }
 
   /**
-   * Generic bulk get operation for b+tree items using byte-array type bkeys. Public methods call this method.
+   * Generic bulk get operation for b+tree items using byte-array type bkeys.
+   * Public methods call this method.
    *
    * @param getBulkList list of operation parameters (item keys, element key range, and so on)
    * @param offset      start index of the elements
@@ -4209,13 +4330,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param tc          transcoder to serialize and unserialize value
    * @return future holding the map of item key and the fetched elements from that key
    */
-  private <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>> btreeGetBulkByteArrayBKey(
+  private <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>
+      btreeGetBulkByteArrayBKey(
           final List<BTreeGetBulk<T>> getBulkList, final int offset,
           final int count, final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-    final Map<String, BTreeGetResult<ByteArrayBKey, T>> result = new ConcurrentHashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
+    final Map<String, BTreeGetResult<ByteArrayBKey, T>> result =
+        new ConcurrentHashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback<T>() {
@@ -4235,7 +4358,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             tree = new ByteArrayTreeMap<ByteArrayBKey, BTreeElement<ByteArrayBKey, T>>(
                     (reverse) ? Collections.reverseOrder() : null);
           }
-          result.put(key, new BTreeGetResult<ByteArrayBKey, T>(tree, new CollectionOperationStatus(status)));
+          result.put(key, new BTreeGetResult<ByteArrayBKey, T>(
+              tree, new CollectionOperationStatus(status)));
         }
 
         @Override
@@ -4250,7 +4374,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       addOp(getBulk.getRepresentKey(), op);
     }
 
-    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>(latch, ops, result, operationTimeout);
+    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>(
+        latch, ops, result, operationTimeout);
   }
 
   @Override

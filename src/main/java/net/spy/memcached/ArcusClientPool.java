@@ -439,31 +439,37 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public CollectionFuture<Boolean> asyncBopCreate(String key,
-                                                  ElementValueType valueType, CollectionAttributes attributes) {
+                                                  ElementValueType valueType,
+                                                  CollectionAttributes attributes) {
     return this.getClient().asyncBopCreate(key, valueType, attributes);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncMopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     return this.getClient().asyncMopCreate(key, type, attributes);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncSopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     return this.getClient().asyncSopCreate(key, type, attributes);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncLopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes) {
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes) {
     return this.getClient().asyncLopCreate(key, type, attributes);
   }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long bkey, ElementFlagFilter eFlagFilter, boolean withDelete,
+                                                                  long bkey,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  boolean withDelete,
                                                                   boolean dropIfEmpty) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty);
@@ -471,116 +477,150 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long from, long to, ElementFlagFilter eFlagFilter, int offset,
-                                                                  int count, boolean withDelete, boolean dropIfEmpty) {
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count,
+                                                                  boolean withDelete,
+                                                                  boolean dropIfEmpty) {
     return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
             count, withDelete, dropIfEmpty);
   }
 
   @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long bkey, ElementFlagFilter eFlagFilter, boolean withDelete,
-                                                                 boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key, long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty, tc);
   }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long from, long to, ElementFlagFilter eFlagFilter, int offset,
-                                                                 int count, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc) {
     return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
             count, withDelete, dropIfEmpty, tc);
   }
 
   @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           List<String> mkeyList, boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty);
   }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           boolean withDelete, boolean dropIfEmpty) {
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty);
   }
 
   @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           String mkey, boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey,
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
     return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty);
   }
 
   @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+                                                          boolean withDelete,
+                                                          boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty, tc);
   }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                          boolean withDelete,
+                                                          boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty, tc);
   }
 
   @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
+                                                          boolean withDelete,
+                                                          boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
     return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty, tc);
   }
 
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
-                                                    boolean withDelete, boolean dropIfEmpty) {
+                                                    boolean withDelete,
+                                                    boolean dropIfEmpty) {
     return this.getClient()
             .asyncLopGet(key, index, withDelete, dropIfEmpty);
   }
 
   @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
-                                                    int to, boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<List<Object>> asyncLopGet(String key,
+                                                    int from, int to,
+                                                    boolean withDelete,
+                                                    boolean dropIfEmpty) {
     return this.getClient().asyncLopGet(key, from, to, withDelete,
             dropIfEmpty);
   }
 
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
-                                                   boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+                                                   boolean withDelete,
+                                                   boolean dropIfEmpty,
+                                                   Transcoder<T> tc) {
     return this.getClient().asyncLopGet(key, index, withDelete,
             dropIfEmpty, tc);
   }
 
   @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from,
-                                                   int to, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key,
+                                                   int from, int to,
+                                                   boolean withDelete,
+                                                   boolean dropIfEmpty,
+                                                   Transcoder<T> tc) {
     return this.getClient().asyncLopGet(key, from, to, withDelete,
             dropIfEmpty, tc);
   }
 
   @Override
-  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
-                                                   boolean withDelete, boolean dropIfEmpty) {
+  public CollectionFuture<Set<Object>> asyncSopGet(String key,
+                                                   int count,
+                                                   boolean withDelete,
+                                                   boolean dropIfEmpty) {
     return this.getClient()
             .asyncSopGet(key, count, withDelete, dropIfEmpty);
   }
 
   @Override
-  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
-                                                  boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+  public <T> CollectionFuture<Set<T>> asyncSopGet(String key,
+                                                  int count,
+                                                  boolean withDelete,
+                                                  boolean dropIfEmpty,
+                                                  Transcoder<T> tc) {
     return this.getClient().asyncSopGet(key, count, withDelete,
             dropIfEmpty, tc);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
-                                                  ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
+                                                  ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty) {
     return this.getClient().asyncBopDelete(key, bkey, eFlagFilter,
             dropIfEmpty);
   }
 
   @Override
-  public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
-                                                  long to, ElementFlagFilter eFlagFilter, int count,
+  public CollectionFuture<Boolean> asyncBopDelete(String key,
+                                                  long from, long to,
+                                                  ElementFlagFilter eFlagFilter,
+                                                  int count,
                                                   boolean dropIfEmpty) {
     return this.getClient().asyncBopDelete(key, from, to, eFlagFilter,
             count, dropIfEmpty);
@@ -624,28 +664,32 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        long from, long to, ElementFlagFilter eFlagFilter) {
+                                                        long from, long to,
+                                                        ElementFlagFilter eFlagFilter) {
     return this.getClient()
             .asyncBopGetItemCount(key, from, to, eFlagFilter);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                  byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
+                                                  byte[] eFlag, Object value,
+                                                  CollectionAttributes attributesForCreate) {
     return this.getClient().asyncBopInsert(key, bkey, eFlag, value,
             attributesForCreate);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                  Object value, CollectionAttributes attributesForCreate) {
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate) {
     return this.getClient().asyncMopInsert(key, mkey, value,
             attributesForCreate);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                  Object value, CollectionAttributes attributesForCreate) {
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate) {
     return this.getClient().asyncLopInsert(key, index, value,
             attributesForCreate);
   }
@@ -658,7 +702,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                      byte[] eFlag, T value, CollectionAttributes attributesForCreate,
+                                                      byte[] eFlag, T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     return this.getClient().asyncBopInsert(key, bkey, eFlag, value,
             attributesForCreate);
@@ -666,7 +711,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                      T value, CollectionAttributes attributesForCreate,
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     return this.getClient().asyncMopInsert(key, mkey, value,
             attributesForCreate, tc);
@@ -674,14 +720,17 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                      T value, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncLopInsert(key, index, value,
             attributesForCreate, tc);
   }
 
   @Override
   public <T> CollectionFuture<Boolean> asyncSopInsert(String key, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncSopInsert(key, value, attributesForCreate,
             tc);
   }
@@ -787,14 +836,16 @@ public class ArcusClientPool implements ArcusClientIF {
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
                                                       byte[] elementFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncBopUpsert(key, bkey, elementFlag, value,
             attributesForCreate, tc);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, byte[] bkey,
-                                                  byte[] eFlag, Object value, CollectionAttributes attributesForCreate) {
+                                                  byte[] eFlag, Object value,
+                                                  CollectionAttributes attributesForCreate) {
     return this.getClient().asyncBopInsert(key, bkey, eFlag, value,
             attributesForCreate);
   }
@@ -802,7 +853,8 @@ public class ArcusClientPool implements ArcusClientIF {
   @Override
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key,
                                                       byte[] bkey, byte[] eFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncBopInsert(key, bkey, eFlag, value,
             attributesForCreate, tc);
   }
@@ -826,7 +878,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] from,
-                                                  byte[] to, ElementFlagFilter eFlagFilter, int count,
+                                                  byte[] to, ElementFlagFilter eFlagFilter,
+                                                  int count,
                                                   boolean dropIfEmpty) {
     return this.getClient().asyncBopDelete(key, from, to, eFlagFilter,
             count, dropIfEmpty);
@@ -834,7 +887,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] bkey,
-                                                  ElementFlagFilter eFlagFilter, boolean dropIfEmpty) {
+                                                  ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty) {
     return this.getClient().asyncBopDelete(key, bkey, eFlagFilter,
             dropIfEmpty);
   }
@@ -850,14 +904,16 @@ public class ArcusClientPool implements ArcusClientIF {
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                       byte[] bkey, byte[] elementFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncBopUpsert(key, bkey, elementFlag, value,
             attributesForCreate, tc);
   }
 
   @Override
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        byte[] from, byte[] to, ElementFlagFilter eFlagFilter) {
+                                                        byte[] from, byte[] to,
+                                                        ElementFlagFilter eFlagFilter) {
     return this.getClient()
             .asyncBopGetItemCount(key, from, to, eFlagFilter);
   }
@@ -870,7 +926,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
-                                                      ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc) {
+                                                      ElementFlagUpdate eFlagUpdate, T value,
+                                                      Transcoder<T> tc) {
     return this.getClient().asyncBopUpdate(key, bkey, eFlagUpdate, value,
             tc);
   }
@@ -883,7 +940,8 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
-                                                      byte[] bkey, ElementFlagUpdate eFlagUpdate, T value,
+                                                      byte[] bkey, ElementFlagUpdate eFlagUpdate,
+                                                      T value,
                                                       Transcoder<T> tc) {
     return this.getClient().asyncBopUpdate(key, bkey, eFlagUpdate, value,
             tc);
@@ -1002,9 +1060,9 @@ public class ArcusClientPool implements ArcusClientIF {
   }
 
   @Override
-  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> asyncBopGetBulk(
-          List<String> keyList, byte[] from, byte[] to,
-          ElementFlagFilter eFlagFilter, int offset, int count) {
+  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
+      asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to,
+                      ElementFlagFilter eFlagFilter, int offset, int count) {
     return this.getClient().asyncBopGetBulk(keyList, from, to, eFlagFilter,
             offset, count);
   }
