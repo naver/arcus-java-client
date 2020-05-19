@@ -199,7 +199,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
-          List<String> keyList, long bkey, byte[] eFlag, T value, CollectionAttributes attributesForCreate,
+          List<String> keyList, long bkey, byte[] eFlag, T value,
+          CollectionAttributes attributesForCreate,
           Transcoder<T> tc);
 
   /**
@@ -215,7 +216,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public abstract Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
-          List<String> keyList, long bkey, byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
+          List<String> keyList, long bkey, byte[] eFlag, Object value,
+          CollectionAttributes attributesForCreate);
 
   /**
    * Insert one item into multiple map at once.
@@ -243,7 +245,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public abstract Future<Map<String, CollectionOperationStatus>> asyncMopInsertBulk(
-          List<String> keyList, String mkey, Object value, CollectionAttributes attributesForCreate);
+          List<String> keyList, String mkey, Object value,
+          CollectionAttributes attributesForCreate);
 
   /**
    * Insert a value into each list
@@ -256,7 +259,8 @@ public interface ArcusClientIF {
    *
    * @param <T>
    * @param keyList             a key list of list
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index
+   *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
    * @param attributesForCreate if not true, a list should be created when key does not exist
    * @param tc                  transcoder to encode value
@@ -306,7 +310,8 @@ public interface ArcusClientIF {
    * }</pre>
    *
    * @param keyList             a key list of the list
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index (the item will be inserted before the element
+   *                            with the given index)
    * @param value               a value to insert into each list
    * @param attributesForCreate if not null, a list should be created when key does not exist
    * @return a future that will indicate the failure list of each operation
@@ -325,7 +330,8 @@ public interface ArcusClientIF {
    * @return a future that will indicate the failure list of each operation
    */
   public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncSopInsertBulk(
-          List<String> keyList, T value, CollectionAttributes attributesForCreate, Transcoder<T> tc);
+          List<String> keyList, T value,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc);
 
   /**
    * Insert a value into each set
@@ -382,7 +388,8 @@ public interface ArcusClientIF {
    * @return a future indicating success, false if there was a key
    */
   public CollectionFuture<Boolean> asyncBopCreate(String key,
-                                                  ElementValueType valueType, CollectionAttributes attributes);
+                                                  ElementValueType valueType,
+                                                  CollectionAttributes attributes);
 
   /**
    * Create an empty map
@@ -393,7 +400,8 @@ public interface ArcusClientIF {
    * @return a future indicating success, false if there was a key
    */
   public CollectionFuture<Boolean> asyncMopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes);
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes);
 
   /**
    * Create an empty set
@@ -404,7 +412,8 @@ public interface ArcusClientIF {
    * @return a future indicating success, false if there was a key
    */
   public CollectionFuture<Boolean> asyncSopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes);
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes);
 
   /**
    * Create an empty list
@@ -415,7 +424,8 @@ public interface ArcusClientIF {
    * @return a future indicating success, false if there was a key
    */
   public CollectionFuture<Boolean> asyncLopCreate(String key,
-                                                  ElementValueType type, CollectionAttributes attributes);
+                                                  ElementValueType type,
+                                                  CollectionAttributes attributes);
 
   /**
    * Retrieves an item on given bkey in the b+tree.
@@ -429,7 +439,10 @@ public interface ArcusClientIF {
    * @return a future that will hold the return value map of the fetch.
    */
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty);
+                                                                  long bkey,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  boolean withDelete,
+                                                                  boolean dropIfEmpty);
 
   /**
    * Retrieves count number of items in given bkey range(from..to)
@@ -447,12 +460,16 @@ public interface ArcusClientIF {
    * @param offset      0-based offset
    * @param count       number of returning values (0 to all)
    * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @return a future that will hold the return value map of the fetch
    */
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
-                                                                  boolean withDelete, boolean dropIfEmpty);
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count,
+                                                                  boolean withDelete,
+                                                                  boolean dropIfEmpty);
 
   /**
    * Retrieves an item on given bkey in the b+tree.
@@ -462,12 +479,17 @@ public interface ArcusClientIF {
    * @param bkey        bkey
    * @param eFlagFilter element flag filter
    * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode returned values
    * @return a future that will hold the return value map of the fetch.
    */
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+                                                                 long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc);
 
   /**
    * Retrieves count number of items in given bkey range(from..to)
@@ -486,20 +508,26 @@ public interface ArcusClientIF {
    * @param offset      0-based offset
    * @param count       number of returning values (0 to all)
    * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode returned values
    * @return a future that will hold the return value map of the fetch
    */
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long from, long to, ElementFlagFilter eFlagFilter, int offset, int count,
-                                                                 boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
+                                                                 boolean withDelete,
+                                                                 boolean dropIfEmpty,
+                                                                 Transcoder<T> tc);
 
   /**
    * Retrieves all items from the map
    *
    * @param key         key of a map
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @return a future that will hold the return value map of the fetch
    */
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
@@ -511,11 +539,12 @@ public interface ArcusClientIF {
    * @param key         key of a map
    * @param mkey        mkey of a map
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @return a future that will hold the return value map of the fetch
    */
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           String mkey, boolean withDelete, boolean dropIfEmpty);
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey,
+                                                           boolean withDelete, boolean dropIfEmpty);
 
   /**
    * Retrieves items on given mkey list in the map.
@@ -523,11 +552,12 @@ public interface ArcusClientIF {
    * @param key         key of a map
    * @param mkeyList    mkeyList
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @return a future that will hold the return value map of the fetch.
    */
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
-                                                           List<String> mkeyList, boolean withDelete, boolean dropIfEmpty);
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
+                                                           boolean withDelete, boolean dropIfEmpty);
 
   /**
    * Retrieves all items from the map
@@ -535,12 +565,14 @@ public interface ArcusClientIF {
    * @param <T>
    * @param key         key of a map
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode returned values
    * @return a future that will hold the return value map of the fetch
    */
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc);
 
   /**
    * Retrieves an item on given mkey in the map.
@@ -549,12 +581,14 @@ public interface ArcusClientIF {
    * @param key         key of a map
    * @param mkey        mkey of a map
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode returned values
    * @return a future that will hold the return value map of the fetch
    */
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          String mkey, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc);
 
   /**
    * Retrieves items on given mkey list in the map.
@@ -563,12 +597,14 @@ public interface ArcusClientIF {
    * @param key         key of a map
    * @param mkeyList    mkeyList
    * @param withDelete  true to remove the returned item in the map
-   * @param dropIfEmpty true to remove the key when all elements are removed. false map will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false map will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode returned values
    * @return a future that will hold the return value map of the fetch.
    */
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
-                                                          List<String> mkeyList, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+                                                          boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc);
 
   /**
    * Retrieves an item on given index in the list.
@@ -576,7 +612,8 @@ public interface ArcusClientIF {
    * @param key         key of a list
    * @param index       list index
    * @param withDelete  true to remove the returned item in the list
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @return a future that will hold the return value list of the fetch
    */
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
@@ -589,11 +626,13 @@ public interface ArcusClientIF {
    * @param from        the first index to delete
    * @param to          the last index to delete
    * @param withDelete  true to remove the returned items in the list
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @return a future that will hold the return value list of the fetch
    */
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int from,
-                                                    int to, boolean withDelete, boolean dropIfEmpty);
+  public CollectionFuture<List<Object>> asyncLopGet(String key,
+                                                    int from, int to,
+                                                    boolean withDelete, boolean dropIfEmpty);
 
   /**
    * Retrieves an item on given index in the list.
@@ -602,12 +641,14 @@ public interface ArcusClientIF {
    * @param key         key of a list
    * @param index       list index
    * @param withDelete  true to remove the returned item in the list
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @param tc          a tranacoder to decode returned value
    * @return a future that will hold the return value list of the fetch
    */
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
-                                                   boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+                                                   boolean withDelete, boolean dropIfEmpty,
+                                                   Transcoder<T> tc);
 
   /**
    * Retrieves items on given index range(from..to) in the list. (Arcus 1.6 and above)
@@ -617,12 +658,15 @@ public interface ArcusClientIF {
    * @param from        the first index to delete
    * @param to          the last index to delete
    * @param withDelete  true to remove the returned items in the list
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @param tc          a transcoder to decode the returned values
    * @return a future that will hold the return value list of the fetch
    */
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from,
-                                                   int to, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key,
+                                                   int from, int to,
+                                                   boolean withDelete, boolean dropIfEmpty,
+                                                   Transcoder<T> tc);
 
   /**
    * Retrieves count number of random items in the set.
@@ -630,7 +674,8 @@ public interface ArcusClientIF {
    * @param key         key of a set
    * @param count       number of items to fetch
    * @param withDelete  true to remove the returned item in the set
-   * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false set will remain empty even if all the elements are removed
    * @return a future that will hold the return value set of the fetch
    */
   public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
@@ -643,12 +688,14 @@ public interface ArcusClientIF {
    * @param key         key of a set
    * @param count       number of items to fetch
    * @param withDelete  true to remove the returned item in the set
-   * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false set will remain empty even if all the elements are removed
    * @param tc          a tranacoder to decode returned value
    * @return a future that will hold the return value set of the fetch
    */
   public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
-                                                  boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+                                                  boolean withDelete, boolean dropIfEmpty,
+                                                  Transcoder<T> tc);
 
   /**
    * Deletes an item with given bkey in the b+tree. (Arcus 1.6 or above)
@@ -656,11 +703,13 @@ public interface ArcusClientIF {
    * @param key         key of a b+tree
    * @param bkey        bkey of an item to delete
    * @param eFlagFilter element flag filter
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncBopDelete(String key, long bkey,
-                                                  ElementFlagFilter eFlagFilter, boolean dropIfEmpty);
+                                                  ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty);
 
   /**
    * Deletes count number of items in given bkey range(from..to) in the b+tree (Arcus 1.6 or above)
@@ -670,26 +719,31 @@ public interface ArcusClientIF {
    * @param to          the last bkey to delete
    * @param eFlagFilter element flag filter
    * @param count       number of returning values (0 to all)
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
-   * @return whether or not the operation was performed
-   */
-  public CollectionFuture<Boolean> asyncBopDelete(String key, long from,
-                                                  long to, ElementFlagFilter eFlagFilter, int count, boolean dropIfEmpty);
-
-  /**
-   * Deletes count number of items in given bkey range(from..to) in the b+tree (Arcus 1.6 or above)
-   *
-   * @param key         key of a b+tree
-   * @param from        the first bkey to delete
-   * @param to          the last bkey to delete
-   * @param eFlagFilter element flag filter
-   * @param count       number of returning values (0 to all)
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncBopDelete(String key,
-                                                  byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count,
-                                                  boolean dropIfEmpty);
+                                                  long from, long to,
+                                                  ElementFlagFilter eFlagFilter,
+                                                  int count, boolean dropIfEmpty);
+
+  /**
+   * Deletes count number of items in given bkey range(from..to) in the b+tree (Arcus 1.6 or above)
+   *
+   * @param key         key of a b+tree
+   * @param from        the first bkey to delete
+   * @param to          the last bkey to delete
+   * @param eFlagFilter element flag filter
+   * @param count       number of returning values (0 to all)
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
+   * @return whether or not the operation was performed
+   */
+  public CollectionFuture<Boolean> asyncBopDelete(String key,
+                                                  byte[] from, byte[] to,
+                                                  ElementFlagFilter eFlagFilter,
+                                                  int count, boolean dropIfEmpty);
 
   /**
    * Deletes count number of items in given bkey range(from..to) in the b+tree (Arcus 1.6 or above)
@@ -697,17 +751,20 @@ public interface ArcusClientIF {
    * @param key         key of a b+tree
    * @param bkey        bkey to delete
    * @param eFlagFilter element flag filter
-   * @param dropIfEmpty true to remove the key when all elements are removed. false b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false b+ tree will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
-  public CollectionFuture<Boolean> asyncBopDelete(String key,
-                                                  byte[] bkey, ElementFlagFilter eFlagFilter, boolean dropIfEmpty);
+  public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] bkey,
+                                                  ElementFlagFilter eFlagFilter,
+                                                  boolean dropIfEmpty);
 
   /**
    * Deletes an item on given index in the map.
    *
    * @param key         key of a map
-   * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncMopDelete(String key,
@@ -718,7 +775,8 @@ public interface ArcusClientIF {
    *
    * @param key         key of a map
    * @param mkey        mkey of a map
-   * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncMopDelete(String key, String mkey,
@@ -729,7 +787,8 @@ public interface ArcusClientIF {
    *
    * @param key         key of a list
    * @param index       list index
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
@@ -741,7 +800,8 @@ public interface ArcusClientIF {
    * @param key         key of a list
    * @param from        the first index to delete
    * @param to          the last index to delete
-   * @param dropIfEmpty true to remove the key when all elements are removed. false list will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false list will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncLopDelete(String key, int from,
@@ -752,7 +812,8 @@ public interface ArcusClientIF {
    *
    * @param key         key of a set
    * @param value       value of an item
-   * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false set will remain empty even if all the elements are removed
    * @return whether or not the operation was performed
    */
   public CollectionFuture<Boolean> asyncSopDelete(String key, Object value,
@@ -764,7 +825,8 @@ public interface ArcusClientIF {
    * @param <T>
    * @param key         key of a set
    * @param value       value of an item
-   * @param dropIfEmpty true to remove the key when all elements are removed. false set will remain empty even if all the elements are removed
+   * @param dropIfEmpty true to remove the key when all elements are removed.
+   *                    false set will remain empty even if all the elements are removed
    * @param tc          a transcoder to encode the value
    * @return whether or not the operation was performed
    */
@@ -781,21 +843,24 @@ public interface ArcusClientIF {
    * @return a future that will hold the count of exists element
    */
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        long from, long to, ElementFlagFilter eFlagFilter);
+                                                        long from, long to,
+                                                        ElementFlagFilter eFlagFilter);
 
   /**
    * Inserts an item into the b+tree.
    *
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree node
-   * @param eFlag               element flag. Length of element flag is between 1 and 31. if this argument is null, Arcus don't assign element flag.
+   * @param eFlag               element flag. Length of element flag is between 1 and 31.
+   *                            if this argument is null, Arcus don't assign element flag.
    * @param value               a value to insert into the b+tree
    * @param attributesForCreate attributes of the key
    * @return a future indicating success, false if there was no key and
    * attributesForCreate is null
    */
   public CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                  byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
+                                                  byte[] eFlag, Object value,
+                                                  CollectionAttributes attributesForCreate);
 
   /**
    * Inserts an item into the map
@@ -808,7 +873,8 @@ public interface ArcusClientIF {
    * attributesForCreate is null
    */
   public CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                  Object value, CollectionAttributes attributesForCreate);
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate);
 
   /**
    * Insert a value into each list
@@ -819,13 +885,15 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index
+   *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
    * @param attributesForCreate attributes of the key
    * @return a future that will indicate the failure list of each operation
    */
   public CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                  Object value, CollectionAttributes attributesForCreate);
+                                                  Object value,
+                                                  CollectionAttributes attributesForCreate);
 
   /**
    * Inserts an item into the set.
@@ -845,7 +913,8 @@ public interface ArcusClientIF {
    * @param <T>
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree node
-   * @param eFlag               element flag. Length of element flag is between 1 and 31. if this argument is null, Arcus don't assign element flag.
+   * @param eFlag               element flag. Length of element flag is between 1 and 31.
+   *                            if this argument is null, Arcus don't assign element flag.
    * @param value               a value to insert into the b+tree
    * @param attributesForCreate attributes of the key
    * @param tc                  a trancoder to encode the value
@@ -853,7 +922,8 @@ public interface ArcusClientIF {
    * and attributesForCreate parameter is null.
    */
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key, long bkey,
-                                                      byte[] eFlag, T value, CollectionAttributes attributesForCreate,
+                                                      byte[] eFlag, T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc);
 
   /**
@@ -869,7 +939,8 @@ public interface ArcusClientIF {
    * and attributesForCreate parameter is null.
    */
   public <T> CollectionFuture<Boolean> asyncMopInsert(String key, String mkey,
-                                                      T value, CollectionAttributes attributesForCreate,
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc);
 
   /**
@@ -881,14 +952,17 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index
+   *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
    * @param attributesForCreate attributes of the key
    * @param tc                  a transcoder to encode the value
    * @return a future that will indicate the failure list of each operation
    */
   public <T> CollectionFuture<Boolean> asyncLopInsert(String key, int index,
-                                                      T value, CollectionAttributes attributesForCreate, Transcoder<T> tc);
+                                                      T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc);
 
   /**
    * Inserts an item into the set.
@@ -902,7 +976,8 @@ public interface ArcusClientIF {
    * and attributesForCreate parameter is null
    */
   public <T> CollectionFuture<Boolean> asyncSopInsert(String key, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc);
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc);
 
   /**
    * Insert values into a b+ tree
@@ -936,7 +1011,8 @@ public interface ArcusClientIF {
    * </pre>
    *
    * @param key                 a key of the list
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index
+   *                            (the item will be inserted before the element with the given index)
    * @param valueList           valuses to insert into the set
    * @param attributesForCreate attributes of the key
    * @return a future that will indicate the failure list of each operation
@@ -994,7 +1070,8 @@ public interface ArcusClientIF {
    *
    * @param <T>
    * @param key                 a key of the list
-   * @param index               list index (the item will be inserted before the element with the given index)
+   * @param index               list index
+   *                            (the item will be inserted before the element with the given index)
    * @param valueList           valuses to insert into the set
    * @param attributesForCreate attributes of the key
    * @param tc                  transcoder to encode value
@@ -1072,7 +1149,8 @@ public interface ArcusClientIF {
    *
    * Element that matched both key and bkey criteria will updated.
    * If element is not exists and attributesForCreate argument is not null.
-   * Create the tree that has an attribute of 'attributesForCreate' and insert the element that has elementFlag and value.
+   * Create the tree that has an attribute of 'attributesForCreate' and
+   * insert the element that has elementFlag and value.
    *
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree element
@@ -1084,14 +1162,16 @@ public interface ArcusClientIF {
    * attributesForCreate argument is null.
    */
   public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
-                                                  byte[] elementFlag, Object value, CollectionAttributes attributesForCreate);
+                                                  byte[] elementFlag, Object value,
+                                                  CollectionAttributes attributesForCreate);
 
   /**
    * Update or insert an element.
    *
    * Element that matched both key and bkey criteria will updated.
    * If element is not exists and attributesForCreate argument is not null.
-   * Create the tree that has an attribute of 'attributesForCreate' and insert the element that has elementFlag and value.
+   * Create the tree that has an attribute of 'attributesForCreate' and
+   * insert the element that has elementFlag and value.
    *
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree element
@@ -1104,7 +1184,8 @@ public interface ArcusClientIF {
    * attributesForCreate argument is null.
    */
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
-                                                      byte[] elementFlag, T value, CollectionAttributes attributesForCreate,
+                                                      byte[] elementFlag, T value,
+                                                      CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc);
 
   /**
@@ -1134,7 +1215,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
-                                                      ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc);
+                                                      ElementFlagUpdate eFlagUpdate, T value,
+                                                      Transcoder<T> tc);
 
   /**
    * Update an element from the map
@@ -1211,7 +1293,8 @@ public interface ArcusClientIF {
    * @param value               new value of element. this value can't be null.
    * @param attributesForCreate create a b+tree with this attributes, if given key is not
    *                            exists.
-   * @return a future indicating success, false if there was no key and attributesForCreate argument is null
+   * @return a future indicating success, false if there was no key and
+   *         attributesForCreate argument is null
    */
   public CollectionFuture<Boolean> asyncBopInsert(String key,
                                                   byte[] bkey, byte[] eFlag, Object value,
@@ -1229,11 +1312,13 @@ public interface ArcusClientIF {
    * @param attributesForCreate create a b+tree with this attributes, if given key is not
    *                            exists.
    * @param tc                  transcoder to encode value
-   * @return a future indicating success, false if there was no key and attributesForCreate argument is null
+   * @return a future indicating success, false if there was no key and
+   *         attributesForCreate argument is null
    */
   public <T> CollectionFuture<Boolean> asyncBopInsert(String key,
                                                       byte[] bkey, byte[] eFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc);
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc);
 
   /**
    * Retrieves count number of items in given bkey range(from..to)
@@ -1251,7 +1336,8 @@ public interface ArcusClientIF {
    * @param offset      0-based offset
    * @param count       number of returning values (0 to all)
    * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
    * @return a future that will hold the return value map of the fetch
    */
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
@@ -1274,7 +1360,8 @@ public interface ArcusClientIF {
    * @param offset      0-based offset
    * @param count       number of returning values (0 to all)
    * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty false to remove the key when all elements are removed. true b+ tree will remain empty even if all the elements are removed
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
    * @param tc          transcoder to decode value
    * @return a future that will hold the return value map of the fetch
    */
@@ -1324,7 +1411,8 @@ public interface ArcusClientIF {
    */
   public <T> CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                       byte[] bkey, byte[] elementFlag, T value,
-                                                      CollectionAttributes attributesForCreate, Transcoder<T> tc);
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc);
 
   /**
    * Get count of elements in given bkey range(from..to) and eFlagFilter.
@@ -1336,7 +1424,8 @@ public interface ArcusClientIF {
    * @return a future that will hold the count of exists element
    */
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
-                                                        byte[] from, byte[] to, ElementFlagFilter eFlagFilter);
+                                                        byte[] from, byte[] to,
+                                                        ElementFlagFilter eFlagFilter);
 
   /**
    * Update an element from the b+tree
@@ -1350,7 +1439,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public CollectionFuture<Boolean> asyncBopUpdate(String key,
-                                                  byte[] bkey, ElementFlagUpdate eFlagUpdate, Object value);
+                                                  byte[] bkey, ElementFlagUpdate eFlagUpdate,
+                                                  Object value);
 
   /**
    * Update an element from the b+tree
@@ -1365,7 +1455,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
-                                                      byte[] bkey, ElementFlagUpdate eFlagUpdate, T value, Transcoder<T> tc);
+                                                      byte[] bkey, ElementFlagUpdate eFlagUpdate,
+                                                      T value, Transcoder<T> tc);
 
   /**
    * Checks multiple items' membership in a set using the default transcoder.
@@ -1430,7 +1521,8 @@ public interface ArcusClientIF {
    * @return a future that will hold the return value map of the fetch
    */
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty);
+          String key, byte[] bkey,
+          ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty);
 
   /**
    * Retrieves count number of items in given bkey in the b+tree.
@@ -1445,8 +1537,8 @@ public interface ArcusClientIF {
    * @return a future that will hold the return value map of the fetch
    */
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty,
-          Transcoder<T> tc);
+          String key, byte[] bkey,
+          ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
 
   /**
    * Get elements that matched both filter and bkey range criteria from
@@ -1493,7 +1585,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public abstract Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
-          List<String> keyList, byte[] bkey, byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
+          List<String> keyList, byte[] bkey,
+          byte[] eFlag, Object value, CollectionAttributes attributesForCreate);
 
   /**
    * Insert one item into multiple b+trees at once.
@@ -1509,8 +1602,8 @@ public interface ArcusClientIF {
    * @return a future indicating success
    */
   public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
-          List<String> keyList, byte[] bkey, byte[] eFlag, T value, CollectionAttributes attributesForCreate,
-          Transcoder<T> tc);
+          List<String> keyList, byte[] bkey,
+          byte[] eFlag, T value, CollectionAttributes attributesForCreate, Transcoder<T> tc);
 
   /**
    * Get elements from each b+tree.
@@ -1523,7 +1616,8 @@ public interface ArcusClientIF {
    * @param count       number of returning values (0 to all) (max = 200)
    * @return future indicating result of each b+tree
    */
-  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> asyncBopGetBulk(
+  public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
+      asyncBopGetBulk(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count);
 
@@ -1848,7 +1942,8 @@ public interface ArcusClientIF {
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder);
 
   /**
-   * Upsert (update if element exists, insert otherwise) an element into b+tree and also get the "trimmed" element if any.
+   * Upsert (update if element exists, insert otherwise) an element into b+tree and
+   * also get the "trimmed" element if any.
    *
    * @param key                 b+tree item's key
    * @param bkey                element's key
@@ -1862,7 +1957,8 @@ public interface ArcusClientIF {
           CollectionAttributes attributesForCreate);
 
   /**
-   * Upsert (update if element exists, insert otherwise) an element into b+tree and also get the "trimmed" element if any.
+   * Upsert (update if element exists, insert otherwise) an element into b+tree and
+   * also get the "trimmed" element if any.
    *
    * @param key                 b+tree item's key
    * @param bkey                element's key
@@ -1877,7 +1973,8 @@ public interface ArcusClientIF {
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder);
 
   /**
-   * Upsert (update if element exists, insert otherwise) an element into b+tree and also get the "trimmed" element if any.
+   * Upsert (update if element exists, insert otherwise) an element into b+tree and
+   * also get the "trimmed" element if any.
    *
    * @param key                 b+tree item's key
    * @param bkey                element's key (byte-array type key)
@@ -1891,7 +1988,8 @@ public interface ArcusClientIF {
           CollectionAttributes attributesForCreate);
 
   /**
-   * Upsert (update if element exists, insert otherwise) an element into b+tree and also get the "trimmed" element if any.
+   * Upsert (update if element exists, insert otherwise) an element into b+tree and
+   * also get the "trimmed" element if any.
    *
    * @param key                 b+tree item's key
    * @param bkey                element's key (byte-array type key)
