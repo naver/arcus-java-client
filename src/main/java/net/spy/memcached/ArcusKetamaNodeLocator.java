@@ -54,11 +54,13 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config = conf;
 
     int numReps = config.getNodeRepetitions();
-    for (MemcachedNode node : nodes) {
-      // Ketama does some special work with md5 where it reuses chunks.
-      if (alg == HashAlgorithm.KETAMA_HASH) {
+    // Ketama does some special work with md5 where it reuses chunks.
+    if (alg == HashAlgorithm.KETAMA_HASH) {
+      for (MemcachedNode node : nodes) {
         updateHash(node, false);
-      } else {
+      }
+    } else {
+      for (MemcachedNode node : nodes) {
         for (int i = 0; i < numReps; i++) {
           long nodeHashKey = hashAlg.hash(config.getKeyForNode(node, i));
           SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(nodeHashKey);

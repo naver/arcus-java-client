@@ -59,9 +59,9 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     config = conf;
 
     int numReps = config.getNodeRepetitions();
-    for (MemcachedNode node : nodes) {
-      // Ketama does some special work with md5 where it reuses chunks.
-      if (alg == HashAlgorithm.KETAMA_HASH) {
+    // Ketama does some special work with md5 where it reuses chunks.
+    if (alg == HashAlgorithm.KETAMA_HASH) {
+      for (MemcachedNode node : nodes) {
         for (int i = 0; i < numReps / 4; i++) {
           byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node, i));
           for (int h = 0; h < 4; h++) {
@@ -71,11 +71,11 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
                     | (digest[h * 4] & 0xFF);
             ketamaNodes.put(k, node);
           }
-
         }
-      } else {
+      }
+    } else {
+      for (MemcachedNode node : nodes) {
         for (int i = 0; i < numReps; i++) {
-
           ketamaNodes.put(hashAlg.hash(config.getKeyForNode(node, i)), node);
         }
       }

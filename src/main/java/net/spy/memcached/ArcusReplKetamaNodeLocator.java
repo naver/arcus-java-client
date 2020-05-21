@@ -76,11 +76,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
 
     int numReps = config.getNodeRepetitions();
-    for (MemcachedReplicaGroup group : allGroups.values()) {
-      // Ketama does some special work with md5 where it reuses chunks.
-      if (alg == HashAlgorithm.KETAMA_HASH) {
+    // Ketama does some special work with md5 where it reuses chunks.
+    if (alg == HashAlgorithm.KETAMA_HASH) {
+      for (MemcachedReplicaGroup group : allGroups.values()) {
         updateHash(group, false);
-      } else {
+      }
+    } else {
+      for (MemcachedReplicaGroup group : allGroups.values()) {
         for (int i = 0; i < numReps; i++) {
           long nodeHashKey = hashAlg.hash(config.getKeyForGroup(group, i));
           SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(nodeHashKey);
