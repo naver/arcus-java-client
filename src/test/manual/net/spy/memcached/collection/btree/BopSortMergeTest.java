@@ -17,7 +17,14 @@
 package net.spy.memcached.collection.btree;
 
 import junit.framework.Assert;
-import net.spy.memcached.collection.*;
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionOverflowAction;
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 

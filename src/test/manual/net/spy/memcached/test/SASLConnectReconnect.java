@@ -18,7 +18,7 @@ import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * A very simple test of using SASL PLAIN auth and ensuring that operations are
