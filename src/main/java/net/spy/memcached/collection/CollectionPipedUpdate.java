@@ -18,13 +18,11 @@ package net.spy.memcached.collection;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
-import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class CollectionPipedUpdate<T> extends CollectionObject {

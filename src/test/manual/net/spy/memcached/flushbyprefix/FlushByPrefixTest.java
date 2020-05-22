@@ -17,10 +17,8 @@
 package net.spy.memcached.flushbyprefix;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.internal.OperationFuture;
 
 public class FlushByPrefixTest extends BaseIntegrationTest {
 

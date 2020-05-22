@@ -147,8 +147,8 @@
 
         <!-- Imports                                                   -->
         <!-- see https://checkstyle.sourceforge.io/config_imports.html -->
-        <!--
         <module name="AvoidStarImport"/>
+        <!--
         <module name="CustomImportOrder">
             <property name="sortImportsInGroupAlphabetically" value="true"/>
             <property name="separateLineBetweenGroups" value="true"/>
@@ -157,10 +157,8 @@
         </module>
         -->
         <module name="IllegalImport"/>
-        <!--
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
-        -->
 
         <!-- Javadoc Comments                                          -->
         <!-- see https://checkstyle.sourceforge.io/config_javadoc.html -->

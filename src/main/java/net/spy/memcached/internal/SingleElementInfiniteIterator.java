@@ -1,6 +1,5 @@
 package net.spy.memcached.internal;
 
-import java.lang.UnsupportedOperationException;
 import java.util.Iterator;
 
 /**

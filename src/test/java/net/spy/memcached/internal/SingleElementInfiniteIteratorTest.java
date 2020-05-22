@@ -1,7 +1,5 @@
 package net.spy.memcached.internal;
 
-import java.lang.UnsupportedOperationException;
-
 import junit.framework.TestCase;
 
 public class SingleElementInfiniteIteratorTest extends TestCase {

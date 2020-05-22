@@ -1,7 +1,13 @@
 package net.spy.memcached.LongKeyTest;
 
 import junit.framework.Assert;
-import net.spy.memcached.collection.*;
+import net.spy.memcached.collection.BTreeGetResult;
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.SMGetFuture;

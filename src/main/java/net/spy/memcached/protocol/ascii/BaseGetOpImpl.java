@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 
-import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.OperationCallback;

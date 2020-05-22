@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.util.BTreeUtil;
-import net.spy.memcached.collection.SMGetMode;
 
 public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 

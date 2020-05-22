@@ -19,7 +19,6 @@ package net.spy.memcached;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import net.spy.memcached.collection.BaseIntegrationTest;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.runners.JUnit4ClassRunner;
