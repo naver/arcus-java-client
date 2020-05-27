@@ -593,6 +593,10 @@ public final class MemcachedConnection extends SpyObject {
     int ops = 0;
     ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
     ch.socket().setReuseAddress(true);
+    /* The codes above can be replaced by the codes below since java 1.7 */
+    // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
+    // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+
     /* ENABLE_REPLICATION if */
     // Do not attempt to connect if this node is fake.
     // Otherwise, we keep connecting to a non-existent listen address
@@ -899,8 +903,8 @@ public final class MemcachedConnection extends SpyObject {
       }
       qa.reconnecting();
       try {
-        if (qa.getChannel() != null && qa.getChannel().socket() != null) {
-          qa.getChannel().socket().close();
+        if (qa.getChannel() != null) {
+          qa.getChannel().close();
         } else {
           getLogger().info("The channel or socket was null for %s",
                   qa);
@@ -989,6 +993,9 @@ public final class MemcachedConnection extends SpyObject {
           ch.configureBlocking(false);
           ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
           ch.socket().setReuseAddress(true);
+          /* The codes above can be replaced by the codes below since java 1.7 */
+          // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
+          // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
           int ops = 0;
           if (ch.connect(qa.getSocketAddress())) {
             getLogger().info("Immediately reconnected to %s", qa);
