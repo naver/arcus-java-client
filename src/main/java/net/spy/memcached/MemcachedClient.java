@@ -76,14 +76,14 @@ import net.spy.memcached.transcoders.Transcoder;
  * <h2>Basic usage</h2>
  *
  * <pre>{@code
- * 	MemcachedClient c=new MemcachedClient(
- * 		new InetSocketAddress("hostname", portNum));
+ *  MemcachedClient c=new MemcachedClient(
+ *    new InetSocketAddress("hostname", portNum));
  *
- * 	// Store a value (async) for one hour
- * 	c.set("someKey", 3600, someObject);
- * 	// Retrieve a value.
- * 	Object myObject=c.get("someKey");
- * }</pre>
+ *  // Store a value (async) for one hour
+ *  c.set("someKey", 3600, someObject);
+ *  // Retrieve a value.
+ *  Object myObject=c.get("someKey");
+ *  }</pre>
  *
  * <h2>Advanced Usage</h2>
  *
@@ -1390,7 +1390,7 @@ public class MemcachedClient extends SpyThread
 
               public void receivedStatus(OperationStatus status) {
                 if (!status.isSuccess()) {
-                  getLogger().warn("Unsuccessful stat fetch:	%s",
+                  getLogger().warn("Unsuccessful stat fetch:  %s",
                           status);
                 }
               }

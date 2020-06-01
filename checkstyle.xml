@@ -47,11 +47,9 @@
 
     <!-- Whitespace                                                   -->
     <!-- see https://checkstyle.sourceforge.io/config_whitespace.html -->
-    <!--
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
     </module>
-    -->
 
     <module name="TreeWalker">
         <!-- Annotations                                                  -->

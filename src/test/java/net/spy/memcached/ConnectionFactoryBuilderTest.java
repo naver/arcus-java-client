@@ -61,7 +61,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
     assertTrue(f.getDefaultTranscoder() instanceof SerializingTranscoder);
     //assertSame(DefaultConnectionFactory.DEFAULT_FAILURE_MODE,
-    //		f.getFailureMode());
+    // f.getFailureMode());
     assertSame(FailureMode.Cancel, f.getFailureMode());
     assertEquals(0, f.getInitialObservers().size());
     assertTrue(f.getOperationFactory() instanceof AsciiOperationFactory);

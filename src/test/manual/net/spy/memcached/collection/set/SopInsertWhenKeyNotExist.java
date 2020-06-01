@@ -33,8 +33,8 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * CREATE	FIXED	VALUE
-   * true	false	null
+   * CREATE FIXED VALUE
+   *  true  false null
    * </pre>
    */
   public void testSopInsert_nokey_01() throws Exception {
@@ -43,8 +43,8 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * CREATE	FIXED	VALUE
-   * false	true	not null
+   *  CREATE  FIXED VALUE
+   *  false true  not null
    * </pre>
    */
   public void testSopInsert_nokey_02() throws Exception {
@@ -53,8 +53,8 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * CREATE	FIXED	VALUE
-   * false	false	not null
+   *  CREATE  FIXED VALUE
+   *  false  false not null
    * </pre>
    */
   public void testSopInsert_nokey_04() throws Exception {
@@ -63,8 +63,8 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * CREATE	FIXED	VALUE
-   * true	true	not null
+   *  CREATE  FIXED VALUE
+   *  true  true  not null
    * </pre>
    */
   public void testSopInsert_nokey_05() throws Exception {
