@@ -113,7 +113,7 @@ public abstract class BaseTranscoderCase extends BaseMockCase {
     assertEquals(l, decoded);
   }
 
-	/*
+  /*
     private void displayBytes(long l, byte[] encoded) {
       System.out.print(l + " [");
       for(byte b : encoded) {

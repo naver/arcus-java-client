@@ -94,21 +94,21 @@ public interface ArcusClientIF {
    *
    * <h2>Basic usage</h2>
    * <pre>{@code
-   * 	ArcusClient c = getClientFromPool();
+   *  ArcusClient c = getClientFromPool();
    *
-   * 	List<String> keys = new ArrayList();
-   * 	keys.add("KEY1");
-   * 	keys.add("KEY2");
+   *  List<String> keys = new ArrayList();
+   *  keys.add("KEY1");
+   *  keys.add("KEY2");
    *
-   * 	// The object to store
-   * 	Object value = "VALUE";
+   *  // The object to store
+   *  Object value = "VALUE";
    *
-   * 	// Get customized transcoder
-   * 	Transcoder myTranscoder = getTranscoder();
+   *  // Get customized transcoder
+   *  Transcoder myTranscoder = getTranscoder();
    *
-   * 	// Store a value (async) on each keys for one hour using multiple memcached client.
-   * 	c.setBulk(keys, 3600, value, transcoder);
-   * 	}</pre>
+   *  // Store a value (async) on each keys for one hour using multiple memcached client.
+   *  c.setBulk(keys, 3600, value, transcoder);
+   *  }</pre>
    *
    * @param <T>
    * @param key the key list which this object should be added
@@ -157,15 +157,15 @@ public interface ArcusClientIF {
    *
    * <h2>Basic usage</h2>
    * <pre>{@code
-   *	ArcusClient c = getClientFromPool();
+   *  ArcusClient c = getClientFromPool();
    *
-   *	List<String> keys = new ArrayList();
-   *	keys.add("KEY1");
-   *	keys.add("KEY2");
+   *  List<String> keys = new ArrayList();
+   *  keys.add("KEY1");
+   *  keys.add("KEY2");
    *
-   *	// Delete a value (async) on each keys for one hour using multiple memcached client.
-   *	c.asyncDeleteBulk(keys);
-   *	}</pre>
+   *  // Delete a value (async) on each keys for one hour using multiple memcached client.
+   *  c.asyncDeleteBulk(keys);
+   *  }</pre>
    *
    * @param key the key list which this object should be deleted
    * @return a future that will hold the list of failed
@@ -283,30 +283,30 @@ public interface ArcusClientIF {
    * <h2>Basic usage</h2>
    *
    * <pre>{@code
-   * 	ArcusClient client = getClientFromPool();
+   *  ArcusClient client = getClientFromPool();
    *
-   * 	List<String> keyList = getKeyListShouldHaveValue();
-   * 	String value = "Some-value";
-   * 	int index = 0;
-   * 	boolean createKeyIfNotExists = true;
+   *  List<String> keyList = getKeyListShouldHaveValue();
+   *  String value = "Some-value";
+   *  int index = 0;
+   *  boolean createKeyIfNotExists = true;
    *
-   * 	Future<Map<String, CollectionOperationStatus>> future = client.asyncLopInsertBulk(keyList,
-   * 			index, value, createKeyIfNotExists);
+   *  Future<Map<String, CollectionOperationStatus>> future = client.asyncLopInsertBulk(keyList,
+   *    index, value, createKeyIfNotExists);
    *
-   * 	Map<String, CollectionOperationStatus> failedList = null;
-   * 	try {
-   * 		failedList = future.get(1000L, TimeUnit.MILLISECONDS);
-   *    } catch (TimeoutException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    } catch (InterruptedException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    } catch (ExecutionException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    }
-   * 	handleFailure(failedList);
+   *  Map<String, CollectionOperationStatus> failedList = null;
+   *  try {
+   *    failedList = future.get(1000L, TimeUnit.MILLISECONDS);
+   *  } catch (TimeoutException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  } catch (InterruptedException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  } catch (ExecutionException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  }
+   *  handleFailure(failedList);
    * }</pre>
    *
    * @param keyList             a key list of the list
@@ -339,29 +339,29 @@ public interface ArcusClientIF {
    * <h2>Basic usage</h2>
    *
    * <pre>{@code
-   * 	ArcusClient client = getClientFromPool();
+   *  ArcusClient client = getClientFromPool();
    *
-   * 	List<String> keyList = getKeyListShouldHaveValue();
-   * 	String value = "Some-value";
-   * 	boolean createKeyIfNotExists = true;
+   *  List<String> keyList = getKeyListShouldHaveValue();
+   *  String value = "Some-value";
+   *  boolean createKeyIfNotExists = true;
    *
-   * 	Future<Map<String, CollectionOperationStatus>> future = client.asyncSopInsertBulk(keyList,
-   * 			value, createKeyIfNotExists);
+   *  Future<Map<String, CollectionOperationStatus>> future = client.asyncSopInsertBulk(keyList,
+   *    value, createKeyIfNotExists);
    *
-   * 	Map<String, CollectionOperationStatus> failedList = null;
-   * 	try {
-   * 		failedList = future.get(1000L, TimeUnit.MILLISECONDS);
-   *    } catch (TimeoutException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    } catch (InterruptedException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    } catch (ExecutionException e) {
-   * 		future.cancel(true);
-   * 		// Handle error here
-   *    }
-   * 	handleFailure(failedList);
+   *  Map<String, CollectionOperationStatus> failedList = null;
+   *  try {
+   *    failedList = future.get(1000L, TimeUnit.MILLISECONDS);
+   *  } catch (TimeoutException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  } catch (InterruptedException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  } catch (ExecutionException e) {
+   *    future.cancel(true);
+   *    // Handle error here
+   *  }
+   *  handleFailure(failedList);
    * }</pre>
    *
    * @param keyList             a key list of set
@@ -449,8 +449,8 @@ public interface ArcusClientIF {
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
    * <pre>
-   * 	from >= to : in descending order
-   * 	from < to  : in ascending order
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
    * </pre>
    *
    * @param key         key of a b+tree
@@ -496,8 +496,8 @@ public interface ArcusClientIF {
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
    * <pre>
-   * 	from >= to : in descending order
-   * 	from < to  : in ascending order
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
    * </pre>
    *
    * @param <T>
@@ -1325,8 +1325,8 @@ public interface ArcusClientIF {
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
    * <pre>
-   * 	from >= to : in descending order
-   * 	from < to  : in ascending order
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
    * </pre>
    *
    * @param key         key of a b+tree
@@ -1349,8 +1349,8 @@ public interface ArcusClientIF {
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
    * <pre>
-   * 	from >= to : in descending order
-   * 	from < to  : in ascending order
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
    * </pre>
    *
    * @param key         key of a b+tree

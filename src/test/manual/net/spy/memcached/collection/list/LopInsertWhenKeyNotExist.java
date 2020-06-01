@@ -35,8 +35,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * -1	true	false	null
+   * INDEX  CREATE  FIXED VALUE
+   * -1 true  false null
    * </pre>
    */
   public void testLopInsert_nokey_01() throws Exception {
@@ -45,8 +45,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * -1	false	true	not null
+   * INDEX  CREATE  FIXED VALUE
+   * -1 false true  not null
    * </pre>
    */
   public void testLopInsert_nokey_02() throws Exception {
@@ -57,8 +57,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * 0	false	true	not null
+   * INDEX  CREATE  FIXED VALUE
+   * 0  false true  not null
    * </pre>
    */
   public void testLopInsert_nokey_03() throws Exception {
@@ -67,8 +67,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * 0	false	false	not null
+   * INDEX  CREATE  FIXED VALUE
+   * 0  false false not null
    * </pre>
    */
   public void testLopInsert_nokey_04() throws Exception {
@@ -77,8 +77,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * 0	true	true	not null
+   * INDEX  CREATE  FIXED VALUE
+   * 0  true  true  not null
    * </pre>
    */
   public void testLopInsert_nokey_05() throws Exception {
@@ -87,8 +87,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * -1	true	false	not null
+   * INDEX  CREATE  FIXED VALUE
+   * -1 true  false not null
    * </pre>
    */
   public void testLopInsert_nokey_06() throws Exception {
@@ -97,8 +97,8 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   /**
    * <pre>
-   * INDEX	CREATE	FIXED	VALUE
-   * count	true	true	not null
+   * INDEX  CREATE  FIXED VALUE
+   * count  true  true  not null
    * </pre>
    */
   public void testLopInsert_nokey_07() throws Exception {

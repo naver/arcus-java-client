@@ -119,7 +119,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key1 4
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -207,7 +207,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key1 4
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -350,7 +350,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // expected value set
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -362,8 +362,8 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getMissedKeys().size());
       assertEquals(0, future1.getMissedKeys().size());
       //for (Map.Entry<String, CollectionOperationStatus> m : future.getMissedKeys().entrySet()) {
-      //	assertEquals("key0", m.getKey());
-      //	assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
+      //  assertEquals("key0", m.getKey());
+      //  assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
       //}
 
       /*
@@ -379,7 +379,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getTrimmedKeys().size());
       assertEquals(0, future1.getTrimmedKeys().size());
       //for (SMGetTrimKey e : future.getTrimmedKeys()) {
-      //	System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
+      //  System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
       //}
 
       /*
@@ -513,7 +513,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // expected value set
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       // missed key
@@ -523,8 +523,8 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getMissedKeys().size());
       assertEquals(0, future1.getMissedKeys().size());
       //for (Map.Entry<String, CollectionOperationStatus> m : future.getMissedKeys().entrySet()) {
-      //	assertEquals("key0", m.getKey());
-      //	assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
+      //  assertEquals("key0", m.getKey());
+      //  assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
       //}
 
       /*
@@ -548,7 +548,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getTrimmedKeys().size());
       assertEquals(0, future1.getTrimmedKeys().size());
       //for (SMGetTrimKey e : future.getTrimmedKeys()) {
-      //	System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
+      //  System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
       //}
 
       /*
@@ -634,7 +634,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key0 4
       // key0 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -722,7 +722,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key0 4
       // key0 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -739,7 +739,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
        */
       assertEquals(0, future.getTrimmedKeys().size());
       //for (SMGetTrimKey e : future.getTrimmedKeys()) {
-      //	System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
+      //  System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
       //}
 
       /*
@@ -865,7 +865,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // expected value set
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -877,8 +877,8 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getMissedKeys().size());
       assertEquals(0, future1.getMissedKeys().size());
       //for (Map.Entry<String, CollectionOperationStatus> m : future.getMissedKeys().entrySet()) {
-      //	assertEquals("key0", m.getKey());
-      //	assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
+      //  assertEquals("key0", m.getKey());
+      //  assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
       //}
 
       /*
@@ -894,7 +894,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getTrimmedKeys().size());
       assertEquals(0, future1.getTrimmedKeys().size());
       //for (SMGetTrimKey e : future.getTrimmedKeys()) {
-      //	System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
+      //  System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
       //}
 
       /*
@@ -1028,7 +1028,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // expected value set
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -1040,8 +1040,8 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getMissedKeys().size());
       assertEquals(0, future1.getMissedKeys().size());
       //for (Map.Entry<String, CollectionOperationStatus> m : future.getMissedKeys().entrySet()) {
-      //	assertEquals("key0", m.getKey());
-      //	assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
+      //  assertEquals("key0", m.getKey());
+      //  assertEquals(CollectionResponse.OUT_OF_RANGE, m.getValue().getResponse());
       //}
 
       /*
@@ -1065,7 +1065,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(0, future3.getTrimmedKeys().size());
       assertEquals(0, future1.getTrimmedKeys().size());
       //for (SMGetTrimKey e : future.getTrimmedKeys()) {
-      //	System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
+      //  System.out.println("Trimmed key : " + e.getKey() + ", bkey : " + e.getBkey());
       //}
 
       /*
@@ -1148,7 +1148,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key1 6
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
@@ -1242,7 +1242,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       // key1 6
       // key1 5
       //for (SMGetElement<Object> each : result) {
-      //	System.out.println(each.getKey() + " " + each.getBkey());
+      //  System.out.println(each.getKey() + " " + each.getBkey());
       //}
 
       /*
