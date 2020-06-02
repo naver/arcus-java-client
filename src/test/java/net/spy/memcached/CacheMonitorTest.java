@@ -94,39 +94,29 @@ public class CacheMonitorTest extends MockObjectTestCase {
     Code code;
 
     code = Code.NONODE;
-    {
-      cacheMonitor.processResult(
-          code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-      // do nothing
-    }
+    cacheMonitor.processResult(
+        code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+    // do nothing
 
     code = Code.SESSIONEXPIRED;
-    {
-      listener.expects(once()).method("closing");
-      cacheMonitor.processResult(
-          code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-      assertTrue(cacheMonitor.dead);
-    }
+    listener.expects(once()).method("closing");
+    cacheMonitor.processResult(
+        code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+    assertTrue(cacheMonitor.dead);
 
     code = Code.NOAUTH;
-    {
-      listener.expects(once()).method("closing");
-      cacheMonitor.processResult(
-          code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-      assertTrue(cacheMonitor.dead);
-    }
+    listener.expects(once()).method("closing");
+    cacheMonitor.processResult(
+        code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
+    assertTrue(cacheMonitor.dead);
 
     code = Code.CONNECTIONLOSS;
-    {
-      cacheMonitor.processResult(
-          code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-    }
+    cacheMonitor.processResult(
+        code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
 
     code = Code.SESSIONMOVED;
-    {
-      cacheMonitor.processResult(
-          code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-    }
+    cacheMonitor.processResult(
+        code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
   }
 
   public void testProcess_syncConnected() throws Exception {

@@ -71,6 +71,7 @@ public enum HashAlgorithm {
    */
   public long hash(final String k) {
     long rv = 0;
+    int len = k.length();
     switch (this) {
       case NATIVE_HASH:
         rv = k.hashCode();
@@ -81,43 +82,35 @@ public enum HashAlgorithm {
         crc32.update(KeyUtil.getKeyBytes(k));
         rv = (crc32.getValue() >> 16) & 0x7fff;
         break;
-      case FNV1_64_HASH: {
+      case FNV1_64_HASH:
         // Thanks to pierre@demartines.com for the pointer
         rv = FNV_64_INIT;
-        int len = k.length();
         for (int i = 0; i < len; i++) {
           rv *= FNV_64_PRIME;
           rv ^= k.charAt(i);
         }
-      }
-      break;
-      case FNV1A_64_HASH: {
+        break;
+      case FNV1A_64_HASH:
         rv = FNV_64_INIT;
-        int len = k.length();
         for (int i = 0; i < len; i++) {
           rv ^= k.charAt(i);
           rv *= FNV_64_PRIME;
         }
-      }
-      break;
-      case FNV1_32_HASH: {
+        break;
+      case FNV1_32_HASH:
         rv = FNV_32_INIT;
-        int len = k.length();
         for (int i = 0; i < len; i++) {
           rv *= FNV_32_PRIME;
           rv ^= k.charAt(i);
         }
-      }
-      break;
-      case FNV1A_32_HASH: {
+        break;
+      case FNV1A_32_HASH:
         rv = FNV_32_INIT;
-        int len = k.length();
         for (int i = 0; i < len; i++) {
           rv ^= k.charAt(i);
           rv *= FNV_32_PRIME;
         }
-      }
-      break;
+        break;
       case KETAMA_HASH:
         byte[] bKey = computeMd5(k);
         rv = ((long) (bKey[3] & 0xFF) << 24)
