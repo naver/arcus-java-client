@@ -68,8 +68,8 @@
 
         <!-- Block Checks                                             -->
         <!-- see https://checkstyle.sourceforge.io/config_blocks.html -->
-        <!--
         <module name="AvoidNestedBlocks"/>
+        <!--
         <module name="EmptyBlock">
             <property name="option" value="TEXT"/>
             <property name="tokens"
