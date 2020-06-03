@@ -789,22 +789,21 @@ public final class MemcachedConnection extends SpyObject {
     } catch (ClosedChannelException e) {
       // Note, not all channel closes end up here
       if (!shutDown) {
-        getLogger().info("Closed channel and not shutting down.  "
+        getLogger().warn("Closed channel and not shutting down.  "
                 + "Queueing reconnect on %s", qa, e);
         lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
       }
     } catch (ConnectException e) {
       // Failures to establish a connection should attempt a reconnect
       // without signaling the observers.
-      getLogger().info("Reconnecting due to failure to connect to %s",
+      getLogger().warn("Reconnecting due to failure to connect to %s",
               qa, e);
       queueReconnect(qa, ReconnDelay.DEFAULT, "failure to connect");
     } catch (OperationException e) {
-      qa.setupForAuth("authentication failure"); // noop if !shouldAuth
-      getLogger().info("Reconnection due to exception " +
-              "handling a memcached operation on %s.  " +
-              "This may be due to an authentication failure.", qa, e);
-      lostConnection(qa, ReconnDelay.IMMEDIATE, "authentication failure");
+      qa.setupForAuth("operation exception"); // noop if !shouldAuth
+      getLogger().warn("Reconnection due to exception " +
+              "handling a memcached exception on %s.", qa, e);
+      lostConnection(qa, ReconnDelay.IMMEDIATE, "operation exception");
     } catch (Exception e) {
       // Any particular error processing an item should simply
       // cause us to reconnect to the server.
@@ -813,7 +812,7 @@ public final class MemcachedConnection extends SpyObject {
       // restarting, which lead here with IOException
 
       qa.setupForAuth("due to exception"); // noop if !shouldAuth
-      getLogger().info("Reconnecting due to exception on %s", qa, e);
+      getLogger().warn("Reconnecting due to exception on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, "exception" + e);
     }
     qa.fixupOps();
