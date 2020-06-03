@@ -656,6 +656,7 @@ public final class MemcachedConnection extends SpyObject {
 
   public void putMemcachedQueue(String addrs) {
     _nodeManageQueue.offer(addrs);
+    selector.wakeup();
   }
 
   // Handle the memcached server group that's been added by CacheManager.
@@ -1038,10 +1039,6 @@ public final class MemcachedConnection extends SpyObject {
    */
   NodeLocator getLocator() {
     return locator;
-  }
-
-  Selector getSelector() {
-    return selector;
   }
 
   /**
