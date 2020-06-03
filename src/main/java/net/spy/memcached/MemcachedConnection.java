@@ -976,8 +976,9 @@ public final class MemcachedConnection extends SpyObject {
             new IdentityHashMap<MemcachedNode, Boolean>();
     final List<MemcachedNode> rereQueue = new ArrayList<MemcachedNode>();
     SocketChannel ch = null;
-    for (Iterator<MemcachedNode> i =
-         reconnectQueue.headMap(now).values().iterator(); i.hasNext(); ) {
+
+    Iterator<MemcachedNode> i = reconnectQueue.headMap(now).values().iterator();
+    while (i.hasNext()) {
       final MemcachedNode qa = i.next();
       i.remove();
       try {
@@ -1001,8 +1002,7 @@ public final class MemcachedConnection extends SpyObject {
           qa.registerChannel(ch, ch.register(selector, ops, qa));
           assert qa.getChannel() == ch : "Channel was lost.";
         } else {
-          getLogger().debug(
-                  "Skipping duplicate reconnect request for %s", qa);
+          getLogger().debug("Skipping duplicate reconnect request for %s", qa);
         }
       } catch (SocketException e) {
         getLogger().warn("Error on reconnect", e);
@@ -1013,8 +1013,7 @@ public final class MemcachedConnection extends SpyObject {
         //it's possible that above code will leak file descriptors under abnormal
         //conditions (when ch.open() fails and throws IOException.
         //always close non connected channel
-        if (ch != null && !ch.isConnected()
-                && !ch.isConnectionPending()) {
+        if (ch != null && !ch.isConnected() && !ch.isConnectionPending()) {
           try {
             ch.close();
           } catch (IOException x) {
