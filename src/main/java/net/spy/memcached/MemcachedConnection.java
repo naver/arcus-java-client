@@ -654,6 +654,7 @@ public final class MemcachedConnection extends SpyObject {
     addOperation(node, op);
   }
 
+  // Called by CacheManger to add the memcached server group.
   public void putMemcachedQueue(String addrs) {
     _nodeManageQueue.offer(addrs);
     selector.wakeup();
@@ -661,24 +662,18 @@ public final class MemcachedConnection extends SpyObject {
 
   // Handle the memcached server group that's been added by CacheManager.
   void handleNodeManageQueue() throws IOException {
-    if (_nodeManageQueue.isEmpty()) {
-      return;
-    }
+    if (!_nodeManageQueue.isEmpty()) {
+      String addrs = _nodeManageQueue.poll();
 
-    // Get addresses from the queue
-    String addrs = _nodeManageQueue.poll();
-
-    // Update the memcached server group.
-    /* ENABLE_REPLICATION if */
-    if (arcusReplEnabled)
-      updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
-    else
+      // Update the memcached server group.
+      /* ENABLE_REPLICATION if */
+      if (arcusReplEnabled) {
+        updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
+        return;
+      }
+      /* ENABLE_REPLICATION end */
       updateConnections(AddrUtil.getAddresses(addrs));
-    /* ENABLE_REPLICATION else */
-    /*
-    updateConnections(AddrUtil.getAddresses(addrs));
-    */
-    /* ENABLE_REPLICATION end */
+    }
   }
 
   // Handle any requests that have been made against the client.
