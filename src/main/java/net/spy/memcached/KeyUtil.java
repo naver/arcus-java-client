@@ -7,7 +7,10 @@ import java.util.Collection;
 /**
  * Utilities for processing key values.
  */
-public class KeyUtil {
+public final class KeyUtil {
+
+  private KeyUtil() {
+  }
 
   /**
    * Get the bytes for a key.
