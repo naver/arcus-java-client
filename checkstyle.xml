@@ -101,9 +101,7 @@
         <!-- Class Design                                             -->
         <!-- see https://checkstyle.sourceforge.io/config_design.html -->
         <module name="FinalClass"/>
-        <!--
         <module name="HideUtilityClassConstructor"/>
-        -->
         <module name="InterfaceIsType"/>
         <module name="OneTopLevelClass"/>
         <!--

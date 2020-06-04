@@ -17,9 +17,12 @@
 package net.spy.memcached.util;
 
 
-public class BTreeUtil {
+public final class BTreeUtil {
 
   private static final String HEXES = "0123456789ABCDEF";
+
+  private BTreeUtil() {
+  }
 
   public static String toHex(byte[] byteArray) {
     if (byteArray == null)

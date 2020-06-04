@@ -7,7 +7,10 @@ import java.util.List;
 /**
  * Convenience utilities for simplifying common address parsing.
  */
-public class AddrUtil {
+public final class AddrUtil {
+
+  private AddrUtil() {
+  }
 
   /**
    * Split a string containing whitespace or comma separated host or

@@ -14,7 +14,11 @@ import net.spy.memcached.MemcachedClient;
  * This expects a server on port 11212 that's somewhat unstable so it can report
  * and what-not.
  */
-public class ObserverToy {
+public final class ObserverToy {
+
+  private ObserverToy() {
+  }
+
   public static void main(String args[]) throws Exception {
     final ConnectionObserver obs = new ConnectionObserver() {
       public void connectionEstablished(SocketAddress sa,

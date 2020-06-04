@@ -7,7 +7,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Small test program that does a bunch of sets in a tight loop.
  */
-public class DoLotsOfSets {
+public final class DoLotsOfSets {
+
+  private DoLotsOfSets() {
+  }
 
   public static void main(String[] args) throws Exception {
     // Create a client with a queue big enough to hold the 300,000 items

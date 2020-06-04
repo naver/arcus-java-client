@@ -18,6 +18,9 @@ public final class CloseUtil {
 
   private static Logger logger = LoggerFactory.getLogger(CloseUtil.class);
 
+  private CloseUtil() {
+  }
+
   /**
    * Close a closeable.
    */
