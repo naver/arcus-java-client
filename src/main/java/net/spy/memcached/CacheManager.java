@@ -55,8 +55,8 @@ public class CacheManager extends SpyThread implements Watcher,
   private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
   private static final String ARCUS_REPL_CLIENT_INFO_ZPATH = "/arcus_repl/client_list/";
-
   /* ENABLE_REPLICATION end */
+
   private static final int ZK_SESSION_TIMEOUT = 15000;
 
   private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
@@ -96,8 +96,8 @@ public class CacheManager extends SpyThread implements Watcher,
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled = false;
-
   /* ENABLE_REPLICATION end */
+
   public CacheManager(String hostPort, String serviceCode,
                       ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
                       int waitTimeForConnect) {
@@ -159,7 +159,6 @@ public class CacheManager extends SpyThread implements Watcher,
           throw new NotExistsServiceCodeException(serviceCode);
         }
         */
-
         /* ENABLE_REPLICATION end */
 
         String path = getClientInfo();
@@ -387,7 +386,6 @@ public class CacheManager extends SpyThread implements Watcher,
     // Arcus repl cluster
     // Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
     // by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
-
     /* ENABLE_REPLICATION end */
     String addrs = getAddressListString(children);
 
@@ -457,7 +455,6 @@ public class CacheManager extends SpyThread implements Watcher,
     }
     /* ENABLE_REPLICATION else */
     /*
-
     List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
     int addrCount = socketList.size();
     */

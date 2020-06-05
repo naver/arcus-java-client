@@ -220,8 +220,8 @@ public class MemcachedNodeROImpl implements MemcachedNode {
   public String getStatus() {
     throw new UnsupportedOperationException();
   }
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   public void setReplicaGroup(MemcachedReplicaGroup g) {
     throw new UnsupportedOperationException();
   }

@@ -201,8 +201,8 @@ public interface ConnectionFactory {
    * get delimiter
    */
   byte getDelimiter();
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   /**
    * get read priority on replica nodes
    */

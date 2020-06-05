@@ -275,8 +275,8 @@ public interface MemcachedNode {
    * @return status string
    */
   String getStatus();
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   void setReplicaGroup(MemcachedReplicaGroup g);
 
   MemcachedReplicaGroup getReplicaGroup();

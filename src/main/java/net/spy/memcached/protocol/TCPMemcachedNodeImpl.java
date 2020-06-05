@@ -91,8 +91,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   /* ENABLE_REPLICATION if */
   private MemcachedReplicaGroup replicaGroup;
-
   /* ENABLE_REPLICATION end */
+
   public boolean isFake() {
     return isFake;
   }
@@ -141,7 +141,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     assert rq != null : "No operation read queue";
     assert wq != null : "No operation write queue";
     assert iq != null : "No input queue";
-        /* ENABLE_REPLICATION if */
+    /* ENABLE_REPLICATION if */
     if (sa instanceof ArcusReplNodeAddress) {
       socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
     } else {
@@ -658,8 +658,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     sb.append(" #TR=").append(getTimeoutRatioNow());
     return sb.toString();
   }
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   public void setReplicaGroup(MemcachedReplicaGroup g) {
     replicaGroup = g;
   }

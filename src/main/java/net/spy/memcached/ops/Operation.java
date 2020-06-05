@@ -47,14 +47,12 @@ public interface Operation {
   OperationState getState();
 
   /* ENABLE_REPLICATION if */
-
   /**
    * reset operation state to WRITE_QUEUED
    */
   void resetState();
 
   void setMoved(boolean s);
-
   /* ENABLE_REPLICATION end */
 
   /**

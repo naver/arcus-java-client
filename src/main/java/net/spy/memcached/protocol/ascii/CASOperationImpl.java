@@ -56,10 +56,8 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
-    getCallback().receivedStatus(matchStatus(line,
-            STORED, NOT_FOUND, EXISTS));
+    getCallback().receivedStatus(matchStatus(line, STORED, NOT_FOUND, EXISTS));
     transitionState(OperationState.COMPLETE);
   }
 

@@ -95,8 +95,8 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
+
     if (update.getItemCount() == 1) {
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
               NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,

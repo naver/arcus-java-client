@@ -103,8 +103,8 @@ public class CollectionGetOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
+
     /*
       VALUE <flag> <count>\r\n
       <collection_data>\r\n

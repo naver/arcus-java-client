@@ -91,7 +91,6 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(
             matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,

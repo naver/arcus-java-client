@@ -175,7 +175,6 @@ public class DefaultConnectionFactory extends SpyObject
   public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
   private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST =
       new HashMap<APIType, ReadPriority>();
-
   /* ENABLE_REPLICATION end */
 
   /**

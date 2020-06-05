@@ -95,7 +95,6 @@ public final class MemcachedConnection extends SpyObject {
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled;
-
   /* ENABLE_REPLICATION end */
 
   /**
@@ -139,8 +138,8 @@ public final class MemcachedConnection extends SpyObject {
   boolean getArcusReplEnabled() {
     return arcusReplEnabled;
   }
-
   /* ENABLE_REPLICATION end */
+
   private boolean selectorsMakeSense() {
     for (MemcachedNode qa : locator.getAll()) {
       if (qa.getSk() != null && qa.getSk().isValid()) {
@@ -580,8 +579,8 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("Delay switchover because invalid group state : " + group);
     }
   }
-
   /* ENABLE_REPLICATION end */
+
   MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
@@ -855,7 +854,6 @@ public final class MemcachedConnection extends SpyObject {
         /* ENABLE_REPLICATION end */
       }
       /* ENABLE_REPLICATION if */
-
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
         rbuf.clear();
         switchoverMemcachedReplGroup(qa);
@@ -1277,8 +1275,8 @@ public final class MemcachedConnection extends SpyObject {
     /*
     MemcachedNode primary = locator.getPrimary(key);
     */
-
     /* ENABLE_REPLICATION end */
+
     // FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
     if (primary.isActive() || failureMode == FailureMode.Retry) {
       placeIn = primary;
@@ -1314,8 +1312,8 @@ public final class MemcachedConnection extends SpyObject {
   public int getAddedQueueSize() {
     return addedQueue.size();
   }
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   private interface Task {
     void doTask();
   }

@@ -120,7 +120,6 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
 
     /*

@@ -71,8 +71,8 @@ final class MutatorOperationImpl extends OperationImpl
     if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
       receivedMoveOperations(line);
     }
-
     /* ENABLE_REPLICATION end */
+
     OperationStatus status = null;
     try {
       Long.valueOf(line);

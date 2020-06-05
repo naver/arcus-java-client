@@ -112,7 +112,6 @@ public class ConnectionFactoryBuilder {
   public boolean getArcusReplEnabled() {
     return arcusReplEnabled;
   }
-
   /* ENABLE_REPLICATION end */
 
   /**
@@ -382,7 +381,6 @@ public class ConnectionFactoryBuilder {
   }
 
   /* ENABLE_REPLICATION if */
-
   /**
    * Set read prioirty for choosing replica node to read data
    */
@@ -429,7 +427,6 @@ public class ConnectionFactoryBuilder {
   public Map<APIType, ReadPriority> getAPIReadPriority() {
     return this.apiReadPriorityList;
   }
-
   /* ENABLE_REPLICATION end */
 
   /**
@@ -446,8 +443,8 @@ public class ConnectionFactoryBuilder {
         c.setArcusReplEnabled(arcusReplEnabled);
         return c;
       }
-
       /* ENABLE_REPLICATION end */
+
       @Override
       public BlockingQueue<Operation> createOperationQueue() {
         return opQueueFactory == null ?
@@ -483,15 +480,9 @@ public class ConnectionFactoryBuilder {
               // which builds keys off the server's group name, not
               // its ip:port.
               return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
-            } else {
-              // Arcus base cluster
-              return new ArcusKetamaNodeLocator(nodes, getHashAlg());
             }
-            /* ENABLE_REPLICATION else */
-            /*
-            return new ArcusKetamaNodeLocator(nodes, getHashAlg());
-            */
             /* ENABLE_REPLICATION end */
+            return new ArcusKetamaNodeLocator(nodes, getHashAlg());
           default:
             throw new IllegalStateException(
                     "Unhandled locator type: " + locator);
@@ -618,8 +609,8 @@ public class ConnectionFactoryBuilder {
       public byte getDelimiter() {
         return delimiter;
       }
-      /* ENABLE_REPLICATION if */
 
+      /* ENABLE_REPLICATION if */
       @Override
       public ReadPriority getReadPriority() {
         return readPriority;

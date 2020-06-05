@@ -56,7 +56,6 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
     transitionState(OperationState.COMPLETE);

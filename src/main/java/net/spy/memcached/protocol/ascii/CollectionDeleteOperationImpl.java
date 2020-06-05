@@ -87,7 +87,6 @@ public class CollectionDeleteOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
             NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,

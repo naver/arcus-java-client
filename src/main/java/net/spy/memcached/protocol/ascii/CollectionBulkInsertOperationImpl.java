@@ -97,8 +97,8 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
+
     if (insert.getItemCount() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,

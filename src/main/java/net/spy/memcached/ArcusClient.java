@@ -1729,8 +1729,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
             if (cstatus.isSuccess()) {
               rv.set(new Integer(cstatus.getMessage()),
-                      new CollectionOperationStatus(
-                              new OperationStatus(true, "END")));
+                      new CollectionOperationStatus(new OperationStatus(true, "END")));
               return;
             }
 
@@ -4458,12 +4457,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             if (status.isSuccess()) {
               try {
                 rv.set(new Long(status.getMessage()),
-                        new CollectionOperationStatus(
-                                new OperationStatus(true, "END")));
+                        new CollectionOperationStatus(new OperationStatus(true, "END")));
               } catch (NumberFormatException e) {
                 rv.set(null, new CollectionOperationStatus(
-                        new OperationStatus(false,
-                                status.getMessage())));
+                        new OperationStatus(false, status.getMessage())));
 
                 if (getLogger().isDebugEnabled()) {
                   getLogger().debug(

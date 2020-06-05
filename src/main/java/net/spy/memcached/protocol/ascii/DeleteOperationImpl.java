@@ -44,7 +44,6 @@ final class DeleteOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
     transitionState(OperationState.COMPLETE);

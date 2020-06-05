@@ -105,8 +105,8 @@ public abstract class BaseOperationImpl extends SpyObject {
   public final OperationState getState() {
     return state;
   }
-  /* ENABLE_REPLICATION if */
 
+  /* ENABLE_REPLICATION if */
   /**
    * reset operation state to WRITE_QUEUED
    */

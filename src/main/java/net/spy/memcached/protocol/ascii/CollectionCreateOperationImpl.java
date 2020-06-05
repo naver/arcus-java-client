@@ -81,10 +81,8 @@ public class CollectionCreateOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
-    getCallback().receivedStatus(
-            matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
+    getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
     transitionState(OperationState.COMPLETE);
   }
 

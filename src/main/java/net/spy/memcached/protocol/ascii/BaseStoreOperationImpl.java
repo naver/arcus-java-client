@@ -60,7 +60,6 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, STORED));
     transitionState(OperationState.COMPLETE);

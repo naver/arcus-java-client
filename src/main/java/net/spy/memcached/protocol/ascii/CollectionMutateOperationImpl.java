@@ -84,8 +84,8 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
+
     try {
       // <result value>\r\n
       Long.valueOf(line);

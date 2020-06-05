@@ -101,7 +101,6 @@ public class CollectionInsertOperationImpl extends OperationImpl
       receivedMoveOperations(line);
       return;
     }
-
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(
             matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
