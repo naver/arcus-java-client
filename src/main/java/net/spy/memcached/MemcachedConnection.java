@@ -260,258 +260,35 @@ public final class MemcachedConnection extends SpyObject {
     }
   }
 
-  public void updateConnections(List<InetSocketAddress> addrs) throws IOException {
+  private void handleNodesToRemove(final List<MemcachedNode> nodesToRemove) {
+    for (MemcachedNode node : nodesToRemove) {
+      getLogger().info("old memcached node removed %s", node);
+      /* Remove the node from the reconnect queue. FIXME(duplicate nodes). */
+      for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
+        if (node.equals(each.getValue())) {
+          reconnectQueue.remove(each.getKey());
+          break;
+        }
+      }
+      /* Handle the operations added to the node. */
+      String cause = "node removed.";
+      if (failureMode == FailureMode.Cancel) {
+        cancelOperations(node.destroyReadQueue(false), cause);
+        cancelOperations(node.destroyWriteQueue(false), cause);
+        cancelOperations(node.destroyInputQueue(), cause);
+      } else if (failureMode == FailureMode.Redistribute ||
+                 failureMode == FailureMode.Retry) {
+        redistributeOperations(node.destroyReadQueue(true), cause);
+        redistributeOperations(node.destroyWriteQueue(true), cause);
+        redistributeOperations(node.destroyInputQueue(), cause);
+      }
+    }
+  }
+
+  private void updateConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
     List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 
-    // Classify the incoming node list.
-    /* ENABLE_REPLICATION if */
-    if (arcusReplEnabled) {
-      List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
-      List<Task> taskList = new ArrayList<Task>(); // tasks executed after locator update
-
-      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-              ArcusReplNodeAddress.makeGroupAddrsList(addrs);
-      Map<String, MemcachedReplicaGroup> oldAllGroups =
-              ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
-
-      for (Map.Entry<String, MemcachedReplicaGroup> entry : oldAllGroups.entrySet()) {
-        MemcachedReplicaGroup oldGroup = entry.getValue();
-        MemcachedNode oldMasterNode = oldGroup.getMasterNode();
-        MemcachedNode oldSlaveNode = oldGroup.getSlaveNode();
-
-        List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
-        ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
-        ArcusClient.arcusLogger.debug("Old group nodes : [" + oldGroup + "]");
-
-        if (newGroupAddrs == null) {
-          /* Old group nodes have disappered. Remove the old group nodes. */
-          removeNodes.add(oldMasterNode);
-          if (oldSlaveNode != null) removeNodes.add(oldSlaveNode);
-          continue;
-        }
-        if (newGroupAddrs.size() == 0) {
-          /* New group is invalid, do nothing. */
-          newAllGroups.remove(entry.getKey());
-          continue;
-        }
-
-        ArcusReplNodeAddress oldMasterAddr =
-            (ArcusReplNodeAddress) oldMasterNode.getSocketAddress();
-        ArcusReplNodeAddress newMasterAddr = newGroupAddrs.get(0);
-        assert oldMasterAddr != null : "invalid old rgroup";
-        assert newMasterAddr != null : "invalid new rgroup";
-
-        if (newGroupAddrs.size() == 1) { /* New group has only a master node. */
-          if (oldSlaveNode == null) { /* Old group has only a master node. */
-            if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-              /* The same master node. Do nothing. */
-            } else {
-              /* The master of the group has changed to the new one. */
-              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-              removeNodes.add(oldMasterNode);
-              attachNodes.add(newMasterNode);
-
-              /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldMasterNode, false,
-                  "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-            }
-          } else { /* Old group has both a master node and a slave node. */
-            ArcusReplNodeAddress oldSlaveAddr =
-                (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress();
-            if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-              /* The old slave has disappeared. */
-              removeNodes.add(oldSlaveNode);
-
-              /* move operation slave -> master
-               * Slave node have only read operations, then don't need call setupResend
-               */
-              taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
-            } else if (newMasterAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
-              /* The old slave has failovered to the master with new slave */
-              removeNodes.add(oldMasterNode);
-              changeRoleGroups.add(oldGroup);
-
-              /* move operation master -> slave */
-              taskList.add(new SetupResendTask(oldMasterNode, false,
-                  "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
-            } else {
-              /* All nodes of old group have gone away. And, new master has appeared. */
-              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-              removeNodes.add(oldMasterNode);
-              removeNodes.add(oldSlaveNode);
-              attachNodes.add(newMasterNode);
-
-              /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldMasterNode, false,
-                  "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-              /* move operation old slave -> new master
-               * Slave node have only read operations, then don't need call setupResend
-               */
-              taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
-            }
-          }
-        } else { /* New group has both a master node and a slave node */
-          ArcusReplNodeAddress newSlaveAddr = newGroupAddrs.get(1);
-          if (oldSlaveNode == null) { /* Old group has only a master node. */
-            if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-              /* New slave node has appeared. */
-              attachNodes.add(attachMemcachedNode(newSlaveAddr));
-            } else if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-              /* Really rare case: old master => slave, A new master */
-              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-              changeRoleGroups.add(oldGroup);
-              attachNodes.add(newMasterNode);
-
-              /* move operation old master -> new master */
-              taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
-                  "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-            } else {
-              /* Old master has gone away. And, new group has appeared. */
-              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-              removeNodes.add(oldMasterNode);
-              attachNodes.add(newMasterNode);
-              attachNodes.add(attachMemcachedNode(newSlaveAddr));
-
-              /* move operation old master -> new master */
-              taskList.add(new SetupResendTask(oldMasterNode, false,
-                  "Discarded all pending reading state operation to move operations."));
-              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-            }
-          } else { /* Old group has both a master node and a slave node. */
-            ArcusReplNodeAddress oldSlaveAddr =
-                (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress();
-            if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-              if (newSlaveAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
-                /* The same master and slave nodes. Do nothing. */
-              } else {
-                /* Only old slave has changed to the new one. */
-                MemcachedNode newSlaveNode = attachMemcachedNode(newSlaveAddr);
-                removeNodes.add(oldSlaveNode);
-                attachNodes.add(newSlaveNode);
-
-                /* move operation old slave -> new slave
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldSlaveNode, newSlaveNode));
-              }
-            } else if (newMasterAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
-              if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-                /* Switchover */
-                changeRoleGroups.add(oldGroup);
-
-                /* move operation master -> slave
-                 * must keep the following execution order when switchover
-                 * - first moveOperations
-                 * - second, queueReconnect
-                 *
-                 * because moves all operations
-                 */
-                taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
-                taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
-                    "Discarded all pending reading state operation to move operations."));
-              } else {
-                /* Failover. And, new slave has appeared */
-                removeNodes.add(oldMasterNode);
-                changeRoleGroups.add(oldGroup);
-                attachNodes.add(attachMemcachedNode(newSlaveAddr));
-
-                /* move operation old master -> old slave */
-                taskList.add(new SetupResendTask(oldMasterNode, false,
-                    "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
-              }
-            } else {
-              /* A completely new master has appered. */
-              if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
-                /* Old slave disappeared. Old master has changed to the slave. */
-                MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-                removeNodes.add(oldSlaveNode);
-                changeRoleGroups.add(oldGroup);
-                attachNodes.add(newMasterNode);
-
-                /* move operation old master -> new master */
-                taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
-                    "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-                /* move operation old slave -> old master(slave)
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
-              } else if (newSlaveAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
-                /* Only old master has disappeared. */
-                MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-                removeNodes.add(oldMasterNode);
-                attachNodes.add(newMasterNode);
-
-                /* move operation old master -> new master */
-                taskList.add(new SetupResendTask(oldMasterNode, false,
-                    "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-              } else {
-                /* Old group has completely changed to the new group. */
-                MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
-                MemcachedNode newSlaveNode = attachMemcachedNode(newSlaveAddr);
-                removeNodes.add(oldMasterNode);
-                removeNodes.add(oldSlaveNode);
-                attachNodes.add(newMasterNode);
-                attachNodes.add(newSlaveNode);
-
-                /* move operation old master -> new master */
-                taskList.add(new SetupResendTask(oldMasterNode, false,
-                    "Discarded all pending reading state operation to move operations."));
-                taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-                /* move operation old slave -> new slave
-                 * Slave node have only read operations, then don't need call setupResend
-                 */
-                taskList.add(new MoveOperationTask(oldSlaveNode, newSlaveNode));
-              }
-            }
-          }
-        }
-        newAllGroups.remove(entry.getKey());
-      }
-
-      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
-        if (newGroupAddrs.size() == 0) { /* Incomplete group, now */
-          attachNodes.add(attachMemcachedNode(ArcusReplNodeAddress.createFake(entry.getKey())));
-        } else { /* Completely new group */
-          attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
-          if (newGroupAddrs.size() > 1)
-            attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
-        }
-      }
-
-      // Update the hash.
-      ((ArcusReplKetamaNodeLocator) locator).update(attachNodes, removeNodes, changeRoleGroups);
-
-      // do task after locator update
-      for (Task t : taskList) {
-        t.doTask();
-      }
-    } else {
-      for (MemcachedNode node : locator.getAll()) {
-        if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
-          addrs.remove((InetSocketAddress) node.getSocketAddress());
-        } else {
-          removeNodes.add(node);
-        }
-      }
-
-      for (SocketAddress sa : addrs) {
-        attachNodes.add(attachMemcachedNode(sa));
-      }
-
-      // Update the hash.
-      locator.update(attachNodes, removeNodes);
-    }
-    /* ENABLE_REPLICATION else */
-    /*
     for (MemcachedNode node : locator.getAll()) {
       if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
         addrs.remove((InetSocketAddress) node.getSocketAddress());
@@ -520,37 +297,253 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
 
-    // Make connections to the newly added nodes.
+    /* Make connections to the newly added nodes. */
     for (SocketAddress sa : addrs) {
       attachNodes.add(attachMemcachedNode(sa));
     }
 
-    // Update the hash.
+    /* Update the hash. */
     locator.update(attachNodes, removeNodes);
-    */
-    /* ENABLE_REPLICATION end */
 
-    // Remove unavailable nodes in the reconnect queue.
-    for (MemcachedNode node : removeNodes) {
-      getLogger().info("old memcached node removed %s", node);
-      for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-        if (node.equals(each.getValue())) {
-          reconnectQueue.remove(each.getKey());
-          break;
+    /* Remove the unavailable nodes. */
+    handleNodesToRemove(removeNodes);
+  }
+
+  /* ENABLE_REPLICATION if */
+  public void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
+    List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
+    List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
+    List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
+    List<Task> taskList = new ArrayList<Task>(); // tasks executed after locator update
+
+    Map<String, List<ArcusReplNodeAddress>> newAllGroups =
+            ArcusReplNodeAddress.makeGroupAddrsList(addrs);
+    Map<String, MemcachedReplicaGroup> oldAllGroups =
+            ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
+
+    for (Map.Entry<String, MemcachedReplicaGroup> entry : oldAllGroups.entrySet()) {
+      MemcachedReplicaGroup oldGroup = entry.getValue();
+      MemcachedNode oldMasterNode = oldGroup.getMasterNode();
+      MemcachedNode oldSlaveNode = oldGroup.getSlaveNode();
+
+      List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
+      ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
+      ArcusClient.arcusLogger.debug("Old group nodes : [" + oldGroup + "]");
+
+      if (newGroupAddrs == null) {
+        /* Old group nodes have disappered. Remove the old group nodes. */
+        removeNodes.add(oldMasterNode);
+        if (oldSlaveNode != null) removeNodes.add(oldSlaveNode);
+        continue;
+      }
+      if (newGroupAddrs.size() == 0) {
+        /* New group is invalid, do nothing. */
+        newAllGroups.remove(entry.getKey());
+        continue;
+      }
+
+      ArcusReplNodeAddress oldMasterAddr = (ArcusReplNodeAddress) oldMasterNode.getSocketAddress();
+      ArcusReplNodeAddress newMasterAddr = newGroupAddrs.get(0);
+      assert oldMasterAddr != null : "invalid old rgroup";
+      assert newMasterAddr != null : "invalid new rgroup";
+
+      if (newGroupAddrs.size() == 1) { /* New group has only a master node. */
+        if (oldSlaveNode == null) { /* Old group has only a master node. */
+          if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+            /* The same master node. Do nothing. */
+          } else {
+            /* The master of the group has changed to the new one. */
+            MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+            removeNodes.add(oldMasterNode);
+            attachNodes.add(newMasterNode);
+
+            /* move operation old master -> new master */
+            taskList.add(new SetupResendTask(oldMasterNode, false,
+                "Discarded all pending reading state operation to move operations."));
+            taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+          }
+        } else { /* Old group has both a master node and a slave node. */
+          ArcusReplNodeAddress oldSlaveAddr =
+              (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress();
+          if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+            /* The old slave has disappeared. */
+            removeNodes.add(oldSlaveNode);
+
+            /* move operation slave -> master
+             * Slave node have only read operations, then don't need call setupResend
+             */
+            taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+          } else if (newMasterAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
+            /* The old slave has failovered to the master with new slave */
+            removeNodes.add(oldMasterNode);
+            changeRoleGroups.add(oldGroup);
+
+            /* move operation master -> slave */
+            taskList.add(new SetupResendTask(oldMasterNode, false,
+                "Discarded all pending reading state operation to move operations."));
+            taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
+          } else {
+            /* All nodes of old group have gone away. And, new master has appeared. */
+            MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+            removeNodes.add(oldMasterNode);
+            removeNodes.add(oldSlaveNode);
+            attachNodes.add(newMasterNode);
+
+            /* move operation old master -> new master */
+            taskList.add(new SetupResendTask(oldMasterNode, false,
+                "Discarded all pending reading state operation to move operations."));
+            taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+            /* move operation old slave -> new master
+             * Slave node have only read operations, then don't need call setupResend
+             */
+            taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
+          }
+        }
+      } else { /* New group has both a master node and a slave node */
+        ArcusReplNodeAddress newSlaveAddr = newGroupAddrs.get(1);
+        if (oldSlaveNode == null) { /* Old group has only a master node. */
+          if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+            /* New slave node has appeared. */
+            attachNodes.add(attachMemcachedNode(newSlaveAddr));
+          } else if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+            /* Really rare case: old master => slave, A new master */
+            MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+            changeRoleGroups.add(oldGroup);
+            attachNodes.add(newMasterNode);
+
+            /* move operation old master -> new master */
+            taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
+                "Discarded all pending reading state operation to move operations."));
+            taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+          } else {
+            /* Old master has gone away. And, new group has appeared. */
+            MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+            removeNodes.add(oldMasterNode);
+            attachNodes.add(newMasterNode);
+            attachNodes.add(attachMemcachedNode(newSlaveAddr));
+
+            /* move operation old master -> new master */
+            taskList.add(new SetupResendTask(oldMasterNode, false,
+                "Discarded all pending reading state operation to move operations."));
+            taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+          }
+        } else { /* Old group has both a master node and a slave node. */
+          ArcusReplNodeAddress oldSlaveAddr =
+              (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress();
+          if (newMasterAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+            if (newSlaveAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
+              /* The same master and slave nodes. Do nothing. */
+            } else {
+              /* Only old slave has changed to the new one. */
+              MemcachedNode newSlaveNode = attachMemcachedNode(newSlaveAddr);
+              removeNodes.add(oldSlaveNode);
+              attachNodes.add(newSlaveNode);
+
+              /* move operation old slave -> new slave
+               * Slave node have only read operations, then don't need call setupResend
+               */
+              taskList.add(new MoveOperationTask(oldSlaveNode, newSlaveNode));
+            }
+          } else if (newMasterAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
+            if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+              /* Switchover */
+              changeRoleGroups.add(oldGroup);
+
+              /* move operation master -> slave
+               * must keep the following execution order when switchover
+               * - first moveOperations
+               * - second, queueReconnect
+               *
+               * because moves all operations
+               */
+              taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
+              taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
+                  "Discarded all pending reading state operation to move operations."));
+            } else {
+              /* Failover. And, new slave has appeared */
+              removeNodes.add(oldMasterNode);
+              changeRoleGroups.add(oldGroup);
+              attachNodes.add(attachMemcachedNode(newSlaveAddr));
+
+              /* move operation old master -> old slave */
+              taskList.add(new SetupResendTask(oldMasterNode, false,
+                  "Discarded all pending reading state operation to move operations."));
+              taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
+            }
+          } else {
+            /* A completely new master has appered. */
+            if (newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+              /* Old slave disappeared. Old master has changed to the slave. */
+              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+              removeNodes.add(oldSlaveNode);
+              changeRoleGroups.add(oldGroup);
+              attachNodes.add(newMasterNode);
+
+              /* move operation old master -> new master */
+              taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
+                  "Discarded all pending reading state operation to move operations."));
+              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+              /* move operation old slave -> old master(slave)
+               * Slave node have only read operations, then don't need call setupResend
+               */
+              taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+            } else if (newSlaveAddr.getIPPort().equals(oldSlaveAddr.getIPPort())) {
+              /* Only old master has disappeared. */
+              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+              removeNodes.add(oldMasterNode);
+              attachNodes.add(newMasterNode);
+
+              /* move operation old master -> new master */
+              taskList.add(new SetupResendTask(oldMasterNode, false,
+                  "Discarded all pending reading state operation to move operations."));
+              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+            } else {
+              /* Old group has completely changed to the new group. */
+              MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+              MemcachedNode newSlaveNode = attachMemcachedNode(newSlaveAddr);
+              removeNodes.add(oldMasterNode);
+              removeNodes.add(oldSlaveNode);
+              attachNodes.add(newMasterNode);
+              attachNodes.add(newSlaveNode);
+
+              /* move operation old master -> new master */
+              taskList.add(new SetupResendTask(oldMasterNode, false,
+                  "Discarded all pending reading state operation to move operations."));
+              taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
+              /* move operation old slave -> new slave
+               * Slave node have only read operations, then don't need call setupResend
+               */
+              taskList.add(new MoveOperationTask(oldSlaveNode, newSlaveNode));
+            }
+          }
         }
       }
-      String cause = "node removed.";
-      if (failureMode == FailureMode.Cancel) {
-        cancelOperations(node.destroyReadQueue(false), cause);
-        cancelOperations(node.destroyWriteQueue(false), cause);
-        cancelOperations(node.destroyInputQueue(), cause);
-      } else if (failureMode == FailureMode.Redistribute || failureMode == FailureMode.Retry) {
-        redistributeOperations(node.destroyReadQueue(true), cause);
-        redistributeOperations(node.destroyWriteQueue(true), cause);
-        redistributeOperations(node.destroyInputQueue(), cause);
+      newAllGroups.remove(entry.getKey());
+    }
+
+    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+      List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
+      if (newGroupAddrs.size() == 0) { /* Incomplete group, now */
+        attachNodes.add(attachMemcachedNode(ArcusReplNodeAddress.createFake(entry.getKey())));
+      } else { /* Completely new group */
+        attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+        if (newGroupAddrs.size() > 1)
+          attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
       }
     }
+
+    /* Update the hash. */
+    ((ArcusReplKetamaNodeLocator) locator).update(attachNodes, removeNodes, changeRoleGroups);
+
+    /* do task after locator update */
+    for (Task t : taskList) {
+      t.doTask();
+    }
+
+    /* Remove the unavailable nodes. */
+    handleNodesToRemove(removeNodes);
   }
+  /* ENABLE_REPLICATION end */
 
   /* ENABLE_REPLICATION if */
   private void switchoverMemcachedReplGroup(MemcachedNode node) {
@@ -665,7 +658,7 @@ public final class MemcachedConnection extends SpyObject {
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
       if (arcusReplEnabled) {
-        updateConnections(ArcusReplNodeAddress.getAddresses(addrs));
+        updateReplConnections(ArcusReplNodeAddress.getAddresses(addrs));
         return;
       }
       /* ENABLE_REPLICATION end */
