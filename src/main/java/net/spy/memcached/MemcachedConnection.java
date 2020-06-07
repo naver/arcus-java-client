@@ -1024,6 +1024,36 @@ public final class MemcachedConnection extends SpyObject {
     return locator;
   }
 
+  /* ENABLE_REPLICATION if */
+  private ReplicaPick getReplicaPick(final Operation o) {
+    ReplicaPick pick = ReplicaPick.MASTER;
+
+    if (o.isReadOperation()) {
+      ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
+      if (readPriority != null) {
+        if (readPriority == ReadPriority.SLAVE)
+          pick = ReplicaPick.SLAVE;
+        else if (readPriority == ReadPriority.RR)
+          pick = ReplicaPick.RR;
+      } else {
+        pick = getReplicaPick();
+      }
+    }
+    return pick;
+  }
+
+  private ReplicaPick getReplicaPick() {
+    ReadPriority readPriority = f.getReadPriority();
+    ReplicaPick pick = ReplicaPick.MASTER;
+
+    if (readPriority == ReadPriority.SLAVE)
+      pick = ReplicaPick.SLAVE;
+    else if (readPriority == ReadPriority.RR)
+      pick = ReplicaPick.RR;
+    return pick;
+  }
+  /* ENABLE_REPLICATION end */
+
   /**
    * Get the primary node for the key string.
    *
@@ -1121,37 +1151,6 @@ public final class MemcachedConnection extends SpyObject {
               + key + " (and not immediately cancelled)";
     }
   }
-
-  /* ENABLE_REPLICATION if */
-  private ReplicaPick getReplicaPick(final Operation o) {
-    ReplicaPick pick = ReplicaPick.MASTER;
-
-    if (o.isReadOperation()) {
-      ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
-      if (readPriority != null) {
-        if (readPriority == ReadPriority.SLAVE)
-          pick = ReplicaPick.SLAVE;
-        else if (readPriority == ReadPriority.RR)
-          pick = ReplicaPick.RR;
-      } else {
-        pick = getReplicaPick();
-      }
-    }
-
-    return pick;
-  }
-
-  public ReplicaPick getReplicaPick() {
-    ReadPriority readPriority = f.getReadPriority();
-    ReplicaPick pick = ReplicaPick.MASTER;
-
-    if (readPriority == ReadPriority.SLAVE)
-      pick = ReplicaPick.SLAVE;
-    else if (readPriority == ReadPriority.RR)
-      pick = ReplicaPick.RR;
-    return pick;
-  }
-  /* ENABLE_REPLICATION end */
 
   public void insertOperation(final MemcachedNode node, final Operation o) {
     o.setHandlingNode(node);
