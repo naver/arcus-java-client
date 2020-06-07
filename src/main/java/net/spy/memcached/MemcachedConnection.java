@@ -1025,6 +1025,64 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /**
+   * Get the primary node for the key string.
+   *
+   * @param key the key the operation is operating upon
+   */
+  public MemcachedNode getPrimaryNode(final String key) {
+    /* ENABLE_REPLICATION if */
+    if (this.arcusReplEnabled) {
+      return ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick());
+    }
+    /* ENABLE_REPLICATION end */
+    return locator.getPrimary(key);
+  }
+
+  /**
+   * Get the primary node for the key string and the operation.
+   *
+   * @param key the key the operation is operating upon
+   * @param o   the operation
+   */
+  public MemcachedNode getPrimaryNode(final String key, final Operation o) {
+    /* ENABLE_REPLICATION if */
+    if (this.arcusReplEnabled) {
+      return ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick(o));
+    }
+    /* ENABLE_REPLICATION end */
+    return locator.getPrimary(key);
+  }
+
+  /**
+   * Get the another node sequence for the key string.
+   *
+   * @param key the key the operation is operating upon
+   */
+  public Iterator<MemcachedNode> getNodeSequence(final String key) {
+    /* ENABLE_REPLICATION if */
+    if (this.arcusReplEnabled) {
+      return ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick());
+    }
+    /* ENABLE_REPLICATION end */
+    return locator.getSequence(key);
+  }
+
+  /**
+   * Get the another node sequence for the key string and the operation.
+   *
+   * @param key the key the operation is operating upon
+   * @param o   the operation
+   */
+  public Iterator<MemcachedNode> getNodeSequence(final String key, final Operation o) {
+    /* ENABLE_REPLICATION if */
+    if (this.arcusReplEnabled) {
+      return ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick(o));
+    }
+    /* ENABLE_REPLICATION end */
+    return locator.getSequence(key);
+  }
+
+  /**
    * Add an operation to the given connection.
    *
    * @param key the key the operation is operating upon
@@ -1032,17 +1090,7 @@ public final class MemcachedConnection extends SpyObject {
    */
   public void addOperation(final String key, final Operation o) {
     MemcachedNode placeIn = null;
-    /* ENABLE_REPLICATION if */
-    MemcachedNode primary;
-    if (this.arcusReplEnabled) {
-      primary = ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick(o));
-    } else
-      primary = locator.getPrimary(key);
-    /* ENABLE_REPLICATION else */
-    /*
-    MemcachedNode primary = locator.getPrimary(key);
-    */
-    /* ENABLE_REPLICATION end */
+    MemcachedNode primary = getPrimaryNode(key, o);
     if (primary.isActive() || failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else if (failureMode == FailureMode.Cancel) {
@@ -1050,27 +1098,13 @@ public final class MemcachedConnection extends SpyObject {
       o.cancel("inactive node");
     } else {
       // Look for another node in sequence that is ready.
-      /* ENABLE_REPLICATION if */
-      Iterator<MemcachedNode> iter = this.arcusReplEnabled
-              ? ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick(o))
-              : locator.getSequence(key);
-      for (; placeIn == null && iter.hasNext(); ) {
+      Iterator<MemcachedNode> iter = getNodeSequence(key, o);
+      while (placeIn == null && iter.hasNext()) {
         MemcachedNode n = iter.next();
         if (n.isActive()) {
           placeIn = n;
         }
       }
-      /* ENABLE_REPLICATION else */
-      /*
-      for(Iterator<MemcachedNode> i=locator.getSequence(key);
-        placeIn == null && i.hasNext(); ) {
-        MemcachedNode n=i.next();
-        if(n.isActive()) {
-          placeIn=n;
-        }
-      }
-      */
-      /* ENABLE_REPLICATION end */
       // If we didn't find an active node, queue it in the primary node
       // and wait for it to come back online.
       if (placeIn == null) {
@@ -1255,44 +1289,18 @@ public final class MemcachedConnection extends SpyObject {
    */
   public MemcachedNode findNodeByKey(String key) {
     MemcachedNode placeIn = null;
-    /* ENABLE_REPLICATION if */
-    MemcachedNode primary = null;
-    if (this.arcusReplEnabled) {
-      /* just used for arrange key */
-      primary = ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick());
-    } else
-      primary = locator.getPrimary(key);
-    /* ENABLE_REPLICATION else */
-    /*
-    MemcachedNode primary = locator.getPrimary(key);
-    */
-    /* ENABLE_REPLICATION end */
-
+    MemcachedNode primary = getPrimaryNode(key);
     // FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
     if (primary.isActive() || failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else {
-      /* ENABLE_REPLICATION if */
-      Iterator<MemcachedNode> iter = this.arcusReplEnabled
-              ? ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick())
-              : locator.getSequence(key);
-      for (; placeIn == null && iter.hasNext(); ) {
+      Iterator<MemcachedNode> iter = getNodeSequence(key);
+      while (placeIn == null && iter.hasNext()) {
         MemcachedNode n = iter.next();
         if (n.isActive()) {
           placeIn = n;
         }
       }
-      /* ENABLE_REPLICATION else */
-      /*
-      for (Iterator<MemcachedNode> i = locator.getSequence(key); placeIn == null
-          && i.hasNext();) {
-        MemcachedNode n = i.next();
-        if (n.isActive()) {
-          placeIn = n;
-        }
-      }
-      */
-      /* ENABLE_REPLICATION end */
       if (placeIn == null) {
         placeIn = primary;
       }
