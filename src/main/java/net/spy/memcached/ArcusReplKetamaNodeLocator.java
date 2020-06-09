@@ -35,14 +35,14 @@ import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
 public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator {
 
-  private TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
-  private HashMap<String, MemcachedReplicaGroup> allGroups;
-  private Collection<MemcachedNode> allNodes;
+  private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
+  private final HashMap<String, MemcachedReplicaGroup> allGroups;
+  private final Collection<MemcachedNode> allNodes;
 
-  private HashAlgorithm hashAlg;
-  private ArcusReplKetamaNodeLocatorConfiguration config;
+  private final HashAlgorithm hashAlg;
+  private final ArcusReplKetamaNodeLocatorConfiguration config;
 
-  Lock lock = new ReentrantLock();
+  private final Lock lock = new ReentrantLock();
 
   public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
     // This configuration class is aware that InetSocketAddress is really
@@ -334,11 +334,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   private class ReplKetamaIterator implements Iterator<MemcachedNode> {
-    final String key;
-    long hashVal;
-    int remainingTries;
-    int numTries = 0;
-    ReplicaPick pick = ReplicaPick.MASTER;
+    private final String key;
+    private long hashVal;
+    private int remainingTries;
+    private int numTries = 0;
+    private final ReplicaPick pick;
 
     public ReplKetamaIterator(final String k, ReplicaPick p, final int t) {
       super();

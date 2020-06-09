@@ -327,8 +327,8 @@ public final class MemcachedConnection extends SpyObject {
       MemcachedNode oldSlaveNode = oldGroup.getSlaveNode();
 
       List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
-      ArcusClient.arcusLogger.debug("New group nodes : " + newGroupAddrs);
-      ArcusClient.arcusLogger.debug("Old group nodes : [" + oldGroup + "]");
+      getLogger().debug("New group nodes : " + newGroupAddrs);
+      getLogger().debug("Old group nodes : [" + oldGroup + "]");
 
       if (newGroupAddrs == null) {
         // Old group nodes have disappered. Remove the old group nodes.
@@ -544,7 +544,7 @@ public final class MemcachedConnection extends SpyObject {
      * because moves all operations
      */
     if (group.getMasterNode() != null && group.getSlaveNode() != null) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).master) {
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         node.moveOperations(group.getSlaveNode());
         addedQueue.offer(group.getSlaveNode());
         ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);

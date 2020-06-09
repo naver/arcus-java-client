@@ -32,7 +32,7 @@ import net.sf.ehcache.Element;
  */
 public class FrontCacheGetFuture<T> implements Future<T> {
 
-  Element element;
+  private final Element element;
 
   public FrontCacheGetFuture(Element element) {
     this.element = element;

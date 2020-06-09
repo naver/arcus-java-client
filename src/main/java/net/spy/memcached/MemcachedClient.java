@@ -125,7 +125,7 @@ public class MemcachedClient extends SpyThread
 
   private volatile boolean running = true;
   private volatile boolean shuttingDown = false;
-  public LocalCacheManager localCacheManager = null;
+  protected LocalCacheManager localCacheManager = null;
 
   protected final long operationTimeout;
 
@@ -134,9 +134,9 @@ public class MemcachedClient extends SpyThread
 
   protected final Transcoder<Object> transcoder;
 
-  final TranscodeService tcService;
+  private final TranscodeService tcService;
 
-  final AuthDescriptor authDescriptor;
+  private final AuthDescriptor authDescriptor;
 
   private final byte delimiter;
 

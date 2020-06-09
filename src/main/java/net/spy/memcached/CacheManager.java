@@ -233,7 +233,7 @@ public class CacheManager extends SpyThread implements Watcher,
       hostInfo = "unknown-host_0.0.0.0_";
     }
     path = path + hostInfo
-         + this.poolSize + "_java_" + ArcusClient.VERSION + "_";
+         + this.poolSize + "_java_" + ArcusClient.getVersion() + "_";
 
     /* get time and zk session id */
     String restInfo;
@@ -286,7 +286,7 @@ public class CacheManager extends SpyThread implements Watcher,
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
-        if (!cacheMonitor.dead) {
+        if (!cacheMonitor.isDead()) {
           try {
             wait();
           } catch (InterruptedException e) {

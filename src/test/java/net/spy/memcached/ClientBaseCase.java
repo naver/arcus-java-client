@@ -35,17 +35,17 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class ClientBaseCase extends TestCase {
 
-  public static String ZK_HOST = System.getProperty("ZK_HOST",
+  public static final String ZK_HOST = System.getProperty("ZK_HOST",
           "127.0.0.1:2181");
 
-  public static String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
+  public static final String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
           "test");
 
-  public static String ARCUS_HOST = System
+  public static final String ARCUS_HOST = System
           .getProperty("ARCUS_HOST",
                   "127.0.0.1:11211");
 
-  public static boolean USE_ZK = Boolean.valueOf(System.getProperty(
+  public static final boolean USE_ZK = Boolean.valueOf(System.getProperty(
           "USE_ZK", "false"));
 
   public static Collection<String> stringify(Collection<?> c) {

@@ -104,11 +104,9 @@
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
         <module name="OneTopLevelClass"/>
-        <!--
         <module name="VisibilityModifier">
             <property name="protectedAllowed" value="true"/>
         </module>
-        -->
 
         <!-- Coding                                                   -->
         <!-- see https://checkstyle.sourceforge.io/config_coding.html -->

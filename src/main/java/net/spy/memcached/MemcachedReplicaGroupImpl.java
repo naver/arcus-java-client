@@ -34,7 +34,7 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
       return false;
 
     if (this.group.equals(getGroupNameForNode(node))) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).master)
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster())
         this.masterNode = node;
       else
         this.slaveNode = node;
@@ -51,7 +51,7 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
       return false;
 
     if (this.group.equals(getGroupNameForNode(node))) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).master)
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster())
         this.masterNode = null;
       else
         this.slaveNode = null;
@@ -67,11 +67,11 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 
     this.masterNode = this.slaveNode;
     if (this.masterNode != null) // previous slave node
-      ((ArcusReplNodeAddress) this.masterNode.getSocketAddress()).master = true;
+      ((ArcusReplNodeAddress) this.masterNode.getSocketAddress()).setMaster(true);
 
     this.slaveNode = tmpNode;
     if (this.slaveNode != null) // previous master node
-      ((ArcusReplNodeAddress) this.slaveNode.getSocketAddress()).master = false;
+      ((ArcusReplNodeAddress) this.slaveNode.getSocketAddress()).setMaster(false);
 
     return true;
   }

@@ -67,9 +67,9 @@ public class CacheLoaderTest extends BaseMockCase {
 
   static class LoadCounter implements CacheLoader.StorageListener {
 
-    public volatile int exceptions = 0;
-    public volatile int success = 0;
-    public volatile int failure = 0;
+    private volatile int exceptions = 0;
+    private volatile int success = 0;
+    private volatile int failure = 0;
 
     public void errorStoring(String k, Exception e) {
       exceptions++;

@@ -18,9 +18,11 @@ package net.spy.memcached;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.spy.memcached.compat.SpyObject;
@@ -38,13 +40,11 @@ import net.spy.memcached.util.KetamaNodeLocatorConfiguration;
  */
 public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 
+  private final TreeMap<Long, MemcachedNode> ketamaNodes;
+  private final Collection<MemcachedNode> allNodes;
 
-  final TreeMap<Long, MemcachedNode> ketamaNodes;
-  final Collection<MemcachedNode> allNodes;
-
-  final HashAlgorithm hashAlg;
-  final KetamaNodeLocatorConfiguration config;
-
+  private final HashAlgorithm hashAlg;
+  private final KetamaNodeLocatorConfiguration config;
 
   public KetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
     this(nodes, alg, new DefaultKetamaNodeLocatorConfiguration());
@@ -157,12 +157,16 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     throw new UnsupportedOperationException("update not supported");
   }
 
+  public SortedMap<Long, MemcachedNode> getKetamaNodes() {
+    return Collections.unmodifiableSortedMap(ketamaNodes);
+  }
+
   class KetamaIterator implements Iterator<MemcachedNode> {
 
-    final String key;
-    long hashVal;
-    int remainingTries;
-    int numTries = 0;
+    private final String key;
+    private long hashVal;
+    private int remainingTries;
+    private int numTries = 0;
 
     public KetamaIterator(final String k, final int t) {
       super();

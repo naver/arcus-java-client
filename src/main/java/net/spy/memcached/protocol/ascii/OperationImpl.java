@@ -39,8 +39,8 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   private static final String CHARSET = "UTF-8";
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-  OperationReadType readType = OperationReadType.LINE;
-  boolean foundCr = false;
+  private OperationReadType readType = OperationReadType.LINE;
+  private boolean foundCr = false;
 
   protected OperationImpl() {
     super();

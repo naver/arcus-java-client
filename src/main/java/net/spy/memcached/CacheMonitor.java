@@ -33,15 +33,15 @@ import org.apache.zookeeper.ZooKeeper;
 public class CacheMonitor extends SpyObject implements Watcher,
         ChildrenCallback {
 
-  ZooKeeper zk;
+  private final ZooKeeper zk;
 
-  String cacheListZPath;
+  private final String cacheListZPath;
 
-  String serviceCode;
+  private final String serviceCode;
 
-  volatile boolean dead;
+  private volatile boolean dead;
 
-  CacheMonitorListener listener;
+  private final CacheMonitorListener listener;
 
   /**
    * Constructor
@@ -144,6 +144,13 @@ public class CacheMonitor extends SpyObject implements Watcher,
       dead = true;
       listener.closing();
     }
+  }
+
+  /**
+   * Check if the cache monitor is dead.
+   */
+  public boolean isDead() {
+    return dead;
   }
 
   private String getInfo() {

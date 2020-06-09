@@ -19,9 +19,11 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,13 +35,13 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
 public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
-  TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
-  Collection<MemcachedNode> allNodes;
+  private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
+  private final Collection<MemcachedNode> allNodes;
 
-  HashAlgorithm hashAlg;
-  ArcusKetamaNodeLocatorConfiguration config;
+  private final HashAlgorithm hashAlg;
+  private final ArcusKetamaNodeLocatorConfiguration config;
 
-  Lock lock = new ReentrantLock();
+  private final Lock lock = new ReentrantLock();
 
   public ArcusKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
     this(nodes, alg, new ArcusKetamaNodeLocatorConfiguration());
@@ -236,12 +238,20 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     }
   }
 
+  public SortedMap<Long, SortedSet<MemcachedNode>> getKetamaNodes() {
+    return Collections.unmodifiableSortedMap(ketamaNodes);
+  }
+
+  public Collection<MemcachedNode> getAllNodes() {
+    return Collections.unmodifiableCollection(allNodes);
+  }
+
   class KetamaIterator implements Iterator<MemcachedNode> {
 
-    final String key;
-    long hashVal;
-    int remainingTries;
-    int numTries = 0;
+    private final String key;
+    private long hashVal;
+    private int remainingTries;
+    private int numTries = 0;
 
     public KetamaIterator(final String k, final int t) {
       super();
