@@ -25,8 +25,8 @@ import net.spy.memcached.internal.CollectionFuture;
 
 public class SopExistTest extends BaseIntegrationTest {
 
-  String key = "SopExistTest";
-  String value = "value";
+  private final String key = "SopExistTest";
+  private final String value = "value";
 
   @Override
   protected void setUp() throws Exception {

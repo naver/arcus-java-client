@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MopBulkAPITest extends BaseIntegrationTest {
 
-  private String key = "MopBulkAPITest33";
-  Map<String, Object> elements = new HashMap<String, Object>();
-  Map<String, Object> updateMap = new HashMap<String, Object>();
+  private final String key = "MopBulkAPITest33";
+  private final Map<String, Object> elements = new HashMap<String, Object>();
+  private final Map<String, Object> updateMap = new HashMap<String, Object>();
 
 
   private int getValueCount() {

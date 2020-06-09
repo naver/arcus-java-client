@@ -23,8 +23,8 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
 public class ProtocolSetDeleteTest extends TestCase {
-  Object value = "value";
-  Transcoder<Object> testTranscoder = new CollectionTranscoder();
+  private final Object value = "value";
+  private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
   public void testStringify() {
     // default setting : dropIfEmpty = true
