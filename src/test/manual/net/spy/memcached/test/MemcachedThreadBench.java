@@ -33,9 +33,9 @@ import net.spy.memcached.MemcachedClient;
 public class MemcachedThreadBench extends TestCase {
 
   private static class WorkerStat {
-    public int start, runs;
+    private int start, runs;
 
-    public long setterTime, getterTime;
+    private long setterTime, getterTime;
 
     public WorkerStat() {
       start = runs = 0;

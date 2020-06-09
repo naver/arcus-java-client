@@ -32,8 +32,8 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class LopBulkAPITest extends BaseIntegrationTest {
 
-  private String key = "LopBulkAPITest33";
-  List<Object> valueList = new ArrayList<Object>();
+  private final String key = "LopBulkAPITest33";
+  private final List<Object> valueList = new ArrayList<Object>();
 
   private int getValueCount() {
     return mc.getMaxPipedItemCount();

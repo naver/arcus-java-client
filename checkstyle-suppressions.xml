@@ -6,5 +6,4 @@
 
 <suppressions>
     <suppress checks="LineLength" files="OperationType\.java"/>
-    <suppress checks="VisibilityModifier" files="src/test/*"/>
 </suppressions>

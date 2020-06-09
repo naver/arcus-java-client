@@ -31,8 +31,8 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 
 public class SopBulkAPITest extends BaseIntegrationTest {
 
-  private String key = "SopBulkAPITest";
-  List<Object> valueList = new ArrayList<Object>();
+  private final String key = "SopBulkAPITest";
+  private final List<Object> valueList = new ArrayList<Object>();
 
   private int getValueCount() {
     return mc.getMaxPipedItemCount();

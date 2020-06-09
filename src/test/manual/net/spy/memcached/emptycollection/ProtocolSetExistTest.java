@@ -23,8 +23,8 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
 public class ProtocolSetExistTest extends TestCase {
-  Object value = "value";
-  Transcoder<Object> testTranscoder = new CollectionTranscoder();
+  private final Object value = "value";
+  private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
   public void testStringify() {
     SetExist<Object> exist = new SetExist<Object>(value, testTranscoder);

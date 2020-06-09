@@ -325,8 +325,8 @@ public class VariousTypeTest extends BaseIntegrationTest {
   private static final class UserDefinedClass implements Serializable {
     private static final long serialVersionUID = 8942558579188233740L;
 
-    public int i;
-    public List<String> list;
+    private final int i;
+    private final List<String> list;
 
     public UserDefinedClass() {
       this.i = 100;

@@ -35,7 +35,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 public class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
-  List<String> keyList = null;
+  private List<String> keyList = null;
 
   @Override
   protected void setUp() throws Exception {
