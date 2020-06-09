@@ -17,6 +17,9 @@
 /* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
+import net.spy.memcached.compat.log.Logger;
+import net.spy.memcached.compat.log.LoggerFactory;
+
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,10 +29,11 @@ import java.util.Map;
 public class ArcusReplNodeAddress extends InetSocketAddress {
 
   private static final long serialVersionUID = -1555690881482453720L;
-  boolean master;
-  String group;
-  String ip;
-  int port;
+  private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusReplNodeAddress.class);
+  private boolean master;
+  private final String group;
+  private final String ip;
+  private final int port;
 
   private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
     super(ip, port);
@@ -100,7 +104,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
       list = parseNodeNames(s);
     } catch (Exception e) {
       // May see an exception if nodes do not follow the replication naming convention
-      ArcusClient.arcusLogger.error("Exception caught while parsing node" +
+      arcusLogger.error("Exception caught while parsing node" +
               " addresses. cache_list=" + s + "\n" + e);
       e.printStackTrace();
       list = null;
@@ -142,7 +146,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
       List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
 
       if (newGroupNodes.size() >= 3) {
-        ArcusClient.arcusLogger.error(entry.getKey()
+        arcusLogger.error(entry.getKey()
                 + " group have too many node. " + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       } else if (newGroupNodes.size() == 2 &&
@@ -150,7 +154,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         /*
          * Two nodes have the same ip and port
          */
-        ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+        arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
                 + "Master and Slave nodes have the same ip and port. "
                 + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
@@ -159,7 +163,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         /*
          * Two nodes are master
          */
-        ArcusClient.arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
+        arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
                 + "This group have two master node. "
                 + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
@@ -170,13 +174,21 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
          * Maybe! this group have slave and slave node
          * or slave node only
          */
-        ArcusClient.arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
+        arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
                 + "This group don't have master node. "
                 + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       }
     }
     return newAllGroups;
+  }
+
+  public boolean isMaster() {
+    return master;
+  }
+
+  public void setMaster(boolean master) {
+    this.master = master;
   }
 }
 /* ENABLE_REPLICATION end */

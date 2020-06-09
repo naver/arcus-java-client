@@ -69,8 +69,8 @@ public class ArcusKetamaHashingTest extends TestCase {
     ArcusKetamaNodeLocator smLocator = new ArcusKetamaNodeLocator(
             smaller, HashAlgorithm.KETAMA_HASH);
 
-    SortedMap<Long, SortedSet<MemcachedNode>> lgMap = lgLocator.ketamaNodes;
-    SortedMap<Long, SortedSet<MemcachedNode>> smMap = smLocator.ketamaNodes;
+    SortedMap<Long, SortedSet<MemcachedNode>> lgMap = lgLocator.getKetamaNodes();
+    SortedMap<Long, SortedSet<MemcachedNode>> smMap = smLocator.getKetamaNodes();
 
     // Verify that EVERY entry in the smaller map has an equivalent
     // mapping in the larger map.

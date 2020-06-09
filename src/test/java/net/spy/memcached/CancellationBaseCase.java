@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
  * Base class for cancellation tests.
  */
 public abstract class CancellationBaseCase extends TestCase {
-  String serverList = "127.0.0.1:64213";
+  private static final String serverList = "127.0.0.1:64213";
   private MemcachedClient client = null;
 
   @Override

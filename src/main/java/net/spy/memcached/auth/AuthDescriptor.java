@@ -7,10 +7,10 @@ import javax.security.auth.callback.CallbackHandler;
  */
 public class AuthDescriptor {
 
-  public final String[] mechs;
-  public final CallbackHandler cbh;
+  private final String[] mechs;
+  private final CallbackHandler cbh;
   private int authAttempts;
-  private int allowedAuthAttempts;
+  private final int allowedAuthAttempts;
 
   /**
    * Request authentication using the given list of mechanisms and callback
@@ -54,5 +54,13 @@ public class AuthDescriptor {
       authAttempts++;
       return false;
     }
+  }
+
+  public String[] getMechs() {
+    return mechs;
+  }
+
+  public CallbackHandler getCallback() {
+    return cbh;
   }
 }

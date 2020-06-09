@@ -41,12 +41,12 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 
   protected boolean reverse;
 
-  public String key;
-  public int flag;
-  public long subkey;
-  public int dataLength;
+  private String key;
+  private int flag;
+  private long subkey;
+  private int dataLength;
 
-  public byte[] eflag = null;
+  private byte[] eflag = null;
 
   private ElementFlagFilter eFlagFilter;
 

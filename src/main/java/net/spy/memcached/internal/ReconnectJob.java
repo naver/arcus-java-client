@@ -21,10 +21,10 @@ import net.spy.memcached.ConnectionFactoryBuilder;
 
 public class ReconnectJob {
 
-  String hostPort;
-  String serviceCode;
-  ConnectionFactoryBuilder cfb;
-  ArcusClient[] client;
+  private final String hostPort;
+  private final String serviceCode;
+  private final ConnectionFactoryBuilder cfb;
+  private final ArcusClient[] client;
 
   public ReconnectJob(String hostPort, String serviceCode,
                       ConnectionFactoryBuilder cfb, ArcusClient[] client) {

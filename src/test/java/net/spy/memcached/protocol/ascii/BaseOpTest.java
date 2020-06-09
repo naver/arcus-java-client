@@ -88,7 +88,7 @@ public class BaseOpTest extends BaseMockCase {
     private final LinkedList<String> lines = new LinkedList<String>();
     private byte[] currentBytes = null;
     private int bytesToRead = 0;
-    public int linesToRead = 1;
+    private int linesToRead = 1;
 
     public SimpleOp(OperationReadType t) {
       setReadType(t);

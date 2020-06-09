@@ -90,14 +90,14 @@ public class AuthThread extends SpyThread {
 
   private Operation buildOperation(OperationStatus st, OperationCallback cb) {
     if (st == null) {
-      return opFact.saslAuth(authDescriptor.mechs,
+      return opFact.saslAuth(authDescriptor.getMechs(),
               node.getSocketAddress().toString(), null,
-              authDescriptor.cbh, cb);
+              authDescriptor.getCallback(), cb);
     } else {
-      return opFact.saslStep(authDescriptor.mechs,
+      return opFact.saslStep(authDescriptor.getMechs(),
               KeyUtil.getKeyBytes(st.getMessage()),
               node.getSocketAddress().toString(), null,
-              authDescriptor.cbh, cb);
+              authDescriptor.getCallback(), cb);
     }
 
   }

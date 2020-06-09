@@ -40,11 +40,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   protected Map<Integer, T> map;
 
-  public String key;
-  public int flag;
-  public Object subkey;
-  public int dataLength;
-  public byte[] eflag = null;
+  protected String key;
+  protected int flag;
+  protected Object subkey;
+  protected int dataLength;
+  protected byte[] eflag = null;
 
   protected BTreeGetBulkImpl(List<String> keyList, byte[] from, byte[] to,
                              ElementFlagFilter eFlagFilter, int offset, int count) {

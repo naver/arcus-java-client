@@ -12,7 +12,7 @@ import net.spy.memcached.MemcachedNode;
 public class DefaultKetamaNodeLocatorConfiguration implements
         KetamaNodeLocatorConfiguration {
 
-  final int NUM_REPS = 160;
+  private static final int NUM_REPS = 160;
 
   // Internal lookup map to try to carry forward the optimisation that was
   // previously in KetamaNodeLocator

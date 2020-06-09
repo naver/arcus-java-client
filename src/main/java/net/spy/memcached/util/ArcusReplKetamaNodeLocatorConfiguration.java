@@ -26,7 +26,7 @@ import java.util.Comparator;
 public class ArcusReplKetamaNodeLocatorConfiguration implements
         KetamaNodeLocatorConfiguration {
 
-  final int NUM_REPS = 160;
+  private static final int NUM_REPS = 160;
 
   public String getKeyForNode(MemcachedNode node, int repetition) {
     ArcusReplNodeAddress addr = (ArcusReplNodeAddress) node.getSocketAddress();

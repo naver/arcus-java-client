@@ -66,19 +66,19 @@ public class MemcachedConnectionTest extends TestCase {
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(1 == locator.allNodes.size());
+    assertTrue(1 == locator.getAllNodes().size());
 
     // 2nd test (nodes=3)
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(3 == locator.allNodes.size());
+    assertTrue(3 == locator.getAllNodes().size());
 
     // 3rd test (nodes=1)
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(1 == locator.allNodes.size());
+    assertTrue(1 == locator.getAllNodes().size());
   }
 
   public void testNodeManageQueue_empty() throws Exception {
@@ -89,7 +89,7 @@ public class MemcachedConnectionTest extends TestCase {
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(0 == locator.allNodes.size());
+    assertTrue(0 == locator.getAllNodes().size());
   }
 
   public void testNodeManageQueue_invalid_addr() throws Exception {
@@ -116,7 +116,7 @@ public class MemcachedConnectionTest extends TestCase {
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(2 == locator.allNodes.size());
+    assertTrue(2 == locator.getAllNodes().size());
   }
 
   public void testNodeManageQueue_twice() throws Exception {
@@ -128,7 +128,7 @@ public class MemcachedConnectionTest extends TestCase {
     conn.handleNodeManageQueue();
 
     // then
-    assertTrue(1 == locator.allNodes.size());
+    assertTrue(1 == locator.getAllNodes().size());
   }
 
   public void testAddOperations() throws Exception {

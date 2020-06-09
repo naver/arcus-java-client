@@ -51,8 +51,8 @@ public enum CollectionType {
           CollectionOverflowAction.largest_silent_trim,
           CollectionOverflowAction.largest_trim)),;
 
-  private Set<CollectionOverflowAction> availableOverflowAction;
-  String stringValue;
+  private final Set<CollectionOverflowAction> availableOverflowAction;
+  private final String stringValue;
 
   CollectionType(String stringValue, Set<CollectionOverflowAction> available) {
     this.stringValue = stringValue;

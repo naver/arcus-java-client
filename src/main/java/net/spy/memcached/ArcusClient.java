@@ -181,21 +181,21 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
 
-  static String VERSION;
-  static Logger arcusLogger = LoggerFactory.getLogger("net.spy.memcached");
-  static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
-  public boolean dead;
+  private static String VERSION;
+  private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);
+  private static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
+  private boolean dead;
 
   // final BulkService bulkService;
-  final Transcoder<Object> collectionTranscoder;
+  private final Transcoder<Object> collectionTranscoder;
 
-  final int smgetKeyChunkSize;
+  private final int smgetKeyChunkSize;
 
-  static final int BOPGET_BULK_CHUNK_SIZE = 200;
-  static final int NON_PIPED_BULK_INSERT_CHUNK_SIZE = 500;
+  private static final int BOPGET_BULK_CHUNK_SIZE = 200;
+  private static final int NON_PIPED_BULK_INSERT_CHUNK_SIZE = 500;
 
-  static final int MAX_GETBULK_ELEMENT_COUNT = 50;
-  static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
+  private static final int MAX_GETBULK_ELEMENT_COUNT = 50;
+  private static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
   private static final int MAX_MKEY_LENGTH = 250;
 
   private CacheManager cacheManager;
@@ -280,10 +280,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
     if (serviceCode.isEmpty()) {
       throw new IllegalArgumentException("Service code is empty.");
-    }
-
-    if (VERSION == null) {
-      VERSION = getVersion();
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
@@ -439,7 +435,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<CollectionAttributes> rv = new CollectionFuture<CollectionAttributes>(
             latch, operationTimeout);
     Operation op = opFact.getAttr(key, new GetAttrOperation.Callback() {
-      CollectionAttributes attrs = new CollectionAttributes();
+      private final CollectionAttributes attrs = new CollectionAttributes();
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus stat;
@@ -484,7 +480,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          List<T> list = new ArrayList<T>();
+          private final List<T> list = new ArrayList<T>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -583,7 +579,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          Set<T> set = new HashSet<T>();
+          private final Set<T> set = new HashSet<T>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -664,7 +660,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
+          private final TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
                   (reverse) ? Collections.reverseOrder() : null);
 
           public void receivedStatus(OperationStatus status) {
@@ -746,7 +742,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          HashMap<String, T> map = new HashMap<String, T>();
+          private final HashMap<String, T> map = new HashMap<String, T>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -905,7 +901,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionPipedInsert(key, insert,
         new CollectionPipedInsertOperation.Callback() {
-          Map<Integer, CollectionOperationStatus> result =
+          private final Map<Integer, CollectionOperationStatus> result =
                   new TreeMap<Integer, CollectionOperationStatus>();
 
           public void receivedStatus(OperationStatus status) {
@@ -965,7 +961,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionPipedUpdate(key, update,
         new CollectionPipedUpdateOperation.Callback() {
-          Map<Integer, CollectionOperationStatus> result =
+          private final Map<Integer, CollectionOperationStatus> result =
               new TreeMap<Integer, CollectionOperationStatus>();
 
           public void receivedStatus(OperationStatus status) {
@@ -2245,7 +2241,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (BTreeSMGet<T> smGet : smGetList) {
       Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperationOld.Callback() {
-        final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
+        private final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
 
         @Override
         public void receivedStatus(OperationStatus status) {
@@ -2460,8 +2456,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (BTreeSMGet<T> smGet : smGetList) {
       Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
-        final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
-        final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
+        private final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
+        private final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
 
         @Override
         public void receivedStatus(OperationStatus status) {
@@ -2976,7 +2972,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          TreeMap<ByteArrayBKey, Element<T>> map = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
+          private final TreeMap<ByteArrayBKey, Element<T>> map
+              = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
                   (reverse) ? Collections.reverseOrder() : null);
 
           public void receivedStatus(OperationStatus status) {
@@ -3101,7 +3098,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.bopGetByPosition(k, get, new BTreeGetByPositionOperation.Callback() {
 
-      TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>(
+      private final TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>(
               (reverse) ? Collections.reverseOrder() : null);
 
       public void receivedStatus(OperationStatus status) {
@@ -3204,7 +3201,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.bopFindPosition(k, get, new BTreeFindPositionOperation.Callback() {
 
-      int position = 0;
+      private int position = 0;
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus;
@@ -3326,7 +3323,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.bopFindPositionWithGet(k, get,
         new BTreeFindPositionWithGetOperation.Callback() {
 
-          TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
+          private final TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -3496,7 +3493,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.bopInsertAndGet(k, get, co.getData(),
         new BTreeInsertAndGetOperation.Callback() {
-          Element<E> element = null;
+          private Element<E> element = null;
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -3668,9 +3665,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.collectionPipedExist(key, exist,
         new CollectionPipedExistOperation.Callback() {
 
-          Map<T, Boolean> result = new HashMap<T, Boolean>();
+          private final Map<T, Boolean> result = new HashMap<T, Boolean>();
 
-          boolean hasAnError = false;
+          private boolean hasAnError = false;
 
           public void receivedStatus(OperationStatus status) {
             if (hasAnError)
@@ -4496,29 +4493,34 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    *
    * @return version string
    */
-  private static String getVersion() {
-    Enumeration<URL> resEnum;
-    try {
-      resEnum = Thread.currentThread().getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
-      while (resEnum.hasMoreElements()) {
-        try {
-          URL url = resEnum.nextElement();
-          InputStream is = url.openStream();
-          if (is != null) {
-            Manifest manifest = new Manifest(is);
-            java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
-            String version = mainAttribs.getValue("Arcusclient-Version");
-            if (version != null) {
-              return version;
+  public static String getVersion() {
+    if (VERSION == null) {
+      Enumeration<URL> resEnum;
+      try {
+        resEnum = Thread.currentThread()
+            .getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
+        while (resEnum.hasMoreElements()) {
+          try {
+            URL url = resEnum.nextElement();
+            InputStream is = url.openStream();
+            if (is != null) {
+              Manifest manifest = new Manifest(is);
+              java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
+              String version = mainAttribs.getValue("Arcusclient-Version");
+              if (version != null) {
+                return version;
+              }
             }
-          }
-        } catch (Exception e) {
+          } catch (Exception e) {
 
+          }
         }
+      } catch (IOException e1) {
+        return "NONE";
       }
-    } catch (IOException e1) {
       return "NONE";
     }
-    return "NONE";
+
+    return VERSION;
   }
 }

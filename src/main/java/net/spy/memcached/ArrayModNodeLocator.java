@@ -27,7 +27,7 @@ import java.util.List;
  */
 public final class ArrayModNodeLocator implements NodeLocator {
 
-  final MemcachedNode[] nodes;
+  private final MemcachedNode[] nodes;
 
   private final HashAlgorithm hashAlg;
 

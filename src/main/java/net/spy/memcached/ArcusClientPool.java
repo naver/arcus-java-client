@@ -52,9 +52,9 @@ import net.spy.memcached.transcoders.Transcoder;
  */
 public class ArcusClientPool implements ArcusClientIF {
 
-  int poolSize;
-  ArcusClient[] client;
-  Random rand;
+  private final int poolSize;
+  private final ArcusClient[] client;
+  private final Random rand;
 
   public ArcusClientPool(int poolSize, ArcusClient[] client) {
 

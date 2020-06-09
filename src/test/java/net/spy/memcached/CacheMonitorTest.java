@@ -102,13 +102,13 @@ public class CacheMonitorTest extends MockObjectTestCase {
     listener.expects(once()).method("closing");
     cacheMonitor.processResult(
         code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-    assertTrue(cacheMonitor.dead);
+    assertTrue(cacheMonitor.isDead());
 
     code = Code.NOAUTH;
     listener.expects(once()).method("closing");
     cacheMonitor.processResult(
         code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
-    assertTrue(cacheMonitor.dead);
+    assertTrue(cacheMonitor.isDead());
 
     code = Code.CONNECTIONLOSS;
     cacheMonitor.processResult(
@@ -153,7 +153,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
     cacheMonitor.process(event);
 
     // then
-    assertTrue(cacheMonitor.dead);
+    assertTrue(cacheMonitor.isDead());
   }
 
   public void testProcess_nodeChildrenChanged() throws Exception {

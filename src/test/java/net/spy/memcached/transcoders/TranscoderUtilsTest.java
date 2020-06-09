@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 public class TranscoderUtilsTest extends TestCase {
 
   private TranscoderUtils tu;
-  byte[] oversizeBytes = new byte[16];
+  private final byte[] oversizeBytes = new byte[16];
 
   @Override
   protected void setUp() throws Exception {
