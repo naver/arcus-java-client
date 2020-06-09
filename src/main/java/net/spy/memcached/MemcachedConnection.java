@@ -616,7 +616,7 @@ public final class MemcachedConnection extends SpyObject {
         getLogger().info("new memcached node connected to %s immediately", qa);
         // FIXME.  Do we ever execute this path?
         // This method does not call observer.connectionEstablished.
-        qa.connected();
+        connected(qa);
       } else {
         getLogger().info("new memcached node added %s to connect queue", qa);
         ops = SelectionKey.OP_CONNECT;
@@ -995,6 +995,8 @@ public final class MemcachedConnection extends SpyObject {
           int ops = 0;
           if (ch.connect(qa.getSocketAddress())) {
             getLogger().info("Immediately reconnected to %s", qa);
+            connected(qa);
+            addedQueue.offer(qa);
             assert ch.isConnected();
           } else {
             ops = SelectionKey.OP_CONNECT;
