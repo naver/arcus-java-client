@@ -4495,30 +4495,27 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    */
   public static String getVersion() {
     if (VERSION == null) {
+      VERSION = "NONE";
+
       Enumeration<URL> resEnum;
       try {
         resEnum = Thread.currentThread()
             .getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
         while (resEnum.hasMoreElements()) {
-          try {
-            URL url = resEnum.nextElement();
-            InputStream is = url.openStream();
-            if (is != null) {
-              Manifest manifest = new Manifest(is);
-              java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
-              String version = mainAttribs.getValue("Arcusclient-Version");
-              if (version != null) {
-                return version;
-              }
+          URL url = resEnum.nextElement();
+          InputStream is = url.openStream();
+          if (is != null) {
+            Manifest manifest = new Manifest(is);
+            java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
+            String version = mainAttribs.getValue("Arcusclient-Version");
+            if (version != null) {
+              VERSION = version;
             }
-          } catch (Exception e) {
-
           }
         }
-      } catch (IOException e1) {
-        return "NONE";
+      } catch (Exception e) {
+        // Failed to get version.
       }
-      return "NONE";
     }
 
     return VERSION;
