@@ -42,7 +42,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
     try {
       mc.delete(KEY).get();
     } catch (Exception e) {
-
+      // test success.
     }
     Assert.assertNull(mc.asyncGetAttr(KEY).get());
   }

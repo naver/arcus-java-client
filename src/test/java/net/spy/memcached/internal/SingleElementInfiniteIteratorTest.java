@@ -24,6 +24,7 @@ public class SingleElementInfiniteIteratorTest extends TestCase {
       iterator.remove();
       fail("Expected UnsupportedOperationException on a remove.");
     } catch (UnsupportedOperationException e) {
+      // test success.
     }
   }
 }

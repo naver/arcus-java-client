@@ -129,7 +129,7 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
       try {
         list.add(new Attribute(attribute, getAttribute(attribute)));
       } catch (Exception e) {
-
+        // Failed to get attributes.
       }
     }
 

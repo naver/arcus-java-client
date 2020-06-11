@@ -30,6 +30,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
       deleteList(key, 1000);
       super.tearDown();
     } catch (Exception e) {
+      // test success.
     }
   }
 
@@ -124,6 +125,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
                               : null)).get(1000, TimeUnit.MILLISECONDS);
       fail("should be failed");
     } catch (Exception e) {
+      // test success.
     }
     return result;
   }

@@ -51,6 +51,7 @@ public class CollectionTranscoder extends SerializingTranscoder implements
   public static int examineFlags(ElementValueType type) {
     int flags = 0;
     if (type == ElementValueType.STRING) {
+      // string type has no flags.
     } else if (type == ElementValueType.LONG) {
       flags |= SPECIAL_LONG;
     } else if (type == ElementValueType.INTEGER) {

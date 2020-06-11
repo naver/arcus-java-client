@@ -69,15 +69,14 @@
         <!-- Block Checks                                             -->
         <!-- see https://checkstyle.sourceforge.io/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
-        <!--
         <module name="EmptyBlock">
-            <property name="option" value="TEXT"/>
-            <property name="tokens"
-                      value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+          <property name="option" value="text" />
+          <property name="tokens"
+                    value="LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY,
+                    LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_CATCH, LITERAL_WHILE,
+                    INSTANCE_INIT, STATIC_INIT" />
         </module>
-        <module name="EmptyCatchBlock">
-            <property name="exceptionVariableName" value="expected"/>
-        </module>
+        <!--
         <module name="LeftCurly">
             <property name="tokens"
                       value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF,

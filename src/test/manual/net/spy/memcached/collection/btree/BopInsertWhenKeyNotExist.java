@@ -89,6 +89,7 @@ public class BopInsertWhenKeyNotExist extends BaseIntegrationTest {
                               : null)).get(1000, TimeUnit.MILLISECONDS);
       fail("should be failed");
     } catch (Exception e) {
+      // test success.
     }
     return result;
   }
