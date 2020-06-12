@@ -5,6 +5,7 @@ package net.spy.memcached.protocol;
 
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Wrapper callback for use in optimized gets.
@@ -12,7 +13,7 @@ import net.spy.memcached.ops.OperationStatus;
 public class GetCallbackWrapper implements GetOperation.Callback {
 
   private static final OperationStatus END =
-          new OperationStatus(true, "END");
+          new OperationStatus(true, "END", StatusCode.SUCCESS);
 
   private boolean completed = false;
   private int remainingKeys = 0;

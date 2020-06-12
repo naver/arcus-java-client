@@ -25,6 +25,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatsOperation;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Operation to retrieve statistics from a memcached server.
@@ -32,7 +33,8 @@ import net.spy.memcached.ops.StatsOperation;
 final class StatsOperationImpl extends OperationImpl
         implements StatsOperation {
 
-  private static final OperationStatus END = new OperationStatus(true, "END");
+  private static final OperationStatus END =
+          new OperationStatus(true, "END", StatusCode.SUCCESS);
 
   private static final byte[] MSG = "stats\r\n".getBytes();
 

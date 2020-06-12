@@ -10,13 +10,15 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Base class for get and gets handlers.
  */
 abstract class BaseGetOpImpl extends OperationImpl {
 
-  private static final OperationStatus END = new OperationStatus(true, "END");
+  private static final OperationStatus END =
+          new OperationStatus(true, "END", StatusCode.SUCCESS);
   private static final String RN_STRING = "\r\n";
   private final String cmd;
   private final Collection<String> keys;

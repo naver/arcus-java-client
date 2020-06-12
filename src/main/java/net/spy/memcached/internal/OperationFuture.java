@@ -24,8 +24,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Managed future for operations.
@@ -34,10 +37,11 @@ import net.spy.memcached.ops.OperationState;
  *
  * @param <T> Type of object returned from this future.
  */
-public class OperationFuture<T> implements Future<T> {
+public class OperationFuture<T> extends SpyObject implements Future<T> {
 
   protected final CountDownLatch latch;
   private final AtomicReference<T> objRef;
+  protected OperationStatus status;
   private final long timeout;
   private Operation op;
 
@@ -50,6 +54,7 @@ public class OperationFuture<T> implements Future<T> {
     super();
     latch = l;
     objRef = oref;
+    status = null;
     timeout = opTimeout;
   }
 
@@ -91,8 +96,22 @@ public class OperationFuture<T> implements Future<T> {
     return objRef.get();
   }
 
-  public void set(T o) {
+  public OperationStatus getStatus() {
+    if (status == null) {
+      try {
+        get();
+      } catch (InterruptedException e) {
+        status = new OperationStatus(false, "Interrupted", StatusCode.INTERRUPTED);
+      } catch (ExecutionException e) {
+        getLogger().warn("Error getting status of operation", e);
+      }
+    }
+    return status;
+  }
+
+  public void set(T o, OperationStatus s) {
     objRef.set(o);
+    status = s;
   }
 
   public void setOperation(Operation to) {

@@ -11,6 +11,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.VersionOperation;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Operation to request the version of a memcached server.
@@ -30,9 +31,10 @@ final class VersionOperationImpl extends OperationImpl
   public void handleLine(String line) {
     OperationStatus cause;
     if (line.startsWith("VERSION ")) {
-      cause = new OperationStatus(true, line.substring("VERSION ".length()));
+      cause = new OperationStatus(
+              true, line.substring("VERSION ".length()), StatusCode.SUCCESS);
     } else {
-      cause = new OperationStatus(false, line);
+      cause = new OperationStatus(false, line, StatusCode.fromAsciiLine(line));
     }
     getCallback().receivedStatus(cause);
     transitionState(OperationState.COMPLETE);

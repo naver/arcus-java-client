@@ -17,11 +17,13 @@
 package net.spy.memcached.plugin;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.sf.ehcache.Element;
+import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Future returned for GET operations.
@@ -30,11 +32,15 @@ import net.sf.ehcache.Element;
  *
  * @param <T> Type of object returned from the get
  */
-public class FrontCacheGetFuture<T> implements Future<T> {
+public class FrontCacheGetFuture<T> extends GetFuture<T> {
 
+  private static final OperationStatus END =
+          new OperationStatus(true, "END", StatusCode.SUCCESS);
   private final Element element;
 
+
   public FrontCacheGetFuture(Element element) {
+    super(null, 0);
     this.element = element;
   }
 
@@ -46,6 +52,11 @@ public class FrontCacheGetFuture<T> implements Future<T> {
   @Override
   public T get() throws InterruptedException, ExecutionException {
     return getValue();
+  }
+
+  @Override
+  public OperationStatus getStatus() {
+    return END;
   }
 
   @SuppressWarnings("unchecked")

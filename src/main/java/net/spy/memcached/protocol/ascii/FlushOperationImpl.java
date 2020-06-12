@@ -10,6 +10,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Memcached flush_all operation.
@@ -20,7 +21,7 @@ final class FlushOperationImpl extends OperationImpl
   private static final byte[] FLUSH = "flush_all\r\n".getBytes();
 
   private static final OperationStatus OK =
-          new OperationStatus(true, "OK");
+          new OperationStatus(true, "OK", StatusCode.SUCCESS);
 
   private final int delay;
 

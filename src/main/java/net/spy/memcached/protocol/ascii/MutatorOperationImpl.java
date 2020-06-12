@@ -30,6 +30,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Operation for mutating integers inside of memcached.
@@ -40,9 +41,9 @@ final class MutatorOperationImpl extends OperationImpl
   public static final int OVERHEAD = 32;
 
   private static final OperationStatus NOT_FOUND =
-          new OperationStatus(false, "NOT_FOUND");
+          new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
   private static final OperationStatus TYPE_MISMATCH =
-          new OperationStatus(false, "TYPE_MISMATCH");
+          new OperationStatus(false, "TYPE_MISMATCH", StatusCode.ERR_TYPE_MISMATCH);
 
   private final Mutator mutator;
   private final String key;

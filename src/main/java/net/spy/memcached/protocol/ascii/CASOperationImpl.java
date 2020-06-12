@@ -14,6 +14,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.ops.StatusCode;
 
 class CASOperationImpl extends OperationImpl implements CASOperation {
 
@@ -23,11 +24,14 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
   private static final int OVERHEAD = 64;
 
   private static final OperationStatus STORED =
-          new CASOperationStatus(true, "STORED", CASResponse.OK);
+          new CASOperationStatus(true, "STORED",
+                  CASResponse.OK, StatusCode.SUCCESS);
   private static final OperationStatus NOT_FOUND =
-          new CASOperationStatus(false, "NOT_FOUND", CASResponse.NOT_FOUND);
+          new CASOperationStatus(false, "NOT_FOUND",
+                  CASResponse.NOT_FOUND, StatusCode.ERR_NOT_FOUND);
   private static final OperationStatus EXISTS =
-          new CASOperationStatus(false, "EXISTS", CASResponse.EXISTS);
+          new CASOperationStatus(false, "EXISTS",
+                  CASResponse.EXISTS, StatusCode.ERR_EXISTS);
 
   private final String key;
   private final long casValue;
