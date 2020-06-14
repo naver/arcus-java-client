@@ -24,6 +24,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Arcus flush by prefix operation.
@@ -31,8 +32,10 @@ import net.spy.memcached.ops.OperationType;
 final class FlushByPrefixOperationImpl extends OperationImpl implements
         FlushOperation {
 
-  private static final OperationStatus OK = new OperationStatus(true, "OK");
-  private static final OperationStatus NOT_FOUND = new OperationStatus(false, "NOT_FOUND");
+  private static final OperationStatus OK =
+          new OperationStatus(true, "OK", StatusCode.SUCCESS);
+  private static final OperationStatus NOT_FOUND =
+          new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
 
   private final String prefix;
   private final int delay;

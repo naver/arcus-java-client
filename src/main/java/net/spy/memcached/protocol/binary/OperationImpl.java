@@ -12,6 +12,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.protocol.BaseOperationImpl;
 
 /**
@@ -32,16 +33,20 @@ abstract class OperationImpl extends BaseOperationImpl {
   protected static final int ERR_NOT_STORED = 5;
 
   protected static final OperationStatus NOT_FOUND_STATUS =
-          new CASOperationStatus(false, "Not Found", CASResponse.NOT_FOUND);
+          new CASOperationStatus(false, "Not Found",
+                  CASResponse.NOT_FOUND, StatusCode.ERR_NOT_FOUND);
   protected static final OperationStatus EXISTS_STATUS =
-          new CASOperationStatus(false, "Object exists", CASResponse.EXISTS);
+          new CASOperationStatus(false, "Object exists",
+                  CASResponse.EXISTS, StatusCode.ERR_EXISTS);
   protected static final OperationStatus NOT_STORED_STATUS =
-          new CASOperationStatus(false, "Not Stored", CASResponse.NOT_FOUND);
+          new CASOperationStatus(false, "Not Stored",
+                  CASResponse.NOT_FOUND, StatusCode.ERR_NOT_STORED);
 
   protected static final byte[] EMPTY_BYTES = new byte[0];
 
   protected static final OperationStatus STATUS_OK =
-          new CASOperationStatus(true, "OK", CASResponse.OK);
+          new CASOperationStatus(true, "OK",
+                  CASResponse.OK, StatusCode.SUCCESS);
 
   private static final AtomicInteger seqNumber = new AtomicInteger(0);
 

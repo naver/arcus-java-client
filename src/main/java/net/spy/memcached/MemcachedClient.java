@@ -354,7 +354,7 @@ public class MemcachedClient extends SpyThread
     Operation op = opFact.store(storeType, key, co.getFlags(),
             exp, co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus val) {
-                rv.set(val.isSuccess());
+                rv.set(val.isSuccess(), val);
               }
 
               public void complete() {
@@ -381,7 +381,7 @@ public class MemcachedClient extends SpyThread
     Operation op = opFact.cat(catType, cas, key, co.getData(),
         new OperationCallback() {
           public void receivedStatus(OperationStatus val) {
-            rv.set(val.isSuccess());
+            rv.set(val.isSuccess(), val);
           }
 
           public void complete() {
@@ -508,11 +508,11 @@ public class MemcachedClient extends SpyThread
             co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus val) {
                 if (val instanceof CASOperationStatus) {
-                  rv.set(((CASOperationStatus) val).getCASResponse());
+                  rv.set(((CASOperationStatus) val).getCASResponse(), val);
                 } else if (val instanceof CancelledOperationStatus) {
-                  rv.set(CASResponse.CANCELED);
+                  rv.set(CASResponse.CANCELED, val);
                 } else {
-                  rv.set(CASResponse.UNDEFINED);
+                  rv.set(CASResponse.UNDEFINED, val);
                 }
               }
 
@@ -870,7 +870,7 @@ public class MemcachedClient extends SpyThread
           private Future<T> val = null;
 
           public void receivedStatus(OperationStatus status) {
-            rv.set(val);
+            rv.set(val, status);
           }
 
           public void gotData(String k, int flags, byte[] data) {
@@ -927,7 +927,7 @@ public class MemcachedClient extends SpyThread
           private CASValue<T> val = null;
 
           public void receivedStatus(OperationStatus status) {
-            rv.set(val);
+            rv.set(val, status);
           }
 
           public void gotData(String k, int flags, long cas, byte[] data) {
@@ -1530,7 +1530,7 @@ public class MemcachedClient extends SpyThread
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
         new OperationCallback() {
           public void receivedStatus(OperationStatus s) {
-            rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"));
+            rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"), s);
           }
 
           public void complete() {
@@ -1671,7 +1671,7 @@ public class MemcachedClient extends SpyThread
     DeleteOperation op = opFact.delete(key,
         new OperationCallback() {
           public void receivedStatus(OperationStatus s) {
-            rv.set(s.isSuccess());
+            rv.set(s.isSuccess(), s);
           }
 
           public void complete() {

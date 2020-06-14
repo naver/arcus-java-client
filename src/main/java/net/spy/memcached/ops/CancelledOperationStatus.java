@@ -6,7 +6,7 @@ package net.spy.memcached.ops;
 public class CancelledOperationStatus extends OperationStatus {
 
   public CancelledOperationStatus() {
-    super(false, "cancelled");
+    super(false, "cancelled", StatusCode.CANCELLED);
   }
 
 }

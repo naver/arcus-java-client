@@ -392,7 +392,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.store(storeType, key, co.getFlags(),
             exp, co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus val) {
-                rv.set(val.isSuccess());
+                rv.set(val.isSuccess(), val);
               }
 
               public void complete() {
