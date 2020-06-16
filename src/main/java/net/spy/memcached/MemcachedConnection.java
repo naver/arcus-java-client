@@ -160,8 +160,7 @@ public final class MemcachedConnection extends SpyObject {
         } else {
           int sops = qa.getSk().interestOps();
           assert sops == SelectionKey.OP_CONNECT
-                  : "Not connected, and not watching for connect: "
-                  + sops;
+                  : "Not connected, and not watching for connect: " + sops;
         }
       }
     }
@@ -221,12 +220,10 @@ public final class MemcachedConnection extends SpyObject {
                 ReconnDelay.DEFAULT, "too many empty selects");
           }
         }
-        assert emptySelects < EXCESSIVE_EMPTY
-                : "Too many empty selects";
+        assert emptySelects < EXCESSIVE_EMPTY : "Too many empty selects";
       }
     } else {
-      getLogger().debug("Selected %d, selected %d keys",
-              selected, selectedKeys.size());
+      getLogger().debug("Selected %d, selected %d keys", selected, selectedKeys.size());
       emptySelects = 0;
 
       for (SelectionKey sk : selectedKeys) {
@@ -240,13 +237,11 @@ public final class MemcachedConnection extends SpyObject {
     for (SelectionKey sk : selector.keys()) {
       MemcachedNode mn = (MemcachedNode) sk.attachment();
       if (mn.getContinuousTimeout() > timeoutExceptionThreshold) {
-        getLogger().warn(
-                "%s exceeded continuous timeout threshold. >%s (%s)",
+        getLogger().warn("%s exceeded continuous timeout threshold. >%s (%s)",
                 mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
       } else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold) {
-        getLogger().warn(
-                "%s exceeded timeout ratio threshold. >%s (%s)",
+        getLogger().warn("%s exceeded timeout ratio threshold. >%s (%s)",
                 mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
       }
@@ -833,8 +828,7 @@ public final class MemcachedConnection extends SpyObject {
     } catch (ConnectException e) {
       // Failures to establish a connection should attempt a reconnect
       // without signaling the observers.
-      getLogger().warn("Reconnecting due to failure to connect to %s",
-              qa, e);
+      getLogger().warn("Reconnecting due to failure to connect to %s", qa, e);
       queueReconnect(qa, ReconnDelay.DEFAULT, "failure to connect");
     } catch (OperationException e) {
       qa.setupForAuth("operation exception"); // noop if !shouldAuth
@@ -881,12 +875,10 @@ public final class MemcachedConnection extends SpyObject {
         }
         currentOp.readFromBuffer(rbuf);
         if (currentOp.getState() == OperationState.COMPLETE) {
-          getLogger().debug(
-                  "Completed read op: %s and giving the next %d bytes",
+          getLogger().debug("Completed read op: %s and giving the next %d bytes",
                   currentOp, rbuf.remaining());
           Operation op = qa.removeCurrentReadOp();
-          assert op == currentOp
-                  : "Expected to pop " + currentOp + " got " + op;
+          assert op == currentOp : "Expected to pop " + currentOp + " got " + op;
           currentOp = qa.getCurrentReadOp();
         }
         /* ENABLE_REPLICATION if */
@@ -941,8 +933,7 @@ public final class MemcachedConnection extends SpyObject {
         if (qa.getChannel() != null) {
           qa.getChannel().close();
         } else {
-          getLogger().info("The channel or socket was null for %s",
-                  qa);
+          getLogger().info("The channel or socket was null for %s", qa);
         }
       } catch (IOException e) {
         getLogger().warn("IOException trying to close a socket", e);
@@ -1001,8 +992,7 @@ public final class MemcachedConnection extends SpyObject {
             added++;
           }
         }
-        assert added > 0
-                : "Didn't add any new operations when redistributing";
+        assert added > 0 : "Didn't add any new operations when redistributing";
       } else {
         // Cancel things that don't have definite targets.
         op.cancel(cause);
