@@ -87,7 +87,6 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         // an unexpected format.  Abort the whole method instead of
         // trying to ignore malformed strings.
         // Is this the right behavior?  FIXME
-
         a = ArcusReplNodeAddress.create(group, master, ipport);
       }
       addrs.add(a);
@@ -132,51 +131,44 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         gNodeList = new ArrayList<ArcusReplNodeAddress>();
         newAllGroups.put(groupName, gNodeList);
       }
-            /* Make a master node the first element of node list. */
-      if (a.master) /* shifts the element currently at that position */
+      // Add the master node as the first element of node list.
+      if (a.master) // shifts the element currently at that position
         gNodeList.add(0, a);
-      else /* Don't care the index, just add. */
+      else // Don't care the index, just add it.
         gNodeList.add(a);
     }
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-      /* If newGroupNodes is validate
-       * then newGroupNodes is sorted by master / slave
-       */
+      // If newGroupNodes is valid, it is sorted by master and slave order.
       List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
 
       if (newGroupNodes.size() >= 3) {
-        arcusLogger.error(entry.getKey()
-                + " group have too many node. " + newGroupNodes);
+        arcusLogger.error("Invalid group " + entry.getKey() + " : "
+                + " Too many nodes. " + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       } else if (newGroupNodes.size() == 2 &&
               newGroupNodes.get(0).getIPPort().equals(newGroupNodes.get(1).getIPPort())) {
-        /*
-         * Two nodes have the same ip and port
-         */
-        arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
-                + "Master and Slave nodes have the same ip and port. "
-                + newGroupNodes);
+        // Two nodes have the same ip and port.
+        arcusLogger.error("Invalid group " + entry.getKey() + " : "
+                + "Two nodes have the same ip and port. " + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       } else if (newGroupNodes.size() == 2 &&
               newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
-        /*
-         * Two nodes are master
-         */
-        arcusLogger.error("Group " + entry.getKey() + " have invalid state. "
-                + "This group have two master node. "
-                + newGroupNodes);
+        // Two nodes are masters.
+        arcusLogger.error("Invalid group " + entry.getKey() + " : "
+                + "Two master nodes exist. " + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       } else if (!newGroupNodes.get(0).master) {
-        /*
-         * Fake group (node) is always master...
-         *
-         * Maybe! this group have slave and slave node
-         * or slave node only
+        /* This case can occur during the switchover or failover.
+         * 1) In the switchover, it occurs after below the first phase. 
+         * - the old master is changed to the new slave node.
+         * - the old slave is changed to the new master node.
+         * 2) In the failover, it occurs after below the first phase.
+         * - the old master is removed by abnormal shutdown.
+         * - the old slave is changed to the new master node.
          */
-        arcusLogger.info("Group " + entry.getKey() + " have invalid state. "
-                + "This group don't have master node. "
-                + newGroupNodes);
+        arcusLogger.info("Invalid group " + entry.getKey() + " : "
+                + "Master does not exist. " + newGroupNodes);
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       }
     }
