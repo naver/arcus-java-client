@@ -48,7 +48,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   }
 
   public String toString() {
-    return "Group(" + group + ") Address(" + ip + ":" + port + ") " + (master ? "MASTER" : "SLAVE");
+    return "{" + group + " " + (master ? "M" : "S") + " " + ip + ":" + port + "}";
   }
 
   public String getIPPort() {
