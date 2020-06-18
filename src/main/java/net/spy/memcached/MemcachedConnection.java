@@ -1012,6 +1012,11 @@ public final class MemcachedConnection extends SpyObject {
       final MemcachedNode qa = i.next();
       i.remove();
       try {
+        if (qa.getChannel() != null) {
+          getLogger().info("Skipping reconnect request that already reconnected to %s", qa);
+          continue;
+        }
+
         if (!seen.containsKey(qa)) {
           seen.put(qa, Boolean.TRUE);
           getLogger().info("Reconnecting %s", qa);
