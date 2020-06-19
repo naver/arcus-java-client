@@ -333,16 +333,16 @@ public class CacheManager extends SpyThread implements Watcher,
   }
 
   private String getAddressListString(List<String> children) {
-    String addrs = "";
+    StringBuilder addrs = new StringBuilder();
     for (int i = 0; i < children.size(); i++) {
       String[] temp = children.get(i).split("-");
       if (i != 0) {
-        addrs = addrs + "," + temp[0];
+        addrs.append(",").append(temp[0]);
       } else {
-        addrs = temp[0];
+        addrs.append(temp[0]);
       }
     }
-    return addrs;
+    return addrs.toString();
   }
 
   /**
