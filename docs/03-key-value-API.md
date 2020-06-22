@@ -48,18 +48,21 @@ Future<Boolean> append(long cas, String key, Object val)
   초기에 CAS(compare-and-set) 연산으로 수행하기 위한 용도로 필요했던 인자이다.
 
 
-그리고, 한번의 API 호출로 다수의 key-value items을 set하는 bulk API를 제공한다.
+그리고, 한번의 API 호출로 다수의 key-value items을 저장하는 bulk API를 제공한다.
 
 ```java
-Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key, int exp, Object obj)
-Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> map, int exp)
+Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, List<String> key, int exp, Object obj)
+Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, Map<String, Object> map, int exp)
 ```
 
-- 다수의 key-value item을 한번에 set한다.
-- 전자는 key list의 모든 key에 대해 동일한 obj로 set 연산을 한번에 수행하며, 
-  후자는 map에 있는 모든 \<key, obj\>에 대해 set 연산을 한번에 수행한다.
+- 다수의 key-value item을 한번에 저장한다.
+- 전자는 key list의 모든 key에 대해 동일한 obj로 저장 연산을 한번에 수행하며,
+  후자는 map에 있는 모든 \<key, obj\>에 대해 저장 연산을 한번에 수행한다.
 - 저장된 key-value item들은 모두 exp 초 이후에 삭제된다.
-
+- StoreType은 연산의 저장 유형을 지정한다. 아래의 유형이 있다.
+  - StoreType.set
+  - StoreType.add
+  - StoreType.replace
 
 expiration은 key가 현재 시간부터 expire 될 때까지의 시간(초 단위)을 입력한다.
 시간이 30일을 초과하는 경우 expire 될 unix time을 입력한다.
@@ -67,6 +70,13 @@ expiration은 key가 현재 시간부터 expire 될 때까지의 시간(초 단�
 
 - 0: key가 expire 되지 않도록 설정한다. 하지만 Arcus cache server의 메모리가 부족한 경우 LRU에 의해 언제든지 삭제될 수 있다.
 - -1: key를 sticky item으로 만든다. Sticky item은 expire 되지 않으며 LRU에 의해 삭제되지도 않는다.
+
+저장에 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.
+
+future.get(key).getStatusCode() | 설명
+--------------------------------| ---------
+StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item이 없음)
+StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
 
 
 ### Key-Value Item 조회
@@ -128,8 +138,8 @@ Future<Boolean> delete(String key)
 - 주어진 key를 가진 item을 cache에서 삭제한다.
  
 ```java
-Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key)
-Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key)
+Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key)
+Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key)
 ```
 
 - 다수의 key-value item을 한번에 delete한다.
@@ -137,6 +147,6 @@ Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key)
 
 delete 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.
 
-future.get(key).getResponse() | 설명
-------------------------------| ---------
-CollectionResponse.NOT_FOUND  | Key miss (주어진 key에 해당하는 item이 없음)
+future.get(key).getStatusCode() | 설명
+--------------------------------| ---------
+StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item이 없음)

@@ -1,6 +1,6 @@
 /*
  * arcus-java-client : Arcus Java client
- * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2020 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,16 @@ import java.util.concurrent.TimeoutException;
 
 import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 
-public class BulkSetTest extends BaseIntegrationTest {
+public class BulkStoreTest extends BaseIntegrationTest {
 
   public void testZeroSizedKeys() {
     try {
-      mc.asyncSetBulk(new ArrayList<String>(0), 60, "value");
+      mc.asyncStoreBulk(StoreType.set, new ArrayList<String>(0),
+              60, "value");
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // should get here.
@@ -44,7 +46,8 @@ public class BulkSetTest extends BaseIntegrationTest {
     }
 
     try {
-      mc.asyncSetBulk(new ArrayList<String>(0), 60, new Object(), new CollectionTranscoder());
+      mc.asyncStoreBulk(StoreType.set, new ArrayList<String>(0),
+              60, new Object(), new CollectionTranscoder());
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // should get here.
@@ -54,13 +57,13 @@ public class BulkSetTest extends BaseIntegrationTest {
     }
   }
 
-  public void testInsertAndGet2() {
+  public void testSetAndGet2() {
     int TEST_COUNT = 3;
 
     try {
       // SET null key
       try {
-        mc.asyncSetBulk(null, 60);
+        mc.asyncStoreBulk(StoreType.set, null, 60);
       } catch (Exception e) {
         assertEquals("Map is null.", e.getMessage());
       }
@@ -82,10 +85,10 @@ public class BulkSetTest extends BaseIntegrationTest {
         }
 
         // SET
-        Future<Map<String, CollectionOperationStatus>> future = mc
-                .asyncSetBulk(o, 60);
+        Future<Map<String, OperationStatus>> future = mc
+                .asyncStoreBulk(StoreType.set, o, 60);
 
-        Map<String, CollectionOperationStatus> errorList;
+        Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           Assert.assertTrue("Error list is not empty.",
@@ -120,7 +123,7 @@ public class BulkSetTest extends BaseIntegrationTest {
     }
   }
 
-  public void testInsertAndGet() {
+  public void testSetAndGet() {
     String value = "MyValue";
 
     int TEST_COUNT = 64;
@@ -128,7 +131,7 @@ public class BulkSetTest extends BaseIntegrationTest {
     try {
       // SET null key
       try {
-        mc.asyncSetBulk(null, 60, value);
+        mc.asyncStoreBulk(StoreType.set, null, 60, value);
       } catch (Exception e) {
         assertEquals("Key list is null.", e.getMessage());
       }
@@ -146,10 +149,124 @@ public class BulkSetTest extends BaseIntegrationTest {
         }
 
         // SET
-        Future<Map<String, CollectionOperationStatus>> future = mc
-                .asyncSetBulk(Arrays.asList(keys), 60, value);
+        Future<Map<String, OperationStatus>> future = mc
+                .asyncStoreBulk(StoreType.set, Arrays.asList(keys), 60, value);
 
-        Map<String, CollectionOperationStatus> errorList;
+        Map<String, OperationStatus> errorList;
+        try {
+          errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+          Assert.assertTrue("Error list is not empty.",
+                  errorList.isEmpty());
+        } catch (TimeoutException e) {
+          future.cancel(true);
+          e.printStackTrace();
+          Assert.fail(e.getMessage());
+        }
+
+        // GET
+        int errorCount = 0;
+        for (String key : keys) {
+          String v = (String) mc.get(key);
+          if (!value.equals(v)) {
+            errorCount++;
+          }
+        }
+
+        Assert.assertEquals("Error count is greater than 0.", 0,
+                errorCount);
+
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
+
+
+  public void testAddAndGet() {
+    String value = "MyValue";
+
+    int TEST_COUNT = 64;
+
+    try {
+      for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
+        // generate key
+        String[] keys = new String[keySize];
+        for (int i = 0; i < keys.length; i++) {
+          keys[i] = "MyKey" + i;
+        }
+
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key);
+        }
+
+        // ADD
+        Future<Map<String, OperationStatus>> future = mc
+                .asyncStoreBulk(StoreType.add, Arrays.asList(keys), 60, value);
+
+        Map<String, OperationStatus> errorList;
+        try {
+          errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+          Assert.assertTrue("Error list is not empty.",
+                  errorList.isEmpty());
+        } catch (TimeoutException e) {
+          future.cancel(true);
+          e.printStackTrace();
+          Assert.fail(e.getMessage());
+        }
+
+        // GET
+        int errorCount = 0;
+        for (String key : keys) {
+          String v = (String) mc.get(key);
+          if (!value.equals(v)) {
+            errorCount++;
+          }
+        }
+
+        Assert.assertEquals("Error count is greater than 0.", 0,
+                errorCount);
+
+        // REMOVE
+        for (String key : keys) {
+          mc.delete(key);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail();
+    }
+  }
+
+
+  public void testReplaceAndGet() {
+    String value = "MyValue";
+
+    int TEST_COUNT = 64;
+
+    try {
+      for (int keySize = 1; keySize < TEST_COUNT; keySize++) {
+        // generate key
+        String[] keys = new String[keySize];
+        for (int i = 0; i < keys.length; i++) {
+          keys[i] = "MyKey" + i;
+        }
+
+        // SET
+        for (String key : keys) {
+          mc.set(key, 60, "oldValue");
+        }
+
+        // REPLACE
+        Future<Map<String, OperationStatus>> future = mc
+                .asyncStoreBulk(StoreType.replace, Arrays.asList(keys), 60, value);
+
+        Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           Assert.assertTrue("Error list is not empty.",

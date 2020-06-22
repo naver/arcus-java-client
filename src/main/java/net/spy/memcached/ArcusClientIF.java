@@ -38,6 +38,8 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -117,6 +119,7 @@ public interface ArcusClientIF {
    * @param tc  the transcoder to serialize and unserialize the value
    * @return a future that will hold the list of failed
    */
+  @Deprecated
   public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, T o, Transcoder<T> tc);
 
@@ -128,6 +131,7 @@ public interface ArcusClientIF {
    * @param o   the object to store on each keys
    * @return a future that will hold the list of failed
    */
+  @Deprecated
   public abstract Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, Object o);
 
@@ -139,6 +143,7 @@ public interface ArcusClientIF {
    * @param tc  the transcoder to serialize and unserialize the value
    * @return a future that will hold the list of failed
    */
+  @Deprecated
   public abstract <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, T> o, int exp, Transcoder<T> tc);
 
@@ -149,8 +154,77 @@ public interface ArcusClientIF {
    * @param exp the expiration of this object
    * @return a future that will hold the list of failed
    */
+  @Deprecated
   public abstract Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, Object> o, int exp);
+
+
+  /**
+   * Store an object in the cache on each key.
+   *
+   * <h2>Basic usage</h2>
+   * <pre>{@code
+   *  ArcusClient c = getClientFromPool();
+   *
+   *  List<String> keys = new ArrayList();
+   *  keys.add("KEY1");
+   *  keys.add("KEY2");
+   *
+   *  // The object to store
+   *  Object value = "VALUE";
+   *
+   *  // Get customized transcoder
+   *  Transcoder myTranscoder = getTranscoder();
+   *
+   *  // Store a value (async) on each keys for one hour using multiple memcached client.
+   *  c.asyncStoreBulk(StoreType.set, keys, 3600, value, transcoder);
+   *  }</pre>
+   *
+   * @param <T>
+   * @param type the type of store operation to perform.
+   * @param key  the key list which this object should be added
+   * @param exp  the expiration of this object
+   * @param o    the object to store on each keys
+   * @param tc   the transcoder to serialize and unserialize the value
+   * @return a future that will hold the list of failed
+   */
+  public abstract <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, List<String> key, int exp, T o, Transcoder<T> tc);
+
+  /**
+   * Store an object in the cache on each key using specified memcached client
+   *
+   * @param type the type of store operation to perform.
+   * @param key  the key list which this object should be added
+   * @param exp  the expiration of this object
+   * @param o    the object to store on each keys
+   * @return a future that will hold the list of failed
+   */
+  public abstract Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, List<String> key, int exp, Object o);
+
+  /**
+   * Store an object in the cache on each key using specified memcached client
+   *
+   * @param type the type of store operation to perform.
+   * @param o    the map that has keys and values to store
+   * @param exp  the expiration of this object
+   * @param tc   the transcoder to serialize and unserialize the value
+   * @return a future that will hold the list of failed
+   */
+  public abstract <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, Map<String, T> o, int exp, Transcoder<T> tc);
+
+  /**
+   * Store an object in the cache on each key using specified memcached client
+   *
+   * @param type the type of store operation to perform.
+   * @param o    the map that has keys and values to store
+   * @param exp  the expiration of this object
+   * @return a future that will hold the list of failed
+   */
+  public abstract Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, Map<String, Object> o, int exp);
 
   /**
    * Delete an object in the cache on each key.
@@ -171,7 +245,7 @@ public interface ArcusClientIF {
    * @return a future that will hold the list of failed
    *
    */
-  public abstract Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+  public abstract Future<Map<String, OperationStatus>> asyncDeleteBulk(
           List<String> key);
 
   /**
@@ -181,7 +255,7 @@ public interface ArcusClientIF {
    * @return a future that will hold the list of failed
    *
    */
-  public abstract Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+  public abstract Future<Map<String, OperationStatus>> asyncDeleteBulk(
           String... key);
 
 
