@@ -25,6 +25,7 @@ import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
 
 import org.junit.After;
 import org.junit.Before;
@@ -132,7 +133,7 @@ public class ArcusTimeoutTest extends TestCase {
       keys[i] = "MyKey" + i;
     }
 
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncDeleteBulk(keys);
+    Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);
     future.get(1L, TimeUnit.MILLISECONDS);
   }
 
@@ -146,7 +147,7 @@ public class ArcusTimeoutTest extends TestCase {
       keys[i] = "MyKey" + i;
     }
 
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncDeleteBulk(keys);
+    Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);
     future.get(1L, TimeUnit.MILLISECONDS);
   }
 

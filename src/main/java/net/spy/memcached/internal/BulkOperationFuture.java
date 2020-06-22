@@ -1,7 +1,6 @@
 package net.spy.memcached.internal;
 
 import net.spy.memcached.MemcachedConnection;
-import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -14,10 +13,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BulkOperationFuture
-        extends OperationFuture<Map<String, CollectionOperationStatus>> {
-  protected final Map<String, CollectionOperationStatus> failedResult =
-          new HashMap<String, CollectionOperationStatus>();
+public abstract class BulkOperationFuture<T>
+        extends OperationFuture<Map<String, T>> {
+  protected final Map<String, T> failedResult =
+          new HashMap<String, T>();
   protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
   public BulkOperationFuture(Collection<String> keys, CountDownLatch l, long timeout) {
@@ -48,7 +47,7 @@ public abstract class BulkOperationFuture
   }
 
   @Override
-  public Map<String, CollectionOperationStatus> get(long duration,
+  public Map<String, T> get(long duration,
                                                     TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {

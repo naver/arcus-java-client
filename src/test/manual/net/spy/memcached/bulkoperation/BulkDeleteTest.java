@@ -18,8 +18,8 @@ package net.spy.memcached.bulkoperation;
 
 import junit.framework.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,10 +72,10 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         }
 
         // Bulk delete
-        Future<Map<String, CollectionOperationStatus>> future = mc.
+        Future<Map<String, OperationStatus>> future = mc.
                 asyncDeleteBulk(Arrays.asList(keys));
 
-        Map<String, CollectionOperationStatus> errorList;
+        Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           Assert.assertTrue("Error list is not empty.",
@@ -123,18 +123,18 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         }
 
         // Bulk delete
-        Future<Map<String, CollectionOperationStatus>> future = mc.
+        Future<Map<String, OperationStatus>> future = mc.
                 asyncDeleteBulk(Arrays.asList(keys));
 
-        Map<String, CollectionOperationStatus> errorList;
+        Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           Assert.assertEquals("Error count is less than input.",
                   keys.length/2, errorList.size());
-          for (Map.Entry<String, CollectionOperationStatus> error :
+          for (Map.Entry<String, OperationStatus> error :
                   errorList.entrySet()) {
-            Assert.assertEquals(error.getValue().getResponse(),
-                    CollectionResponse.NOT_FOUND);
+            Assert.assertEquals(error.getValue().getStatusCode(),
+                    StatusCode.ERR_NOT_FOUND);
           }
         } catch (TimeoutException e) {
           future.cancel(true);

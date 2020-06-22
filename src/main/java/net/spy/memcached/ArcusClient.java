@@ -1225,6 +1225,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  @Deprecated
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
                                                                          final int exp, final T o,
@@ -1239,7 +1240,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch blatch = new CountDownLatch(key.size());
 
-    return new BulkOperationFuture(key, blatch, operationTimeout) {
+    return new BulkOperationFuture<CollectionOperationStatus>(key, blatch, operationTimeout) {
       @Override
       public Operation createOp(final String k) {
         Operation op = opFact.store(StoreType.set, k, co.getFlags(),
@@ -1260,12 +1261,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
+  @Deprecated
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key,
                                                                      int exp, Object o) {
     return asyncSetBulk(key, exp, o, transcoder);
   }
 
+  @Deprecated
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final Map<String, T> o,
                                                                          final int exp,
@@ -1278,7 +1281,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch blatch = new CountDownLatch(o.size());
 
-    return new BulkOperationFuture(o.keySet(), blatch, operationTimeout) {
+    return new BulkOperationFuture<CollectionOperationStatus>(o.keySet(), blatch,
+            operationTimeout) {
       @Override
       public Operation createOp(final String k) {
         CachedData co = transcoder.encode(o.get(k));
@@ -1300,14 +1304,99 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     };
   }
 
+  @Deprecated
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o,
                                                                      int exp) {
     return asyncSetBulk(o, exp, transcoder);
   }
 
+
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(List<String> key) {
+  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
+                                                                 final List<String> key,
+                                                                 final int exp, final T o,
+                                                                 Transcoder<T> tc) {
+    if (key == null) {
+      throw new IllegalArgumentException("Key list is null.");
+    } else if (key.isEmpty()) {
+      throw new IllegalArgumentException("Key list is empty.");
+    }
+
+    final CachedData co = transcoder.encode(o);
+
+    final CountDownLatch blatch = new CountDownLatch(key.size());
+
+    return new BulkOperationFuture<OperationStatus>(key, blatch, operationTimeout) {
+      @Override
+      public Operation createOp(final String k) {
+        Operation op = opFact.store(type, k, co.getFlags(),
+                exp, co.getData(), new OperationCallback() {
+                  public void receivedStatus(OperationStatus val) {
+                    if (!val.isSuccess())
+                      failedResult.put(k, val);
+                  }
+
+                  public void complete() {
+                    blatch.countDown();
+                  }
+                });
+        addOp(k, op);
+        return op;
+      }
+    };
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
+                                                             List<String> key,
+                                                             int exp, Object o) {
+    return asyncStoreBulk(type, key, exp, o, transcoder);
+  }
+
+  @Override
+  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
+                                                                 final Map<String, T> o,
+                                                                 final int exp,
+                                                                 Transcoder<T> tc) {
+    if (o == null) {
+      throw new IllegalArgumentException("Map is null.");
+    } else if (o.isEmpty()) {
+      throw new IllegalArgumentException("Map is empty.");
+    }
+
+    final CountDownLatch blatch = new CountDownLatch(o.size());
+
+    return new BulkOperationFuture<OperationStatus>(o.keySet(), blatch, operationTimeout) {
+      @Override
+      public Operation createOp(final String k) {
+        CachedData co = transcoder.encode(o.get(k));
+        Operation op = opFact.store(type, k, co.getFlags(),
+                exp, co.getData(), new OperationCallback() {
+                  public void receivedStatus(OperationStatus val) {
+                    if (!val.isSuccess())
+                      failedResult.put(k, val);
+                  }
+
+                  public void complete() {
+                    blatch.countDown();
+                  }
+                });
+        addOp(k, op);
+        return op;
+      }
+    };
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
+                                                             Map<String, Object> o,
+                                                             int exp) {
+    return asyncStoreBulk(type, o, exp, transcoder);
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     } else if (key.isEmpty()) {
@@ -1316,14 +1405,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch blatch = new CountDownLatch(key.size());
 
-    return new BulkOperationFuture(key, blatch, operationTimeout) {
+    return new BulkOperationFuture<OperationStatus>(key, blatch, operationTimeout) {
       @Override
       public Operation createOp(final String k) {
         Operation op = opFact.delete(k, new OperationCallback() {
           public void receivedStatus(OperationStatus val) {
             if (!val.isSuccess())
-              failedResult.put(k, new CollectionOperationStatus(false, String
-                      .valueOf(val.isSuccess()), CollectionResponse.NOT_FOUND));
+              failedResult.put(k, val);
           }
 
           public void complete() {
@@ -1337,7 +1425,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(String... key) {
+  public Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     }

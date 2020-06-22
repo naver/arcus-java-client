@@ -33,8 +33,14 @@ import net.spy.memcached.ops.StatusCode;
 abstract class BaseStoreOperationImpl extends OperationImpl {
 
   private static final int OVERHEAD = 32;
+
   private static final OperationStatus STORED =
           new OperationStatus(true, "STORED", StatusCode.SUCCESS);
+  private static final OperationStatus NOT_FOUND =
+          new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
+  private static final OperationStatus EXISTS =
+          new OperationStatus(false, "EXISTS", StatusCode.ERR_EXISTS);
+
   protected final String type;
   protected final String key;
   protected final int flags;
@@ -62,7 +68,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
       return;
     }
     /* ENABLE_REPLICATION end */
-    getCallback().receivedStatus(matchStatus(line, STORED));
+    getCallback().receivedStatus(matchStatus(line, STORED, NOT_FOUND, EXISTS));
     transitionState(OperationState.COMPLETE);
   }
 

@@ -45,6 +45,8 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -332,38 +334,67 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().asyncSopExist(key, value);
   }
 
+  @Deprecated
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().asyncSetBulk(key, exp, o, tc);
   }
 
+  @Deprecated
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, Object o) {
     return this.getClient().asyncSetBulk(key, exp, o);
   }
 
+  @Deprecated
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, T> o, int exp, Transcoder<T> tc) {
     return this.getClient().asyncSetBulk(o, exp, tc);
   }
 
+  @Deprecated
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, Object> o, int exp) {
     return this.getClient().asyncSetBulk(o, exp);
   }
 
+
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, List<String> key, int exp, T o, Transcoder<T> tc) {
+    return this.getClient().asyncStoreBulk(type, key, exp, o, tc);
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, List<String> key, int exp, Object o) {
+    return this.getClient().asyncStoreBulk(type, key, exp, o);
+  }
+
+  @Override
+  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, Map<String, T> o, int exp, Transcoder<T> tc) {
+    return this.getClient().asyncStoreBulk(type, o, exp, tc);
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncStoreBulk(
+          StoreType type, Map<String, Object> o, int exp) {
+    return this.getClient().asyncStoreBulk(type, o, exp);
+  }
+
+  @Override
+  public Future<Map<String, OperationStatus>> asyncDeleteBulk(
           List<String> key) {
     return this.getClient().asyncDeleteBulk(key);
   }
 
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncDeleteBulk(
+  public Future<Map<String, OperationStatus>> asyncDeleteBulk(
           String... key) {
     return this.getClient().asyncDeleteBulk(key);
   }
