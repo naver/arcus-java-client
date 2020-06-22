@@ -43,7 +43,9 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     return root.toString();
   }
 
-  public MemcachedNode getMemcachedNode() { return root; }
+  public MemcachedNode getMemcachedNode() {
+    return root;
+  }
 
   public void addOp(Operation op) {
     throw new UnsupportedOperationException();

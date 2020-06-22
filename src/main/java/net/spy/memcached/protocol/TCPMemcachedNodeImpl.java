@@ -539,7 +539,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return enabledMGetOp;
   }
 
-  public final boolean enabledSpaceSeparate() { return enabledSpaceSeparate; }
+  public final boolean enabledSpaceSeparate() {
+    return enabledSpaceSeparate;
+  }
 
   public final int getBytesRemainingToWrite() {
     return toWrite;
