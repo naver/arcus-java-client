@@ -72,6 +72,7 @@ class SetAttrOperationImpl extends OperationImpl
     /* ENABLE_REPLICATION if */
     if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
       receivedMoveOperations(line);
+      return;
     }
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(
