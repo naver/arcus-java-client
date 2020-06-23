@@ -799,7 +799,7 @@ public final class MemcachedConnection extends SpyObject {
               sk, sk.isReadable(), sk.isWritable(),
               sk.isConnectable(), sk.attachment());
       if (sk.isConnectable()) {
-        getLogger().info("Connection state changed for %s", sk);
+        getLogger().info("Connection state changed for %s", qa);
         final SocketChannel channel = qa.getChannel();
         if (channel.finishConnect()) {
           connected(qa);
