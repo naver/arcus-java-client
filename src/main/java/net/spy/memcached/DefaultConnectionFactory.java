@@ -206,12 +206,14 @@ public class DefaultConnectionFactory extends SpyObject
     this(DEFAULT_OP_QUEUE_LEN, DEFAULT_READ_BUFFER_SIZE);
   }
 
-  public MemcachedNode createMemcachedNode(SocketAddress sa,
+  public MemcachedNode createMemcachedNode(String name,
+                                           SocketAddress sa,
                                            SocketChannel c, int bufSize) {
 
     OperationFactory of = getOperationFactory();
     if (of instanceof AsciiOperationFactory) {
-      return new AsciiMemcachedNodeImpl(sa, c, bufSize,
+      return new AsciiMemcachedNodeImpl(name,
+              sa, c, bufSize,
               createReadOperationQueue(),
               createWriteOperationQueue(),
               createOperationQueue(),
@@ -221,7 +223,8 @@ public class DefaultConnectionFactory extends SpyObject
       if (getAuthDescriptor() != null) {
         doAuth = true;
       }
-      return new BinaryMemcachedNodeImpl(sa, c, bufSize,
+      return new BinaryMemcachedNodeImpl(name,
+              sa, c, bufSize,
               createReadOperationQueue(),
               createWriteOperationQueue(),
               createOperationQueue(),
@@ -233,9 +236,10 @@ public class DefaultConnectionFactory extends SpyObject
     }
   }
 
-  public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+  public MemcachedConnection createConnection(String name,
+                                              List<InetSocketAddress> addrs)
           throws IOException {
-    return new MemcachedConnection(getReadBufSize(), this, addrs,
+    return new MemcachedConnection(name, getReadBufSize(), this, addrs,
             getInitialObservers(), getFailureMode(), getOperationFactory());
   }
 

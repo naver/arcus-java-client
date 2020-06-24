@@ -59,12 +59,14 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     final DefaultConnectionFactory factory = new DefaultConnectionFactory(inputQueueSize, 4096);
 
     TCPMemcachedNodeImpl fromNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
+        "tcp node impl test node",
         InetSocketAddress.createUnresolved("127.0.0.1", 11211),
         SocketChannel.open(),
         4096
     );
 
     TCPMemcachedNodeImpl toNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
+        "tcp node impl test node",
         InetSocketAddress.createUnresolved("127.0.0.2", 11211),
         SocketChannel.open(),
         4096

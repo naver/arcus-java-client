@@ -92,15 +92,16 @@ public abstract class ClientBaseCase extends TestCase {
          */
         @Override
         public MemcachedConnection createConnection(
-                List<InetSocketAddress> addrs) throws IOException {
-          return new MemcachedConnection(getReadBufSize(), this, addrs,
+                String name, List<InetSocketAddress> addrs) throws IOException {
+          return new MemcachedConnection(name, getReadBufSize(), this, addrs,
                   getInitialObservers(), getFailureMode(), getOperationFactory());
         }
 
         @Override
-        public MemcachedNode createMemcachedNode(SocketAddress sa,
+        public MemcachedNode createMemcachedNode(String name,
+                                                 SocketAddress sa,
                                                  SocketChannel c, int bufSize) {
-          return inner.createMemcachedNode(sa, c, bufSize);
+          return inner.createMemcachedNode(name, sa, c, bufSize);
         }
 
         @Override

@@ -43,12 +43,13 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * Create the memcached client and the front cache.
    *
    * @param cf    the connection factory to configure connections for this client
+   * @param name  client name
    * @param addrs the socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
    */
   public FrontCacheMemcachedClient(ConnectionFactory cf,
-                                   List<InetSocketAddress> addrs) throws IOException {
-    super(cf, addrs);
+                                   String name, List<InetSocketAddress> addrs) throws IOException {
+    super(cf, name, addrs);
 
     if (cf.getMaxFrontCacheElements() > 0) {
       String cacheName = cf.getFrontCacheName();

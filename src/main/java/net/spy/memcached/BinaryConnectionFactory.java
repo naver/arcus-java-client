@@ -38,10 +38,12 @@ public class BinaryConnectionFactory extends DefaultConnectionFactory {
   }
 
   @Override
-  public MemcachedNode createMemcachedNode(SocketAddress sa,
+  public MemcachedNode createMemcachedNode(String name,
+                                           SocketAddress sa,
                                            SocketChannel c, int bufSize) {
     boolean doAuth = false;
-    return new BinaryMemcachedNodeImpl(sa, c, bufSize,
+    return new BinaryMemcachedNodeImpl(name,
+            sa, c, bufSize,
             createReadOperationQueue(),
             createWriteOperationQueue(),
             createOperationQueue(),

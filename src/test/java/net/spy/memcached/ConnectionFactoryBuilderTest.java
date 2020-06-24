@@ -90,7 +90,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
 
     SocketChannel sc = SocketChannel.open();
     try {
-      assertTrue(f.createMemcachedNode(
+      assertTrue(f.createMemcachedNode("factory builder test node",
               InetSocketAddress.createUnresolved("localhost", 11211),
               sc, 1)
               instanceof AsciiMemcachedNodeImpl);
@@ -167,7 +167,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
 
     SocketChannel sc = SocketChannel.open();
     try {
-      assertTrue(f.createMemcachedNode(
+      assertTrue(f.createMemcachedNode("factory builder test node",
               InetSocketAddress.createUnresolved("localhost", 11211),
               sc, 1)
               instanceof BinaryMemcachedNodeImpl);
