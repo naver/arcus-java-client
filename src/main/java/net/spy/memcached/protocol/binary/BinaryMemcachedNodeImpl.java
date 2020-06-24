@@ -20,11 +20,12 @@ public class BinaryMemcachedNodeImpl extends TCPMemcachedNodeImpl {
   private final int MAX_SET_OPTIMIZATION_COUNT = 65535;
   private final int MAX_SET_OPTIMIZATION_BYTES = 2 * 1024 * 1024;
 
-  public BinaryMemcachedNodeImpl(SocketAddress sa, SocketChannel c,
+  public BinaryMemcachedNodeImpl(String name,
+                                 SocketAddress sa, SocketChannel c,
                                  int bufSize, BlockingQueue<Operation> rq,
                                  BlockingQueue<Operation> wq, BlockingQueue<Operation> iq,
                                  Long opQueueMaxBlockTimeNs, boolean waitForAuth) {
-    super(sa, c, bufSize, rq, wq, iq, opQueueMaxBlockTimeNs,
+    super(name, sa, c, bufSize, rq, wq, iq, opQueueMaxBlockTimeNs,
             waitForAuth, false /* binary protocol */);
   }
 

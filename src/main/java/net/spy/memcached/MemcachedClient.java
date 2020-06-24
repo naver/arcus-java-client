@@ -140,9 +140,22 @@ public class MemcachedClient extends SpyThread
 
   private final byte delimiter;
 
+  private static final String DEFAULT_MEMCACHED_CLIENT_NAME = "MemcachedClient";
+
   private static final int GET_BULK_CHUNK_SIZE = 200;
 
   private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
+
+  /**
+   * Get a memcache client operating on the specified memcached locations.
+   *
+   * @param name client name
+   * @param ia   the memcached locations
+   * @throws IOException if connections cannot be established
+   */
+  public MemcachedClient(String name, InetSocketAddress... ia) throws IOException {
+    this(new DefaultConnectionFactory(), name, Arrays.asList(ia));
+  }
 
   /**
    * Get a memcache client operating on the specified memcached locations.
@@ -151,7 +164,7 @@ public class MemcachedClient extends SpyThread
    * @throws IOException if connections cannot be established
    */
   public MemcachedClient(InetSocketAddress... ia) throws IOException {
-    this(new DefaultConnectionFactory(), Arrays.asList(ia));
+    this(new DefaultConnectionFactory(), DEFAULT_MEMCACHED_CLIENT_NAME, Arrays.asList(ia));
   }
 
   /**
@@ -162,9 +175,8 @@ public class MemcachedClient extends SpyThread
    */
   public MemcachedClient(List<InetSocketAddress> addrs)
           throws IOException {
-    this(new DefaultConnectionFactory(), addrs);
+    this(new DefaultConnectionFactory(), DEFAULT_MEMCACHED_CLIENT_NAME, addrs);
   }
-
   /**
    * Get a memcache client over the specified memcached locations.
    *
@@ -174,8 +186,24 @@ public class MemcachedClient extends SpyThread
    */
   public MemcachedClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
+    this(cf, DEFAULT_MEMCACHED_CLIENT_NAME, addrs);
+  }
+
+  /**
+   * Get a memcache client over the specified memcached locations.
+   *
+   * @param cf    the connection factory to configure connections for this client
+   * @param name  client name
+   * @param addrs the socket addresses
+   * @throws IOException if connections cannot be established
+   */
+  public MemcachedClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
+          throws IOException {
     if (cf == null) {
       throw new NullPointerException("Connection factory required");
+    }
+    if (name == null) {
+      throw new NullPointerException("Client name required");
     }
     if (addrs == null) {
       throw new NullPointerException("Server list required");
@@ -192,7 +220,7 @@ public class MemcachedClient extends SpyThread
     transcoder = cf.getDefaultTranscoder();
     opFact = cf.getOperationFactory();
     assert opFact != null : "Connection factory failed to make op factory";
-    conn = cf.createConnection(addrs);
+    conn = cf.createConnection(name, addrs);
     assert conn != null : "Connection factory failed to make a connection";
     operationTimeout = cf.getOperationTimeout();
     authDescriptor = cf.getAuthDescriptor();

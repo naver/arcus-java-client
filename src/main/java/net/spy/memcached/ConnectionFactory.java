@@ -39,18 +39,22 @@ public interface ConnectionFactory {
   /**
    * Create a MemcachedConnection for the given SocketAddresses.
    *
+   * @param name  client name
    * @param addrs the addresses of the memcached servers
    * @return a new MemcachedConnection connected to those addresses
    * @throws IOException for problems initializing the memcached connections
    */
-  MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+  MemcachedConnection createConnection(String name, List<InetSocketAddress> addrs)
           throws IOException;
+
 
   /**
    * Create a new memcached node.
    */
-  MemcachedNode createMemcachedNode(SocketAddress sa,
+  MemcachedNode createMemcachedNode(String name,
+                                    SocketAddress sa,
                                     SocketChannel c, int bufSize);
+
 
   /**
    * Create a BlockingQueue for operations for a connection.

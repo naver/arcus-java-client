@@ -68,6 +68,7 @@ public final class MemcachedConnection extends SpyObject {
   // find those bugs and often works around them.
   private static final int EXCESSIVE_EMPTY = 0x1000000;
 
+  private String connName;
   private volatile boolean shutDown = false;
   // If true, optimization will collapse multiple sequential get ops
   private final boolean shouldOptimize;
@@ -100,16 +101,19 @@ public final class MemcachedConnection extends SpyObject {
   /**
    * Construct a memcached connection.
    *
+   * @param name    the name of memcached connection
    * @param bufSize the size of the buffer used for reading from the server
    * @param f       the factory that will provide an operation queue
    * @param a       the addresses of the servers to connect to
    * @throws IOException if a connection attempt fails early
    */
-  public MemcachedConnection(int bufSize, ConnectionFactory f,
+  public MemcachedConnection(String name,
+                             int bufSize, ConnectionFactory f,
                              List<InetSocketAddress> a, Collection<ConnectionObserver> obs,
                              FailureMode fm, OperationFactory opfactory)
           throws IOException {
     this.f = f;
+    connName = name;
     connObservers.addAll(obs);
     reconnectQueue = new TreeMap<Long, MemcachedNode>();
     addedQueue = new ConcurrentLinkedQueue<MemcachedNode>();
@@ -122,7 +126,7 @@ public final class MemcachedConnection extends SpyObject {
     selector = Selector.open();
     List<MemcachedNode> connections = new ArrayList<MemcachedNode>(a.size());
     for (SocketAddress sa : a) {
-      connections.add(attachMemcachedNode(sa));
+      connections.add(attachMemcachedNode(connName, sa));
     }
     locator = f.createLocator(connections);
   }
@@ -294,7 +298,7 @@ public final class MemcachedConnection extends SpyObject {
 
     // Make connections to the newly added nodes.
     for (SocketAddress sa : addrs) {
-      attachNodes.add(attachMemcachedNode(sa));
+      attachNodes.add(attachMemcachedNode(connName, sa));
     }
 
     // Update the hash.
@@ -350,7 +354,7 @@ public final class MemcachedConnection extends SpyObject {
       if (oldMasterAddr.getIPPort().equals(newMasterAddr.getIPPort())) {
         if (oldSlaveAddr == null) {
           if (newSlaveAddr != null) {
-            attachNodes.add(attachMemcachedNode(newSlaveAddr));
+            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           }
         } else if (newSlaveAddr == null) {
           if (oldSlaveAddr != null) {
@@ -359,7 +363,7 @@ public final class MemcachedConnection extends SpyObject {
             taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
           }
         } else if (!oldSlaveAddr.getIPPort().equals(newSlaveAddr.getIPPort())) {
-          attachNodes.add(attachMemcachedNode(newSlaveAddr));
+          attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           removeNodes.add(oldSlaveNode);
           // move operation slave -> master. Don't call setupResend() on slave.
           taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
@@ -382,15 +386,15 @@ public final class MemcachedConnection extends SpyObject {
               "Discarded all pending reading state operation to move operations."));
           taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
           if (newSlaveAddr != null) {
-            attachNodes.add(attachMemcachedNode(newSlaveAddr));
+            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           }
         }
       } else {
         // Old master has gone away. And, new group has appeared.
-        MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
+        MemcachedNode newMasterNode = attachMemcachedNode(connName, newMasterAddr);
         attachNodes.add(newMasterNode);
         if (newSlaveAddr != null) {
-          attachNodes.add(attachMemcachedNode(newSlaveAddr));
+          attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master. Call setupResend() on master
@@ -570,11 +574,12 @@ public final class MemcachedConnection extends SpyObject {
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
       if (newGroupAddrs.size() == 0) { // Incomplete group, now
-        attachNodes.add(attachMemcachedNode(ArcusReplNodeAddress.createFake(entry.getKey())));
+        attachNodes.add(attachMemcachedNode(connName,
+                ArcusReplNodeAddress.createFake(entry.getKey())));
       } else { // Completely new group
-        attachNodes.add(attachMemcachedNode(newGroupAddrs.get(0)));
+        attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(0)));
         if (newGroupAddrs.size() > 1)
-          attachNodes.add(attachMemcachedNode(newGroupAddrs.get(1)));
+          attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(1)));
       }
     }
 
@@ -618,11 +623,12 @@ public final class MemcachedConnection extends SpyObject {
   }
   /* ENABLE_REPLICATION end */
 
-  MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
+  MemcachedNode attachMemcachedNode(String name,
+                                    SocketAddress sa) throws IOException {
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
     // bufSize : 16384 (default value)
-    MemcachedNode qa = f.createMemcachedNode(sa, ch, f.getReadBufSize());
+    MemcachedNode qa = f.createMemcachedNode(name, sa, ch, f.getReadBufSize());
     if (timeoutRatioThreshold > 0) {
       qa.enableTimeoutRatio();
     }

@@ -485,8 +485,9 @@ public class CacheManager extends SpyThread implements Watcher,
     client = new ArcusClient[poolSize];
     for (int i = 0; i < poolSize; i++) {
       try {
-        client[i] = ArcusClient.getInstance(cfb.build(), socketList);
-        client[i].setName("Memcached IO (" + (i+1) + "-" + poolSize + ") for " + serviceCode);
+        String clientName = "ArcusClient(" + (i+1) + "-" + poolSize + ") for " + serviceCode;
+        client[i] = ArcusClient.getInstance(cfb.build(), clientName, socketList);
+        client[i].setName("Memcached IO for " + serviceCode);
         client[i].setCacheManager(this);
       } catch (IOException e) {
         getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.");

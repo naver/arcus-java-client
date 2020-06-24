@@ -184,6 +184,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static String VERSION;
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);
   private static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
+  private static final String DEFAULT_ARCUS_CLIENT_NAME = "ArcusClient";
   private boolean dead;
 
   // final BulkService bulkService;
@@ -232,7 +233,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   /**
    * @param hostPorts   arcus admin addresses
    * @param serviceCode service code
-   * @param poolSize    Arcus clinet pool size
+   * @param poolSize    Arcus client pool size
    * @param cfb         ConnectionFactoryBuilder
    * @return multiple ArcusClient
    */
@@ -245,7 +246,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   /**
    * @param serviceCode service code
-   * @param poolSize    Arcus clinet pool size
+   * @param poolSize    Arcus client pool size
    * @param cfb         ConnectionFactoryBuilder
    * @return multiple ArcusClient
    */
@@ -260,7 +261,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param hostPorts   arcus admin addresses
    * @param serviceCode service code
    * @param cfb         ConnectionFactoryBuilder
-   * @param poolSize    Arcus clinet pool size
+   * @param poolSize    Arcus client pool size
    * @param waitTimeFor Connect
    *                    waiting time for connection establishment(milliseconds)
    * @return multiple ArcusClient
@@ -303,12 +304,32 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Create an Arcus client for the given memcached server addresses.
    *
    * @param cf    connection factory to configure connections for this client
+   * @param name  client name
    * @param addrs socket addresses for the memcached servers
    * @return Arcus client
    */
   protected static ArcusClient getInstance(ConnectionFactory cf,
+                                           String name,
                                            List<InetSocketAddress> addrs) throws IOException {
-    return new ArcusClient(cf, addrs);
+    return new ArcusClient(cf, name, addrs);
+  }
+
+  /**
+   * Create an Arcus client for the given memcached server addresses.
+   *
+   * @param cf    connection factory to configure connections for this client
+   * @param name  client name
+   * @param addrs socket addresses for the memcached servers
+   * @throws IOException if connections cannot be established
+   */
+  public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
+          throws IOException {
+    super(cf, name, addrs);
+    // bulkService = new BulkService(cf.getBulkServiceLoopLimit(),
+    //         cf.getBulkServiceThreadCount(), cf.getBulkServiceSingleOpTimeout());
+    collectionTranscoder = new CollectionTranscoder();
+    smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
+    registerMbean();
   }
 
   /**
@@ -318,11 +339,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param addrs socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
    */
-  public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
+  public ArcusClient(ConnectionFactory cf,
+                     List<InetSocketAddress> addrs)
           throws IOException {
-    super(cf, addrs);
-    // bulkService = new BulkService(cf.getBulkServiceLoopLimit(),
-    //         cf.getBulkServiceThreadCount(), cf.getBulkServiceSingleOpTimeout());
+    super(cf, DEFAULT_ARCUS_CLIENT_NAME, addrs);
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean();

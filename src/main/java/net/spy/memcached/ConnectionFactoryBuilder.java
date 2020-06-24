@@ -437,9 +437,10 @@ public class ConnectionFactoryBuilder {
 
       /* ENABLE_REPLICATION if */
       @Override
-      public MemcachedConnection createConnection(List<InetSocketAddress> addrs)
+      public MemcachedConnection createConnection(String name,
+                                                  List<InetSocketAddress> addrs)
               throws IOException {
-        MemcachedConnection c = super.createConnection(addrs);
+        MemcachedConnection c = super.createConnection(name, addrs);
         c.setArcusReplEnabled(arcusReplEnabled);
         return c;
       }
