@@ -54,8 +54,9 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       attr.setMaxCount(3333);
 
       Map<String, Object> elements = new HashMap<String, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncMopPipedInsertBulk(KEY, elements, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
@@ -86,8 +87,9 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       CollectionAttributes attr = new CollectionAttributes();
 
       Map<String, Object> elements = new HashMap<String, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncMopPipedInsertBulk(KEY, elements, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
@@ -109,8 +111,9 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       Map<String, Object> elements = new HashMap<String, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncMopPipedInsertBulk(KEY, elements,
                       new CollectionAttributes()).get();
@@ -133,8 +136,9 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       Map<String, Object> elements = new HashMap<String, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncMopPipedInsertBulk(KEY, elements, null).get();
       Assert.assertEquals(10, insertResult.size());

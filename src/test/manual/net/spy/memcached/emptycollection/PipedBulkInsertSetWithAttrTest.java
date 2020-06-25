@@ -55,8 +55,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       attr.setMaxCount(3333);
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++)
+      for (int i = 1; i < 11; i++) {
         valueList.add(i);
+      }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncLopPipedInsertBulk(KEY, INDEX, valueList, attr).get();
@@ -94,8 +95,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       CollectionAttributes attr = new CollectionAttributes();
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++)
+      for (int i = 1; i < 11; i++) {
         valueList.add(i);
+      }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncLopPipedInsertBulk(KEY, INDEX, valueList, attr).get();
@@ -125,8 +127,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++)
+      for (int i = 1; i < 11; i++) {
         valueList.add(i);
+      }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncLopPipedInsertBulk(KEY, INDEX, valueList,
@@ -157,8 +160,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++)
+      for (int i = 1; i < 11; i++) {
         valueList.add(i);
+      }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncLopPipedInsertBulk(KEY, INDEX, valueList, null).get();

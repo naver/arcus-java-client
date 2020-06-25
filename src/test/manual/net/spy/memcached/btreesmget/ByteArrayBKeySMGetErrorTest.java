@@ -38,8 +38,9 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   static {
     String KEY = ByteArrayBKeySMGetErrorTest.class.getSimpleName()
             + new Random().nextLong();
-    for (int i = 1; i <= 10; i++)
+    for (int i = 1; i <= 10; i++) {
       KEY_LIST.add(KEY + (i * 9));
+    }
   }
 
   @Override

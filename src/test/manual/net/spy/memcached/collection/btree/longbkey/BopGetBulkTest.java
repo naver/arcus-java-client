@@ -190,8 +190,9 @@ public class BopGetBulkTest extends BaseIntegrationTest {
     try {
       // delete some data.
       for (int i = 0; i < keyList.size(); i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.delete(keyList.get(i)).get();
+        }
       }
 
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;

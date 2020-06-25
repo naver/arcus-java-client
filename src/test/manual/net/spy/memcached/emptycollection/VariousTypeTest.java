@@ -336,25 +336,29 @@ public class VariousTypeTest extends BaseIntegrationTest {
     }
 
     public boolean equals(Object o) {
-      if (!(o instanceof UserDefinedClass))
+      if (!(o instanceof UserDefinedClass)) {
         return false;
+      }
 
       UserDefinedClass c = (UserDefinedClass) o;
 
       boolean eq = this.i == c.i;
 
-      if (this.list == null && c.list == null)
+      if (this.list == null && c.list == null) {
         return eq;
+      }
 
       eq &= this.list.size() == c.list.size();
 
-      if (!eq)
+      if (!eq) {
         return eq;
+      }
 
       for (int i = 0; i < this.list.size(); i++) {
         eq &= this.list.get(i).equals(c.list.get(i));
-        if (!eq)
+        if (!eq) {
           return eq;
+        }
       }
 
       return eq;

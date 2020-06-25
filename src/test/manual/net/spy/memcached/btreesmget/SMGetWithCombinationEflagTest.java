@@ -101,12 +101,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         keyList.add(KEY + i);
       }
       for (int i = 0; i < 50; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -161,12 +162,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         keyList.add(KEY + i);
       }
       for (int i = 0; i < 50; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -221,12 +223,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         keyList.add(KEY + i);
       }
       for (int i = 0; i < 10; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -281,12 +284,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         keyList.add(KEY + i);
       }
       for (int i = 0; i < 9; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -341,12 +345,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         keyList.add(KEY + i);
       }
       for (int i = 0; i < 10; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -390,12 +395,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
 
       for (int i = 0; i < 5; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -439,12 +445,13 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
 
       for (int i = 0; i < 5; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get();
-        else
+              "VALUE" + i, new CollectionAttributes()).get();
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get();
+              new CollectionAttributes()).get();
+        }
       }
     } catch (Exception e) {
       fail(e.getMessage());
@@ -488,14 +495,15 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
 
       for (int i = 0; i < 1000; i++) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
           mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
-                  "VALUE" + i, new CollectionAttributes()).get(1000L,
-                  TimeUnit.MILLISECONDS);
-        else
+              "VALUE" + i, new CollectionAttributes()).get(1000L,
+              TimeUnit.MILLISECONDS);
+        } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
-                  new CollectionAttributes()).get(1000L,
-                  TimeUnit.MILLISECONDS);
+              new CollectionAttributes()).get(1000L,
+              TimeUnit.MILLISECONDS);
+        }
       }
     } catch (TimeoutException e) {
       fail(e.getMessage());
