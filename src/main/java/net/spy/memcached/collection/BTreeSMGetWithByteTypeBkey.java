@@ -93,8 +93,9 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
   }
 
   public String stringify() {
-    if (str != null)
+    if (str != null) {
       return str;
+    }
 
     StringBuilder b = new StringBuilder();
 
@@ -102,8 +103,9 @@ public class BTreeSMGetWithByteTypeBkey<T> implements BTreeSMGet<T> {
     b.append(" ").append(keyList.size());
     b.append(" ").append(range);
 
-    if (eFlagFilter != null)
+    if (eFlagFilter != null) {
       b.append(" ").append(eFlagFilter.toString());
+    }
 
     b.append(" ").append(count);
 

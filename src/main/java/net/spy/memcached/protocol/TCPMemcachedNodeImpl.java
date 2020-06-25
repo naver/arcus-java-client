@@ -114,8 +114,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private void addTimeoutRatioCount(boolean timedOut) {
     if (toRatioEnabled) {
       toRatioLock.lock();
-      if ((++toCountIdx) >= MAX_TOCOUNT)
+      if ((++toCountIdx) >= MAX_TOCOUNT) {
         toCountIdx = 0;
+      }
       if (toCountArray[toCountIdx] > 0) {
         toRatioNow -= toCountArray[toCountIdx];
         toCountArray[toCountIdx] = 0;
@@ -123,8 +124,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       if (timedOut) {
         toCountArray[toCountIdx] = 1;
         toRatioNow += 1;
-        if (toRatioNow > toRatioMax)
+        if (toRatioNow > toRatioMax) {
           toRatioMax = toRatioNow;
+        }
       }
       toRatioLock.unlock();
     }

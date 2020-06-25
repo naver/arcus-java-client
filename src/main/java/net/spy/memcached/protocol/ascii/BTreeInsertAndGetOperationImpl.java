@@ -97,10 +97,11 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     this.key = key;
     this.get = get;
     this.dataToStore = dataToStore;
-    if (get.getCmd() == BTreeInsertAndGet.Command.INSERT)
+    if (get.getCmd() == BTreeInsertAndGet.Command.INSERT) {
       setAPIType(APIType.BOP_INSERT);
-    else if (get.getCmd() == BTreeInsertAndGet.Command.UPSERT)
+    } else if (get.getCmd() == BTreeInsertAndGet.Command.UPSERT) {
       setAPIType(APIType.BOP_UPSERT);
+    }
     setOperationType(OperationType.WRITE);
   }
 

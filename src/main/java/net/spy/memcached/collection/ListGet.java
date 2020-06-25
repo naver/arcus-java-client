@@ -59,12 +59,18 @@ public class ListGet extends CollectionGet {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
 
     StringBuilder b = new StringBuilder();
     b.append(range);
-    if (delete && dropIfEmpty) b.append(" drop");
-    if (delete && !dropIfEmpty) b.append(" delete");
+    if (delete && dropIfEmpty) {
+      b.append(" drop");
+    }
+    if (delete && !dropIfEmpty) {
+      b.append(" delete");
+    }
 
     str = b.toString();
     return str;

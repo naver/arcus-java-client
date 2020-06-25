@@ -77,10 +77,11 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
     this.key = key;
     this.update = update;
     this.cb = (Callback) cb;
-    if (this.update instanceof BTreePipedUpdate)
+    if (this.update instanceof BTreePipedUpdate) {
       setAPIType(APIType.BOP_UPDATE);
-    else if (this.update instanceof MapPipedUpdate)
+    } else if (this.update instanceof MapPipedUpdate) {
       setAPIType(APIType.MOP_UPDATE);
+    }
     setOperationType(OperationType.WRITE);
   }
 

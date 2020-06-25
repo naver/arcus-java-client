@@ -25,8 +25,9 @@ public final class BTreeUtil {
   }
 
   public static String toHex(byte[] byteArray) {
-    if (byteArray == null)
+    if (byteArray == null) {
       return null;
+    }
 
     final StringBuilder hex = new StringBuilder(2 * byteArray.length + 2);
 

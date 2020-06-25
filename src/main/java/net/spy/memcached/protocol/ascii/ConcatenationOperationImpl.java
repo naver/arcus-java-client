@@ -17,10 +17,11 @@ public class ConcatenationOperationImpl extends BaseStoreOperationImpl
                                     byte[] d, OperationCallback cb) {
     super(t.name(), k, 0, 0, d, cb);
     concatType = t;
-    if (t == ConcatenationType.append)
+    if (t == ConcatenationType.append) {
       setAPIType(APIType.APPEND);
-    else if (t == ConcatenationType.prepend)
+    } else if (t == ConcatenationType.prepend) {
       setAPIType(APIType.PREPEND);
+    }
   }
 
   public long getCasValue() {

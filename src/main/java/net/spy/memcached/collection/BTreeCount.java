@@ -47,8 +47,9 @@ public class BTreeCount extends CollectionCount {
   }
 
   public String stringify() {
-    if (str != null)
+    if (str != null) {
       return str;
+    }
 
     StringBuilder b = new StringBuilder();
 

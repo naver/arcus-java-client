@@ -83,18 +83,20 @@ public class CollectionGetOperationImpl extends OperationImpl
     super(cb);
     this.key = key;
     this.collectionGet = collectionGet;
-    if (this.collectionGet instanceof ListGet)
+    if (this.collectionGet instanceof ListGet) {
       setAPIType(APIType.LOP_GET);
-    else if (this.collectionGet instanceof SetGet)
+    } else if (this.collectionGet instanceof SetGet) {
       setAPIType(APIType.SOP_GET);
-    else if (this.collectionGet instanceof MapGet)
+    } else if (this.collectionGet instanceof MapGet) {
       setAPIType(APIType.MOP_GET);
-    else if (this.collectionGet instanceof BTreeGet)
+    } else if (this.collectionGet instanceof BTreeGet) {
       setAPIType(APIType.BOP_GET);
-    if (collectionGet.isDelete())
+    }
+    if (collectionGet.isDelete()) {
       setOperationType(OperationType.WRITE);
-    else
+    } else {
       setOperationType(OperationType.READ);
+    }
   }
 
   public void handleLine(String line) {

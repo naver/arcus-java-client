@@ -66,7 +66,9 @@ public class MapGet extends CollectionGet {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
 
     if (mkeyList.size() == 0) {
       additionalArgs = null;

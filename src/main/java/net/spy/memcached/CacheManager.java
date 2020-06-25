@@ -276,8 +276,9 @@ public class CacheManager extends SpyThread implements Watcher,
         case Expired:
           // If the session was expired, just shutdown this client to be re-initiated.
           getLogger().warn("Session expired. Trying to reconnect to the Arcus admin." + getInfo());
-          if (cacheMonitor != null)
+          if (cacheMonitor != null) {
             cacheMonitor.shutdown();
+          }
           break;
       }
     }
@@ -431,10 +432,11 @@ public class CacheManager extends SpyThread implements Watcher,
       /* recreate socket list */
       socketList.clear();
       for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (entry.getValue().size() == 0)
+        if (entry.getValue().size() == 0) {
           socketList.add(ArcusReplNodeAddress.createFake(entry.getKey()));
-        else
+        } else {
           socketList.addAll(entry.getValue());
+        }
       }
 
       // Exclude fake server addresses in the initial latch count.
@@ -444,8 +446,9 @@ public class CacheManager extends SpyThread implements Watcher,
       for (InetSocketAddress a : socketList) {
         // See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
         if (("/" + CacheManager.FAKE_SERVER_NODE).equals(
-                a.getAddress() + ":" + a.getPort()) != true)
+                a.getAddress() + ":" + a.getPort()) != true) {
           addrCount++;
+        }
       }
     } else {
       socketList = AddrUtil.getAddresses(addrs);
@@ -477,10 +480,11 @@ public class CacheManager extends SpyThread implements Watcher,
     cfb.setInitialObservers(Collections.singleton(observer));
 
     int _awaitTime = 0;
-    if (waitTimeForConnect == 0)
+    if (waitTimeForConnect == 0) {
       _awaitTime = 50 * addrCount * poolSize;
-    else
+    } else {
       _awaitTime = waitTimeForConnect;
+    }
 
     client = new ArcusClient[poolSize];
     for (int i = 0; i < poolSize; i++) {

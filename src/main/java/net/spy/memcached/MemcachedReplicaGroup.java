@@ -26,8 +26,9 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   private boolean prevMasterPick;
 
   protected MemcachedReplicaGroup(final String groupName) {
-    if (groupName == null)
+    if (groupName == null) {
       throw new IllegalArgumentException("Memcached in Replica Group must have group name");
+    }
     this.group = groupName;
   }
 

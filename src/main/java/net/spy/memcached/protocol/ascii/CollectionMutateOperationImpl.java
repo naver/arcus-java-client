@@ -67,10 +67,11 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     this.subkey = subkey;
     this.collectionMutate = collectionMutate;
     if (this.collectionMutate instanceof BTreeMutate) {
-      if (((BTreeMutate) this.collectionMutate).getMutator() == Mutator.incr)
+      if (((BTreeMutate) this.collectionMutate).getMutator() == Mutator.incr) {
         setAPIType(APIType.BOP_INCR);
-      else
+      } else {
         setAPIType(APIType.BOP_DECR);
+      }
     }
     setOperationType(OperationType.WRITE);
   }

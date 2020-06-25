@@ -59,10 +59,11 @@ final class MutatorOperationImpl extends OperationImpl
     amount = amt;
     def = d;
     exp = e;
-    if (m == Mutator.incr)
+    if (m == Mutator.incr) {
       setAPIType(APIType.INCR);
-    else if (m == Mutator.decr)
+    } else if (m == Mutator.decr) {
       setAPIType(APIType.DECR);
+    }
     setOperationType(OperationType.WRITE);
   }
 

@@ -67,8 +67,9 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
     this.key = key;
     this.setPipedExist = collectionExist;
     this.cb = (Callback) cb;
-    if (this.setPipedExist instanceof SetPipedExist)
+    if (this.setPipedExist instanceof SetPipedExist) {
       setAPIType(APIType.SOP_EXIST);
+    }
     setOperationType(OperationType.READ);
   }
 

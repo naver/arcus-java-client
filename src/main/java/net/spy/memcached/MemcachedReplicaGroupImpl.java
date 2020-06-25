@@ -23,21 +23,24 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
     super(getGroupNameForNode(node));
 
     // Cannot make MemcachedReplicaGoup instance without group name and master/slave node
-    if (node == null)
+    if (node == null) {
       throw new IllegalArgumentException("Memcached Node must not be null");
+    }
 
     setMemcachedNode(node);
   }
 
   public boolean setMemcachedNode(final MemcachedNode node) {
-    if (node == null)
+    if (node == null) {
       return false;
+    }
 
     if (this.group.equals(getGroupNameForNode(node))) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster())
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = node;
-      else
+      } else {
         this.slaveNode = node;
+      }
 
       node.setReplicaGroup(this);
       return true;
@@ -47,14 +50,16 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
   }
 
   public boolean deleteMemcachedNode(final MemcachedNode node) {
-    if (node == null)
+    if (node == null) {
       return false;
+    }
 
     if (this.group.equals(getGroupNameForNode(node))) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster())
+      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = null;
-      else
+      } else {
         this.slaveNode = null;
+      }
       return true;
     } else {
       return false;
@@ -66,12 +71,14 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
     MemcachedNode tmpNode = this.masterNode;
 
     this.masterNode = this.slaveNode;
-    if (this.masterNode != null) // previous slave node
+    if (this.masterNode != null) { // previous slave node
       ((ArcusReplNodeAddress) this.masterNode.getSocketAddress()).setMaster(true);
+    }
 
     this.slaveNode = tmpNode;
-    if (this.slaveNode != null) // previous master node
+    if (this.slaveNode != null) { // previous master node
       ((ArcusReplNodeAddress) this.slaveNode.getSocketAddress()).setMaster(false);
+    }
 
     return true;
   }

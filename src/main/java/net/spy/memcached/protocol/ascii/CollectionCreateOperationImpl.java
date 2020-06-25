@@ -61,14 +61,15 @@ public class CollectionCreateOperationImpl extends OperationImpl
     super(cb);
     this.key = key;
     this.collectionCreate = collectionCreate;
-    if (this.collectionCreate instanceof ListCreate)
+    if (this.collectionCreate instanceof ListCreate) {
       setAPIType(APIType.LOP_CREATE);
-    else if (this.collectionCreate instanceof SetCreate)
+    } else if (this.collectionCreate instanceof SetCreate) {
       setAPIType(APIType.SOP_CREATE);
-    else if (this.collectionCreate instanceof BTreeCreate)
+    } else if (this.collectionCreate instanceof BTreeCreate) {
       setAPIType(APIType.BOP_CREATE);
-    else if (this.collectionCreate instanceof MapCreate)
+    } else if (this.collectionCreate instanceof MapCreate) {
       setAPIType(APIType.MOP_CREATE);
+    }
     setOperationType(OperationType.WRITE);
   }
 

@@ -62,7 +62,9 @@ public class MapDelete extends CollectionDelete {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
 
     if (mkeyList.size() == 0) {
       additionalArgs = null;

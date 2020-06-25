@@ -332,7 +332,9 @@ public final class MemcachedConnection extends SpyObject {
       if (newGroupAddrs == null) {
         // Old group nodes have disappered. Remove the old group nodes.
         removeNodes.add(oldMasterNode);
-        if (oldSlaveNode != null) removeNodes.add(oldSlaveNode);
+        if (oldSlaveNode != null) {
+          removeNodes.add(oldSlaveNode);
+        }
         continue;
       }
       if (newGroupAddrs.size() == 0) {
@@ -418,8 +420,9 @@ public final class MemcachedConnection extends SpyObject {
                 ArcusReplNodeAddress.createFake(entry.getKey())));
       } else { // Completely new group
         attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(0)));
-        if (newGroupAddrs.size() > 1)
+        if (newGroupAddrs.size() > 1) {
           attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(1)));
+        }
       }
     }
 
@@ -924,10 +927,11 @@ public final class MemcachedConnection extends SpyObject {
     if (o.isReadOperation()) {
       ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
       if (readPriority != null) {
-        if (readPriority == ReadPriority.SLAVE)
+        if (readPriority == ReadPriority.SLAVE) {
           pick = ReplicaPick.SLAVE;
-        else if (readPriority == ReadPriority.RR)
+        } else if (readPriority == ReadPriority.RR) {
           pick = ReplicaPick.RR;
+        }
       } else {
         pick = getReplicaPick();
       }
@@ -939,10 +943,11 @@ public final class MemcachedConnection extends SpyObject {
     ReadPriority readPriority = f.getReadPriority();
     ReplicaPick pick = ReplicaPick.MASTER;
 
-    if (readPriority == ReadPriority.SLAVE)
+    if (readPriority == ReadPriority.SLAVE) {
       pick = ReplicaPick.SLAVE;
-    else if (readPriority == ReadPriority.RR)
+    } else if (readPriority == ReadPriority.RR) {
       pick = ReplicaPick.RR;
+    }
     return pick;
   }
   /* ENABLE_REPLICATION end */
@@ -1165,8 +1170,9 @@ public final class MemcachedConnection extends SpyObject {
         LoggerFactory.getLogger(MemcachedConnection.class).debug(
             "handling node for operation is not set");
       } else {
-        if (isTimeout || !op.isCancelled())
+        if (isTimeout || !op.isCancelled()) {
           node.setContinuousTimeout(isTimeout);
+        }
       }
     } catch (Exception e) {
       LoggerFactory.getLogger(MemcachedConnection.class).error(e.getMessage());
@@ -1251,8 +1257,9 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     public void doTask() {
-      if (fromNode.moveOperations(toNode) > 0)
+      if (fromNode.moveOperations(toNode) > 0) {
         addedQueue.offer(toNode);
+      }
     }
   }
   /* ENABLE_REPLICATION end */

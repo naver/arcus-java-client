@@ -40,8 +40,9 @@ public abstract class BulkOperationFuture<T>
   @Override
   public boolean isCancelled() {
     for (Operation op : ops) {
-      if (op.isCancelled())
+      if (op.isCancelled()) {
         return true;
+      }
     }
     return false;
   }
