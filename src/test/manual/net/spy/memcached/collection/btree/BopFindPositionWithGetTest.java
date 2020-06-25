@@ -62,10 +62,11 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       if (i >= pwgCount && i < (totCount - pwgCount)) {
         rstCount = pwgCount + 1 + pwgCount;
       } else {
-        if (i < pwgCount)
+        if (i < pwgCount) {
           rstCount = i + 1 + pwgCount;
-        else
+        } else {
           rstCount = pwgCount + 1 + ((totCount - 1) - i);
+        }
       }
       assertEquals(rstCount, result.size());
       assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
@@ -108,10 +109,11 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       if (i >= pwgCount && i < (totCount - pwgCount)) {
         rstCount = pwgCount + 1 + pwgCount;
       } else {
-        if (i < pwgCount)
+        if (i < pwgCount) {
           rstCount = pwgCount + 1 + i;
-        else
+        } else {
           rstCount = ((totCount - 1) - i) + 1 + pwgCount;
+        }
       }
       assertEquals(rstCount, result.size());
       assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
@@ -157,10 +159,11 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       if (i >= pwgCount && i < (totCount - pwgCount)) {
         rstCount = pwgCount + 1 + pwgCount;
       } else {
-        if (i < pwgCount)
+        if (i < pwgCount) {
           rstCount = i + 1 + pwgCount;
-        else
+        } else {
           rstCount = pwgCount + 1 + ((totCount - 1) - i);
+        }
       }
       assertEquals(rstCount, result.size());
       assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
@@ -208,10 +211,11 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       if (i >= pwgCount && i < (totCount - pwgCount)) {
         rstCount = pwgCount + 1 + pwgCount;
       } else {
-        if (i < pwgCount)
+        if (i < pwgCount) {
           rstCount = pwgCount + 1 + i;
-        else
+        } else {
           rstCount = ((totCount - 1) - i) + 1 + pwgCount;
+        }
       }
       assertEquals(rstCount, result.size());
       assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());

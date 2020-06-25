@@ -60,8 +60,9 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       attr.setMaxCount(3333);
 
       Map<Long, Object> elements = new HashMap<Long, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(i, 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncBopPipedInsertBulk(KEY, elements, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
@@ -92,8 +93,9 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       CollectionAttributes attr = new CollectionAttributes();
 
       Map<Long, Object> elements = new HashMap<Long, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(i, 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncBopPipedInsertBulk(KEY, elements, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
@@ -115,8 +117,9 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       Map<Long, Object> elements = new HashMap<Long, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(i, 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncBopPipedInsertBulk(KEY, elements,
                       new CollectionAttributes()).get();
@@ -139,8 +142,9 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       Map<Long, Object> elements = new HashMap<Long, Object>();
-      for (long i = 1; i < 11; i++)
+      for (long i = 1; i < 11; i++) {
         elements.put(i, 1);
+      }
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncBopPipedInsertBulk(KEY, elements, null).get();
       Assert.assertEquals(10, insertResult.size());
@@ -159,9 +163,10 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
     try {
       byte[] eflag = new byte[]{0, 1, 0, 1};
       List<Element<Object>> elements = new ArrayList<Element<Object>>();
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < 10; i++) {
         elements.add(new Element<Object>(new byte[]{(byte) i},
-                "VALUE" + i, eflag));
+            "VALUE" + i, eflag));
+      }
 
       Map<Integer, CollectionOperationStatus> map = mc
               .asyncBopPipedInsertBulk(KEY, elements,
@@ -188,8 +193,9 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       byte[] eflag = new byte[]{0, 1, 0, 1};
 
       List<Element<Object>> elements = new ArrayList<Element<Object>>();
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < 10; i++) {
         elements.add(new Element<Object>(i, "VALUE" + i, eflag));
+      }
 
       Map<Integer, CollectionOperationStatus> map = mc
               .asyncBopPipedInsertBulk(KEY, elements,

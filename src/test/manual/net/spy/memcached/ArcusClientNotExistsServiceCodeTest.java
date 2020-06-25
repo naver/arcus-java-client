@@ -25,8 +25,9 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 public class ArcusClientNotExistsServiceCodeTest extends TestCase {
 
   public void testNotExistsServiceCode() {
-    if (!BaseIntegrationTest.USE_ZK)
+    if (!BaseIntegrationTest.USE_ZK) {
       return;
+    }
 
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     try {

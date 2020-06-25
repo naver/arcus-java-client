@@ -137,8 +137,9 @@ public class SopPipedExistTest extends BaseIntegrationTest {
       for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
         findValues.add("VALUE" + i);
 
-        if (i / 2 == 0)
+        if (i / 2 == 0) {
           continue;
+        }
         Assert.assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i,
                 new CollectionAttributes()).get());
       }
