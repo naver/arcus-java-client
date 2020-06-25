@@ -32,14 +32,17 @@ public class PartitionedList<T> extends AbstractList<List<T>> {
   @Override
   public List<T> get(int index) {
     int listSize = size();
-    if (listSize < 0)
+    if (listSize < 0) {
       throw new IllegalArgumentException("negative size: " + listSize);
-    if (index < 0)
+    }
+    if (index < 0) {
       throw new IndexOutOfBoundsException("index " + index
-              + " must not be negative");
-    if (index >= listSize)
+          + " must not be negative");
+    }
+    if (index >= listSize) {
       throw new IndexOutOfBoundsException("index " + index
-              + " must be less than size " + listSize);
+          + " must be less than size " + listSize);
+    }
     int start = index * size;
     int end = Math.min(start + size, list.size());
     return list.subList(start, end);

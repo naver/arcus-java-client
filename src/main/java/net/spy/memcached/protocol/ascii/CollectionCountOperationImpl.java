@@ -60,8 +60,9 @@ public class CollectionCountOperationImpl extends OperationImpl implements
     super(cb);
     this.key = key;
     this.collectionCount = collectionCount;
-    if (this.collectionCount instanceof BTreeCount)
+    if (this.collectionCount instanceof BTreeCount) {
       setAPIType(APIType.BOP_COUNT);
+    }
     setOperationType(OperationType.READ);
   }
 

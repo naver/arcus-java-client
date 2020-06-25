@@ -74,7 +74,9 @@ public abstract class CollectionInsert<T> {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
 
     StringBuilder b = new StringBuilder();
 

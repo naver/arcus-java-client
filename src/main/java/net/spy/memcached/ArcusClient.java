@@ -1098,8 +1098,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public boolean isCancelled() {
         for (Operation op : ops) {
-          if (op.isCancelled())
+          if (op.isCancelled()) {
             return true;
+          }
         }
         return false;
       }
@@ -1266,9 +1267,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         Operation op = opFact.store(StoreType.set, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess())
+                    if (!val.isSuccess()) {
                       failedResult.put(k, new CollectionOperationStatus(false, String
-                              .valueOf(val.isSuccess()), CollectionResponse.END));
+                          .valueOf(val.isSuccess()), CollectionResponse.END));
+                    }
                   }
 
                   public void complete() {
@@ -1309,9 +1311,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         Operation op = opFact.store(StoreType.set, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess())
+                    if (!val.isSuccess()) {
                       failedResult.put(k, new CollectionOperationStatus(false, String
-                              .valueOf(val.isSuccess()), CollectionResponse.END));
+                          .valueOf(val.isSuccess()), CollectionResponse.END));
+                    }
                   }
 
                   public void complete() {
@@ -1353,8 +1356,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         Operation op = opFact.store(type, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess())
+                    if (!val.isSuccess()) {
                       failedResult.put(k, val);
+                    }
                   }
 
                   public void complete() {
@@ -1394,8 +1398,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         Operation op = opFact.store(type, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess())
+                    if (!val.isSuccess()) {
                       failedResult.put(k, val);
+                    }
                   }
 
                   public void complete() {
@@ -1430,8 +1435,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       public Operation createOp(final String k) {
         Operation op = opFact.delete(k, new OperationCallback() {
           public void receivedStatus(OperationStatus val) {
-            if (!val.isSuccess())
+            if (!val.isSuccess()) {
               failedResult.put(k, val);
+            }
           }
 
           public void complete() {
@@ -2115,8 +2121,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public boolean isCancelled() {
         for (Operation op : ops) {
-          if (op.isCancelled())
+          if (op.isCancelled()) {
             return true;
+          }
         }
         return false;
       }
@@ -2286,16 +2293,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     if (mergedResult.size() > count) {
       int toIndex = (count + offset > mergedResult.size()) ? mergedResult
               .size() : count + offset;
-      if (offset > toIndex)
+      if (offset > toIndex) {
         return Collections.emptyList();
+      }
       return mergedResult.subList(offset, toIndex);
     } else {
       if (offset > 0) {
         int toIndex = (count + offset > mergedResult.size()) ? mergedResult
                 .size() : count + offset;
 
-        if (offset > toIndex)
+        if (offset > toIndex) {
           return Collections.emptyList();
+        }
         return mergedResult.subList(offset, toIndex);
       } else {
         return mergedResult;
@@ -2380,8 +2389,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               for (SMGetElement<T> result : eachResult) {
                 for (; pos < mergedResult.size(); pos++) {
                   if ((reverse) ? (0 < result.compareTo(mergedResult.get(pos)))
-                          : (0 > result.compareTo(mergedResult.get(pos))))
+                          : (0 > result.compareTo(mergedResult.get(pos)))) {
                     break;
+                  }
                 }
                 if (pos >= totalResultElementCount) {
                   addAll = false;
@@ -2422,15 +2432,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 }
               }
               if (mergedTrim.get()) {
-                if (isDuplicated)
+                if (isDuplicated) {
                   resultOperationStatus.add(new OperationStatus(true, "DUPLICATED_TRIMMED"));
-                else
+                } else {
                   resultOperationStatus.add(new OperationStatus(true, "TRIMMED"));
+                }
               } else {
-                if (isDuplicated)
+                if (isDuplicated) {
                   resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-                else
+                } else {
                   resultOperationStatus.add(new OperationStatus(true, "END"));
+                }
               }
             }
           } finally {
@@ -2445,8 +2457,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotData(String key, Object subkey, int flags, byte[] data) {
-          if (stopCollect.get())
+          if (stopCollect.get()) {
             return;
+          }
 
           if (subkey instanceof Long) {
             eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(
@@ -2497,8 +2510,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
 
-        if (smGetList.size() == 1)
+        if (smGetList.size() == 1) {
           return mergedResult;
+        }
 
         return getSubList(mergedResult, offset, count);
       }
@@ -2602,8 +2616,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   if (comp == 0) { // compare key string
                     comp = result.compareKeyTo(mergedResult.get(pos));
                     if ((reverse) ? (0 < comp) : (0 > comp)) {
-                      if (smgetMode == SMGetMode.UNIQUE)
+                      if (smgetMode == SMGetMode.UNIQUE) {
                         mergedResult.remove(pos); // remove dup bkey
+                      }
                       break;
                     } else {
                       if (smgetMode == SMGetMode.UNIQUE) {
@@ -2680,10 +2695,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                     break;
                   }
                 }
-                if (isDuplicated)
+                if (isDuplicated) {
                   resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-                else
+                } else {
                   resultOperationStatus.add(new OperationStatus(true, "END"));
+                }
               }
             }
           } finally {
@@ -2698,8 +2714,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotData(String key, Object subkey, int flags, byte[] data) {
-          if (stopCollect.get())
+          if (stopCollect.get()) {
             return;
+          }
 
           if (subkey instanceof Long) {
             eachResult.add(new SMGetElement<T>(key, (Long) subkey, tc.decode(
@@ -2718,8 +2735,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotTrimmedKey(String key, Object subkey) {
-          if (stopCollect.get())
+          if (stopCollect.get()) {
             return;
+          }
 
           if (subkey instanceof Long) {
             eachTrimmedResult.add(new SMGetTrimKey(key, (Long) subkey));
@@ -2760,8 +2778,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
 
-        if (smGetList.size() == 1)
+        if (smGetList.size() == 1) {
           return mergedResult;
+        }
 
         return getSubList(mergedResult, 0, count);
       }
@@ -3778,8 +3797,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           private boolean hasAnError = false;
 
           public void receivedStatus(OperationStatus status) {
-            if (hasAnError)
+            if (hasAnError) {
               return;
+            }
 
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -4003,8 +4023,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public boolean isCancelled() {
         for (Operation op : ops) {
-          if (op.isCancelled())
+          if (op.isCancelled()) {
             return true;
+          }
         }
         return false;
       }
@@ -4252,8 +4273,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public boolean isCancelled() {
         for (Operation op : ops) {
-          if (op.isCancelled())
+          if (op.isCancelled()) {
             return true;
+          }
         }
         return false;
       }

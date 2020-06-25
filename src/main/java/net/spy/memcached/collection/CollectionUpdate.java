@@ -43,8 +43,9 @@ public abstract class CollectionUpdate<T> {
   }
 
   public String stringify() {
-    if (str != null)
+    if (str != null) {
       return str;
+    }
 
     StringBuilder b = new StringBuilder();
 

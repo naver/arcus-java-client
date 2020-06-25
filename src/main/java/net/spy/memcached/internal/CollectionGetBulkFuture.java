@@ -109,8 +109,9 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   }
 
   public CollectionOperationStatus getOperationStatus() {
-    if (isCancelled())
+    if (isCancelled()) {
       return new CollectionOperationStatus(new OperationStatus(false, "CANCELED"));
+    }
 
     return new CollectionOperationStatus(new OperationStatus(true, "END"));
   }

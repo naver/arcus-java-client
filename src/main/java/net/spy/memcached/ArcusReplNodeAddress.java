@@ -132,10 +132,11 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         newAllGroups.put(groupName, gNodeList);
       }
       // Add the master node as the first element of node list.
-      if (a.master) // shifts the element currently at that position
+      if (a.master) { // shifts the element currently at that position
         gNodeList.add(0, a);
-      else // Don't care the index, just add it.
+      } else { // Don't care the index, just add it.
         gNodeList.add(a);
+      }
     }
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {

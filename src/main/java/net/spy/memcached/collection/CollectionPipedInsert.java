@@ -67,9 +67,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
-                !CollectionType.list.isAvailableOverflowAction(overflowAction))
+                !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+        }
       }
       this.key = key;
       this.index = index;
@@ -151,9 +152,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
-                !CollectionType.set.isAvailableOverflowAction(overflowAction))
+                !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+        }
       }
       this.key = key;
       this.set = set;
@@ -234,9 +236,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
-                !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+                !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+        }
       }
       this.key = key;
       this.map = map;
@@ -324,9 +327,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
-                !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+                !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+        }
       }
       this.key = key;
       this.elements = elements;
@@ -422,9 +426,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       if (createKeyIfNotExists) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null &&
-                !CollectionType.map.isAvailableOverflowAction(overflowAction))
+                !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
+        }
       }
       this.key = key;
       this.map = map;

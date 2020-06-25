@@ -299,10 +299,11 @@ public class ConnectionFactoryBuilder {
    */
   public ConnectionFactoryBuilder setTimeoutRatioThreshold(int to) {
     assert (to >= 0 && to < 100) : "Timeout ratio threshold range is 0~99.";
-    if (to < 0 || to >= 100)
+    if (to < 0 || to >= 100) {
       timeoutRatioThreshold = 0; // disable
-    else
+    } else {
       timeoutRatioThreshold = to;
+    }
     return this;
   }
 

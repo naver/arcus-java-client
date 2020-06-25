@@ -67,9 +67,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
-            && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+        }
       }
       this.keyList = keyList;
       this.bkey = String.valueOf(bkey);
@@ -88,9 +89,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
-            && !CollectionType.btree.isAvailableOverflowAction(overflowAction))
+            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
+        }
       }
       this.keyList = keyList;
       this.bkey = BTreeUtil.toHex(bkey);
@@ -174,9 +176,11 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
                          CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null && !CollectionType.map.isAvailableOverflowAction(overflowAction))
+        if (overflowAction != null
+            && !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
+        }
       }
       this.keyList = keyList;
       this.mkey = mkey;
@@ -256,9 +260,11 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
                          CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null && !CollectionType.set.isAvailableOverflowAction(overflowAction))
+        if (overflowAction != null &&
+            !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
+        }
       }
       this.keyList = keyList;
       this.value = value;
@@ -336,9 +342,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
-            && !CollectionType.list.isAvailableOverflowAction(overflowAction))
+            && !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
           throw new IllegalArgumentException(
               overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
+        }
       }
       this.keyList = keyList;
       this.index = index;

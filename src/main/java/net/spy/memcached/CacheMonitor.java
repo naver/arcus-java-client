@@ -85,8 +85,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
    * Processes every events from the ZooKeeper.
    */
   public void process(WatchedEvent event) {
-    if (event.getType() == Event.EventType.NodeChildrenChanged)
+    if (event.getType() == Event.EventType.NodeChildrenChanged) {
       asyncGetCacheList();
+    }
   }
 
   /**

@@ -66,7 +66,9 @@ public class BTreeGetByPosition extends CollectionGet {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
     StringBuilder b = new StringBuilder();
     b.append(order.getAscii());
     b.append(" ");

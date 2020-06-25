@@ -79,16 +79,17 @@ public class CollectionInsertOperationImpl extends OperationImpl
     this.subkey = subkey;
     this.collectionInsert = collectionInsert;
     this.data = data;
-    if (this.collectionInsert instanceof ListInsert)
+    if (this.collectionInsert instanceof ListInsert) {
       setAPIType(APIType.LOP_INSERT);
-    else if (this.collectionInsert instanceof SetInsert)
+    } else if (this.collectionInsert instanceof SetInsert) {
       setAPIType(APIType.SOP_INSERT);
-    else if (this.collectionInsert instanceof MapInsert)
+    } else if (this.collectionInsert instanceof MapInsert) {
       setAPIType(APIType.MOP_INSERT);
-    else if (this.collectionInsert instanceof BTreeInsert)
+    } else if (this.collectionInsert instanceof BTreeInsert) {
       setAPIType(APIType.BOP_INSERT);
-    else if (this.collectionInsert instanceof BTreeUpsert)
+    } else if (this.collectionInsert instanceof BTreeUpsert) {
       setAPIType(APIType.BOP_UPSERT);
+    }
     setOperationType(OperationType.WRITE);
   }
 

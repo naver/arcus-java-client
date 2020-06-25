@@ -52,20 +52,27 @@ public class CollectionAttributes extends Attributes {
   protected String stringify() {
     StringBuilder b = new StringBuilder();
 
-    if (flags != null)
+    if (flags != null) {
       b.append(" flags=").append(flags);
-    if (expireTime != null)
+    }
+    if (expireTime != null) {
       b.append(" expiretime=").append(expireTime);
-    if (type != null)
+    }
+    if (type != null) {
       b.append(" type=").append(type.getStringValue());
-    if (count != null)
+    }
+    if (count != null) {
       b.append(" count=").append(count);
-    if (maxCount != null)
+    }
+    if (maxCount != null) {
       b.append(" maxcount=").append(maxCount);
-    if (overflowAction != null)
+    }
+    if (overflowAction != null) {
       b.append(" overflowaction=").append(String.valueOf(overflowAction));
-    if (readable != null)
+    }
+    if (readable != null) {
       b.append(" readable=").append((readable) ? "on" : "off");
+    }
     if (maxBkeyRange != null || maxBkeyRangeByBytes != null) {
       if (maxBkeyRange != null) {
         b.append(" maxbkeyrange=").append(String.valueOf(maxBkeyRange));

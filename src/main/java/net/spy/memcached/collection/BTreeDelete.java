@@ -110,7 +110,9 @@ public class BTreeDelete extends CollectionDelete {
   }
 
   public String stringify() {
-    if (str != null) return str;
+    if (str != null) {
+      return str;
+    }
 
     StringBuilder b = new StringBuilder();
     b.append(range);

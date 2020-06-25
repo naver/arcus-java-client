@@ -338,8 +338,9 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           }
           byteBuffer.reset();
-        } else
+        } else {
           byteBuffer.write(b);
+        }
       }
       return;
     }
@@ -370,13 +371,14 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             // <key> <bkey>\r\n
             String[] chunk = new String(byteBuffer.toByteArray())
                     .split(" ");
-            if (smGet instanceof BTreeSMGetWithLongTypeBkey)
+            if (smGet instanceof BTreeSMGetWithLongTypeBkey) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
-                      .gotTrimmedKey(chunk[0], Long.parseLong(chunk[1]));
-            else if (smGet instanceof BTreeSMGetWithByteTypeBkey)
+                  .gotTrimmedKey(chunk[0], Long.parseLong(chunk[1]));
+            } else if (smGet instanceof BTreeSMGetWithByteTypeBkey) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
-                      .gotTrimmedKey(chunk[0],
-                              BTreeUtil.hexStringToByteArrays(chunk[1].substring(2)));
+                  .gotTrimmedKey(chunk[0],
+                      BTreeUtil.hexStringToByteArrays(chunk[1].substring(2)));
+            }
             count++;
           } else {
             /* unexpected response */
@@ -385,8 +387,9 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           }
           byteBuffer.reset();
-        } else
+        } else {
           byteBuffer.write(b);
+        }
       }
       return;
     }

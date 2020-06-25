@@ -311,8 +311,9 @@ public class MemcachedClient extends SpyThread
         throw new IllegalArgumentException(
                 "Key contains invalid characters:  ``" + key + "''");
       }
-      if (b == delimiter)
+      if (b == delimiter) {
         hasPrefix = true;
+      }
     }
 
     // Validate the prefix
@@ -322,7 +323,9 @@ public class MemcachedClient extends SpyThread
                 "Key contains invalid prefix: ``" + key + "''");
       }
       for (byte b : keyBytes) {
-        if (b == delimiter) break;
+        if (b == delimiter) {
+          break;
+        }
         if (!(('a' <= b && b <= 'z') || ('A' <= b && b <= 'Z') ||
                 ('0' <= b && b <= '9') ||
                 (b == '_') || (b == '-') || (b == '+') || (b == '.'))) {
@@ -1755,8 +1758,9 @@ public class MemcachedClient extends SpyThread
       @Override
       public boolean isCancelled() {
         for (Operation op : ops) {
-          if (op.isCancelled())
+          if (op.isCancelled()) {
             return true;
+          }
         }
         return false;
       }

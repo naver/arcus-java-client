@@ -52,14 +52,16 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
     int comp;
         /* compare bkey */
-    if (bytebkey == null)
-      comp = new Long(bkey).compareTo(param.getBkey());
-    else
+    if (bytebkey == null) {
+      comp = Long.valueOf(bkey).compareTo(param.getBkey());
+    } else {
       comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+    }
 
     /* if bkey is equal, then compare key */
-    if (comp == 0)
+    if (comp == 0) {
       comp = key.compareTo(param.getKey());
+    }
 
     return comp;
   }
@@ -68,10 +70,11 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
     assert param != null;
 
     /* compare bkey */
-    if (bytebkey == null)
-      return new Long(bkey).compareTo(param.getBkey());
-    else
+    if (bytebkey == null) {
+      return Long.valueOf(bkey).compareTo(param.getBkey());
+    } else {
       return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
+    }
   }
 
   public int compareKeyTo(SMGetElement<T> param) {

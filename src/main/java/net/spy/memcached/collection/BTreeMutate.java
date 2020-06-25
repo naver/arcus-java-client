@@ -71,14 +71,19 @@ public class BTreeMutate extends CollectionMutate {
   }
 
   public String stringify() {
-    if (str != null)
+    if (str != null) {
       return str;
+    }
 
     StringBuilder b = new StringBuilder();
     b.append(by);
 
-    if (initial >= 0) b.append(" ").append(initial);
-    if (elementFlag != null) b.append(" ").append(getElementFlagByHex());
+    if (initial >= 0) {
+      b.append(" ").append(initial);
+    }
+    if (elementFlag != null) {
+      b.append(" ").append(getElementFlagByHex());
+    }
 
     str = b.toString();
     return str;

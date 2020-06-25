@@ -20,12 +20,13 @@ final class StoreOperationImpl extends BaseStoreOperationImpl
                             byte[] d, OperationCallback cb) {
     super(t.name(), k, f, e, d, cb);
     storeType = t;
-    if (t == StoreType.add)
+    if (t == StoreType.add) {
       setAPIType(APIType.ADD);
-    else if (t == StoreType.set)
+    } else if (t == StoreType.set) {
       setAPIType(APIType.SET);
-    else if (t == StoreType.replace)
+    } else if (t == StoreType.replace) {
       setAPIType(APIType.REPLACE);
+    }
   }
 
   public StoreType getStoreType() {

@@ -57,16 +57,19 @@ public class PartitionedMap<K, V> extends AbstractList<Map<K, V>> {
   public Map<K, V> get(int index) {
     int listSize = size();
 
-    if (listSize < 0)
+    if (listSize < 0) {
       throw new IllegalArgumentException("negative size: " + listSize);
+    }
 
-    if (index < 0)
+    if (index < 0) {
       throw new IndexOutOfBoundsException("index " + index
-              + " must not be negative");
+          + " must not be negative");
+    }
 
-    if (index >= listSize)
+    if (index >= listSize) {
       throw new IndexOutOfBoundsException("index " + index
-              + " must be less than size " + listSize);
+          + " must be less than size " + listSize);
+    }
 
     return mapList.get(index);
   }

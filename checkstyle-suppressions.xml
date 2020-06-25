@@ -6,4 +6,5 @@
 
 <suppressions>
     <suppress checks="LineLength" files="OperationType\.java"/>
+    <suppress checks="NeedBraces" files="src/test/manual"/>
 </suppressions>

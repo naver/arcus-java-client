@@ -38,14 +38,17 @@ public class Attributes extends SpyObject {
   protected String stringify() {
     StringBuilder b = new StringBuilder();
 
-    if (flags != null)
+    if (flags != null) {
       b.append(" flags=").append(flags);
+    }
 
-    if (expireTime != null)
+    if (expireTime != null) {
       b.append(" expiretime=").append(expireTime);
+    }
 
-    if (type != null)
+    if (type != null) {
       b.append(" type=").append(type.getStringValue());
+    }
 
     str = (b.length() < 1) ? "" : b.substring(1);
 

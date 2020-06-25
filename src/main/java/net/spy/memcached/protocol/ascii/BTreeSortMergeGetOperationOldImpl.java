@@ -271,8 +271,9 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
                     .gotMissedKey(byteBuffer.toByteArray());
           }
           byteBuffer.reset();
-        } else
+        } else {
           byteBuffer.write(b);
+        }
       }
       return;
     }

@@ -150,8 +150,9 @@ public abstract class BaseOperationImpl extends SpyObject {
     }
     if (state == OperationState.COMPLETE) {
       /* ENABLE_REPLICATION if */
-      if (moved)
+      if (moved) {
         getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
+      }
       /* ENABLE_REPLICATION end */
       callback.complete();
     }

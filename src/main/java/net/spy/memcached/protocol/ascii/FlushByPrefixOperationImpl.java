@@ -69,10 +69,12 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
     StringBuilder sb = new StringBuilder();
     sb.append("flush_prefix ");
     sb.append(prefix);
-    if (delay != -1)
+    if (delay != -1) {
       sb.append(" ").append(delay);
-    if (noreply)
+    }
+    if (noreply) {
       sb.append(" noreply");
+    }
     sb.append("\r\n");
 
     ByteBuffer bb = ByteBuffer.allocate(sb.length());
