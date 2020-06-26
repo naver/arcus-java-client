@@ -202,7 +202,9 @@ public final class MemcachedConnection extends SpyObject {
     getLogger().debug("Done dealing with queue.");
 
     long delay = 0;
-    if (!reconnectQueue.isEmpty()) {
+    if (!_nodeManageQueue.isEmpty()) {
+      delay = 1;
+    } else if (!reconnectQueue.isEmpty()) {
       long now = System.currentTimeMillis();
       long then = reconnectQueue.firstKey();
       delay = Math.max(then - now, 1);
