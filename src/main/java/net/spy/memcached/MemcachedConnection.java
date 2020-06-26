@@ -172,15 +172,7 @@ public final class MemcachedConnection extends SpyObject {
     return true;
   }
 
-  /**
-   * MemcachedClient calls this method to handle IO over the connections.
-   */
-  public void handleIO() throws IOException {
-    if (shutDown) {
-      throw new IOException("No IO while shut down");
-    }
-
-    // input versionOp to the node that need it.
+  private void addVersionOpToVersionAbsentNodes() {
     Iterator<MemcachedNode> it = nodesNeedVersionOp.iterator();
     while (it.hasNext()) {
       MemcachedNode qa = it.next();
@@ -192,9 +184,20 @@ public final class MemcachedConnection extends SpyObject {
       }
       it.remove();
     }
+  }
 
-    // Deal with all of the stuff that's been added, but may not be marked
-    // writable.
+  /**
+   * MemcachedClient calls this method to handle IO over the connections.
+   */
+  public void handleIO() throws IOException {
+    if (shutDown) {
+      throw new IOException("No IO while shut down");
+    }
+
+    // add versionOp to the node that need it.
+    addVersionOpToVersionAbsentNodes();
+
+    // Deal with all of the stuff that's been added, but may not be marked writable.
     handleInputQueue();
     getLogger().debug("Done dealing with queue.");
 
@@ -210,8 +213,7 @@ public final class MemcachedConnection extends SpyObject {
     Set<SelectionKey> selectedKeys = selector.selectedKeys();
 
     if (selectedKeys.isEmpty() && !shutDown) {
-      getLogger().debug("No selectors ready, interrupted: "
-              + Thread.interrupted());
+      getLogger().debug("No selectors ready, interrupted: " + Thread.interrupted());
       if (++emptySelects > DOUBLE_CHECK_EMPTY) {
         for (SelectionKey sk : selector.keys()) {
           getLogger().info("%s has %s, interested in %s",
@@ -233,7 +235,6 @@ public final class MemcachedConnection extends SpyObject {
       for (SelectionKey sk : selectedKeys) {
         handleIO(sk);
       }
-
       selectedKeys.clear();
     }
 
