@@ -312,7 +312,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  public void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
+  private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
     List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
     List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
