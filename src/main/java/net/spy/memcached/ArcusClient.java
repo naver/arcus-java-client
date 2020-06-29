@@ -1146,6 +1146,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         return new CollectionOperationStatus(true, "END",
                 CollectionResponse.END);
       }
+
+      @Override
+      public boolean isDone() {
+        boolean rv = true;
+        for (Operation op : ops) {
+          rv &= op.getState() == OperationState.COMPLETE;
+        }
+        return rv || isCancelled();
+      }
     };
   }
 
@@ -4072,6 +4081,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         return new CollectionOperationStatus(true, "END",
                 CollectionResponse.END);
       }
+
+      @Override
+      public boolean isDone() {
+        boolean rv = true;
+        for (Operation op : ops) {
+          rv &= op.getState() == OperationState.COMPLETE;
+        }
+        return rv || isCancelled();
+      }
     };
   }
 
@@ -4313,6 +4331,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public CollectionOperationStatus getOperationStatus() {
         return null;
+      }
+
+      @Override
+      public boolean isDone() {
+        boolean rv = true;
+        for (Operation op : ops) {
+          rv &= op.getState() == OperationState.COMPLETE;
+        }
+        return rv || isCancelled();
       }
     };
   }
