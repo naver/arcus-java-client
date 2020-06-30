@@ -1797,11 +1797,12 @@ public class MemcachedClient extends SpyThread
 
       @Override
       public boolean isDone() {
-        boolean rv = true;
         for (Operation op : ops) {
-          rv &= op.getState() == OperationState.COMPLETE;
+          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
+            return false;
+          }
         }
-        return rv || isCancelled();
+        return true;
       }
     };
   }

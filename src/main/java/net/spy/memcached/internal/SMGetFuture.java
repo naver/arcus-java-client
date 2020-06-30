@@ -69,11 +69,12 @@ public abstract class SMGetFuture<T> implements Future<T> {
 
   @Override
   public boolean isDone() {
-    boolean rv = true;
     for (Operation op : ops) {
-      rv &= op.getState() == OperationState.COMPLETE;
+      if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
+        return false;
+      }
     }
-    return rv || isCancelled();
+    return true;
   }
 
   public abstract Map<String, CollectionOperationStatus> getMissedKeys();
