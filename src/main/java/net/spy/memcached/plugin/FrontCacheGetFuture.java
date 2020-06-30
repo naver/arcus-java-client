@@ -77,7 +77,7 @@ public class FrontCacheGetFuture<T> extends GetFuture<T> {
 
   @Override
   public boolean isDone() {
-    return false;
+    return true;
   }
 
 }
