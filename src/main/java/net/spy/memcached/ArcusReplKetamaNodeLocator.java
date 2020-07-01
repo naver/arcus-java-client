@@ -317,7 +317,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
         SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
         if (remove) {
-          nodeSet.remove(ketamaGroups);
+          nodeSet.remove(group);
           if (nodeSet.size() == 0) {
             ketamaGroups.remove(k);
           }
