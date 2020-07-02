@@ -685,7 +685,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return allOp;
   }
 
-  public void addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+  public int addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+    int movedOpCount = 0;
     for (Operation op : allOp) {
       if (inputQueue.remainingCapacity() == 0) {
         op.cancel("by moving operations");
@@ -699,22 +700,27 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
           op.resetState(); // reset operation state
         }
         op.setMoved(true);
+        movedOpCount++;
+        inputQueue.offer(op);
       }
-      addOpCount++;
-      inputQueue.offer(op);
     }
+    addOpCount += movedOpCount;
+    return movedOpCount;
   }
 
   public int moveOperations(final MemcachedNode toNode) {
     BlockingQueue<Operation> allOp = getAllOperations();
     int opCount = allOp.size();
+    int movedOpCount = 0;
 
     if (opCount > 0) {
-      toNode.addAllOpToInputQ(allOp);
-      getLogger().info("Total %d operations have been moved to %s", opCount, toNode);
+      movedOpCount = toNode.addAllOpToInputQ(allOp);
+      getLogger().info("Total %d operations have been moved to %s "
+              + "and %d operations have been canceled.",
+          movedOpCount, toNode, opCount - movedOpCount);
     }
 
-    return opCount;
+    return movedOpCount;
   }
   /* ENABLE_REPLICATION end */
 }

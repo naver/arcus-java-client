@@ -45,7 +45,14 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     modifiersField.setAccessible(true);
     modifiersField.setInt(queueField, queueField.getModifiers() & ~Modifier.FINAL);
 
-    return (Queue) queueField.get(node);
+    return (Queue<Operation>) queueField.get(node);
+  }
+
+  private long getAddOpCount(TCPMemcachedNodeImpl node)
+      throws Exception {
+    Field field = TCPMemcachedNodeImpl.class.getDeclaredField("addOpCount");
+    field.setAccessible(true);
+    return field.getLong(node);
   }
 
   public void testMoveOperations() throws Exception {
@@ -96,22 +103,23 @@ public class TCPMemcachedNodeImplTest extends TestCase {
 
     for (int i = 0; i < fromAllOpCount; i++) {
       if (fromNode.getReadQueueSize() < fromReadOpCount) {
-        getQueue("readQ", fromNode).offer(fromOperations.get(i));
+        assertTrue(getQueue("readQ", fromNode).offer(fromOperations.get(i)));
       } else if (fromNode.getWriteQueueSize() < fromWriteOpCount) {
-        getQueue("writeQ", fromNode).offer(fromOperations.get(i));
+        assertTrue(getQueue("writeQ", fromNode).offer(fromOperations.get(i)));
       } else {
-        getQueue("inputQueue", fromNode).offer(fromOperations.get(i));
+        assertTrue(getQueue("inputQueue", fromNode).offer(fromOperations.get(i)));
       }
     }
 
     // when
-    fromNode.moveOperations(toNode);
+    assertEquals(inputQueueSize, fromNode.moveOperations(toNode));
 
     // then
     assertEquals(0, fromNode.getInputQueueSize());
     assertEquals(0, fromNode.getWriteQueueSize());
     assertEquals(0, fromNode.getReadQueueSize());
     assertEquals(inputQueueSize, toNode.getInputQueueSize());
+    assertEquals(inputQueueSize, getAddOpCount(toNode));
 
     for (int i = 0; i < fromAllOpCount; i++) {
       Operation op = fromOperations.get(i);

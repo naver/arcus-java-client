@@ -454,12 +454,14 @@ public final class MemcachedConnection extends SpyObject {
      */
     if (group.getMasterNode() != null && group.getSlaveNode() != null) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
-        node.moveOperations(group.getSlaveNode());
-        addedQueue.offer(group.getSlaveNode());
+        if (node.moveOperations(group.getSlaveNode()) > 0) {
+          addedQueue.offer(group.getSlaveNode());
+        }
         ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
       } else {
-        node.moveOperations(group.getMasterNode());
-        addedQueue.offer(group.getMasterNode());
+        if (node.moveOperations(group.getMasterNode()) > 0) {
+          addedQueue.offer(group.getMasterNode());
+        }
       }
       queueReconnect(node, ReconnDelay.IMMEDIATE,
           "Discarded all pending reading state operation to move operations.");
