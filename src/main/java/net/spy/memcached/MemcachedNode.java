@@ -274,7 +274,7 @@ public interface MemcachedNode {
 
   MemcachedReplicaGroup getReplicaGroup();
 
-  void addAllOpToInputQ(BlockingQueue<Operation> allOp);
+  int addAllOpToInputQ(BlockingQueue<Operation> allOp);
 
   int moveOperations(final MemcachedNode toNode);
   /* ENABLE_REPLICATION end */
