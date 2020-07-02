@@ -643,7 +643,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     } catch (ExecutionException e) {
       e.printStackTrace();
       OperationException oe = (OperationException) e.getCause();
-      assertSame(OperationErrorType.CLIENT, oe.getType());
+      // ensure compatibility about changing E2BIG
+      assertTrue(OperationErrorType.CLIENT == oe.getType() ||
+            OperationErrorType.SERVER == oe.getType());
     }
 
     // But I should still be able to do something.
