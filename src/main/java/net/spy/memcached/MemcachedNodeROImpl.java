@@ -211,10 +211,6 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public boolean isFake() {
-    throw new UnsupportedOperationException();
-  }
-
   public void shutdown() throws IOException {
     throw new UnsupportedOperationException();
   }

@@ -2260,7 +2260,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       if (!keySet.add(k)) {
         throw new IllegalArgumentException("Duplicate keys exist in key list.");
       }
-      String node = conn.findNodeByKey(k).getSocketAddress().toString();
+      MemcachedNode qa = conn.findNodeByKey(k);
+      String node;
+      if (qa == null) {
+        node = "fake_node";
+      } else {
+        node = qa.getSocketAddress().toString();
+      }
       int cc;
       if (chunkCount.containsKey(node)) {
         cc = chunkCount.get(node);

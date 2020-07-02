@@ -85,15 +85,6 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private List<String> prevCacheList;
 
-  /**
-   * The locator class of the spymemcached has an assumption
-   * that it should have one cache node at least.
-   * Thus, we add a fake server node in it
-   * if there's no cache servers for the given service code.
-   * This is just a work-around, but it works really.
-   */
-  public static final String FAKE_SERVER_NODE = "0.0.0.0:23456";
-
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled = false;
   /* ENABLE_REPLICATION end */
@@ -347,8 +338,6 @@ public class CacheManager extends SpyThread implements Watcher,
   }
 
   /**
-   * If there's no children in the znode, make a fake server node.
-   *
    * Change current MemcachedNodes to new MemcachedNodes but intersection of
    * current and new will be ruled out.
    *
@@ -356,13 +345,11 @@ public class CacheManager extends SpyThread implements Watcher,
    *            new children node list
    */
   public void commandCacheListChange(List<String> children) {
-    // If there's no children, add a fake server node to the list.
     if (children.size() == 0) {
       getLogger().error("Cannot find any cache nodes for your service code. " +
               "Please contact Arcus support to solve this problem. " +
               "[serviceCode=" + serviceCode + ", addminSessionId=0x" +
               Long.toHexString(zk.getSessionId()));
-      children.add(CacheManager.FAKE_SERVER_NODE);
     }
 
     if (!children.equals(prevCacheList)) {
@@ -432,30 +419,16 @@ public class CacheManager extends SpyThread implements Watcher,
       /* recreate socket list */
       socketList.clear();
       for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (entry.getValue().size() == 0) {
-          socketList.add(ArcusReplNodeAddress.createFake(entry.getKey()));
-        } else {
+        if (entry.getValue().size() > 0) { // valid replica group
           socketList.addAll(entry.getValue());
-        }
-      }
-
-      // Exclude fake server addresses in the initial latch count.
-      // Otherwise we may block here for a while trying to connect to
-      // slave-only groups.
-      addrCount = 0;
-      for (InetSocketAddress a : socketList) {
-        // See TCPMemcachedNodeImpl:TCPMemcachedNodeImpl().
-        if (("/" + CacheManager.FAKE_SERVER_NODE).equals(
-                a.getAddress() + ":" + a.getPort()) != true) {
-          addrCount++;
         }
       }
     } else {
       socketList = AddrUtil.getAddresses(addrs);
-      // Preserve base cluster behavior.  The initial latch count
-      // includes fake server addresses.
-      addrCount = socketList.size();
     }
+
+    addrCount = socketList.size();
+
     /* ENABLE_REPLICATION else */
     /*
     List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);

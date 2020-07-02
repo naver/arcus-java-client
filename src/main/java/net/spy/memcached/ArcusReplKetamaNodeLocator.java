@@ -132,15 +132,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public MemcachedNode getPrimary(final String k) {
-    MemcachedNode rv = getNodeForKey(hashAlg.hash(k), ReplicaPick.MASTER);
-    assert rv != null : "Found no node for key" + k;
-    return rv;
+    return getNodeForKey(hashAlg.hash(k), ReplicaPick.MASTER);
   }
 
   public MemcachedNode getPrimary(final String k, ReplicaPick pick) {
-    MemcachedNode rv = getNodeForKey(hashAlg.hash(k), pick);
-    assert rv != null : "Found no node for key" + k;
-    return rv;
+    return getNodeForKey(hashAlg.hash(k), pick);
   }
 
   public long getMaxKey() {
@@ -149,31 +145,33 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
   private MemcachedNode getNodeForKey(long hash, ReplicaPick pick) {
     MemcachedReplicaGroup rg;
-    MemcachedNode rv;
+    MemcachedNode rv = null;
 
     lock.lock();
     try {
-      if (!ketamaGroups.containsKey(hash)) {
-        Long nodeHash = ketamaGroups.ceilingKey(hash);
-        if (nodeHash == null) {
-          hash = ketamaGroups.firstKey();
-        } else {
-          hash = nodeHash.longValue();
+      if (!ketamaGroups.isEmpty()) {
+        if (!ketamaGroups.containsKey(hash)) {
+          Long nodeHash = ketamaGroups.ceilingKey(hash);
+          if (nodeHash == null) {
+            hash = ketamaGroups.firstKey();
+          } else {
+            hash = nodeHash.longValue();
+          }
+          // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
+          // in a lot of places, so I'm doing this myself.
+          /*
+          SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
+          if (tailMap.isEmpty()) {
+            hash = ketamaNodes.firstKey();
+          } else {
+            hash = tailMap.firstKey();
+          }
+          */
         }
-        // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
-        // in a lot of places, so I'm doing this myself.
-        /*
-        SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
-        if (tailMap.isEmpty()) {
-          hash = ketamaNodes.firstKey();
-        } else {
-          hash = tailMap.firstKey();
-        }
-        */
+        rg = ketamaGroups.get(hash).first();
+        // return a node (master / slave) for the replica pick request.
+        rv = rg.getNodeForReplicaPick(pick);
       }
-      rg = ketamaGroups.get(hash).first();
-      // return a node (master / slave) for the replica pick request.
-      rv = rg.getNodeForReplicaPick(pick);
     } catch (RuntimeException e) {
       throw e;
     } finally {

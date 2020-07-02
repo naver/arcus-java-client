@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -35,7 +34,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.spy.memcached.ArcusReplNodeAddress;
-import net.spy.memcached.CacheManager;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
@@ -87,16 +85,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
    */
   private volatile long addOpCount;
 
-  // fake node
-  private boolean isFake = false;
-
   /* ENABLE_REPLICATION if */
   private MemcachedReplicaGroup replicaGroup;
   /* ENABLE_REPLICATION end */
-
-  public boolean isFake() {
-    return isFake;
-  }
 
   private void resetTimeoutRatioCount() {
     if (toRatioEnabled) {
@@ -169,13 +160,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
     setupForAuth("init authentication");
-
-    // is this a fake node?
-    if (sa instanceof InetSocketAddress) {
-      InetSocketAddress inetSockAddr = (InetSocketAddress) sa;
-      String ipport = inetSockAddr.getAddress() + ":" + inetSockAddr.getPort();
-      isFake = ("/" + CacheManager.FAKE_SERVER_NODE).equals(ipport);
-    }
   }
 
   public final void copyInputQueue() {
@@ -443,8 +427,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final boolean isActive() {
-    return !isFake && reconnectAttempt == 0
-            && getChannel() != null && getChannel().isConnected();
+    return reconnectAttempt == 0 && getChannel() != null && getChannel().isConnected();
   }
 
   public final void reconnecting() {
