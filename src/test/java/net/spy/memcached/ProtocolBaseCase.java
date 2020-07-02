@@ -643,7 +643,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     } catch (ExecutionException e) {
       e.printStackTrace();
       OperationException oe = (OperationException) e.getCause();
-      assertSame(OperationErrorType.SERVER, oe.getType());
+      assertSame(OperationErrorType.CLIENT, oe.getType());
     }
 
     // But I should still be able to do something.
