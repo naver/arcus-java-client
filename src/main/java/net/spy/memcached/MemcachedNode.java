@@ -258,13 +258,6 @@ public interface MemcachedNode {
   int getTimeoutRatioNow();
 
   /**
-   * Is this a fake node?
-   *
-   * @return true or false
-   */
-  boolean isFake();
-
-  /**
    * Shutdown the node
    */
   void shutdown() throws IOException;

@@ -418,10 +418,10 @@ public final class MemcachedConnection extends SpyObject {
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
-      if (newGroupAddrs.size() == 0) { // Incomplete group, now
-        attachNodes.add(attachMemcachedNode(connName,
-                ArcusReplNodeAddress.createFake(entry.getKey())));
-      } else { // Completely new group
+      if (newGroupAddrs.size() == 0) {
+        // Incomplete group now, do nothing.
+      } else {
+        // Completely new group
         attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(0)));
         if (newGroupAddrs.size() > 1) {
           attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(1)));
@@ -485,18 +485,6 @@ public final class MemcachedConnection extends SpyObject {
     // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
     // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 
-    /* ENABLE_REPLICATION if */
-    // Do not attempt to connect if this node is fake.
-    // Otherwise, we keep connecting to a non-existent listen address
-    // and keep failing/reconnecting.
-    if (qa.isFake()) {
-      // Locator assumes non-null selectionkey.  So add a dummy one...
-      ops = SelectionKey.OP_CONNECT;
-      qa.setSk(ch.register(selector, ops, qa));
-      getLogger().info("new fake memcached node added %s to connect queue", qa);
-      return qa;
-    }
-    /* ENABLE_REPLICATION end */
     // Initially I had attempted to skirt this by queueing every
     // connect, but it considerably slowed down start time.
     try {
@@ -1022,7 +1010,9 @@ public final class MemcachedConnection extends SpyObject {
   public void addOperation(final String key, final Operation o) {
     MemcachedNode placeIn = null;
     MemcachedNode primary = getPrimaryNode(key, o);
-    if (primary.isActive() || failureMode == FailureMode.Retry) {
+    if (primary == null) {
+      o.cancel("no node");
+    } else if (primary.isActive() || failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else if (failureMode == FailureMode.Cancel) {
       o.setHandlingNode(primary);
@@ -1192,7 +1182,9 @@ public final class MemcachedConnection extends SpyObject {
     MemcachedNode placeIn = null;
     MemcachedNode primary = getPrimaryNode(key);
     // FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
-    if (primary.isActive() || failureMode == FailureMode.Retry) {
+    if (primary == null) {
+      return null;
+    } else if (primary.isActive() || failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else {
       Iterator<MemcachedNode> iter = getNodeSequence(key);

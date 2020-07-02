@@ -226,10 +226,6 @@ public class MockMemcachedNode implements MemcachedNode {
     return -1; // disabled
   }
 
-  public boolean isFake() {
-    return false;
-  }
-
   public void shutdown() throws IOException {
     // noop
   }

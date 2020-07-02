@@ -25,12 +25,12 @@ public final class AddrUtil {
     if (s == null) {
       throw new NullPointerException("Null host list");
     }
-    if (s.trim().equals("")) {
-      throw new IllegalArgumentException("No hosts in list:  ``"
-              + s + "''");
-    }
     ArrayList<InetSocketAddress> addrs =
             new ArrayList<InetSocketAddress>();
+
+    if (s.trim().equals("")) {
+      return addrs;
+    }
 
     for (String hoststuff : s.split("(?:\\s|,)+")) {
       if (hoststuff.equals("")) {

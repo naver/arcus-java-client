@@ -66,30 +66,20 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     return new ArcusReplNodeAddress(group, master, ip, port);
   }
 
-  static ArcusReplNodeAddress createFake(String groupName) {
-    return create(groupName == null ? "invalid" : groupName,
-            true, CacheManager.FAKE_SERVER_NODE);
-  }
-
   private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
     List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
     for (String node : s.split(",")) {
-      ArcusReplNodeAddress a = null;
-      if (node.equals(CacheManager.FAKE_SERVER_NODE)) {
-        a = ArcusReplNodeAddress.createFake(null);
-      } else {
-        String[] temp = node.split("\\^");
-        String group = temp[0];
-        boolean master = temp[1].equals("M") ? true : false;
-        String ipport = temp[2];
-        // We may throw null pointer exception if the string has
-        // an unexpected format.  Abort the whole method instead of
-        // trying to ignore malformed strings.
-        // Is this the right behavior?  FIXME
-        a = ArcusReplNodeAddress.create(group, master, ipport);
-      }
-      addrs.add(a);
+      String[] temp = node.split("\\^");
+      String group = temp[0];
+      boolean master = temp[1].equals("M") ? true : false;
+      String ipport = temp[2];
+      // We may throw null pointer exception if the string has
+      // an unexpected format.  Abort the whole method instead of
+      // trying to ignore malformed strings.
+      // Is this the right behavior?  FIXME
+
+      addrs.add(ArcusReplNodeAddress.create(group, master, ipport));
     }
     return addrs;
   }
@@ -99,20 +89,19 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   static List<InetSocketAddress> getAddresses(String s) {
     List<InetSocketAddress> list = null;
 
-    try {
-      list = parseNodeNames(s);
-    } catch (Exception e) {
-      // May see an exception if nodes do not follow the replication naming convention
-      arcusLogger.error("Exception caught while parsing node" +
-              " addresses. cache_list=" + s + "\n" + e);
-      e.printStackTrace();
-      list = null;
+    if (s != null && !s.isEmpty()) {
+      try {
+        list = parseNodeNames(s);
+      } catch (Exception e) {
+        // May see an exception if nodes do not follow the replication naming convention
+        arcusLogger.error("Exception caught while parsing node" +
+                " addresses. cache_list=" + s + "\n" + e);
+        e.printStackTrace();
+      }
     }
-    // Return at least one node in all cases.  Otherwise we may see unexpected null pointer
-    // exceptions throughout this client library...
-    if (list == null || list.size() == 0) {
-      list = new ArrayList<InetSocketAddress>(1);
-      list.add((InetSocketAddress) ArcusReplNodeAddress.createFake(null));
+
+    if (list == null) {
+      list = new ArrayList<InetSocketAddress>(0);
     }
     return list;
   }

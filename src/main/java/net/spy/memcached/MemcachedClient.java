@@ -1125,7 +1125,9 @@ public class MemcachedClient extends SpyThread
       final MemcachedNode primaryNode = conn.getPrimaryNode(key);
       MemcachedNode node = null;
       // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
-      if (primaryNode.isActive()) {
+      if (primaryNode == null) {
+        node = null;
+      } else if (primaryNode.isActive()) {
         node = primaryNode;
       } else {
         Iterator<MemcachedNode> iter = conn.getNodeSequence(key);
@@ -1139,7 +1141,6 @@ public class MemcachedClient extends SpyThread
           node = primaryNode;
         }
       }
-      assert node != null : "Didn't find a node for " + key;
       List<Collection<String>> lks = chunks.get(node);
       if (lks == null) {
         lks = new ArrayList<Collection<String>>();
@@ -1191,9 +1192,15 @@ public class MemcachedClient extends SpyThread
             : chunks.entrySet()) {
       MemcachedNode node = me.getKey();
       for (int i = 0; i <= chunkCount.get(node); i++) {
-        Operation op = node.enabledMGetOp() ?
-                opFact.mget(me.getValue().get(i), cb) : opFact.get(me.getValue().get(i), cb);
-        conn.addOperation(node, op);
+        Operation op;
+        if (node == null) {
+          op = opFact.mget(me.getValue().get(i), cb);
+          op.cancel("no node");
+        } else {
+          op = node.enabledMGetOp() ? opFact.mget(me.getValue().get(i), cb)
+                                    : opFact.get(me.getValue().get(i), cb);
+          conn.addOperation(node, op);
+        }
         ops.add(op);
       }
     }

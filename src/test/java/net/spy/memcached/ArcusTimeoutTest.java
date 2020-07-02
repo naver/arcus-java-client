@@ -68,7 +68,7 @@ public class ArcusTimeoutTest extends TestCase {
       public FailureMode getFailureMode() {
         return FailureMode.Retry;
       }
-    }, AddrUtil.getAddresses(CacheManager.FAKE_SERVER_NODE));
+    }, AddrUtil.getAddresses("0.0.0.0:23456"));
   }
 
   @After

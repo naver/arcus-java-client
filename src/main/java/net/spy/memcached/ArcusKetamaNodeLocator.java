@@ -95,9 +95,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public MemcachedNode getPrimary(final String k) {
-    MemcachedNode rv = getNodeForKey(hashAlg.hash(k));
-    assert rv != null : "Found no node for key " + k;
-    return rv;
+    return getNodeForKey(hashAlg.hash(k));
   }
 
   long getMaxKey() {
@@ -105,29 +103,31 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   MemcachedNode getNodeForKey(long hash) {
-    MemcachedNode rv;
+    MemcachedNode rv = null;
 
     lock.lock();
     try {
-      if (!ketamaNodes.containsKey(hash)) {
-        Long nodeHash = ketamaNodes.ceilingKey(hash);
-        if (nodeHash == null) {
-          hash = ketamaNodes.firstKey();
-        } else {
-          hash = nodeHash.longValue();
+      if (!ketamaNodes.isEmpty()) {
+        if (!ketamaNodes.containsKey(hash)) {
+          Long nodeHash = ketamaNodes.ceilingKey(hash);
+          if (nodeHash == null) {
+            hash = ketamaNodes.firstKey();
+          } else {
+            hash = nodeHash.longValue();
+          }
+          // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
+          // in a lot of places, so I'm doing this myself.
+          /*
+          SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
+          if (tailMap.isEmpty()) {
+            hash = ketamaNodes.firstKey();
+          } else {
+            hash = tailMap.firstKey();
+          }
+          */
         }
-        // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
-        // in a lot of places, so I'm doing this myself.
-        /*
-        SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
-        if (tailMap.isEmpty()) {
-          hash = ketamaNodes.firstKey();
-        } else {
-          hash = tailMap.firstKey();
-        }
-        */
+        rv = ketamaNodes.get(hash).first();
       }
-      rv = ketamaNodes.get(hash).first();
     } catch (RuntimeException e) {
       throw e;
     } finally {
