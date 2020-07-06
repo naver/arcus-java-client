@@ -6,6 +6,7 @@ to support Arcus memcached cloud.
 - Collection data types
 	- List: A doubly-linked list.
 	- Set: An unordered set of unique data.
+	- Map: An unordered set of <field, value>.
 	- B+Tree: A B+Tree structure similar to sorted map.
 - ZooKeeper based clustering
 
