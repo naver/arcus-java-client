@@ -228,7 +228,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public int addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+  public int addAllOpToWriteQ(BlockingQueue<Operation> allOp) {
     throw new UnsupportedOperationException();
   }
 
