@@ -60,10 +60,9 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     final int fromReadOpCount = 5,
               fromWriteOpCount= 5,
               fromInputOpCount = 10,
-              fromAllOpCount = fromReadOpCount + fromWriteOpCount + fromInputOpCount,
-              inputQueueSize = 15;
+              fromAllOpCount = fromReadOpCount + fromWriteOpCount + fromInputOpCount;
 
-    final DefaultConnectionFactory factory = new DefaultConnectionFactory(inputQueueSize, 4096);
+    final DefaultConnectionFactory factory = new DefaultConnectionFactory();
 
     TCPMemcachedNodeImpl fromNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
         "tcp node impl test node",
@@ -112,23 +111,19 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     }
 
     // when
-    assertEquals(inputQueueSize, fromNode.moveOperations(toNode));
+    assertEquals(fromAllOpCount, fromNode.moveOperations(toNode));
 
     // then
     assertEquals(0, fromNode.getInputQueueSize());
     assertEquals(0, fromNode.getWriteQueueSize());
     assertEquals(0, fromNode.getReadQueueSize());
-    assertEquals(inputQueueSize, toNode.getInputQueueSize());
-    assertEquals(inputQueueSize, getAddOpCount(toNode));
+    assertEquals(fromAllOpCount, toNode.getWriteQueueSize());
+    assertEquals(fromAllOpCount, getAddOpCount(toNode));
 
     for (int i = 0; i < fromAllOpCount; i++) {
       Operation op = fromOperations.get(i);
-      if (i < inputQueueSize) {
-        assertSame(op.getHandlingNode(), toNode);
-        assertFalse(op.isCancelled());
-      } else {
-        assertTrue(op.isCancelled());
-      }
+      assertSame(op.getHandlingNode(), toNode);
+      assertFalse(op.isCancelled());
     }
   }
   

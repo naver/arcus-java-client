@@ -248,7 +248,7 @@ public class MockMemcachedNode implements MemcachedNode {
   }
 
   @Override
-  public int addAllOpToInputQ(BlockingQueue<Operation> allOp) {
+  public int addAllOpToWriteQ(BlockingQueue<Operation> allOp) {
     // noop
     return 0;
   }
