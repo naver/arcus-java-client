@@ -285,8 +285,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    CacheManager exe = new CacheManager(
-            hostPorts, serviceCode, cfb, latch, poolSize,
+    CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, latch, poolSize,
             waitTimeForConnect);
 
     try {
@@ -339,8 +338,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param addrs socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
    */
-  public ArcusClient(ConnectionFactory cf,
-                     List<InetSocketAddress> addrs)
+  public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, DEFAULT_ARCUS_CLIENT_NAME, addrs);
     collectionTranscoder = new CollectionTranscoder();
@@ -352,8 +350,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Register mbean for Arcus client statistics.
    */
   private void registerMbean() {
-    if ("false".equals(System.getProperty("arcus.mbean", "false")
-            .toLowerCase())) {
+    if ("false".equals(System.getProperty("arcus.mbean", "false").toLowerCase())) {
       getLogger().info("Arcus client statistics MBean is NOT registered.");
       return;
     }
@@ -392,20 +389,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               + MAX_MKEY_LENGTH + ")");
     }
     if (keyBytes.length == 0) {
-      throw new IllegalArgumentException(
-              "MKey must contain at least one character.");
+      throw new IllegalArgumentException("MKey must contain at least one character.");
     }
     // Validate the mkey
     for (byte b : keyBytes) {
       if (b == ' ' || b == '\n' || b == '\r' || b == 0) {
-        throw new IllegalArgumentException(
-                "MKey contains invalid characters:  ``" + mkey + "''");
+        throw new IllegalArgumentException("MKey contains invalid characters:  ``"
+                + mkey + "''");
       }
     }
   }
 
-  Future<Boolean> asyncStore(StoreType storeType, String key,
-                             int exp, CachedData co) {
+  Future<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);
@@ -425,8 +420,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<Boolean> asyncSetAttr(String key,
-                                                Attributes attrs) {
+  public CollectionFuture<Boolean> asyncSetAttr(String key, Attributes attrs) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
             latch, operationTimeout);
@@ -518,36 +512,31 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case NOT_FOUND:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k,
-                          cstatus);
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 }
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(list, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 }
                 break;
               case OUT_OF_RANGE:
                 rv.set(list, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found in condition : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
                 }
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 }
                 break;
               default:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) unknown status : %s",
-                          k, cstatus);
+                  getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 }
                 break;
             }
@@ -557,11 +546,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags,
-                              byte[] data) {
+          public void gotData(String key, String subkey, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            list.add(tc.decode(new CachedData(flags, data, tc
-                    .getMaxSize())));
+            list.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
     rv.setOperation(op);
@@ -618,29 +605,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case NOT_FOUND:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k,
-                          cstatus);
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 }
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(set, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 }
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not readable : %s",
-                          k, cstatus);
+                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 }
                 break;
               default:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) unknown status : %s",
-                          k, cstatus);
+                  getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 }
                 break;
             }
@@ -650,11 +633,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags,
-                              byte[] data) {
+          public void gotData(String key, String subkey, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            set.add(tc.decode(new CachedData(flags, data, tc
-                    .getMaxSize())));
+            set.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
 
@@ -699,29 +680,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case NOT_FOUND:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k,
-                          cstatus);
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 }
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 }
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 }
                 break;
               default:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s",
-                          k, cstatus);
+                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 }
                 break;
             }
@@ -731,15 +708,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags,
-                              byte[] data) {
+          public void gotData(String key, String subkey, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             long longSubkey = Long.parseLong(subkey);
-            map.put(longSubkey,
-                    new Element<T>(longSubkey, tc
-                            .decode(new CachedData(flags, data, tc
-                                    .getMaxSize())), collectionGet
-                            .getElementFlag()));
+            map.put(longSubkey, new Element<T>(longSubkey,
+                            tc.decode(new CachedData(flags, data, tc.getMaxSize())),
+                            collectionGet.getElementFlag()));
           }
         });
     rv.setOperation(op);
@@ -780,29 +754,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case NOT_FOUND:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k,
-                          cstatus);
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 }
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 }
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 }
                 break;
               default:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s",
-                          k, cstatus);
+                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 }
                 break;
             }
@@ -812,11 +782,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags,
-                              byte[] data) {
+          public void gotData(String key, String subkey, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            map.put(subkey, tc.decode(new CachedData(flags, data, tc
-                    .getMaxSize())));
+            map.put(subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
     rv.setOperation(op);
@@ -872,10 +840,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   cstatus = new CollectionOperationStatus(status);
                 }
                 rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Insertion to the collection failed : "
+                if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
+                  getLogger().debug("Insertion to the collection failed : "
                                   + cstatus.getMessage()
                                   + " (type="
                                   + collectionInsert.getClass()
@@ -1002,11 +968,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void gotStatus(Integer index, OperationStatus status) {
             if (status instanceof CollectionOperationStatus) {
-              result.put(index,
-                      (CollectionOperationStatus) status);
+              result.put(index, (CollectionOperationStatus) status);
             } else {
-              result.put(index, new CollectionOperationStatus(
-                      status));
+              result.put(index, new CollectionOperationStatus(status));
             }
           }
         });
@@ -1062,19 +1026,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
 
             // got status
-            public void gotStatus(Integer index,
-                                  OperationStatus status) {
+            public void gotStatus(Integer index, OperationStatus status) {
               if (status instanceof CollectionOperationStatus) {
-                mergedResult
-                        .put(index
-                                        + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                mergedResult.put(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
                                 (CollectionOperationStatus) status);
               } else {
-                mergedResult
-                        .put(index
-                                        + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(
-                                        status));
+                mergedResult.put(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                                new CollectionOperationStatus(status));
               }
             }
           });
@@ -1143,8 +1101,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             return new CollectionOperationStatus(status);
           }
         }
-        return new CollectionOperationStatus(true, "END",
-                CollectionResponse.END);
+        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
       }
 
       @Override
@@ -1184,15 +1141,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             rv.set(cstatus.isSuccess(), cstatus);
-            if (!cstatus.isSuccess()
-                    && getLogger().isDebugEnabled()) {
-              getLogger().debug(
-                      "Deletion to the collection failed : "
+            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
+              getLogger().debug("Deletion to the collection failed : "
                               + cstatus.getMessage()
                               + " (type="
-                              + collectionDelete.getClass()
-                              .getName() + ", key=" + key
-                              + ")");
+                              + collectionDelete.getClass().getName()
+                              + ", key=" + key + ")");
             }
           }
 
@@ -1235,14 +1189,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             boolean isExist = (CollectionResponse.EXIST == cstatus
                     .getResponse()) ? true : false;
             rv.set(isExist, cstatus);
-            if (!cstatus.isSuccess()
-                    && getLogger().isDebugEnabled()) {
-              getLogger().debug(
-                      "Exist command to the collection failed : "
+            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
+              getLogger().debug("Exist command to the collection failed : "
                               + cstatus.getMessage()
                               + " (type="
-                              + collectionExist.getClass()
-                              .getName() + ", key=" + key
+                              + collectionExist.getClass().getName()
+                              + ", key=" + key
                               + ", subkey=" + subkey + ")");
             }
           }
@@ -1546,16 +1498,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             rv.set(cstatus.isSuccess(), cstatus);
-            if (!cstatus.isSuccess()
-                    && getLogger().isDebugEnabled()) {
-              getLogger()
-                      .debug("Insertion to the collection failed : "
+            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
+              getLogger().debug("Insertion to the collection failed : "
                               + cstatus.getMessage()
                               + " (type="
-                              + collectionCreate.getClass()
-                              .getName()
-                              + ", key="
-                              + key
+                              + collectionCreate.getClass().getName()
+                              + ", key=" + key
                               + ", attribute="
                               + collectionCreate.toString() + ")");
             }
@@ -1999,8 +1947,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
       for (int i = 0; i < list.size(); i++) {
-        insertList
-                .add(new BTreePipedInsert<T>(key, list.get(i),
+        insertList.add(new BTreePipedInsert<T>(key, list.get(i),
                         (attributesForCreate != null),
                         attributesForCreate, tc));
       }
@@ -2026,8 +1973,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
       for (int i = 0; i < list.size(); i++) {
-        insertList
-                .add(new MapPipedInsert<T>(key, list.get(i),
+        insertList.add(new MapPipedInsert<T>(key, list.get(i),
                         (attributesForCreate != null),
                         attributesForCreate, tc));
       }
@@ -2052,8 +1998,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               list.size());
 
       for (int i = 0; i < list.size(); i++) {
-        insertList
-                .add(new ListPipedInsert<T>(key, index, list.get(i),
+        insertList.add(new ListPipedInsert<T>(key, index, list.get(i),
                         (attributesForCreate != null),
                         attributesForCreate, tc));
       }
@@ -2077,8 +2022,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               list.size());
 
       for (int i = 0; i < list.size(); i++) {
-        insertList
-                .add(new SetPipedInsert<T>(key, list.get(i),
+        insertList.add(new SetPipedInsert<T>(key, list.get(i),
                         (attributesForCreate != null),
                         attributesForCreate, tc));
       }
@@ -2094,8 +2038,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
-    final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(
-            null);
+    final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(null);
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
     final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
@@ -2308,16 +2251,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private <T> List<SMGetElement<T>> getSubList(
           final List<SMGetElement<T>> mergedResult, int offset, int count) {
     if (mergedResult.size() > count) {
-      int toIndex = (count + offset > mergedResult.size()) ? mergedResult
-              .size() : count + offset;
+      int toIndex = (count + offset > mergedResult.size())
+                  ? mergedResult.size() : count + offset;
       if (offset > toIndex) {
         return Collections.emptyList();
       }
       return mergedResult.subList(offset, toIndex);
     } else {
       if (offset > 0) {
-        int toIndex = (count + offset > mergedResult.size()) ? mergedResult
-                .size() : count + offset;
+        int toIndex = (count + offset > mergedResult.size())
+                    ? mergedResult.size() : count + offset;
 
         if (offset > toIndex) {
           return Collections.emptyList();
@@ -2406,7 +2349,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               for (SMGetElement<T> result : eachResult) {
                 for (; pos < mergedResult.size(); pos++) {
                   if ((reverse) ? (0 < result.compareTo(mergedResult.get(pos)))
-                          : (0 > result.compareTo(mergedResult.get(pos)))) {
+                                : (0 > result.compareTo(mergedResult.get(pos)))) {
                     break;
                   }
                 }
@@ -2676,7 +2619,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 for (SMGetTrimKey result : eachTrimmedResult) {
                   for (; pos < mergedTrimmedKeys.size(); pos++) {
                     if ((reverse) ? (0 < result.compareTo(mergedTrimmedKeys.get(pos)))
-                            : (0 > result.compareTo(mergedTrimmedKeys.get(pos)))) {
+                                  : (0 > result.compareTo(mergedTrimmedKeys.get(pos)))) {
                       break;
                     }
                   }
@@ -2695,7 +2638,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 for (int i = mergedTrimmedKeys.size() - 1; i >= 0; i--) {
                   SMGetTrimKey me = mergedTrimmedKeys.get(i);
                   if ((reverse) ? (0 >= me.compareBkeyTo(lastTrimKey))
-                          : (0 <= me.compareBkeyTo(lastTrimKey))) {
+                                : (0 <= me.compareBkeyTo(lastTrimKey))) {
                     mergedTrimmedKeys.remove(i);
                   } else {
                     break;
@@ -2854,8 +2797,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
                                                   ElementFlagUpdate eFlagUpdate, Object value) {
-    BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(
-            value, eFlagUpdate, false);
+    BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, String.valueOf(bkey),
             collectionUpdate, collectionTranscoder);
   }
@@ -2864,8 +2806,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
                                                       ElementFlagUpdate eFlagUpdate, T value,
                                                       Transcoder<T> tc) {
-    BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value,
-            eFlagUpdate, false);
+    BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, String.valueOf(bkey),
             collectionUpdate, tc);
   }
@@ -2874,8 +2815,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopUpdate(String key,
                                                   byte[] bkey, ElementFlagUpdate eFlagUpdate,
                                                   Object value) {
-    BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(
-            value, eFlagUpdate, false);
+    BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, BTreeUtil.toHex(bkey),
             collectionUpdate, collectionTranscoder);
   }
@@ -2885,8 +2825,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       byte[] bkey,
                                                       ElementFlagUpdate eFlagUpdate, T value,
                                                       Transcoder<T> tc) {
-    BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value,
-            eFlagUpdate, false);
+    BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, BTreeUtil.toHex(bkey),
             collectionUpdate, tc);
   }
@@ -2895,8 +2834,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey,
                                                   Object value) {
     validateMKey(mkey);
-    MapUpdate<Object> collectionUpdate = new MapUpdate<Object>(
-            value, false);
+    MapUpdate<Object> collectionUpdate = new MapUpdate<Object>(value, false);
     return asyncCollectionUpdate(key, String.valueOf(mkey),
             collectionUpdate, collectionTranscoder);
   }
@@ -2946,16 +2884,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   cstatus = new CollectionOperationStatus(status);
                 }
                 rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess()
-                        && getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Insertion to the collection failed : "
+                if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
+                  getLogger().debug("Insertion to the collection failed : "
                                   + cstatus.getMessage()
                                   + " (type="
-                                  + collectionUpdate.getClass()
-                                  .getName() + ", key=" + key
-                                  + ", subkey=" + subkey + ", value="
-                                  + collectionUpdate.getNewValue()
+                                  + collectionUpdate.getClass().getName()
+                                  + ", key=" + key
+                                  + ", subkey=" + subkey
+                                  + ", value=" + collectionUpdate.getNewValue()
                                   + ")");
                 }
               }
@@ -3025,8 +2961,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           new ArrayList<CollectionPipedUpdate<T>>(list.size());
 
       for (int i = 0; i < list.size(); i++) {
-        collectionPipedUpdateList.add(new MapPipedUpdate<T>(key, list
-                .get(i), tc));
+        collectionPipedUpdateList.add(new MapPipedUpdate<T>(key, list.get(i), tc));
       }
 
       return asyncCollectionPipedUpdate(key, collectionPipedUpdateList);
@@ -3136,29 +3071,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case NOT_FOUND:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k,
-                          cstatus);
+                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 }
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s",
-                          k, cstatus);
+                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 }
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not readable : %s",
-                          k, cstatus);
+                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 }
                 break;
               default:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s",
-                          k, cstatus);
+                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 }
                 break;
             }
@@ -3168,13 +3099,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey,
-                              int flags, byte[] data) {
+          public void gotData(String key, String subkey, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             byte[] bkey = BTreeUtil.hexStringToByteArrays(subkey);
-            Element<T> element = new Element<T>(bkey, tc
-                    .decode(new CachedData(flags, data, tc
-                            .getMaxSize())), collectionGet.getElementFlag());
+            Element<T> element = new Element<T>(bkey,
+                    tc.decode(new CachedData(flags, data, tc.getMaxSize())),
+                    collectionGet.getElementFlag());
             map.put(new ByteArrayBKey(bkey), element);
           }
         });
@@ -3261,29 +3191,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           case NOT_FOUND:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s) not found : %s", k,
-                      cstatus);
+              getLogger().debug("Key(%s) not found : %s", k, cstatus);
             }
             break;
           case NOT_FOUND_ELEMENT:
             rv.set(map, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Element(%s) not found : %s",
-                      k, cstatus);
+              getLogger().debug("Element(%s) not found : %s", k, cstatus);
             }
             break;
           case UNREADABLE:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not readable : %s",
-                      k, cstatus);
+              getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
             }
             break;
           case TYPE_MISMATCH:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not a B+Tree : %s",
-                      k, cstatus);
+              getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
             }
             break;
           default:
@@ -3363,36 +3289,32 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           case NOT_FOUND:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s) not found : %s", k,
-                      cstatus);
+              getLogger().debug("Key(%s) not found : %s", k, cstatus);
             }
             break;
           case NOT_FOUND_ELEMENT:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Element(%s) not found : %s",
-                      k, cstatus);
+              getLogger().debug("Element(%s) not found : %s", k, cstatus);
             }
             break;
           case UNREADABLE:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not readable : %s",
-                      k, cstatus);
+              getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
             }
             break;
           case BKEY_MISMATCH:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) has wrong bkey : %s(%s)",
-                      k, cstatus, get.getBkeyObject().getType());
+              getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
+                      get.getBkeyObject().getType());
             }
             break;
           case TYPE_MISMATCH:
             rv.set(null, cstatus);
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not a B+Tree : %s",
-                      k, cstatus);
+              getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
             }
             break;
           default:
@@ -3503,8 +3425,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case BKEY_MISMATCH:
                 rv.set(null, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) has wrong bkey : %s(%s)",
-                      k, cstatus, get.getBkeyObject().getType());
+                  getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
+                      get.getBkeyObject().getType());
                 }
                 break;
               case TYPE_MISMATCH:
@@ -3661,8 +3583,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case BKEY_MISMATCH:
                 rv.set(false, cstatus);
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Request for \"%s\" was not successful : %s",
-                          k, cstatus);
+                  getLogger().debug("Request for \"%s\" was not successful : %s", k, cstatus);
                 }
                 break;
               default:
@@ -3710,8 +3631,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, eflag);
         break;
       default:
-        getLogger().error(
-                "Unexpected bkey type : (key:" + key + ", bkey:"
+        getLogger().error("Unexpected bkey type : (key:" + key + ", bkey:"
                         + bkey.toString() + ")");
     }
 
@@ -4004,19 +3924,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
 
             // got status
-            public void gotStatus(Integer index,
-                                  OperationStatus status) {
+            public void gotStatus(Integer index, OperationStatus status) {
               if (status instanceof CollectionOperationStatus) {
-                mergedResult
-                        .put(index
-                                        + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                mergedResult.put(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
                                 (CollectionOperationStatus) status);
               } else {
-                mergedResult
-                        .put(index
-                                        + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(
-                                        status));
+                mergedResult.put(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                                new CollectionOperationStatus(status));
               }
             }
           });
@@ -4086,8 +4000,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             return new CollectionOperationStatus(status);
           }
         }
-        return new CollectionOperationStatus(true, "END",
-                CollectionResponse.END);
+        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
       }
 
       @Override
@@ -4263,18 +4176,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   latch.countDown();
                 }
 
-                public void gotStatus(Integer index,
-                                      OperationStatus status) {
+                public void gotStatus(Integer index, OperationStatus status) {
                   if (!status.isSuccess()) {
                     if (status instanceof CollectionOperationStatus) {
-                      failedResult.put(
-                              insert.getKeyList().get(index),
+                      failedResult.put(insert.getKeyList().get(index),
                               (CollectionOperationStatus) status);
                     } else {
-                      failedResult.put(
-                              insert.getKeyList().get(index),
-                              new CollectionOperationStatus(
-                                      status));
+                      failedResult.put(insert.getKeyList().get(index),
+                              new CollectionOperationStatus(status));
                     }
                   }
                 }
@@ -4610,8 +4519,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final CollectionFuture<Long> rv = new CollectionFuture<Long>(latch,
-            operationTimeout);
+    final CollectionFuture<Long> rv = new CollectionFuture<Long>(latch, operationTimeout);
 
     Operation op = opFact.collectionMutate(k, subkey, collectionMutate,
         new OperationCallback() {
@@ -4627,8 +4535,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                         new OperationStatus(false, status.getMessage())));
 
                 if (getLogger().isDebugEnabled()) {
-                  getLogger().debug(
-                          "Key(%s), Bkey(%s) Unknown response : %s",
+                  getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s",
                           k, subkey, status);
                 }
               }
@@ -4638,8 +4545,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             rv.set(null, new CollectionOperationStatus(status));
 
             if (getLogger().isDebugEnabled()) {
-              getLogger().debug(
-                      "Key(%s), Bkey(%s) Unknown response : %s",
+              getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s",
                       k, subkey, status);
             }
           }
