@@ -16,39 +16,35 @@ Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 
 ### Key-Value Item 저장
 
-key-value item을 저장하는 API로 set, add, replace, prepend/append가 있다.
+key-value item을 저장하는 API로 set, add, replace를 제공한다.
 
 ```java
 Future<Boolean> set(String key, int exp, Object obj)
 Future<Boolean> add(String key, int exp, Object obj)
-```
-
-- \<key, obj\>의 key-value item을 저장한다.
-- 해당 key가 cache에 이미 존재할 경우,
-  - set은 value 부분만 obj로 변경한다.
-  - add는 \<key, obj\> item을 추가하지 않는다.
-- 저장된 key-value item은 exp 초 이후에 삭제된다.
-
-
-```java
 Future<Boolean> replace(String key, int exp, Object obj)
 ```
 
-- 주어진 key의 value 부분만을 obj로 교체한다. 해당 key가 cache에 존재하지 않으면, 교체 작업은 수행되지 않는다.
-- 교체된 key-value item은 exp 초 이후에 삭제된다.
- 
+- \<key, obj\>의 key-value item을 저장한다.
+- Cache에 해당 key의 존재 여부에 따라 각 API 동작은 다음과 같다.
+  - set은 \<key, obj\> item을 무조건 저장한다. 해당 key가 존재하면 교체하여 저장하다.
+  - add는 해당 key가 없을 경우만, \<key, obj\> item을 저장한다.
+  - replace는 해당 key가 있을 경우만, \<key, obj\> item을 교체하여 저장한다.
+- 저장된 key-value item은 exp 초 이후에 삭제된다.
+
+key-vlaue item에 주어진 value를 추가하는 API로 prepend, append를 제공한다.
 
 ```java
 Future<Boolean> prepend(long cas, String key, Object val)
 Future<Boolean> append(long cas, String key, Object val)
 ```
 
-- 주어진 key의 value 부분에서 가장 앞쪽(prepend) 또는 가장 뒤쪽(append)에 val을 추가한다.
+- key-value item에서 value 추가 위치는 API에 따라 다르다.
+  - prepend는 item의 value 부분에서 가장 앞쪽에 추가한다.
+  - append는 item의 value 부분에서 가장 뒤쪽에 추가한다.
 - 첫째 인자인 cas는 현재 이용되지 않으므로 임의의 값을 주면 된다.
   초기에 CAS(compare-and-set) 연산으로 수행하기 위한 용도로 필요했던 인자이다.
 
-
-그리고, 한번의 API 호출로 다수의 key-value items을 저장하는 bulk API를 제공한다.
+한번의 API 호출로 다수의 key-value items을 set하는 bulk API를 제공한다.
 
 ```java
 Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, List<String> key, int exp, Object obj)
@@ -56,8 +52,8 @@ Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, Map<String, 
 ```
 
 - 다수의 key-value item을 한번에 저장한다.
-- 전자는 key list의 모든 key에 대해 동일한 obj로 저장 연산을 한번에 수행하며,
-  후자는 map에 있는 모든 \<key, obj\>에 대해 저장 연산을 한번에 수행한다.
+  - 전자 API는 key list의 모든 key에 대해 동일한 obj로 저장 연산을 한번에 수행한다.  
+  - 후자 API는 map에 있는 모든 \<key, obj\>에 대해 저장 연산을 한번에 수행한다.
 - 저장된 key-value item들은 모두 exp 초 이후에 삭제된다.
 - StoreType은 연산의 저장 유형을 지정한다. 아래의 유형이 있다.
   - StoreType.set
@@ -81,8 +77,7 @@ StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
 
 ### Key-Value Item 조회
 
-하나의 key에 대한 value를 조회하는 API와 
-여러 key들의 value들을 한번에 조회하는 bulk API를 제공한다.
+하나의 key를 가진 cache item에 저장된 value를 조회하는 API를 제공한다.
 
 ```java
 Future<Object> asyncGet(String key)
@@ -90,6 +85,7 @@ Future<Object> asyncGet(String key)
 
 - 주어진 key에 저장된 value를 반환한다.
 
+여러 key들의 value들을 한번에 조회하는 bulk API를 제공한다.
 
 ```java
 Future<Map<String,Object>> asyncGetBulk(Collection<String> keys)
