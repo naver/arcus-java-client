@@ -108,4 +108,6 @@ public interface Operation {
   boolean isReadOperation();
 
   APIType getAPIType();
+
+  boolean isVersionDependent();
 }

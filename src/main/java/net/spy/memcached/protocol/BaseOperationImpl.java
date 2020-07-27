@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.BTreeGetBulkOperation;
+import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
@@ -232,5 +234,10 @@ public abstract class BaseOperationImpl extends SpyObject {
 
   public void setAPIType(APIType type) {
     this.apiType = type;
+  }
+
+  public boolean isVersionDependent() {
+    return this instanceof BTreeGetBulkOperation
+        || this instanceof BTreeSortMergeGetOperation;
   }
 }

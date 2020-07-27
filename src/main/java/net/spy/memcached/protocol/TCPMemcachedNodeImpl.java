@@ -24,6 +24,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -55,6 +57,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private final BlockingQueue<Operation> readQ;
   private final BlockingQueue<Operation> inputQueue;
   private final long opQueueMaxBlockTime;
+  private final List<Operation> requeueOpList = new LinkedList<Operation>();
   // This has been declared volatile so it can be used as an availability
   // indicator.
   private volatile int reconnectAttempt = 1;
@@ -266,6 +269,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       Operation o = getNextWritableOp();
       while (o != null && toWrite < getWbuf().capacity()) {
         assert o.getState() == OperationState.WRITING;
+
+        if (version == null && o.isVersionDependent()) {
+          removeCurrentWriteOp();
+          o.resetState();
+          requeueOpList.add(o);
+          o = getNextWritableOp();
+          continue;
+        }
+
         // This isn't the most optimal way to do this, but it hints
         // at a larger design problem that may need to be taken care
         // if in the bowels of the client.
@@ -301,6 +313,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         toWrite += bytesToCopy;
       }
       getWbuf().flip();
+      if (!requeueOpList.isEmpty()) {
+        writeQ.addAll(requeueOpList);
+        requeueOpList.clear();
+      }
       assert toWrite <= getWbuf().capacity()
               : "toWrite exceeded capacity: " + this;
       assert toWrite == getWbuf().remaining()
