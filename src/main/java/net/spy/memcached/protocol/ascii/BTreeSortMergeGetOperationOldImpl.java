@@ -80,7 +80,9 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
   }
 
   /**
+   * <pre>{@code
    * VALUE <flag> <count>\r\n
+   * }</pre>
    */
   public void handleLine(String line) {
     // Response header

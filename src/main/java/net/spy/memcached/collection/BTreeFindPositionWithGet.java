@@ -21,11 +21,13 @@ import net.spy.memcached.util.BTreeUtil;
 /**
  * Ascii protocol implementation for "bop pwg" (B+Tree find position with get)
  *
+ * <pre>{@code
  * bop pwg <key> <bkey> <order> [<count>]\r\n
  *
  * VALUE <position> <flags> <count> <index>\r\n
  * <bkey> [<eflag>] <bytes> <data>\r\n
  * END\r\n
+ * }</pre>
  *
  * Failure Code
  * - NOT_FOUND

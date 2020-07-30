@@ -21,10 +21,12 @@ import net.spy.memcached.util.BTreeUtil;
 /**
  * Ascii protocol implementation for "bop gbp" (B+Tree get by position)
  *
+ * <pre>{@code
  * bop gbp <key> <order> <position or "position range">\r\n
  * VALUE <flags> <count>\r\n
  * <bkey> [<eflag>] <bytes> <data>\r\n
  * END\r\n (CLIENT_ERROR, NOT_FOUND, UNREADABLE, TYPE_MISMATCH, NOT_FOUND_ELEMENT)
+ * }</pre>
  */
 public class BTreeGetByPosition extends CollectionGet {
 

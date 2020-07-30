@@ -522,10 +522,10 @@ public interface ArcusClientIF {
    * Retrieves count number of items in given bkey range(from..to)
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
-   * <pre>
+   * <pre>{@code
    *  from >= to : in descending order
    *  from < to  : in ascending order
-   * </pre>
+   * }</pre>
    *
    * @param key         key of a b+tree
    * @param from        the first bkey
@@ -569,10 +569,10 @@ public interface ArcusClientIF {
    * Retrieves count number of items in given bkey range(from..to)
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
-   * <pre>
+   * <pre>{@code
    *  from >= to : in descending order
    *  from < to  : in ascending order
-   * </pre>
+   * }</pre>
    *
    * @param <T>
    * @param key         key of a b+tree
@@ -1398,10 +1398,10 @@ public interface ArcusClientIF {
    * Retrieves count number of items in given bkey range(from..to)
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
-   * <pre>
+   * <pre>{@code
    *  from >= to : in descending order
    *  from < to  : in ascending order
-   * </pre>
+   * }</pre>
    *
    * @param key         key of a b+tree
    * @param from        the first bkey
@@ -1422,10 +1422,10 @@ public interface ArcusClientIF {
    * Retrieves count number of items in given bkey range(from..to)
    * from offset in the b+tree.
    * The returned map from the future should be sorted by the given range.
-   * <pre>
+   * <pre>{@code
    *  from >= to : in descending order
    *  from < to  : in ascending order
-   * </pre>
+   * }</pre>
    *
    * @param key         key of a b+tree
    * @param from        the first bkey
