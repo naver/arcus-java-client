@@ -28,7 +28,7 @@ import org.apache.zookeeper.ZooKeeper;
 
 /**
  * CacheMonitor monitors the changes of the cache server list
- * in the ZooKeeper node(/arcus/cache_list/<service_code>).
+ * in the ZooKeeper node{@code (/arcus/cache_list/<service_code>)}.
  */
 public class CacheMonitor extends SpyObject implements Watcher,
         ChildrenCallback {

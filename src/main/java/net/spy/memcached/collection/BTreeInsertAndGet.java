@@ -20,11 +20,13 @@ import net.spy.memcached.util.BTreeUtil;
 
 /**
  * Ascii protocol implementation for store and get(trimmed) operations
+ * <pre>{@code
  * - bop insert <key> <bkey> [<eflag>] <bytes> [create <attributes>] getrim\r\n<data>\r\n
  * - bop upsert <key> <bkey> [<eflag>] <bytes> [create <attributes>] getrim\r\n<data>\r\n
  * VALUE <flags> <count>\r\n
  * <bkey> [<eflag>] <bytes> <data>\r\n
  * TRIMMED\r\n
+ * }</pre>
  *
  * @param <T>
  */

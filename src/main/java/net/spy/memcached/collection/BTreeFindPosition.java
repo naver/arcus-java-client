@@ -19,9 +19,11 @@ package net.spy.memcached.collection;
 /**
  * Ascii protocol implementation for "bop position" (B+Tree find position)
  *
+ * <pre>{@code
  * bop position <key> <bkey> <order>\r\n <position> = 0 or positive integer
  * END\r\n (CLIENT_ERROR, NOT_FOUND, UNREADABLE, BKEY_MISMATCH, TYPE_MISMATCH,
  * NOT_FOUND_ELEMENT)
+ * }</pre>
  */
 public class BTreeFindPosition {
 
