@@ -28,7 +28,7 @@ import net.spy.memcached.util.BTreeUtil;
  * TRIMMED\r\n
  * }</pre>
  *
- * @param <T>
+ * @param <T> the expected class of the value
  */
 public class BTreeInsertAndGet<T> extends BTreeInsert<T> {
 

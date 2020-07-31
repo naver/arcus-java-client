@@ -21,7 +21,7 @@ import net.spy.memcached.util.BTreeUtil;
 /**
  * Collection element
  *
- * @param <T>
+ * @param <T> the expected class of the value
  */
 public class Element<T> {
   private final byte[] bkey;

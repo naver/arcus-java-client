@@ -72,7 +72,7 @@ public interface ArcusClientIF {
   /**
    * Checks an item membership in a set.
    *
-   * @param <T>
+   * @param <T>   the expected class of the value
    * @param key   key of a set
    * @param value value of an item
    * @param tc    a transcoder to encode the value
@@ -112,7 +112,7 @@ public interface ArcusClientIF {
    *  c.setBulk(keys, 3600, value, transcoder);
    *  }</pre>
    *
-   * @param <T>
+   * @param <T> the expected class of the value
    * @param key the key list which this object should be added
    * @param exp the expiration of this object
    * @param o   the object to store on each keys
@@ -138,6 +138,7 @@ public interface ArcusClientIF {
   /**
    * Set an object in the cache on each key using specified memcached client
    *
+   * @param <T> the expected class of the value
    * @param o   the map that has keys and values to store
    * @param exp the expiration of this object
    * @param tc  the transcoder to serialize and unserialize the value
@@ -180,7 +181,7 @@ public interface ArcusClientIF {
    *  c.asyncStoreBulk(StoreType.set, keys, 3600, value, transcoder);
    *  }</pre>
    *
-   * @param <T>
+   * @param <T>  the expected class of the value
    * @param type the type of store operation to perform.
    * @param key  the key list which this object should be added
    * @param exp  the expiration of this object
@@ -206,6 +207,7 @@ public interface ArcusClientIF {
   /**
    * Store an object in the cache on each key using specified memcached client
    *
+   * @param <T>  the expected class of the value
    * @param type the type of store operation to perform.
    * @param o    the map that has keys and values to store
    * @param exp  the expiration of this object
@@ -262,6 +264,7 @@ public interface ArcusClientIF {
   /**
    * Insert one item into multiple b+trees at once.
    *
+   * @param <T>                 the expected class of the value
    * @param keyList             key list of b+tree
    * @param bkey                key of a b+tree element.
    * @param eFlag               element flag. Length of element flag is between 1 and 31. if
@@ -296,6 +299,7 @@ public interface ArcusClientIF {
   /**
    * Insert one item into multiple map at once.
    *
+   * @param <T>                 the expected class of the value
    * @param keyList             key list of map
    * @param mkey                mkey of map.
    * @param value               value of map
@@ -331,7 +335,7 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param keyList             a key list of list
    * @param index               list index
    *                            (the item will be inserted before the element with the given index)
@@ -396,7 +400,7 @@ public interface ArcusClientIF {
   /**
    * Insert a value into each set
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param keyList             a key list of the set
    * @param value               a value to insert into each set
    * @param attributesForCreate if not null, a list should be created when key does not exist
@@ -548,7 +552,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves an item on given bkey in the b+tree.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param bkey        bkey
    * @param eFlagFilter element flag filter
@@ -574,7 +578,7 @@ public interface ArcusClientIF {
    *  from < to  : in ascending order
    * }</pre>
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param from        the first bkey
    * @param to          the last bkey
@@ -636,7 +640,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves all items from the map
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a map
    * @param withDelete  true to remove the returned item in the map
    * @param dropIfEmpty true to remove the key when all elements are removed.
@@ -651,7 +655,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves an item on given mkey in the map.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a map
    * @param mkey        mkey of a map
    * @param withDelete  true to remove the returned item in the map
@@ -667,7 +671,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves items on given mkey list in the map.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a map
    * @param mkeyList    mkeyList
    * @param withDelete  true to remove the returned item in the map
@@ -711,7 +715,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves an item on given index in the list.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a list
    * @param index       list index
    * @param withDelete  true to remove the returned item in the list
@@ -727,7 +731,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves items on given index range(from..to) in the list. (Arcus 1.6 and above)
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a list
    * @param from        the first index to delete
    * @param to          the last index to delete
@@ -758,7 +762,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves count number of random items in the set.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a set
    * @param count       number of items to fetch
    * @param withDelete  true to remove the returned item in the set
@@ -896,7 +900,7 @@ public interface ArcusClientIF {
   /**
    * Deletes an item in the set.
    *
-   * @param <T>
+   * @param <T>         the expected class of the value
    * @param key         key of a set
    * @param value       value of an item
    * @param dropIfEmpty true to remove the key when all elements are removed.
@@ -959,6 +963,7 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
+   * @param key                 key of a list
    * @param index               list index
    *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
@@ -984,7 +989,7 @@ public interface ArcusClientIF {
   /**
    * Inserts an item into the b+tree.
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree node
    * @param eFlag               element flag. Length of element flag is between 1 and 31.
@@ -1003,7 +1008,7 @@ public interface ArcusClientIF {
   /**
    * Inserts an item into the map
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 key of a map
    * @param mkey                key of a map node
    * @param value               a value to insert into the map
@@ -1026,6 +1031,8 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
+   * @param <T>                 the expected class of the value
+   * @param key                 key of a list
    * @param index               list index
    *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
@@ -1041,7 +1048,7 @@ public interface ArcusClientIF {
   /**
    * Inserts an item into the set.
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 key of a set
    * @param value               a value to insert into the set
    * @param tc                  a transcoder to encode the value
@@ -1057,7 +1064,7 @@ public interface ArcusClientIF {
    * Insert values into a b+ tree
    *
    * @param key                 a key list of b+ tree
-   * @param elements
+   * @param elements            mkey and value list of map
    * @param attributesForCreate attributes of the key
    * @return a future that will indicate the failure list of each operation
    */
@@ -1108,9 +1115,9 @@ public interface ArcusClientIF {
   /**
    * Insert values into a b+ tree
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 a key list of b+ tree
-   * @param elements
+   * @param elements            bkey and value list of map
    * @param attributesForCreate attributes of the key
    * @param tc                  transcoder to encode value
    * @return a future that will indicate the failure list of each operation
@@ -1122,7 +1129,7 @@ public interface ArcusClientIF {
   /**
    * Insert values into a map
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 a key list of map
    * @param elements            mkey and value list of map
    * @param attributesForCreate attributes of the key
@@ -1142,7 +1149,7 @@ public interface ArcusClientIF {
    *     -1:append, 0:prepend
    * </pre>
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 a key of the list
    * @param index               list index
    *                            (the item will be inserted before the element with the given index)
@@ -1158,7 +1165,7 @@ public interface ArcusClientIF {
   /**
    * Insert values into a set
    *
-   * @param <T>
+   * @param <T>                 the expected class of the value
    * @param key                 key of a set
    * @param valueList           valuses to insert into the set
    * @param attributesForCreate attributes of the key
@@ -1247,6 +1254,7 @@ public interface ArcusClientIF {
    * Create the tree that has an attribute of 'attributesForCreate' and
    * insert the element that has elementFlag and value.
    *
+   * @param <T>                 the expected class of the value
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree element
    * @param elementFlag         flag of element
@@ -1279,6 +1287,7 @@ public interface ArcusClientIF {
   /**
    * Update an element from the b+tree
    *
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param bkey        key of a b+tree element
    * @param eFlagUpdate new flag of element.
@@ -1306,6 +1315,7 @@ public interface ArcusClientIF {
   /**
    * Update an element from the map
    *
+   * @param <T>   the expected class of the value
    * @param key   key of a map
    * @param mkey  key of a map element
    * @param value new value of element.
@@ -1328,6 +1338,7 @@ public interface ArcusClientIF {
   /**
    * Update elements from the b+tree
    *
+   * @param <T>      the expected class of the value
    * @param key      key of a b+tree
    * @param elements list of b+tree elements
    * @param tc       a transcoder to encode the value of element
@@ -1349,6 +1360,7 @@ public interface ArcusClientIF {
   /**
    * Update elements from the map
    *
+   * @param <T>      the expected class of the value
    * @param key      key of a map
    * @param elements Map of map element
    * @param tc       a transcoder to encode the value of element
@@ -1377,6 +1389,7 @@ public interface ArcusClientIF {
   /**
    * Insert an item into the b+tree
    *
+   * @param <T>                 the expected class of the value
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree element
    * @param eFlag               element flag. Length of element flag is between 1 and 31. if
@@ -1427,6 +1440,7 @@ public interface ArcusClientIF {
    *  from < to  : in ascending order
    * }</pre>
    *
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param from        the first bkey
    * @param to          the last bkey
@@ -1473,6 +1487,7 @@ public interface ArcusClientIF {
    * tree that has an attribute of 'attributesForCreate' and insert the
    * element that has elementFlag and value.
    *
+   * @param <T>                 the expected class of the value
    * @param key                 key of a b+tree
    * @param bkey                key of a b+tree element
    * @param elementFlag         flag of element
@@ -1519,6 +1534,7 @@ public interface ArcusClientIF {
   /**
    * Update an element from the b+tree
    *
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param bkey        key of a b+tree element
    * @param eFlagUpdate new flag of element. do not update the eflag if this argument
@@ -1546,6 +1562,7 @@ public interface ArcusClientIF {
   /**
    * Checks multiple items' membership in a set using the default transcoder.
    *
+   * @param <T>    the expected class of the value
    * @param key    key of set
    * @param values value list to check membership
    * @param tc     transcoder to decode each value
@@ -1572,6 +1589,7 @@ public interface ArcusClientIF {
   /**
    * Insert elements into a b+tree
    *
+   * @param <T>                 the expected class of the value
    * @param key                 a key list of b+ tree
    * @param elements            element list which insert into b+tree
    * @param attributesForCreate create a b+tree with this attributes, if given key is not exists.
@@ -1601,6 +1619,7 @@ public interface ArcusClientIF {
   /**
    * Retrieves count number of items in given bkey in the b+tree.
    *
+   * @param <T>         the expected class of the value
    * @param key         key of a b+tree
    * @param bkey        bkey of an element
    * @param eFlagFilter element flag filter
@@ -1665,6 +1684,7 @@ public interface ArcusClientIF {
   /**
    * Insert one item into multiple b+trees at once.
    *
+   * @param <T>                 the expected class of the value
    * @param keyList             key list of b+tree
    * @param bkey                key of a b+tree element.
    * @param eFlag               element flag. Length of element flag is between 1 and 31. if
@@ -1698,6 +1718,7 @@ public interface ArcusClientIF {
   /**
    * Get elements from each b+tree.
    *
+   * @param <T>         the expected class of the value
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
@@ -1730,6 +1751,7 @@ public interface ArcusClientIF {
   /**
    * Get elements from each b+tree.
    *
+   * @param <T>         the expected class of the value
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
@@ -1850,6 +1872,7 @@ public interface ArcusClientIF {
   /**
    * Get an element from b+tree using its position.
    *
+   * @param <T>   the expected class of the value
    * @param key   b+tree item's key
    * @param order ascending/descending order
    * @param pos   element's position
@@ -1874,6 +1897,7 @@ public interface ArcusClientIF {
   /**
    * Get multiple elements from b+tree using positions.
    *
+   * @param <T>   the expected class of the value
    * @param key   b+tree item's key
    * @param order ascending/descending order
    * @param from  start position
@@ -1922,6 +1946,7 @@ public interface ArcusClientIF {
   /**
    * Get the position, element, and neighbor elements of given bkey in b+tree.
    *
+   * @param <T>      the expected class of the value
    * @param key      b+tree item's key
    * @param longBKey element's bkey (long type bkey)
    * @param order    ascending/descending order
@@ -1947,6 +1972,7 @@ public interface ArcusClientIF {
   /**
    * Get the position, element, and neighbor elements of given bkey in b+tree.
    *
+   * @param <T>           the expected class of the value
    * @param key           b+tree item's key
    * @param byteArrayBKey element's bkey (byte-array type bkey)
    * @param order         ascending/descending order
@@ -1974,6 +2000,7 @@ public interface ArcusClientIF {
   /**
    * Insert an element into b+tree and also get the "trimmed" element if any.
    *
+   * @param <E>                 the expected class of the value
    * @param key                 b+tree item's key
    * @param bkey                element's key
    * @param eFlag               optional element flag
@@ -2003,6 +2030,7 @@ public interface ArcusClientIF {
   /**
    * Insert an element into b+tree and also get the "trimmed" element if any.
    *
+   * @param <E>                 the expected class of the value
    * @param key                 b+tree item's key
    * @param bkey                element's key (byte-array type key)
    * @param eFlag               optional element flag
@@ -2034,6 +2062,7 @@ public interface ArcusClientIF {
    * Upsert (update if element exists, insert otherwise) an element into b+tree and
    * also get the "trimmed" element if any.
    *
+   * @param <E>                 the expected class of the value
    * @param key                 b+tree item's key
    * @param bkey                element's key
    * @param eFlag               optional element flag
@@ -2065,6 +2094,7 @@ public interface ArcusClientIF {
    * Upsert (update if element exists, insert otherwise) an element into b+tree and
    * also get the "trimmed" element if any.
    *
+   * @param <E>                 the expected class of the value
    * @param key                 b+tree item's key
    * @param bkey                element's key (byte-array type key)
    * @param eFlag               optional element flag

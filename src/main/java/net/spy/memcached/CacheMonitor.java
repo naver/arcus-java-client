@@ -46,9 +46,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
   /**
    * Constructor
    *
-   * @param zk          ZooKeeper connection
-   * @param serviceCode service code (or cloud name) to identify each cloud
-   * @param listener    Callback listener
+   * @param zk              ZooKeeper connection
+   * @param cacheListZPath  path of cache list znode
+   * @param serviceCode     service code (or cloud name) to identify each cloud
+   * @param listener        Callback listener
    */
   public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
                       CacheMonitorListener listener) {
@@ -70,6 +71,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
   public interface CacheMonitorListener {
     /**
      * The existing children of the node has changed.
+     *
+     * @param children new children node list
      */
     void commandCacheListChange(List<String> children);
 
