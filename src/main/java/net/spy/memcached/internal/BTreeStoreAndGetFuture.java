@@ -25,7 +25,8 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 /**
  * Future object that contains an b+tree element object
  *
- * @param <T>
+ * @param <T> Type of object returned from this future.
+ * @param <E> the expected class of the value
  */
 public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
 

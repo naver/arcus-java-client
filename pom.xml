@@ -188,6 +188,7 @@
                 <configuration>
                     <show>public</show>
                     <nohelp>false</nohelp>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
                 </configuration>
             </plugin>
             <plugin>
