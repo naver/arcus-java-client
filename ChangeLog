@@ -1,3 +1,45 @@
+2020-08-04 [version 1.12.1]
+	* [FEATURE] asyncDeleteBulk
+	* [FEATURE] add maven plugin of checkstyle
+	* [FEATURE] apply checkstyle
+	* [CLEANUP] apply Indentation checkstyle
+	* [CLEANUP] apply LineLength checkstyle
+	* [CLEANUP] reduce line length in test sources
+	* [CLEANUP] reduce line length in client sources
+	* [CLEANUP] apply Import checkstyle
+	* [CLEANUP] replace tab charcter to space
+	* [CLEANUP] remove nested block
+	* [CLEANUP] prevent instantiation of utility classes
+	* [CLEANUP] remove duplicate code for parsing response of
+	            BTreeGetBulkOperation
+	* [CLEANUP] merged CollectionUpsertOperation to CollectionStoreOperation
+	* [CLEANUP] solve hash point collision with comparison socket address of
+	            node
+	* [CLEANUP] renamed store to insert of collection
+	* [CLEANUP] update comment for collection response format
+	* [CLEANUP] change some javadoc comments to use code tag
+	* [CLEANUP] don't occur switchover in sop exist operation.
+	* [CLEANUP] remove non-javadoc comments
+	* [CLEANUP] refactor asyncSetBulk, asyncDeleteBulk
+	* [CLEANUP] deprecate bulkService API
+	* [CLEANUP] refactored the constructor functions of KetamaNodeLocator.
+	* [CLEANUP] refactor the parts that use socketChannel API
+	* [CLEANUP] remove the authentication failure log when OperationException
+	            occurs
+	* [CLEANUP] refactored the handleNodeManageQueue() method
+	* [CLEANUP] refactored the attemptReconnects() method
+	* [CLEANUP] refactored the ENABLE_REPLICATION code tag
+	* [CLEANUP] refactered the updateConnections() method
+	* [CLEANUP] separated the updateReplConnections() from the
+	            updateConnections()
+	* [CLEANUP] moved the selector wakeup code into putMemcachedQueue()
+	* [FIX] Canceling the operations if input queue of node is full when moving
+	        operations
+	* [ENHANCE] destroy read queue of removed node
+	* [ENHANCE] do not cancel the operation twice when using authentication in
+	            setupResend of TCPMemcachedNodeImpl
+	* [TEST] refactor test codes related setUp and tearDown
+
 2020-03-16 [version 1.12.0]
 	* [FEATURE] change max element bytes
 	* [FIX] ConcurrentModificationException in foreach loop of
