@@ -4,7 +4,7 @@ Key-value item은 하나의 key에 대해 하나의 value만을 저장하는 ite
 
 **제약조건**
 - Key의 최대 크기는 250 character이다.
-- Value는 최대 1Mb까지 저장할 수 있다.
+- Cache item의 최대 크기는 1MB이다.
 
 Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 
