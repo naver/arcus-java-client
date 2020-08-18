@@ -1,4 +1,4 @@
-## 처음 사용자용 가이드
+# 처음 사용자용 가이드
 
 이 문서는 Arcus를 처음 접하는 자바 개발자를 위해 작성되었습니다.
 [Apache Maven][maven]의 개념과 기본 사용법을 알고 있다고 가정하고 있으며,
@@ -6,7 +6,7 @@
 
 [maven]: http://maven.apache.org/ "Apache Maven"
 
-### Arcus
+## Arcus
 
 Arcus는 오픈소스 key-value 캐시 서버인 memcached를 기반으로 부분적으로 fault-tolerant한 메모리 기반의 캐시 클라우드 입니다.
 * memcached : 구글, 페이스북 등에서 대규모로 사용하고 있는 메모리 캐시 서버입니다.
@@ -17,7 +17,7 @@ Arcus는 오픈소스 key-value 캐시 서버인 memcached를 기반으로 부�
 
 또한 Arcus는 key-value 형태의 데이터뿐만 아니라 List, Set, Map, B+Tree 등의 자료구조를 저장할 수 있는 기능을 제공합니다.
 
-### 미리 알아두기
+## 미리 알아두기
 
 - 키(key)
     - Arcus의 key는 prefix와 subkey로 구성되며, prefix와 subkey는 콜론(:)으로 구분됩니다. (예) *users:user_12345*
@@ -30,7 +30,7 @@ Arcus는 오픈소스 key-value 캐시 서버인 memcached를 기반으로 부�
     - Arcus admin: ZooKeeper 서버 주소로서 캐시 서버들의 IP와 PORT 정보를 조회하고 변경이 있을 때 클라이언트에게 알려주는 역할을 합니다.
     - Arcus service code: 사용자 또는 서비스에게 할당된 캐시 서버들을 구분짓는 코드값입니다.
 
-### Hello, Arcus!
+## Hello, Arcus!
 
 기본적인 key-value 캐시 요청을 수행해보도록 하겠습니다. 아커스 서버가 구성되어 있다고 가정합니다.
 우선 다음과 같이 비어 있는 자바 프로젝트를 생성합니다.
@@ -41,7 +41,7 @@ $ cd arcus-quick-start
 $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 이클립스 프로젝트를 생성하여 활용합니다.
 ```
 
-#### pom.xml
+### pom.xml
 
 프로젝트가 생성되면 pom.xml에서 Arcus 클라이언트를 참조하도록 변경합니다.
 
@@ -98,7 +98,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 </project>
 ```
 
-#### HelloArcus.java
+### HelloArcus.java
 
 이제 Arcus와 통신하는 클래스를 생성해봅시다.
 시나리오는 다음과 같습니다.
@@ -207,7 +207,7 @@ public class HelloArcus {
 }
 ```
 
-#### src/test/resources/log4j2.xml
+### src/test/resources/log4j2.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
@@ -263,7 +263,7 @@ public class HelloArcus {
 </Configuration>
 ```
 
-#### 테스트
+### 테스트
 
 위 예제는 127.0.0.1:2181 에 ZooKeeper 가 작동하고 있고 memcached 서버가 구동하고 있다고 가정합니다.
 아직 준비가 안 되어 있다면, 다음 페이지 Running Test Cases 를 따라 준비합니다.

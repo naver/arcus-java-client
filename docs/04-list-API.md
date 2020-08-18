@@ -1,4 +1,4 @@
-## List Item
+# List Item
 
 List collection은 하나의 key에 대해 여러 value들을 double linked list 구조로 유지한다.
 
@@ -21,7 +21,7 @@ List item에 대해 수행가능한 기본 연산들은 아래와 같다.
 - [List Element 일괄 삽입](04-list-API.md#list-element-%EC%9D%BC%EA%B4%84-%EC%82%BD%EC%9E%85)
 
 
-### List Item 생성
+## List Item 생성
 
 새로운 empty list item을 생성한다.
 
@@ -89,7 +89,7 @@ try {
 3. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.  
    
 
-### List Element 삽입
+## List Element 삽입
 
 List에 하나의 element를 삽입하는 함수이다.
 
@@ -313,7 +313,7 @@ try {
 3. 조회 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
-### List Element 일괄 삽입
+## List Element 일괄 삽입
 
 두 유형의 bulk 삽입 기능을 제공한다.
 

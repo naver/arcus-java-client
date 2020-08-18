@@ -1,4 +1,4 @@
-## Arcus Cloud 기본 사항
+# Arcus Cloud 기본 사항
 
 Arcus는 확장된 key-value 데이터 모델을 제공한다.
 하나의 key는 하나의 데이터만을 가지는 simple key-value 유형 외에도
@@ -22,7 +22,7 @@ Arcus cache server의 key-value 모델은 아래의 기본 제약 사항을 가�
 - [Expiration, Eviction, and Sticky Item](01-arcus-cloud-basics.md#expiration-eviction-and-sticky-item)
 
 
-### 서비스코드
+## 서비스코드
 
 서비스코드(service code)는 Arcus에서 cache cloud를 구분하는 코드이다. 
 Arcus cache cloud 서비스를 응용들에게 제공한다는 의미에서 "서비스코드"라는 용어를 사용하게 되었다.
@@ -32,7 +32,7 @@ Arcus java client 객체는 하나의 Arcus 서비스코드만을 가지며, 하
 해당 응용이 둘 이상의 Arcus cache cloud를 접근해야 한다면,
 각 Arcus cache cloud의 서비스코드를 가지는 Arcus java client 객체를 따로 생성하여 사용하여야 한다.
 
-### Arcus Admin
+## Arcus Admin
 
 Arcus admin은 ZooKeeper를 이용하여 각 서비스 코드에 해당하는 Arcus cache cloud를 관리한다.
 특정 서비스 코드에 대한 cache server list를 관리하며,
@@ -41,7 +41,7 @@ cache server 추가 및 삭제에 대해 cache server list를 최신 상태로 �
 Arcus admin은 highly available하여야 하므로, 
 여러 ZooKeeper 서버들을 하나의 ZeeKeeper ensemble로 구성하여 사용한다.
 
-### Cache Key
+## Cache Key
 
 Cache key는 Arcus cache에 저장하는 cache item을 유일하게 식별한다. Cache key 형식은 아래와 같다.
 
@@ -61,7 +61,7 @@ Prefix와 subkey는 아래의 명명 규칙을 가진다.
   이 중에 하이픈(-)은 prefix 명의 첫번째 문자로 올 수 없다.
 - Subkey는 공백을 포함할 수 없으며, 기본적으로 alphanumeric만을 사용하길 권장한다.
 
-### Cache Item
+## Cache Item
 
 Arcus cache는 simple key-value item 외에 다양한 collection item 유형을 가진다.
 
@@ -72,7 +72,7 @@ Arcus cache는 simple key-value item 외에 다양한 collection item 유형을 
   - map item - \<mkey, value\>쌍으로 구성된 데이터 집합을 가지는 item
   - b+tree item - b+tree key 기반으로 정렬된 데이터 집합을 가지는 item
 
-### Expiration, Eviction, and Sticky Item
+## Expiration, Eviction, and Sticky Item
 
 각 cache item은 expiration time 속성을 가진다.
 이 값의 설정으로 자동 expiration을 지정하거나 expire되지 않도록 지정할 수 있다.

@@ -1,4 +1,4 @@
-## Key-Value Item
+# Key-Value Item
 
 Key-value item은 하나의 key에 대해 하나의 value만을 저장하는 item이다.
 
@@ -14,7 +14,7 @@ Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 - [Key-Value Item 삭제](03-key-value-API.md#key-value-item-%EC%82%AD%EC%A0%9C)
 
 
-### Key-Value Item 저장
+## Key-Value Item 저장
 
 key-value item을 저장하는 API로 set, add, replace를 제공한다.
 
@@ -75,7 +75,7 @@ StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item�
 StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
 
 
-### Key-Value Item 조회
+## Key-Value Item 조회
 
 하나의 key를 가진 cache item에 저장된 value를 조회하는 API를 제공한다.
 
@@ -96,7 +96,7 @@ Future<Map<String,Object>> asyncGetBulk(String... keys)
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
 
 
-### Key-Value Item 값의 증감
+## Key-Value Item 값의 증감
 
 key-value item에서 value 부분의 값을 증가시키거나 감소시키는 연산이다. 
 (**[주의] 증감 연산을 사용하려면, 반드시 value 값이 String 유형의 숫자 값이어야 한다.**)
@@ -122,7 +122,7 @@ Future<Long> asyncDecr(String key, int by, long def, int exp)
 - 반환되는 값은 증감 후의 값이다.
 
 
-### Key-Value Item 삭제
+## Key-Value Item 삭제
 
 하나의 key에 대한 item을 삭제하는 API와
 여러 key들의 item들을 한번에 삭제하는 bulk API를 제공한다.
