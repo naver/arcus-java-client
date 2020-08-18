@@ -1,11 +1,11 @@
-﻿## Arcus Java Client
+# Arcus Java Client
 
 - [Arcus Client 기본 사용법](02-arcus-java-client.md#arcus-client-%EA%B8%B0%EB%B3%B8-%EC%82%AC%EC%9A%A9%EB%B2%95) 
 - [Arcus Client 생성, 소멸, 관리](02-arcus-java-client.md#arcus-client-%EC%83%9D%EC%84%B1-%EC%86%8C%EB%A9%B8-%EA%B4%80%EB%A6%AC) 
 - [Arcus Client 설정](02-arcus-java-client.md#arcus-client-%EC%84%A4%EC%A0%95)
 
 
-### Arcus Client 기본 사용법
+## Arcus Client 기본 사용법
 
 예제를 통해 Arcus java client 기본 사용법을 알아본다.
 아래 예제는 Arcus cache에 key가 “sample:testKey”이고 value가 “testValue”인 cache item을 저장한다.
@@ -106,9 +106,9 @@ public class HelloArcus {
 - Spring container에서 관리되는 경우 bean 설정의 destroy-method에서 `shutdown` 메소드가 호출되도록 설정해야 한다.
 
 
-### Arcus Client 생성, 소멸, 관리
+## Arcus Client 생성, 소멸, 관리
 
-#### Arcus Client 생성
+### Arcus Client 생성
 
 하나의 Arcus Client 객체는 Arcus cache cloud에 있는 모든 cache server(or cache node)와 연결을 하나씩 생성하며,
 요청되는 각 cache item의 key에 대해 그 key가 mapping되는 cache server와의 연결을 이용하여 request를 보내고
@@ -182,7 +182,7 @@ Arcus cache cloud로 정상 연결되지 않으면, 다음과 같은 로그가 �
 WARN net.spy.memcached.CacheManager: Some arcus connections are not established.
 ```
 
-#### Arcus Client 소멸
+### Arcus Client 소멸
 
 ArcusClient 또는 ArcusClientPool를 사용하고 난 다음에는
 반드시 shutdown() 메소드를 호출하여 client와 admin, cache server간의 연결을 해제시켜주어야 한다.
@@ -192,7 +192,7 @@ client.shutdown();
 pool.shutdown();
 ```
 
-##### Arcus Client 생명주기 관리
+#### Arcus Client 생명주기 관리
 
 Arcus에 대한 매 요청마다 arcus client 객체를 생성하고 소멸시키는 것은 적절하지 못하다.
 응용 서버의 구동 시에 arcus client 객체를 생성하고, 종료 시에 arcus client 객체를 소멸하면 된다.
@@ -204,7 +204,7 @@ WAS가 초기화 될 때 Arcus server 와 연결을 맺도록 하자.
 WAS가 shutdown될 때 ArcusClient도 함께 shutdown되도록 설정하면 가장 이상적이다.
 
 
-##### Cache Server List 관리
+#### Cache Server List 관리
 
 Arcus는 cache server list를 자동으로 관리한다. 
 Cache server들 중에 일부 서버가 사용 불가능한 상태가 되면
@@ -217,9 +217,9 @@ cache key와 cache server와의 mapping을 갱신하게 한다.
 따라서, Arcus client를 사용할 때 cache server 대수의 변화에 대한 방어 로직은 신경 쓰지 않아도 된다.
 
 
-### Arcus Client 설정
+## Arcus Client 설정
 
-##### Key-Value에서 데이터 압축 설정
+### Key-Value에서 데이터 압축 설정
 
 Arcus client는 key-value item의 데이터 압축 및 해제 기능을 가지고 있다.
 즉, 일정 크기 이상의 데이터이면 그 데이터를 압축하여 cache server에 보내어 저장하고,
@@ -242,7 +242,7 @@ cfb.setTranscoder(trans);
 ArcusClient client = ArcusClient.createArcusClient(SERVICE_CODE, cfb);
 ```
 
-##### Logger 설정
+### Logger 설정
 
 Arcus client 사용 시에 default(DefaultLogger), log4j(Log4JLogger), slf4j(SLF4JLogger), jdk(SunLogger) 등 4가지 종류의 Logger를 사용할 수 있다.
 사용할 logger를 지정하지 않으면 ArcusClient는 DefaultLogger를 기본으로 사용하며,
@@ -317,7 +317,7 @@ Ascii Protocol에 대한 자세한 내용은 [Arcus 서버 명령 프로토콜](
 
 기타 log4j의 자세한 설정 방법은 [log4j 설정 방법](http://logging.apache.org/log4j/2.x/manual/configuration.html)을 확인하기 바란다. 
 
-##### Log4JLogger 사용시 유의사항
+### Log4JLogger 사용시 유의사항
 
 log4j 1.2 이하 버전에서 보안 취약점이 존재하여, Arcus client의 1.11.5 버전부터 Log4JLogger를 사용하려면 log4j2 라이브러리가 요구된다. 이를 위해 응용 의존성에 아래와 같이 log4j2 라이브러리를 추가한다.
 
@@ -347,9 +347,9 @@ java.lang.NoClassDefFoundError: org/apache/logging/log4j/spi/ExtendedLogger
     at net.spy.memcached.compat.log.LoggerFactory.getLogger(LoggerFactory.java:89)
     at net.spy.memcached.ArcusClient.<clinit>(ArcusClient.java:183)
     at Main.main(Main.java:10)
-  ```
+```
 
-##### SLF4JLogger 사용시 유의 사항
+### SLF4JLogger 사용시 유의 사항
 
 slf4j를 사용하는 경우, Arcus client의 SLF4JLogger 클래스를 사용할 것이다. 이 클래스를 사용하려면 slf4j를 구현한 로깅 라이브러리가 응용 의존성에 추가되어야 한다. 만약 추가하지 않을 경우 아래의 예외 메시지가 발생한다.
 
@@ -411,7 +411,7 @@ SLF4J: Class path contains multiple SLF4J bindings.
 SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 ```
 
-##### Transparent Front Cache 사용
+### Transparent Front Cache 사용
 
 Arcus는 기본적으로 원격 Cache 시스템이므로 요청에 대한 응답을 받을 때마다 데이터를 객체화해야 하는 단점이 있다.
 이는 결국 JVM의 Garbage Collector에 부담으로 작용할 것이다.
@@ -481,7 +481,7 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
 각 용도에 맞는 Arcus client 객체를 별도로 생성하여 사용하여야 한다.
 
 
-##### ConnectionFactoryBuilder 클래스의 주요 메소드
+### ConnectionFactoryBuilder 클래스의 주요 메소드
 
 - setFailureMode(FailureMode fm)
 

@@ -1,4 +1,4 @@
-## B+tree Item
+# B+tree Item
 
 B+tree item은 하나의 key에 대해 b+tree 구조 기반으로 b+tree key(bkey)로 정렬된 data의 집합을 가진다.
 
@@ -46,7 +46,7 @@ B+tree position 관련 연산들은 다음과 같다.
 - [B+Tree Position과 Element 동시 조회](07-btree-API.md#btree-position%EA%B3%BC-element-%EB%8F%99%EC%8B%9C-%EC%A1%B0%ED%9A%8C)
 
 
-### BKey(B+Tree Key)와 EFlag(Element Flag)
+## BKey(B+Tree Key)와 EFlag(Element Flag)
 
 B+tree item에서 사용가능한 bkey 데이터 타입은 아래 두 가지이다.
 
@@ -65,7 +65,7 @@ eflag는 현재 b+tree element에만 존재하는 필드이다.
 eflag 데이터 타입은 byte[1~31] 타입만 가능하며, bkey의 byte array 사용 방식과 동일하다.
 
 
-### Element Flag Filter 객체
+## Element Flag Filter 객체
 
 
 Element를 조회, 수정, 삭제 시에 eflag(element flag)에 대한 filter 조건을 사용할 수 있다.
@@ -105,7 +105,7 @@ ElementFlagFilter.BitwiseOperands.AND	      | AND 연산
 ElementFlagFilter.BitwiseOperands.OR	      | OR 연산
 ElementFlagFilter.BitwiseOperands.XOR	      | XOR 연산
 
-#### ElementFlagFilter 메소드
+### ElementFlagFilter 메소드
 
 ElementFlagFilter 클래스의 생성자 함수는 아래와 같다.
 compare 연산자와 compare 값만을 지정하여 ElementFlagFilter 객체를 생성한다.
@@ -123,7 +123,7 @@ ElementFlagFilter setCompareOffset(int offset)
 ElementFlagFilter setBitOperand(BitWiseOperands bitOp, byte[] bitCompValue)
 ```
 
-#### ElementFlagFilter 사용 예제
+### ElementFlagFilter 사용 예제
 
 첫째 예는 b+tree에 저장된 전체 element들에서 eflag 값이 0x0102와 일치하는 element의 개수를 조회한다.
 
@@ -171,7 +171,7 @@ Map<Long, Object> map = mc.asyncBopGet(KEY, BKEY, BKEY + 100, 0, 100, false, fal
 3. 1과 2에서 생성한 filter를 사용하면 eflag가 설정되지 않은 element를 조회할 수 있다.
 
 
-#### ElementMultiFlagsFilter
+### ElementMultiFlagsFilter
 
 Eflag에 대해 아래와 같은 IN 연산과 NOT IN 연산을 수행하기 위한 filter이다.
 
@@ -234,7 +234,7 @@ CollectionFuture<Boolean> future = mc.asyncBopUpdate(KEY, BKEY, eflagUpdate, nul
 ```
 
 
-### B+Tree Item 생성
+## B+Tree Item 생성
 
 새로운 empty b+tree item을 생성한다.
 
@@ -307,7 +307,7 @@ try {
 4. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
-### B+Tree Element 삽입
+## B+Tree Element 삽입
 
 B+Tree에 하나의 element를 삽입한다.
 전자는 long 타입의 bkey를, 후자는 최대 31 크기의 byte array 타입의 bkey를 사용한다.
@@ -475,7 +475,7 @@ public void testInsertAndGetTrimmedLongBKey() throws Exception {
 }
 ```
 
-### B+Tree Element Upsert
+## B+Tree Element Upsert
 
 B+Tree에 하나의 element를 upsert하는 함수들이다.
 Upsert 연산은 해당 element가 없으면 insert하고, 있으면 update하는 연산이다.
@@ -555,7 +555,7 @@ try {
 3. Upsert 결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
 
-### B+Tree Element 변경
+## B+Tree Element 변경
 
 B+Tree에서 하나의 element를 변경하는 함수이다. Element의 eflag 그리고/또는 value를 변경한다.
 전자는 long bkey를, 후자는 최대 31 크기의 byte array bkey를 사용한다.
@@ -620,7 +620,7 @@ CollectionFuture<Boolean> future = mc.asyncBopUpdate(KEY, BKEY, eflagUpdate, nul
 Element 수정에 대한 자세한 수행 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
-### B+Tree Element 삭제
+## B+Tree Element 삭제
 
 B+tree에서 element를 삭제하는 함수들은 두 유형이 있다.
 
@@ -702,7 +702,7 @@ try {
 3. 삭제 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
-### B+tree Element 값의 증감
+## B+tree Element 값의 증감
 
 B+tree element의 값을 증가/감소 시키는 함수는 아래와 같다. 
 Element의 값은 String 형의 숫자이어야 한다.
@@ -776,7 +776,7 @@ try {
 3. Element increment 후 조회에 대한 자세한 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
-### B+Tree Element 개수 계산
+## B+Tree Element 개수 계산
 
 B+tree에서 from부터 to까지의 bkey를 가진 element들 중 eFlagFilter조건을 만족하는 element 개수를 조회한다.
 
@@ -1056,7 +1056,7 @@ try {
 6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
 
 
-### B+Tree Element 일괄 변경
+## B+Tree Element 일괄 변경
 
 B+tree에서 주어진 elements에 해당하는 모든 element의 value 그리고/또는 element flag를 일괄 변경한다.
 
@@ -1165,7 +1165,7 @@ for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { //
 4. BTreeGetResult.getElements()로 조회한 BTreeElement객체로부터 element의 bkey, eflag, value를 조회할 수 있다.
 
 
-### B+Tree Element Sort-Merge 조회
+## B+Tree Element Sort-Merge 조회
 
 다수의 B+tree들에 대해 element 조회를 sort-merge 방식으로 수행하는 기능이다.
 물리적으로 여러 b+tree들로 구성되지만, 이들이 논리적으로 하나의 거대한 b+tree라 가정하고, 
@@ -1306,7 +1306,7 @@ try {
 7. Sort merge get의 최종 수 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
-### B+Tree Position 조회
+## B+Tree Position 조회
 
 B+tree의 검색 조건으로 각 엘리먼트의 위치(position) 정보를 사용할 수 있다. 여기서 위치란 B+tree 안에서 bkey를 통해 일렬로 정렬되어 있는 각 엘리먼트의 인덱스를 뜻하며, 0부터 count-1 까지 순서대로 매겨진다. 순서에 대한 기준으로 오름차순(ASC)과 내림차순(DESC)이 지원된다.
 
@@ -1374,7 +1374,7 @@ public void testLongBKeyDesc() throws Exception {
 }
 ```
 
-### B+Tree Position 기반의 Element 조회
+## B+Tree Position 기반의 Element 조회
 
 B+tree에서 하나의 position 또는 position range에 해당하는 elements를 조회하는 함수이다.
 
@@ -1435,7 +1435,7 @@ public void testLongBKeyMultiple() throws Exception {
 }
 ```
 
-### B+Tree Position과 Element 동시 조회
+## B+Tree Position과 Element 동시 조회
 
 B+tree의 검색 조건으로 특정 엘리먼트의 위치(position) 를 기준으로 주변(앞/뒤 position) 엘리먼트들을 조회 할 수 있다.  여기서 위치란 B+tree안에서 bkey를 통해 일렬로 정렬되어 있는 각 엘리먼트의 인덱스를 뜻하며, 0부터 count-1까지 순서대로 매겨진다. 순서에 대한 기준으로 오름차순(ASC)과 내림차순(DESC)이 지원된다.
 
