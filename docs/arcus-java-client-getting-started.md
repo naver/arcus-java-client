@@ -1,36 +1,36 @@
 # 처음 사용자용 가이드
 
-이 문서는 Arcus를 처음 접하는 자바 개발자를 위해 작성되었습니다.
+이 문서는 ARCUS를 처음 접하는 자바 개발자를 위해 작성되었습니다.
 [Apache Maven][maven]의 개념과 기본 사용법을 알고 있다고 가정하고 있으며,
-자세한 설명을 하기 보다는 Copy&Paste를 통해 Arcus를 사용해볼 수 있는 내용으로 되어 있습니다.
+자세한 설명을 하기 보다는 Copy&Paste를 통해 ARCUS를 사용해볼 수 있는 내용으로 되어 있습니다.
 
 [maven]: http://maven.apache.org/ "Apache Maven"
 
-## Arcus
+## ARCUS
 
-Arcus는 오픈소스 key-value 캐시 서버인 memcached를 기반으로 부분적으로 fault-tolerant한 메모리 기반의 캐시 클라우드 입니다.
+ARCUS는 오픈소스 key-value 캐시 서버인 memcached를 기반으로 부분적으로 fault-tolerant한 메모리 기반의 캐시 클라우드 입니다.
 * memcached : 구글, 페이스북 등에서 대규모로 사용하고 있는 메모리 캐시 서버입니다.
 * 캐시 : 자주 사용되는 데이터를 비교적 고속의 저장소에 넣어둠으로써, 느린 저장소로의 요청을 줄이고 보다 빠른 응답성을 기대할 수 있게 하는 서비스입니다.
-* 메모리 기반 : Arcus는 데이터를 메모리에만 저장합니다. 따라서 모든 데이터는 휘발성이며 언제든지 삭제될 수 있습니다.
+* 메모리 기반 : ARCUS는 데이터를 메모리에만 저장합니다. 따라서 모든 데이터는 휘발성이며 언제든지 삭제될 수 있습니다.
 * 클라우드 : 각 서비스는 필요에 따라 전용 캐시 클러스터를 구성할 수 있으며 동적으로 캐시 서버를 추가하거나 삭제할 수 있습니다. (단, 일부 데이터는 유실됩니다)
-* fault-tolerant : Arcus는 일부 또는 전체 캐시 서버의 이상 상태를 감지하여 적절한 조치를 취합니다.
+* fault-tolerant : ARCUS는 일부 또는 전체 캐시 서버의 이상 상태를 감지하여 적절한 조치를 취합니다.
 
-또한 Arcus는 key-value 형태의 데이터뿐만 아니라 List, Set, Map, B+Tree 등의 자료구조를 저장할 수 있는 기능을 제공합니다.
+또한 ARCUS는 key-value 형태의 데이터뿐만 아니라 List, Set, Map, B+Tree 등의 자료구조를 저장할 수 있는 기능을 제공합니다.
 
 ## 미리 알아두기
 
 - 키(key)
-    - Arcus의 key는 prefix와 subkey로 구성되며, prefix와 subkey는 콜론(:)으로 구분됩니다. (예) *users:user_12345*
-    - Arcus는 prefix를 기준으로 별도의 통계를 수집합니다. prefix 개수의 제한은 없으나 통계 수집을 하는 경우에는 너무 많지 않는 수준(5~10개)으로 생성하시는 것을 권합니다.
+    - ARCUS의 key는 prefix와 subkey로 구성되며, prefix와 subkey는 콜론(:)으로 구분됩니다. (예) *users:user_12345*
+    - ARCUS는 prefix를 기준으로 별도의 통계를 수집합니다. prefix 개수의 제한은 없으나 통계 수집을 하는 경우에는 너무 많지 않는 수준(5~10개)으로 생성하시는 것을 권합니다.
     - 키는 prefix, subkey를 포함하여 250자를 넘을 수 없습니다. 따라서 반드시 응용에서 키 길이를 제한하셔야 합니다.
 - 값(value)
     - 하나의 키에 대한 값은 바이트 스트림 형태로 최대 1MB 까지 저장될 수 있습니다.
     - 자바 객체를 저장하는 경우, 해당 객체는 반드시 Serializable 인터페이스를 구현해야 합니다.
-* Arcus 접속 정보
-    - Arcus admin: ZooKeeper 서버 주소로서 캐시 서버들의 IP와 PORT 정보를 조회하고 변경이 있을 때 클라이언트에게 알려주는 역할을 합니다.
-    - Arcus service code: 사용자 또는 서비스에게 할당된 캐시 서버들을 구분짓는 코드값입니다.
+* ARCUS 접속 정보
+    - ARCUS admin: ZooKeeper 서버 주소로서 캐시 서버들의 IP와 PORT 정보를 조회하고 변경이 있을 때 클라이언트에게 알려주는 역할을 합니다.
+    - ARCUS service code: 사용자 또는 서비스에게 할당된 캐시 서버들을 구분짓는 코드값입니다.
 
-## Hello, Arcus!
+## Hello, ARCUS!
 
 기본적인 key-value 캐시 요청을 수행해보도록 하겠습니다. 아커스 서버가 구성되어 있다고 가정합니다.
 우선 다음과 같이 비어 있는 자바 프로젝트를 생성합니다.
@@ -43,7 +43,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 
 ### pom.xml
 
-프로젝트가 생성되면 pom.xml에서 Arcus 클라이언트를 참조하도록 변경합니다.
+프로젝트가 생성되면 pom.xml에서 ARCUS 클라이언트를 참조하도록 변경합니다.
 
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -71,7 +71,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
             <scope>test</scope>
         </dependency>
 
-        <!-- Arcus 클라이언트 의존성을 추가합니다. -->
+        <!-- ARCUS 클라이언트 의존성을 추가합니다. -->
         <dependency>
             <groupId>com.navercorp.arcus</groupId>
             <artifactId>arcus-java-client</artifactId>
@@ -100,7 +100,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 
 ### HelloArcus.java
 
-이제 Arcus와 통신하는 클래스를 생성해봅시다.
+이제 ARCUS와 통신하는 클래스를 생성해봅시다.
 시나리오는 다음과 같습니다.
 - HelloArcus.sayHello(): Arcus 캐시 서버에 "Hello, Arcus!" 값을 저장합니다.
 - HelloArcus.listenHello(): Arcus 캐시 서버에 저장된 "Hello, Arcus!" 값을 읽어옵니다.

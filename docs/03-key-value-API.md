@@ -64,7 +64,7 @@ expiration은 key가 현재 시간부터 expire 될 때까지의 시간(초 단�
 시간이 30일을 초과하는 경우 expire 될 unix time을 입력한다.
 그 외에 expire 되지 않도록 하기 위해 아래 값을 지정할 수 있다.
 
-- 0: key가 expire 되지 않도록 설정한다. 하지만 Arcus cache server의 메모리가 부족한 경우 LRU에 의해 언제든지 삭제될 수 있다.
+- 0: key가 expire 되지 않도록 설정한다. 하지만 ARCUS cache server의 메모리가 부족한 경우 LRU에 의해 언제든지 삭제될 수 있다.
 - -1: key를 sticky item으로 만든다. Sticky item은 expire 되지 않으며 LRU에 의해 삭제되지도 않는다.
 
 저장에 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.
