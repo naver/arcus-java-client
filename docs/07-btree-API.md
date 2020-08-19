@@ -8,7 +8,7 @@ B+tree item은 하나의 key에 대해 b+tree 구조 기반으로 b+tree key(bke
 - 하나의 b+tree 내에서 모든 element는 동일한 bkey 유형을 가져야 한다.
   즉, long bkey 유형과 byte array bkey 유형이 혼재할 수 없다.
 
-B+tree item 구조와 기본 특징은 [Arcus Server Ascii Protocol 문서의 내용](https://github.com/naver/arcus-memcached/blob/master/doc/arcus-collection-concept.md)을
+B+tree item 구조와 기본 특징은 [ARCUS Server Ascii Protocol 문서의 내용](https://github.com/naver/arcus-memcached/blob/master/doc/arcus-collection-concept.md)을
 먼저 참고하기 바란다.
 
 B+tree item 연산의 설명에 앞서, b+tree 조회 및 변경에 사용하는 객체들을 설명한다.

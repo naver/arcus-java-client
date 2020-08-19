@@ -6,7 +6,7 @@
 
 ### Flush
 
-Arcus는 prefix단위로 flush하는 기능을 제공한다.
+ARCUS는 prefix단위로 flush하는 기능을 제공한다.
 캐시 서버에 저장된 모든 데이터들 중 특정 prefix를 사용하는 모든 key들을 한번의 요청으로 삭제할 수 있다. 단, Front Cache의 데이터는 flush 되지 않는다.
 
 ```java
@@ -36,7 +36,7 @@ try {
 }
 ```
 
-예를 들어, Arcus 서버에 다음 key 들이 저장되어 있다고 가정하자.
+예를 들어, ARCUS 서버에 다음 key 들이 저장되어 있다고 가정하자.
 
 - mydata:subkey1
 - mydata:subkey2
@@ -44,6 +44,6 @@ try {
 - ourdata:subkey4
 - theirdata:subkey5
 
-위 코드에서 client.flush(“myprefix”)를 호출하면 “myprefix”를 prefix로 사용하는 mydata:subkey1, mydata:subkey2 두 key가 Arcus에서 제거된다. 물론 Arcus cloud를 구성하는 모든 서버에 대해서 수행된 결과이며 성공했을 경우 future.get()은 true를 반환한다.
+위 코드에서 client.flush(“myprefix”)를 호출하면 “myprefix”를 prefix로 사용하는 mydata:subkey1, mydata:subkey2 두 key가 ARCUS에서 제거된다. 물론 ARCUS cloud를 구성하는 모든 서버에 대해서 수행된 결과이며 성공했을 경우 future.get()은 true를 반환한다.
 
 

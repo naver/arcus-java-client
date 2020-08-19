@@ -2,7 +2,7 @@
 
 ### Counter 사용
 
-Arcus에서 counter를 사용할 경우 최초에 set 또는 add command를 이용하여 counter key를 등록해야 한다.
+ARCUS에서 counter를 사용할 경우 최초에 set 또는 add command를 이용하여 counter key를 등록해야 한다.
 일단 다음과 같이 저장해 보자.
 
 ```java
@@ -32,7 +32,7 @@ Cache 서버에서 직접 counter 정보를 조회해 보면 “d”가 저장�
   따라서 앞서 언급했듯이 “d”값을 integer값으로 변경할 수 없었던 것이다.
 
 
-**Arcus는 counter 로 사용할 데이터의 최초 값은 반드시 String으로 지정하도록 강제하고 있다.**
+**ARCUS는 counter 로 사용할 데이터의 최초 값은 반드시 String으로 지정하도록 강제하고 있다.**
 **따라서, 반드시 최초 값은 다음과 같이 String 값으로 설정해야 한다.**
 
 
@@ -44,7 +44,7 @@ client.set("nhn_counter", 10000, "100"); // 반드시 이렇게 사용해야 한
 예를 들어 52로 초기값을 저장한다고 하면, 이번에는 counter를 사용해도 에러가 나지 않을 것이다.
 왜냐하면 52의 ASCII code값이 4이기 때문이다.
 
-그리고, arcus client에서 incr/decr command의 입력 값을 primitive 또는 numeric wrapper 값으로 받을 수 있도록 되어 있으나, 내부적으로는 String으로 변환 후 cache server로 전달하도록 되어 있다.
+그리고, ARCUS client에서 incr/decr command의 입력 값을 primitive 또는 numeric wrapper 값으로 받을 수 있도록 되어 있으나, 내부적으로는 String으로 변환 후 cache server로 전달하도록 되어 있다.
 
 
 ### Operation Queue Block Timeout 설정
@@ -96,7 +96,7 @@ Expiretime은 초 단위로 지정된 시간만큼 미래의 시간인 Unix Time
 
 ### Operation timeout 설정
 
-ArcusClient의 모든 비동기방식의 메서드를 호출할 때 timeout을 지정할 수 있다.
+ARCUS Client의 모든 비동기방식의 메서드를 호출할 때 timeout을 지정할 수 있다.
 **이러한 timeout 값을 반드시 지정하여 사용할 것을 권장한다.**
 
 ```java
@@ -104,7 +104,7 @@ Future<Boolean> setResult = client.set("sample:testKey", 10, "testValue");
 boolean result = setResult.get(300L, TimeUnit.MILLISECONDS);
 ```
 
-위 예제는 Arcus cache server에 “testValue”를 저장할 때 timeout값을 300ms로 지정한 코드이다.
+위 예제는 ARCUS cache server에 “testValue”를 저장할 때 timeout값을 300ms로 지정한 코드이다.
 
 첫째, 이 코드가 실행되는 시점에서 full GC(garbage collection)가 발생했고, 
 full GC time이 500ms였다면 이 요청은 timeout이 되게 된다.
