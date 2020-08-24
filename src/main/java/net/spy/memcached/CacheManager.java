@@ -42,11 +42,12 @@ import net.spy.memcached.compat.SpyThread;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.admin.ZooKeeperAdmin;
 
 public class CacheManager extends SpyThread implements Watcher,
-        CacheMonitor.CacheMonitorListener {
+        CacheMonitor.CacheMonitorListener, ConfigMonitor.ConfigMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
   private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
@@ -61,13 +62,15 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
 
-  private final String zkConnectString;
+  private String zkConnectString;
 
   private final String serviceCode;
 
   private CacheMonitor cacheMonitor;
 
-  private ZooKeeper zk;
+  private ConfigMonitor configMonitor;
+
+  private ZooKeeperAdmin zk;
 
   private ArcusClient[] client;
 
@@ -115,7 +118,7 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, zkConnectString);
 
       zkInitLatch = new CountDownLatch(1);
-      zk = new ZooKeeper(zkConnectString, ZK_SESSION_TIMEOUT, this);
+      zk = new ZooKeeperAdmin(zkConnectString, ZK_SESSION_TIMEOUT, this);
 
       try {
         /* In the above ZooKeeper() internals, reverse DNS lookup occurs
@@ -160,6 +163,18 @@ public class CacheManager extends SpyThread implements Watcher,
           if (zk.exists(path, false) == null) {
             zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
           }
+        }
+
+        if (zk.exists(ZooDefs.CONFIG_NODE, false) != null) {
+          byte[] data = zk.getConfig(false, null);
+          if (data.length > 0) {
+            getLogger().warn("Enable Arcus ZooKeeper dynamic reconfig");
+            configMonitor = new ConfigMonitor(zk, this);
+          } else {
+            getLogger().warn("Disable Arcus ZooKeeper dynamic reconfig (invalid config data)");
+          }
+        } else {
+          getLogger().warn("Disable Arcus ZooKeeper dynamic reconfig (config znode not found)");
         }
       } catch (AdminConnectTimeoutException e) {
         shutdownZooKeeperClient();
@@ -268,8 +283,12 @@ public class CacheManager extends SpyThread implements Watcher,
           // If the session was expired, just shutdown this client to be re-initiated.
           getLogger().warn("Session expired. Trying to reconnect to the Arcus admin." + getInfo());
           if (cacheMonitor != null) {
-            cacheMonitor.shutdown();
+            cacheMonitor.setDead();
           }
+          if (configMonitor != null) {
+            configMonitor.setDead();
+          }
+          closing();
           break;
       }
     }
@@ -278,7 +297,7 @@ public class CacheManager extends SpyThread implements Watcher,
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
-        if (!cacheMonitor.isDead()) {
+        if (!cacheMonitor.isDead() && (configMonitor == null || !configMonitor.isDead())) {
           try {
             wait();
           } catch (InterruptedException e) {
@@ -335,6 +354,16 @@ public class CacheManager extends SpyThread implements Watcher,
       }
     }
     return addrs.toString();
+  }
+
+  /**
+   * Change current host list of zookeeper
+   *
+   * @param zkConnectString
+   *            new zkConnectString. format=hostname1:port1,hostname2:port2
+   */
+  public void setZkConnectString(String zkConnectString) {
+    this.zkConnectString = zkConnectString;
   }
 
   /**

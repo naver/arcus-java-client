@@ -151,6 +151,16 @@ public class CacheMonitor extends SpyObject implements Watcher,
   }
 
   /**
+   * Set cache monitor is dead.
+   */
+  public void setDead() {
+    if (!dead) {
+      getLogger().info("Set CacheMonitor is dead. " + getInfo());
+      dead = true;
+    }
+  }
+
+  /**
    * Check if the cache monitor is dead.
    */
   public boolean isDead() {
