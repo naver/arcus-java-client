@@ -348,7 +348,7 @@ public class CacheManager extends SpyThread implements Watcher,
     if (children.size() == 0) {
       getLogger().error("Cannot find any cache nodes for your service code. " +
               "Please contact Arcus support to solve this problem. " +
-              "[serviceCode=" + serviceCode + ", addminSessionId=0x" +
+              "[serviceCode=" + serviceCode + ", adminSessionId=0x" +
               Long.toHexString(zk.getSessionId()));
     }
 
@@ -356,7 +356,7 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().warn("Cache list has been changed : "
           + "From=" + prevCacheList + ", "
           + "To=" + children + ", "
-          + "[serviceCode=" + serviceCode + ", addminSessionId=0x"
+          + "[serviceCode=" + serviceCode + ", adminSessionId=0x"
           + Long.toHexString(zk.getSessionId()));
     }
 
