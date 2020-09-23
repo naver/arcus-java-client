@@ -150,7 +150,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
         entry.setValue(new ArrayList<ArcusReplNodeAddress>());
       } else if (!newGroupNodes.get(0).master) {
         /* This case can occur during the switchover or failover.
-         * 1) In the switchover, it occurs after below the first phase. 
+         * 1) In the switchover, it occurs after below the first phase.
          * - the old master is changed to the new slave node.
          * - the old slave is changed to the new master node.
          * 2) In the failover, it occurs after below the first phase.

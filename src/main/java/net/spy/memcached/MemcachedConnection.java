@@ -30,6 +30,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -96,6 +97,7 @@ public final class MemcachedConnection extends SpyObject {
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled;
+  private Map<String, InetSocketAddress> prevAddrMap = null;
   /* ENABLE_REPLICATION end */
 
   /**
@@ -312,23 +314,84 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
+  private Map<String, InetSocketAddress> makeAddressMap(List<InetSocketAddress> addresses) {
+    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
+    for (InetSocketAddress addr : addresses) {
+      addrMap.put(addr.toString(), addr);
+    }
+    return addrMap;
+  }
+
+  private Set<String> findChangedGroups(List<InetSocketAddress> addrs) {
+    Set<String> changedGroupSet = new HashSet<String>();
+    Map<String, InetSocketAddress> newAddrMap = makeAddressMap(addrs);
+    if (prevAddrMap == null) {
+      for (InetSocketAddress address : newAddrMap.values()) {
+        ArcusReplNodeAddress a = (ArcusReplNodeAddress) address;
+        changedGroupSet.add(a.getGroupName());
+      }
+    } else {
+      for (String newAddrString : newAddrMap.keySet()) {
+        if (prevAddrMap.remove(newAddrString) == null) {
+          ArcusReplNodeAddress a = (ArcusReplNodeAddress) newAddrMap.get(newAddrString);
+          changedGroupSet.add(a.getGroupName());
+        }
+      }
+      for (String prevAddrString : prevAddrMap.keySet()) {
+        ArcusReplNodeAddress a = (ArcusReplNodeAddress) prevAddrMap.get(prevAddrString);
+        changedGroupSet.add(a.getGroupName());
+      }
+    }
+    prevAddrMap = newAddrMap;
+    return changedGroupSet;
+  }
+
+  private void removeAddrsOfUnchangedGroups(List<InetSocketAddress> addrs,
+                                            Set<String> changedGroups) {
+    for (Iterator<InetSocketAddress> iter = addrs.iterator(); iter.hasNext();) {
+      ArcusReplNodeAddress replAddr = (ArcusReplNodeAddress) iter.next();
+      if (!changedGroups.contains(replAddr.getGroupName())) {
+        iter.remove();
+      }
+    }
+  }
+
   private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
     List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
     List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
     List<Task> taskList = new ArrayList<Task>(); // tasks executed after locator update
 
+    /* In replication, after SWITCHOVER or REPL_SLAVE is received from a group
+     * and switchover is performed, but before the group's znode is changed,
+     * another group's znode can be changed.
+     *
+     * In this case, there is a problem that the switchover is restored
+     * because the state of the switchover group and the znode state are different.
+     *
+     * In order to remove the abnormal phenomenon,
+     * we find out the changed groups with the comparision of previous and current znode list,
+     * and update the state of groups based on them.
+     */
+    Set<String> changedGroups = findChangedGroups(addrs);
+    removeAddrsOfUnchangedGroups(addrs, changedGroups);
+
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
             ArcusReplNodeAddress.makeGroupAddrsList(addrs);
     Map<String, MemcachedReplicaGroup> oldAllGroups =
             ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
 
-    for (Map.Entry<String, MemcachedReplicaGroup> entry : oldAllGroups.entrySet()) {
-      MemcachedReplicaGroup oldGroup = entry.getValue();
+    for (String changedGroupName : changedGroups) {
+      MemcachedReplicaGroup oldGroup = oldAllGroups.get(changedGroupName);
+      if (oldGroup == null) {
+        // Newly added group
+        continue;
+      }
+
       MemcachedNode oldMasterNode = oldGroup.getMasterNode();
       MemcachedNode oldSlaveNode = oldGroup.getSlaveNode();
 
-      List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(entry.getKey());
+      List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(changedGroupName);
       getLogger().debug("New group nodes : " + newGroupAddrs);
       getLogger().debug("Old group nodes : [" + oldGroup + "]");
 
@@ -342,7 +405,7 @@ public final class MemcachedConnection extends SpyObject {
       }
       if (newGroupAddrs.size() == 0) {
         // New group is invalid, do nothing.
-        newAllGroups.remove(entry.getKey());
+        newAllGroups.remove(changedGroupName);
         continue;
       }
 
@@ -413,7 +476,7 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
 
-      newAllGroups.remove(entry.getKey());
+      newAllGroups.remove(changedGroupName);
     }
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
