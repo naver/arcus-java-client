@@ -61,7 +61,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
 
-  private final String hostPort;
+  private final String zkConnectString;
 
   private final String serviceCode;
 
@@ -93,7 +93,7 @@ public class CacheManager extends SpyThread implements Watcher,
                       ConnectionFactoryBuilder cfb, CountDownLatch clientInitLatch, int poolSize,
                       int waitTimeForConnect) {
 
-    this.hostPort = hostPort;
+    this.zkConnectString = hostPort;
     this.serviceCode = serviceCode;
     this.cfb = cfb;
     this.clientInitLatch = clientInitLatch;
@@ -112,10 +112,10 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private void initZooKeeperClient() {
     try {
-      getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, hostPort);
+      getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, zkConnectString);
 
       zkInitLatch = new CountDownLatch(1);
-      zk = new ZooKeeper(hostPort, ZK_SESSION_TIMEOUT, this);
+      zk = new ZooKeeper(zkConnectString, ZK_SESSION_TIMEOUT, this);
 
       try {
         /* In the above ZooKeeper() internals, reverse DNS lookup occurs
@@ -126,8 +126,8 @@ public class CacheManager extends SpyThread implements Watcher,
          */
         if (zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS) == false) {
           getLogger().fatal("Connecting to Arcus admin(%s) timed out : %d miliseconds",
-                  hostPort, ZK_CONNECT_TIMEOUT);
-          throw new AdminConnectTimeoutException(hostPort);
+                  zkConnectString, ZK_CONNECT_TIMEOUT);
+          throw new AdminConnectTimeoutException(zkConnectString);
         }
 
         /* ENABLE_REPLICATION if */
@@ -172,7 +172,7 @@ public class CacheManager extends SpyThread implements Watcher,
         throw e;
       } catch (InterruptedException ie) {
         getLogger().fatal("Can't connect to Arcus admin(%s@%s) %s",
-                serviceCode, hostPort, ie.getMessage());
+                serviceCode, zkConnectString, ie.getMessage());
         shutdownZooKeeperClient();
         return;
       } catch (Exception e) {
@@ -253,7 +253,7 @@ public class CacheManager extends SpyThread implements Watcher,
       switch (event.getState()) {
         case SyncConnected:
           zkInitLatch.countDown();
-          getLogger().info("Connected to Arcus admin. (%s@%s)", serviceCode, hostPort);
+          getLogger().info("Connected to Arcus admin. (%s@%s)", serviceCode, zkConnectString);
           if (cacheMonitor != null) {
             getLogger().warn("Reconnected to the Arcus admin. " + getInfo());
           } else {
