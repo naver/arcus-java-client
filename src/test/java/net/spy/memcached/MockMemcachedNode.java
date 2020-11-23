@@ -130,6 +130,10 @@ public class MockMemcachedNode implements MemcachedNode {
     return false;
   }
 
+  public boolean isFirstConnecting() {
+    return false;
+  }
+
   public void reconnecting() {
     // noop
   }

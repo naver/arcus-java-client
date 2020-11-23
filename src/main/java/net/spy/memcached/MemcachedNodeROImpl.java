@@ -123,6 +123,10 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     return root.isActive();
   }
 
+  public boolean isFirstConnecting() {
+    return root.isFirstConnecting();
+  }
+
   public void reconnecting() {
     throw new UnsupportedOperationException();
   }
