@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 import net.sf.ehcache.Element;
 import net.spy.memcached.ConnectionFactory;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -96,7 +97,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * @return a future that will hold success/error status of the operation
    */
   @Override
-  public Future<Boolean> delete(String key) {
+  public OperationFuture<Boolean> delete(String key) {
     if (localCacheManager != null) {
       localCacheManager.delete(key);
     }

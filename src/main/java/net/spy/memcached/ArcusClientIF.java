@@ -189,7 +189,7 @@ public interface ArcusClientIF {
    * @param tc   the transcoder to serialize and unserialize the value
    * @return a future that will hold the list of failed
    */
-  public abstract <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public abstract <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, List<String> key, int exp, T o, Transcoder<T> tc);
 
   /**
@@ -201,7 +201,7 @@ public interface ArcusClientIF {
    * @param o    the object to store on each keys
    * @return a future that will hold the list of failed
    */
-  public abstract Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public abstract OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, List<String> key, int exp, Object o);
 
   /**
@@ -214,7 +214,7 @@ public interface ArcusClientIF {
    * @param tc   the transcoder to serialize and unserialize the value
    * @return a future that will hold the list of failed
    */
-  public abstract <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public abstract <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, Map<String, T> o, int exp, Transcoder<T> tc);
 
   /**
@@ -225,7 +225,7 @@ public interface ArcusClientIF {
    * @param exp  the expiration of this object
    * @return a future that will hold the list of failed
    */
-  public abstract Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public abstract OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, Map<String, Object> o, int exp);
 
   /**
@@ -247,7 +247,7 @@ public interface ArcusClientIF {
    * @return a future that will hold the list of failed
    *
    */
-  public abstract Future<Map<String, OperationStatus>> asyncDeleteBulk(
+  public abstract OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(
           List<String> key);
 
   /**
@@ -257,7 +257,7 @@ public interface ArcusClientIF {
    * @return a future that will hold the list of failed
    *
    */
-  public abstract Future<Map<String, OperationStatus>> asyncDeleteBulk(
+  public abstract OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(
           String... key);
 
 

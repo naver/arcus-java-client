@@ -262,7 +262,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param serviceCode service code
    * @param cfb         ConnectionFactoryBuilder
    * @param poolSize    Arcus client pool size
-   * @param waitTimeFor Connect
+   * @param waitTimeForConnect Connect
    *                    waiting time for connection establishment(milliseconds)
    * @return multiple ArcusClient
    */
@@ -400,7 +400,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  Future<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
+  OperationFuture<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);
@@ -1209,7 +1209,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Deprecated
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
+  public <T> OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
                                                                          final int exp, final T o,
                                                                          Transcoder<T> tc) {
     if (key == null) {
@@ -1246,14 +1246,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Deprecated
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key,
+  public OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(List<String> key,
                                                                      int exp, Object o) {
     return asyncSetBulk(key, exp, o, transcoder);
   }
 
   @Deprecated
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final Map<String, T> o,
+  public <T> OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(final Map<String, T> o,
                                                                          final int exp,
                                                                          Transcoder<T> tc) {
     if (o == null) {
@@ -1290,14 +1290,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Deprecated
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o,
+  public OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(Map<String, Object> o,
                                                                      int exp) {
     return asyncSetBulk(o, exp, transcoder);
   }
 
 
   @Override
-  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
+  public <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
                                                                  final List<String> key,
                                                                  final int exp, final T o,
                                                                  Transcoder<T> tc) {
@@ -1333,14 +1333,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
+  public OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
                                                              List<String> key,
                                                              int exp, Object o) {
     return asyncStoreBulk(type, key, exp, o, transcoder);
   }
 
   @Override
-  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
+  public <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
                                                                  final Map<String, T> o,
                                                                  final int exp,
                                                                  Transcoder<T> tc) {
@@ -1375,14 +1375,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
+  public OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(StoreType type,
                                                              Map<String, Object> o,
                                                              int exp) {
     return asyncStoreBulk(type, o, exp, transcoder);
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key) {
+  public OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     } else if (key.isEmpty()) {
@@ -1412,7 +1412,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key) {
+  public OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(String... key) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     }

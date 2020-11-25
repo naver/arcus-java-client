@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -28,14 +29,14 @@ public interface MemcachedClientIF {
 
   NodeLocator getNodeLocator();
 
-  Future<Boolean> append(long cas, String key, Object val);
+  OperationFuture<Boolean> append(long cas, String key, Object val);
 
-  <T> Future<Boolean> append(long cas, String key, T val,
+  <T> OperationFuture<Boolean> append(long cas, String key, T val,
                              Transcoder<T> tc);
 
-  Future<Boolean> prepend(long cas, String key, Object val);
+  OperationFuture<Boolean> prepend(long cas, String key, Object val);
 
-  <T> Future<Boolean> prepend(long cas, String key, T val,
+  <T> OperationFuture<Boolean> prepend(long cas, String key, T val,
                               Transcoder<T> tc);
 
   <T> Future<CASResponse> asyncCAS(String key, long casId, T value,
@@ -60,27 +61,27 @@ public interface MemcachedClientIF {
   CASResponse cas(String key, long casId, Object value)
           throws OperationTimeoutException;
 
-  <T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc);
+  <T> OperationFuture<Boolean> add(String key, int exp, T o, Transcoder<T> tc);
 
-  Future<Boolean> add(String key, int exp, Object o);
+  OperationFuture<Boolean> add(String key, int exp, Object o);
 
-  <T> Future<Boolean> set(String key, int exp, T o, Transcoder<T> tc);
+  <T> OperationFuture<Boolean> set(String key, int exp, T o, Transcoder<T> tc);
 
-  Future<Boolean> set(String key, int exp, Object o);
+  OperationFuture<Boolean> set(String key, int exp, Object o);
 
-  <T> Future<Boolean> replace(String key, int exp, T o,
+  <T> OperationFuture<Boolean> replace(String key, int exp, T o,
                               Transcoder<T> tc);
 
-  Future<Boolean> replace(String key, int exp, Object o);
+  OperationFuture<Boolean> replace(String key, int exp, Object o);
 
   <T> Future<T> asyncGet(String key, Transcoder<T> tc);
 
   Future<Object> asyncGet(String key);
 
-  <T> Future<CASValue<T>> asyncGets(String key,
+  <T> OperationFuture<CASValue<T>> asyncGets(String key,
                                     Transcoder<T> tc);
 
-  Future<CASValue<Object>> asyncGets(String key);
+  OperationFuture<CASValue<Object>> asyncGets(String key);
 
   <T> CASValue<T> gets(String key, Transcoder<T> tc)
           throws OperationTimeoutException;
@@ -133,13 +134,13 @@ public interface MemcachedClientIF {
   long decr(String key, int by, long def, int exp)
           throws OperationTimeoutException;
 
-  Future<Long> asyncIncr(String key, int by);
+  OperationFuture<Long> asyncIncr(String key, int by);
 
-  Future<Long> asyncIncr(String key, int by, long def, int exp);
+  OperationFuture<Long> asyncIncr(String key, int by, long def, int exp);
 
-  Future<Long> asyncDecr(String key, int by);
+  OperationFuture<Long> asyncDecr(String key, int by);
 
-  Future<Long> asyncDecr(String key, int by, long def, int exp);
+  OperationFuture<Long> asyncDecr(String key, int by, long def, int exp);
 
   long incr(String key, int by, long def)
           throws OperationTimeoutException;
@@ -147,7 +148,7 @@ public interface MemcachedClientIF {
   long decr(String key, int by, long def)
           throws OperationTimeoutException;
 
-  Future<Boolean> delete(String key);
+  OperationFuture<Boolean> delete(String key);
 
   Future<Boolean> flush(int delay);
 
