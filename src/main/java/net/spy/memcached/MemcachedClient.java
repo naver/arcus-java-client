@@ -1127,7 +1127,7 @@ public class MemcachedClient extends SpyThread
       // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
       if (primaryNode == null) {
         node = null;
-      } else if (primaryNode.isActive()) {
+      } else if (primaryNode.isActive() || primaryNode.isFirstConnecting()) {
         node = primaryNode;
       } else {
         Iterator<MemcachedNode> iter = conn.getNodeSequence(key);

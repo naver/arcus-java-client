@@ -152,6 +152,11 @@ public interface MemcachedNode {
   boolean isActive();
 
   /**
+   * True if it is the first connecting attempt.
+   */
+  boolean isFirstConnecting();
+
+  /**
    * Notify this node that it will be reconnecting.
    */
   void reconnecting();

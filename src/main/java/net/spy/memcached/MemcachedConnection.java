@@ -1077,7 +1077,8 @@ public final class MemcachedConnection extends SpyObject {
     MemcachedNode primary = getPrimaryNode(key, o);
     if (primary == null) {
       o.cancel("no node");
-    } else if (primary.isActive() || failureMode == FailureMode.Retry) {
+    } else if (primary.isActive() || primary.isFirstConnecting() ||
+               failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else if (failureMode == FailureMode.Cancel) {
       o.setHandlingNode(primary);
@@ -1249,7 +1250,8 @@ public final class MemcachedConnection extends SpyObject {
     // FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
     if (primary == null) {
       return null;
-    } else if (primary.isActive() || failureMode == FailureMode.Retry) {
+    } else if (primary.isActive() || primary.isFirstConnecting() ||
+               failureMode == FailureMode.Retry) {
       placeIn = primary;
     } else {
       Iterator<MemcachedNode> iter = getNodeSequence(key);

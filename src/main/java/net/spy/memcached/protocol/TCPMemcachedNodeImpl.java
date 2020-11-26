@@ -58,6 +58,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   // This has been declared volatile so it can be used as an availability
   // indicator.
   private volatile int reconnectAttempt = 1;
+  private boolean isFirstConnecting = true;
   private SocketChannel channel;
   private int toWrite = 0;
   protected Operation optimizedOp = null;
@@ -430,14 +431,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return reconnectAttempt == 0 && getChannel() != null && getChannel().isConnected();
   }
 
+  public final boolean isFirstConnecting() {
+    return isFirstConnecting;
+  }
+
   public final void reconnecting() {
     reconnectAttempt++;
+    isFirstConnecting = false;
     continuousTimeout.set(0);
     resetTimeoutRatioCount();
   }
 
   public final void connected() {
     reconnectAttempt = 0;
+    isFirstConnecting = false;
     continuousTimeout.set(0);
     resetTimeoutRatioCount();
   }
