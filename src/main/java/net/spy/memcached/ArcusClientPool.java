@@ -89,20 +89,20 @@ public class ArcusClientPool implements ArcusClientIF {
     }
   }
 
-  public Future<Boolean> append(long cas, String key, Object val) {
+  public OperationFuture<Boolean> append(long cas, String key, Object val) {
     return this.getClient().append(cas, key, val);
   }
 
-  public <T> Future<Boolean> append(long cas, String key, T val,
+  public <T> OperationFuture<Boolean> append(long cas, String key, T val,
                                     Transcoder<T> tc) {
     return this.getClient().append(cas, key, val, tc);
   }
 
-  public Future<Boolean> prepend(long cas, String key, Object val) {
+  public OperationFuture<Boolean> prepend(long cas, String key, Object val) {
     return this.getClient().prepend(cas, key, val);
   }
 
-  public <T> Future<Boolean> prepend(long cas, String key, T val,
+  public <T> OperationFuture<Boolean> prepend(long cas, String key, T val,
                                      Transcoder<T> tc) {
     return this.getClient().prepend(cas, key, val, tc);
   }
@@ -127,28 +127,28 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().cas(key, casId, value);
   }
 
-  public <T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().add(key, exp, o, tc);
   }
 
-  public Future<Boolean> add(String key, int exp, Object o) {
+  public OperationFuture<Boolean> add(String key, int exp, Object o) {
     return this.getClient().add(key, exp, o);
   }
 
-  public <T> Future<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().set(key, exp, o, tc);
   }
 
-  public Future<Boolean> set(String key, int exp, Object o) {
+  public OperationFuture<Boolean> set(String key, int exp, Object o) {
     return this.getClient().set(key, exp, o);
   }
 
-  public <T> Future<Boolean> replace(String key, int exp, T o,
+  public <T> OperationFuture<Boolean> replace(String key, int exp, T o,
                                      Transcoder<T> tc) {
     return this.getClient().replace(key, exp, o, tc);
   }
 
-  public Future<Boolean> replace(String key, int exp, Object o) {
+  public OperationFuture<Boolean> replace(String key, int exp, Object o) {
     return this.getClient().replace(key, exp, o);
   }
 
@@ -269,23 +269,23 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().decr(key, by, def, exp);
   }
 
-  public Future<Long> asyncIncr(String key, int by) {
+  public OperationFuture<Long> asyncIncr(String key, int by) {
     return this.getClient().asyncIncr(key, by);
   }
 
-  public Future<Long> asyncIncr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncIncr(String key, int by, long def, int exp) {
     return this.getClient().asyncIncr(key, by, def, exp);
   }
 
-  public Future<Long> asyncDecr(String key, int by) {
+  public OperationFuture<Long> asyncDecr(String key, int by) {
     return this.getClient().asyncDecr(key, by);
   }
 
-  public Future<Long> asyncDecr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncDecr(String key, int by, long def, int exp) {
     return this.getClient().asyncDecr(key, by, def, exp);
   }
 
-  public Future<Boolean> delete(String key) {
+  public OperationFuture<Boolean> delete(String key) {
     return this.getClient().delete(key);
   }
 
@@ -336,65 +336,65 @@ public class ArcusClientPool implements ArcusClientIF {
 
   @Deprecated
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
+  public <T> OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().asyncSetBulk(key, exp, o, tc);
   }
 
   @Deprecated
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
+  public OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(
           List<String> key, int exp, Object o) {
     return this.getClient().asyncSetBulk(key, exp, o);
   }
 
   @Deprecated
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
+  public <T> OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, T> o, int exp, Transcoder<T> tc) {
     return this.getClient().asyncSetBulk(o, exp, tc);
   }
 
   @Deprecated
   @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
+  public OperationFuture<Map<String, CollectionOperationStatus>> asyncSetBulk(
           Map<String, Object> o, int exp) {
     return this.getClient().asyncSetBulk(o, exp);
   }
 
 
   @Override
-  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, List<String> key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().asyncStoreBulk(type, key, exp, o, tc);
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, List<String> key, int exp, Object o) {
     return this.getClient().asyncStoreBulk(type, key, exp, o);
   }
 
   @Override
-  public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public <T> OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, Map<String, T> o, int exp, Transcoder<T> tc) {
     return this.getClient().asyncStoreBulk(type, o, exp, tc);
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncStoreBulk(
+  public OperationFuture<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, Map<String, Object> o, int exp) {
     return this.getClient().asyncStoreBulk(type, o, exp);
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncDeleteBulk(
+  public OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(
           List<String> key) {
     return this.getClient().asyncDeleteBulk(key);
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncDeleteBulk(
+  public OperationFuture<Map<String, OperationStatus>> asyncDeleteBulk(
           String... key) {
     return this.getClient().asyncDeleteBulk(key);
   }
