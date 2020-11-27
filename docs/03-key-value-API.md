@@ -19,9 +19,9 @@ Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 key-value item을 저장하는 API로 set, add, replace를 제공한다.
 
 ```java
-Future<Boolean> set(String key, int exp, Object obj)
-Future<Boolean> add(String key, int exp, Object obj)
-Future<Boolean> replace(String key, int exp, Object obj)
+OperationFuture<Boolean> set(String key, int exp, Object obj)
+OperationFuture<Boolean> add(String key, int exp, Object obj)
+OperationFuture<Boolean> replace(String key, int exp, Object obj)
 ```
 
 - \<key, obj\>의 key-value item을 저장한다.
@@ -31,11 +31,18 @@ Future<Boolean> replace(String key, int exp, Object obj)
   - replace는 해당 key가 있을 경우만, \<key, obj\> item을 교체하여 저장한다.
 - 저장된 key-value item은 exp 초 이후에 삭제된다.
 
+수행 결과는 future 객체를 통해 얻는다.
+
+future.getStatus().getStatusCode()          | 설명
+--------------------------------------------| ---------
+StatusCode.SUCCESS                          | 저장 성공
+StatusCode.ERR_NOT_STORED                   | 저장 실패 (add : 이미 존재하는 key, replace : 주어진 key에 해당하는 item이 없음)
+
 key-vlaue item에 주어진 value를 추가하는 API로 prepend, append를 제공한다.
 
 ```java
-Future<Boolean> prepend(long cas, String key, Object val)
-Future<Boolean> append(long cas, String key, Object val)
+OperationFuture<Boolean> prepend(long cas, String key, Object val)
+OperationFuture<Boolean> append(long cas, String key, Object val)
 ```
 
 - key-value item에서 value 추가 위치는 API에 따라 다르다.
@@ -43,6 +50,14 @@ Future<Boolean> append(long cas, String key, Object val)
   - append는 item의 value 부분에서 가장 뒤쪽에 추가한다.
 - 첫째 인자인 cas는 현재 이용되지 않으므로 임의의 값을 주면 된다.
   초기에 CAS(compare-and-set) 연산으로 수행하기 위한 용도로 필요했던 인자이다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.getStatus().getStatusCode()          | 설명
+--------------------------------------------| ---------
+StatusCode.SUCCESS                          | 저장 성공
+StatusCode.ERR_NOT_STORED                   | 저장 실패 (주어진 key에 해당하는 item이 없음)  
+
 
 한번의 API 호출로 다수의 key-value items을 set하는 bulk API를 제공한다.
 
@@ -80,21 +95,26 @@ StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
 하나의 key를 가진 cache item에 저장된 value를 조회하는 API를 제공한다.
 
 ```java
-Future<Object> asyncGet(String key)
+GetFuture<Object> asyncGet(String key)
 ```
 
 - 주어진 key에 저장된 value를 반환한다.
 
+수행 결과는 future 객체를 통해 얻는다.
+
+future.get(key).getStatusCode() | 설명
+--------------------------------| ---------
+StatusCode.SUCCESS              | 조회 성공(key에 해당하는 item 존재하지 않아도 성공)
+
 여러 key들의 value들을 한번에 조회하는 bulk API를 제공한다.
 
 ```java
-Future<Map<String,Object>> asyncGetBulk(Collection<String> keys)
-Future<Map<String,Object>> asyncGetBulk(String... keys)
+BulkFuture<Map<String,Object>> asyncGetBulk(Collection<String> keys)
+BulkFuture<Map<String,Object>> asyncGetBulk(String... keys)
 ```
 
 - 다수 key들에 저장된 value를 Map<String, Object> 형태로 반환한다.
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
-
 
 ## Key-Value Item 값의 증감
 
@@ -103,23 +123,29 @@ key-value item에서 value 부분의 값을 증가시키거나 감소시키는 �
 
 
 ```java
-Future<Long> asyncIncr(String key, int by)
-Future<Long> asyncDecr(String key, int by)
+OperationFuture<Long> asyncIncr(String key, int by)
+OperationFuture<Long> asyncDecr(String key, int by)
 ```
 
 - key에 저장된 정수형 데이터의 값을 by 만큼 증가/감소시킨다.
   key가 cache에 존재하지 않으면 증감연산은 수행되지 않는다.
 - 반환되는 값은 증감 후의 값이다. 
 
-
 ```java
-Future<Long> asyncIncr(String key, int by, long def, int exp)
-Future<Long> asyncDecr(String key, int by, long def, int exp)
+OperationFuture<Long> asyncIncr(String key, int by, long def, int exp)
+OperationFuture<Long> asyncDecr(String key, int by, long def, int exp)
 ```
 
 - key에 저장된 정수형 데이터의 값을 by 만큼 증가/감소시킨다.
   key가 cache에 존재하지 않으면 \<key, def\> item을 추가하며, exp 초 이후에 삭제된다.
 - 반환되는 값은 증감 후의 값이다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.getStatus().getStatusCode()          | 설명
+--------------------------------------------| ---------
+StatusCode.SUCCESS                          | 증감 성공
+StatusCode.ERR_NOT_FOUND                    | 증감 실패 (Key miss, 주어진 key에 해당하는 item이 없음)
 
 
 ## Key-Value Item 삭제
@@ -128,10 +154,17 @@ Future<Long> asyncDecr(String key, int by, long def, int exp)
 여러 key들의 item들을 한번에 삭제하는 bulk API를 제공한다.
 
 ```java
-Future<Boolean> delete(String key)
+OperationFuture<Boolean> delete(String key)
 ```
 
 - 주어진 key를 가진 item을 cache에서 삭제한다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.getStatus().getStatusCode()          | 설명
+--------------------------------------------| ---------
+StatusCode.SUCCESS                          | 삭제 성공
+StatusCode.ERR_NOT_FOUND                    | 삭제 실패 (Key miss, 주어진 key에 해당하는 item이 없음)
  
 ```java
 Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key)
@@ -143,6 +176,6 @@ Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key)
 
 delete 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.
 
-future.get(key).getStatusCode() | 설명
---------------------------------| ---------
-StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item이 없음)
+future.get().get(key).getStatusCode() | 설명
+--------------------------------------| ---------
+StatusCode.ERR_NOT_FOUND              | 삭제 실패 (Key miss, 주어진 key에 해당하는 item이 없음)

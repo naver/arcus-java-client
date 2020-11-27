@@ -79,7 +79,7 @@ final class MutatorOperationImpl extends OperationImpl
     OperationStatus status = null;
     try {
       Long.valueOf(line);
-      getCallback().receivedStatus(new OperationStatus(true, line));
+      getCallback().receivedStatus(new OperationStatus(true, line, StatusCode.SUCCESS));
     } catch (NumberFormatException e) {
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
       getCallback().receivedStatus(status);

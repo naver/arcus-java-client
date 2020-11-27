@@ -400,7 +400,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
-  Future<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
+  OperationFuture<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);

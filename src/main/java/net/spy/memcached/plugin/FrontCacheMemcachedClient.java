@@ -19,11 +19,12 @@ package net.spy.memcached.plugin;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import net.sf.ehcache.Element;
 import net.spy.memcached.ConnectionFactory;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -74,7 +75,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * @return a future that will hold the value of the key
    */
   @Override
-  public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
     Element frontElement = null;
 
     if (localCacheManager != null) {
@@ -96,7 +97,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * @return a future that will hold success/error status of the operation
    */
   @Override
-  public Future<Boolean> delete(String key) {
+  public OperationFuture<Boolean> delete(String key) {
     if (localCacheManager != null) {
       localCacheManager.delete(key);
     }
