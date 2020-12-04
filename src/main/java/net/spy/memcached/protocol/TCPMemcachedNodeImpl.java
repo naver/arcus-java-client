@@ -267,19 +267,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       Operation o = getNextWritableOp();
       while (o != null && toWrite < getWbuf().capacity()) {
         assert o.getState() == OperationState.WRITING;
-        // This isn't the most optimal way to do this, but it hints
-        // at a larger design problem that may need to be taken care
-        // if in the bowels of the client.
-        // In practice, readQ should be small, however.
-        if (!readQ.contains(o)) {
-          readQ.add(o);
-        }
 
         ByteBuffer obuf = o.getBuffer();
         assert obuf != null : "Didn't get a write buffer from " + o;
         int bytesToCopy = Math.min(getWbuf().remaining(),
                 obuf.remaining());
-        byte b[] = new byte[bytesToCopy];
+        byte[] b = new byte[bytesToCopy];
         obuf.get(b);
         getWbuf().put(b);
         getLogger().debug("After copying stuff from %s: %s",
@@ -341,6 +334,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         assert o == cancelledOp;
       } else {
         o.writing();
+        readQ.add(o);
         return o;
       }
       o = getCurrentWriteOp();
