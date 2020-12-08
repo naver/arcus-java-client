@@ -188,7 +188,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testInvalidKey2() throws Exception {
     try {
       StringBuilder longKey = new StringBuilder();
-      for (int i = 0; i < 320001; i++) {
+      // MAX_KEY_LENGTH is 4000.
+      for (int i = 0; i <= 4000; i++) {
         longKey.append("a");
       }
       client.get(longKey.toString());

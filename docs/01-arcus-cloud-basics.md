@@ -7,7 +7,7 @@ ARCUS는 확장된 key-value 데이터 모델을 제공한다.
 ARCUS cache server의 key-value 모델은 아래의 기본 제약 사항을 가진다.
 
 - 기존 key-value 모델의 제약 사항
-  - Key의 최대 크기는 250 character이다.
+  - Key의 최대 크기는 4000 character이다.
   - Value의 최대 크기는 1MB이다.
 - Collection 제약 사항
   - 하나의 collection이 가지는 최대 element 개수는 50,000개이다.
