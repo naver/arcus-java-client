@@ -64,7 +64,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
               collectionAttributes.getMaxCount());
 
       // check expire time
-      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 2000L);
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
       Assert.assertNull(map);
@@ -118,7 +118,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
               collectionAttributes.getMaxCount());
 
       // check expire time
-      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 2000L);
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
       Assert.assertNull(map);
