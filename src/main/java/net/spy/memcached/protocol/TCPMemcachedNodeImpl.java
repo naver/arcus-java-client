@@ -48,7 +48,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         implements MemcachedNode {
 
   private String nodeName;
-  private final SocketAddress socketAddress;
+  private SocketAddress socketAddress;
   private final ByteBuffer rbuf;
   private final ByteBuffer wbuf;
   protected final BlockingQueue<Operation> writeQ;
@@ -137,18 +137,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     assert rq != null : "No operation read queue";
     assert wq != null : "No operation write queue";
     assert iq != null : "No input queue";
-    /* ENABLE_REPLICATION if */
-    if (sa instanceof ArcusReplNodeAddress) {
-      socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
-    } else {
-      socketAddress = sa;
-    }
-    /* ENABLE_REPLICATION else */
-    /*
-    socketAddress=sa;
-    */
-    /* ENABLE_REPLICATION end */
+
     nodeName = name + " " + sa;
+    setSocketAddress(sa);
     setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
@@ -415,6 +406,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final ByteBuffer getWbuf() {
     return wbuf;
+  }
+
+  private final void setSocketAddress(SocketAddress sa) {
+    /* ENABLE_REPLICATION if */
+    if (sa instanceof ArcusReplNodeAddress) {
+      socketAddress = new ArcusReplNodeAddress((ArcusReplNodeAddress) sa);
+      return;
+    }
+    /* ENABLE_REPLICATION end */
+    socketAddress = sa;
   }
 
   public final SocketAddress getSocketAddress() {
