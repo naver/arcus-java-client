@@ -60,7 +60,7 @@ public class InsertSetWithAttrTest extends BaseIntegrationTest {
               collectionAttributes.getMaxCount());
 
       // check expire time
-      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 2000L);
       Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
       Assert.assertNull(set);
     } catch (Exception e) {

@@ -68,7 +68,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
               collectionAttributes.getMaxCount());
 
       // check expire time
-      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L);
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 2000L);
       Map<String, Object> map = mc.asyncMopGet(KEY, MKEY,
               false, false).get();
       Assert.assertNull(map);
