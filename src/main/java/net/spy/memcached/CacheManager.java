@@ -110,6 +110,24 @@ public class CacheManager extends SpyThread implements Watcher,
 
   }
 
+  private String getCacheListZPath() {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      return ARCUS_REPL_CACHE_LIST_ZPATH;
+    }
+    /* ENABLE_REPLICATION end */
+    return ARCUS_BASE_CACHE_LIST_ZPATH;
+  }
+
+  private String getClientInfoZPath() {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      return ARCUS_REPL_CLIENT_INFO_ZPATH;
+    }
+    /* ENABLE_REPLICATION end */
+    return ARCUS_BASE_CLIENT_INFO_ZPATH;
+  }
+
   private void initZooKeeperClient() {
     try {
       getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, zkConnectString);
@@ -130,27 +148,22 @@ public class CacheManager extends SpyThread implements Watcher,
           throw new AdminConnectTimeoutException(zkConnectString);
         }
 
-        /* ENABLE_REPLICATION if */
-        if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-          arcusReplEnabled = true;
-          cfb.internalArcusReplEnabled(true);
-          getLogger().info("Connecting to Arcus repl cluster");
-        } else if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-          arcusReplEnabled = false;
-          cfb.internalArcusReplEnabled(false);
-          getLogger().info("Connecting to Arcus cluster");
-        } else {
-          getLogger().fatal("ARCUS cluster named \"%s\" not found.", serviceCode);
-          throw new NotExistsServiceCodeException(serviceCode);
-        }
-        /* ENABLE_REPLICATION else */
-        /*
-        if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) == null) {
-          getLogger().fatal("Service code not found. (" + serviceCode + ")");
-          throw new NotExistsServiceCodeException(serviceCode);
-        }
-        */
-        /* ENABLE_REPLICATION end */
+        do {
+          /* ENABLE_REPLICATION if */
+          if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
+            arcusReplEnabled = true;
+            cfb.internalArcusReplEnabled(true);
+            getLogger().info("Connected to Arcus repl cluster (serviceCode=%s)", serviceCode);
+            break;
+          }
+          /* ENABLE_REPLICATION end */
+          if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
+            getLogger().info("Connected to Arcus cluster (seriveCode=%s)", serviceCode);
+          } else {
+            getLogger().fatal("Service code not found. (%s)", serviceCode);
+            throw new NotExistsServiceCodeException(serviceCode);
+          }
+        } while(false);
 
         String path = getClientInfo();
         if (path.isEmpty()) {
@@ -182,39 +195,22 @@ public class CacheManager extends SpyThread implements Watcher,
         throw new InitializeClientException("Can't initialize Arcus client.", e);
       }
 
-      /* ENABLE_REPLICATION if */
-      String cacheListZPath = arcusReplEnabled ? ARCUS_REPL_CACHE_LIST_ZPATH
-              : ARCUS_BASE_CACHE_LIST_ZPATH;
-      cacheMonitor = new CacheMonitor(zk, cacheListZPath, serviceCode, this);
-      /* ENABLE_REPLICATION else */
-      /*
-      cacheMonitor = new CacheMonitor(zk, ARCUS_BASE_CACHE_LIST_ZPATH, serviceCode, this);
-      */
-      /* ENABLE_REPLICATION end */
+      // create the cache monitor
+      cacheMonitor = new CacheMonitor(zk, getCacheListZPath(), serviceCode, this);
+
     } catch (IOException e) {
       throw new InitializeClientException("Can't initialize Arcus client.", e);
     }
   }
 
   private String getClientInfo() {
-    String path = "";
+    String path = getClientInfoZPath() + serviceCode + "/";
 
     // create the ephemeral znode
-    // /arcus/client_list/{service_code}/{client hostname}
-    //    _{ip address}_{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
-    /* ENABLE_REPLICATION if */
-    if (arcusReplEnabled) {
-      path = ARCUS_REPL_CLIENT_INFO_ZPATH + serviceCode + "/";
-    } else {
-      path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
-    }
-    /* ENABLE_REPLICATION else */
-    /*
-    path = ARCUS_BASE_CLIENT_INFO_ZPATH + serviceCode + "/";
-    */
-    /* ENABLE_REPLICATION end */
+    // /arcus/client_list/{service_code}/{client hostname}_{ip address}
+    // _{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
 
-    /* get host info */
+    // get host info
     String hostInfo;
     try {
       hostInfo = InetAddress.getLocalHost().getHostName() + "_"
@@ -226,14 +222,12 @@ public class CacheManager extends SpyThread implements Watcher,
     path = path + hostInfo
          + this.poolSize + "_java_" + ArcusClient.getVersion() + "_";
 
-    /* get time and zk session id */
+    // get time and zk session id
     String restInfo;
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
       Date currentTime = new Date();
-
-      restInfo = simpleDateFormat.format(currentTime) + "_"
-               + zk.getSessionId();
+      restInfo = simpleDateFormat.format(currentTime) + "_" + zk.getSessionId();
     } catch (Exception e) {
       getLogger().fatal("Can't get time and zk session id.", e);
       restInfo = "00000000000000_0";
@@ -407,43 +401,15 @@ public class CacheManager extends SpyThread implements Watcher,
    *            current available Memcached Addresses
    */
   private void createArcusClient(String addrs) {
-    /* ENABLE_REPLICATION if */
-    List<InetSocketAddress> socketList;
-    int addrCount;
-    if (arcusReplEnabled) {
-      socketList = ArcusReplNodeAddress.getAddresses(addrs);
-
-      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-              ArcusReplNodeAddress.makeGroupAddrsList(socketList);
-
-      /* recreate socket list */
-      socketList.clear();
-      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (entry.getValue().size() > 0) { // valid replica group
-          socketList.addAll(entry.getValue());
-        }
-      }
-    } else {
-      socketList = AddrUtil.getAddresses(addrs);
-    }
-
-    addrCount = socketList.size();
-
-    /* ENABLE_REPLICATION else */
-    /*
-    List<InetSocketAddress> socketList = AddrUtil.getAddresses(addrs);
+    List<InetSocketAddress> socketList = getSocketAddressList(addrs);
     int addrCount = socketList.size();
-    */
-    /* ENABLE_REPLICATION end */
 
     final CountDownLatch latch = new CountDownLatch(addrCount * poolSize);
     final ConnectionObserver observer = new ConnectionObserver() {
-
       @Override
       public void connectionLost(SocketAddress sa) {
 
       }
-
       @Override
       public void connectionEstablished(SocketAddress sa, int reconnectCount) {
         latch.countDown();
@@ -476,13 +442,33 @@ public class CacheManager extends SpyThread implements Watcher,
       } else {
         getLogger().error("Some arcus connections are not established.");
       }
-      // Success signal for initial connections to Zookeeper and
-      // Memcached.
+      // Success signal for initial connections to Zookeeper and Memcached.
     } catch (InterruptedException e) {
       getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.");
     }
     this.clientInitLatch.countDown();
 
+  }
+
+  private List<InetSocketAddress> getSocketAddressList(String addrs) {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      List<InetSocketAddress> socketList = ArcusReplNodeAddress.getAddresses(addrs);
+
+      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
+              ArcusReplNodeAddress.makeGroupAddrsList(socketList);
+
+      // recreate socket list
+      socketList.clear();
+      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+        if (entry.getValue().size() > 0) { // valid replica group
+          socketList.addAll(entry.getValue());
+        }
+      }
+      return socketList;
+    }
+    /* ENABLE_REPLICATION end */
+    return AddrUtil.getAddresses(addrs);
   }
 
   /**
