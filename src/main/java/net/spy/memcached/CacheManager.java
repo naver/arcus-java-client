@@ -49,12 +49,12 @@ public class CacheManager extends SpyThread implements Watcher,
         CacheMonitor.CacheMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
-  private static final String ARCUS_BASE_CLIENT_INFO_ZPATH = "/arcus/client_list/";
+  private static final String ARCUS_BASE_CLIENT_LIST_ZPATH = "/arcus/client_list/";
 
   /* ENABLE_REPLICATION if */
   private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
-  private static final String ARCUS_REPL_CLIENT_INFO_ZPATH = "/arcus_repl/client_list/";
+  private static final String ARCUS_REPL_CLIENT_LIST_ZPATH = "/arcus_repl/client_list/";
   /* ENABLE_REPLICATION end */
 
   private static final int ZK_SESSION_TIMEOUT = 15000;
@@ -119,13 +119,13 @@ public class CacheManager extends SpyThread implements Watcher,
     return ARCUS_BASE_CACHE_LIST_ZPATH;
   }
 
-  private String getClientInfoZPath() {
+  private String getClientListZPath() {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
-      return ARCUS_REPL_CLIENT_INFO_ZPATH;
+      return ARCUS_REPL_CLIENT_LIST_ZPATH;
     }
     /* ENABLE_REPLICATION end */
-    return ARCUS_BASE_CLIENT_INFO_ZPATH;
+    return ARCUS_BASE_CLIENT_LIST_ZPATH;
   }
 
   private void initZooKeeperClient() {
@@ -204,7 +204,7 @@ public class CacheManager extends SpyThread implements Watcher,
   }
 
   private String getClientInfo() {
-    String path = getClientInfoZPath() + serviceCode + "/";
+    String path = getClientListZPath() + serviceCode + "/";
 
     // create the ephemeral znode
     // /arcus/client_list/{service_code}/{client hostname}_{ip address}
