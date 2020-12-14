@@ -376,8 +376,8 @@ public class MemcachedClient extends SpyThread
     return conn.broadcastOperation(of, nodes);
   }
 
-  private <T> Future<Boolean> asyncStore(StoreType storeType, String key,
-                                         int exp, T value, Transcoder<T> tc) {
+  private <T> OperationFuture<Boolean> asyncStore(StoreType storeType, String key,
+                                                  int exp, T value, Transcoder<T> tc) {
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
@@ -397,12 +397,12 @@ public class MemcachedClient extends SpyThread
     return rv;
   }
 
-  private Future<Boolean> asyncStore(StoreType storeType,
-                                     String key, int exp, Object value) {
+  private OperationFuture<Boolean> asyncStore(StoreType storeType,
+                                              String key, int exp, Object value) {
     return asyncStore(storeType, key, exp, value, transcoder);
   }
 
-  private <T> Future<Boolean> asyncCat(
+  private <T> OperationFuture<Boolean> asyncCat(
           ConcatenationType catType, long cas, String key,
           T value, Transcoder<T> tc) {
     CachedData co = tc.encode(value);
@@ -438,7 +438,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> append(long cas, String key, Object val) {
+  public OperationFuture<Boolean> append(long cas, String key, Object val) {
     return append(cas, key, val, transcoder);
   }
 
@@ -457,8 +457,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<Boolean> append(long cas, String key, T val,
-                                    Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> append(long cas, String key, T val,
+                                             Transcoder<T> tc) {
     return asyncCat(ConcatenationType.append, cas, key, val, tc);
   }
 
@@ -475,7 +475,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> prepend(long cas, String key, Object val) {
+  public OperationFuture<Boolean> prepend(long cas, String key, Object val) {
     return prepend(cas, key, val, transcoder);
   }
 
@@ -494,8 +494,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<Boolean> prepend(long cas, String key, T val,
-                                     Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> prepend(long cas, String key, T val,
+                                              Transcoder<T> tc) {
     return asyncCat(ConcatenationType.prepend, cas, key, val, tc);
   }
 
@@ -511,8 +511,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<CASResponse> asyncCAS(String key, long casId, T value,
-                                          Transcoder<T> tc) {
+  public <T> OperationFuture<CASResponse> asyncCAS(String key, long casId, T value,
+                                                   Transcoder<T> tc) {
     return asyncCAS(key, casId, 0, value, tc);
   }
 
@@ -529,8 +529,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<CASResponse> asyncCAS(String key, long casId, int exp, T value,
-                                          Transcoder<T> tc) {
+  public <T> OperationFuture<CASResponse> asyncCAS(String key, long casId, int exp, T value,
+                                                   Transcoder<T> tc) {
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<CASResponse> rv = new OperationFuture<CASResponse>(
@@ -566,7 +566,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<CASResponse> asyncCAS(String key, long casId, Object value) {
+  public OperationFuture<CASResponse> asyncCAS(String key, long casId, Object value) {
     return asyncCAS(key, casId, value, transcoder);
   }
 
@@ -581,8 +581,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue is too
    *                               full to accept any more requests
    */
-  public Future<CASResponse> asyncCAS(String key, long casId,
-                                      int exp, Object value) {
+  public OperationFuture<CASResponse> asyncCAS(String key, long casId,
+                                               int exp, Object value) {
     return asyncCAS(key, casId, exp, value, transcoder);
   }
 
@@ -698,7 +698,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
     return asyncStore(StoreType.add, key, exp, o, tc);
   }
 
@@ -733,7 +733,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> add(String key, int exp, Object o) {
+  public OperationFuture<Boolean> add(String key, int exp, Object o) {
     return asyncStore(StoreType.add, key, exp, o, transcoder);
   }
 
@@ -769,7 +769,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
     return asyncStore(StoreType.set, key, exp, o, tc);
   }
 
@@ -804,7 +804,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> set(String key, int exp, Object o) {
+  public OperationFuture<Boolean> set(String key, int exp, Object o) {
     return asyncStore(StoreType.set, key, exp, o, transcoder);
   }
 
@@ -841,7 +841,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<Boolean> replace(String key, int exp, T o,
+  public <T> OperationFuture<Boolean> replace(String key, int exp, T o,
                                      Transcoder<T> tc) {
     return asyncStore(StoreType.replace, key, exp, o, tc);
   }
@@ -877,7 +877,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> replace(String key, int exp, Object o) {
+  public OperationFuture<Boolean> replace(String key, int exp, Object o) {
     return asyncStore(StoreType.replace, key, exp, o, transcoder);
   }
 
@@ -891,7 +891,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout);
@@ -932,7 +932,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Object> asyncGet(final String key) {
+  public GetFuture<Object> asyncGet(final String key) {
     return asyncGet(key, transcoder);
   }
 
@@ -946,8 +946,8 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<CASValue<T>> asyncGets(final String key,
-                                           final Transcoder<T> tc) {
+  public <T> OperationFuture<CASValue<T>> asyncGets(final String key,
+                                                    final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<CASValue<T>> rv =
@@ -986,7 +986,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<CASValue<Object>> asyncGets(final String key) {
+  public OperationFuture<CASValue<Object>> asyncGets(final String key) {
     return asyncGets(key, transcoder);
   }
 
@@ -1432,7 +1432,7 @@ public class MemcachedClient extends SpyThread
         // XXX:  Potential abstraction leak.
         // The handling of incr/decr in the binary protocol
         // Allows us to avoid string processing.
-        rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"));
+        rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"));
       }
 
       public void complete() {
@@ -1560,7 +1560,7 @@ public class MemcachedClient extends SpyThread
     return rv;
   }
 
-  private Future<Long> asyncMutate(Mutator m, String key, int by, long def,
+  private OperationFuture<Long> asyncMutate(Mutator m, String key, int by, long def,
                                    int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Long> rv = new OperationFuture<Long>(
@@ -1568,7 +1568,7 @@ public class MemcachedClient extends SpyThread
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
         new OperationCallback() {
           public void receivedStatus(OperationStatus s) {
-            rv.set(new Long(s.isSuccess() ? s.getMessage() : "-1"), s);
+            rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"), s);
           }
 
           public void complete() {
@@ -1589,7 +1589,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Long> asyncIncr(String key, int by) {
+  public OperationFuture<Long> asyncIncr(String key, int by) {
     return asyncMutate(Mutator.incr, key, by, -1, 0);
   }
 
@@ -1605,7 +1605,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Long> asyncIncr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncIncr(String key, int by, long def, int exp) {
     return asyncMutate(Mutator.incr, key, by, def, exp);
   }
 
@@ -1619,7 +1619,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Long> asyncDecr(String key, int by) {
+  public OperationFuture<Long> asyncDecr(String key, int by) {
     return asyncMutate(Mutator.decr, key, by, -1, 0);
   }
 
@@ -1635,7 +1635,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Long> asyncDecr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncDecr(String key, int by, long def, int exp) {
     return asyncMutate(Mutator.decr, key, by, def, exp);
   }
 
@@ -1690,7 +1690,7 @@ public class MemcachedClient extends SpyThread
    * @deprecated Hold values are no longer honored.
    */
   @Deprecated
-  public Future<Boolean> delete(String key, int hold) {
+  public OperationFuture<Boolean> delete(String key, int hold) {
     return delete(key);
   }
 
@@ -1702,7 +1702,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public Future<Boolean> delete(String key) {
+  public OperationFuture<Boolean> delete(String key) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
             operationTimeout);

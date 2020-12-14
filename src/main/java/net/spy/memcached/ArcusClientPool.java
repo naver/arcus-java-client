@@ -44,6 +44,7 @@ import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
@@ -89,30 +90,30 @@ public class ArcusClientPool implements ArcusClientIF {
     }
   }
 
-  public Future<Boolean> append(long cas, String key, Object val) {
+  public OperationFuture<Boolean> append(long cas, String key, Object val) {
     return this.getClient().append(cas, key, val);
   }
 
-  public <T> Future<Boolean> append(long cas, String key, T val,
-                                    Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> append(long cas, String key, T val,
+                                             Transcoder<T> tc) {
     return this.getClient().append(cas, key, val, tc);
   }
 
-  public Future<Boolean> prepend(long cas, String key, Object val) {
+  public OperationFuture<Boolean> prepend(long cas, String key, Object val) {
     return this.getClient().prepend(cas, key, val);
   }
 
-  public <T> Future<Boolean> prepend(long cas, String key, T val,
-                                     Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> prepend(long cas, String key, T val,
+                                              Transcoder<T> tc) {
     return this.getClient().prepend(cas, key, val, tc);
   }
 
-  public <T> Future<CASResponse> asyncCAS(String key, long casId, T value,
-                                          Transcoder<T> tc) {
+  public <T> OperationFuture<CASResponse> asyncCAS(String key, long casId, T value,
+                                                   Transcoder<T> tc) {
     return this.getClient().asyncCAS(key, casId, value, tc);
   }
 
-  public Future<CASResponse> asyncCAS(String key, long casId, Object value) {
+  public OperationFuture<CASResponse> asyncCAS(String key, long casId, Object value) {
 
     return this.getClient().asyncCAS(key, casId, value);
   }
@@ -127,44 +128,44 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().cas(key, casId, value);
   }
 
-  public <T> Future<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().add(key, exp, o, tc);
   }
 
-  public Future<Boolean> add(String key, int exp, Object o) {
+  public OperationFuture<Boolean> add(String key, int exp, Object o) {
     return this.getClient().add(key, exp, o);
   }
 
-  public <T> Future<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().set(key, exp, o, tc);
   }
 
-  public Future<Boolean> set(String key, int exp, Object o) {
+  public OperationFuture<Boolean> set(String key, int exp, Object o) {
     return this.getClient().set(key, exp, o);
   }
 
-  public <T> Future<Boolean> replace(String key, int exp, T o,
-                                     Transcoder<T> tc) {
+  public <T> OperationFuture<Boolean> replace(String key, int exp, T o,
+                                              Transcoder<T> tc) {
     return this.getClient().replace(key, exp, o, tc);
   }
 
-  public Future<Boolean> replace(String key, int exp, Object o) {
+  public OperationFuture<Boolean> replace(String key, int exp, Object o) {
     return this.getClient().replace(key, exp, o);
   }
 
-  public <T> Future<T> asyncGet(String key, Transcoder<T> tc) {
+  public <T> GetFuture<T> asyncGet(String key, Transcoder<T> tc) {
     return this.getClient().asyncGet(key, tc);
   }
 
-  public Future<Object> asyncGet(String key) {
+  public GetFuture<Object> asyncGet(String key) {
     return this.getClient().asyncGet(key);
   }
 
-  public <T> Future<CASValue<T>> asyncGets(String key, Transcoder<T> tc) {
+  public <T> OperationFuture<CASValue<T>> asyncGets(String key, Transcoder<T> tc) {
     return this.getClient().asyncGets(key, tc);
   }
 
-  public Future<CASValue<Object>> asyncGets(String key) {
+  public OperationFuture<CASValue<Object>> asyncGets(String key) {
     return this.getClient().asyncGets(key);
   }
 
@@ -269,23 +270,23 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().decr(key, by, def, exp);
   }
 
-  public Future<Long> asyncIncr(String key, int by) {
+  public OperationFuture<Long> asyncIncr(String key, int by) {
     return this.getClient().asyncIncr(key, by);
   }
 
-  public Future<Long> asyncIncr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncIncr(String key, int by, long def, int exp) {
     return this.getClient().asyncIncr(key, by, def, exp);
   }
 
-  public Future<Long> asyncDecr(String key, int by) {
+  public OperationFuture<Long> asyncDecr(String key, int by) {
     return this.getClient().asyncDecr(key, by);
   }
 
-  public Future<Long> asyncDecr(String key, int by, long def, int exp) {
+  public OperationFuture<Long> asyncDecr(String key, int by, long def, int exp) {
     return this.getClient().asyncDecr(key, by, def, exp);
   }
 
-  public Future<Boolean> delete(String key) {
+  public OperationFuture<Boolean> delete(String key) {
     return this.getClient().delete(key);
   }
 
