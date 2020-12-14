@@ -277,7 +277,7 @@ class의 이름과 정확히 일치하는 로거가 없다면 logger tree 상의
 ```
 Application을 디버깅해야 할 때 ARCUS client에서 Arcus server로 전송하는 ascii protocol 문자열이 궁금할 때가 있다. ARCUS Java Client에서 ARCUS server로 전송하는 protocol을 로그로 살펴보려면 아래와 같이 logger를 설정하면 된다.
 예제에 나열된 logger를 모두 설정하면 요청(get, set 등..)별로 모든 로그가 남게 되니 필요한 요청에 해당하는 logger만 설정하면 편리하다.
-Ascii Protocol에 대한 자세한 내용은 [ARCUS 서버 명령 프로토콜](https://github.com/naver/arcus-memcached/blob/master/doc/arcus-ascii-protocol.md) 문서를 참고하기 바란다.
+Ascii Protocol에 대한 자세한 내용은 [ARCUS 서버 명령 프로토콜](https://github.com/naver/arcus-memcached/blob/master/doc/ch00-arcus-ascii-protocol.md) 문서를 참고하기 바란다.
 ```xml
 <!-- collection update -->
 <Logger name="net.spy.memcached.protocol.ascii.CollectionUpdateOperationImpl" level="DEBUG" additivity="false">
