@@ -1081,7 +1081,7 @@ public final class MemcachedConnection extends SpyObject {
       placeIn = primary;
     } else if (failureMode == FailureMode.Cancel) {
       o.setHandlingNode(primary);
-      o.cancel("inactive node");
+      o.cancel("inactive node: (" + primary.getNodeName() + ")");
     } else {
       // Look for another node in sequence that is ready.
       Iterator<MemcachedNode> iter = getNodeSequence(key, o);

@@ -43,6 +43,11 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     return root.toString();
   }
 
+  @Override
+  public String getNodeName() {
+    return root.getNodeName();
+  }
+
   public MemcachedNode getMemcachedNode() {
     return root;
   }

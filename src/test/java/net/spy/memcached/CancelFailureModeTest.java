@@ -3,7 +3,7 @@ package net.spy.memcached;
 import junit.framework.TestCase;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import net.spy.memcached.internal.OperationFuture;
 
 public class CancelFailureModeTest extends TestCase {
   private String serverList= "127.0.0.1:11311";
@@ -29,12 +29,13 @@ public class CancelFailureModeTest extends TestCase {
   }
 
   public void testQueueingToDownServer() throws Exception {
-    Future<Boolean> f = client.add("someKey", 0, "some object");
+    OperationFuture<Boolean> f = client.add("someKey", 0, "some object");
     try {
       boolean b = f.get();
       fail("Should've thrown an exception, returned " + b);
     } catch (ExecutionException e) {
       // probably OK
+      System.out.println(e.getMessage());
     }
     assertTrue(f.isCancelled());
   }

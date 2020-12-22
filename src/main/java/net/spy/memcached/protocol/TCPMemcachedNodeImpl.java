@@ -18,6 +18,7 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -147,7 +148,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     socketAddress=sa;
     */
     /* ENABLE_REPLICATION end */
-    nodeName = name + " " + sa;
+    String hostName = ((InetSocketAddress) sa).getHostName();
+    nodeName = name + " " + sa + hostName;
     setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
@@ -412,6 +414,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       rv = SelectionKey.OP_CONNECT;
     }
     return rv;
+  }
+
+  @Override
+  public final String getNodeName() {
+    return nodeName;
   }
 
   public final ByteBuffer getRbuf() {
