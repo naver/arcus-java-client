@@ -28,7 +28,7 @@ public class MemcachedNodeROImplTest extends MockObjectTestCase {
 
     Set<String> acceptable = new HashSet<String>(Arrays.asList(
             "toString", "getSocketAddress", "getBytesRemainingToWrite",
-            "getReconnectCount", "getSelectionOps", "hasReadOp",
+            "getReconnectCount", "getSelectionOps", "getNodeName", "hasReadOp",
             "hasWriteOp", "isActive", "isFirstConnecting"));
 
     for (Method meth : MemcachedNode.class.getMethods()) {

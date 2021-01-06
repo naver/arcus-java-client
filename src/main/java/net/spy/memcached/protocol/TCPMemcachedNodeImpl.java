@@ -400,6 +400,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return rv;
   }
 
+  public final String getNodeName() {
+    return nodeName;
+  }
+
   public final ByteBuffer getRbuf() {
     return rbuf;
   }
