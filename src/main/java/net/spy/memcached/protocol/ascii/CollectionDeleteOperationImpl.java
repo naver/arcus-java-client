@@ -143,4 +143,13 @@ public class CollectionDeleteOperationImpl extends OperationImpl
     return collectionDelete;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

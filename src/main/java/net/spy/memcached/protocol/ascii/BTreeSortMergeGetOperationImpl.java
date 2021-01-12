@@ -436,4 +436,14 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     MISSED_KEYS,
     TRIMMED_KEYS,
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

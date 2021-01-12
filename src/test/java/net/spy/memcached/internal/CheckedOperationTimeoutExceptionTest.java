@@ -81,5 +81,14 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
       throw new RuntimeException("Not implemented");
     }
 
+    @Override
+    public boolean isBulkOperation() {
+      return false;
+    }
+
+    @Override
+    public boolean isPipeOperation() {
+      return false;
+    }
   }
 }

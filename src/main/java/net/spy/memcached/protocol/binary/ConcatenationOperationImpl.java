@@ -81,4 +81,13 @@ class ConcatenationOperationImpl extends OperationImpl
     return catType;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

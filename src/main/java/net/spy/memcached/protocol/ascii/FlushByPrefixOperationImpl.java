@@ -82,4 +82,14 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
     bb.flip();
     setBuffer(bb);
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

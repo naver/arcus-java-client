@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -84,19 +85,18 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     try {
       return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
-      throw new RuntimeException("Timed out waiting forever", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
-  public Map<String, T> getSome(long to, TimeUnit unit)
+  public Map<String, T> getSome(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
-    Map<String, T> ret = internalGet(to, unit, timedoutOps);
+    Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (timedoutOps.size() > 0) {
       timeout = true;
       LoggerFactory.getLogger(getClass()).warn(
-              new CheckedOperationTimeoutException(
-                      "Operation timed out: ", timedoutOps).getMessage());
+              new CheckedOperationTimeoutException(duration, units, timedoutOps).getMessage());
     }
     return ret;
 
@@ -108,14 +108,13 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    *
    * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
-  public Map<String, T> get(long to, TimeUnit unit)
+  public Map<String, T> get(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException, TimeoutException {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
-    Map<String, T> ret = internalGet(to, unit, timedoutOps);
+    Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (timedoutOps.size() > 0) {
       this.timeout = true;
-      throw new CheckedOperationTimeoutException("Operation timed out.",
-              timedoutOps);
+      throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
     }
     return ret;
   }

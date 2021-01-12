@@ -18,4 +18,13 @@ public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
     setAPIType(APIType.MGET);
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

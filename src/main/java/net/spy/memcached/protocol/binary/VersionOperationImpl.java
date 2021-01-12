@@ -24,4 +24,13 @@ class VersionOperationImpl extends OperationImpl implements VersionOperation {
             new OperationStatus(true, new String(pl), StatusCode.SUCCESS));
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

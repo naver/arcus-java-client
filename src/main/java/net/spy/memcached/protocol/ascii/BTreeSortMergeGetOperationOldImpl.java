@@ -316,4 +316,14 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
   public Collection<String> getKeys() {
     return smGet.getKeyList();
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

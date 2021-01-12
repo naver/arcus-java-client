@@ -260,4 +260,14 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
   public Collection<String> getKeys() {
     return Collections.singleton(key);
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

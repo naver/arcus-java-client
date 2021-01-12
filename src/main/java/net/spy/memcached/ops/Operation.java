@@ -107,5 +107,9 @@ public interface Operation {
 
   boolean isReadOperation();
 
+  boolean isBulkOperation();
+
+  boolean isPipeOperation();
+
   APIType getAPIType();
 }

@@ -49,7 +49,7 @@ public abstract class BulkOperationFuture<T>
 
   @Override
   public Map<String, T> get(long duration,
-                                                    TimeUnit units) throws InterruptedException,
+                            TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
       for (Operation op : ops) {
@@ -59,8 +59,7 @@ public abstract class BulkOperationFuture<T>
           MemcachedConnection.opSucceeded(op);
         }
       }
-      throw new CheckedOperationTimeoutException(
-              "Timed out waiting for bulk operation >" + duration + " " + units, ops);
+      throw new CheckedOperationTimeoutException(duration, units, ops);
     } else {
       // continuous timeout counter will be reset
       for (Operation op : ops) {

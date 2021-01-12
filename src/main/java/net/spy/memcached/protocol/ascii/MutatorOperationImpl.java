@@ -126,4 +126,13 @@ final class MutatorOperationImpl extends OperationImpl
     return mutator;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

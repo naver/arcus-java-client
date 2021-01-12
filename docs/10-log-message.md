@@ -106,14 +106,14 @@ at net.spy.memcached.MemcachedClient.run(MemcachedClient.java:1630)
 timeout시간 내에 사용자가 요청한 결과 값을 반환해 줄 수 없으면 아래 로그를 남기고 TimeoutException을 던진다.
 
 ```java
-net.spy.memcached.internal.CheckedOperationTimeoutException: Timed out waiting for operation. > 300 - failing node: /127.0.0.1:11211 [WRITING] [#iq=13 #Wops=7 #Rops=10 #CT=13]
+net.spy.memcached.internal.CheckedOperationTimeoutException: GET operation timed out (>300 MILLISECONDS ) - failing node: /127.0.0.1:11211 [WRITING] [#iq=13 #Wops=7 #Rops=10 #CT=13]
 ```
 
 로그의 의미는 다음과 같다.
 
 | 메세지 | 설명 |
 | ------ | ---- |
-| Timed out waiting for operation. > 300 MILLISECONDS| Timeout 값이 300ms로 지정되어있고 요청의 결과를 받기까지300ms이상 걸려서 timeout되었다.|
+| GET operation timed out (>300 MILLISECONDS )| Timeout 값이 300ms로 지정되어있고 GET 요청의 결과를 받기까지 300ms 이상 걸려서 timeout되었다.|
 | Failing node: /127.0.0.1:11211 | 해당 요청은 127.0.0.1:11211 에서 수행한다. |
 | [WRITING]	| 해당 요청은 socket write를 위해 대기 중이다. |
 | [READING]	| 해당 요청은 서버로 전달되었고 결과가 돌아오기를 기다리거나, 결과 값을 읽어 들이는 중이다. |

@@ -171,4 +171,13 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
     return update;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return true;
+  }
 }

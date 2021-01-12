@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
@@ -44,7 +45,7 @@ public abstract class SMGetFuture<T> implements Future<T> {
     try {
       return get(timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
-      throw new RuntimeException("Timed out waiting for smget operation", e);
+      throw new OperationTimeoutException(e);
     }
   }
 

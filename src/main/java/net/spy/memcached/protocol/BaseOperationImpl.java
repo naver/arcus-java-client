@@ -21,14 +21,14 @@ import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.compat.SpyObject;
-import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CancelledOperationStatus;
-import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.OperationErrorType;
+import net.spy.memcached.ops.APIType;
 
 /**
  * Base class for protocol-specific operation implementations.
@@ -233,4 +233,8 @@ public abstract class BaseOperationImpl extends SpyObject {
   public void setAPIType(APIType type) {
     this.apiType = type;
   }
+
+  public abstract boolean isBulkOperation();
+
+  public abstract boolean isPipeOperation();
 }

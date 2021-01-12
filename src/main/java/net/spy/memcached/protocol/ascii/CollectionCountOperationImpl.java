@@ -115,4 +115,14 @@ public class CollectionCountOperationImpl extends OperationImpl implements
   public Collection<String> getKeys() {
     return Collections.singleton(key);
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }
