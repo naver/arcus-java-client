@@ -168,6 +168,10 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  public boolean enabledMGetsOp() {
+    throw new UnsupportedOperationException();
+  }
+
   public boolean enabledSpaceSeparate() {
     throw new UnsupportedOperationException();
   }

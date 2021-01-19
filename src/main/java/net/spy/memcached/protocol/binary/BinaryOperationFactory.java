@@ -16,7 +16,6 @@
  */
 package net.spy.memcached.protocol.binary;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -71,13 +70,9 @@ import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetOperation.Callback;
 import net.spy.memcached.ops.GetsOperation;
-import net.spy.memcached.ops.KeyedOperation;
-import net.spy.memcached.ops.MultiGetOperationCallback;
-import net.spy.memcached.ops.MultiGetsOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -114,9 +109,19 @@ public class BinaryOperationFactory extends BaseOperationFactory {
     return new GetOperationImpl(key, cb);
   }
 
+  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback callback) {
+    throw new RuntimeException(
+            "gets is not supported in binary protocol yet.");
+  }
+
   public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
     throw new RuntimeException(
             "mget is not supported in binary protocol yet.");
+  }
+
+  public GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb) {
+    throw new RuntimeException(
+            "mgets is not supported in binary protocol yet.");
   }
 
   public MutatorOperation mutate(Mutator m, String key, int by,
@@ -151,24 +156,6 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   public ConcatenationOperation cat(ConcatenationType catType, long casId,
                                     String key, byte[] data, OperationCallback cb) {
     return new ConcatenationOperationImpl(catType, key, data, casId, cb);
-  }
-
-  @Override
-  protected Collection<? extends Operation> cloneGet(KeyedOperation op) {
-    Collection<Operation> rv = new ArrayList<Operation>();
-    GetOperation.Callback getCb = null;
-    GetsOperation.Callback getsCb = null;
-    if (op.getCallback() instanceof GetOperation.Callback) {
-      getCb = new MultiGetOperationCallback(
-              op.getCallback(), op.getKeys().size());
-    } else {
-      getsCb = new MultiGetsOperationCallback(
-              op.getCallback(), op.getKeys().size());
-    }
-    for (String k : op.getKeys()) {
-      rv.add(getCb == null ? gets(k, getsCb) : get(k, getCb));
-    }
-    return rv;
   }
 
   public SASLAuthOperation saslAuth(String[] mech, String serverName,

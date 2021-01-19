@@ -105,6 +105,19 @@ public interface MemcachedClientIF {
 
   BulkFuture<Map<String, Object>> asyncGetBulk(String... keys);
 
+  <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                         Iterator<Transcoder<T>> tcs);
+
+  <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                         Transcoder<T> tc);
+
+  BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys);
+
+  <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
+                                                         String... keys);
+
+  BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys);
+
   <T> Map<String, T> getBulk(Collection<String> keys, Transcoder<T> tc)
           throws OperationTimeoutException;
 
@@ -115,6 +128,18 @@ public interface MemcachedClientIF {
           throws OperationTimeoutException;
 
   Map<String, Object> getBulk(String... keys)
+          throws OperationTimeoutException;
+
+  <T> Map<String, CASValue<T>> getsBulk(Collection<String> keys, Transcoder<T> tc)
+          throws OperationTimeoutException;
+
+  Map<String, CASValue<Object>> getsBulk(Collection<String> keys)
+          throws OperationTimeoutException;
+
+  <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys)
+          throws OperationTimeoutException;
+
+  Map<String, CASValue<Object>> getsBulk(String... keys)
           throws OperationTimeoutException;
 
   Map<SocketAddress, String> getVersions();

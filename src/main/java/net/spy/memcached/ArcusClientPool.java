@@ -210,6 +210,29 @@ public class ArcusClientPool implements ArcusClientIF {
     return this.getClient().asyncGetBulk(keys);
   }
 
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                                Iterator<Transcoder<T>> tcs) {
+    return this.getClient().asyncGetsBulk(keys, tcs);
+  }
+
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                                Transcoder<T> tc) {
+    return this.getClient().asyncGetsBulk(keys, tc);
+  }
+
+  public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys) {
+    return this.getClient().asyncGetsBulk(keys);
+  }
+
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
+                                                                String... keys) {
+    return this.getClient().asyncGetsBulk(tc, keys);
+  }
+
+  public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys) {
+    return this.getClient().asyncGetsBulk(keys);
+  }
+
   public <T> Map<String, T> getBulk(Collection<String> keys, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().getBulk(keys, tc);
@@ -228,6 +251,26 @@ public class ArcusClientPool implements ArcusClientIF {
   public Map<String, Object> getBulk(String... keys)
           throws OperationTimeoutException {
     return this.getClient().getBulk(keys);
+  }
+
+  public <T> Map<String, CASValue<T>> getsBulk(Collection<String> keys, Transcoder<T> tc)
+          throws OperationTimeoutException {
+    return this.getClient().getsBulk(keys, tc);
+  }
+
+  public Map<String, CASValue<Object>> getsBulk(Collection<String> keys)
+          throws OperationTimeoutException {
+    return this.getClient().getsBulk(keys);
+  }
+
+  public <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys)
+          throws OperationTimeoutException {
+    return this.getClient().getsBulk(tc, keys);
+  }
+
+  public Map<String, CASValue<Object>> getsBulk(String... keys)
+          throws OperationTimeoutException {
+    return this.getClient().getsBulk(keys);
   }
 
   public Map<SocketAddress, String> getVersions() {
