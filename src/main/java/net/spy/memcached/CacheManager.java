@@ -163,7 +163,7 @@ public class CacheManager extends SpyThread implements Watcher,
             getLogger().fatal("Service code not found. (%s)", serviceCode);
             throw new NotExistsServiceCodeException(serviceCode);
           }
-        } while(false);
+        } while (false);
 
         String path = getClientInfo();
         if (path.isEmpty()) {
@@ -428,7 +428,7 @@ public class CacheManager extends SpyThread implements Watcher,
     client = new ArcusClient[poolSize];
     for (int i = 0; i < poolSize; i++) {
       try {
-        String clientName = "ArcusClient(" + (i+1) + "-" + poolSize + ") for " + serviceCode;
+        String clientName = "ArcusClient(" + (i + 1) + "-" + poolSize + ") for " + serviceCode;
         client[i] = ArcusClient.getInstance(cfb.build(), clientName, socketList);
         client[i].setName("Memcached IO for " + serviceCode);
         client[i].setCacheManager(this);
