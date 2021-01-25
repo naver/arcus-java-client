@@ -23,7 +23,7 @@ public class BinaryClientTest extends ProtocolBaseCase {
 
   @Override
   protected String getExpectedVersionSource() {
-    return "/"+ARCUS_HOST;
+    return "/" + ARCUS_HOST;
   }
 
   @Override

@@ -58,7 +58,7 @@ public class TCPMemcachedNodeImplTest extends TestCase {
   public void testMoveOperations() throws Exception {
     // given
     final int fromReadOpCount = 5,
-              fromWriteOpCount= 5,
+              fromWriteOpCount = 5,
               fromInputOpCount = 10,
               fromAllOpCount = fromReadOpCount + fromWriteOpCount + fromInputOpCount;
 
@@ -97,7 +97,8 @@ public class TCPMemcachedNodeImplTest extends TestCase {
               });
           op.initialize();
           add(op);
-        }}
+        }
+      }
     };
 
     for (int i = 0; i < fromAllOpCount; i++) {

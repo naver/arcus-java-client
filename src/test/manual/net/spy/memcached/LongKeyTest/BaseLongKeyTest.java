@@ -25,7 +25,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   private char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
   private final List<String> keys = new ArrayList<String>() {
     {
-      int defaultKeyLenght = 4000-10; // MAX_KEY_LENGTH - key index string length
+      int defaultKeyLenght = 4000 - 10; // MAX_KEY_LENGTH - key index string length
       for (int i = 0; i < keySize; i++) {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();

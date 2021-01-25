@@ -12,7 +12,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     mc.flush();
   }
 
-  public void testStore_success() throws Exception{
+  public void testStore_success() throws Exception {
     //given
     String value = "value1";
     String replaceValue = "value2";
@@ -25,9 +25,9 @@ public class OperationStatusTest extends BaseIntegrationTest {
     OperationFuture<Boolean> prependOperationFuture = mc.prepend(10, "abc", appendValue);
     OperationFuture<Boolean> appendOperationFuture = mc.append(10, "abc", appendValue);
 
-    mc.add("bcc",EXP, value);
-    mc.add("cbd",EXP,"2222");
-    mc.add("efg",EXP,"3333");
+    mc.add("bcc", EXP, value);
+    mc.add("cbd", EXP, "2222");
+    mc.add("efg", EXP, "3333");
 
     //then
     assertEquals(StatusCode.SUCCESS, addOperationFuture.getStatus().getStatusCode());
@@ -37,7 +37,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.SUCCESS, appendOperationFuture.getStatus().getStatusCode());
   }
 
-  public void testStore_fail() throws Exception{
+  public void testStore_fail() throws Exception {
     //given
     String value = "value1";
     String replaceValue = "value2";

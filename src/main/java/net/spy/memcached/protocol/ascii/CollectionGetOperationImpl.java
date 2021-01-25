@@ -248,7 +248,7 @@ public class CollectionGetOperationImpl extends OperationImpl
   public void initialize() {
     String cmd = collectionGet.getCommand();
     if (collectionGet instanceof MapGet) {
-      MapGet mapGet = (MapGet)collectionGet;
+      MapGet mapGet = (MapGet) collectionGet;
       if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
         mapGet.setKeySeparator(" ");
       } else {

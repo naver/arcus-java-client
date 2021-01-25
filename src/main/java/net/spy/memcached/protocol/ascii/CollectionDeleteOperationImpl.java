@@ -100,7 +100,7 @@ public class CollectionDeleteOperationImpl extends OperationImpl
   public void initialize() {
     String cmd = collectionDelete.getCommand();
     if (collectionDelete instanceof MapDelete) {
-      MapDelete mapDelete = (MapDelete)collectionDelete;
+      MapDelete mapDelete = (MapDelete) collectionDelete;
       if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
         mapDelete.setKeySeparator(" ");
       } else {

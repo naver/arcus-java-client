@@ -31,7 +31,7 @@ public class CollectionMaxElementSize extends BaseIntegrationTest {
   }
 
   public void testlargeSize() throws Exception {
-    int largeSize = 16*1024-2; //16KB
+    int largeSize = 16 * 1024 - 2; //16KB
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < largeSize; i++) {
       sb.append(i % 9);

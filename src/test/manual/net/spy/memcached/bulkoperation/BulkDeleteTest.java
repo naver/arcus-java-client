@@ -130,7 +130,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           Assert.assertEquals("Error count is less than input.",
-                  keys.length/2, errorList.size());
+                  keys.length / 2, errorList.size());
           for (Map.Entry<String, OperationStatus> error :
                   errorList.entrySet()) {
             Assert.assertEquals(error.getValue().getStatusCode(),

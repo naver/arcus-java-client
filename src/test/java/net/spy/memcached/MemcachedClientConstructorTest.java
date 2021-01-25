@@ -34,7 +34,7 @@ public class MemcachedClientConstructorTest extends TestCase {
 
   private void assertWorking() throws Exception {
     Map<SocketAddress, String> versions = client.getVersions();
-    assertEquals("/"+ARCUS_HOST,
+    assertEquals("/" + ARCUS_HOST,
             versions.keySet().iterator().next().toString());
   }
 

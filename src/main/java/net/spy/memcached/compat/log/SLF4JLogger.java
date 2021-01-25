@@ -72,11 +72,11 @@ public class SLF4JLogger extends AbstractLogger {
    */
   @Override
   public void log(Level level, Object message, Throwable e) {
-    if(level == null) {
+    if (level == null) {
       level = Level.FATAL;
     }
 
-    switch(level) {
+    switch (level) {
       case TRACE:
         logger.trace(message.toString(), e);
         break;

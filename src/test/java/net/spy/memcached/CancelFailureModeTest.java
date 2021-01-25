@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class CancelFailureModeTest extends TestCase {
-  private String serverList= "127.0.0.1:11311";
+  private String serverList = "127.0.0.1:11311";
   private MemcachedClient client = null;
 
   @Override

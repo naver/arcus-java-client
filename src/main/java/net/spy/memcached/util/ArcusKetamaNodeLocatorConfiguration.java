@@ -54,10 +54,10 @@ public class ArcusKetamaNodeLocatorConfiguration extends
     @Override
     public int compare(MemcachedNode node1, MemcachedNode node2) {
       if (node1 instanceof MemcachedNodeROImpl) {
-        node1 = ((MemcachedNodeROImpl)node1).getMemcachedNode();
+        node1 = ((MemcachedNodeROImpl) node1).getMemcachedNode();
       }
       if (node2 instanceof MemcachedNodeROImpl) {
-        node2 = ((MemcachedNodeROImpl)node2).getMemcachedNode();
+        node2 = ((MemcachedNodeROImpl) node2).getMemcachedNode();
       }
       String name1 = socketAddresses.get(node1);
       String name2 = socketAddresses.get(node2);
