@@ -31,6 +31,16 @@ public class AsciiClientTest extends ProtocolBaseCase {
       public void initialize() {
         setBuffer(ByteBuffer.wrap("garbage\r\n".getBytes()));
       }
+
+      @Override
+      public boolean isBulkOperation() {
+        return false;
+      }
+
+      @Override
+      public boolean isPipeOperation() {
+        return false;
+      }
     });
   }
 

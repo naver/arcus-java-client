@@ -117,4 +117,14 @@ public class CollectionCreateOperationImpl extends OperationImpl
   public CollectionCreate getCreate() {
     return collectionCreate;
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

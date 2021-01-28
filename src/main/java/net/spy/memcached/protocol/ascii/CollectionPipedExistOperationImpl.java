@@ -144,4 +144,14 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
   public SetPipedExist<?> getExist() {
     return setPipedExist;
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return true;
+  }
 }

@@ -630,7 +630,7 @@ public class MemcachedClient extends SpyThread
     } catch (ExecutionException e) {
       throw new RuntimeException("Exception waiting for value", e);
     } catch (TimeoutException e) {
-      throw new OperationTimeoutException("Timeout waiting for value", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
@@ -1011,7 +1011,7 @@ public class MemcachedClient extends SpyThread
     } catch (ExecutionException e) {
       throw new RuntimeException("Exception waiting for value", e);
     } catch (TimeoutException e) {
-      throw new OperationTimeoutException("Timeout waiting for value", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
@@ -1054,7 +1054,7 @@ public class MemcachedClient extends SpyThread
       throw new RuntimeException("Exception waiting for value", e);
     } catch (TimeoutException e) {
       future.cancel(true);
-      throw new OperationTimeoutException("Timeout waiting for value", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
@@ -1284,8 +1284,7 @@ public class MemcachedClient extends SpyThread
     } catch (ExecutionException e) {
       throw new RuntimeException("Failed getting bulk values", e);
     } catch (TimeoutException e) {
-      throw new OperationTimeoutException(
-              "Timeout waiting for bulkvalues", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
@@ -1427,7 +1426,7 @@ public class MemcachedClient extends SpyThread
   private long mutate(Mutator m, String key, int by, long def, int exp) {
     final AtomicLong rv = new AtomicLong();
     final CountDownLatch latch = new CountDownLatch(1);
-    addOp(key, opFact.mutate(m, key, by, def, exp, new OperationCallback() {
+    Operation op = addOp(key, opFact.mutate(m, key, by, def, exp, new OperationCallback() {
       public void receivedStatus(OperationStatus s) {
         // XXX:  Potential abstraction leak.
         // The handling of incr/decr in the binary protocol
@@ -1441,9 +1440,7 @@ public class MemcachedClient extends SpyThread
     }));
     try {
       if (!latch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
-        throw new OperationTimeoutException(
-                "Mutate operation timed out, unable to modify counter ["
-                        + key + "]");
+        throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, op);
       }
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted", e);
@@ -1553,8 +1550,7 @@ public class MemcachedClient extends SpyThread
       } catch (ExecutionException e) {
         throw new RuntimeException("Failed waiting for store", e);
       } catch (TimeoutException e) {
-        throw new OperationTimeoutException(
-                "Timeout waiting to mutate or init value", e);
+        throw new OperationTimeoutException(e);
       }
     }
     return rv;
@@ -1780,8 +1776,7 @@ public class MemcachedClient extends SpyThread
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation. >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {

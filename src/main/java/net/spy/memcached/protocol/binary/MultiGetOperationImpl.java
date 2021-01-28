@@ -113,4 +113,13 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
     return keys.values();
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

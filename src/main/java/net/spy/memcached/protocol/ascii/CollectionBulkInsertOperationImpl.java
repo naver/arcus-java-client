@@ -172,4 +172,13 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     return insert;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

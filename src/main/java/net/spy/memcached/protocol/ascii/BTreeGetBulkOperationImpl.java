@@ -250,4 +250,14 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   public Collection<String> getKeys() {
     return getBulk.getKeyList();
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return true;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

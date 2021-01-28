@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -49,7 +50,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
     try {
       return get(timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
-      throw new RuntimeException("Timed out waiting for smget operation", e);
+      throw new OperationTimeoutException(e);
     }
   }
 
@@ -60,8 +61,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
       for (Operation op : ops) {
         MemcachedConnection.opTimedOut(op);
       }
-      throw new CheckedOperationTimeoutException(
-          "Timed out waiting for b+tree get bulk operation", ops);
+      throw new CheckedOperationTimeoutException(duration, units, ops);
     } else {
       for (Operation op : ops) {
         MemcachedConnection.opSucceeded(op);

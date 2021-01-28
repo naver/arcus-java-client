@@ -45,4 +45,13 @@ final class VersionOperationImpl extends OperationImpl
     setBuffer(ByteBuffer.wrap(REQUEST));
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

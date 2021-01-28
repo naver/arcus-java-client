@@ -290,4 +290,13 @@ public class CollectionGetOperationImpl extends OperationImpl
     return collectionGet;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

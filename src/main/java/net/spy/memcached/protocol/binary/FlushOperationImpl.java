@@ -22,4 +22,13 @@ class FlushOperationImpl extends OperationImpl implements FlushOperation {
     prepareBuffer("", 0, EMPTY_BYTES, delay);
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

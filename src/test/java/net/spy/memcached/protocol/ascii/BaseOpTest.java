@@ -134,5 +134,14 @@ public class BaseOpTest extends BaseMockCase {
       setBuffer(ByteBuffer.allocate(0));
     }
 
+    @Override
+    public boolean isBulkOperation() {
+      return false;
+    }
+
+    @Override
+    public boolean isPipeOperation() {
+      return false;
+    }
   }
 }

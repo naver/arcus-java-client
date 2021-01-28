@@ -1071,8 +1071,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -2072,8 +2071,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation. >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -2431,8 +2429,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -2699,8 +2696,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -3922,8 +3918,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for operation >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -4168,13 +4163,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       public Map<String, CollectionOperationStatus> get(long duration,
                                                         TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
-
         if (!latch.await(duration, units)) {
           for (Operation op : ops) {
             MemcachedConnection.opTimedOut(op);
           }
-          throw new CheckedOperationTimeoutException(
-                  "Timed out waiting for bulk operation >" + duration + " " + units, ops);
+          throw new CheckedOperationTimeoutException(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {

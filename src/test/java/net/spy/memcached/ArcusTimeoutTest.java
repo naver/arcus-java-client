@@ -335,6 +335,7 @@ public class ArcusTimeoutTest extends TestCase {
     future.cancel(true);
   }
 
+  @Test(expected = TimeoutException.class)
   public void testMopInsertBulkTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
     String mkey = "MyMopKey";

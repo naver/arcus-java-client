@@ -38,4 +38,13 @@ public class StatsOperationImpl extends OperationImpl
     resetInput();
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

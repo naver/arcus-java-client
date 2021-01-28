@@ -16,12 +16,13 @@
  */
 package net.spy.memcached.internal;
 
+import net.spy.memcached.TimedOutMessageFactory;
+import net.spy.memcached.ops.Operation;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import net.spy.memcached.MemcachedNode;
-import net.spy.memcached.ops.Operation;
 
 /**
  * Timeout exception that tracks the original operation.
@@ -44,37 +45,21 @@ public class CheckedOperationTimeoutException extends TimeoutException {
 
   public CheckedOperationTimeoutException(String message,
                                           Collection<Operation> ops) {
-    super(createMessage(message, ops));
+    super(TimedOutMessageFactory.createMessage(message, ops));
     operations = ops;
   }
 
-  private static String createMessage(String message,
-                                      Collection<Operation> ops) {
-    StringBuilder rv = new StringBuilder(message);
-    rv.append(" - failing node");
-    rv.append(ops.size() == 1 ? ": " : "s: ");
-    boolean first = true;
-    for (Operation op : ops) {
-      if (first) {
-        first = false;
-      } else {
-        rv.append(", ");
-      }
-      MemcachedNode node = op == null ? null : op.getHandlingNode();
-      rv.append(node == null ? "<unknown>" : node.getSocketAddress());
-      if (op != null) {
-        rv.append(" [").append(op.getState()).append("]");
-      }
-      if (node != null) {
-        rv.append(" [").append(node.getStatus()).append("]");
-      }
-//    if (op != null && op.getBuffer() != null) {
-//      rv.append(" [")
-//          .append(new String(op.getBuffer().array()).replace(
-//              "\r\n", "\\n")).append("]");
-//    }
-    }
-    return rv.toString();
+  public CheckedOperationTimeoutException(long duration,
+                                          TimeUnit units,
+                                          Operation op) {
+    this(duration, units, Collections.singleton(op));
+  }
+
+  public CheckedOperationTimeoutException(long duration,
+                                          TimeUnit units,
+                                          Collection<Operation> ops) {
+    super(TimedOutMessageFactory.createTimedoutMessage(duration, units, ops));
+    operations = ops;
   }
 
   /**

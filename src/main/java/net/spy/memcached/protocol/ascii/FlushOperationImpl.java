@@ -57,4 +57,14 @@ final class FlushOperationImpl extends OperationImpl
     }
     setBuffer(b);
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

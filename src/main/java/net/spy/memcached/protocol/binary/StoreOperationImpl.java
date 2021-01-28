@@ -106,4 +106,13 @@ class StoreOperationImpl extends OperationImpl
     return storeType;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

@@ -122,4 +122,14 @@ public class CollectionExistOperationImpl extends OperationImpl
   public CollectionExist getExist() {
     return collectionExist;
   }
+
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }

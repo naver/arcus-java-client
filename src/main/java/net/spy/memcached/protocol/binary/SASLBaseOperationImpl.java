@@ -72,4 +72,14 @@ public abstract class SASLBaseOperationImpl extends OperationImpl {
     }
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
+
 }

@@ -134,4 +134,13 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     return subkey;
   }
 
+  @Override
+  public boolean isBulkOperation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPipeOperation() {
+    return false;
+  }
 }
