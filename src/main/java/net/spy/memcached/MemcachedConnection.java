@@ -294,8 +294,8 @@ public final class MemcachedConnection extends SpyObject {
     List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
 
     for (MemcachedNode node : locator.getAll()) {
-      if (addrs.contains((InetSocketAddress) node.getSocketAddress())) {
-        addrs.remove((InetSocketAddress) node.getSocketAddress());
+      if (addrs.contains(node.getSocketAddress())) {
+        addrs.remove(node.getSocketAddress());
       } else {
         removeNodes.add(node);
       }
@@ -749,7 +749,7 @@ public final class MemcachedConnection extends SpyObject {
 
       qa.setupForAuth("due to exception"); // noop if !shouldAuth
       getLogger().warn("Reconnecting due to exception on %s", qa, e);
-      lostConnection(qa, ReconnDelay.DEFAULT, "exception" + e);
+      lostConnection(qa, ReconnDelay.DEFAULT, e.getMessage());
     }
     qa.fixupOps();
   }

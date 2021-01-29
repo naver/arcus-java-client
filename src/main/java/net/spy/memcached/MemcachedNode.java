@@ -131,6 +131,11 @@ public interface MemcachedNode {
   int getSelectionOps();
 
   /**
+   * Get the node name used for reading ip, port and hostname from this node
+   */
+  String getNodeName();
+
+  /**
    * Get the buffer used for reading data from this node.
    */
   ByteBuffer getRbuf();
