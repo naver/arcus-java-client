@@ -1003,8 +1003,9 @@ public class MemcachedClient extends SpyThread
    *                                   is too full to accept any more requests
    */
   public <T> CASValue<T> gets(String key, Transcoder<T> tc) {
+    OperationFuture<CASValue<T>> future = asyncGets(key, tc);
     try {
-      return asyncGets(key, tc).get(
+      return future.get(
               operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted waiting for value", e);
@@ -1098,9 +1099,6 @@ public class MemcachedClient extends SpyThread
     // Break the gets down into groups by key
     final Map<MemcachedNode, List<Collection<String>>> chunks
             = new HashMap<MemcachedNode, List<Collection<String>>>();
-    final Map<MemcachedNode, Integer> chunkCount
-            = new HashMap<MemcachedNode, Integer>();
-    final NodeLocator locator = conn.getLocator();
     Iterator<String> key_iter = keys.iterator();
     while (key_iter.hasNext() && tc_iter.hasNext()) {
       String key = key_iter.next();
@@ -1119,53 +1117,15 @@ public class MemcachedClient extends SpyThread
           continue;
         }
       }
-
       tc_map.put(key, tc);
       validateKey(key);
-      final MemcachedNode primaryNode = conn.getPrimaryNode(key);
-      MemcachedNode node = null;
-      // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
-      if (primaryNode == null) {
-        node = null;
-      } else if (primaryNode.isActive() || primaryNode.isFirstConnecting()) {
-        node = primaryNode;
-      } else {
-        Iterator<MemcachedNode> iter = conn.getNodeSequence(key);
-        while (node == null && iter.hasNext()) {
-          MemcachedNode n = iter.next();
-          if (n.isActive()) {
-            node = n;
-          }
-        }
-        if (node == null) {
-          node = primaryNode;
-        }
-      }
-      List<Collection<String>> lks = chunks.get(node);
-      if (lks == null) {
-        lks = new ArrayList<Collection<String>>();
-        Collection<String> ts = new ArrayList<String>();
-        lks.add(0, ts);
-        chunks.put(node, lks);
-        chunkCount.put(node, 0);
-      }
-      if (lks.get(chunkCount.get(node)).size() >= GET_BULK_CHUNK_SIZE) {
-        int count = chunkCount.get(node) + 1;
-        Collection<String> ts = new ArrayList<String>();
-        lks.add(count, ts);
-        chunkCount.put(node, count);
-      }
-      Collection<String> ks = lks.get(chunkCount.get(node));
-      ks.add(key);
+      MemcachedNode node = findNodeByKey(key);
+      addKeyToChunk(chunks, key, node);
     }
 
-    int chunk_size = 0;
-    for (Map.Entry<MemcachedNode, Integer> counts
-            : chunkCount.entrySet()) {
-      chunk_size += counts.getValue() + 1;
-    }
-    final CountDownLatch latch = new CountDownLatch(chunk_size);
-    final Collection<Operation> ops = new ArrayList<Operation>(chunk_size);
+    int wholeChunkSize = getWholeChunkSize(chunks);
+    final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
+    final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
 
     GetOperation.Callback cb = new GetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
@@ -1191,14 +1151,14 @@ public class MemcachedClient extends SpyThread
     for (Map.Entry<MemcachedNode, List<Collection<String>>> me
             : chunks.entrySet()) {
       MemcachedNode node = me.getKey();
-      for (int i = 0; i <= chunkCount.get(node); i++) {
+      for (Collection<String> lk : me.getValue()) {
         Operation op;
         if (node == null) {
-          op = opFact.mget(me.getValue().get(i), cb);
+          op = opFact.mget(lk, cb);
           op.cancel("no node");
         } else {
-          op = node.enabledMGetOp() ? opFact.mget(me.getValue().get(i), cb)
-                                    : opFact.get(me.getValue().get(i), cb);
+          op = node.enabledMGetOp() ? opFact.mget(lk, cb)
+                                    : opFact.get(lk, cb);
           conn.addOperation(node, op);
         }
         ops.add(op);
@@ -1236,7 +1196,7 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
-   * Varargs wrapper for asynchronous bulk gets.
+   * Varargs wrapper for asynchronous bulk get.
    *
    * @param <T>
    * @param tc   the transcoder to serialize and unserialize value
@@ -1251,7 +1211,7 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
-   * Varargs wrapper for asynchronous bulk gets with the default transcoder.
+   * Varargs wrapper for asynchronous bulk get with the default transcoder.
    *
    * @param keys one more more keys to get
    * @return the future values of those keys
@@ -1260,6 +1220,207 @@ public class MemcachedClient extends SpyThread
    */
   public BulkFuture<Map<String, Object>> asyncGetBulk(String... keys) {
     return asyncGetBulk(Arrays.asList(keys), transcoder);
+  }
+
+  /**
+   * Asynchronously gets (with CAS support) a bunch of objects from the cache.
+   *
+   * @param <T>
+   * @param keys    the keys to request
+   * @param tc_iter an iterator of transcoders to serialize and
+   *                unserialize values; the transcoders are matched with
+   *                the keys in the same order.  The minimum of the key
+   *                collection length and number of transcoders is used
+   *                and no exception is thrown if they do not match
+   * @return a Future result of that fetch
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                                Iterator<Transcoder<T>> tc_iter) {
+    final Map<String, Future<CASValue<T>>> m
+            = new ConcurrentHashMap<String, Future<CASValue<T>>>();
+
+    // This map does not need to be a ConcurrentHashMap
+    // because it is fully populated when it is used and
+    // used only to read the transcoder for a key.
+    final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
+
+    // Break the gets down into groups by key
+    final Map<MemcachedNode, List<Collection<String>>> chunks
+            = new HashMap<MemcachedNode, List<Collection<String>>>();
+    Iterator<String> key_iter = keys.iterator();
+    while (key_iter.hasNext() && tc_iter.hasNext()) {
+      String key = key_iter.next();
+      Transcoder<T> tc = tc_iter.next();
+
+      tc_map.put(key, tc);
+      validateKey(key);
+      MemcachedNode node = findNodeByKey(key);
+      addKeyToChunk(chunks, key, node);
+    }
+
+    int wholeChunkSize = getWholeChunkSize(chunks);
+    final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
+    final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
+
+    GetsOperation.Callback cb = new GetsOperation.Callback() {
+      public void receivedStatus(OperationStatus status) {
+        if (!status.isSuccess()) {
+          getLogger().warn("Unsuccessful gets:  %s", status);
+        }
+      }
+
+      public void gotData(String k, int flags, long cas, byte[] data) {
+        Transcoder<T> tc = tc_map.get(k);
+
+        m.put(k, tcService.decode(tc, cas,
+                new CachedData(flags, data, tc.getMaxSize())));
+      }
+
+      public void complete() {
+        latch.countDown();
+      }
+    };
+
+    // Now that we know how many servers it breaks down into, and the latch
+    // is all set up, convert all of these strings collections to operations
+    checkState();
+    for (Map.Entry<MemcachedNode, List<Collection<String>>> me
+            : chunks.entrySet()) {
+      MemcachedNode node = me.getKey();
+      for (Collection<String> lk : me.getValue()) {
+        Operation op;
+        if (node == null) {
+          op = opFact.mgets(lk, cb);
+          op.cancel("no node");
+        } else {
+          op = node.enabledMGetsOp() ? opFact.mgets(lk, cb)
+                                     : opFact.gets(lk, cb);
+          conn.addOperation(node, op);
+        }
+        ops.add(op);
+      }
+    }
+    return new BulkGetFuture<CASValue<T>>(m, ops, latch);
+  }
+
+  /**
+   * find node by key
+   * @param key the key to request
+   * @return primary node
+   */
+  private MemcachedNode findNodeByKey(String key) {
+    final MemcachedNode primaryNode = conn.getPrimaryNode(key);
+    MemcachedNode node = null;
+    // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
+    if (primaryNode == null) {
+      node = null;
+    } else if (primaryNode.isActive() || primaryNode.isFirstConnecting()) {
+      node = primaryNode;
+    } else {
+      Iterator<MemcachedNode> iter = conn.getNodeSequence(key);
+      while (node == null && iter.hasNext()) {
+        MemcachedNode n = iter.next();
+        if (n.isActive()) {
+          node = n;
+        }
+      }
+      if (node == null) {
+        node = primaryNode;
+      }
+    }
+    return node;
+  }
+
+  /**
+   * add key to chunks
+   * @param chunks collection list that sorted by node
+   * @param key the key to request
+   * @param node primary node to request
+   */
+  private void addKeyToChunk(Map<MemcachedNode, List<Collection<String>>> chunks,
+                             String key, MemcachedNode node) {
+    List<Collection<String>> lks = chunks.get(node);
+    if (lks == null) {
+      lks = new ArrayList<Collection<String>>();
+      Collection<String> ts = new ArrayList<String>();
+      lks.add(ts);
+      chunks.put(node, lks);
+    }
+    if (lks.get(lks.size() - 1).size() >= GET_BULK_CHUNK_SIZE) {
+      lks.add(new ArrayList<String>());
+    }
+    lks.get(lks.size() - 1).add(key);
+  }
+
+  /**
+   * get size of whole chunk by node
+   * @param chunks collection list that sorted by node
+   * @return size of whole chunk
+   */
+  private int getWholeChunkSize(Map<MemcachedNode, List<Collection<String>>> chunks) {
+    int wholeChunkSize = 0;
+    for (Map.Entry<MemcachedNode, List<Collection<String>>> counts
+            : chunks.entrySet()) {
+      wholeChunkSize += counts.getValue().size();
+    }
+    return wholeChunkSize;
+  }
+
+  /**
+   * Asynchronously gets (with CAS support) a bunch of objects from the cache.
+   *
+   * @param <T>
+   * @param keys the keys to request
+   * @param tc   the transcoder to serialize and unserialize values
+   * @return a Future result of that fetch
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
+                                                                Transcoder<T> tc) {
+    return asyncGetsBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
+  }
+
+  /**
+   * Asynchronously gets (with CAS support) a bunch of objects from the cache and decode them
+   * with the given transcoder.
+   *
+   * @param keys the keys to request
+   * @return a Future result of that fetch
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys) {
+    return asyncGetsBulk(keys, transcoder);
+  }
+
+  /**
+   * Varargs wrapper for asynchronous bulk gets.
+   *
+   * @param <T>
+   * @param tc   the transcoder to serialize and unserialize value
+   * @param keys one more more keys to get
+   * @return the future values of those keys
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
+                                                                String... keys) {
+    return asyncGetsBulk(Arrays.asList(keys), tc);
+  }
+
+  /**
+   * Varargs wrapper for asynchronous bulk gets (with CAS support) with the default transcoder.
+   *
+   * @param keys one more more keys to get
+   * @return the future values of those keys
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys) {
+    return asyncGetsBulk(Arrays.asList(keys), transcoder);
   }
 
   /**
@@ -1331,6 +1492,77 @@ public class MemcachedClient extends SpyThread
   public Map<String, Object> getBulk(String... keys) {
     return getBulk(Arrays.asList(keys), transcoder);
   }
+
+  /**
+   * Gets (with CAS support) values for multiple keys from the cache.
+   *
+   * @param <T>
+   * @param keys the keys
+   * @param tc   the transcoder to serialize and unserialize value
+   * @return a map of the CAS values (for each value that exists)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+  public <T> Map<String, CASValue<T>> getsBulk(Collection<String> keys,
+                                               Transcoder<T> tc) {
+    try {
+      return asyncGetsBulk(keys, tc).get(
+              operationTimeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new RuntimeException("Interrupted getting bulk values", e);
+    } catch (ExecutionException e) {
+      throw new RuntimeException("Failed getting bulk values", e);
+    } catch (TimeoutException e) {
+      throw new OperationTimeoutException(e.toString(), e);
+    }
+  }
+
+  /**
+   * Gets (with CAS support) values for multiple keys from the cache.
+   *
+   * @param keys the keys
+   * @return a map of the CAS values (for each value that exists)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+  public Map<String, CASValue<Object>> getsBulk(Collection<String> keys) {
+    return getsBulk(keys, transcoder);
+  }
+
+  /**
+   * Gets (with CAS support) values for multiple keys from the cache.
+   *
+   * @param <T>
+   * @param tc   the transcoder to serialize and unserialize value
+   * @param keys the keys
+   * @return a map of the CAS values (for each value that exists)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+  public <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys) {
+    return getsBulk(Arrays.asList(keys), tc);
+  }
+
+  /**
+   * Gets (with CAS support) values for multiple keys from the cache.
+   *
+   * @param keys the keys
+   * @return a map of the CAS values (for each value that exists)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+  public Map<String, CASValue<Object>> getsBulk(String... keys) {
+    return getsBulk(Arrays.asList(keys), transcoder);
+  }
+
 
   /**
    * Get the versions of all of the connected memcacheds.

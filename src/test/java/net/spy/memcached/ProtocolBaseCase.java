@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SyncThread;
+import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.transcoders.SerializingTranscoder;
@@ -458,6 +459,106 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
   }
 
+  public void testGetsBulk() throws Exception {
+    Collection<String> keys = Arrays.asList("test1", "test2", "test3");
+    assertEquals(0, client.getsBulk(keys).size());
+    client.set("test1", 5, "val1");
+    client.set("test2", 5, "val2");
+    Map<String, CASValue<Object>> vals = client.getsBulk(keys);
+    assertEquals(2, vals.size());
+    assertEquals("val1", vals.get("test1").getValue());
+    assertEquals("val2", vals.get("test2").getValue());
+    assertEquals(client.gets("test1").getCas(), vals.get("test1").getCas());
+    assertEquals(client.gets("test2").getCas(), vals.get("test2").getCas());
+  }
+
+  public void testGetsBulkVararg() throws Exception {
+    assertEquals(0, client.getsBulk("test1", "test2", "test3").size());
+    client.set("test1", 5, "val1");
+    client.set("test2", 5, "val2");
+    Map<String, CASValue<Object>> vals = client.getsBulk("test1", "test2", "test3");
+    assertEquals(2, vals.size());
+    assertEquals("val1", vals.get("test1").getValue());
+    assertEquals("val2", vals.get("test2").getValue());
+    assertEquals(client.gets("test1").getCas(), vals.get("test1").getCas());
+    assertEquals(client.gets("test2").getCas(), vals.get("test2").getCas());
+  }
+
+  public void testGetsBulkVarargWithTranscoder() throws Exception {
+    Transcoder<String> t = new TestTranscoder();
+    assertEquals(0, client.getsBulk(t, "test1", "test2", "test3").size());
+    client.set("test1", 5, "val1", t);
+    client.set("test2", 5, "val2", t);
+    Map<String, CASValue<String>> vals = client.getsBulk(t,
+            "test1", "test2", "test3");
+    assertEquals(2, vals.size());
+    assertEquals("val1", vals.get("test1").getValue());
+    assertEquals("val2", vals.get("test2").getValue());
+    assertEquals(client.gets("test1", t).getCas(), vals.get("test1").getCas());
+    assertEquals(client.gets("test2", t).getCas(), vals.get("test2").getCas());
+  }
+
+  public void testAsyncGetsBulkVarargWithTranscoder() throws Exception {
+    Transcoder<String> t = new TestTranscoder();
+    assertEquals(0, client.getsBulk(t, "test1", "test2", "test3").size());
+    client.set("test1", 5, "val1", t);
+    client.set("test2", 5, "val2", t);
+    BulkFuture<Map<String, CASValue<String>>> vals = client.asyncGetsBulk(t,
+            "test1", "test2", "test3");
+    assertEquals(2, vals.get().size());
+    assertEquals("val1", vals.get().get("test1").getValue());
+    assertEquals("val2", vals.get().get("test2").getValue());
+    assertEquals(client.gets("test1", t).getCas(), vals.get().get("test1").getCas());
+    assertEquals(client.gets("test2", t).getCas(), vals.get().get("test2").getCas());
+  }
+
+  public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
+    ArrayList<String> keys = new ArrayList<String>();
+    keys.add("test1");
+    keys.add("test2");
+    keys.add("test3");
+
+    ArrayList<Transcoder<String>> tcs = new ArrayList<Transcoder<String>>(keys.size());
+    for (String key : keys) {
+      tcs.add(new TestWithKeyTranscoder(key));
+    }
+
+    // Any transcoders listed after list of keys should be
+    // ignored.
+    for (String key : keys) {
+      tcs.add(new TestWithKeyTranscoder(key));
+    }
+
+    assertEquals(0, client.asyncGetBulk(keys, tcs.listIterator()).get().size());
+
+    client.set(keys.get(0), 5, "val1", tcs.get(0));
+    client.set(keys.get(1), 5, "val2", tcs.get(1));
+    BulkFuture<Map<String, CASValue<String>>> vals = client.asyncGetsBulk(keys, tcs.listIterator());
+    assertEquals(2, vals.get().size());
+    CASValue<String> val1 = vals.get().get(keys.get(0));
+    CASValue<String> val2 = vals.get().get(keys.get(1));
+    assertEquals("val1", val1.getValue());
+    assertEquals("val2", val2.getValue());
+    assertEquals(client.gets(keys.get(0), tcs.get(0)).getCas(), val1.getCas());
+    assertEquals(client.gets(keys.get(1), tcs.get(1)).getCas(), val2.getCas());
+
+    // Set with one transcoder with the proper key and get
+    // with another transcoder with the wrong key.
+    keys.add(0, "test4");
+    Transcoder<String> encodeTranscoder = new TestWithKeyTranscoder(keys.get(0));
+    client.set(keys.get(0), 5, "val4", encodeTranscoder).get();
+
+    Transcoder<String> decodeTranscoder = new TestWithKeyTranscoder("not " + keys.get(0));
+    tcs.add(0, decodeTranscoder);
+    try {
+      client.asyncGetsBulk(keys, tcs.listIterator()).get();
+      fail("Expected ExecutionException caused by key mismatch");
+    } catch (java.util.concurrent.ExecutionException e) {
+      // pass
+    }
+  }
+
+
   public void testAvailableServers() {
     if (USE_ZK) {
       return; // We don't know the server address priori
@@ -611,7 +712,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
   }
 
-  public void xtestGracefulShutdownTooSlow() throws Exception {
+  public void testGracefulShutdownTooSlow() throws Exception {
     for (int i = 0; i < 10000; i++) {
       client.set("t" + i, 10, i);
     }

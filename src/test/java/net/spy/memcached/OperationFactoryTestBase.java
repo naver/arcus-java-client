@@ -230,6 +230,55 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     }
   }
 
+  // These are harder cases as they fan out.
+  public void testMultipleGetsOperationCloning() {
+    Collection<String> keys = Arrays.asList("k1", "k2", "k3");
+    GetsOperation.Callback callback =
+            (GetsOperation.Callback) mock(GetsOperation.Callback.class).proxy();
+    GetsOperation op = ofact.gets(keys, callback);
+
+    Collection<Operation> ops = ofact.clone(op);
+    assertEquals(3, ops.size());
+
+    Collection<String> mutableKeys = new ArrayList<String>(keys);
+    int i = 3;
+    for (Operation o : ops) {
+      assertEquals(i, mutableKeys.size()); // Starting size
+      GetsOperation go = (GetsOperation) o;
+      mutableKeys.removeAll(go.getKeys());
+      // Verify we matched and removed 1
+      assertEquals(--i, mutableKeys.size());
+    }
+  }
+
+  public void testMultipleGetsOperationFanout() {
+    long[] casId = {82757248, 82757249, 82757250};
+    Collection<String> keys = Arrays.asList("k1", "k2", "k3");
+    Mock m = mock(GetsOperation.Callback.class);
+    OperationStatus st = new OperationStatus(true, "blah");
+    m.expects(once()).method("complete");
+    m.expects(once()).method("receivedStatus").with(same(st));
+    m.expects(once()).method("gotData")
+            .with(eq("k1"), eq(1), eq(casId[0]), isA(byte[].class));
+    m.expects(once()).method("gotData")
+            .with(eq("k2"), eq(2), eq(casId[1]), isA(byte[].class));
+    m.expects(once()).method("gotData")
+            .with(eq("k3"), eq(3), eq(casId[2]), isA(byte[].class));
+
+    GetsOperation.Callback callback = (GetsOperation.Callback) m.proxy();
+    GetsOperation op = ofact.gets(keys, callback);
+
+    // Transition each operation callback into the complete state.
+    Iterator<String> ki = keys.iterator();
+    int i = 0;
+    for (Operation o : ofact.clone(op)) {
+      GetsOperation.Callback cb = (GetsOperation.Callback) o.getCallback();
+      cb.gotData(ki.next(), ++i, casId[i - 1], new byte[3]);
+      cb.receivedStatus(st);
+      cb.complete();
+    }
+  }
+
   protected void assertKey(KeyedOperation op) {
     assertEquals(TEST_KEY, op.getKeys().iterator().next());
   }

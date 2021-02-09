@@ -69,6 +69,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private String version = null;
   private boolean isAsciiProtocol = true;
   private boolean enabledMGetOp = false;
+  private boolean enabledMGetsOp = false;
   private boolean enabledSpaceSeparate = false;
 
   // operation Future.get timeout counter
@@ -496,42 +497,52 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final void setVersion(String vr) {
     version = vr;
-    setEnableMGetOp();
-    setEnableSpaceSeparate();
+    StringTokenizer tokens = new StringTokenizer(version, ".");
+    int majorVersion = Integer.parseInt(tokens.nextToken());
+    int minorVersion = Integer.parseInt(tokens.nextToken());
+    boolean isEnterprise = version.contains("E");
+    if (isAsciiProtocol) {
+      setEnableMGetOp(majorVersion, minorVersion, isEnterprise);
+      setEnableMGetsOp(majorVersion, minorVersion, isEnterprise);
+      setEnableSpaceSeparate(majorVersion, minorVersion, isEnterprise);
+    }
   }
 
   public final String getVersion() {
     return version;
   }
 
-  private final void setEnableMGetOp() {
-    if (isAsciiProtocol) {
-      StringTokenizer tokens = new StringTokenizer(version, ".");
-      int majorVersion = Integer.parseInt(tokens.nextToken());
-      int minorVersion = Integer.parseInt(tokens.nextToken());
-      if (version.contains("E")) {
-        enabledMGetOp = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
-      } else {
-        enabledMGetOp = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
-      }
+  private void setEnableMGetOp(int majorVersion, int minorVersion, boolean isEnterprise) {
+    if (isEnterprise) {
+      enabledMGetOp = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
+    } else {
+      enabledMGetOp = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
     }
   }
 
-  private final void setEnableSpaceSeparate() {
-    if (isAsciiProtocol) {
-      StringTokenizer tokens = new StringTokenizer(version, ".");
-      int majorVersion = Integer.parseInt(tokens.nextToken());
-      int minorVersion = Integer.parseInt(tokens.nextToken());
-      if (version.contains("E")) {
-        enabledSpaceSeparate = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
-      } else {
-        enabledSpaceSeparate = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
-      }
+  private void setEnableMGetsOp(int majorVersion, int minorVersion, boolean isEnterprise) {
+    if (isEnterprise) {
+      enabledMGetsOp = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 8));
+    } else {
+      enabledMGetsOp = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 12));
+    }
+  }
+
+  private void setEnableSpaceSeparate(int majorVersion, int minorVersion,
+                                            boolean isEnterprise) {
+    if (isEnterprise) {
+      enabledSpaceSeparate = (majorVersion > 0 || (majorVersion == 0 && minorVersion > 6));
+    } else {
+      enabledSpaceSeparate = (majorVersion > 1 || (majorVersion == 1 && minorVersion > 10));
     }
   }
 
   public final boolean enabledMGetOp() {
     return enabledMGetOp;
+  }
+
+  public final boolean enabledMGetsOp() {
+    return enabledMGetsOp;
   }
 
   public final boolean enabledSpaceSeparate() {

@@ -106,14 +106,38 @@ future.get(key).getStatusCode() | 설명
 --------------------------------| ---------
 StatusCode.SUCCESS              | 조회 성공(key에 해당하는 item 존재하지 않아도 성공)
 
-여러 key들의 value들을 한번에 조회하는 bulk API를 제공한다.
+여러 key들의 value를 한번에 조회하는 bulk API를 제공한다.
 
 ```java
-BulkFuture<Map<String,Object>> asyncGetBulk(Collection<String> keys)
-BulkFuture<Map<String,Object>> asyncGetBulk(String... keys)
+BulkFuture<Map<String, Object>> asyncGetBulk(Collection<String> keys)
+BulkFuture<Map<String, Object>> asyncGetBulk(String... keys)
 ```
 
 - 다수 key들에 저장된 value를 Map<String, Object> 형태로 반환한다.
+- 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
+
+하나의 key를 가진 cache item에 저장된 CASValue를 조회하는 API를 제공한다.
+
+```java
+GetFuture<CASValue<Object>> asyncGets(String key)
+```
+
+- 주어진 key에 저장된 CASValue(cas, value)를 반환한다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.get(key).getStatusCode() | 설명
+--------------------------------| ---------
+StatusCode.SUCCESS              | 조회 성공(key에 해당하는 item 존재하지 않아도 성공)
+
+여러 key들의 CASValue를 한번에 조회하는 bulk API를 제공한다.
+
+```java
+BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys)
+BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys)
+```
+
+- 다수 key들에 저장된 CASValue를 Map<String, CASValue<Object>> 형태로 반환한다.
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
 
 ## Key-Value Item 값의 증감

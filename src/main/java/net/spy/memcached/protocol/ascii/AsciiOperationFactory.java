@@ -16,7 +16,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -70,12 +69,9 @@ import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
-import net.spy.memcached.ops.KeyedOperation;
-import net.spy.memcached.ops.MultiGetOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -111,8 +107,16 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new GetsOperationImpl(key, cb);
   }
 
+  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb) {
+    return new GetsOperationImpl(keys, cb);
+  }
+
   public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
     return new MGetOperationImpl(keys, cb);
+  }
+
+  public GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb) {
+    return new MGetsOperationImpl(keys, cb);
   }
 
   public MutatorOperation mutate(Mutator m, String key, int by,
@@ -146,17 +150,6 @@ public class AsciiOperationFactory extends BaseOperationFactory {
                                     long casId,
                                     String key, byte[] data, OperationCallback cb) {
     return new ConcatenationOperationImpl(catType, key, data, cb);
-  }
-
-  @Override
-  protected Collection<? extends Operation> cloneGet(KeyedOperation op) {
-    Collection<Operation> rv = new ArrayList<Operation>();
-    GetOperation.Callback callback = new MultiGetOperationCallback(
-            op.getCallback(), op.getKeys().size());
-    for (String k : op.getKeys()) {
-      rv.add(get(k, callback));
-    }
-    return rv;
   }
 
   public SASLMechsOperation saslMechs(OperationCallback cb) {

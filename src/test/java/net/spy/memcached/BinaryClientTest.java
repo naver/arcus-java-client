@@ -32,6 +32,31 @@ public class BinaryClientTest extends ProtocolBaseCase {
     assertTrue(true);
   }
 
+  @Override
+  public void testGetsBulk() throws Exception {
+    assertTrue(true);
+  }
+
+  @Override
+  public void testGetsBulkVararg() throws Exception {
+    assertTrue(true);
+  }
+
+  @Override
+  public void testGetsBulkVarargWithTranscoder() throws Exception {
+    assertTrue(true);
+  }
+
+  @Override
+  public void testAsyncGetsBulkVarargWithTranscoder() throws Exception {
+    assertTrue(true);
+  }
+
+  @Override
+  public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
+    assertTrue(true);
+  }
+
   public void testCASAppendFail() throws Exception {
     final String key = "append.key";
     assertTrue(client.set(key, 5, "test").get());

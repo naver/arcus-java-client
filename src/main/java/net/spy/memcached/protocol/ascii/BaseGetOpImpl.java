@@ -150,7 +150,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
       commandBuilder.append(keysString);
       commandBuilder.append(RN_STRING);
     } else {
-      assert cmd.equals("mget") : "Unknown Command " + cmd;
+      assert (cmd.equals("mget") || cmd.equals("mgets")) : "Unknown Command " + cmd;
 
       int lenKeys = keysString.getBytes().length;
       int numKeys = keys.size();

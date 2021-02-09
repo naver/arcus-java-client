@@ -44,12 +44,16 @@ public abstract class BaseOperationFactory implements OperationFactory {
     Collection<Operation> rv = new ArrayList<Operation>(
             op.getKeys().size());
     if (op instanceof GetOperation) {
-      rv.addAll(cloneGet(op));
-    } else if (op instanceof GetsOperation) {
-      GetsOperation.Callback callback =
-              (GetsOperation.Callback) op.getCallback();
+      GetOperation.Callback getCb = new MultiGetOperationCallback(
+              op.getCallback(), op.getKeys().size());
       for (String k : op.getKeys()) {
-        rv.add(gets(k, callback));
+        rv.add(get(k, getCb));
+      }
+    } else if (op instanceof GetsOperation) {
+      GetsOperation.Callback getsCb = new MultiGetsOperationCallback(
+              op.getCallback(), op.getKeys().size());
+      for (String k : op.getKeys()) {
+        rv.add(gets(k, getsCb));
       }
     } else if (op instanceof CASOperation) {
       CASOperation cop = (CASOperation) op;
@@ -98,11 +102,6 @@ public abstract class BaseOperationFactory implements OperationFactory {
     } else {
       assert false : "Unhandled operation type: " + op.getClass();
     }
-
     return rv;
   }
-
-  protected abstract Collection<? extends Operation> cloneGet(
-          KeyedOperation op);
-
 }

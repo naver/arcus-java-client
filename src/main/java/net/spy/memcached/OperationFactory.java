@@ -143,6 +143,15 @@ public interface OperationFactory {
   GetOperation get(Collection<String> keys, GetOperation.Callback cb);
 
   /**
+   * Create a gets operation.
+   *
+   * @param keys the collection of keys to get
+   * @param cb   the callback that will contain the results
+   * @return a new GetsOperation
+   */
+  GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb);
+
+  /**
    * Create a mget operation.
    *
    * @param keys the collection of keys to get
@@ -150,6 +159,15 @@ public interface OperationFactory {
    * @return a new GetOperation
    */
   GetOperation mget(Collection<String> keys, GetOperation.Callback cb);
+
+  /**
+   * Create a mgets operation.
+   *
+   * @param keys the collection of keys to get
+   * @param cb   the callback that will contain the results
+   * @return a new GetOperation
+   */
+  GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb);
 
   /**
    * Create a mutator operation.

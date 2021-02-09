@@ -183,6 +183,11 @@ public class MockMemcachedNode implements MemcachedNode {
     return false;
   }
 
+  @Override
+  public boolean enabledMGetsOp() {
+    return false;
+  }
+
   public boolean enabledSpaceSeparate() {
     return false;
   }

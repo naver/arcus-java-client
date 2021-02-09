@@ -217,6 +217,11 @@ public interface MemcachedNode {
   boolean enabledMGetOp();
 
   /**
+   * Check the enable MGets operation.
+   */
+  boolean enabledMGetsOp();
+
+  /**
    * Check the enable SpaceSeparate operation.
    */
   boolean enabledSpaceSeparate();
