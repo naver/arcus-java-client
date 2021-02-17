@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.CASValue;
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -157,7 +158,8 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
       if (localCacheManager != null) {
         // iff it is from the remote cache.
         if (!(future instanceof LocalCacheManager.Task)) {
-          localCacheManager.put(key, value);
+          localCacheManager.put(key,
+                  value instanceof CASValue ? ((CASValue<?>) value).getValue() : value);
         }
       }
     }

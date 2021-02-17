@@ -969,6 +969,9 @@ public class MemcachedClient extends SpyThread
           }
 
           public void complete() {
+            if (localCacheManager != null) {
+                localCacheManager.put(key, val);
+            }
             latch.countDown();
           }
         });
@@ -1302,7 +1305,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<CASValue<T>>(m, ops, latch);
+    return new BulkGetFuture<CASValue<T>>(m, ops, latch, localCacheManager);
   }
 
   /**
