@@ -65,3 +65,6 @@ ARCUS Java Client User Guide
   - [Flush](09-other-API.md#flush)
 - [Java Client Log Messages](10-log-message.md)
 - [Java Client 사용시 주의사항](11-client-notes.md)
+- [Future-get, getSome](arcus-future-get-API.md)
+  - [get](arcus-future-get-API.md#get)
+  - [getSome](arcus-future-get-API.md#getsome)
