@@ -19,6 +19,7 @@ package net.spy.memcached.collection;
 import java.util.List;
 import java.util.Map;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
@@ -101,7 +102,7 @@ public class BTreeSMGetWithLongTypeBkeyOld<T> implements BTreeSMGet<T> {
 
     StringBuilder b = new StringBuilder();
 
-    b.append(getSpaceSeparatedKeys().length());
+    b.append(KeyUtil.getKeyBytes(getSpaceSeparatedKeys()).length);
     b.append(" ").append(keyList.size());
     b.append(" ").append(range);
 
