@@ -32,6 +32,9 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.StatsOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +50,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -653,5 +657,82 @@ public class ArcusTimeoutMessageTest extends TestCase {
       e.printStackTrace();
     }
     f.cancel(true);
+  }
+
+  @Test
+  public void getVersionWithTimeout() {
+    Operation op = mc.opFact.version(getCb());
+
+    try {
+      mc.getVersions();
+    } catch (Exception e) {
+      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
+      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+
+      assertEquals(exceptionMessage, timedoutMessages);
+    }
+  }
+
+  @Test
+  public void getStatsWithTimeout() {
+    Operation op = mc.opFact.stats(null, new StatsOperation.Callback() {
+      @Override
+      public void gotStat(String name, String val) {
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+      }
+
+      @Override
+      public void complete() {
+      }
+    });
+
+    try {
+      mc.getStats();
+    } catch (Exception e) {
+      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
+      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+
+      assertEquals(exceptionMessage, timedoutMessages);
+    }
+  }
+
+  @Test
+  public void flushWithTimeout() {
+    Future<Boolean> f = mc.flush();
+    Operation op = mc.opFact.flush(-1, getCb());
+
+    try {
+      f.get(1L, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
+      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+
+      assertEquals(exceptionMessage, timedoutMessages);
+    }
+    f.cancel(true);
+  }
+
+  private OperationCallback getCb() {
+    return new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+      }
+
+      @Override
+      public void complete() {
+      }
+    };
+  }
+
+  private String createTimedoutMessage(Operation op) {
+    return TimedOutMessageFactory
+            .createTimedoutMessage(1, TimeUnit.MILLISECONDS, Collections.singletonList(op));
+  }
+
+  private String getTimedoutHeadMessage(String message) {
+    return message.split("-")[0];
   }
 }

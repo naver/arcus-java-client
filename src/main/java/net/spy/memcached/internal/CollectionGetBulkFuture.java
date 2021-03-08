@@ -73,9 +73,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
       }
     } else {
       // continuous timeout counter will be reset
-      for (Operation op : ops) {
-        MemcachedConnection.opSucceeded(op);
-      }
+      MemcachedConnection.opsSucceeded(ops);
     }
 
     for (Operation op : ops) {

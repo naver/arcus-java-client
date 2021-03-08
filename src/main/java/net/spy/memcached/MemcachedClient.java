@@ -1579,18 +1579,22 @@ public class MemcachedClient extends SpyThread
    * Get the versions of all of the connected memcacheds.
    *
    * @return a Map of SocketAddress to String for connected servers
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
   public Map<SocketAddress, String> getVersions() {
     final Map<SocketAddress, String> rv =
             new ConcurrentHashMap<SocketAddress, String>();
+    Collection<MemcachedNode> nodes = getAllNodes();
+    final List<Operation> ops = new ArrayList<Operation>(nodes.size());
 
     CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
       public Operation newOp(final MemcachedNode n,
                              final CountDownLatch latch) {
         final SocketAddress sa = n.getSocketAddress();
-        return opFact.version(
+        Operation op = opFact.version(
             new OperationCallback() {
               public void receivedStatus(OperationStatus s) {
                 rv.put(sa, s.getMessage());
@@ -1600,10 +1604,37 @@ public class MemcachedClient extends SpyThread
                 latch.countDown();
               }
             });
+        ops.add(op);
+        return op;
       }
-    });
+    }, nodes);
     try {
-      blatch.await(operationTimeout, TimeUnit.MILLISECONDS);
+      if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
+        Collection<Operation> timedoutOps = new HashSet<Operation>();
+        for (Operation op : ops) {
+          if (op.getState() != OperationState.COMPLETE) {
+            MemcachedConnection.opTimedOut(op);
+            timedoutOps.add(op);
+          } else {
+            MemcachedConnection.opSucceeded(op);
+          }
+        }
+        if (timedoutOps.size() > 0) {
+          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
+        }
+      } else {
+        MemcachedConnection.opsSucceeded(ops);
+      }
+
+      for (Operation op : ops) {
+        if (op != null && op.hasErrored()) {
+          throw new RuntimeException(op.getException());
+        }
+        if (op != null && op.isCancelled()) {
+          throw new RuntimeException(op.getCancelCause());
+        }
+      }
+
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted waiting for versions", e);
     }
@@ -1614,6 +1645,8 @@ public class MemcachedClient extends SpyThread
    * Get all of the stats from all of the connections.
    *
    * @return a Map of a Map of stats replies by SocketAddress
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
@@ -1627,19 +1660,23 @@ public class MemcachedClient extends SpyThread
    * @param arg which stats to get
    * @return a Map of the server SocketAddress to a map of String stat
    * keys to String stat values.
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
   public Map<SocketAddress, Map<String, String>> getStats(final String arg) {
     final Map<SocketAddress, Map<String, String>> rv
             = new HashMap<SocketAddress, Map<String, String>>();
+    Collection<MemcachedNode> nodes = getAllNodes();
+    final List<Operation> ops = new ArrayList<Operation>(nodes.size());
 
     CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
       public Operation newOp(final MemcachedNode n,
                              final CountDownLatch latch) {
         final SocketAddress sa = n.getSocketAddress();
         rv.put(sa, new HashMap<String, String>());
-        return opFact.stats(arg,
+        Operation op = opFact.stats(arg,
             new StatsOperation.Callback() {
               public void gotStat(String name, String val) {
                 rv.get(sa).put(name, val);
@@ -1656,10 +1693,37 @@ public class MemcachedClient extends SpyThread
                 latch.countDown();
               }
             });
+        ops.add(op);
+        return op;
       }
-    });
+    }, nodes);
     try {
-      blatch.await(operationTimeout, TimeUnit.MILLISECONDS);
+      if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
+        Collection<Operation> timedoutOps = new HashSet<Operation>();
+        for (Operation op : ops) {
+          if (op.getState() != OperationState.COMPLETE) {
+            MemcachedConnection.opTimedOut(op);
+            timedoutOps.add(op);
+          } else {
+            MemcachedConnection.opSucceeded(op);
+          }
+        }
+        if (timedoutOps.size() > 0) {
+          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
+        }
+      } else {
+        MemcachedConnection.opsSucceeded(ops);
+      }
+
+      for (Operation op : ops) {
+        if (op != null && op.hasErrored()) {
+          throw new RuntimeException(op.getException());
+        }
+        if (op != null && op.isCancelled()) {
+          throw new RuntimeException(op.getCancelCause());
+        }
+      }
+
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted waiting for stats", e);
     }
@@ -2035,9 +2099,7 @@ public class MemcachedClient extends SpyThread
           }
         } else {
           // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
-          }
+          MemcachedConnection.opsSucceeded(ops);
         }
 
         for (Operation op : ops) {
@@ -2079,11 +2141,13 @@ public class MemcachedClient extends SpyThread
   public Set<String> listSaslMechanisms() {
     final ConcurrentMap<String, String> rv
             = new ConcurrentHashMap<String, String>();
+    Collection<MemcachedNode> nodes = getAllNodes();
+    final List<Operation> ops = new ArrayList<Operation>(nodes.size());
 
     CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
       public Operation newOp(MemcachedNode n,
                              final CountDownLatch latch) {
-        return opFact.saslMechs(new OperationCallback() {
+        Operation op = opFact.saslMechs(new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
             for (String s : status.getMessage().split(" ")) {
               rv.put(s, s);
@@ -2094,11 +2158,38 @@ public class MemcachedClient extends SpyThread
             latch.countDown();
           }
         });
+        ops.add(op);
+        return op;
       }
-    });
+    }, nodes);
 
     try {
-      blatch.await();
+      if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
+        Collection<Operation> timedoutOps = new HashSet<Operation>();
+        for (Operation op : ops) {
+          if (op.getState() != OperationState.COMPLETE) {
+            MemcachedConnection.opTimedOut(op);
+            timedoutOps.add(op);
+          } else {
+            MemcachedConnection.opSucceeded(op);
+          }
+        }
+        if (timedoutOps.size() > 0) {
+          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
+        }
+      } else {
+        MemcachedConnection.opsSucceeded(ops);
+      }
+
+      for (Operation op : ops) {
+        if (op != null && op.hasErrored()) {
+          throw new RuntimeException(op.getException());
+        }
+        if (op != null && op.isCancelled()) {
+          throw new RuntimeException(op.getCancelCause());
+        }
+      }
+
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
