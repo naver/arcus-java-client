@@ -1,3 +1,20 @@
+2021-03-17 [version 1.13.0]
+	* [FEATURE] support mgets command.
+	* [FEATURE] change return type of kv API. (Future => OperationFuture)
+	* [FEATURE] set the max key size to 4000.
+	* [FIX] invalid key length in bop mget, smget command.
+	* [FIX] cancel sync operations when an exception occurred.
+	* [ENHANCE] add node information to the cancellation message.
+	* [ENHANCE] add the specific TimeoutException message.
+	* [ENHANCE] do not check the op existence in readQ when writing it.
+	* [ENHANCE] do not cancel the operations if it is first connecting.
+	* [ENHANCE] reflected only the changed groups in hash ring.
+	* [CLEANUP] apply whitespace checkstyle.
+	* [TEST] bump junit from 4.4 to 4.13.1.
+	* [DOC] add the description of future api.
+	* [DOC] change the description of the max item size.
+	* [DOC] adjust some format to improve doc readability.
+
 2020-08-04 [version 1.12.1]
 	* [FEATURE] asyncDeleteBulk
 	* [FEATURE] add maven plugin of checkstyle
