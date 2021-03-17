@@ -62,7 +62,7 @@ public class InsertListWithAttrTest extends BaseIntegrationTest {
               collectionAttributes.getMaxCount());
 
       // check expire time
-      Thread.sleep(EXPIRE_TIME_IN_SEC * 2000L);
+      Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
       List<Object> list = mc.asyncLopGet(KEY, INDEX, false, false).get();
       Assert.assertNull(list);
     } catch (Exception e) {
