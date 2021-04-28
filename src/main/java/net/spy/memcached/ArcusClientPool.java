@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +54,7 @@ import net.spy.memcached.transcoders.Transcoder;
 /**
  * Bags for ArcusClient
  */
-public class ArcusClientPool implements ArcusClientIF {
+public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
 
   private final int poolSize;
   private final ArcusClient[] client;
@@ -84,275 +85,390 @@ public class ArcusClientPool implements ArcusClientIF {
     return client;
   }
 
+  @Override
   public void shutdown() {
     for (ArcusClient ac : client) {
       ac.shutdown();
     }
   }
 
+  @Override
+  public boolean shutdown(long timeout, TimeUnit unit) {
+    boolean result = true;
+
+    for (ArcusClient ac : client) {
+      result = ac.shutdown(timeout, unit) && result;
+    }
+
+    return result;
+  }
+
+  @Override
+  public Collection<SocketAddress> getAvailableServers() {
+    return this.getClient().getAvailableServers();
+  }
+
+  @Override
+  public Collection<SocketAddress> getUnavailableServers() {
+    return this.getClient().getUnavailableServers();
+  }
+
+  @Override
+  public Transcoder<Object> getTranscoder() {
+    return this.getClient().getTranscoder();
+  }
+
+  @Override
+  public NodeLocator getNodeLocator() {
+    return this.getClient().getNodeLocator();
+  }
+
+  @Override
   public OperationFuture<Boolean> append(long cas, String key, Object val) {
     return this.getClient().append(cas, key, val);
   }
 
+  @Override
   public <T> OperationFuture<Boolean> append(long cas, String key, T val,
                                              Transcoder<T> tc) {
     return this.getClient().append(cas, key, val, tc);
   }
 
+  @Override
   public OperationFuture<Boolean> prepend(long cas, String key, Object val) {
     return this.getClient().prepend(cas, key, val);
   }
 
+  @Override
   public <T> OperationFuture<Boolean> prepend(long cas, String key, T val,
                                               Transcoder<T> tc) {
     return this.getClient().prepend(cas, key, val, tc);
   }
 
+  @Override
   public <T> OperationFuture<CASResponse> asyncCAS(String key, long casId, T value,
                                                    Transcoder<T> tc) {
     return this.getClient().asyncCAS(key, casId, value, tc);
   }
 
+  @Override
   public OperationFuture<CASResponse> asyncCAS(String key, long casId, Object value) {
 
     return this.getClient().asyncCAS(key, casId, value);
   }
 
+  @Override
+  public <T> OperationFuture<CASResponse> asyncCAS(String key, long casId, int exp, T value,
+                                          Transcoder<T> tc) {
+    return this.getClient().asyncCAS(key, casId, exp, value, tc);
+  }
+
+  @Override
+  public OperationFuture<CASResponse> asyncCAS(String key, long casId, int exp, Object value) {
+    return this.getClient().asyncCAS(key, casId, exp, value);
+  }
+
+  @Override
+  public <T> CASResponse cas(String key, long casId, int exp, T value, Transcoder<T> tc)
+      throws OperationTimeoutException {
+    return this.getClient().cas(key, casId, exp, value, tc);
+  }
+
+  @Override
+  public CASResponse cas(String key, long casId, int exp, Object value)
+      throws OperationTimeoutException {
+    return this.getClient().cas(key, casId, exp, value);
+  }
+
+  @Override
   public <T> CASResponse cas(String key, long casId, T value, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().cas(key, casId, value, tc);
   }
 
+  @Override
   public CASResponse cas(String key, long casId, Object value)
           throws OperationTimeoutException {
     return this.getClient().cas(key, casId, value);
   }
 
+  @Override
   public <T> OperationFuture<Boolean> add(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().add(key, exp, o, tc);
   }
 
+  @Override
   public OperationFuture<Boolean> add(String key, int exp, Object o) {
     return this.getClient().add(key, exp, o);
   }
 
+  @Override
   public <T> OperationFuture<Boolean> set(String key, int exp, T o, Transcoder<T> tc) {
     return this.getClient().set(key, exp, o, tc);
   }
 
+  @Override
   public OperationFuture<Boolean> set(String key, int exp, Object o) {
     return this.getClient().set(key, exp, o);
   }
 
+  @Override
   public <T> OperationFuture<Boolean> replace(String key, int exp, T o,
                                               Transcoder<T> tc) {
     return this.getClient().replace(key, exp, o, tc);
   }
 
+  @Override
   public OperationFuture<Boolean> replace(String key, int exp, Object o) {
     return this.getClient().replace(key, exp, o);
   }
 
+  @Override
   public <T> GetFuture<T> asyncGet(String key, Transcoder<T> tc) {
     return this.getClient().asyncGet(key, tc);
   }
 
+  @Override
   public GetFuture<Object> asyncGet(String key) {
     return this.getClient().asyncGet(key);
   }
 
+  @Override
   public <T> OperationFuture<CASValue<T>> asyncGets(String key, Transcoder<T> tc) {
     return this.getClient().asyncGets(key, tc);
   }
 
+  @Override
   public OperationFuture<CASValue<Object>> asyncGets(String key) {
     return this.getClient().asyncGets(key);
   }
 
+  @Override
   public <T> CASValue<T> gets(String key, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().gets(key, tc);
   }
 
+  @Override
   public CASValue<Object> gets(String key) throws OperationTimeoutException {
     return this.getClient().gets(key);
   }
 
+  @Override
   public <T> T get(String key, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().get(key, tc);
   }
 
+  @Override
   public Object get(String key) throws OperationTimeoutException {
     return this.getClient().get(key);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Iterator<Transcoder<T>> tcs) {
     return this.getClient().asyncGetBulk(keys, tcs);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Transcoder<T> tc) {
     return this.getClient().asyncGetBulk(keys, tc);
   }
 
+  @Override
   public BulkFuture<Map<String, Object>> asyncGetBulk(Collection<String> keys) {
     return this.getClient().asyncGetBulk(keys);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Transcoder<T> tc,
                                                      String... keys) {
     return this.getClient().asyncGetBulk(tc, keys);
   }
 
+  @Override
   public BulkFuture<Map<String, Object>> asyncGetBulk(String... keys) {
     return this.getClient().asyncGetBulk(keys);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Iterator<Transcoder<T>> tcs) {
     return this.getClient().asyncGetsBulk(keys, tcs);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Transcoder<T> tc) {
     return this.getClient().asyncGetsBulk(keys, tc);
   }
 
+  @Override
   public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys) {
     return this.getClient().asyncGetsBulk(keys);
   }
 
+  @Override
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
                                                                 String... keys) {
     return this.getClient().asyncGetsBulk(tc, keys);
   }
 
+  @Override
   public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys) {
     return this.getClient().asyncGetsBulk(keys);
   }
 
+  @Override
   public <T> Map<String, T> getBulk(Collection<String> keys, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().getBulk(keys, tc);
   }
 
+  @Override
   public Map<String, Object> getBulk(Collection<String> keys)
           throws OperationTimeoutException {
     return this.getClient().getBulk(keys);
   }
 
+  @Override
   public <T> Map<String, T> getBulk(Transcoder<T> tc, String... keys)
           throws OperationTimeoutException {
     return this.getClient().getBulk(tc, keys);
   }
 
+  @Override
   public Map<String, Object> getBulk(String... keys)
           throws OperationTimeoutException {
     return this.getClient().getBulk(keys);
   }
 
+  @Override
   public <T> Map<String, CASValue<T>> getsBulk(Collection<String> keys, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().getsBulk(keys, tc);
   }
 
+  @Override
   public Map<String, CASValue<Object>> getsBulk(Collection<String> keys)
           throws OperationTimeoutException {
     return this.getClient().getsBulk(keys);
   }
 
+  @Override
   public <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys)
           throws OperationTimeoutException {
     return this.getClient().getsBulk(tc, keys);
   }
 
+  @Override
   public Map<String, CASValue<Object>> getsBulk(String... keys)
           throws OperationTimeoutException {
     return this.getClient().getsBulk(keys);
   }
 
+  @Override
   public Map<SocketAddress, String> getVersions() {
     return this.getClient().getVersions();
   }
 
+  @Override
   public Map<SocketAddress, Map<String, String>> getStats() {
     return this.getClient().getStats();
   }
 
+  @Override
   public Map<SocketAddress, Map<String, String>> getStats(String prefix) {
     return this.getClient().getStats(prefix);
   }
 
+  @Override
   public long incr(String key, int by) throws OperationTimeoutException {
     return this.getClient().incr(key, by);
   }
 
+  @Override
   public long decr(String key, int by) throws OperationTimeoutException {
     return this.getClient().decr(key, by);
   }
 
+  @Override
   public long incr(String key, int by, long def)
           throws OperationTimeoutException {
     return this.getClient().incr(key, by, def);
   }
 
+  @Override
   public long incr(String key, int by, long def, int exp)
           throws OperationTimeoutException {
     return this.getClient().incr(key, by, def, exp);
   }
 
+  @Override
   public long decr(String key, int by, long def)
           throws OperationTimeoutException {
     return this.getClient().decr(key, by, def);
   }
 
+  @Override
   public long decr(String key, int by, long def, int exp)
           throws OperationTimeoutException {
     return this.getClient().decr(key, by, def, exp);
   }
 
+  @Override
   public OperationFuture<Long> asyncIncr(String key, int by) {
     return this.getClient().asyncIncr(key, by);
   }
 
+  @Override
   public OperationFuture<Long> asyncIncr(String key, int by, long def, int exp) {
     return this.getClient().asyncIncr(key, by, def, exp);
   }
 
+  @Override
   public OperationFuture<Long> asyncDecr(String key, int by) {
     return this.getClient().asyncDecr(key, by);
   }
 
+  @Override
   public OperationFuture<Long> asyncDecr(String key, int by, long def, int exp) {
     return this.getClient().asyncDecr(key, by, def, exp);
   }
 
+  @Override
   public OperationFuture<Boolean> delete(String key) {
     return this.getClient().delete(key);
   }
 
+  @Override
   public Future<Boolean> flush(int delay) {
     return this.getClient().flush(delay);
   }
 
+  @Override
   public Future<Boolean> flush() {
     return this.getClient().flush();
   }
 
+  @Override
   public boolean waitForQueues(long timeout, TimeUnit unit) {
     return this.getClient().waitForQueues(timeout, unit);
   }
 
+  @Override
   public boolean addObserver(ConnectionObserver obs) {
     return this.getClient().addObserver(obs);
   }
 
+  @Override
   public boolean removeObserver(ConnectionObserver obs) {
     return this.getClient().removeObserver(obs);
   }
 
+  @Override
   public Set<String> listSaslMechanisms() {
     return this.getClient().listSaslMechanisms();
   }
