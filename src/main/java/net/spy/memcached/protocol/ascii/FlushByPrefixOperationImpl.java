@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
  */
 package net.spy.memcached.protocol.ascii;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.ops.APIType;
@@ -79,7 +81,7 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
 
     ByteBuffer bb = ByteBuffer.allocate(sb.length());
     bb.put(sb.toString().getBytes());
-    bb.flip();
+    ((Buffer) bb).flip();
     setBuffer(bb);
   }
 

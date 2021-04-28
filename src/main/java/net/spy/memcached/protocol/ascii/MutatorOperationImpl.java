@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@
 
 package net.spy.memcached.protocol.ascii;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +98,7 @@ final class MutatorOperationImpl extends OperationImpl
     } else {
       setArguments(b, mutator.name(), key, amount);
     }
-    b.flip();
+    ((Buffer) b).flip();
     setBuffer(b);
   }
 

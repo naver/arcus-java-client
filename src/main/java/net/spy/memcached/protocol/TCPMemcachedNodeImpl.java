@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2020 JaM2in Co., Ltd.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package net.spy.memcached.protocol;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -144,7 +145,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
-    getWbuf().clear();
+    ((Buffer) getWbuf()).clear();
     readQ = rq;
     writeQ = wq;
     inputQueue = iq;
@@ -177,7 +178,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       for (Operation o : rv) {
         if ((o.getState() == OperationState.WRITE_QUEUED ||
              o.getState() == OperationState.WRITING) && o.getBuffer() != null) {
-          o.getBuffer().reset(); // buffer offset reset
+          ((Buffer) o.getBuffer()).reset(); // buffer offset reset
         } else {
           o.initialize(); // write completed or not yet initialized
         }
@@ -208,7 +209,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     } else if (op != null) {
       ByteBuffer buf = op.getBuffer();
       if (buf != null) {
-        buf.reset();
+        ((Buffer) buf).reset();
       } else {
         /* This case cannot happen. */
         getLogger().warn("No buffer for current write op, removing");
@@ -232,8 +233,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       op.cancel(cause);
     }
 
-    getWbuf().clear();
-    getRbuf().clear();
+    ((Buffer) getWbuf()).clear();
+    ((Buffer) getRbuf()).clear();
     toWrite = 0;
   }
 
@@ -255,7 +256,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final void fillWriteBuffer(boolean shouldOptimize) {
     if (toWrite == 0 && readQ.remainingCapacity() > 0) {
-      getWbuf().clear();
+      ((Buffer) getWbuf()).clear();
       Operation o = getNextWritableOp();
       while (o != null && toWrite < getWbuf().capacity()) {
         assert o.getState() == OperationState.WRITING;
@@ -286,7 +287,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         }
         toWrite += bytesToCopy;
       }
-      getWbuf().flip();
+      ((Buffer) getWbuf()).flip();
       assert toWrite <= getWbuf().capacity()
               : "toWrite exceeded capacity: " + this;
       assert toWrite == getWbuf().remaining()
@@ -708,7 +709,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       op.setHandlingNode(this);
       if ((op.getState() == OperationState.WRITE_QUEUED ||
            op.getState() == OperationState.WRITING) && op.getBuffer() != null) {
-        op.getBuffer().reset(); // buffer offset reset
+        ((Buffer) op.getBuffer()).reset(); // buffer offset reset
       } else {
         op.initialize(); // write completed or not yet initialized
         op.resetState(); // reset operation state

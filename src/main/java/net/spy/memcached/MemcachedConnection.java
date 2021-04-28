@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +24,7 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -773,7 +775,7 @@ public final class MemcachedConnection extends SpyObject {
     int read = channel.read(rbuf);
     while (read > 0) {
       getLogger().debug("Read %d bytes", read);
-      rbuf.flip();
+      ((Buffer) rbuf).flip();
       while (rbuf.remaining() > 0) {
         if (currentOp == null) {
           throw new IllegalStateException("No read operation.");
@@ -793,12 +795,12 @@ public final class MemcachedConnection extends SpyObject {
       }
       /* ENABLE_REPLICATION if */
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
-        rbuf.clear();
+        ((Buffer) rbuf).clear();
         switchoverMemcachedReplGroup(qa);
         break;
       }
       /* ENABLE_REPLICATION end */
-      rbuf.clear();
+      ((Buffer) rbuf).clear();
       read = channel.read(rbuf);
     }
     if (read < 0) {
