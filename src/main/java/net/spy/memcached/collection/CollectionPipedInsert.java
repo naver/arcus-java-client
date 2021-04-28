@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
  */
 package net.spy.memcached.collection;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,7 +131,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       }
 
       // flip the buffer
-      bb.flip();
+      ((Buffer) bb).flip();
 
       return bb;
     }
@@ -213,7 +215,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
         bb.put(CRLF);
       }
       // flip the buffer
-      bb.flip();
+      ((Buffer) bb).flip();
 
       return bb;
     }
@@ -302,7 +304,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       }
 
       // flip the buffer
-      bb.flip();
+      ((Buffer) bb).flip();
 
       return bb;
     }
@@ -402,7 +404,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       }
 
       // flip the buffer
-      bb.flip();
+      ((Buffer) bb).flip();
 
       return bb;
     }
@@ -492,7 +494,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       }
 
       // flip the buffer
-      bb.flip();
+      ((Buffer) bb).flip();
 
       return bb;
     }

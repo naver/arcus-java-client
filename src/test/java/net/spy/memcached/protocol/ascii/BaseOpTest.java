@@ -2,6 +2,7 @@
 
 package net.spy.memcached.protocol.ascii;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -73,12 +74,12 @@ public class BaseOpTest extends BaseMockCase {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
 
     b.put(input1.getBytes());
-    b.flip();
+    ((Buffer) b).flip();
     op.readFromBuffer(b);
     assertNull(op.getCurrentLine());
-    b.clear();
+    ((Buffer) b).clear();
     b.put(input2.getBytes());
-    b.flip();
+    ((Buffer) b).flip();
     op.readFromBuffer(b);
     assertEquals("this is a test", op.getCurrentLine());
   }

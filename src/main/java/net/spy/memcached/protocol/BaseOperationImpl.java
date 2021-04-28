@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
@@ -138,7 +140,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   protected final void setBuffer(ByteBuffer to) {
     assert to != null : "Trying to set buffer to null";
     cmd = to;
-    cmd.mark();
+    ((Buffer) cmd).mark();
   }
 
   /**
