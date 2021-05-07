@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1210,14 +1211,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
                                                                          final int exp, final T o,
-                                                                         Transcoder<T> tc) {
+                                                                         final Transcoder<T> tc) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     } else if (key.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
 
-    final CachedData co = transcoder.encode(o);
+    final CachedData co = tc.encode(o);
 
     final CountDownLatch blatch = new CountDownLatch(key.size());
 
@@ -1254,7 +1255,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final Map<String, T> o,
                                                                          final int exp,
-                                                                         Transcoder<T> tc) {
+                                                                         final Transcoder<T> tc) {
     if (o == null) {
       throw new IllegalArgumentException("Map is null.");
     } else if (o.isEmpty()) {
@@ -1267,7 +1268,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             operationTimeout) {
       @Override
       public Operation createOp(final String k) {
-        CachedData co = transcoder.encode(o.get(k));
+        CachedData co = tc.encode(o.get(k));
         Operation op = opFact.store(StoreType.set, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
@@ -1299,14 +1300,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
                                                                  final List<String> key,
                                                                  final int exp, final T o,
-                                                                 Transcoder<T> tc) {
+                                                                 final Transcoder<T> tc) {
     if (key == null) {
       throw new IllegalArgumentException("Key list is null.");
     } else if (key.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
 
-    final CachedData co = transcoder.encode(o);
+    final CachedData co = tc.encode(o);
 
     final CountDownLatch blatch = new CountDownLatch(key.size());
 
@@ -1342,7 +1343,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
                                                                  final Map<String, T> o,
                                                                  final int exp,
-                                                                 Transcoder<T> tc) {
+                                                                 final Transcoder<T> tc) {
     if (o == null) {
       throw new IllegalArgumentException("Map is null.");
     } else if (o.isEmpty()) {
@@ -1354,7 +1355,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return new BulkOperationFuture<OperationStatus>(o.keySet(), blatch, operationTimeout) {
       @Override
       public Operation createOp(final String k) {
-        CachedData co = transcoder.encode(o.get(k));
+        CachedData co = tc.encode(o.get(k));
         Operation op = opFact.store(type, k, co.getFlags(),
                 exp, co.getData(), new OperationCallback() {
                   public void receivedStatus(OperationStatus val) {
