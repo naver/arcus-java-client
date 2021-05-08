@@ -1,3 +1,6 @@
+2021-05-08 [version 1.13.2]
+	* [FIX] do not use default transcoder.
+
 2021-05-04 [version 1.13.1]
 	* [FIX] support library backward compatibility for arcus-spring
 	* [FIX] fix compatibility with Java 6, 7, 8 for ByteBuffer
