@@ -259,12 +259,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * @param hostPorts   arcus admin addresses
-   * @param serviceCode service code
-   * @param cfb         ConnectionFactoryBuilder
-   * @param poolSize    Arcus client pool size
-   * @param waitTimeFor Connect
-   *                    waiting time for connection establishment(milliseconds)
+   * @param hostPorts          arcus admin addresses
+   * @param serviceCode        service code
+   * @param cfb                ConnectionFactoryBuilder
+   * @param poolSize           Arcus client pool size
+   * @param waitTimeForConnect Connect waiting time for connection establishment(milliseconds)
    * @return multiple ArcusClient
    */
   private static ArcusClientPool createArcusClient(String hostPorts, String serviceCode,
@@ -3568,7 +3567,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param flags item flags, used when creating the item (see createKeyIfNotExists)
    * @param bkey  element key
    * @param eflag element flags
-   * @param value element value
+   * @param data  element data
    * @param tc    transcoder to serialize and unserialize value
    * @return element object containing all the parameters and transcoded value
    */

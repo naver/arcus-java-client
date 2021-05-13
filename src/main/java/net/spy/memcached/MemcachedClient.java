@@ -347,7 +347,7 @@ public class MemcachedClient extends SpyThread
    * (internal use) Add a raw operation to a numbered connection.
    * This method is exposed for testing.
    *
-   * @param which server number
+   * @param key   the key the operation is operating upon
    * @param op    the operation to perform
    * @return the Operation
    */
