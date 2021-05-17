@@ -1206,6 +1206,31 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /**
+   * helper method: increase timeout count on a distinct attached node to this op
+   *
+   * @param ops
+   */
+  public static void opsTimedOut(Collection<Operation> ops) {
+    Collection<String> timedoutNodes = new HashSet<String>();
+    for (Operation op : ops) {
+      try {
+        MemcachedNode node = op.getHandlingNode();
+        if (node == null) {
+          continue;
+        }
+
+        String key = node.getSocketAddress().toString();
+        if (!timedoutNodes.contains(key)) {
+          timedoutNodes.add(key);
+          node.setContinuousTimeout(true);
+        }
+      } catch (Exception e) {
+        LoggerFactory.getLogger(MemcachedConnection.class).error(e.getMessage());
+      }
+    }
+  }
+
+  /**
    * helper method: reset timeout counter
    *
    * @param op

@@ -124,16 +124,22 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * TimeUnit)
    */
   private Map<String, T> internalGet(long to, TimeUnit unit,
-                                     Collection<Operation> timedoutOps) throws InterruptedException,
-          ExecutionException {
+                                     Collection<Operation> timedoutOps)
+           throws InterruptedException, ExecutionException {
     if (!latch.await(to, unit)) {
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
-          MemcachedConnection.opTimedOut(op);
           timedoutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
+      }
+      if (timedoutOps.size() > 0) {
+        MemcachedConnection.opsTimedOut(timedoutOps);
+      }
+    } else {
+      for (Operation op : ops) {
+        MemcachedConnection.opSucceeded(op);
       }
     }
     for (Operation op : ops) {

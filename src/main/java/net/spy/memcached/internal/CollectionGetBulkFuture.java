@@ -17,6 +17,7 @@
 package net.spy.memcached.internal;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -58,11 +59,20 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   public T get(long duration, TimeUnit units)
       throws InterruptedException, TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
+      Collection<Operation> timedoutOps = new HashSet<Operation>();
       for (Operation op : ops) {
-        MemcachedConnection.opTimedOut(op);
+        if (op.getState() != OperationState.COMPLETE) {
+          timedoutOps.add(op);
+        } else {
+          MemcachedConnection.opSucceeded(op);
+        }
       }
-      throw new CheckedOperationTimeoutException(duration, units, ops);
+      if (timedoutOps.size() > 0) {
+        MemcachedConnection.opsTimedOut(timedoutOps);
+        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+      }
     } else {
+      // continuous timeout counter will be reset
       for (Operation op : ops) {
         MemcachedConnection.opSucceeded(op);
       }
