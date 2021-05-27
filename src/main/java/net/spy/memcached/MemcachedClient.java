@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -2020,10 +2021,18 @@ public class MemcachedClient extends SpyThread
               throws InterruptedException, TimeoutException, ExecutionException {
         if (!blatch.await(duration, units)) {
           // whenever timeout occurs, continuous timeout counter will increase by 1.
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              MemcachedConnection.opTimedOut(op);
+              timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
+          if (timedoutOps.size() > 0) {
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+          }
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {

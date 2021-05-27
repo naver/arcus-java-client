@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1068,16 +1069,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           throws InterruptedException, TimeoutException, ExecutionException {
 
         if (!latch.await(duration, units)) {
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              timedoutOps.add(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
+          if (timedoutOps.size() > 0) {
+            MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
           }
         }
+        // continuous timeout counter will be reset only once in pipe
+        MemcachedConnection.opSucceeded(ops.iterator().next());
 
         for (Operation op : ops) {
           if (op != null && op.hasErrored()) {
@@ -2068,10 +2072,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         if (!blatch.await(duration, units)) {
           // whenever timeout occurs, continuous timeout counter will increase by 1.
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              MemcachedConnection.opTimedOut(op);
+              timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
+          if (timedoutOps.size() > 0) {
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+          }
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -2426,10 +2438,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           throws InterruptedException, TimeoutException, ExecutionException {
 
         if (!blatch.await(duration, units)) {
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
+          if (timedoutOps.size() > 0) {
+            MemcachedConnection.opsTimedOut(timedoutOps);
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+          }
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -2693,10 +2713,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           throws InterruptedException, TimeoutException, ExecutionException {
 
         if (!blatch.await(duration, units)) {
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
+          if (timedoutOps.size() > 0) {
+            MemcachedConnection.opsTimedOut(timedoutOps);
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+          }
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
@@ -3915,16 +3943,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           throws InterruptedException, TimeoutException, ExecutionException {
 
         if (!latch.await(duration, units)) {
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              timedoutOps.add(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
+          if (timedoutOps.size() > 0) {
+            MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
           }
         }
+        // continuous timeout counter will be reset only once in pipe
+        MemcachedConnection.opSucceeded(ops.iterator().next());
 
         for (Operation op : ops) {
           if (op != null && op.hasErrored()) {
@@ -4164,10 +4195,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                         TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
         if (!latch.await(duration, units)) {
+          Collection<Operation> timedoutOps = new HashSet<Operation>();
           for (Operation op : ops) {
-            MemcachedConnection.opTimedOut(op);
+            if (op.getState() != OperationState.COMPLETE) {
+              timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
+            }
           }
-          throw new CheckedOperationTimeoutException(duration, units, ops);
+          if (timedoutOps.size() > 0) {
+            MemcachedConnection.opsTimedOut(timedoutOps);
+            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+          }
         } else {
           // continuous timeout counter will be reset
           for (Operation op : ops) {
