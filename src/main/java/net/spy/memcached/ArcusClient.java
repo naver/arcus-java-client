@@ -2086,9 +2086,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         } else {
           // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
-          }
+          MemcachedConnection.opsSucceeded(ops);
         }
 
         for (Operation op : ops) {
@@ -2452,9 +2450,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         } else {
           // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
-          }
+          MemcachedConnection.opsSucceeded(ops);
         }
 
         for (Operation op : ops) {
@@ -2727,9 +2723,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         } else {
           // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
-          }
+          MemcachedConnection.opsSucceeded(ops);
         }
 
         for (Operation op : ops) {
@@ -4209,9 +4203,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         } else {
           // continuous timeout counter will be reset
-          for (Operation op : ops) {
-            MemcachedConnection.opSucceeded(op);
-          }
+          MemcachedConnection.opsSucceeded(ops);
         }
 
         for (Operation op : ops) {

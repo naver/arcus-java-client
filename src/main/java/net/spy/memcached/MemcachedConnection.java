@@ -1240,6 +1240,17 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /**
+   * helper method: reset timeout counter
+   *
+   * @param ops
+   */
+  public static void opsSucceeded(Collection<Operation> ops) {
+    for (Operation op : ops) {
+      MemcachedConnection.setTimeout(op, false);
+    }
+  }
+
+  /**
    * helper method: do some error checking and set timeout boolean
    *
    * @param op
