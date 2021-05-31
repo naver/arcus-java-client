@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +16,6 @@
  * limitations under the License.
  */
 package net.spy.memcached;
-
-/**
- * A program to use CacheMonitor to start and
- * stop memcached node based on a znode. The program watches the
- * specified znode and saves the znode that corresponds to the
- * memcached server in the remote machine. It also changes the
- * previous ketama node
- */
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -45,6 +38,13 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
 
+/**
+ * A program to use CacheMonitor to start and
+ * stop memcached node based on a znode. The program watches the
+ * specified znode and saves the znode that corresponds to the
+ * memcached server in the remote machine. It also changes the
+ * previous ketama node
+ */
 public class CacheManager extends SpyThread implements Watcher,
         CacheMonitor.CacheMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
@@ -142,28 +142,33 @@ public class CacheManager extends SpyThread implements Watcher,
          * that bring delay of 5 seconds (as well as dns and host file lookup).
          * So, ZK_CONNECT_TIMEOUT is set as much like ZK session timeout.
          */
-        if (zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS) == false) {
+        if (!zkInitLatch.await(ZK_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)) {
           getLogger().fatal("Connecting to Arcus admin(%s) timed out : %d miliseconds",
                   zkConnectString, ZK_CONNECT_TIMEOUT);
           throw new AdminConnectTimeoutException(zkConnectString);
         }
 
-        do {
-          /* ENABLE_REPLICATION if */
-          if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
-            arcusReplEnabled = true;
-            cfb.internalArcusReplEnabled(true);
-            getLogger().info("Connected to Arcus repl cluster (serviceCode=%s)", serviceCode);
-            break;
-          }
-          /* ENABLE_REPLICATION end */
+        /* ENABLE_REPLICATION if */
+        if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
+          arcusReplEnabled = true;
+          cfb.internalArcusReplEnabled(true);
+          getLogger().info("Connected to Arcus repl cluster (serviceCode=%s)", serviceCode);
+        } else {
+        /* ENABLE_REPLICATION end */
           if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
             getLogger().info("Connected to Arcus cluster (seriveCode=%s)", serviceCode);
           } else {
             getLogger().fatal("Service code not found. (%s)", serviceCode);
             throw new NotExistsServiceCodeException(serviceCode);
           }
-        } while (false);
+        }
+
+        if (client == null &&
+            zk.getChildren(getCacheListZPath() + serviceCode, null).isEmpty()) {
+          getLogger().fatal("Memcached nodes not found. (zpath=%s, serviceCode=%s)",
+              getCacheListZPath(), serviceCode);
+          throw new NotExistsMemcachedNodeException(serviceCode);
+        }
 
         String path = getClientInfo();
         if (path.isEmpty()) {
@@ -372,7 +377,9 @@ public class CacheManager extends SpyThread implements Watcher,
     String addrs = getAddressListString(children);
 
     if (client == null) {
-      createArcusClient(addrs);
+      if (!addrs.isEmpty()) {
+        createArcusClient(addrs);
+      }
       return;
     }
 
@@ -418,7 +425,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
     cfb.setInitialObservers(Collections.singleton(observer));
 
-    int _awaitTime = 0;
+    int _awaitTime;
     if (waitTimeForConnect == 0) {
       _awaitTime = 50 * addrCount * poolSize;
     } else {
@@ -433,7 +440,7 @@ public class CacheManager extends SpyThread implements Watcher,
         client[i].setName("Memcached IO for " + serviceCode);
         client[i].setCacheManager(this);
       } catch (IOException e) {
-        getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.");
+        getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
       }
     }
     try {
@@ -444,7 +451,7 @@ public class CacheManager extends SpyThread implements Watcher,
       }
       // Success signal for initial connections to Zookeeper and Memcached.
     } catch (InterruptedException e) {
-      getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.");
+      getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
     }
     this.clientInitLatch.countDown();
 
