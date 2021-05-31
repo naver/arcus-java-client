@@ -372,7 +372,9 @@ public class CacheManager extends SpyThread implements Watcher,
     String addrs = getAddressListString(children);
 
     if (client == null) {
-      createArcusClient(addrs);
+      if (!addrs.isEmpty()) {
+        createArcusClient(addrs);
+      }
       return;
     }
 
