@@ -54,6 +54,26 @@ public final class ArrayModNodeLocator implements NodeLocator {
     return Arrays.asList(nodes);
   }
 
+  /* ENABLE_MIGRATION if */
+  public Collection<MemcachedNode> getAlterAll() {
+    return null;
+  }
+
+  public Collection<MemcachedNode> getExistAll() {
+    return null;
+  }
+  @Override
+  public void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type) {
+    throw new UnsupportedOperationException("not supported");
+  }
+
+
+  @Override
+  public boolean updateMigration(Long spoint, Long epoint) {
+    throw new UnsupportedOperationException("not supported");
+  }
+  /* ENABLE_MIGRATION end */
+
   public MemcachedNode getPrimary(String k) {
     return nodes[getServerForKey(k)];
   }

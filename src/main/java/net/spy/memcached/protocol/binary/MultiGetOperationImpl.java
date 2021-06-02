@@ -146,4 +146,8 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
     return true;
   }
 
+  @Override
+  public boolean isMGetOperation() {
+    return false;
+  }
 }

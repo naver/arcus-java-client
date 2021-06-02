@@ -80,6 +80,14 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
 
     Integer position = null;
 
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
+
     if (line.startsWith("POSITION=")) {
       String[] stuff = line.split("=");
       assert stuff.length == 2;

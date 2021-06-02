@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.RedirectHandler;
 
 
 /**
@@ -129,6 +130,10 @@ public interface Operation {
   boolean isPipeOperation();
 
   boolean isIdempotentOperation();
+
+  /* ENABLE_MIGRATION if */
+  RedirectHandler getRedirectHandler();
+  /* ENABLE_MIGRATION end */
 
   APIType getAPIType();
 }

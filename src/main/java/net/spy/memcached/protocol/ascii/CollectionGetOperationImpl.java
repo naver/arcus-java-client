@@ -108,7 +108,13 @@ public class CollectionGetOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     /*
       VALUE <flag> <count>\r\n
       <collection_data>\r\n

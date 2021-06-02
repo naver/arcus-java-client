@@ -30,6 +30,10 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
+  public BTreeGetBulkWithLongTypeBkey(BTreeGetBulkImpl bTreeGetBulk) {
+    super(bTreeGetBulk);
+  }
+
   public Long getSubkey() {
     return (Long) subkey;
   }

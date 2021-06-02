@@ -97,6 +97,26 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     return allNodes;
   }
 
+  /* ENABLE_MIGRATION if */
+  public Collection<MemcachedNode> getAlterAll() {
+    return null;
+  }
+
+  public Collection<MemcachedNode> getExistAll() {
+    return null;
+  }
+
+  @Override
+  public void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type) {
+    throw new UnsupportedOperationException("not supported");
+  }
+
+  @Override
+  public boolean updateMigration(Long spoint, Long epoint) {
+    throw new UnsupportedOperationException("not supported");
+  }
+  /* ENABLE_MIGRATION end */
+
   public MemcachedNode getPrimary(final String k) {
     MemcachedNode rv = getNodeForKey(hashAlg.hash(k));
     assert rv != null : "Found no node for key " + k;

@@ -17,6 +17,7 @@
 package net.spy.memcached;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -68,10 +69,12 @@ import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.KeyedOperation;
+import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -81,6 +84,7 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
+
 
 /**
  * Factory that builds operations for protocol handlers.
@@ -359,6 +363,13 @@ public interface OperationFactory {
    */
   Collection<Operation> clone(KeyedOperation op);
 
+  /* ENABLE_MIGRATION if */
+  MultiOperationCallback createMultiOperationCallback(KeyedOperation op, int count,
+                                                      OperationStatus operationStatus);
+
+  Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
+                                List<Integer> keyIndexes, MultiOperationCallback mcb);
+  /* ENABLE_MIGRATION end */
   /**
    * Create operation for collection items.
    *

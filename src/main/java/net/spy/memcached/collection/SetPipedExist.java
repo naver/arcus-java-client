@@ -38,6 +38,24 @@ public class SetPipedExist<T> extends CollectionObject {
   private final Transcoder<T> tc;
   private int itemCount;
 
+  protected int redirectIndex = 0;
+
+  /* ENABLE_MIGRATION if */
+  private ArrayList<Integer> redirectIndexes;
+  /* ENABLE_MIGRATION end */
+
+  /* ENABLE_MIGRATION if */
+  public void addRedirectIndex(int index) {
+    if (redirectIndexes == null) {
+      redirectIndexes = new ArrayList<Integer>();
+    }
+    redirectIndexes.add(index);
+  }
+  public void setRedirectIndex(int i) {
+    this.redirectIndex = i;
+  }
+  /* ENABLE_MIGRATION end */
+
   public List<T> getValues() {
     return this.values;
   }
@@ -76,7 +94,7 @@ public class SetPipedExist<T> extends CollectionObject {
 
     // create ascii operation string
     int eSize = encodedList.size();
-    for (int i = 0; i < eSize; i++) {
+    for (int i = redirectIndex; i < eSize; i++) {
       byte[] each = encodedList.get(i);
 
       setArguments(bb, COMMAND, key, each.length,
