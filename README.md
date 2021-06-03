@@ -12,6 +12,12 @@ to support Arcus memcached cloud.
 
 [spymemcached]: https://code.google.com/p/spymemcached/ "spymemcached"
 
+## JDK Requirements
+
+Compatible with jdk version
+- runtime requirements : At least 1.6
+- build requirements : At least 1.8
+
 ## Getting Started
 
 The Maven artifact for arcus java client is in the central Maven repository.
