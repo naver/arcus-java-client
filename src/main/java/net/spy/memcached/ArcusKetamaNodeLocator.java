@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,55 +39,38 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
   private final Collection<MemcachedNode> allNodes;
 
-  private final HashAlgorithm hashAlg;
+  private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
   private final ArcusKetamaNodeLocatorConfiguration config;
 
   private final Lock lock = new ReentrantLock();
 
-  public ArcusKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
-    this(nodes, alg, new ArcusKetamaNodeLocatorConfiguration());
+  public ArcusKetamaNodeLocator(List<MemcachedNode> nodes) {
+    this(nodes, new ArcusKetamaNodeLocatorConfiguration());
   }
 
-  public ArcusKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg,
+  public ArcusKetamaNodeLocator(List<MemcachedNode> nodes,
                                 ArcusKetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
-    hashAlg = alg;
     ketamaNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     config = conf;
 
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
-    if (alg == HashAlgorithm.KETAMA_HASH) {
-      for (MemcachedNode node : nodes) {
-        updateHash(node, false);
-      }
-    } else {
-      for (MemcachedNode node : nodes) {
-        for (int i = 0; i < numReps; i++) {
-          long nodeHashKey = hashAlg.hash(config.getKeyForNode(node, i));
-          SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(nodeHashKey);
-          if (nodeSet == null) {
-            nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
-            ketamaNodes.put(nodeHashKey, nodeSet);
-          }
-          nodeSet.add(node);
-        }
-      }
+    for (MemcachedNode node : nodes) {
+      updateHash(node, false);
     }
+
+    /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
     assert ketamaNodes.size() <= numReps * nodes.size();
-    /* ketamaNodes.size() can be smaller than numReps*nodes.size()
-     * because of hash collision
-     */
   }
 
   private ArcusKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedNode>> smn,
-                                 Collection<MemcachedNode> an, HashAlgorithm alg,
+                                 Collection<MemcachedNode> an,
                                  ArcusKetamaNodeLocatorConfiguration conf) {
     super();
     ketamaNodes = smn;
     allNodes = an;
-    hashAlg = alg;
     config = conf;
   }
 
@@ -115,16 +99,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           } else {
             hash = nodeHash.longValue();
           }
-          // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
-          // in a lot of places, so I'm doing this myself.
-          /*
-          SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
-          if (tailMap.isEmpty()) {
-            hash = ketamaNodes.firstKey();
-          } else {
-            hash = tailMap.firstKey();
-          }
-          */
         }
         rv = ketamaNodes.get(hash).first();
       }
@@ -167,7 +141,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       lock.unlock();
     }
 
-    return new ArcusKetamaNodeLocator(smn, an, hashAlg, config);
+    return new ArcusKetamaNodeLocator(smn, an, config);
   }
 
   public void update(Collection<MemcachedNode> toAttach,
