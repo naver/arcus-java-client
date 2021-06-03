@@ -64,10 +64,8 @@ public class ArcusKetamaHashingTest extends TestCase {
     MemcachedNode oddManOut = larger.get(larger.size() - 1);
     assertFalse(smaller.contains(oddManOut));
 
-    ArcusKetamaNodeLocator lgLocator = new ArcusKetamaNodeLocator(
-            larger, HashAlgorithm.KETAMA_HASH);
-    ArcusKetamaNodeLocator smLocator = new ArcusKetamaNodeLocator(
-            smaller, HashAlgorithm.KETAMA_HASH);
+    ArcusKetamaNodeLocator lgLocator = new ArcusKetamaNodeLocator(larger);
+    ArcusKetamaNodeLocator smLocator = new ArcusKetamaNodeLocator(smaller);
 
     SortedMap<Long, SortedSet<MemcachedNode>> lgMap = lgLocator.getKetamaNodes();
     SortedMap<Long, SortedSet<MemcachedNode>> smMap = smLocator.getKetamaNodes();

@@ -481,10 +481,10 @@ public class ConnectionFactoryBuilder {
               // This locator uses ArcusReplKetamaNodeLocatorConfiguration
               // which builds keys off the server's group name, not
               // its ip:port.
-              return new ArcusReplKetamaNodeLocator(nodes, getHashAlg());
+              return new ArcusReplKetamaNodeLocator(nodes);
             }
             /* ENABLE_REPLICATION end */
-            return new ArcusKetamaNodeLocator(nodes, getHashAlg());
+            return new ArcusKetamaNodeLocator(nodes);
           default:
             throw new IllegalStateException(
                     "Unhandled locator type: " + locator);

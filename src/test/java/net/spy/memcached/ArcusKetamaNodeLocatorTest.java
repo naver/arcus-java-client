@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +27,8 @@ import java.util.List;
  */
 public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
 
-  protected void setupNodes(HashAlgorithm alg, int n) {
+  @Override
+  protected void setupNodes(int n) {
     super.setupNodes(n);
     for (int i = 0; i < nodeMocks.length; i++) {
       nodeMocks[i].expects(atLeastOnce())
@@ -35,12 +37,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
                       "127.0.0.1", 10000 + i)));
     }
 
-    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes), alg);
-  }
-
-  @Override
-  protected void setupNodes(int n) {
-    setupNodes(HashAlgorithm.KETAMA_HASH, n);
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes));
   }
 
   public void testAll() throws Exception {
@@ -131,16 +128,6 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertPosForKey("49044", 4);
   }
 
-  public void testFNV1A_32() {
-    HashAlgorithm alg = HashAlgorithm.FNV1A_32_HASH;
-    setupNodes(alg, 5);
-    assertSequence("noelani", 1, 2, 2, 2, 3);
-
-    assertSame(nodes[2], locator.getPrimary("dustin"));
-    assertSame(nodes[1], locator.getPrimary("noelani"));
-    assertSame(nodes[4], locator.getPrimary("some other key"));
-  }
-
   private MemcachedNode[] mockNodes(String servers[]) {
     setupNodes(servers.length);
 
@@ -166,8 +153,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
       "10.0.1.7:11211",
       "10.0.1.8:11211"
     };
-    locator = new ArcusKetamaNodeLocator(Arrays.asList(mockNodes(servers)),
-            HashAlgorithm.KETAMA_HASH);
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(mockNodes(servers)));
 
     String[][] exp = {
       {"0", "10.0.1.1:11211"},

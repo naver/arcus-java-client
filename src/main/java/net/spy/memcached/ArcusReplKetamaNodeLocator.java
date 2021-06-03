@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,23 +40,22 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   private final HashMap<String, MemcachedReplicaGroup> allGroups;
   private final Collection<MemcachedNode> allNodes;
 
-  private final HashAlgorithm hashAlg;
+  private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
   private final ArcusReplKetamaNodeLocatorConfiguration config;
 
   private final Lock lock = new ReentrantLock();
 
-  public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg) {
+  public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes) {
     // This configuration class is aware that InetSocketAddress is really
     // ArcusReplNodeAddress.  Its getKeyForNode uses the group name, instead
     // of the socket address.
-    this(nodes, alg, new ArcusReplKetamaNodeLocatorConfiguration());
+    this(nodes, new ArcusReplKetamaNodeLocatorConfiguration());
   }
 
-  private ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes, HashAlgorithm alg,
+  private ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes,
                                      ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
-    hashAlg = alg;
     ketamaGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
     allGroups = new HashMap<String, MemcachedReplicaGroup>();
 
@@ -77,40 +77,22 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
-    if (alg == HashAlgorithm.KETAMA_HASH) {
-      for (MemcachedReplicaGroup group : allGroups.values()) {
-        updateHash(group, false);
-      }
-    } else {
-      for (MemcachedReplicaGroup group : allGroups.values()) {
-        for (int i = 0; i < numReps; i++) {
-          long nodeHashKey = hashAlg.hash(config.getKeyForGroup(group, i));
-          SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(nodeHashKey);
-          if (nodeSet == null) {
-            nodeSet = new TreeSet<MemcachedReplicaGroup>(
-                    new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-            ketamaGroups.put(nodeHashKey, nodeSet);
-          }
-          nodeSet.add(group);
-        }
-      }
+    for (MemcachedReplicaGroup group : allGroups.values()) {
+      updateHash(group, false);
     }
+
+    /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
     assert ketamaGroups.size() <= (numReps * allGroups.size());
-    /* ketamaGroups.size() can be smaller than numReps*AllGroups.size()
-     * because of hash collision
-     */
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
                                      HashMap<String, MemcachedReplicaGroup> ag,
                                      Collection<MemcachedNode> an,
-                                     HashAlgorithm alg,
                                      ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     ketamaGroups = kg;
     allGroups = ag;
     allNodes = an;
-    hashAlg = alg;
     config = conf;
   }
 
@@ -157,16 +139,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           } else {
             hash = nodeHash.longValue();
           }
-          // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
-          // in a lot of places, so I'm doing this myself.
-          /*
-          SortedMap<Long, MemcachedNode> tailMap = ketamaNodes.tailMap(hash);
-          if (tailMap.isEmpty()) {
-            hash = ketamaNodes.firstKey();
-          } else {
-            hash = tailMap.firstKey();
-          }
-          */
         }
         rg = ketamaGroups.get(hash).first();
         // return a node (master / slave) for the replica pick request.
@@ -221,7 +193,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       lock.unlock();
     }
 
-    return new ArcusReplKetamaNodeLocator(smg, ag, an, hashAlg, config);
+    return new ArcusReplKetamaNodeLocator(smg, ag, an, config);
   }
 
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {

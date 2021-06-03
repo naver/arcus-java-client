@@ -116,16 +116,6 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
       } else {
         hash = nodeHash.longValue();
       }
-      // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
-      // in a lot of places, so I'm doing this myself.
-      /*
-      SortedMap<Long, MemcachedNode> tailMap=ketamaNodes.tailMap(hash);
-      if(tailMap.isEmpty()) {
-        hash=ketamaNodes.firstKey();
-      } else {
-        hash=tailMap.firstKey();
-      }
-      */
     }
     rv = ketamaNodes.get(hash);
     return rv;
