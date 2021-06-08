@@ -284,20 +284,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Service code is empty.");
     }
 
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, latch, poolSize,
-            waitTimeForConnect);
-
-    try {
-      latch.await();
-    } catch (Exception e) {
-      arcusLogger.warn("you cannot see this message!");
-    }
-
-    ArcusClient[] client = exe.getAC();
-
-    return new ArcusClientPool(poolSize, client);
+    CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect);
+    return new ArcusClientPool(poolSize, exe.getAC());
   }
 
   /**
