@@ -105,14 +105,16 @@ public final class MemcachedConnection extends SpyObject {
   /**
    * Construct a memcached connection.
    *
-   * @param name    the name of memcached connection
-   * @param bufSize the size of the buffer used for reading from the server
-   * @param f       the factory that will provide an operation queue
-   * @param a       the addresses of the servers to connect to
+   * @param name      the name of memcached connection
+   * @param f         the factory that will provide an operation queue
+   * @param a         the addresses of the servers to connect to
+   * @param obs       the observers that see the first connection established.
+   * @param fm        the failure mode for the underlying connection :
+   *                  Cancel(default), Redistribute, Retry.
+   * @param opfactory the operation factory.
    * @throws IOException if a connection attempt fails early
    */
-  public MemcachedConnection(String name,
-                             int bufSize, ConnectionFactory f,
+  public MemcachedConnection(String name, ConnectionFactory f,
                              List<InetSocketAddress> a, Collection<ConnectionObserver> obs,
                              FailureMode fm, OperationFactory opfactory)
           throws IOException {
@@ -540,7 +542,6 @@ public final class MemcachedConnection extends SpyObject {
                                     SocketAddress sa) throws IOException {
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
-    // bufSize : 16384 (default value)
     MemcachedNode qa = f.createMemcachedNode(name, sa, ch, f.getReadBufSize());
     if (timeoutRatioThreshold > 0) {
       qa.enableTimeoutRatio();
