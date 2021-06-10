@@ -93,7 +93,7 @@ public abstract class ClientBaseCase extends TestCase {
         @Override
         public MemcachedConnection createConnection(
                 String name, List<InetSocketAddress> addrs) throws IOException {
-          return new MemcachedConnection(name, getReadBufSize(), this, addrs,
+          return new MemcachedConnection(name, this, addrs,
                   getInitialObservers(), getFailureMode(), getOperationFactory());
         }
 

@@ -34,11 +34,11 @@ public class MemcachedConnectionTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder().setReadBufferSize(1024);
     ConnectionFactory cf = cfb.build();
     List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
-    conn = new MemcachedConnection("connection test", 1024, cf, addrs,
+    conn = new MemcachedConnection("connection test", cf, addrs,
         cf.getInitialObservers(), cf.getFailureMode(), cf.getOperationFactory());
     locator = (ArcusKetamaNodeLocator) conn.getLocator();
   }
