@@ -382,7 +382,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
     for (ArcusClient ac : client) {
       MemcachedConnection conn = ac.getMemcachedConnection();
-      conn.putMemcachedQueue(addrs);
+      conn.putNodesChangeQueue(addrs);
     }
   }
 

@@ -52,7 +52,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     return root;
   }
 
-  public void addOp(Operation op) {
+  public void addOpToInputQ(Operation op) {
     throw new UnsupportedOperationException();
   }
 

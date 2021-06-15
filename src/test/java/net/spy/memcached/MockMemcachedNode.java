@@ -106,7 +106,7 @@ public class MockMemcachedNode implements MemcachedNode {
     return false;
   }
 
-  public void addOp(Operation op) {
+  public void addOpToInputQ(Operation op) {
     // noop
   }
 
