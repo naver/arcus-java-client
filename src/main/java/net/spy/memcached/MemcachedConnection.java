@@ -62,6 +62,7 @@ import net.spy.memcached.ops.OperationStatus;
  */
 public final class MemcachedConnection extends SpyObject {
 
+  private int emptySelects = 0;
   // The number of empty selects we'll allow before assuming we may have
   // missed one and should check the current selectors.  This generally
   // indicates a bug, but we'll check it nonetheless.
@@ -71,31 +72,32 @@ public final class MemcachedConnection extends SpyObject {
   // find those bugs and often works around them.
   private static final int EXCESSIVE_EMPTY = 0x1000000;
 
-  private String connName;
-  private volatile boolean shutDown = false;
-  // If true, optimization will collapse multiple sequential get ops
-  private final boolean shouldOptimize;
+  private final int timeoutExceptionThreshold;
+  private final int timeoutRatioThreshold;
+  // maximum amount of time to wait between reconnect attempts
+  private final long maxReconnectDelay;
+
+  private final String connName;
   private Selector selector = null;
   private final NodeLocator locator;
   private final FailureMode failureMode;
-  // maximum amount of time to wait between reconnect attempts
-  private final long maxDelay;
-  private int emptySelects = 0;
+  // If true, optimization will collapse multiple sequential get ops
+  private final boolean optimizeGetOp;
+  private volatile boolean shutDown = false;
+
   // AddedQueue is used to track the QueueAttachments for which operations
   // have recently been queued.
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   // The key is the time at which they are eligible for reconnect
   private final SortedMap<Long, MemcachedNode> reconnectQueue;
+  private final BlockingQueue<String> nodesChangeQueue = new LinkedBlockingQueue<String>();
+
+  private final OperationFactory opFactory;
+  private final ConnectionFactory connFactory;
   private final Collection<ConnectionObserver> connObservers =
           new ConcurrentLinkedQueue<ConnectionObserver>();
-  private final OperationFactory opFact;
-  private final int timeoutExceptionThreshold;
-  private final int timeoutRatioThreshold;
-
-  private BlockingQueue<String> _nodeManageQueue = new LinkedBlockingQueue<String>();
-  private final ConnectionFactory f;
-  private Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
+  private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled;
@@ -118,15 +120,15 @@ public final class MemcachedConnection extends SpyObject {
                              List<InetSocketAddress> a, Collection<ConnectionObserver> obs,
                              FailureMode fm, OperationFactory opfactory)
           throws IOException {
-    this.f = f;
+    this.connFactory = f;
     connName = name;
     connObservers.addAll(obs);
     reconnectQueue = new TreeMap<Long, MemcachedNode>();
     addedQueue = new ConcurrentLinkedQueue<MemcachedNode>();
     failureMode = fm;
-    shouldOptimize = f.shouldOptimize();
-    maxDelay = f.getMaxReconnectDelay();
-    opFact = opfactory;
+    optimizeGetOp = f.shouldOptimize();
+    maxReconnectDelay = f.getMaxReconnectDelay();
+    opFactory = opfactory;
     timeoutExceptionThreshold = f.getTimeoutExceptionThreshold();
     timeoutRatioThreshold = f.getTimeoutRatioThreshold();
     selector = Selector.open();
@@ -138,7 +140,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  // handleNodeManageQueue and updateConnections behave slightly differently
+  // handleNodesChangeQueue and updateConnections behave slightly differently
   // depending on the Arcus version.  We could have created a subclass and overload
   // those methods.  But, MemcachedConnection is a final class.
   void setArcusReplEnabled(boolean b) {
@@ -208,7 +210,7 @@ public final class MemcachedConnection extends SpyObject {
     getLogger().debug("Done dealing with queue.");
 
     long delay = 0;
-    if (!_nodeManageQueue.isEmpty()) {
+    if (!nodesChangeQueue.isEmpty()) {
       delay = 1;
     } else if (!reconnectQueue.isEmpty()) {
       long now = System.currentTimeMillis();
@@ -261,7 +263,7 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     // Deal with the memcached server group that's been added by CacheManager.
-    handleNodeManageQueue();
+    handleNodesChangeQueue();
 
     if (!shutDown && !reconnectQueue.isEmpty()) {
       attemptReconnects();
@@ -542,12 +544,12 @@ public final class MemcachedConnection extends SpyObject {
                                     SocketAddress sa) throws IOException {
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
-    MemcachedNode qa = f.createMemcachedNode(name, sa, ch, f.getReadBufSize());
+    MemcachedNode qa = connFactory.createMemcachedNode(name, sa, ch, connFactory.getReadBufSize());
     if (timeoutRatioThreshold > 0) {
       qa.enableTimeoutRatio();
     }
     int ops = 0;
-    ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
+    ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
     ch.socket().setReuseAddress(true);
     /* The codes above can be replaced by the codes below since java 1.7 */
     // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
@@ -578,7 +580,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void prepareVersionInfo(final MemcachedNode node) {
-    Operation op = opFact.version(new OperationCallback() {
+    Operation op = opFactory.version(new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
         if (status.isSuccess()) {
@@ -599,15 +601,15 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   // Called by CacheManger to add the memcached server group.
-  public void putMemcachedQueue(String addrs) {
-    _nodeManageQueue.offer(addrs);
+  public void putNodesChangeQueue(String addrs) {
+    nodesChangeQueue.offer(addrs);
     selector.wakeup();
   }
 
   // Handle the memcached server group that's been added by CacheManager.
-  void handleNodeManageQueue() throws IOException {
-    if (!_nodeManageQueue.isEmpty()) {
-      String addrs = _nodeManageQueue.poll();
+  void handleNodesChangeQueue() throws IOException {
+    if (!nodesChangeQueue.isEmpty()) {
+      String addrs = nodesChangeQueue.poll();
 
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
@@ -650,7 +652,7 @@ public final class MemcachedConnection extends SpyObject {
         if (readyForIO) {
           try {
             if (qa.getWbuf().hasRemaining()) {
-              handleWrites(qa.getSk(), qa);
+              handleWrites(qa);
             }
           } catch (IOException e) {
             getLogger().warn("Exception handling write", e);
@@ -713,17 +715,17 @@ public final class MemcachedConnection extends SpyObject {
           connected(qa);
           addedQueue.offer(qa);
           if (qa.getWbuf().hasRemaining()) {
-            handleWrites(sk, qa);
+            handleWrites(qa);
           }
         } else {
           assert !channel.isConnected() : "connected";
         }
       } else {
         if (sk.isValid() && sk.isReadable()) {
-          handleReads(sk, qa);
+          handleReads(qa);
         }
         if (sk.isValid() && sk.isWritable()) {
-          handleWrites(sk, qa);
+          handleWrites(qa);
         }
       }
     } catch (ClosedChannelException e) {
@@ -757,18 +759,18 @@ public final class MemcachedConnection extends SpyObject {
     qa.fixupOps();
   }
 
-  private void handleWrites(SelectionKey sk, MemcachedNode qa)
+  private void handleWrites(MemcachedNode qa)
           throws IOException {
-    qa.fillWriteBuffer(shouldOptimize);
+    qa.fillWriteBuffer(optimizeGetOp);
     boolean canWriteMore = qa.getBytesRemainingToWrite() > 0;
     while (canWriteMore) {
       int wrote = qa.writeSome();
-      qa.fillWriteBuffer(shouldOptimize);
+      qa.fillWriteBuffer(optimizeGetOp);
       canWriteMore = wrote > 0 && qa.getBytesRemainingToWrite() > 0;
     }
   }
 
-  private void handleReads(SelectionKey sk, MemcachedNode qa)
+  private void handleReads(MemcachedNode qa)
           throws IOException {
     Operation currentOp = qa.getCurrentReadOp();
     ByteBuffer rbuf = qa.getRbuf();
@@ -854,7 +856,7 @@ public final class MemcachedConnection extends SpyObject {
           break;
         case DEFAULT:
         default:
-          delay = (long) Math.min(maxDelay,
+          delay = (long) Math.min(maxReconnectDelay,
                   Math.pow(2, qa.getReconnectCount())) * 1000;
           break;
       }
@@ -894,7 +896,7 @@ public final class MemcachedConnection extends SpyObject {
         KeyedOperation ko = (KeyedOperation) op;
         int added = 0;
         for (String k : ko.getKeys()) {
-          for (Operation newop : opFact.clone(ko)) {
+          for (Operation newop : opFactory.clone(ko)) {
             addOperation(k, newop);
             added++;
           }
@@ -929,7 +931,7 @@ public final class MemcachedConnection extends SpyObject {
           getLogger().info("Reconnecting %s", qa);
           ch = SocketChannel.open();
           ch.configureBlocking(false);
-          ch.socket().setTcpNoDelay(!f.useNagleAlgorithm());
+          ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
           ch.socket().setReuseAddress(true);
           /* The codes above can be replaced by the codes below since java 1.7 */
           // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
@@ -984,7 +986,7 @@ public final class MemcachedConnection extends SpyObject {
     ReplicaPick pick = ReplicaPick.MASTER;
 
     if (o.isReadOperation()) {
-      ReadPriority readPriority = f.getAPIReadPriority().get(o.getAPIType());
+      ReadPriority readPriority = connFactory.getAPIReadPriority().get(o.getAPIType());
       if (readPriority != null) {
         if (readPriority == ReadPriority.SLAVE) {
           pick = ReplicaPick.SLAVE;
@@ -999,7 +1001,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private ReplicaPick getReplicaPick() {
-    ReadPriority readPriority = f.getReadPriority();
+    ReadPriority readPriority = connFactory.getReadPriority();
     ReplicaPick pick = ReplicaPick.MASTER;
 
     if (readPriority == ReadPriority.SLAVE) {
@@ -1125,7 +1127,7 @@ public final class MemcachedConnection extends SpyObject {
   public void addOperation(final MemcachedNode node, final Operation o) {
     o.setHandlingNode(node);
     o.initialize();
-    node.addOp(o);
+    node.addOpToInputQ(o);
     addedQueue.offer(node);
     Selector s = selector.wakeup();
     assert s == selector : "Wakeup returned the wrong selector.";
@@ -1139,7 +1141,7 @@ public final class MemcachedConnection extends SpyObject {
       Operation o = me.getValue();
       o.setHandlingNode(node);
       o.initialize();
-      node.addOp(o);
+      node.addOpToInputQ(o);
       addedQueue.offer(node);
     }
     Selector s = selector.wakeup();
@@ -1163,7 +1165,7 @@ public final class MemcachedConnection extends SpyObject {
       Operation op = of.newOp(node, latch);
       op.setHandlingNode(node);
       op.initialize();
-      node.addOp(op);
+      node.addOpToInputQ(op);
       addedQueue.offer(node);
     }
     Selector s = selector.wakeup();

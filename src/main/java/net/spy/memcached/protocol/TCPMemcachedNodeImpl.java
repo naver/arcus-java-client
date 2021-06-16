@@ -353,7 +353,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return !(optimizedOp == null && writeQ.isEmpty());
   }
 
-  public final void addOp(Operation op) {
+  public final void addOpToInputQ(Operation op) {
     try {
       if (!authLatch.await(1, TimeUnit.SECONDS)) {
         op.cancel("authentication timeout");

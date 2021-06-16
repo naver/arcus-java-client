@@ -115,7 +115,7 @@ public interface MemcachedNode {
    * Add an operation to the queue.  Authentication operations should
    * never be added to the queue, but this is not checked.
    */
-  void addOp(Operation op);
+  void addOpToInputQ(Operation op);
 
   /**
    * Insert an operation to the beginning of the queue.
