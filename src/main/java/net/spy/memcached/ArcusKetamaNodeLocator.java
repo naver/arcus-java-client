@@ -75,7 +75,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public Collection<MemcachedNode> getAll() {
-    return allNodes;
+    return Collections.unmodifiableCollection(allNodes);
+  }
+
+  public SortedMap<Long, SortedSet<MemcachedNode>> getKetamaNodes() {
+    return Collections.unmodifiableSortedMap(ketamaNodes);
   }
 
   public MemcachedNode getPrimary(final String k) {
@@ -97,13 +101,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           if (nodeHash == null) {
             hash = ketamaNodes.firstKey();
           } else {
-            hash = nodeHash.longValue();
+            hash = nodeHash;
           }
         }
         rv = ketamaNodes.get(hash).first();
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -135,8 +137,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       for (MemcachedNode n : allNodes) {
         an.add(new MemcachedNodeROImpl(n));
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -168,8 +168,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           node.setSk(null);
         }
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -210,14 +208,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     if (remove) {
       config.removeNode(node);
     }
-  }
-
-  public SortedMap<Long, SortedSet<MemcachedNode>> getKetamaNodes() {
-    return Collections.unmodifiableSortedMap(ketamaNodes);
-  }
-
-  public Collection<MemcachedNode> getAllNodes() {
-    return Collections.unmodifiableCollection(allNodes);
   }
 
   class KetamaIterator implements Iterator<MemcachedNode> {

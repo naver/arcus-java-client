@@ -21,6 +21,7 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,11 +98,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public Collection<MemcachedNode> getAll() {
-    return allNodes;
+    return Collections.unmodifiableCollection(allNodes);
   }
 
   public Map<String, MemcachedReplicaGroup> getAllGroups() {
-    return allGroups;
+    return Collections.unmodifiableMap(allGroups);
   }
 
   public Collection<MemcachedNode> getMasterNodes() {
@@ -137,15 +138,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           if (nodeHash == null) {
             hash = ketamaGroups.firstKey();
           } else {
-            hash = nodeHash.longValue();
+            hash = nodeHash;
           }
         }
         rg = ketamaGroups.get(hash).first();
         // return a node (master / slave) for the replica pick request.
         rv = rg.getNodeForReplicaPick(pick);
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -187,8 +186,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedNode n : allNodes) {
         an.add(new MemcachedNodeROImpl(n));
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -261,8 +258,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         allGroups.remove(group.getGroupName());
         updateHash(group, true);
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
