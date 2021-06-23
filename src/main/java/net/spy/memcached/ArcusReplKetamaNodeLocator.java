@@ -138,15 +138,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           if (nodeHash == null) {
             hash = ketamaGroups.firstKey();
           } else {
-            hash = nodeHash.longValue();
+            hash = nodeHash;
           }
         }
         rg = ketamaGroups.get(hash).first();
         // return a node (master / slave) for the replica pick request.
         rv = rg.getNodeForReplicaPick(pick);
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -188,8 +186,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedNode n : allNodes) {
         an.add(new MemcachedNodeROImpl(n));
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -262,8 +258,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         allGroups.remove(group.getGroupName());
         updateHash(group, true);
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }

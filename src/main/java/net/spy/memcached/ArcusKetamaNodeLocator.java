@@ -101,13 +101,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           if (nodeHash == null) {
             hash = ketamaNodes.firstKey();
           } else {
-            hash = nodeHash.longValue();
+            hash = nodeHash;
           }
         }
         rv = ketamaNodes.get(hash).first();
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -139,8 +137,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       for (MemcachedNode n : allNodes) {
         an.add(new MemcachedNodeROImpl(n));
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
@@ -172,8 +168,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           node.setSk(null);
         }
       }
-    } catch (RuntimeException e) {
-      throw e;
     } finally {
       lock.unlock();
     }
