@@ -21,6 +21,7 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,11 +98,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public Collection<MemcachedNode> getAll() {
-    return allNodes;
+    return Collections.unmodifiableCollection(allNodes);
   }
 
   public Map<String, MemcachedReplicaGroup> getAllGroups() {
-    return allGroups;
+    return Collections.unmodifiableMap(allGroups);
   }
 
   public Collection<MemcachedNode> getMasterNodes() {
