@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +18,17 @@
 package net.spy.memcached;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
 import javax.management.DynamicMBean;
-import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanException;
 import javax.management.MBeanInfo;
-import javax.management.ReflectionException;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.protocol.TCPMemcachedNodeImpl;
@@ -50,27 +47,18 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
 
   private static final String DELIMETER = "-";
 
-  private final ArcusClient client;
-  private final Map<String, MemcachedNode> nodes = new ConcurrentHashMap<String, MemcachedNode>();
+  private final MemcachedClient client;
+
+  private volatile Map<String, MemcachedNode> nodes = new HashMap<String, MemcachedNode>();
 
   public StatisticsHandler(final ArcusClient client) {
     this.client = client;
-
-    Collection<MemcachedNode> allNodes = ((MemcachedClient) client)
-            .getAllNodes();
-
-    for (MemcachedNode node : allNodes) {
-      nodes.put(node.getSocketAddress().toString(), node);
-    }
   }
 
   @Override
-  public Object getAttribute(String attribute)
-          throws AttributeNotFoundException, MBeanException,
-          ReflectionException {
-
+  public Object getAttribute(String attribute) throws AttributeNotFoundException {
     if (attribute.contains(ADDED_Q)) {
-      return ((MemcachedClient) client).getAddedQueueSize();
+      return client.getAddedQueueSize();
     }
 
     TCPMemcachedNodeImpl node = (TCPMemcachedNodeImpl) getNode(attribute);
@@ -104,21 +92,15 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
   }
 
   private MemcachedNode getNode(String attribute) {
-    try {
-      if (attribute.contains(DELIMETER)) {
-        MemcachedNode memcachedNode = nodes.get(attribute
-                .split(DELIMETER)[1]);
-        if (memcachedNode instanceof TCPMemcachedNodeImpl) {
-          return memcachedNode;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
+    if (attribute.contains(DELIMETER)) {
+      MemcachedNode memcachedNode = nodes.get(attribute
+          .split(DELIMETER, 2)[1]);
+      if (memcachedNode instanceof TCPMemcachedNodeImpl) {
+        return memcachedNode;
       }
-    } catch (Exception e) {
-      return null;
     }
+
+    return null;
   }
 
   @Override
@@ -139,6 +121,14 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
   @Override
   public MBeanInfo getMBeanInfo() {
     List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
+
+    Map<String, MemcachedNode> newNodes = new HashMap<String, MemcachedNode>();
+
+    for (MemcachedNode node : client.getAllNodes()) {
+      newNodes.put(node.getSocketAddress().toString(), node);
+    }
+
+    nodes = newNodes;
 
     // global input queue
     attributes.add(new MBeanAttributeInfo(ADDED_Q, "long",
@@ -180,19 +170,17 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
   }
 
   @Override
-  public Object invoke(String actionName, Object[] params, String[] signature)
-          throws MBeanException, ReflectionException {
+  public Object invoke(String actionName, Object[] params, String[] signature) {
     return null;
   }
 
   @Override
-  public void setAttribute(Attribute attribute)
-          throws AttributeNotFoundException, InvalidAttributeValueException,
-          MBeanException, ReflectionException {
+  public void setAttribute(Attribute attribute) {
   }
 
   @Override
   public AttributeList setAttributes(AttributeList attributes) {
     return null;
   }
+
 }
