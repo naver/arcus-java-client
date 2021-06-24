@@ -44,11 +44,11 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
   private static final String READ_Q = "readQ";
   private static final String RECONN_CNT = "reconnectCount";
   private static final String CONT_TIMEOUT = "continuousTimeout";
+  private static final String VERSION = "version";
 
   private static final String DELIMETER = "-";
 
   private final MemcachedClient client;
-
   private volatile Map<String, MemcachedNode> nodes = new HashMap<String, MemcachedNode>();
 
   public StatisticsHandler(final ArcusClient client) {
@@ -85,6 +85,10 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
 
     if (attribute.contains(WRITE_Q)) {
       return node.getWriteQueueSize();
+    }
+
+    if (attribute.contains(VERSION)) {
+      return node.getVersion();
     }
 
     throw new AttributeNotFoundException("Atrribute '" + attribute
@@ -160,6 +164,11 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
       attributes.add(new MBeanAttributeInfo(WRITE_Q + DELIMETER
               + entry.getValue().getSocketAddress().toString(), "int",
               "write queue count", true, false, false));
+
+      // version
+      attributes.add(new MBeanAttributeInfo(VERSION + DELIMETER
+              + entry.getValue().getSocketAddress().toString(), "String",
+              "version", true, false, false));
     }
 
     getLogger().info("retrieve client statistics mbean informations.");
