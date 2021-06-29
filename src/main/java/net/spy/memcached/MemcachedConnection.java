@@ -425,27 +425,23 @@ public final class MemcachedConnection extends SpyObject {
       ArcusReplNodeAddress newSlaveAddr = newGroupAddrs.size() > 1 ?
           newGroupAddrs.get(1) : null;
 
-      if (oldMasterAddr.getIPPort().equals(newMasterAddr.getIPPort())) {
+      if (oldMasterAddr.isSameAddress(newMasterAddr)) {
         if (oldSlaveAddr == null) {
           if (newSlaveAddr != null) {
             attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           }
         } else if (newSlaveAddr == null) {
-          if (oldSlaveAddr != null) {
-            removeNodes.add(oldSlaveNode);
-            // move operation slave -> master. Don't call setupResend() on slave.
-            taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
-          }
-        } else if (!oldSlaveAddr.getIPPort().equals(newSlaveAddr.getIPPort())) {
+          removeNodes.add(oldSlaveNode);
+          // move operation slave -> master. Don't call setupResend() on slave.
+          taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+        } else if (!oldSlaveAddr.isSameAddress(newSlaveAddr)) {
           attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           removeNodes.add(oldSlaveNode);
           // move operation slave -> master. Don't call setupResend() on slave.
           taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
         }
-      } else if (oldSlaveAddr != null &&
-                 oldSlaveAddr.getIPPort().equals(newMasterAddr.getIPPort())) {
-        if (newSlaveAddr != null &&
-            newSlaveAddr.getIPPort().equals(oldMasterAddr.getIPPort())) {
+      } else if (oldSlaveAddr != null && oldSlaveAddr.isSameAddress(newMasterAddr)) {
+        if (newSlaveAddr != null && newSlaveAddr.isSameAddress(oldMasterAddr)) {
           // Switchover
           changeRoleGroups.add(oldGroup);
           taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
@@ -487,13 +483,10 @@ public final class MemcachedConnection extends SpyObject {
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       List<ArcusReplNodeAddress> newGroupAddrs = entry.getValue();
-      if (newGroupAddrs.size() == 0) {
-        // Incomplete group now, do nothing.
-      } else {
-        // Completely new group
-        attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(0)));
-        if (newGroupAddrs.size() > 1) {
-          attachNodes.add(attachMemcachedNode(connName, newGroupAddrs.get(1)));
+      // newGroupAddrs may be empty in which case incomplete or invalid group
+      if (!newGroupAddrs.isEmpty()) {
+        for (ArcusReplNodeAddress newAddr : newGroupAddrs) {
+          attachNodes.add(attachMemcachedNode(connName, newAddr));
         }
       }
     }

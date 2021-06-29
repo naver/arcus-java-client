@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ package net.spy.memcached;
 public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 
   public MemcachedReplicaGroupImpl(final MemcachedNode node) {
-    super(getGroupNameForNode(node));
+    super(getGroupNameFromNode(node));
 
     // Cannot make MemcachedReplicaGoup instance without group name and master/slave node
     if (node == null) {
@@ -35,7 +36,7 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
       return false;
     }
 
-    if (this.group.equals(getGroupNameForNode(node))) {
+    if (this.group.equals(getGroupNameFromNode(node))) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = node;
       } else {
@@ -44,9 +45,8 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 
       node.setReplicaGroup(this);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   public boolean deleteMemcachedNode(final MemcachedNode node) {
@@ -54,16 +54,15 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
       return false;
     }
 
-    if (this.group.equals(getGroupNameForNode(node))) {
+    if (this.group.equals(getGroupNameFromNode(node))) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = null;
       } else {
         this.slaveNode = null;
       }
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   public boolean changeRole() {

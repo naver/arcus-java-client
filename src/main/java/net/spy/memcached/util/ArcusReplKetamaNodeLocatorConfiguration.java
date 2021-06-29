@@ -23,6 +23,10 @@ import net.spy.memcached.MemcachedReplicaGroup;
 
 import java.util.Comparator;
 
+/**
+ * This configuration class is aware that InetSocketAddress is really ArcusReplNodeAddress.
+ * Its getKeyForNode uses the group name, instead of the socket address.
+ */
 public class ArcusReplKetamaNodeLocatorConfiguration implements
         KetamaNodeLocatorConfiguration {
 

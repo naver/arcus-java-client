@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +36,8 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   private final String ip;
   private final int port;
 
+  private static final int groupNodeSize = 2;
+
   private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
     super(ip, port);
     this.group = group;
@@ -66,13 +69,13 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     return new ArcusReplNodeAddress(group, master, ip, port);
   }
 
-  private static List<InetSocketAddress> parseNodeNames(String s) throws Exception {
+  private static List<InetSocketAddress> parseNodeNames(String s) {
     List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
 
     for (String node : s.split(",")) {
       String[] temp = node.split("\\^");
       String group = temp[0];
-      boolean master = temp[1].equals("M") ? true : false;
+      boolean master = temp[1].equals("M");
       String ipport = temp[2];
       // We may throw null pointer exception if the string has
       // an unexpected format.  Abort the whole method instead of
@@ -112,8 +115,8 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
             new HashMap<String, List<ArcusReplNodeAddress>>();
 
-    for (int i = 0; i < addrs.size(); i++) {
-      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addrs.get(i);
+    for (InetSocketAddress addr : addrs) {
+      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addr;
       String groupName = a.getGroupName();
       List<ArcusReplNodeAddress> gNodeList = newAllGroups.get(groupName);
       if (gNodeList == null) {
@@ -131,38 +134,46 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       // If newGroupNodes is valid, it is sorted by master and slave order.
       List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
-
-      if (newGroupNodes.size() >= 3) {
-        arcusLogger.error("Invalid group " + entry.getKey() + " : "
-                + " Too many nodes. " + newGroupNodes);
-        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-      } else if (newGroupNodes.size() == 2 &&
-              newGroupNodes.get(0).getIPPort().equals(newGroupNodes.get(1).getIPPort())) {
-        // Two nodes have the same ip and port.
-        arcusLogger.error("Invalid group " + entry.getKey() + " : "
-                + "Two nodes have the same ip and port. " + newGroupNodes);
-        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-      } else if (newGroupNodes.size() == 2 &&
-              newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
-        // Two nodes are masters.
-        arcusLogger.error("Invalid group " + entry.getKey() + " : "
-                + "Two master nodes exist. " + newGroupNodes);
-        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-      } else if (!newGroupNodes.get(0).master) {
-        /* This case can occur during the switchover or failover.
-         * 1) In the switchover, it occurs after below the first phase.
-         * - the old master is changed to the new slave node.
-         * - the old slave is changed to the new master node.
-         * 2) In the failover, it occurs after below the first phase.
-         * - the old master is removed by abnormal shutdown.
-         * - the old slave is changed to the new master node.
-         */
-        arcusLogger.info("Invalid group " + entry.getKey() + " : "
-                + "Master does not exist. " + newGroupNodes);
-        entry.setValue(new ArrayList<ArcusReplNodeAddress>());
-      }
+      validateGroup(entry);
     }
     return newAllGroups;
+  }
+
+  private static void validateGroup(Map.Entry<String, List<ArcusReplNodeAddress>> group) {
+    List<ArcusReplNodeAddress> newGroupNodes = group.getValue();
+    if (newGroupNodes.size() > groupNodeSize) {
+      arcusLogger.error("Invalid group " + group.getKey() + " : "
+              + " Too many nodes. " + newGroupNodes);
+      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+    } else if (newGroupNodes.size() == groupNodeSize &&
+            newGroupNodes.get(0).isSameAddress(newGroupNodes.get(1))) {
+      // Two nodes have the same ip and port.
+      arcusLogger.error("Invalid group " + group.getKey() + " : "
+              + "Two nodes have the same ip and port. " + newGroupNodes);
+      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+    } else if (newGroupNodes.size() == groupNodeSize &&
+            newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
+      // Two nodes are masters.
+      arcusLogger.error("Invalid group " + group.getKey() + " : "
+              + "Two master nodes exist. " + newGroupNodes);
+      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+    } else if (!newGroupNodes.get(0).master) {
+      /* This case can occur during the switchover or failover.
+       * 1) In the switchover, it occurs after below the first phase.
+       * - the old master is changed to the new slave node.
+       * - the old slave is changed to the new master node.
+       * 2) In the failover, it occurs after below the first phase.
+       * - the old master is removed by abnormal shutdown.
+       * - the old slave is changed to the new master node.
+       */
+      arcusLogger.info("Invalid group " + group.getKey() + " : "
+              + "Master does not exist. " + newGroupNodes);
+      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+    }
+  }
+
+  public boolean isSameAddress(ArcusReplNodeAddress addr) {
+    return this.getIPPort().equals(addr.getIPPort());
   }
 
   public boolean isMaster() {
