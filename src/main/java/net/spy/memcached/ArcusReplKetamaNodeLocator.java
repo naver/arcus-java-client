@@ -42,30 +42,21 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   private final Collection<MemcachedNode> allNodes;
 
   private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
-  private final ArcusReplKetamaNodeLocatorConfiguration config;
+  private final ArcusReplKetamaNodeLocatorConfiguration config
+          = new ArcusReplKetamaNodeLocatorConfiguration();
 
   private final Lock lock = new ReentrantLock();
 
   public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes) {
-    // This configuration class is aware that InetSocketAddress is really
-    // ArcusReplNodeAddress.  Its getKeyForNode uses the group name, instead
-    // of the socket address.
-    this(nodes, new ArcusReplKetamaNodeLocatorConfiguration());
-  }
-
-  private ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes,
-                                     ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
     ketamaGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
     allGroups = new HashMap<String, MemcachedReplicaGroup>();
 
-    config = conf;
-
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
       MemcachedReplicaGroup mrg =
-              allGroups.get(MemcachedReplicaGroup.getGroupNameForNode(node));
+              allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
 
       if (mrg == null) {
         mrg = new MemcachedReplicaGroupImpl(node);
@@ -88,13 +79,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
                                      HashMap<String, MemcachedReplicaGroup> ag,
-                                     Collection<MemcachedNode> an,
-                                     ArcusReplKetamaNodeLocatorConfiguration conf) {
+                                     Collection<MemcachedNode> an) {
     super();
     ketamaGroups = kg;
     allGroups = ag;
     allNodes = an;
-    config = conf;
   }
 
   public Collection<MemcachedNode> getAll() {
@@ -143,7 +132,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         }
         rg = ketamaGroups.get(hash).first();
         // return a node (master / slave) for the replica pick request.
-        rv = rg.getNodeForReplicaPick(pick);
+        rv = rg.getNodeByReplicaPick(pick);
       }
     } finally {
       lock.unlock();
@@ -190,7 +179,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       lock.unlock();
     }
 
-    return new ArcusReplKetamaNodeLocator(smg, ag, an, config);
+    return new ArcusReplKetamaNodeLocator(smg, ag, an);
   }
 
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
@@ -211,7 +200,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
         MemcachedReplicaGroup mrg =
-                allGroups.get(MemcachedReplicaGroup.getGroupNameForNode(node));
+                allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
         mrg.deleteMemcachedNode(node);
 
         try {
@@ -232,7 +221,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedNode node : toAttach) {
         allNodes.add(node);
         MemcachedReplicaGroup mrg =
-                allGroups.get(MemcachedReplicaGroup.getGroupNameForNode(node));
+                allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
         if (mrg == null) {
           mrg = new MemcachedReplicaGroupImpl(node);
           getLogger().info("new memcached replica group added %s", mrg.getGroupName());

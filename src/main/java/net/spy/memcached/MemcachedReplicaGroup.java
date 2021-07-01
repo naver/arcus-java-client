@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2021 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +57,10 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     return slaveNode;
   }
 
-  public MemcachedNode getNodeForReplicaPick(ReplicaPick priority) {
+  public MemcachedNode getNodeByReplicaPick(ReplicaPick pick) {
     MemcachedNode node = null;
 
-    switch (priority) {
+    switch (pick) {
       case MASTER:
         node = masterNode;
         break;
@@ -76,7 +77,7 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
         } else {
           node = masterNode;
         }
-        prevMasterPick = prevMasterPick ? false : true;
+        prevMasterPick = !prevMasterPick;
         break;
       default: // This case never exist.
         break;
@@ -86,7 +87,7 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
 
   public abstract boolean changeRole();
 
-  public static String getGroupNameForNode(final MemcachedNode node) {
+  public static String getGroupNameFromNode(final MemcachedNode node) {
     return ((ArcusReplNodeAddress) node.getSocketAddress()).getGroupName();
   }
 }
