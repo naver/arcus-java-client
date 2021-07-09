@@ -21,7 +21,9 @@ public class MemcachedReplicaGroupROImpl extends MemcachedReplicaGroup {
   public MemcachedReplicaGroupROImpl(final MemcachedReplicaGroup group) {
     super(group.getGroupName());
     this.masterNode = new MemcachedNodeROImpl(group.getMasterNode());
-    this.slaveNode = new MemcachedNodeROImpl(group.getSlaveNode());
+    for (MemcachedNode slaveNode : group.getSlaveNodes()) {
+      slaveNodes.add(new MemcachedNodeROImpl(slaveNode));
+    }
   }
 
   @Override
