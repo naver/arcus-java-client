@@ -125,6 +125,17 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
 
   protected final void receivedMoveOperations(String cause) {
+    // switchover message e.g.
+    // one slave node case : "SWITCHOVER", "REPL_SLAVE",
+    // two or more than slave nodes case : "SWITCHOVER <ip:port>", "REPL_SLAVE <ip:port>"
+    String[] messages = cause.split(" ");
+    if (messages.length < 1 || messages.length > 2) {
+      getLogger().error("response message error: %s by %s from %s", cause, this, handlingNode);
+      transitionState(OperationState.COMPLETE);
+      return;
+    } else if (messages.length == 2) {
+      handlingNode.getReplicaGroup().setMasterCandidateByAddr(messages[1]);
+    }
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
     transitionState(OperationState.MOVING);
   }

@@ -20,13 +20,19 @@ package net.spy.memcached;
 
 import net.spy.memcached.compat.SpyObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public abstract class MemcachedReplicaGroup extends SpyObject {
   protected final String group;
   protected MemcachedNode masterNode;
-  protected MemcachedNode slaveNode;
-  private boolean prevMasterPick;
+  protected List<MemcachedNode> slaveNodes = new ArrayList<MemcachedNode>(MAX_REPL_SLAVE_SIZE);
+  private int nextSlaveIndex = -1;
+  protected MemcachedNode masterCandidate;
+  private final StringBuilder sb = new StringBuilder();
 
-  public static final int MAX_REPL_SLAVE_SIZE = 1;
+  public static final int MAX_REPL_SLAVE_SIZE = 2;
   public static final int MAX_REPL_GROUP_SIZE = MAX_REPL_SLAVE_SIZE + 1;
 
   protected MemcachedReplicaGroup(final String groupName) {
@@ -36,12 +42,21 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     this.group = groupName;
   }
 
+  @Override
   public String toString() {
-    return "[" + this.masterNode + ", " + this.slaveNode + "]";
+    sb.setLength(0);
+    sb.append("[");
+    sb.append(masterNode);
+    for (MemcachedNode slaveNode : slaveNodes) {
+      sb.append(", ");
+      sb.append(slaveNode);
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
   public boolean isEmptyGroup() {
-    return masterNode == null && slaveNode == null;
+    return masterNode == null && slaveNodes.isEmpty();
   }
 
   public abstract boolean setMemcachedNode(final MemcachedNode node);
@@ -56,8 +71,28 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     return masterNode;
   }
 
-  public MemcachedNode getSlaveNode() {
-    return slaveNode;
+  public List<MemcachedNode> getSlaveNodes() {
+    if (slaveNodes.isEmpty()) {
+      return null;
+    }
+    return Collections.unmodifiableList(slaveNodes);
+  }
+
+  public MemcachedNode getMasterCandidate() {
+    return masterCandidate;
+  }
+
+  public void setMasterCandidate(MemcachedNode masterCandidate) {
+    this.masterCandidate = masterCandidate;
+  }
+
+  public void setMasterCandidateByAddr(String address) {
+    for (MemcachedNode node : this.getSlaveNodes()) {
+      if (address.equals(((ArcusReplNodeAddress) node.getSocketAddress()).getIPPort())) {
+        this.setMasterCandidate(node);
+        break;
+      }
+    }
   }
 
   public MemcachedNode getNodeByReplicaPick(ReplicaPick pick) {
@@ -68,23 +103,65 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
         node = masterNode;
         break;
       case SLAVE:
-        if (slaveNode != null && slaveNode.isActive()) {
-          node = slaveNode;
-        } else {
+        if (!slaveNodes.isEmpty()) {
+          node = getNextActiveSlaveNodeRotate();
+        }
+        if (node == null) {
           node = masterNode;
         }
         break;
       case RR:
-        if (prevMasterPick && slaveNode != null && slaveNode.isActive()) {
-          node = slaveNode;
-        } else {
+        if (!slaveNodes.isEmpty()) {
+          node = getNextActiveSlaveNodeNoRotate();
+        }
+        if (node == null) {
           node = masterNode;
         }
-        prevMasterPick = !prevMasterPick;
         break;
       default: // This case never exist.
         break;
     }
+    return node;
+  }
+
+
+  private MemcachedNode getNextActiveSlaveNodeRotate() {
+    MemcachedNode node = null;
+    int firstIndex = -1;
+
+    do {
+      if (++nextSlaveIndex >= slaveNodes.size()) {
+        nextSlaveIndex = 0;
+      }
+      if (nextSlaveIndex == firstIndex) {
+        break;
+      }
+      node = slaveNodes.get(nextSlaveIndex);
+      if (!node.isActive()) {
+        node = null;
+        if (firstIndex == -1) {
+          firstIndex = nextSlaveIndex;
+        }
+      }
+    } while (node == null);
+
+    return node;
+  }
+
+  private MemcachedNode getNextActiveSlaveNodeNoRotate() {
+    MemcachedNode node = null;
+
+    do {
+      if (++nextSlaveIndex >= slaveNodes.size()) {
+        nextSlaveIndex = -1;
+        break;
+      }
+      node = slaveNodes.get(nextSlaveIndex);
+      if (!node.isActive()) {
+        node = null;
+      }
+    } while (node == null);
+
     return node;
   }
 

@@ -395,7 +395,7 @@ public final class MemcachedConnection extends SpyObject {
       }
 
       MemcachedNode oldMasterNode = oldGroup.getMasterNode();
-      MemcachedNode oldSlaveNode = oldGroup.getSlaveNode();
+      List<MemcachedNode> oldSlaveNodes = oldGroup.getSlaveNodes();
 
       List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(changedGroupName);
       getLogger().debug("New group nodes : " + newGroupAddrs);
@@ -404,8 +404,8 @@ public final class MemcachedConnection extends SpyObject {
       if (newGroupAddrs == null) {
         // Old group nodes have disappered. Remove the old group nodes.
         removeNodes.add(oldMasterNode);
-        if (oldSlaveNode != null) {
-          removeNodes.add(oldSlaveNode);
+        if (oldSlaveNodes != null) {
+          removeNodes.addAll(oldSlaveNodes);
         }
         continue;
       }
@@ -420,61 +420,98 @@ public final class MemcachedConnection extends SpyObject {
       assert oldMasterAddr != null : "invalid old rgroup";
       assert newMasterAddr != null : "invalid new rgroup";
 
-      ArcusReplNodeAddress oldSlaveAddr = oldSlaveNode != null ?
-          (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress() : null;
-      ArcusReplNodeAddress newSlaveAddr = newGroupAddrs.size() > 1 ?
-          newGroupAddrs.get(1) : null;
+      List<ArcusReplNodeAddress> oldSlaveAddrs = getAddrsFromNodes(oldSlaveNodes);
+      List<ArcusReplNodeAddress> newSlaveAddrs = getSlaveAddrsFromGroupAddrs(newGroupAddrs);
 
       if (oldMasterAddr.isSameAddress(newMasterAddr)) {
-        if (oldSlaveAddr == null) {
-          if (newSlaveAddr != null) {
-            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+        if (oldSlaveAddrs == null) {
+          if (newSlaveAddrs != null) {
+            for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+              attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+            }
           }
-        } else if (newSlaveAddr == null) {
-          removeNodes.add(oldSlaveNode);
-          // move operation slave -> master. Don't call setupResend() on slave.
-          taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
-        } else if (!oldSlaveAddr.isSameAddress(newSlaveAddr)) {
-          attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
-          removeNodes.add(oldSlaveNode);
-          // move operation slave -> master. Don't call setupResend() on slave.
-          taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+        } else if (newSlaveAddrs == null) {
+          removeNodes.addAll(oldSlaveNodes);
+          // move operation all slave -> master. Don't call setupResend() on slave.
+          for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+            taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+          }
+        } else {
+          // add newly added slave node
+          for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+            if (!containsAddr(oldSlaveAddrs, newSlaveAddr)) {
+              attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+            }
+          }
+
+          // remove not exist old slave node
+          for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+            if (!containsAddr(newSlaveAddrs,
+                    (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
+              removeNodes.add(oldSlaveNode);
+              // move operation slave -> master. Don't call setupResend() on slave.
+              taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
+            }
+          }
         }
-      } else if (oldSlaveAddr != null && oldSlaveAddr.isSameAddress(newMasterAddr)) {
-        if (newSlaveAddr != null && newSlaveAddr.isSameAddress(oldMasterAddr)) {
+      } else if (oldSlaveAddrs != null && containsAddr(oldSlaveAddrs, newMasterAddr)) {
+        MemcachedNode masterCandidate;
+        if (newSlaveAddrs != null && containsAddr(newSlaveAddrs, oldMasterAddr)) {
           // Switchover
+          masterCandidate = getNodeByAddr(oldSlaveNodes, newMasterAddr);
+          oldGroup.setMasterCandidate(masterCandidate);
           changeRoleGroups.add(oldGroup);
-          taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
+          taskList.add(new MoveOperationTask(oldMasterNode, masterCandidate));
           taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
               "Discarded all pending reading state operation to move operations."));
         } else {
           // Failover
+          masterCandidate = getNodeByAddr(oldSlaveNodes, newMasterAddr);
+          oldGroup.setMasterCandidate(masterCandidate);
           changeRoleGroups.add(oldGroup);
           removeNodes.add(oldMasterNode);
           // move operation: master -> slave. Call setupResend() on master
           taskList.add(new SetupResendTask(oldMasterNode, false,
               "Discarded all pending reading state operation to move operations."));
-          taskList.add(new MoveOperationTask(oldMasterNode, oldSlaveNode));
-          if (newSlaveAddr != null) {
-            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+          taskList.add(new MoveOperationTask(oldMasterNode, masterCandidate));
+        }
+        // add newly added slave node
+        if (newSlaveAddrs != null) {
+          for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+            if (!containsAddr(oldSlaveAddrs, newSlaveAddr)) {
+              attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+            }
+          }
+        }
+        // remove not exist old slave node
+        for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+          if (!containsAddr(newSlaveAddrs,
+                  (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
+            removeNodes.add(oldSlaveNode);
+            // move operation slave -> master. Don't call setupResend() on slave.
+            taskList.add(new MoveOperationTask(oldSlaveNode, masterCandidate));
           }
         }
       } else {
         // Old master has gone away. And, new group has appeared.
         MemcachedNode newMasterNode = attachMemcachedNode(connName, newMasterAddr);
         attachNodes.add(newMasterNode);
-        if (newSlaveAddr != null) {
-          attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+        if (newSlaveAddrs != null) {
+          for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+          }
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master. Call setupResend() on master
         taskList.add(new SetupResendTask(oldMasterNode, false,
             "Discarded all pending reading state operation to move operations."));
         taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
-        if (oldSlaveNode != null) {
-          removeNodes.add(oldSlaveNode);
-          // move operation slave -> master. Don't call setupResend() on slave.
-          taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
+        if (oldSlaveNodes != null) {
+          for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+            removeNodes.add(oldSlaveNode);
+            // move operation slave -> master. Don't call setupResend() on slave.
+            taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
+          }
         }
       }
 
@@ -502,6 +539,56 @@ public final class MemcachedConnection extends SpyObject {
     // Remove the unavailable nodes.
     handleNodesToRemove(removeNodes);
   }
+
+  private List<ArcusReplNodeAddress> getAddrsFromNodes(List<MemcachedNode> nodes) {
+    List<ArcusReplNodeAddress> addrs = null;
+    if (nodes != null) {
+      addrs = new ArrayList<ArcusReplNodeAddress>(nodes.size());
+      for (MemcachedNode node : nodes) {
+        addrs.add((ArcusReplNodeAddress) node.getSocketAddress());
+      }
+    }
+    return addrs;
+  }
+
+  private List<ArcusReplNodeAddress> getSlaveAddrsFromGroupAddrs(
+          List<ArcusReplNodeAddress> groupAddrs) {
+    List<ArcusReplNodeAddress> slaveAddrs = null;
+    int groupSize = groupAddrs.size();
+    if (groupSize > 1) {
+      slaveAddrs = new ArrayList<ArcusReplNodeAddress>(groupSize - 1);
+      for (int i = 1; i < groupSize; i++) {
+        slaveAddrs.add(groupAddrs.get(i));
+      }
+    }
+    return slaveAddrs;
+  }
+
+  private boolean containsAddr(List<ArcusReplNodeAddress> addrList,
+                               ArcusReplNodeAddress targetAddr) {
+    boolean contain = false;
+    if (addrList == null) {
+      return contain;
+    }
+
+    for (ArcusReplNodeAddress address : addrList) {
+      contain = targetAddr.isSameAddress(address);
+      if (contain) {
+        break;
+      }
+    }
+    return contain;
+  }
+
+  private MemcachedNode getNodeByAddr(List<MemcachedNode> nodes, ArcusReplNodeAddress targetAddr) {
+    for (MemcachedNode node : nodes) {
+      // targetAddr made by node so index will must be returned
+      if (targetAddr.isSameAddress((ArcusReplNodeAddress) node.getSocketAddress())) {
+        return node;
+      }
+    }
+    throw new IllegalArgumentException("incomplete or invalid nodes");
+  }
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_REPLICATION if */
@@ -514,10 +601,11 @@ public final class MemcachedConnection extends SpyObject {
      *
      * because moves all operations
      */
-    if (group.getMasterNode() != null && group.getSlaveNode() != null) {
+    if (group.getMasterNode() != null && group.getSlaveNodes() != null) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
-        if (node.moveOperations(group.getSlaveNode()) > 0) {
-          addedQueue.offer(group.getSlaveNode());
+        MemcachedNode masterCandidateNode = group.getMasterCandidate();
+        if (node.moveOperations(masterCandidateNode) > 0) {
+          addedQueue.offer(masterCandidateNode);
         }
         ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
       } else {
