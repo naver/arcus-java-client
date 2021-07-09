@@ -20,13 +20,20 @@ package net.spy.memcached;
 
 import net.spy.memcached.compat.SpyObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class MemcachedReplicaGroup extends SpyObject {
   protected final String group;
   protected MemcachedNode masterNode;
-  protected MemcachedNode slaveNode;
+  protected List<MemcachedNode> slaveNodes = new ArrayList<MemcachedNode>(MAX_REPL_SLAVE_SIZE);
   private boolean prevMasterPick;
+  private int nextSlaveIndex;
+  private int nextRrIndex;
+  protected MemcachedNode masterCandidate;
+  private final StringBuilder sb = new StringBuilder();
 
-  public static final int MAX_REPL_SLAVE_SIZE = 1;
+  public static final int MAX_REPL_SLAVE_SIZE = 2;
   public static final int MAX_REPL_GROUP_SIZE = MAX_REPL_SLAVE_SIZE + 1;
 
   protected MemcachedReplicaGroup(final String groupName) {
@@ -37,11 +44,19 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   }
 
   public String toString() {
-    return "[" + this.masterNode + ", " + this.slaveNode + "]";
+    sb.setLength(0);
+    sb.append("[");
+    sb.append(masterNode);
+    for (MemcachedNode slaveNode : slaveNodes) {
+      sb.append(", ");
+      sb.append(slaveNode);
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
   public boolean isEmptyGroup() {
-    return masterNode == null && slaveNode == null;
+    return masterNode == null && slaveNodes.isEmpty();
   }
 
   public abstract boolean setMemcachedNode(final MemcachedNode node);
@@ -56,8 +71,20 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     return masterNode;
   }
 
-  public MemcachedNode getSlaveNode() {
-    return slaveNode;
+  public List<MemcachedNode> getSlaveNodes() {
+    return slaveNodes;
+  }
+
+  public MemcachedNode getSlaveNode(int index) {
+    return slaveNodes.get(index);
+  }
+
+  public MemcachedNode getMasterCandidate() {
+    return masterCandidate;
+  }
+
+  public void setMasterCandidate(MemcachedNode masterCandidate) {
+    this.masterCandidate = masterCandidate;
   }
 
   public MemcachedNode getNodeByReplicaPick(ReplicaPick pick) {
@@ -68,23 +95,46 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
         node = masterNode;
         break;
       case SLAVE:
-        if (slaveNode != null && slaveNode.isActive()) {
-          node = slaveNode;
-        } else {
+        if (!slaveNodes.isEmpty()) {
+          node = getNextActiveSlaveNode(true);
+        }
+        if (node == null) {
           node = masterNode;
         }
         break;
       case RR:
-        if (prevMasterPick && slaveNode != null && slaveNode.isActive()) {
-          node = slaveNode;
-        } else {
+        if (prevMasterPick) {
+          node = getNextActiveSlaveNode(false);
+        }
+        if (node == null) {
           node = masterNode;
         }
-        prevMasterPick = !prevMasterPick;
         break;
       default: // This case never exist.
         break;
     }
+    return node;
+  }
+
+  private MemcachedNode getNextActiveSlaveNode(boolean rotate) {
+    MemcachedNode node;
+    int index = rotate ? this.nextSlaveIndex : this.nextRrIndex;
+    int firstIndex = index;
+
+    do {
+      node = slaveNodes.get(index);
+      if (!node.isActive()) {
+        node = null;
+      }
+      index = (index + 1) % slaveNodes.size();
+    } while (node == null && index != firstIndex);
+
+    if (rotate) {
+      this.nextSlaveIndex = index;
+    } else {
+      this.nextRrIndex = index;
+    }
+
     return node;
   }
 
