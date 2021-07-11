@@ -103,7 +103,7 @@ public class CollectionGetOperationImpl extends OperationImpl
 
   public void handleLine(String line) {
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       receivedMoveOperations(line);
       return;
     }

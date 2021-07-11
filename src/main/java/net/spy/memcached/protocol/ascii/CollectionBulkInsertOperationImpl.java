@@ -93,7 +93,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       this.insert.setNextOpIndex(index);
       receivedMoveOperations(line);
       return;

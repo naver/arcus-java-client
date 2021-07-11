@@ -157,4 +157,8 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   }
 
   public abstract void handleLine(String line);
+
+  protected boolean hasSwitchedOver(String line) {
+    return line.startsWith("SWITCHOVER") || line.startsWith("REPL_SLAVE");
+  }
 }

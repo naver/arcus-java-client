@@ -83,7 +83,7 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     OperationStatus status = null;
 
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       receivedMoveOperations(line);
       return;
     }

@@ -119,7 +119,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     }
 
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       receivedMoveOperations(line);
       return;
     }
