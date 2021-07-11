@@ -95,7 +95,7 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
             : "Read ``" + line + "'' when in " + getState() + " state";
 
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       this.insert.setNextOpIndex(index);
       receivedMoveOperations(line);
       return;

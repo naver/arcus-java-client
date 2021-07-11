@@ -91,7 +91,7 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
             + "'' when in " + getState() + " state";
 
     /* ENABLE_REPLICATION if */
-    if (line.equals("SWITCHOVER") || line.equals("REPL_SLAVE")) {
+    if (hasSwitchedOver(line)) {
       this.update.setNextOpIndex(index);
       receivedMoveOperations(line);
       return;
