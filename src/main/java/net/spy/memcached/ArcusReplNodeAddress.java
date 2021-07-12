@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ArcusReplNodeAddress extends InetSocketAddress {
 
@@ -35,8 +37,6 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   private final String group;
   private final String ip;
   private final int port;
-
-  private static final int groupNodeSize = 2;
 
   private ArcusReplNodeAddress(String group, boolean master, String ip, int port) {
     super(ip, port);
@@ -133,7 +133,6 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       // If newGroupNodes is valid, it is sorted by master and slave order.
-      List<ArcusReplNodeAddress> newGroupNodes = entry.getValue();
       validateGroup(entry);
     }
     return newAllGroups;
@@ -141,21 +140,21 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 
   private static void validateGroup(Map.Entry<String, List<ArcusReplNodeAddress>> group) {
     List<ArcusReplNodeAddress> newGroupNodes = group.getValue();
-    if (newGroupNodes.size() > groupNodeSize) {
+    int groupSize = newGroupNodes.size();
+
+    if (groupSize > MemcachedReplicaGroup.MAX_REPL_GROUP_SIZE) {
       arcusLogger.error("Invalid group " + group.getKey() + " : "
               + " Too many nodes. " + newGroupNodes);
       group.setValue(new ArrayList<ArcusReplNodeAddress>());
-    } else if (newGroupNodes.size() == groupNodeSize &&
-            newGroupNodes.get(0).isSameAddress(newGroupNodes.get(1))) {
-      // Two nodes have the same ip and port.
+    } else if (groupSize > 1 && hasDuplicatedAddress(newGroupNodes, groupSize)) {
+      // Two or more nodes have the same ip and port.
       arcusLogger.error("Invalid group " + group.getKey() + " : "
-              + "Two nodes have the same ip and port. " + newGroupNodes);
+              + "Two or more nodes have the same ip and port." + newGroupNodes);
       group.setValue(new ArrayList<ArcusReplNodeAddress>());
-    } else if (newGroupNodes.size() == groupNodeSize &&
-            newGroupNodes.get(0).master && newGroupNodes.get(1).master) {
-      // Two nodes are masters.
+    } else if (groupSize > 1 && hasMultiMasters(newGroupNodes)) {
+      // Two or more nodes are masters.
       arcusLogger.error("Invalid group " + group.getKey() + " : "
-              + "Two master nodes exist. " + newGroupNodes);
+              + "Two or more master nodes exist. " + newGroupNodes);
       group.setValue(new ArrayList<ArcusReplNodeAddress>());
     } else if (!newGroupNodes.get(0).master) {
       /* This case can occur during the switchover or failover.
@@ -182,6 +181,30 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
 
   public void setMaster(boolean master) {
     this.master = master;
+  }
+
+  private static boolean hasDuplicatedAddress(List<ArcusReplNodeAddress> groupNodes, int groupSize) {
+    if (groupSize == 2) {
+      return groupNodes.get(0).isSameAddress(groupNodes.get(1));
+    }
+
+    Set<String> addrSet = new HashSet<String>();
+    for (ArcusReplNodeAddress nodeAddress : groupNodes) {
+      addrSet.add(nodeAddress.getIPPort());
+    }
+    return groupSize != addrSet.size();
+  }
+
+  private static boolean hasMultiMasters(List<ArcusReplNodeAddress> newGroupNodes) {
+    int masterCount = 0;
+    for (ArcusReplNodeAddress nodeAddress : newGroupNodes) {
+      if (nodeAddress.isMaster()) {
+        if (++masterCount > 1) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 /* ENABLE_REPLICATION end */

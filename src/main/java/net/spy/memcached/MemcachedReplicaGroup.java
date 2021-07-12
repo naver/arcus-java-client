@@ -26,6 +26,9 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   protected MemcachedNode slaveNode;
   private boolean prevMasterPick;
 
+  public static final int MAX_REPL_SLAVE_SIZE = 1;
+  public static final int MAX_REPL_GROUP_SIZE = MAX_REPL_SLAVE_SIZE + 1;
+
   protected MemcachedReplicaGroup(final String groupName) {
     if (groupName == null) {
       throw new IllegalArgumentException("Memcached in Replica Group must have group name");
