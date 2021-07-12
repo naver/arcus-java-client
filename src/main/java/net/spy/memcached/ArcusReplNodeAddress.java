@@ -183,7 +183,8 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     this.master = master;
   }
 
-  private static boolean hasDuplicatedAddress(List<ArcusReplNodeAddress> groupNodes, int groupSize) {
+  private static boolean hasDuplicatedAddress(List<ArcusReplNodeAddress> groupNodes,
+                                              int groupSize) {
     if (groupSize == 2) {
       return groupNodes.get(0).isSameAddress(groupNodes.get(1));
     }
