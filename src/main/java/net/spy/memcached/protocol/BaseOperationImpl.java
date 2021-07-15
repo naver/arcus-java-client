@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationException;
@@ -125,8 +127,22 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
 
   protected final void receivedMoveOperations(String cause) {
+    if (cause.contains(" ")) {
+      String[] messages = cause.split(" ");
+      setMasterCandidate(messages[1]);
+    }
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
     transitionState(OperationState.MOVING);
+  }
+
+  private void setMasterCandidate(String address) {
+    MemcachedReplicaGroup replicaGroup = handlingNode.getReplicaGroup();
+    for (MemcachedNode node : replicaGroup.getSlaveNodes()) {
+      if (address.equals(((ArcusReplNodeAddress) node.getSocketAddress()).getIPPort())) {
+        replicaGroup.setMasterCandidate(node);
+        break;
+      }
+    }
   }
   /* ENABLE_REPLICATION end */
 
