@@ -748,7 +748,7 @@ public final class MemcachedConnection extends SpyObject {
       // restarting, which lead here with IOException
 
       qa.setupForAuth("due to exception"); // noop if !shouldAuth
-      getLogger().warn("Reconnecting due to exception on %s", qa, e);
+      getLogger().error("Reconnecting due to exception on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, e.getMessage());
     }
     qa.fixupOps();
