@@ -18,6 +18,7 @@
 package net.spy.memcached;
 
 import java.io.IOException;
+import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -160,7 +161,10 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         updateHash(node, true);
 
         try {
-          node.getSk().attach(null);
+          SelectionKey sk = node.getSk();
+          if (sk != null) {
+            sk.attach(null);
+          }
           node.shutdown();
         } catch (IOException e) {
           getLogger().error(
