@@ -352,14 +352,15 @@ public final class MemcachedConnection extends SpyObject {
     return changedGroupSet;
   }
 
-  private void removeAddrsOfUnchangedGroups(List<InetSocketAddress> addrs,
-                                            Set<String> changedGroups) {
-    for (Iterator<InetSocketAddress> iter = addrs.iterator(); iter.hasNext();) {
-      ArcusReplNodeAddress replAddr = (ArcusReplNodeAddress) iter.next();
-      if (!changedGroups.contains(replAddr.getGroupName())) {
-        iter.remove();
+  private List<InetSocketAddress> findAddrsOfChangedGroups(List<InetSocketAddress> addrs,
+                                                           Set<String> changedGroups) {
+    List<InetSocketAddress> changedGroupAddrs = new ArrayList<InetSocketAddress>();
+    for (InetSocketAddress addr : addrs) {
+      if (changedGroups.contains(((ArcusReplNodeAddress) addr).getGroupName())) {
+        changedGroupAddrs.add(addr);
       }
     }
+    return changedGroupAddrs;
   }
 
   private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
@@ -380,10 +381,10 @@ public final class MemcachedConnection extends SpyObject {
      * and update the state of groups based on them.
      */
     Set<String> changedGroups = findChangedGroups(addrs);
-    removeAddrsOfUnchangedGroups(addrs, changedGroups);
+    List<InetSocketAddress> changedGroupAddrs  = findAddrsOfChangedGroups(addrs, changedGroups);
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            ArcusReplNodeAddress.makeGroupAddrsList(addrs);
+            ArcusReplNodeAddress.makeGroupAddrsList(changedGroupAddrs);
     Map<String, MemcachedReplicaGroup> oldAllGroups =
             ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
 
