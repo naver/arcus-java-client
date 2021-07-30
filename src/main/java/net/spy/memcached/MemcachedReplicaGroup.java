@@ -95,6 +95,15 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     }
   }
 
+  public void setMasterCandidateByAddr(ArcusReplNodeAddress address) {
+    for (MemcachedNode node : this.getSlaveNodes()) {
+      if (address.isSameAddress((ArcusReplNodeAddress) node.getSocketAddress())) {
+        this.setMasterCandidate(node);
+        break;
+      }
+    }
+  }
+
   public MemcachedNode getNodeByReplicaPick(ReplicaPick pick) {
     MemcachedNode node = null;
 

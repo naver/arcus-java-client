@@ -22,6 +22,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationException;
@@ -31,6 +32,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Base class for protocol-specific operation implementations.
@@ -129,12 +131,16 @@ public abstract class BaseOperationImpl extends SpyObject {
     // one slave node case : "SWITCHOVER", "REPL_SLAVE",
     // two or more than slave nodes case : "SWITCHOVER <ip:port>", "REPL_SLAVE <ip:port>"
     String[] messages = cause.split(" ");
-    if (messages.length < 1 || messages.length > 2) {
+    MemcachedReplicaGroup group = handlingNode.getReplicaGroup();
+    if (messages.length == 1) {
+      group.setMasterCandidate(group.getSlaveNodes().get(0));
+    } else if (messages.length == 2) {
+      group.setMasterCandidateByAddr(messages[1]);
+    } else {
       getLogger().error("response message error: %s by %s from %s", cause, this, handlingNode);
+      getCallback().receivedStatus(new OperationStatus(false, cause, StatusCode.UNDEFINED));
       transitionState(OperationState.COMPLETE);
       return;
-    } else if (messages.length == 2) {
-      handlingNode.getReplicaGroup().setMasterCandidateByAddr(messages[1]);
     }
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
     transitionState(OperationState.MOVING);

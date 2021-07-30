@@ -455,26 +455,21 @@ public final class MemcachedConnection extends SpyObject {
           }
         }
       } else if (oldSlaveAddrs != null && containsAddr(oldSlaveAddrs, newMasterAddr)) {
-        MemcachedNode masterCandidate;
         if (newSlaveAddrs != null && containsAddr(newSlaveAddrs, oldMasterAddr)) {
           // Switchover
-          masterCandidate = getNodeByAddr(oldSlaveNodes, newMasterAddr);
-          oldGroup.setMasterCandidate(masterCandidate);
-          changeRoleGroups.add(oldGroup);
-          taskList.add(new MoveOperationTask(oldMasterNode, masterCandidate));
           taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
               "Discarded all pending reading state operation to move operations."));
         } else {
           // Failover
-          masterCandidate = getNodeByAddr(oldSlaveNodes, newMasterAddr);
-          oldGroup.setMasterCandidate(masterCandidate);
-          changeRoleGroups.add(oldGroup);
           removeNodes.add(oldMasterNode);
           // move operation: master -> slave. Call setupResend() on master
           taskList.add(new SetupResendTask(oldMasterNode, false,
               "Discarded all pending reading state operation to move operations."));
-          taskList.add(new MoveOperationTask(oldMasterNode, masterCandidate));
         }
+        oldGroup.setMasterCandidateByAddr(newMasterAddr);
+        changeRoleGroups.add(oldGroup);
+        taskList.add(new MoveOperationTask(oldMasterNode, oldGroup.getMasterCandidate()));
+
         // add newly added slave node
         if (newSlaveAddrs != null) {
           for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
@@ -489,7 +484,7 @@ public final class MemcachedConnection extends SpyObject {
                   (ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
             removeNodes.add(oldSlaveNode);
             // move operation slave -> master. Don't call setupResend() on slave.
-            taskList.add(new MoveOperationTask(oldSlaveNode, masterCandidate));
+            taskList.add(new MoveOperationTask(oldSlaveNode, oldGroup.getMasterCandidate()));
           }
         }
       } else {
