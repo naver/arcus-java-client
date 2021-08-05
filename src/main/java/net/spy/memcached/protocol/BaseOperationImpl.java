@@ -22,6 +22,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationException;
@@ -31,6 +32,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Base class for protocol-specific operation implementations.
@@ -125,6 +127,25 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
 
   protected final void receivedMoveOperations(String cause) {
+    // switchover message e.g.
+    // one slave node case : "SWITCHOVER", "REPL_SLAVE",
+    // two or more than slave nodes case : "SWITCHOVER <ip:port>", "REPL_SLAVE <ip:port>"
+    String[] messages = cause.split(" ");
+    MemcachedReplicaGroup group = handlingNode.getReplicaGroup();
+    if (messages.length == 1) {
+      group.setMasterCandidate();
+    } else if (messages.length == 2) {
+      group.setMasterCandidateByAddr(messages[1]);
+    }
+
+    if (group.getMasterCandidate() == null) {
+      getLogger().error("there is a problem to set master candidate : %s by %s from %s",
+              cause, this, handlingNode);
+      getCallback().receivedStatus(new OperationStatus(false, cause, StatusCode.UNDEFINED));
+      transitionState(OperationState.COMPLETE);
+      return;
+    }
+
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
     transitionState(OperationState.MOVING);
   }
