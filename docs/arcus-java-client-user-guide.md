@@ -1,6 +1,6 @@
-ARCUS Java Client User Guide
+# ARCUS Java Client User Guide
 
-[Content]
+## [Content]
 
 - [ARCUS Cloud 기본 사항](01-arcus-cloud-basics.md)
   - [서비스코드](01-arcus-cloud-basics.md#%EC%84%9C%EB%B9%84%EC%8A%A4%EC%BD%94%EB%93%9C)
@@ -65,6 +65,6 @@ ARCUS Java Client User Guide
   - [Flush](09-other-API.md#flush)
 - [Java Client Log Messages](10-log-message.md)
 - [Java Client 사용시 주의사항](11-client-notes.md)
-- [Future-get, getSome](arcus-future-get-API.md)
-  - [get](arcus-future-get-API.md#get)
-  - [getSome](arcus-future-get-API.md#getsome)
+- [Future-get, getSome](12-arcus-future-get-API.md)
+  - [get](12-arcus-future-get-API.md#get)
+  - [getSome](12-arcus-future-get-API.md#getsome)

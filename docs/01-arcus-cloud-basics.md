@@ -4,7 +4,7 @@ ARCUS는 확장된 key-value 데이터 모델을 제공한다.
 하나의 key는 하나의 데이터만을 가지는 simple key-value 유형 외에도
 하나의 key가 여러 데이터를 구조화된 형태로 저장하는 collection 유형을 제공한다.
 
-ARCUS cache server의 key-value 모델은 아래의 기본 제약 사항을 가진다.
+ARCUS Cache Server의 key-value 모델은 아래의 기본 제약 사항을 가진다.
 
 - 기존 key-value 모델의 제약 사항
   - Key의 최대 크기는 4000 character이다.
@@ -13,7 +13,7 @@ ARCUS cache server의 key-value 모델은 아래의 기본 제약 사항을 가�
   - 하나의 collection이 가지는 최대 element 개수는 50,000개이다.
   - Collection element가 저장하는 value의 최대 크기는 16KB이다.
 
-아래에서 ARCUS cloud를 이해하는 데 있어 기본 사항들을 기술한다.
+아래에서 ARCUS Cloud를 이해하는 데 있어 기본 사항들을 기술한다.
 
 - [서비스코드](01-arcus-cloud-basics.md#%EC%84%9C%EB%B9%84%EC%8A%A4%EC%BD%94%EB%93%9C)
 - [ARCUS Admin](01-arcus-cloud-basics.md#arcus-admin)
@@ -24,17 +24,17 @@ ARCUS cache server의 key-value 모델은 아래의 기본 제약 사항을 가�
 
 ## 서비스코드
 
-서비스코드(service code)는 ARCUS에서 cache cloud를 구분하는 코드이다. 
-ARCUS cache cloud 서비스를 응용들에게 제공한다는 의미에서 "서비스코드"라는 용어를 사용하게 되었다.
+서비스코드(service code)는 ARCUS에서 Cache Cloud를 구분하는 코드이다. 
+ARCUS Cache Cloud 서비스를 응용들에게 제공한다는 의미에서 "서비스코드"라는 용어를 사용하게 되었다.
 
-하나의 응용에서 하나 이상의 ARCUS cache cloud를 구축하여 사용할 수 있다.
-ARCUS java client 객체는 하나의 ARCUS 서비스코드만을 가지며, 하나의 ARCUS cache cloud에만 접근할 수 있다.
-해당 응용이 둘 이상의 ARCUS cache cloud를 접근해야 한다면,
-각 ARCUS cache cloud의 서비스코드를 가지는 ARCUS java client 객체를 따로 생성하여 사용하여야 한다.
+하나의 응용에서 하나 이상의 ARCUS Cache Cloud를 구축하여 사용할 수 있다.
+ARCUS Java Client 객체는 하나의 ARCUS 서비스코드만을 가지며, 하나의 ARCUS Cache Cloud에만 접근할 수 있다.
+해당 응용이 둘 이상의 ARCUS Cache Cloud를 접근해야 한다면,
+각 ARCUS Cache Cloud의 서비스코드를 가지는 ARCUS Java Client 객체를 따로 생성하여 사용하여야 한다.
 
 ## ARCUS Admin
 
-ARCUS admin은 ZooKeeper를 이용하여 각 서비스 코드에 해당하는 ARCUS cache cloud를 관리한다.
+ARCUS admin은 ZooKeeper를 이용하여 각 서비스 코드에 해당하는 ARCUS Cache Cloud를 관리한다.
 특정 서비스 코드에 대한 cache server list를 관리하며,
 cache server 추가 및 삭제에 대해 cache server list를 최신 상태로 유지하며,
 서비스 코드에 대한 cache server list 정보를 arcus client에게 전달한다.
@@ -43,7 +43,7 @@ ARCUS admin은 highly available하여야 하므로,
 
 ## Cache Key
 
-Cache key는 ARCUS cache에 저장하는 cache item을 유일하게 식별한다. Cache key 형식은 아래와 같다.
+Cache key는 ARCUS Cache에 저장하는 cache item을 유일하게 식별한다. Cache key 형식은 아래와 같다.
 
 ```
   Cache Key : [<prefix>:]<subkey>
@@ -63,7 +63,7 @@ Prefix와 subkey는 아래의 명명 규칙을 가진다.
 
 ## Cache Item
 
-ARCUS cache는 simple key-value item 외에 다양한 collection item 유형을 가진다.
+ARCUS Cache는 simple key-value item 외에 다양한 collection item 유형을 가진다.
 
 - simple key-value item - 기존 key-value item
 - collection item
@@ -77,9 +77,9 @@ ARCUS cache는 simple key-value item 외에 다양한 collection item 유형을 
 각 cache item은 expiration time 속성을 가진다.
 이 값의 설정으로 자동 expiration을 지정하거나 expire되지 않도록 지정할 수 있다.
 
-ARCUS cache는 memory cache이며, 한정된 메모리 공간을 사용하여 데이터를 caching한다.
+ARCUS Cache는 memory cache이며, 한정된 메모리 공간을 사용하여 데이터를 caching한다.
 메모리 공간이 모두 사용된 상태에서 새로운 cache item 저장 요청이 들어오면,
-ARCUS cache는 "out of memory" 오류를 내거나
+ARCUS Cache는 "out of memory" 오류를 내거나
 LRU(least recently used) 기반으로 오랫동안 접근되지 않은 cache item을 evict시켜
 available 메모리 공간을 확보한 후에 새로운 cache item을 저장한다.
 
@@ -87,4 +87,3 @@ available 메모리 공간을 확보한 후에 새로운 cache item을 저장한
 이러한 cache item을 sticky item이라 하며, expiration time을 -1로 설정하면 된다.
 Sticky item의 삭제는 전적으로 응용에 의해 관리되어야 함을 주의해야 한다.
 그리고, sticky item 역시 메모리에 저장되기 때문에 server가 restart되면 사라지게 된다.
-

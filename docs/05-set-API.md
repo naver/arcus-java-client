@@ -47,10 +47,10 @@ CollectionFuture<Boolean> asyncSopCreate(String key, ElementValueType valueType,
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.CREATED             | 생성 성공
-False        | CollectionResponse.EXISTS              | 동일 key 가 이미 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.CREATED                | 생성 성공
+False        | CollectionResponse.EXISTS                 | 동일 key 가 이미 존재함
 
 
 Set item을 생성하는 예제는 아래와 같다.
@@ -104,14 +104,14 @@ CollectionFuture<Boolean> asyncSopInsert(String key, Object value, CollectionAtt
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.STORED              | Set collection이 존재하여 element 만 삽입됨
-True         | CollectionResponse.CREATED_STORED      | Set collection이 create되고 element가 삽입됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 set이 아님
-False        | CollectionResponse.OVERFLOWED          | Overflow 상태임
-False        | CollectionResponse.ELEMENT_EXISTS      | 동일한 값을 가진 element가 set에 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.STORED                 | Set collection이 존재하여 element 만 삽입됨
+True         | CollectionResponse.CREATED_STORED         | Set collection이 create되고 element가 삽입됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 set이 아님
+False        | CollectionResponse.OVERFLOWED             | Overflow 상태임
+False        | CollectionResponse.ELEMENT_EXISTS         | 동일한 값을 가진 element가 set에 존재함
              
 
 Set에 하나의 element를 삽입하는 예제는 아래와 같다.
@@ -154,6 +154,7 @@ try {
    지정한 시간에 삽입 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
 3. Set은 값의 중복을 허용하지 않는다. 중복 값의 유무에 따라 반환 값은 다음과 같이 달라진다.
+   - 이미 삽입된 값이 Set에 존재한다면 false를, 존재하지 않았다면 true를 반환한다.
 4. 삽입 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
@@ -171,13 +172,13 @@ CollectionFuture<Boolean> asyncSopDelete(String key, Object value, boolean dropI
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.DELETED             | Set에서 element만 삭제됨
-True         | CollectionResponse.DELETED_DROPPED     | Set에서 element 삭제 후, empty set이 되어서 그 set도 삭제함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 key가 set이 아님
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | Key는 있지만 주어진 value를 가진 element가 없음
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.DELETED                | Set에서 element만 삭제됨
+True         | CollectionResponse.DELETED_DROPPED        | Set에서 element 삭제 후, empty set이 되어서 그 set도 삭제함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | Key는 있지만 주어진 value를 가진 element가 없음
 
 Set에서 하나의 element를 삭제하는 예제이다.
 
@@ -213,7 +214,7 @@ try {
 1. dropIfEmpty값이 true이면 element를 삭제한 후 set이 비어있게 될 때 key도 함께 삭제한다.
 2. timeout은 1초로 지정했다. 지정한 시간에 삭제 결과가 넘어 오지 않거나
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
-3. 정상적으로 삭제되면 true를 반환한다. 자세한 삭제 결과는 future.operationStatus().getResponse() 로 확인 할 수 있다.
+3. 정상적으로 삭제되면 true를 반환한다. 자세한 삭제 결과는 future.getOperationStatus().getResponse() 로 확인 할 수 있다.
 
 
 ## Set Element 존재유무 확인
@@ -230,13 +231,13 @@ CollectionFuture<Boolean> asyncSopExist(String key, Object value)
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.EXIST               | Element가 존재함
-True         | CollectionResponse.NOT_EXIST           | Element가 존재하지 않음
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 key가 set이 아님
-False        | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.EXIST                  | Element가 존재함
+True         | CollectionResponse.NOT_EXIST              | Element가 존재하지 않음
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
+False        | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 
 Set element의 존재여부를 확인하는 예제는 아래와 같다.
@@ -298,15 +299,15 @@ CollectionFuture<Set<Object>> asyncSopGet(String key, int count, boolean withDel
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.END                 | Element를 조회만 한 상태
-not null     | CollectionResponse.DELETED             | Element를 조회하고 삭제한 상태
-not null     | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 set을 drop(delete)한 상태
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | Element가 존재하지 않은 상태임, set이 비어있음
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 set이 아님
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.END                    | Element를 조회만 한 상태
+not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태
+not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 set을 drop(delete)한 상태
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT      | Element가 존재하지 않은 상태임, set이 비어있음
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 Set element를 조회하는 예제는 아래와 같다.
 
@@ -346,7 +347,7 @@ try {
 2. timeout은 1초로 지정했다. 조회에 성공하면 future는 조회 결과를 반환한다.
    지정한 시간에 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
-3. 조회 결과에 관한 자세한 내용은 future.operationStatus().getResponse() 로 확인이 가능하다.
+3. 조회 결과에 관한 자세한 내용은 future.getOperationStatus().getResponse() 로 확인이 가능하다.
 
 
 ## Set Element 일괄 삽입
@@ -451,20 +452,20 @@ CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(String key, List<O
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.EXIST               | Element가 존재함
-not null     | CollectionResponse.NOT_EXIST           | Element가 존재하지 않음
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 set이 아님
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.EXIST                  | Element가 존재함
+not null     | CollectionResponse.NOT_EXIST              | Element가 존재하지 않음
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 결과로 반환된 result(Map\<Object, Boolean\>) 객체에서 다음과 같은 정보를 확인할 수 있다
 
-result 객체의 Method | 자료형    | 설명
--------------------|---------|----------
-getKey()           | Object  | value
-getValue()         | Boolean | value의 존재 유무
+result 객체의 Method | 자료형  |  설명
+--------------------|---------|----------
+getKey()            | Object  | value
+getValue()          | Boolean | value의 존재 유무
 
 
 아래 코드는 set안에 VALUE1부터 VALUE4의 존재유무를 판단하는 코드이다.

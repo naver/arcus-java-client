@@ -46,4 +46,3 @@ try {
 
 위 코드에서 client.flush(“myprefix”)를 호출하면 “myprefix”를 prefix로 사용하는 mydata:subkey1, mydata:subkey2 두 key가 ARCUS에서 제거된다. 물론 ARCUS cloud를 구성하는 모든 서버에 대해서 수행된 결과이며 성공했을 경우 future.get()은 true를 반환한다.
 
-
