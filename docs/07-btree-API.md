@@ -99,8 +99,8 @@ ElementFlagFilter.CompOperands.GreaterOrEqual | 크거나 같은 것
 
 제공하는 bitwise 연산자는 다음과 같다.
 
-compare 연산자                                | 설명
---------------------------------------------- | ----
+| bitwise 연산자                              | 설명
+|-------------------------------------------- | ----
 ElementFlagFilter.BitwiseOperands.AND	      | AND 연산
 ElementFlagFilter.BitwiseOperands.OR	      | OR 연산
 ElementFlagFilter.BitwiseOperands.XOR	      | XOR 연산
@@ -258,10 +258,10 @@ CollectionFuture<Boolean> asyncBopCreate(String key, ElementValueType valueType,
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.CREATED             | 생성 성공
-False        | CollectionResponse.EXISTS              | 동일 key가 이미 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.CREATED                | 생성 성공
+False        | CollectionResponse.EXISTS                 | 동일 key가 이미 존재함
 
 
 B+tree item을 생성하는 예제는 아래와 같다.
@@ -329,16 +329,16 @@ asyncBopInsert(String key, byte[] bkey, byte[] eFlag, Object value, CollectionAt
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.STORED              | Element만 삽입함
-True         | CollectionResponse.CREATED_STORED      | B+tree collection 생성하고 element를 삽입함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-False        | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-False        | CollectionResponse.ELEMENT_EXISTS      | 주어진 bkey를 가진 element가 이미 존재함
-False        | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
-False        | CollectionResponse.OUT_OF_RANGE        | 주어진 bkey가 b+tree trimmed 영역에 해당됨
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.STORED                 | Element만 삽입함
+True         | CollectionResponse.CREATED_STORED         | B+tree collection 생성하고 element를 삽입함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+False        | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+False        | CollectionResponse.ELEMENT_EXISTS         | 주어진 bkey를 가진 element가 이미 존재함
+False        | CollectionResponse.OVERFLOWED             | 최대 저장가능한 개수만큼 element들이 존재함
+False        | CollectionResponse.OUT_OF_RANGE           | 주어진 bkey가 b+tree trimmed 영역에 해당됨
 
 B+tree element를 삽입하는 예제는 아래와 같다.
 
@@ -410,28 +410,28 @@ B+tree에 bkey에 해당하는 엘리먼트를 insert 하거나 upsert 할 때 �
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.STORED              | Element만 삽입함
-True         | CollectionResponse.CREATED_STORED      | B+tree collection 생성하고 element를 삽입함
-True         | CollectionResponse.REPLACED            | Element가 교체됨
-True         | CollectionResponse.TRIMMED             | element가 삽입되고, 삽입으로 trimmed element가 조회됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-False        | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-False        | CollectionResponse.ELEMENT_EXISTS      | 주어진 bkey를 가진 element가 이미 존재함
-False        | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
-False        | CollectionResponse.OUT_OF_RANGE        | 주어진 bkey가 b+tree trimmed 영역에 해당됨
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.STORED                 | Element만 삽입함
+True         | CollectionResponse.CREATED_STORED         | B+tree collection 생성하고 element를 삽입함
+True         | CollectionResponse.REPLACED               | Element가 교체됨
+True         | CollectionResponse.TRIMMED                | element가 삽입되고, 삽입으로 trimmed element가 조회됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+False        | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+False        | CollectionResponse.ELEMENT_EXISTS         | 주어진 bkey를 가진 element가 이미 존재함
+False        | CollectionResponse.OVERFLOWED             | 최대 저장가능한 개수만큼 element들이 존재함
+False        | CollectionResponse.OUT_OF_RANGE           | 주어진 bkey가 b+tree trimmed 영역에 해당됨
 
 future.getElement()객체를 통해 삭제(trim) 되는 엘리먼트의 정보를 확인할 수 있다
 
-future.getElement() 객체의 Method | 자료형    | 설명
---------------------------------|---------|------
-getValue()                      | Object  | element의 값
-getByteArrayBkey()              | byte[]  | element bkey 값(byte[])
-getLongBkey()                   | long    | element bkey 값(long)
-isByteArrayBkey()               | boolean | element bkey byte array 여부
-getFlag()                       | byte[]  | element flag값(byte[])
+future.getElement() 객체의 Method |  자료형  | 설명
+--------------------------------- | ------- | ---------
+getValue()                        | Object  | element의 값
+getByteArrayBkey()                | byte[]  | element bkey 값(byte[])
+getLongBkey()                     | long    | element bkey 값(long)
+isByteArrayBkey()                 | boolean | element bkey byte array 여부
+getFlag()                         | byte[]  | element flag값(byte[])
 
 B+tree에 element 삽입하면서 암묵적으로 trim되는 element를 조회하는 예제는 아래와 같다.
 
@@ -498,16 +498,16 @@ asyncBopUpsert(String key, byte[] bkey, byte[] eFlag, Object value, CollectionAt
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.STORED              | Element만 삽입함
-True         | CollectionResponse.CREATED_STORED      | B+tree collection 생성하고 element를 삽입함
-True         | CollectionResponse.REPLACED            | Element가 교체됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-False        | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-False        | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
-False        | CollectionResponse.OUT_OF_RANGE        | 주어진 bkey가 b+tree trimmed 영역에 해당됨
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.STORED                 | Element만 삽입함
+True         | CollectionResponse.CREATED_STORED         | B+tree collection 생성하고 element를 삽입함
+True         | CollectionResponse.REPLACED               | Element가 교체됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+False        | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+False        | CollectionResponse.OVERFLOWED             | 최대 저장가능한 개수만큼 element들이 존재함
+False        | CollectionResponse.OUT_OF_RANGE           | 주어진 bkey가 b+tree trimmed 영역에 해당됨
 
 B+tree element를 upsert하는 예제는 아래와 같다.
 
@@ -567,7 +567,7 @@ CollectionFuture<Boolean> asyncBopUpdate(String key, byte[] bkey, ElementFlagUpd
 
 - key: 변경 대상 b+tree의 key
 - bkey: 변경 대상 element의 bkey(b+tree key)
-- eFlagUpate: element의 eflag 변경할 내용
+- eFlagUpdate: element의 eflag 변경할 내용
   - eflag를 변경하지 않으려면 null을 지정한다.
   - eflag를 삭제하려면 ElementFlagUpdate.RESET_FLAG를 지정한다.
 - value: element의 new value
@@ -575,14 +575,14 @@ CollectionFuture<Boolean> asyncBopUpdate(String key, byte[] bkey, ElementFlagUpd
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.UPDATED             | Element가 변경됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 bkey를 가진 element가 없음
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-False        | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-False        | CollectionResponse.EFLAG_MISMATCH      | 주어진 eFlagUpate가 해당 element의 eflag 데이터와 불일치
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.UPDATED                | Element가 변경됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | 주어진 bkey를 가진 element가 없음
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+False        | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+False        | CollectionResponse.EFLAG_MISMATCH         | 주어진 eFlagUpdate가 해당 element의 eflag 데이터와 불일치
 
 특정 element의 eflag는 그대로 두고 value만 변경한다.
 
@@ -653,14 +653,14 @@ asyncBopDelete(String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.DELETED             | Element만 삭제함
-True         | CollectionResponse.DELETED_DROPPED     | Element 삭제하고 B+tree 자체도 삭제함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 bkey를 가진 element가 없음
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-False        | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.DELETED                | Element만 삭제함
+True         | CollectionResponse.DELETED_DROPPED        | Element 삭제하고 B+tree 자체도 삭제함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | 주어진 bkey를 가진 element가 없음
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+False        | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
 
 
 다음은 b+tree에서 bkey가 1인 element를 삭제하는 예제이다.
@@ -731,16 +731,16 @@ CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by, long init
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명
------------- | -------------------------------------- | ---------
-element 값    | CollectionResponse.END                 | 증감 정상 수행
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 bkey를 가진 element가 없음
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
-null         | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
-null         | CollectionResponse.OUT_OF_RANGE        | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
+future.get() | future.getOperationStatus().getResponse()  | 설명
+------------ | ------------------------------------------ | ---------
+element 값   | CollectionResponse.END                     | 증감 정상 수행
+null         | CollectionResponse.NOT_FOUND               | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT       | 주어진 bkey를 가진 element가 없음
+null         | CollectionResponse.TYPE_MISMATCH           | 해당 item이 b+tree가 아님
+null         | CollectionResponse.BKEY_MISMATCH           | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null         | CollectionResponse.UNREADABLE              | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+null         | CollectionResponse.OVERFLOWED              | 최대 저장가능한 개수만큼 element들이 존재함
+null         | CollectionResponse.OUT_OF_RANGE            | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
 
 B+tree element 값을 증가시키는 예제는 다음과 같다.
 
@@ -795,13 +795,13 @@ asyncBopGetItemCount(String key, byte[] from, byte[] to, ElementFlagFilter eFlag
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명
--------------| -------------------------------------- | -------
-element 개수  | CollectionResponse.END                 | Element count를 성공적으로 조회
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 set이 아님
-null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get()  | future.getOperationStatus().getResponse()  | 설명
+--------------| ------------------------------------------ | -------
+element 개수  | CollectionResponse.END                     | Element count를 성공적으로 조회
+null          | CollectionResponse.NOT_FOUND               | Key miss (주어진 key에 해당하는 item이 없음)
+null          | CollectionResponse.TYPE_MISMATCH           | 해당 item이 b+tree가 아님
+null          | CollectionResponse.BKEY_MISMATCH           | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null          | CollectionResponse.UNREADABLE              | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 
 B+tree element 개수를 확인하는 예제는 아래와 같다.
@@ -872,23 +872,23 @@ asyncBopGet(String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, i
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.END                 | Element만 조회, 조회 범위에 b+tree trim 영역 없음
-not null     | CollectionResponse.TRIMMED             | Element만 조회, 조회 범위에 b+tree trim 영역 있음
-not null     | CollectionResponse.DELETED             | Element를 조회하고 삭제한 상태
-not null     | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음
-null         | CollectionResponse.OUT_OF_RANGE        | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
-null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.END                    | Element만 조회, 조회 범위에 b+tree trim 영역 없음
+not null     | CollectionResponse.TRIMMED                | Element만 조회, 조회 범위에 b+tree trim 영역 있음
+not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태
+not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT      | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음
+null         | CollectionResponse.OUT_OF_RANGE           | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 b+tree가 아님
+null         | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 
 결과로 반환된 result(Map\<Long, Element\<Object\>\>) 객체에서 다음과 같은 정보를 확인할 수 있다
 
-result 객체의 Method            | 자료형    | 설명
+result 객체의 Method          | 자료형   | 설명
 ------------------------------|---------|-------------
 getKey()                      | Long    | btree내의 position
 getValue().getValue()         | Object  | element의 값
@@ -1065,7 +1065,7 @@ CollectionFuture<Map<Integer, CollectionOperationStatus>>
 asyncBopPipedUpdateBulk(String key, List<Element<Object>> elements)
 ```
 - key: 변경 대상 b+tree의 key
-- elements: 변경 대상 elements에 대해 bkey와 eFlagUpate, new value를 가진다.
+- elements: 변경 대상 elements에 대해 bkey와 eFlagUpdate, new value를 가진다.
 
 
 ## B+Tree Element 일괄 조회
@@ -1074,9 +1074,9 @@ asyncBopPipedUpdateBulk(String key, List<Element<Object>> elements)
 eFlagFilter 조건을 만족하는 elements 중 offset 위치부터 count 개수만큼 조회한다.
 
 ```java
-CollectionFuture<Map<String, BTreeGetResult<Long, Object>>>
+CollectionGetBulkFuturee<Map<String, BTreeGetResult<Long, Object>>>
 asyncBopGetBulk(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count)
-CollectionFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
+CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
 asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count)
 ```
 
@@ -1104,9 +1104,9 @@ null                         | CollectionResponse.UNREADABLE           | 해당 
 
 BTreeGetResult.getElements()로 조회한 BTreeElement 객체로부터 개별 element의 bkey, eflag, value를 조회할 수 있다.
 
-BTreeElement 객체의 Method    | 자료형	           | 설명
---------------------------- | ---------------- | ----
-getKey()                    | long 또는 byte[]  | element의 bkey
+BTreeElement 객체의 Method  | 자료형	          | 설명
+--------------------------- | -----------------| ----
+getKey()                    | long 또는 byte[] | element의 bkey
 getEFlag()                  | byte[]           | element flag
 getValue()                  | Object           | element의 값
 
@@ -1230,13 +1230,13 @@ asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFi
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.END                 | Element 조회, No duplicate bkey
-not null     | CollectionResponse.DUPLICATED          | Element 조회, Duplicate bkey 존재
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 b+tree가 아님
-null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.ATTR_MISMATCH       | sort-merge get에 참여한 b+tree의 속성이 서로 다름, arcus-memcached 1.11.3 이후 속성 제약이 사라짐
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.END                    | Element 조회, No duplicate bkey
+not null     | CollectionResponse.DUPLICATED             | Element 조회, Duplicate bkey 존재
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+null         | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null         | CollectionResponse.ATTR_MISMATCH          | sort-merge get에 참여한 b+tree의 속성이 서로 다름, arcus-memcached 1.11.3 이후 속성 제약이 사라짐
 
 
 B+tree element sort-merge 조회하는 예제는 아래와 같다.
@@ -1292,13 +1292,13 @@ try {
 
 1. 예제는 “KeyA”, “KeyB”, “KeyC”에 저장된 element들 중 bkey가 0부터 100까지 해당하는 element들 10개를 조회한다.
    - 주의할 점은 key로 주어진 b+tree의 attribute설정은 모두 같아야 한다. 그렇지 않으면 오류가 발생한다.
-2. ElementFlagFilter는 bkey에 지정된 eflag가 elementFlagFIlter로 지정된 조건을 만족하는 element들만 조회하는 조건이다    
+2. ElementFlagFilter는 bkey에 지정된 eflag가 elementFlagFilter로 지정된 조건을 만족하는 element들만 조회하는 조건이다    
    예제에서는 eflag filter를 사용하지 않음으로 조회하였다.
 3. timeout은 1초로 지정했다. 지정한 시간에 조회 결과가 넘어 오지 않거나
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
 4. 조회된 값은 List\<SMGetElement\>형태로 반환된다. 이로부터 조회된 element를 조회할 수 있다.
    조회 결과에 동일한 bkey가 존재하면 key를 기준으로 정렬되어 반환된다.
-5. 조회할 때 지정한 key들 중에 smget에 참여하지 key들은 future.getMissedKeys()를 통해 Map 형태로 실패 원인과 함께 조회할 수 있다.
+5. 조회할 때 지정한 key들 중에 smget에 참여하지 않는 key들은 future.getMissedKeys()를 통해 Map 형태로 실패 원인과 함께 조회할 수 있다.
    - 실패원인은 cache miss(NOT_FOUND), unreadable 상태(UNREADABLE), bkey 범위 조회를 만족하는 처음 bkey가 trim된 상태(OUT_OF_RANGE) 중 하나이다.
    - 응용은 이들 키들에 대해서는 back-end storage인 DB에서 동일 조회 조건으로 elements를 검색하여 sort-merge 결과에 반영하여야 한다.
 6. bkey 조회 범위의 처음 bkey가 존재하지만 bkey 범위의 끝에 다다르기 전에 trim이 발생한 key와 trim 직전에 cache에 있는 마지막 bkey를 조회할 수 있다.
@@ -1324,14 +1324,14 @@ CollectionFuture<Integer> asyncBopFindPosition(String key, byte[] bkey, BTreeOrd
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get()     | future.operationStatus().getResponse() | 설명
----------------- | -------------------------------------- | ---------
-element position | CollectionResponse.OK                  | Element 위치를 성공적으로 조회
-null             | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null             | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
-null             | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-null             | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null             | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+future.get()     | future.getOperationStatus().getResponse() | 설명
+---------------- | ----------------------------------------- | ---------
+element position | CollectionResponse.OK                     | Element 위치를 성공적으로 조회
+null             | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null             | CollectionResponse.NOT_FOUND_ELEMENT      | Element miss
+null             | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+null             | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null             | CollectionResponse.UNREADABLE             | 해당 key가 unreadable상태임
 
 B+tree position 조회 예제는 아래와 같다.
 
@@ -1392,13 +1392,13 @@ asyncBopGetByPosition(String key, BTreeOrder order, int from, int to)
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-not null     | CollectionResponse.END                 | Element를 성공적으로 조회
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-null         | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+not null     | CollectionResponse.END                    | Element를 성공적으로 조회
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT      | Element miss
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+null         | CollectionResponse.UNREADABLE             | 해당 key가 unreadable상태임
 
 
 B+tree에서 position 기반의 element 조회 예제이다.
@@ -1454,18 +1454,18 @@ asyncBopFindPositionWithGet(String key, byte[] byteArrayBKey, BTreeOrder order, 
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명
------------- | -------------------------------------- | ---------
-not null     | CollectionResponse.END                 | Element를 성공적으로 조회
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | Element miss
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 item이 b+tree가 아님
-null         | CollectionResponse.BKEY_MISMATCH       | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.UNREADABLE          | 해당 key가 unreadable상태임
+future.get() | future.getOperationStatus().getResponse() | 설명
+------------ | ----------------------------------------- | ---------
+not null     | CollectionResponse.END                    | Element를 성공적으로 조회
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT      | Element miss
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
+null         | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
+null         | CollectionResponse.UNREADABLE             | 해당 key가 unreadable상태임
 
 결과로 반환된 result(Map\<Integer, Element\<Object\>\>) 객체에서 다음과 같은 정보를 확인할 수 있다
 
-result 객체의 Method                | 자료형              | 설명
+result 객체의 Method              | 자료형             | 설명
 ----------------------------------|-------------------|---------------
 getKey()                          | integer           | btree내의 position
 getValue().getValue()             | Object            | element의 값

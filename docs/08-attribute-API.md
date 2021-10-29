@@ -139,4 +139,3 @@ try {
 2. timeout은 1초로 지정했다. 지정한 시간에 삭제 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
 3. Key가 없으면 null이 반환된다.
 4. 조회된 Attribute객체에서 count값을 조회한다. 이 값이 key에 저장된 Collection이 가지고 있는 엘리먼트의 총 개수이다.
-

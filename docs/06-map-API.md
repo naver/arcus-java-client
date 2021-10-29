@@ -45,10 +45,10 @@ CollectionFuture<Boolean> asyncMopCreate(String key, ElementValueType valueType,
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.CREATED             | 생성 성공
-False        | CollectionResponse.EXISTS              | 동일 key가 이미 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.CREATED                | 생성 성공
+False        | CollectionResponse.EXISTS                 | 동일 key가 이미 존재함
 
 
 Map item을 생성하는 예제는 아래와 같다.
@@ -111,14 +111,14 @@ CollectionFuture<Boolean> asyncMopInsert(String key, String mkey, Object value, 
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.STORED              | Map collection이 존재하여 element만 삽입함
-True         | CollectionResponse.CREATED_STORED      | Map collection 생성하고 element를 삽입함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 map이 아님
-False        | CollectionResponse.ELEMENT_EXISTS      | 주어진 mkey를 가진 element가 이미 존재함
-False        | CollectionResponse.OVERFLOWED          | 최대 저장가능한 개수만큼 element들이 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.STORED                 | Map collection이 존재하여 element만 삽입함
+True         | CollectionResponse.CREATED_STORED         | Map collection 생성하고 element를 삽입함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 map이 아님
+False        | CollectionResponse.ELEMENT_EXISTS         | 주어진 mkey를 가진 element가 이미 존재함
+False        | CollectionResponse.OVERFLOWED             | 최대 저장가능한 개수만큼 element들이 존재함
 
 Map element를 삽입하는 예제는 아래와 같다.
 
@@ -175,12 +175,12 @@ CollectionFuture<Boolean> asyncMopUpdate(String key, String mkey, Object value)
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.UPDATED             | Element가 변경됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 mkey를 가진 element가 없음
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 map이 아님
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.UPDATED                | Element가 변경됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | 주어진 mkey를 가진 element가 없음
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 map이 아님
 
 특정 element의 value를 변경한다.
 
@@ -215,13 +215,13 @@ asyncMopDelete(String key, String mkey, boolean dropIfEmpty)
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | ---------
-True         | CollectionResponse.DELETED             | Element만 삭제함
-True         | CollectionResponse.DELETED_DROPPED     | Element 삭제하고 Map 자체도 삭제함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | 주어진 mkey를 가진 element가 없음
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 item이 map이 아님
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.DELETED                | Element만 삭제함
+True         | CollectionResponse.DELETED_DROPPED        | Element 삭제하고 Map 자체도 삭제함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | 주어진 mkey를 가진 element가 없음
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 map이 아님
 
 
 다음은 map에서 mkey가 mkey1인 element를 삭제하는 예제이다.
@@ -294,15 +294,15 @@ asyncMopGet(String key, List<String> mkeyList, boolean withDelete, boolean dropI
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.END                 | Element만 조회
-not null     | CollectionResponse.DELETED             | Element를 조회하고 삭제한 상태
-not null     | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 map을 drop한 상태
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT   | 조회된 element가 없음, 조회 범위에 map 영역 없음
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 map이 아님
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.END                    | Element만 조회
+not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태
+not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 map을 drop한 상태
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.NOT_FOUND_ELEMENT      | 조회된 element가 없음, 조회 범위에 map 영역 없음
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 map이 아님
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 
 Map element를 조회하는 예제는 아래와 같다.

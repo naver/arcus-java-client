@@ -45,10 +45,10 @@ CollectionFuture<Boolean> asyncLopCreate(String key, ElementValueType valueType,
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.CREATED             | 생성 성공
-False        | CollectionResponse.EXISTS              | 동일 key 가 이미 존재함
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.CREATED                | 생성 성공
+False        | CollectionResponse.EXISTS                 | 동일 key 가 이미 존재함
 
 
 List item을 생성하는 예제는 아래와 같다.
@@ -111,14 +111,14 @@ List에 새로운 element를 삽입한다.
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.STORED              | List collection이 존재하여 element 만 삽입됨
-True         | CollectionResponse.CREATED_STORED      | List collection이 create되고 element가 삽입됨
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-Fasle        | CollectionResponse.TYPE_MISMATCH       | 해당 key가 list가 아님
-False        | CollectionResponse.OVERFLOWED          | Overflow 상태임
-False        | CollectionResponse.OUT_OF_RANGE        | 삽입 위치가 list의 element index 범위를 넘어섬
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.STORED                 | List collection이 존재하여 element 만 삽입됨
+True         | CollectionResponse.CREATED_STORED         | List collection이 create되고 element가 삽입됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 key가 list가 아님
+False        | CollectionResponse.OVERFLOWED             | Overflow 상태임
+False        | CollectionResponse.OUT_OF_RANGE           | 삽입 위치가 list의 element index 범위를 넘어섬
              
 
 List element를 삽입하는 예제는 아래와 같다.
@@ -181,13 +181,13 @@ CollectionFuture<Boolean> asyncLopDelete(String key, int from, int to, boolean d
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-True         | CollectionResponse.DELETED             | List에서 element만 삭제됨
-True         | CollectionResponse.DELETED_DROPPED     | List에서 element 삭제 후, empty list가 되어서 그 list도 삭제함
-False        | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-False        | CollectionResponse.TYPE_MISMATCH       | 해당 key가 list가 아님
-False        | CollectionResponse.NOT_FOUND_ELEMENT   | List 는 있지만 조건에 맞는 element가 없음
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+True         | CollectionResponse.DELETED                | List에서 element만 삭제됨
+True         | CollectionResponse.DELETED_DROPPED        | List에서 element 삭제 후, empty list가 되어서 그 list도 삭제함
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 key가 list가 아님
+False        | CollectionResponse.NOT_FOUND_ELEMENT      | List 는 있지만 조건에 맞는 element가 없음
 
 
 List에서 index가 0부터 10까지의 element를 삭제하는 예제이다.
@@ -229,7 +229,7 @@ try {
    지정한 시간에 삭제 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우,
    TimeoutException이 발생한다.
 3. 정상적으로 삭제되면 true를 반환한다.
-   삭제 결과에 따른 반환 값은 future.operationStatus().getResponse()로 확인한다.
+   삭제 결과에 따른 반환 값은 future.getOperationStatus().getResponse()로 확인한다.
 
 ## List Element 조회
 
@@ -250,15 +250,15 @@ CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to, boolean
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.operationStatus().getResponse() | 설명 
------------- | -------------------------------------- | -------
-not null     | CollectionResponse.END                 | Element를 조회만 한 상태
-not null     | CollectionResponse.DELETED             | Element를 조회하고 삭제한 상태
-not null     | CollectionResponse.DELETED_DROPPED     | Element를 조회하고 삭제한 다음 list를 drop(delete)한 상태
-null         | CollectionResponse.NOT_FOUND           | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.TYPE_MISMATCH       | 해당 key가 list가 아님
-null         | CollectionResponse.UNREADABLE          | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
-null         | CollectionResponse.OUT_OF_RANGE        | Index가 list의 element index범위를 벗어남
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | -------
+not null     | CollectionResponse.END                    | Element를 조회만 한 상태
+not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태
+not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 list를 drop(delete)한 상태
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 list가 아님
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+null         | CollectionResponse.OUT_OF_RANGE           | Index가 list의 element index범위를 벗어남
 
 List element를 조회하는 예제는 아래와 같다.
 
@@ -408,4 +408,3 @@ try {
 5. 일부 실패한 아이템의 실패 원인을 조회하려면 insert할 때 사용된 값(bulkData)의 iteration 순서에 따라 결과
    Map을 조회하면 된다.
 6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
-

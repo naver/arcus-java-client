@@ -111,16 +111,16 @@ net.spy.memcached.internal.CheckedOperationTimeoutException: GET operation timed
 
 로그의 의미는 다음과 같다.
 
-| 메세지 | 설명 |
-| ------ | ---- |
+| 메세지                                      | 설명                                                   
+| ------------------------------------------- | ----------------------------------------------------- |
 | GET operation timed out (>300 MILLISECONDS )| Timeout 값이 300ms로 지정되어있고 GET 요청의 결과를 받기까지 300ms 이상 걸려서 timeout되었다.|
-| Failing node: /127.0.0.1:11211 | 해당 요청은 127.0.0.1:11211 에서 수행한다. |
-| [WRITING]	| 해당 요청은 socket write를 위해 대기 중이다. |
-| [READING]	| 해당 요청은 서버로 전달되었고 결과가 돌아오기를 기다리거나, 결과 값을 읽어 들이는 중이다. |
-| #iq	| 해당 ARCUS node Input queue에서 대기중인 요청 수 |
-| #Wops	| Writing 상태에 있는 요청 수 |
-| #Rops	| Reading 상태에 있는 요청 수 |
-| #CT	| Continuous timeout, 해당 arcus node에서 연속적으로 발생한 timeout 횟수, 이 값이 connection factory builder로 지정되는 timeout threshold값을 넘어서면 클라이언트는 해당 서버와의 연결을 끊고 다시 연결한다. |
+| Failing node: /127.0.0.1:11211              | 해당 요청은 127.0.0.1:11211 에서 수행한다. 
+| [WRITING]	                                  | 해당 요청은 socket write를 위해 대기 중이다. 
+| [READING]	                                  | 해당 요청은 서버로 전달되었고 결과가 돌아오기를 기다리거나, 결과 값을 읽어 들이는 중이다. 
+| #iq	                                        | 해당 ARCUS node Input queue에서 대기중인 요청 수 
+| #Wops	                                      | Writing 상태에 있는 요청 수 
+| #Rops	                                      | Reading 상태에 있는 요청 수 
+| #CT	                                        | Continuous timeout, 해당 arcus node에서 연속적으로 발생한 timeout 횟수, 이 값이 connection factory builder로 지정되는 timeout threshold값을 넘어서면 클라이언트는 해당 서버와의 연결을 끊고 다시 연결한다. 
 
 즉, 해석해 보자면 ARCUS node 127.0.0.1:11211에 대해 요청을 보냈는데 300ms이내에 결과값을 돌려줄 수 없어 실패했다는 의미이다.
 가장 많이 발생할 수 있는 메시지로 원인 또한 매우 다양하다. 원인을 나열해 보자면 다음과 같다.
@@ -145,5 +145,4 @@ net.spy.memcached.internal.CheckedOperationTimeoutException: GET operation timed
 - 한계
 
   Client 한 개로 처리하는데 한계이다. pool사용을 고려해본다.  
-
 

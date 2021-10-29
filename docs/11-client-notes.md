@@ -118,4 +118,3 @@ Linux 환경에서 최소 retransmission timeout은 200ms이며,
 Packet retransmission은 제법 흔하게 발생하고 있으므로,
 이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
 따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
-
