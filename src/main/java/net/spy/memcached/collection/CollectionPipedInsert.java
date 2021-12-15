@@ -50,6 +50,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     this.nextOpIndex = i;
   }
 
+  public int getNextOpIndex() {
+    return nextOpIndex;
+  }
+
   public abstract ByteBuffer getAsciiCommand();
 
   public abstract ByteBuffer getBinaryCommand();
