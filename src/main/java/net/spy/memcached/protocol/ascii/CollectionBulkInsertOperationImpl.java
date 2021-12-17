@@ -100,12 +100,12 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     }
     /* ENABLE_REPLICATION end */
 
-    if (insert.getItemCount() == 1) {
+    if (insert.getItemCount() - insert.getNextOpIndex() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
       if (status.isSuccess()) {
-        cb.receivedStatus(END);
+        cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
         cb.gotStatus(index, status);
         cb.receivedStatus(FAILED_END);
