@@ -17,6 +17,7 @@
 package net.spy.memcached.emptycollection;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -47,10 +48,10 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
   public void testDeleteWithMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, FLAG.getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes(FLAG));
 
       boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-              FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
+              KeyUtil.getKeyBytes(FLAG), VALUE, new CollectionAttributes()).get();
       Assert.assertTrue(insertResult);
 
       // check attr
@@ -73,10 +74,10 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
   public void testDeleteWithUnMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "aa".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("aa"));
 
       boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-              FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
+              KeyUtil.getKeyBytes(FLAG), VALUE, new CollectionAttributes()).get();
       Assert.assertTrue(insertResult);
 
       // check attr

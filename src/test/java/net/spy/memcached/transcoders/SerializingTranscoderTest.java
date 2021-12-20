@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import net.spy.memcached.CachedData;
+import net.spy.memcached.KeyUtil;
 
 /**
  * Test the serializing transcoder.
@@ -39,7 +40,7 @@ public class SerializingTranscoderTest extends BaseTranscoderCase {
     CachedData cd = tc.encode(s1);
     // This should *not* be compressed because it is too small
     assertEquals(0, cd.getFlags());
-    assertTrue(Arrays.equals(s1.getBytes(), cd.getData()));
+    assertTrue(Arrays.equals(KeyUtil.getKeyBytes(s1), cd.getData()));
     assertEquals(s1, tc.decode(cd));
   }
 
@@ -49,7 +50,7 @@ public class SerializingTranscoderTest extends BaseTranscoderCase {
     tc.setCompressionThreshold(8);
     CachedData cd = tc.encode(s1);
     assertEquals(SerializingTranscoder.COMPRESSED, cd.getFlags());
-    assertFalse(Arrays.equals(s1.getBytes(), cd.getData()));
+    assertFalse(Arrays.equals(KeyUtil.getKeyBytes(s1), cd.getData()));
     assertEquals(s1, tc.decode(cd));
   }
 

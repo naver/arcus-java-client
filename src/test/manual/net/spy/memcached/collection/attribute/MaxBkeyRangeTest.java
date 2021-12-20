@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
@@ -32,7 +33,7 @@ public class MaxBkeyRangeTest extends BaseIntegrationTest {
   private final long BKEY = 1;
   private final byte[] BYTE_BKEY = new byte[]{(byte) 1};
   private final String VALUE = "VALUE";
-  private final byte[] EFLAG = "eflag".getBytes();
+  private final byte[] EFLAG = KeyUtil.getKeyBytes("eflag");
 
   @Override
   protected void setUp() throws Exception {

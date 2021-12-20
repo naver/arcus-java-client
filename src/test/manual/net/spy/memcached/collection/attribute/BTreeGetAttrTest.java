@@ -17,6 +17,7 @@
 package net.spy.memcached.collection.attribute;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
@@ -27,7 +28,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE = "VALUE";
-  private final byte[] EFLAG = "eflag".getBytes();
+  private final byte[] EFLAG = KeyUtil.getKeyBytes("eflag");
 
   @Override
   protected void setUp() throws Exception {

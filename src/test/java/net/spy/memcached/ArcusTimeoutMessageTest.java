@@ -167,7 +167,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String value = "value";
 
     OperationFuture<Boolean> f
-            = mc.asyncStore(StoreType.add, key, 10, new CachedData(30, value.getBytes(), 300));
+            = mc.asyncStore(StoreType.add, key, 10, new CachedData(30, KeyUtil.getKeyBytes(value), 300));
 
     try {
       f.get(1L, TimeUnit.MILLISECONDS);

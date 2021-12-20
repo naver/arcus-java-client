@@ -19,6 +19,7 @@ package net.spy.memcached.emptycollection;
 import java.util.Map;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -105,7 +106,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       attr.setExpireTime(EXPIRE_TIME_IN_SEC);
       attr.setMaxCount(3333);
 
-      byte[] filter = "0001".getBytes();
+      byte[] filter = KeyUtil.getKeyBytes("0001");
 
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY, filter,
               "value", attr).get();
@@ -137,8 +138,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       attr.setExpireTime(EXPIRE_TIME_IN_SEC);
       attr.setMaxCount(3333);
 
-      byte[] filter = "1234567890123456789012345678901234567890"
-              .getBytes();
+      byte[] filter = KeyUtil.getKeyBytes("1234567890123456789012345678901234567890");
 
       try {
         mc.asyncBopInsert(KEY, BKEY, filter, "value", attr).get();

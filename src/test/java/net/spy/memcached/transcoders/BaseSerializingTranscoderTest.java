@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
 import net.spy.memcached.CachedData;
+import net.spy.memcached.KeyUtil;
 
 /**
  * Base tests of the base serializing transcoder stuff.
@@ -97,7 +98,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
   public void testBadCharsetEncode() {
     ex.overrideCharsetSet("Some Crap");
     try {
-      ex.decodeString("Woo!".getBytes());
+      ex.decodeString(KeyUtil.getKeyBytes("Woo!"));
       fail("Expected runtime exception");
     } catch (RuntimeException e) {
       assertSame(UnsupportedEncodingException.class,

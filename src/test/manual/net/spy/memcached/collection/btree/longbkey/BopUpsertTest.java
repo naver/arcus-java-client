@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -35,8 +36,8 @@ public class BopUpsertTest extends BaseIntegrationTest {
   private final byte[] BKEY = new byte[]{(byte) 1};
   private final String VALUE = "VALUE";
   private final String VALUE2 = "EULAV";
-  private final byte[] FLAG = "FLAG".getBytes();
-  private final byte[] FLAG2 = "GALF".getBytes();
+  private final byte[] FLAG = KeyUtil.getKeyBytes("FLAG");
+  private final byte[] FLAG2 = KeyUtil.getKeyBytes("GALF");
 
   @Override
   protected void setUp() throws Exception {

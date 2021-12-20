@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.KeyUtil;
+
 import java.util.List;
 
 public class MapGet extends CollectionGet {
@@ -73,7 +75,7 @@ public class MapGet extends CollectionGet {
     if (mkeyList.size() == 0) {
       additionalArgs = null;
     } else {
-      additionalArgs = getSpaceSeparatedMkeys().getBytes();
+      additionalArgs = KeyUtil.getKeyBytes(getSpaceSeparatedMkeys());
     }
 
     StringBuilder b = new StringBuilder();

@@ -17,6 +17,7 @@
 package net.spy.memcached.collection.btree.longbkey;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
@@ -46,7 +47,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   public void testGetBKeyCountFromInvalidKey() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.GreaterThan, "1".getBytes());
+              CompOperands.GreaterThan, KeyUtil.getKeyBytes("1"));
 
       CollectionFuture<Integer> future = mc.asyncBopGetItemCount(
               "INVALIDKEY", BKEY, BKEY, filter);
@@ -64,7 +65,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   public void testGetBKeyCountFromInvalidType() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "eflag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("eflag"));
 
       // insert value into set
       Boolean insertResult = mc.asyncSopInsert(KEY, "value",
@@ -88,19 +89,19 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   public void testGetBKeyCountFromNotEmpty() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "eflag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("eflag"));
 
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert two items
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-              "eflag".getBytes(), "value", new CollectionAttributes())
+              KeyUtil.getKeyBytes("eflag"), "value", new CollectionAttributes())
               .get();
       Assert.assertTrue(insertResult);
 
       Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
-              "eflag".getBytes(), "value", new CollectionAttributes())
+              KeyUtil.getKeyBytes("eflag"), "value", new CollectionAttributes())
               .get();
       Assert.assertTrue(insertResult2);
 
@@ -123,14 +124,14 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   public void testGetBKeyCountFromNotEmpty2() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "eflag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("eflag"));
 
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert two items
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-              "eflag".getBytes(), "value", new CollectionAttributes())
+              KeyUtil.getKeyBytes("eflag"), "value", new CollectionAttributes())
               .get();
       Assert.assertTrue(insertResult);
 
@@ -157,19 +158,19 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   public void testGetBKeyCountFromNotEmpty3() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "eflag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("eflag"));
 
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert two items
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
-              "eflag".getBytes(), "value", new CollectionAttributes())
+              KeyUtil.getKeyBytes("eflag"), "value", new CollectionAttributes())
               .get();
       Assert.assertTrue(insertResult);
 
       Boolean insertResult2 = mc.asyncBopInsert(KEY, BKEY2,
-              "eflageflag".getBytes(), "value",
+              KeyUtil.getKeyBytes("eflageflag"), "value",
               new CollectionAttributes()).get();
       Assert.assertTrue(insertResult2);
 

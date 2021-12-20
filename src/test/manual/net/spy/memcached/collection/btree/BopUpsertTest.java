@@ -17,6 +17,7 @@
 package net.spy.memcached.collection.btree;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
@@ -40,7 +41,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
 
   public void testUpsertNotExistsKey() {
     try {
-      boolean result = mc.asyncBopUpsert(KEY, BKEY, "eflag".getBytes(),
+      boolean result = mc.asyncBopUpsert(KEY, BKEY, KeyUtil.getKeyBytes("eflag"),
               "VALUE", new CollectionAttributes()).get();
 
       Assert.assertTrue("Upsert failed", result);

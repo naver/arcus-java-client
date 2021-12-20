@@ -4,6 +4,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.ByteBuffer;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -19,7 +20,7 @@ import net.spy.memcached.ops.StatusCode;
 final class VersionOperationImpl extends OperationImpl
         implements VersionOperation, NoopOperation {
 
-  private static final byte[] REQUEST = "version\r\n".getBytes();
+  private static final byte[] REQUEST = KeyUtil.getKeyBytes("version\r\n");
 
   public VersionOperationImpl(OperationCallback c) {
     super(c);

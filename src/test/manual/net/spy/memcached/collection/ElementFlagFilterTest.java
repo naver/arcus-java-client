@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import junit.framework.Assert;
@@ -34,7 +35,7 @@ public class ElementFlagFilterTest extends TestCase {
 
   public void testValidate2() {
     try {
-      new ElementFlagFilter(null, "".getBytes());
+      new ElementFlagFilter(null, KeyUtil.getKeyBytes(""));
     } catch (NullPointerException e) {
       return;
     }
@@ -53,7 +54,7 @@ public class ElementFlagFilterTest extends TestCase {
   public void testZeroLengthCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes(""));
       filter.toString();
     } catch (IllegalArgumentException e) {
       return;
@@ -67,9 +68,9 @@ public class ElementFlagFilterTest extends TestCase {
   public void testZeroLengthBitCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "A".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("A"));
 
-      filter.setBitOperand(BitWiseOperands.AND, "".getBytes());
+      filter.setBitOperand(BitWiseOperands.AND, KeyUtil.getKeyBytes(""));
       filter.toString();
     } catch (IllegalArgumentException e) {
       return;
@@ -84,7 +85,7 @@ public class ElementFlagFilterTest extends TestCase {
     String src = "ABC";
 
     ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal,
-            src.getBytes());
+            KeyUtil.getKeyBytes(src));
 
     Assert.assertEquals("0 EQ 0x414243", filter.toString());
 
@@ -92,7 +93,7 @@ public class ElementFlagFilterTest extends TestCase {
 
     Assert.assertEquals("2 EQ 0x414243", filter.toString());
 
-    filter.setBitOperand(BitWiseOperands.AND, src.getBytes());
+    filter.setBitOperand(BitWiseOperands.AND, KeyUtil.getKeyBytes(src));
 
     Assert.assertEquals("2 & 0x414243 EQ 0x414243", filter.toString());
   }

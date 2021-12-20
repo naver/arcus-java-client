@@ -29,7 +29,7 @@ public class AsciiClientTest extends ProtocolBaseCase {
 
       @Override
       public void initialize() {
-        setBuffer(ByteBuffer.wrap("garbage\r\n".getBytes()));
+        setBuffer(ByteBuffer.wrap(KeyUtil.getKeyBytes("garbage\r\n")));
       }
 
       @Override

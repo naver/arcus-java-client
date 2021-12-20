@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import net.spy.memcached.CachedData;
+import net.spy.memcached.KeyUtil;
 
 /**
  * Handles old whalin (tested with v1.6) encoding: data type is in the first
@@ -258,11 +259,11 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
   }
 
   private byte[] encodeW1String(String value) {
-    byte[] svalue = null;
+    byte[] svalue = new byte[0];
     try {
       svalue = value.getBytes(charset);
     } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     }
     byte[] result = new byte[svalue.length + 1];
     System.arraycopy(svalue, 0, result, 1, svalue.length);

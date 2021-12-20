@@ -20,6 +20,7 @@ package net.spy.memcached.protocol.ascii;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -80,7 +81,7 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
     sb.append("\r\n");
 
     ByteBuffer bb = ByteBuffer.allocate(sb.length());
-    bb.put(sb.toString().getBytes());
+    bb.put(KeyUtil.getKeyBytes(sb.toString()));
     ((Buffer) bb).flip();
     setBuffer(bb);
   }

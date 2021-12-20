@@ -17,6 +17,7 @@
 package net.spy.memcached.collection.btree.longbkey;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
@@ -48,7 +49,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(new byte[]{0}), VALUE).get());
 
       Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), VALUE).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -60,7 +61,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(new byte[]{0}), null).get());
 
       Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), null).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), null).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -75,7 +76,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(new byte[]{0}), VALUE).get());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), VALUE).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -90,7 +91,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
               new ElementFlagUpdate(new byte[]{0}), null).get());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), null).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), null).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -109,8 +110,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
       Assert.assertFalse(mc.asyncBopUpdate(
               KEY,
               BKEY,
-              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-                      .getBytes()), VALUE).get());
+              new ElementFlagUpdate(0, BitWiseOperands.AND, KeyUtil.getKeyBytes(EFLAG)),
+              VALUE).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -121,8 +122,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
       Assert.assertFalse(mc.asyncBopUpdate(
               KEY,
               BKEY,
-              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-                      .getBytes()), null).get());
+              new ElementFlagUpdate(0, BitWiseOperands.AND, KeyUtil.getKeyBytes(EFLAG)),
+              null).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -130,14 +131,14 @@ public class BopUpdateTest extends BaseIntegrationTest {
 
   public void testExistsUpdateUsingBitOpWithValue() {
     try {
-      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, KeyUtil.getKeyBytes(EFLAG),
               VALUE, new CollectionAttributes()).get());
 
       Assert.assertTrue(mc.asyncBopUpdate(
               KEY,
               BKEY,
-              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-                      .getBytes()), VALUE).get());
+              new ElementFlagUpdate(0, BitWiseOperands.AND, KeyUtil.getKeyBytes(EFLAG)),
+              VALUE).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }
@@ -145,14 +146,14 @@ public class BopUpdateTest extends BaseIntegrationTest {
 
   public void testExistsUpdateUsingBitOpWithoutValue() {
     try {
-      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
+      Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, KeyUtil.getKeyBytes(EFLAG),
               VALUE, new CollectionAttributes()).get());
 
       Assert.assertTrue(mc.asyncBopUpdate(
               KEY,
               BKEY,
-              new ElementFlagUpdate(0, BitWiseOperands.AND, EFLAG
-                      .getBytes()), null).get());
+              new ElementFlagUpdate(0, BitWiseOperands.AND, KeyUtil.getKeyBytes(EFLAG)),
+              null).get());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }

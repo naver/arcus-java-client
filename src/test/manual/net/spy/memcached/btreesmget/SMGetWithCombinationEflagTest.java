@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
@@ -102,7 +103,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
       for (int i = 0; i < 50; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -163,7 +164,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
       for (int i = 0; i < 50; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -224,7 +225,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
       for (int i = 0; i < 10; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -285,7 +286,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
       for (int i = 0; i < 9; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -346,7 +347,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       }
       for (int i = 0; i < 10; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -396,7 +397,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 
       for (int i = 0; i < 5; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -446,7 +447,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 
       for (int i = 0; i < 5; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get();
         } else {
           mc.asyncBopInsert(KEY + i, i, null, "VALUE" + i,
@@ -496,7 +497,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 
       for (int i = 0; i < 1000; i++) {
         if (i % 2 == 0) {
-          mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(),
+          mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"),
               "VALUE" + i, new CollectionAttributes()).get(1000L,
               TimeUnit.MILLISECONDS);
         } else {
@@ -560,7 +561,7 @@ public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
         if (i % 2 == 0) {
           continue;
         }
-        mc.asyncBopInsert(KEY + i, i, "EFLAG".getBytes(), "VALUE" + i,
+        mc.asyncBopInsert(KEY + i, i, KeyUtil.getKeyBytes("EFLAG"), "VALUE" + i,
                 new CollectionAttributes()).get();
       }
     } catch (Exception e) {

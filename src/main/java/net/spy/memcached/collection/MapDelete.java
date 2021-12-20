@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.KeyUtil;
+
 import java.util.List;
 
 public class MapDelete extends CollectionDelete {
@@ -69,7 +71,7 @@ public class MapDelete extends CollectionDelete {
     if (mkeyList.size() == 0) {
       additionalArgs = null;
     } else {
-      additionalArgs = getSpaceSeparatedMkeys().getBytes();
+      additionalArgs = KeyUtil.getKeyBytes(getSpaceSeparatedMkeys());
     }
 
     StringBuilder b = new StringBuilder();

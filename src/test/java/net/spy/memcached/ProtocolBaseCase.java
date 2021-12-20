@@ -914,7 +914,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
 
     public CachedData encode(String o) {
-      return new CachedData(flags, o.getBytes(), getMaxSize());
+      return new CachedData(flags, KeyUtil.getKeyBytes(o), getMaxSize());
     }
 
     public int getMaxSize() {
@@ -956,8 +956,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
 
     public CachedData encode(String o) {
-      byte[] keyBytes = key.getBytes();
-      byte[] valueBytes = o.getBytes();
+      byte[] keyBytes = KeyUtil.getKeyBytes(key);
+      byte[] valueBytes = KeyUtil.getKeyBytes(o);
       int length = 4 + keyBytes.length + 4 + valueBytes.length;
       byte[] bytes = new byte[length];
 

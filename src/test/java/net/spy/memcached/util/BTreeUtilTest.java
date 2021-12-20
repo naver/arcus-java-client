@@ -18,13 +18,14 @@ package net.spy.memcached.util;
 
 import java.util.Arrays;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.compat.BaseMockCase;
 
 public class BTreeUtilTest extends BaseMockCase {
 
   public void testAA() {
 
-    System.out.println(Arrays.toString("".getBytes()));
+    System.out.println(Arrays.toString(KeyUtil.getKeyBytes("")));
 
   }
 

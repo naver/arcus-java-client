@@ -19,6 +19,7 @@ package net.spy.memcached.collection.btree;
 import java.util.concurrent.ExecutionException;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagUpdate;
@@ -99,7 +100,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   public void testUpdateExceededLengthEFlag() {
-    byte[] eflag = "1234567890123456789012345678901234567890".getBytes();
+    byte[] eflag = KeyUtil.getKeyBytes("1234567890123456789012345678901234567890");
 
     try {
       // insert one
@@ -124,11 +125,11 @@ public class BopUpdateTest extends BaseIntegrationTest {
 
       // update eflag only
       Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), null).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), null).get());
 
       // update both value and eflag
       Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), VALUE).get());
 
       // delete eflag
       Assert.assertFalse(mc.asyncBopUpdate(KEY, BKEY,
@@ -170,19 +171,19 @@ public class BopUpdateTest extends BaseIntegrationTest {
               .asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, NEW_EFLAG
-                              .getBytes()), false, false).get().isEmpty());
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(NEW_EFLAG)),
+                      false, false).get().isEmpty());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(NEW_EFLAG.getBytes()), null).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(NEW_EFLAG)), null).get());
 
       Assert.assertEquals(
               NEW_VALUE,
               mc.asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, NEW_EFLAG
-                              .getBytes()), false, false).get().get(BKEY)
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(NEW_EFLAG)),
+                      false, false).get().get(BKEY)
                       .getValue());
 
       //
@@ -194,7 +195,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
                       false, false).get().get(BKEY).getValue());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(EFLAG.getBytes()), VALUE).get());
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(EFLAG)), VALUE).get());
 
       Assert.assertEquals(
               VALUE,
@@ -209,8 +210,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
               mc.asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, EFLAG
-                              .getBytes()), false, false).get().get(BKEY)
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(EFLAG)),
+                      false, false).get().get(BKEY)
                       .getValue());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
@@ -220,8 +221,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
               .asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, EFLAG
-                              .getBytes()), false, false).get().isEmpty());
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(EFLAG)),
+                      false, false).get().isEmpty());
 
     } catch (Exception e) {
       Assert.fail(e.getMessage());
@@ -276,7 +277,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
                       false, false).get().get(BKEY).getValue());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
-              new ElementFlagUpdate(NEW_EFLAG.getBytes()), NEW_VALUE)
+              new ElementFlagUpdate(KeyUtil.getKeyBytes(NEW_EFLAG)), NEW_VALUE)
               .get());
 
       Assert.assertEquals(
@@ -292,8 +293,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
               mc.asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, NEW_EFLAG
-                              .getBytes()), false, false).get().get(BKEY)
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(NEW_EFLAG)),
+                      false, false).get().get(BKEY)
                       .getValue());
 
       Assert.assertTrue(mc.asyncBopUpdate(KEY, BKEY,
@@ -303,8 +304,8 @@ public class BopUpdateTest extends BaseIntegrationTest {
               .asyncBopGet(
                       KEY,
                       BKEY,
-                      new ElementFlagFilter(CompOperands.Equal, EFLAG
-                              .getBytes()), false, false).get().isEmpty());
+                      new ElementFlagFilter(CompOperands.Equal, KeyUtil.getKeyBytes(EFLAG)),
+                      false, false).get().isEmpty());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
     }

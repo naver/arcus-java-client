@@ -19,6 +19,7 @@ package net.spy.memcached.emptycollection;
 import java.util.Map;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
@@ -37,7 +38,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
     super.setUp();
     mc.delete(KEY).get();
 
-    boolean insertResult = mc.asyncBopInsert(KEY, BKEY, "flag".getBytes(),
+    boolean insertResult = mc.asyncBopInsert(KEY, BKEY, KeyUtil.getKeyBytes("flag"),
             VALUE, new CollectionAttributes()).get();
     Assert.assertTrue(insertResult);
   }
@@ -53,7 +54,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   public void testGetWithDeleteAndWithoutDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "flag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("flag"));
 
       // check attr
       Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
@@ -83,8 +84,8 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   public void testGetWithDeleteAndWithDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "flag".getBytes());
-      filter.setBitOperand(BitWiseOperands.AND, "flag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("flag"));
+      filter.setBitOperand(BitWiseOperands.AND, KeyUtil.getKeyBytes("flag"));
 
       // check attr
       Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
@@ -112,7 +113,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   public void testRangedGetWithtDeleteAndWithoutDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "flag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("flag"));
 
       // check attr
       Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
@@ -141,8 +142,8 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   public void testRangedGetWithtDeleteAndWithDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "flag".getBytes());
-      filter.setBitOperand(BitWiseOperands.AND, "flag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("flag"));
+      filter.setBitOperand(BitWiseOperands.AND, KeyUtil.getKeyBytes("flag"));
 
       // check attr
       Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
@@ -169,7 +170,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   public void testRangedGetWithtDeleteAndWithDeleteWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
-              CompOperands.Equal, "flag".getBytes());
+              CompOperands.Equal, KeyUtil.getKeyBytes("flag"));
 
       // check attr
       Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()

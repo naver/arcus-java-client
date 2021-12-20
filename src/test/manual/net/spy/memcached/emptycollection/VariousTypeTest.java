@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -243,7 +244,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
 
   public void testByteArray() {
     try {
-      byte[] value = "value".getBytes();
+      byte[] value = KeyUtil.getKeyBytes("value");
 
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,

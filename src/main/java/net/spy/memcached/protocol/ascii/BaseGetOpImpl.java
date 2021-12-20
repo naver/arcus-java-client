@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.OperationCallback;
@@ -170,7 +171,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
     } else {
       assert (cmd.equals("mget") || cmd.equals("mgets")) : "Unknown Command " + cmd;
 
-      int lenKeys = keysString.getBytes().length;
+      int lenKeys = KeyUtil.getKeyBytes(keysString).length;
       int numKeys = keys.size();
 
       // make command string, for example,
@@ -185,7 +186,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
       commandBuilder.append(RN_STRING);
     }
 
-    commandLine = commandBuilder.toString().getBytes();
+    commandLine = KeyUtil.getKeyBytes(commandBuilder.toString());
     size = commandLine.length;
 
     b = ByteBuffer.allocate(size);

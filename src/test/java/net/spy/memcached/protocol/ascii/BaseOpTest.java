@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.spy.memcached.KeyUtil;
 import net.spy.memcached.compat.BaseMockCase;
 
 /**
@@ -35,7 +36,7 @@ public class BaseOpTest extends BaseMockCase {
       // ok
     }
     op.setBytesToRead(2);
-    op.handleRead(ByteBuffer.wrap("hi".getBytes()));
+    op.handleRead(ByteBuffer.wrap(KeyUtil.getKeyBytes("hi")));
   }
 
   public void testLineReadType() throws Exception {
@@ -53,14 +54,14 @@ public class BaseOpTest extends BaseMockCase {
 
   public void testLineParser() throws Exception {
     String input = "This is a multiline string\r\nhere is line two\r\n";
-    ByteBuffer b = ByteBuffer.wrap(input.getBytes());
+    ByteBuffer b = ByteBuffer.wrap(KeyUtil.getKeyBytes(input));
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
     op.linesToRead = 2;
     op.readFromBuffer(b);
     assertEquals("This is a multiline string", op.getLines().get(0));
     assertEquals("here is line two", op.getLines().get(1));
     op.setBytesToRead(2);
-    op.readFromBuffer(ByteBuffer.wrap("xy".getBytes()));
+    op.readFromBuffer(ByteBuffer.wrap(KeyUtil.getKeyBytes("xy")));
     byte[] expected = {'x', 'y'};
     assertTrue("Expected " + Arrays.toString(expected) + " but got "
                     + Arrays.toString(op.getCurentBytes()),
@@ -73,12 +74,12 @@ public class BaseOpTest extends BaseMockCase {
     ByteBuffer b = ByteBuffer.allocate(20);
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
 
-    b.put(input1.getBytes());
+    b.put(KeyUtil.getKeyBytes(input1));
     ((Buffer) b).flip();
     op.readFromBuffer(b);
     assertNull(op.getCurrentLine());
     ((Buffer) b).clear();
-    b.put(input2.getBytes());
+    b.put(KeyUtil.getKeyBytes(input2));
     ((Buffer) b).flip();
     op.readFromBuffer(b);
     assertEquals("this is a test", op.getCurrentLine());
