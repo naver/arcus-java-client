@@ -29,14 +29,12 @@ final class VersionOperationImpl extends OperationImpl
 
   @Override
   public void handleLine(String line) {
-    OperationStatus cause;
-    if (line.startsWith("VERSION ")) {
-      cause = new OperationStatus(
-              true, line.substring("VERSION ".length()), StatusCode.SUCCESS);
-    } else {
-      cause = new OperationStatus(false, line, StatusCode.fromAsciiLine(line));
-    }
-    getCallback().receivedStatus(cause);
+    String version = line.startsWith("VERSION ") ? line.substring("VERSION ".length()) : line;
+
+    getCallback().receivedStatus(matchStatus(version,
+            new OperationStatus(true,
+                    version,
+                    StatusCode.SUCCESS)));
     transitionState(OperationState.COMPLETE);
   }
 
