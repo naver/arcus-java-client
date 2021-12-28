@@ -1130,7 +1130,7 @@ public final class MemcachedConnection extends SpyObject {
       return;
     }
     o.setHandlingNode(node);
-    if ((!node.isActive() || !node.isFirstConnecting()) &&
+    if ((!node.isActive() && !node.isFirstConnecting()) &&
         failureMode == FailureMode.Cancel) {
        o.cancel("inactive node");
        return;
@@ -1294,20 +1294,24 @@ public final class MemcachedConnection extends SpyObject {
    * @return a memcached node
    */
   public MemcachedNode findNodeByKey(String key) {
-    MemcachedNode placeIn = getPrimaryNode(key);
-    if (placeIn != null &&
-        (!placeIn.isActive() && !placeIn.isFirstConnecting()) &&
-        failureMode == FailureMode.Redistribute) {
+    MemcachedNode node = getPrimaryNode(key);
+    if (node == null) {
+      return null;
+    }
+    if (node.isActive() || node.isFirstConnecting()) {
+      return node;
+    }
+    if (failureMode == FailureMode.Redistribute) {
       Iterator<MemcachedNode> iter = getNodeSequence(key);
       while (iter.hasNext()) {
         MemcachedNode n = iter.next();
         if (n != null && n.isActive()) {
-          placeIn = n;
+          node = n;
           break;
         }
       }
     }
-    return placeIn;
+    return node;
   }
 
   public int getAddedQueueSize() {
