@@ -1124,8 +1124,7 @@ public class MemcachedClient extends SpyThread
       }
       tc_map.put(key, tc);
       validateKey(key);
-      MemcachedNode node = findNodeByKey(key);
-      addKeyToChunk(chunks, key, node);
+      addKeyToChunk(chunks, key, conn.findNodeByKey(key));
     }
 
     int wholeChunkSize = getWholeChunkSize(chunks);
@@ -1160,12 +1159,11 @@ public class MemcachedClient extends SpyThread
         Operation op;
         if (node == null) {
           op = opFact.mget(lk, cb);
-          op.cancel("no node");
         } else {
           op = node.enabledMGetOp() ? opFact.mget(lk, cb)
                                     : opFact.get(lk, cb);
-          conn.addOperation(node, op);
         }
+        conn.addOperation(node, op);
         ops.add(op);
       }
     }
@@ -1261,8 +1259,7 @@ public class MemcachedClient extends SpyThread
 
       tc_map.put(key, tc);
       validateKey(key);
-      MemcachedNode node = findNodeByKey(key);
-      addKeyToChunk(chunks, key, node);
+      addKeyToChunk(chunks, key, conn.findNodeByKey(key));
     }
 
     int wholeChunkSize = getWholeChunkSize(chunks);
@@ -1298,44 +1295,15 @@ public class MemcachedClient extends SpyThread
         Operation op;
         if (node == null) {
           op = opFact.mgets(lk, cb);
-          op.cancel("no node");
         } else {
           op = node.enabledMGetsOp() ? opFact.mgets(lk, cb)
                                      : opFact.gets(lk, cb);
-          conn.addOperation(node, op);
         }
+        conn.addOperation(node, op);
         ops.add(op);
       }
     }
     return new BulkGetFuture<CASValue<T>>(m, ops, latch);
-  }
-
-  /**
-   * find node by key
-   * @param key the key to request
-   * @return primary node
-   */
-  private MemcachedNode findNodeByKey(String key) {
-    final MemcachedNode primaryNode = conn.getPrimaryNode(key);
-    MemcachedNode node = null;
-    // FIXME.  Support FailureMode.  See MemcachedConnection.addOperation.
-    if (primaryNode == null) {
-      node = null;
-    } else if (primaryNode.isActive() || primaryNode.isFirstConnecting()) {
-      node = primaryNode;
-    } else {
-      Iterator<MemcachedNode> iter = conn.getNodeSequence(key);
-      while (node == null && iter.hasNext()) {
-        MemcachedNode n = iter.next();
-        if (n.isActive()) {
-          node = n;
-        }
-      }
-      if (node == null) {
-        node = primaryNode;
-      }
-    }
-    return node;
   }
 
   /**

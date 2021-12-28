@@ -1111,40 +1111,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param o   the operation
    */
   public void addOperation(final String key, final Operation o) {
-    MemcachedNode placeIn = null;
-    MemcachedNode primary = getPrimaryNode(key, o);
-    if (primary == null) {
-      o.cancel("no node");
-    } else if (primary.isActive() || primary.isFirstConnecting() ||
-               failureMode == FailureMode.Retry) {
-      placeIn = primary;
-    } else if (failureMode == FailureMode.Cancel) {
-      o.setHandlingNode(primary);
-      o.cancel("inactive node");
-    } else {
-      // Look for another node in sequence that is ready.
-      Iterator<MemcachedNode> iter = getNodeSequence(key, o);
-      while (placeIn == null && iter.hasNext()) {
-        MemcachedNode n = iter.next();
-        if (n.isActive()) {
-          placeIn = n;
-        }
-      }
-      // If we didn't find an active node, queue it in the primary node
-      // and wait for it to come back online.
-      if (placeIn == null) {
-        placeIn = primary;
-      }
-    }
-
-    assert o.isCancelled() || placeIn != null
-            : "No node found for key " + key;
-    if (placeIn != null) {
-      addOperation(placeIn, o);
-    } else {
-      assert o.isCancelled() : "No not found for "
-              + key + " (and not immediately cancelled)";
-    }
+    addOperation(findNodeByKey(key), o);
   }
 
   public void insertOperation(final MemcachedNode node, final Operation o) {
@@ -1158,7 +1125,16 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   public void addOperation(final MemcachedNode node, final Operation o) {
+    if (node == null) {
+      o.cancel("no node");
+      return;
+    }
     o.setHandlingNode(node);
+    if ((!node.isActive() && !node.isFirstConnecting()) &&
+        failureMode == FailureMode.Cancel) {
+       o.cancel("inactive node");
+       return;
+    }
     o.initialize();
     node.addOpToInputQ(o);
     addedQueue.offer(node);
@@ -1168,7 +1144,6 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   public void addOperations(final Map<MemcachedNode, Operation> ops) {
-
     for (Map.Entry<MemcachedNode, Operation> me : ops.entrySet()) {
       final MemcachedNode node = me.getKey();
       Operation o = me.getValue();
@@ -1319,27 +1294,24 @@ public final class MemcachedConnection extends SpyObject {
    * @return a memcached node
    */
   public MemcachedNode findNodeByKey(String key) {
-    MemcachedNode placeIn = null;
-    MemcachedNode primary = getPrimaryNode(key);
-    // FIXME.  Support other FailureMode's.  See MemcachedConnection.addOperation.
-    if (primary == null) {
+    MemcachedNode node = getPrimaryNode(key);
+    if (node == null) {
       return null;
-    } else if (primary.isActive() || primary.isFirstConnecting() ||
-               failureMode == FailureMode.Retry) {
-      placeIn = primary;
-    } else {
+    }
+    if (node.isActive() || node.isFirstConnecting()) {
+      return node;
+    }
+    if (failureMode == FailureMode.Redistribute) {
       Iterator<MemcachedNode> iter = getNodeSequence(key);
-      while (placeIn == null && iter.hasNext()) {
+      while (iter.hasNext()) {
         MemcachedNode n = iter.next();
-        if (n.isActive()) {
-          placeIn = n;
+        if (n != null && n.isActive()) {
+          node = n;
+          break;
         }
       }
-      if (placeIn == null) {
-        placeIn = primary;
-      }
     }
-    return placeIn;
+    return node;
   }
 
   public int getAddedQueueSize() {
