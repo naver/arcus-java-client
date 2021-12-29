@@ -118,3 +118,52 @@ Linux 환경에서 최소 retransmission timeout은 200ms이며,
 Packet retransmission은 제법 흔하게 발생하고 있으므로,
 이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
 따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
+
+### 캐릭터 인코딩
+
+ARCUS Client가 지원하는 캐릭터 인코딩은 UTF-8이다. UTF-8 이외의 UTF-16과 같은 다른 인코딩 타입을 지원하지 않아,
+만약 시스템에서 UTF-16과 같은 캐릭터 인코딩을 사용하고 있다면 반드시 UTF-8 타입으로 변경해주어야 한다. 
+리눅스 기준으로 시스템의 기본 캐릭터 인코딩 확인 및 변경 방법은 아래와 같다. 
+리눅스 배포판, 버전마다 다를 수 있으므로 참고로만 활용한다.
+
+#### 시스템 캐릭터 인코딩 확인 (Linux 기준)
+```bash
+$ echo $LANG
+en_US.UTF-8
+```
+
+```bash
+$ locale
+LANG=en_US.UTF-8
+LC_CTYPE=en_US.UTF-8
+LC_NUMERIC="en_US.UTF-8"
+LC_TIME="en_US.UTF-8"
+LC_COLLATE="en_US.UTF-8"
+LC_MONETARY="en_US.UTF-8"
+LC_MESSAGES="en_US.UTF-8"
+LC_PAPER="en_US.UTF-8"
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS="en_US.UTF-8"
+LC_TELEPHONE="en_US.UTF-8"
+LC_MEASUREMENT="en_US.UTF-8"
+LC_IDENTIFICATION="en_US.UTF-8"
+LC_ALL=
+```
+
+#### 시스템 캐릭터 인코딩 변경 (Linux 기준)
+ 
+```bash
+$ localectl set-locale LANG=en_US.UTF-8
+```
+
+
+#### JVM 인코딩 변경
+
+시스템의 캐릭터 인코딩을 변경하기가 어렵다면, JVM에서 변경해주어도 괜찮다. JVM의 Property(-D) 옵션 중 `file.encoding` 옵션을 사용하여 변경할 수 있다.
+
+```
+-Dfile.encoding=UTF-8
+```
+
+
+
