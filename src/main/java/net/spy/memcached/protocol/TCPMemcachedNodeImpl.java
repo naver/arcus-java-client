@@ -705,12 +705,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     int movedOpCount = 0;
     for (Operation op : allOp) {
       op.setHandlingNode(this);
-      if ((op.getState() == OperationState.WRITE_QUEUED ||
-           op.getState() == OperationState.WRITING) && op.getBuffer() != null) {
-        ((Buffer) op.getBuffer()).reset(); // buffer offset reset
-      } else {
-        op.initialize(); // write completed or not yet initialized
-        op.resetState(); // reset operation state
+      switch (op.getState()) {
+        case WRITING:
+          op.resetState(); // reset operation state
+          // fallthrough
+        case WRITE_QUEUED:
+          if (op.getBuffer() != null) {
+            ((Buffer) op.getBuffer()).reset(); // buffer offset reset
+          } else {
+            op.initialize(); // this case cannot happen.
+          }
+          break;
+        default:
+          op.initialize(); // write completed or not yet initialized
+          op.resetState(); // reset operation state
       }
       if (writeQ.offer(op)) {
         op.setMoved(true);
