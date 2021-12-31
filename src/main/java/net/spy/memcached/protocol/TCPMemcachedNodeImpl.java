@@ -680,18 +680,19 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private BlockingQueue<Operation> getAllOperations() {
     BlockingQueue<Operation> allOp = new LinkedBlockingQueue<Operation>();
 
-    if (hasReadOp()) {
-      readQ.drainTo(allOp);
-    }
-
-    while (hasWriteOp()) {
-      /* Operation could exist both writeQ and readQ,
-       * if all bytes of the operation have not been written yet.
-       */
-      Operation op = removeCurrentWriteOp();
-      if (!allOp.contains(op)) {
+    while (hasReadOp()) {
+      Operation op = removeCurrentReadOp();
+      if (op == getCurrentWriteOp()) {
+        /* Operation could exist both writeQ and readQ,
+         * if all bytes of the operation have not been written yet.
+         */
+      } else {
         allOp.add(op);
       }
+    }
+
+    if (hasWriteOp()) {
+      writeQ.drainTo(allOp);
     }
 
     if (!inputQueue.isEmpty()) {
