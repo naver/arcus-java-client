@@ -1132,8 +1132,8 @@ public final class MemcachedConnection extends SpyObject {
     o.setHandlingNode(node);
     if ((!node.isActive() && !node.isFirstConnecting()) &&
         failureMode == FailureMode.Cancel) {
-       o.cancel("inactive node");
-       return;
+      o.cancel("inactive node");
+      return;
     }
     o.initialize();
     node.addOpToInputQ(o);
