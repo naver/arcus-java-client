@@ -10,16 +10,16 @@ Set item은 하나의 key에 대해 unique value의 집합을 저장한다.
 
 Set item에 수행가능한 기본 연산들은 다음과 같다.
 
-- [Set Item 생성](05-set-API.md#set-item-%EC%83%9D%EC%84%B1) (Set item 삭제는 key-value item 삭제 함수로 수행한다) 
-- [Set Element 삽입](05-set-API.md#set-element-%EC%82%BD%EC%9E%85)
-- [Set Element 삭제](05-set-API.md#set-element-%EC%82%AD%EC%A0%9C)
-- [Set Element 존재유무 확인](05-set-API.md#set-element-%EC%A1%B4%EC%9E%AC%EC%9C%A0%EB%AC%B4-%ED%99%95%EC%9D%B8)
-- [Set Element 조회](05-set-API.md#set-element-%EC%A1%B0%ED%9A%8C)
+- [Set Item 생성](05-set-API.md#set-item-생성) (Set item 삭제는 key-value item 삭제 함수로 수행한다) 
+- [Set Element 삽입](05-set-API.md#set-element-삽입)
+- [Set Element 삭제](05-set-API.md#set-element-삭제)
+- [Set Element 존재여부 확인](05-set-API.md#set-element-존재여부-확인)
+- [Set Element 조회](05-set-API.md#set-element-조회)
 
 여러 set element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
 
-- [Set Element 일괄 삽입](05-set-API.md#set-element-%EC%9D%BC%EA%B4%84-%EC%82%BD%EC%9E%85)
-- [Set Element 일괄 존재유무 확인](05-set-API.md#set-element-%EC%9D%BC%EA%B4%84-%EC%A1%B4%EC%9E%AC%EC%97%AC%EB%B6%80-%ED%99%95%EC%9D%B8)
+- [Set Element 일괄 삽입](05-set-API.md#set-element-일괄-삽입)
+- [Set Element 일괄 존재여부 확인](05-set-API.md#set-element-일괄-존재여부-확인)
 
 
 ## Set Item 생성
@@ -217,16 +217,16 @@ try {
 3. 정상적으로 삭제되면 true를 반환한다. 자세한 삭제 결과는 future.getOperationStatus().getResponse() 로 확인 할 수 있다.
 
 
-## Set Element 존재유무 확인
+## Set Element 존재여부 확인
 
-Set에서 주어진 value를 가진 element의 존재유무를 확인한다.
+Set에서 주어진 value를 가진 element의 존재여부를 확인한다.
 
 ```java
 CollectionFuture<Boolean> asyncSopExist(String key, Object value)
 ```
 
 - key: 조회 대상 set의 key
-- value: 존재유무를 확인할 value
+- value: 존재여부를 확인할 value
 
 
 수행 결과는 future 객체를 통해 얻는다.
@@ -447,7 +447,7 @@ CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(String key, List<O
 ```
 
 - key: 조회 대상 set의 key
-- values: 존재유무를 확인할 value list
+- values: 존재여부를 확인할 value list
 
 
 수행 결과는 future 객체를 통해 얻는다.

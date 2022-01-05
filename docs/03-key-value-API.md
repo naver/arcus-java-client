@@ -8,10 +8,10 @@ Key-value item은 하나의 key에 대해 하나의 value만을 저장하는 ite
 
 Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 
-- [Key-Value Item 저장](03-key-value-API.md#key-value-item-%EC%A0%80%EC%9E%A5)
-- [Key-Value Item 조회](03-key-value-API.md#key-value-item-%EC%A1%B0%ED%9A%8C)
-- [Key-Value Item 값의 증감](03-key-value-API.md#key-value-item-%EA%B0%92%EC%9D%98-%EC%A6%9D%EA%B0%90)
-- [Key-Value Item 삭제](03-key-value-API.md#key-value-item-%EC%82%AD%EC%A0%9C)
+- [Key-Value Item 저장](03-key-value-API.md#key-value-item-저장)
+- [Key-Value Item 조회](03-key-value-API.md#key-value-item-조회)
+- [Key-Value Item 값의 증감](03-key-value-API.md#key-value-item-값의-증감)
+- [Key-Value Item 삭제](03-key-value-API.md#key-value-item-삭제)
 
 
 ## Key-Value Item 저장

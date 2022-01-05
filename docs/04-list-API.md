@@ -11,14 +11,14 @@ List collection은 하나의 key에 대해 여러 value들을 double linked list
 
 List item에 대해 수행가능한 기본 연산들은 아래와 같다.
 
-- [List Item 생성](04-list-API.md#list-item-%EC%83%9D%EC%84%B1) (List Item 삭제는 key-value item 삭제 함수로 수행한다)
-- [List Element 삽입](04-list-API.md#list-element-%EC%82%BD%EC%9E%85)
-- [List Element 삭제](04-list-API.md#list-element-%EC%82%AD%EC%A0%9C) 
-- [List Element 조회](04-list-API.md#list-element-%EC%A1%B0%ED%9A%8C)
+- [List Item 생성](04-list-API.md#list-item-생성) (List Item 삭제는 key-value item 삭제 함수로 수행한다)
+- [List Element 삽입](04-list-API.md#list-element-삽입)
+- [List Element 삭제](04-list-API.md#list-element-삭제) 
+- [List Element 조회](04-list-API.md#list-element-조회)
 
 여러 list element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
 
-- [List Element 일괄 삽입](04-list-API.md#list-element-%EC%9D%BC%EA%B4%84-%EC%82%BD%EC%9E%85)
+- [List Element 일괄 삽입](04-list-API.md#list-element-일괄-삽입)
 
 
 ## List Item 생성

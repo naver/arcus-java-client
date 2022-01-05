@@ -15,7 +15,7 @@ ARCUS Cache Server의 key-value 모델은 아래의 기본 제약 사항을 가�
 
 아래에서 ARCUS Cloud를 이해하는 데 있어 기본 사항들을 기술한다.
 
-- [서비스코드](01-arcus-cloud-basics.md#%EC%84%9C%EB%B9%84%EC%8A%A4%EC%BD%94%EB%93%9C)
+- [서비스코드](01-arcus-cloud-basics.md#서비스코드)
 - [ARCUS Admin](01-arcus-cloud-basics.md#arcus-admin)
 - [Cache Key](01-arcus-cloud-basics.md#cache-key)
 - [Cache Item](01-arcus-cloud-basics.md#cache-item)
