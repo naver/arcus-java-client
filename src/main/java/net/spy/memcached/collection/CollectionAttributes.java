@@ -108,8 +108,7 @@ public class CollectionAttributes extends Attributes {
       } else if ("expiretime".equals(name)) {
         expireTime = Integer.parseInt(value);
       } else if ("type".equals(name)) {
-        type
-                = CollectionType.find(value);
+        type = CollectionType.find(value);
       } else if ("count".equals(name)) {
         count = Long.parseLong(value);
       } else if ("maxcount".equals(name)) {
