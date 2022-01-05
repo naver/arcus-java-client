@@ -203,10 +203,6 @@ public class CollectionAttributes extends Attributes {
     return minBkey;
   }
 
-  public void setMinBkey(Long minBkey) {
-    this.minBkey = minBkey;
-  }
-
   public byte[] getMinBkeyByBytes() {
     return minBkeyByBytes;
   }
