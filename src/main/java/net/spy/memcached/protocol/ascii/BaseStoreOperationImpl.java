@@ -34,7 +34,7 @@ import net.spy.memcached.ops.StatusCode;
  */
 abstract class BaseStoreOperationImpl extends OperationImpl {
 
-  private static final int OVERHEAD = 32;
+  private static final int OVERHEAD = 64;
 
   private static final OperationStatus STORED =
           new OperationStatus(true, "STORED", StatusCode.SUCCESS);
