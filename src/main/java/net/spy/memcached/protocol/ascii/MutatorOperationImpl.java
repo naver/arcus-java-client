@@ -40,7 +40,7 @@ import net.spy.memcached.ops.StatusCode;
 final class MutatorOperationImpl extends OperationImpl
         implements MutatorOperation {
 
-  public static final int OVERHEAD = 32;
+  public static final int OVERHEAD = 64;
 
   private static final OperationStatus NOT_FOUND =
           new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
