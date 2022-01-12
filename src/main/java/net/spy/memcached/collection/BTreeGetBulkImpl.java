@@ -62,7 +62,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
                              ElementFlagFilter eFlagFilter, int offset, int count) {
 
     this.keyList = keyList;
-    this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
+    this.range = BTreeUtil.convertBkey(from) + ((to > -1) ? ".." + BTreeUtil.convertBkey(to) : "");
     this.eFlagFilter = eFlagFilter;
     this.offset = offset;
     this.count = count;

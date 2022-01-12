@@ -27,7 +27,7 @@ public class BTreeCount extends CollectionCount {
   protected final ElementFlagFilter elementFlagFilter;
 
   public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.range = BTreeUtil.convertBkey(from) + ".." + BTreeUtil.convertBkey(to);
     this.elementFlagFilter = elementFlagFilter;
   }
 
@@ -37,13 +37,11 @@ public class BTreeCount extends CollectionCount {
   }
 
   public BTreeCount(long from, long to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this(from, to, (ElementFlagFilter) elementMultiFlagsFilter);
   }
 
   public BTreeCount(byte[] from, byte[] to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this(from, to, (ElementFlagFilter) elementMultiFlagsFilter);
   }
 
   public String stringify() {

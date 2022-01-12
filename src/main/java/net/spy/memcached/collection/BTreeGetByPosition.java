@@ -54,7 +54,7 @@ public class BTreeGetByPosition extends CollectionGet {
   public BTreeGetByPosition(BTreeOrder order, int posFrom, int posTo) {
     this.headerCount = 2;
     this.order = order;
-    this.range = String.valueOf(posFrom) + ".." + String.valueOf(posTo);
+    this.range = BTreeUtil.convertBkey(posFrom) + ".." + BTreeUtil.convertBkey(posTo);
     this.posFrom = posFrom;
     this.posTo = posTo;
   }

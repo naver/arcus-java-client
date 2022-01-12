@@ -89,4 +89,11 @@ public class BTreeUtilTest extends BaseMockCase {
       }
     });
   }
+
+  public void testConvertUnsignedLongToString() {
+    assertEquals("9223372036854775807", BTreeUtil.convertBkey(Long.MAX_VALUE));
+    assertEquals("9223372036854775808", BTreeUtil.convertBkey(Long.MIN_VALUE));
+    assertEquals("1", BTreeUtil.convertBkey(1));
+    assertEquals("18446744073709551615", BTreeUtil.convertBkey(-1));
+  }
 }
