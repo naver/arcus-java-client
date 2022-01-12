@@ -79,4 +79,15 @@ public final class BTreeUtil {
     }
     return array1.length - array2.length;
   }
+
+  public static void validateBkey(byte[] bkey) {
+    if (bkey.length > 31) {
+      throw new IllegalArgumentException("bkey size exceeded 31");
+    }
+  }
+
+  public static void validateBkey(byte[] from, byte[] to) {
+    validateBkey(from);
+    validateBkey(to);
+  }
 }

@@ -2800,16 +2800,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopUpdate(String key,
                                                   byte[] bkey, ElementFlagUpdate eFlagUpdate,
                                                   Object value) {
+    BTreeUtil.validateBkey(bkey);
     BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, BTreeUtil.toHex(bkey), collectionUpdate,
             collectionTranscoder);
   }
+
 
   @Override
   public <T> CollectionFuture<Boolean> asyncBopUpdate(String key,
                                                       byte[] bkey,
                                                       ElementFlagUpdate eFlagUpdate, T value,
                                                       Transcoder<T> tc) {
+    BTreeUtil.validateBkey(bkey);
     BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value, eFlagUpdate, false);
     return asyncCollectionUpdate(key, BTreeUtil.toHex(bkey), collectionUpdate, tc);
   }
@@ -2953,6 +2956,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopInsert(String key, byte[] bkey,
                                                   byte[] eFlag, Object value,
                                                   CollectionAttributes attributesForCreate) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsert<Object> bTreeInsert = new BTreeInsert<Object>(value,
             eFlag, (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeInsert,
@@ -2964,6 +2968,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       byte[] bkey, byte[] eFlag, T value,
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsert<T> bTreeInsert = new BTreeInsert<T>(value, eFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeInsert, tc);
@@ -2973,6 +2978,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty) {
+    BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, bkey, 0, 1, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopExtendedGet(key, get, false, collectionTranscoder);
   }
@@ -2981,6 +2987,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
+    BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, bkey, 0, 1, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopExtendedGet(key, get, false, tc);
   }
@@ -2989,6 +2996,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
       String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
       int offset, int count, boolean withDelete, boolean dropIfEmpty) {
+    BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
     return asyncBopExtendedGet(key, get, reverse, collectionTranscoder);
@@ -2999,6 +3007,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
           int count, boolean withDelete, boolean dropIfEmpty,
           Transcoder<T> tc) {
+    BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
     return asyncBopExtendedGet(key, get, reverse, tc);
@@ -3210,22 +3219,22 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<Integer> asyncBopFindPosition(String key, long longBKey,
+  public CollectionFuture<Integer> asyncBopFindPosition(String key, long bkey,
                                                         BTreeOrder order) {
     if (order == null) {
       throw new IllegalArgumentException("BTreeOrder must not be null.");
     }
-    BTreeFindPosition get = new BTreeFindPosition(longBKey, order);
+    BTreeFindPosition get = new BTreeFindPosition(bkey, order);
     return asyncBopFindPosition(key, get);
   }
 
   @Override
-  public CollectionFuture<Integer> asyncBopFindPosition(String key, byte[] byteArrayBKey,
+  public CollectionFuture<Integer> asyncBopFindPosition(String key, byte[] bkey,
                                                         BTreeOrder order) {
     if (order == null) {
       throw new IllegalArgumentException("BTreeOrder must not be null.");
     }
-    BTreeFindPosition get = new BTreeFindPosition(byteArrayBKey, order);
+    BTreeFindPosition get = new BTreeFindPosition(bkey, order);
     return asyncBopFindPosition(key, get);
   }
 
@@ -3310,29 +3319,31 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
-          String key, long longBKey, BTreeOrder order, int count) {
-    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(longBKey, order, count);
+          String key, long bkey, BTreeOrder order, int count) {
+    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(bkey, order, count);
     return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
-          String key, long longBKey, BTreeOrder order, int count, Transcoder<T> tc) {
-    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(longBKey, order, count);
+          String key, long bkey, BTreeOrder order, int count, Transcoder<T> tc) {
+    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(bkey, order, count);
     return asyncBopFindPositionWithGet(key, get, tc);
   }
 
   @Override
   public CollectionFuture<Map<Integer, Element<Object>>> asyncBopFindPositionWithGet(
-          String key, byte[] byteArrayBKey, BTreeOrder order, int count) {
-    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(byteArrayBKey, order, count);
+          String key, byte[] bkey, BTreeOrder order, int count) {
+    BTreeUtil.validateBkey(bkey);
+    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(bkey, order, count);
     return asyncBopFindPositionWithGet(key, get, collectionTranscoder);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
-          String key, byte[] byteArrayBKey, BTreeOrder order, int count, Transcoder<T> tc) {
-    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(byteArrayBKey, order, count);
+          String key, byte[] bkey, BTreeOrder order, int count, Transcoder<T> tc) {
+    BTreeUtil.validateBkey(bkey);
+    BTreeFindPositionWithGet get = new BTreeFindPositionWithGet(bkey, order, count);
     return asyncBopFindPositionWithGet(key, get, tc);
   }
 
@@ -3454,6 +3465,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopInsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
             BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
@@ -3463,6 +3475,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopInsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
             BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
@@ -3490,6 +3503,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopUpsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
             BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
@@ -3499,6 +3513,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopUpsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
+    BTreeUtil.validateBkey(bkey);
     BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
             BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
@@ -3607,6 +3622,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   byte[] from, byte[] to,
                                                   ElementFlagFilter eFlagFilter, int count,
                                                   boolean dropIfEmpty) {
+    BTreeUtil.validateBkey(from, to);
     BTreeDelete delete = new BTreeDelete(from, to, count, false, dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
   }
@@ -3615,6 +3631,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopDelete(String key,
                                                   byte[] bkey, ElementFlagFilter eFlagFilter,
                                                   boolean dropIfEmpty) {
+    BTreeUtil.validateBkey(bkey);
     BTreeDelete delete = new BTreeDelete(bkey, false, dropIfEmpty, eFlagFilter);
     return asyncCollectionDelete(key, delete);
   }
@@ -3623,6 +3640,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopUpsert(String key,
                                                   byte[] bkey, byte[] elementFlag, Object value,
                                                   CollectionAttributes attributesForCreate) {
+    BTreeUtil.validateBkey(bkey);
     BTreeUpsert<Object> bTreeUpsert = new BTreeUpsert<Object>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeUpsert,
@@ -3634,6 +3652,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       byte[] bkey, byte[] elementFlag, T value,
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
+    BTreeUtil.validateBkey(bkey);
     BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<T>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeUpsert,
@@ -3644,6 +3663,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Integer> asyncBopGetItemCount(String key,
                                                         byte[] from, byte[] to,
                                                         ElementFlagFilter eFlagFilter) {
+    BTreeUtil.validateBkey(from, to);
     CollectionCount collectionCount = new BTreeCount(from, to, eFlagFilter);
     return asyncCollectionCount(key, collectionCount);
   }
@@ -3781,6 +3801,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count) {
+    BTreeUtil.validateBkey(from, to);
     if (keyList == null || keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
@@ -3813,6 +3834,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode) {
+    BTreeUtil.validateBkey(from, to);
     if (keyList == null || keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
@@ -4006,6 +4028,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, byte[] bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
 
+    BTreeUtil.validateBkey(bkey);
     return asyncBopInsertBulk(keyList, bkey, eFlag, value,
             attributesForCreate, collectionTranscoder);
   }
@@ -4015,6 +4038,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, byte[] bkey, byte[] eFlag, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
+    BTreeUtil.validateBkey(bkey);
     Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
@@ -4268,6 +4292,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count,
           Transcoder<T> tc) {
+    BTreeUtil.validateBkey(from, to);
     if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
     }
@@ -4409,59 +4434,63 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by);
     return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey,
                                              int by) {
+    BTreeUtil.validateBkey(bkey);
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by);
-    return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+    return asyncCollectionMutate(key, BTreeUtil.toHex(bkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by, initial, eFlag);
     return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag) {
+    BTreeUtil.validateBkey(bkey);
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by, initial, eFlag);
-    return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+    return asyncCollectionMutate(key, BTreeUtil.toHex(bkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by);
     return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey,
                                              int by) {
+    BTreeUtil.validateBkey(bkey);
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by);
-    return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+    return asyncCollectionMutate(key, BTreeUtil.toHex(bkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by, initial, eFlag);
     return asyncCollectionMutate(key, String.valueOf(subkey), collectionMutate);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag) {
+    BTreeUtil.validateBkey(bkey);
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by, initial, eFlag);
-    return asyncCollectionMutate(key, BTreeUtil.toHex(subkey), collectionMutate);
+    return asyncCollectionMutate(key, BTreeUtil.toHex(bkey), collectionMutate);
   }
 
   /**

@@ -16,9 +16,12 @@
  */
 package net.spy.memcached.util;
 
+import net.spy.memcached.compat.BaseMockCase;
+import org.junit.function.ThrowingRunnable;
+
 import java.util.Arrays;
 
-import net.spy.memcached.compat.BaseMockCase;
+import static org.junit.Assert.assertThrows;
 
 public class BTreeUtilTest extends BaseMockCase {
 
@@ -76,5 +79,14 @@ public class BTreeUtilTest extends BaseMockCase {
 
     assertEquals(-1, BTreeUtil.compareByteArraysInLexOrder(array1, array2));
     assertEquals(1, BTreeUtil.compareByteArraysInLexOrder(array2, array1));
+  }
+
+  public void testInValidSizeBkey() {
+    assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
+      @Override
+      public void run() throws Throwable {
+        BTreeUtil.validateBkey(new byte[32]);
+      }
+    });
   }
 }
