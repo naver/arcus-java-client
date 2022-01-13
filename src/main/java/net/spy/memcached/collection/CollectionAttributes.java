@@ -75,7 +75,7 @@ public class CollectionAttributes extends Attributes {
     }
     if (maxBkeyRange != null || maxBkeyRangeByBytes != null) {
       if (maxBkeyRange != null) {
-        b.append(" maxbkeyrange=").append(String.valueOf(maxBkeyRange));
+        b.append(" maxbkeyrange=").append(BTreeUtil.toULong(maxBkeyRange));
       } else {
         b.append(" maxbkeyrange=").append(
                 BTreeUtil.toHex(maxBkeyRangeByBytes));
