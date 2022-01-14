@@ -42,7 +42,7 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
   @Override
   public String toString() {
     return "SMGetElement {KEY:" + key + ", BKEY:"
-            + ((bytebkey == null) ? BTreeUtil.toULong(bkey) : BTreeUtil.toHex(bytebkey))
+            + ((bytebkey == null) ? String.valueOf(bkey) : BTreeUtil.toHex(bytebkey))
             + ", VALUE:" + value + "}";
   }
 

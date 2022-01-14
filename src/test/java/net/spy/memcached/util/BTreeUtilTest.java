@@ -89,11 +89,4 @@ public class BTreeUtilTest extends BaseMockCase {
       }
     });
   }
-
-  public void testToUnsignedLong() {
-    assertEquals("9223372036854775807", BTreeUtil.toULong(Long.MAX_VALUE));
-    assertEquals("9223372036854775808", BTreeUtil.toULong(Long.MIN_VALUE));
-    assertEquals("1", BTreeUtil.toULong(1));
-    assertEquals("18446744073709551615", BTreeUtil.toULong(-1));
-  }
 }

@@ -92,7 +92,7 @@ public class BKeyObject {
 
   public String getBKeyAsString() {
     if (BKeyType.LONG == type) {
-      return BTreeUtil.toULong(longBKey);
+      return String.valueOf(longBKey);
     } else if (BKeyType.BYTEARRAY == type) {
       return BTreeUtil.toHex(byteArrayBKey.getBytes());
     } else {

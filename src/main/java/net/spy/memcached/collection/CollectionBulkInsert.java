@@ -79,7 +79,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
         }
       }
       this.keyList = keyList;
-      this.bkey = BTreeUtil.toULong(bkey);
+      this.bkey = String.valueOf(bkey);
       this.eflag = BTreeUtil.toHex(eflag);
       this.value = value;
       this.attribute = attr;
