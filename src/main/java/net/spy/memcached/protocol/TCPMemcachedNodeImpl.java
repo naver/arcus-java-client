@@ -48,7 +48,7 @@ import net.spy.memcached.ops.OperationState;
 public abstract class TCPMemcachedNodeImpl extends SpyObject
         implements MemcachedNode {
 
-  private String nodeName;
+  private String name;
   private SocketAddress socketAddress;
   private final ByteBuffer rbuf;
   private final ByteBuffer wbuf;
@@ -140,7 +140,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     assert wq != null : "No operation write queue";
     assert iq != null : "No input queue";
 
-    nodeName = name + " " + sa;
+    this.name = name;
     setSocketAddress(sa);
     setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
@@ -403,7 +403,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final String getNodeName() {
-    return nodeName;
+    return name + " " + socketAddress;
   }
 
   public final ByteBuffer getRbuf() {
@@ -463,7 +463,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     int rsize = readQ.size() + (optimizedOp == null ? 0 : 1);
     int wsize = writeQ.size();
     int isize = inputQueue.size();
-    return "{QA name=" + nodeName
+    return "{QA name=" + getNodeName()
             + ", #Rops=" + rsize
             + ", #Wops=" + wsize
             + ", #iq=" + isize
