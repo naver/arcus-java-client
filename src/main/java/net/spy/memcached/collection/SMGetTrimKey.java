@@ -38,7 +38,7 @@ public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
   @Override
   public String toString() {
     return "SMGetElement {KEY:" + key + ", BKEY:"
-            + ((bytebkey == null) ? BTreeUtil.toULong(bkey) : BTreeUtil.toHex(bytebkey)) + "}";
+            + ((bytebkey == null) ? String.valueOf(bkey) : BTreeUtil.toHex(bytebkey)) + "}";
   }
 
   @Override

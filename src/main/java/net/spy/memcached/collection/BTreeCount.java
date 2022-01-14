@@ -27,7 +27,7 @@ public class BTreeCount extends CollectionCount {
   protected final ElementFlagFilter elementFlagFilter;
 
   public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
-    this.range = BTreeUtil.toULong(from) + ".." + BTreeUtil.toULong(to);
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.elementFlagFilter = elementFlagFilter;
   }
 
@@ -37,7 +37,7 @@ public class BTreeCount extends CollectionCount {
   }
 
   public BTreeCount(long from, long to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = BTreeUtil.toULong(from) + ".." + BTreeUtil.toULong(to);
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
   }
 

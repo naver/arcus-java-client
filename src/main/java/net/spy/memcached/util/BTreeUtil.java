@@ -17,8 +17,6 @@
 package net.spy.memcached.util;
 
 
-import com.google.common.primitives.UnsignedLong;
-
 public final class BTreeUtil {
 
   private static final String HEXES = "0123456789ABCDEF";
@@ -89,12 +87,5 @@ public final class BTreeUtil {
         throw new IllegalArgumentException("bkey size exceeded 31");
       }
     }
-  }
-
-  public static String toULong(long bkey) {
-    if (bkey < 0) {
-      return UnsignedLong.fromLongBits(bkey).toString();
-    }
-    return String.valueOf(bkey);
   }
 }

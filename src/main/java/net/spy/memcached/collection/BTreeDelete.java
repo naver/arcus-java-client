@@ -26,7 +26,7 @@ public class BTreeDelete extends CollectionDelete {
   protected ElementFlagFilter elementFlagFilter;
 
   public BTreeDelete(long bkey, boolean noreply) {
-    this.range = BTreeUtil.toULong(bkey);
+    this.range = String.valueOf(bkey);
     this.noreply = noreply;
   }
 
@@ -38,12 +38,12 @@ public class BTreeDelete extends CollectionDelete {
   }
 
   public BTreeDelete(long from, long to, boolean noreply) {
-    this.range = BTreeUtil.toULong(from) + ".." + BTreeUtil.toULong(to);
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.noreply = noreply;
   }
 
   public BTreeDelete(long from, long to, int count, boolean noreply) {
-    this.range = BTreeUtil.toULong(from) + ".." + BTreeUtil.toULong(to);
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.count = count;
     this.noreply = noreply;
   }

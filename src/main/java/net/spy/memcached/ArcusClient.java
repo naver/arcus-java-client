@@ -1811,7 +1811,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   CollectionAttributes attributesForCreate) {
     BTreeInsert<Object> bTreeInsert = new BTreeInsert<Object>(value,
             eFlag, (attributesForCreate != null), null, attributesForCreate);
-    return asyncCollectionInsert(key, BTreeUtil.toULong(bkey), bTreeInsert, collectionTranscoder);
+    return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert, collectionTranscoder);
   }
 
   @Override
@@ -1848,7 +1848,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       Transcoder<T> tc) {
     BTreeInsert<T> bTreeInsert = new BTreeInsert<T>(value, eFlag,
             (attributesForCreate != null), null, attributesForCreate);
-    return asyncCollectionInsert(key, BTreeUtil.toULong(bkey), bTreeInsert, tc);
+    return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert, tc);
   }
 
   @Override
@@ -2764,7 +2764,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUpsert<Object> bTreeUpsert = new BTreeUpsert<Object>(value,
             elementFlag, (attributesForCreate != null), null, attributesForCreate);
 
-    return asyncCollectionInsert(key, BTreeUtil.toULong(bkey), bTreeUpsert,
+    return asyncCollectionInsert(key, String.valueOf(bkey), bTreeUpsert,
             collectionTranscoder);
   }
 
@@ -2777,14 +2777,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<T>(value, elementFlag,
             (attributesForCreate != null), null, attributesForCreate);
 
-    return asyncCollectionInsert(key, BTreeUtil.toULong(bkey), bTreeUpsert, tc);
+    return asyncCollectionInsert(key, String.valueOf(bkey), bTreeUpsert, tc);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey,
                                                   ElementFlagUpdate eFlagUpdate, Object value) {
     BTreeUpdate<Object> collectionUpdate = new BTreeUpdate<Object>(value, eFlagUpdate, false);
-    return asyncCollectionUpdate(key, BTreeUtil.toULong(bkey), collectionUpdate,
+    return asyncCollectionUpdate(key, String.valueOf(bkey), collectionUpdate,
             collectionTranscoder);
   }
 
@@ -2793,7 +2793,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       ElementFlagUpdate eFlagUpdate, T value,
                                                       Transcoder<T> tc) {
     BTreeUpdate<T> collectionUpdate = new BTreeUpdate<T>(value, eFlagUpdate, false);
-    return asyncCollectionUpdate(key, BTreeUtil.toULong(bkey), collectionUpdate, tc);
+    return asyncCollectionUpdate(key, String.valueOf(bkey), collectionUpdate, tc);
   }
 
   @Override
@@ -4438,7 +4438,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by);
-    return asyncCollectionMutate(key, BTreeUtil.toULong(bkey), collectionMutate);
+    return asyncCollectionMutate(key, String.valueOf(bkey), collectionMutate);
   }
 
   @Override
@@ -4453,7 +4453,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.incr, by, initial, eFlag);
-    return asyncCollectionMutate(key, BTreeUtil.toULong(bkey), collectionMutate);
+    return asyncCollectionMutate(key, String.valueOf(bkey), collectionMutate);
   }
 
   @Override
@@ -4468,7 +4468,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by);
-    return asyncCollectionMutate(key, BTreeUtil.toULong(bkey), collectionMutate);
+    return asyncCollectionMutate(key, String.valueOf(bkey), collectionMutate);
   }
 
   @Override
@@ -4483,7 +4483,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
     CollectionMutate collectionMutate = new BTreeMutate(Mutator.decr, by, initial, eFlag);
-    return asyncCollectionMutate(key, BTreeUtil.toULong(bkey), collectionMutate);
+    return asyncCollectionMutate(key, String.valueOf(bkey), collectionMutate);
   }
 
   @Override

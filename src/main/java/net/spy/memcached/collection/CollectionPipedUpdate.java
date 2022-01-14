@@ -26,7 +26,6 @@ import java.util.Map;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
-import net.spy.memcached.util.BTreeUtil;
 
 public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
@@ -101,7 +100,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
-                .getBkeyByHex() : BTreeUtil.toULong(each.getLongBkey()))).length;
+                .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
         if (decodedList.get(i) != null) {
           capacity += decodedList.get(i++).length;
         }
@@ -130,7 +129,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
         setArguments(bb, COMMAND, key,
                 (element.isByteArraysBkey() ? element.getBkeyByHex()
-                        : BTreeUtil.toULong(element.getLongBkey())),
+                        : String.valueOf(element.getLongBkey())),
                 b.toString(), (value == null ? -1 : value.length),
                 (i < eSize - 1) ? PIPE : "");
         if (value != null) {

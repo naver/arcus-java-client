@@ -29,7 +29,7 @@ public class BTreeGet extends CollectionGet {
 
   public BTreeGet(long bkey, boolean delete) {
     this.headerCount = 2;
-    this.range = BTreeUtil.toULong(bkey);
+    this.range = String.valueOf(bkey);
     this.delete = delete;
   }
 
@@ -42,7 +42,7 @@ public class BTreeGet extends CollectionGet {
 
   public BTreeGet(long from, long to, int offset, int count, boolean delete) {
     this.headerCount = 2;
-    this.range = BTreeUtil.toULong(from) + ".." + BTreeUtil.toULong(to);
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.offset = offset;
     this.count = count;
     this.delete = delete;

@@ -27,7 +27,6 @@ import java.util.Map;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
-import net.spy.memcached.util.BTreeUtil;
 
 public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
@@ -271,7 +270,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       int i = 0;
       for (Long eachBkey : map.keySet()) {
         capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes(BTreeUtil.toULong(eachBkey)).length;
+        capacity += KeyUtil.getKeyBytes(String.valueOf(eachBkey)).length;
         capacity += decodedList.get(i++).length;
         capacity += 128;
       }
@@ -363,7 +362,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       for (Element<T> each : elements) {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
-                .getBkeyByHex() : BTreeUtil.toULong(each.getLongBkey()))).length;
+                .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
         capacity += KeyUtil.getKeyBytes(each.getFlagByHex()).length;
         capacity += decodedList.get(i++).length;
         capacity += 128;
@@ -383,7 +382,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
                 COMMAND,
                 key,
                 (element.isByteArraysBkey() ? element.getBkeyByHex()
-                        : BTreeUtil.toULong(element.getLongBkey())),
+                        : String.valueOf(element.getLongBkey())),
                 element.getFlagByHex(),
                 value.length,
                 (createKeyIfNotExists) ? "create" : "",
