@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
 
 public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   private static final String command = "bop mget";
+
+  private MemcachedNode node;
 
   private String keySeparator;
   private String spaceSeparatedKeys;
@@ -47,9 +50,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   protected int dataLength;
   protected byte[] eflag = null;
 
-  protected BTreeGetBulkImpl(List<String> keyList, byte[] from, byte[] to,
-                             ElementFlagFilter eFlagFilter, int offset, int count) {
-
+  protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
+                             byte[] from, byte[] to,
+                             ElementFlagFilter eFlagFilter, int offset,
+                             int count) {
+    this.node = node;
     this.keyList = keyList;
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
     this.eFlagFilter = eFlagFilter;
@@ -58,9 +63,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
   }
 
-  protected BTreeGetBulkImpl(List<String> keyList, long from, long to,
-                             ElementFlagFilter eFlagFilter, int offset, int count) {
-
+  protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
+                             long from, long to,
+                             ElementFlagFilter eFlagFilter, int offset,
+                             int count) {
+    this.node = node;
     this.keyList = keyList;
     this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
     this.eFlagFilter = eFlagFilter;
@@ -90,11 +97,8 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     return spaceSeparatedKeys;
   }
 
-  public String getRepresentKey() {
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalStateException("Key list is empty.");
-    }
-    return keyList.get(0);
+  public MemcachedNode getMemcachedNode() {
+    return node;
   }
 
   public List<String> getKeyList() {

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2120,16 +2121,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               "The sum of offset and count must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
     }
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, smgetKeyChunkSize);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
-    for (List<String> v : arrangedKey.values()) {
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(
-            v, from, to, eFlagFilter, 0, offset + count));
+        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, 0, offset + count));
       } else {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(
-            v, from, to, eFlagFilter, offset, count));
+        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, offset, count));
       }
     }
     return smget(smGetList, offset, count, (from > to), collectionTranscoder);
@@ -2150,12 +2152,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               + MAX_SMGET_COUNT + ".");
     }
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, smgetKeyChunkSize);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
-    for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(
-          v, from, to, eFlagFilter, count, smgetMode));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, count, smgetMode));
     }
     return smget(smGetList, count, (from > to), collectionTranscoder, smgetMode);
   }
@@ -2166,11 +2169,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    *
    * @param keyList   list of keys
    * @param groupSize max size of the key group (number of keys)
-   * @return map of group name (memcached node + sequence number) and keys in the group
+   * @return list of grouped (memcached node + keys) in the group
    */
-  private Map<String, List<String>> groupingKeys(List<String> keyList, int groupSize) {
+  private Collection<Entry<MemcachedNode, List<String>>> groupingKeys(List<String> keyList, int groupSize) {
     Map<String, Integer> chunkCount = new HashMap<String, Integer>();
-    Map<String, List<String>> result = new HashMap<String, List<String>>();
+    Map<String, Entry<MemcachedNode, List<String>>> result = new HashMap<String,
+        Entry<MemcachedNode, List<String>>>();
     Set<String> keySet = new HashSet<String>();
 
     MemcachedConnection conn = getMemcachedConnection();
@@ -2200,21 +2204,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       List<String> arrangedKeyList = null;
 
       if (result.containsKey(resultKey)) {
-        if (result.get(resultKey).size() >= groupSize) {
+        if (result.get(resultKey).getValue().size() >= groupSize) {
           arrangedKeyList = new ArrayList<String>();
           cc++;
-          result.put(node + cc, arrangedKeyList);
+          result.put(node + cc, new AbstractMap.SimpleEntry<MemcachedNode,
+              List<String>>(qa, arrangedKeyList));
           chunkCount.put(node, cc);
         } else {
-          arrangedKeyList = result.get(resultKey);
+          arrangedKeyList = result.get(resultKey).getValue();
         }
       } else {
         arrangedKeyList = new ArrayList<String>();
-        result.put(resultKey, arrangedKeyList);
+        result.put(resultKey, new AbstractMap.SimpleEntry<MemcachedNode,
+            List<String>>(qa, arrangedKeyList));
       }
       arrangedKeyList.add(k);
     }
-    return result;
+    return result.values();
   }
 
   /**
@@ -2415,7 +2421,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       });
       ops.add(op);
-      addOp(smGet.getRepresentKey(), op);
+      addOp(smGet.getMemcachedNode(), op);
     }
 
     return new SMGetFuture<List<SMGetElement<T>>>(ops, operationTimeout) {
@@ -2688,7 +2694,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       });
       ops.add(op);
-      addOp(smGet.getRepresentKey(), op);
+      addOp(smGet.getMemcachedNode(), op);
     }
 
     return new SMGetFuture<List<SMGetElement<T>>>(ops, operationTimeout) {
@@ -3813,16 +3819,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               "The sum of offset and count must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
     }
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, smgetKeyChunkSize);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
-    for (List<String> v : arrangedKey.values()) {
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(
-            v, from, to, eFlagFilter, 0, offset + count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, 0, offset + count));
       } else {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(
-            v, from, to, eFlagFilter, offset, count));
+        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, offset, count));
       }
     }
 
@@ -3846,12 +3853,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               + MAX_SMGET_COUNT + ".");
     }
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, smgetKeyChunkSize);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, smgetKeyChunkSize);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<BTreeSMGet<Object>>(
             arrangedKey.size());
-    for (List<String> v : arrangedKey.values()) {
-      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(
-          v, from, to, eFlagFilter, count, smgetMode));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      smGetList.add(new BTreeSMGetWithByteTypeBkey<Object>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, count, smgetMode));
     }
 
     return smget(smGetList, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
@@ -4010,14 +4018,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, long bkey, byte[] eFlag, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
 
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
-    for (List<String> eachKeyList : arrangedKey.values()) {
-      insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(
-              eachKeyList, bkey, eFlag, value, attributesForCreate, tc));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(entry.getKey(),
+            entry.getValue(), bkey, eFlag, value, attributesForCreate, tc));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4039,13 +4048,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
     BTreeUtil.validateBkey(bkey);
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
-    for (List<String> eachKeyList : arrangedKey.values()) {
-      insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(
-              eachKeyList, bkey, eFlag, value, attributesForCreate, tc));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(entry.getKey(),
+            entry.getValue(), bkey, eFlag, value, attributesForCreate, tc));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4065,14 +4075,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
     validateMKey(mkey);
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
 
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
-    for (List<String> eachKeyList : arrangedKey.values()) {
-      insertList.add(new CollectionBulkInsert.MapBulkInsert<T>(
-              eachKeyList, mkey, value, attributesForCreate, tc));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      insertList.add(new CollectionBulkInsert.MapBulkInsert<T>(entry.getKey(),
+            entry.getValue(), mkey, value, attributesForCreate, tc));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4091,13 +4102,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
-    for (List<String> eachKeyList : arrangedKey.values()) {
-      insertList.add(new CollectionBulkInsert.SetBulkInsert<T>(
-              eachKeyList, value, attributesForCreate, tc));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      insertList.add(new CollectionBulkInsert.SetBulkInsert<T>(entry.getKey(),
+            entry.getValue(), value, attributesForCreate, tc));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4116,13 +4128,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, int index, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
-    Map<String, List<String>> arrangedKey = groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
-    for (List<String> eachKeyList : arrangedKey.values()) {
-      insertList.add(new CollectionBulkInsert.ListBulkInsert<T>(
-              eachKeyList, index, value, attributesForCreate, tc));
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      insertList.add(new CollectionBulkInsert.ListBulkInsert<T>(entry.getKey(),
+            entry.getValue(), index, value, attributesForCreate, tc));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4169,7 +4182,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 }
               });
       ops.add(op);
-      addOp(insert.getKeyList().get(0), op);
+      addOp(insert.getMemcachedNode(), op);
     }
 
     // return future
@@ -4268,14 +4281,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           + MAX_GETBULK_ELEMENT_COUNT + ".");
     }
 
-    Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> rearrangedKeys =
+            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
 
     List<BTreeGetBulk<T>> getBulkList = new ArrayList<BTreeGetBulk<T>>(
             rearrangedKeys.size());
 
-    for (Entry<String, List<String>> entry : rearrangedKeys.entrySet()) {
-      getBulkList.add(new BTreeGetBulkWithLongTypeBkey<T>(entry
-              .getValue(), from, to, eFlagFilter, offset, count));
+    for (Entry<MemcachedNode, List<String>> entry : rearrangedKeys) {
+      getBulkList.add(new BTreeGetBulkWithLongTypeBkey<T>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, offset, count));
     }
 
     return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
@@ -4305,14 +4319,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           + MAX_GETBULK_ELEMENT_COUNT + ".");
     }
 
-    Map<String, List<String>> rearrangedKeys = groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
+    Collection<Entry<MemcachedNode, List<String>>> rearrangedKeys =
+            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
 
     List<BTreeGetBulk<T>> getBulkList = new ArrayList<BTreeGetBulk<T>>(
             rearrangedKeys.size());
 
-    for (Entry<String, List<String>> entry : rearrangedKeys.entrySet()) {
-      getBulkList.add(new BTreeGetBulkWithByteTypeBkey<T>(entry
-              .getValue(), from, to, eFlagFilter, offset, count));
+    for (Entry<MemcachedNode, List<String>> entry : rearrangedKeys) {
+      getBulkList.add(new BTreeGetBulkWithByteTypeBkey<T>(entry.getKey(),
+            entry.getValue(), from, to, eFlagFilter, offset, count));
     }
 
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
@@ -4368,7 +4383,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       });
       ops.add(op);
-      addOp(getBulk.getRepresentKey(), op);
+      addOp(getBulk.getMemcachedNode(), op);
     }
 
     return new CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>>(
@@ -4427,7 +4442,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       });
       ops.add(op);
-      addOp(getBulk.getRepresentKey(), op);
+      addOp(getBulk.getMemcachedNode(), op);
     }
 
     return new CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>(

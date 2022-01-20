@@ -18,13 +18,16 @@ package net.spy.memcached.collection;
 
 import java.util.List;
 
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
-  public BTreeGetBulkWithLongTypeBkey(List<String> keyList, long from, long to,
-                                      ElementFlagFilter eFlagFilter, int offset, int count) {
-    super(keyList, from, to, eFlagFilter, offset, count);
+  public BTreeGetBulkWithLongTypeBkey(MemcachedNode node, List<String> keyList,
+                                      long from, long to,
+                                      ElementFlagFilter eFlagFilter,
+                                      int offset, int count) {
+    super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
   public Long getSubkey() {
@@ -55,4 +58,5 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
       this.flag = Integer.valueOf(splited[3]);
     }
   }
+
 }

@@ -18,13 +18,16 @@ package net.spy.memcached.collection;
 
 import java.util.List;
 
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
-  public BTreeGetBulkWithByteTypeBkey(List<String> keyList, byte[] from, byte[] to,
-                                      ElementFlagFilter eFlagFilter, int offset, int count) {
-    super(keyList, from, to, eFlagFilter, offset, count);
+  public BTreeGetBulkWithByteTypeBkey(MemcachedNode node, List<String> keyList,
+                                      byte[] from, byte[] to,
+                                      ElementFlagFilter eFlagFilter,
+                                      int offset, int count) {
+    super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
   public byte[] getSubkey() {
