@@ -27,6 +27,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -143,6 +144,11 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       }
       index++;
     }
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionPipedUpdateOperationImpl(key, update, cb);
   }
 
   @Override

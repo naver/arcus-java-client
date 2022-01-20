@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.ops.CASOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreOperation;
@@ -114,5 +115,11 @@ class StoreOperationImpl extends OperationImpl
   @Override
   public boolean isPipeOperation() {
     return false;
+  }
+
+  @Override
+  public Operation clone() {
+    return new StoreOperationImpl(storeType, key, flags, exp, data, cas,
+        callback);
   }
 }

@@ -32,6 +32,7 @@ import net.spy.memcached.collection.MapDelete;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionDeleteOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -96,6 +97,11 @@ public class CollectionDeleteOperationImpl extends OperationImpl
             BKEY_MISMATCH);
     getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionDeleteOperationImpl(key, collectionDelete, callback);
   }
 
   @Override

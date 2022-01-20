@@ -26,6 +26,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionBulkInsertOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -146,6 +147,11 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
 
       index++;
     }
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionBulkInsertOperationImpl(Collections.singletonList(key), insert, callback);
   }
 
   @Override

@@ -28,6 +28,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -110,6 +111,11 @@ final class MutatorOperationImpl extends OperationImpl
 
   public Collection<String> getKeys() {
     return Collections.singleton(key);
+  }
+
+  @Override
+  public Operation clone() {
+    return new MutatorOperationImpl(mutator, key, amount, def, exp, callback);
   }
 
   public int getBy() {

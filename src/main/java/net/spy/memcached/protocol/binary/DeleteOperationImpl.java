@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.ops.DeleteOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 
@@ -47,5 +48,10 @@ class DeleteOperationImpl extends OperationImpl implements
   @Override
   public boolean isPipeOperation() {
     return false;
+  }
+
+  @Override
+  public Operation clone() {
+    return new DeleteOperationImpl(key, cas, callback);
   }
 }

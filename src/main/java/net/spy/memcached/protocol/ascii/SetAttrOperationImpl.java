@@ -28,6 +28,7 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -81,6 +82,11 @@ class SetAttrOperationImpl extends OperationImpl
             matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
                     ATTR_ERROR_BAD_VALUE));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new SetAttrOperationImpl(key, attrs, callback);
   }
 
   @Override

@@ -27,6 +27,7 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CASOperation;
 import net.spy.memcached.ops.CASOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -81,6 +82,11 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, STORED, NOT_FOUND, EXISTS));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new CASOperationImpl(key, casValue, flags, exp, data, callback);
   }
 
   @Override

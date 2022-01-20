@@ -27,6 +27,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.GetAttrOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
@@ -80,6 +81,11 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
     }
+  }
+
+  @Override
+  public Operation clone() {
+    return new GetAttrOperationImpl(key, cb);
   }
 
   @Override

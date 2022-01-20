@@ -2,6 +2,7 @@ package net.spy.memcached.protocol.ascii;
 
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.Operation;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,5 +27,10 @@ public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
   @Override
   public boolean isPipeOperation() {
     return false;
+  }
+
+  @Override
+  public Operation clone() {
+    return new MGetOperationImpl(getKeys(), (Callback)callback);
   }
 }

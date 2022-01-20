@@ -12,4 +12,5 @@ public interface KeyedOperation extends Operation {
    */
   Collection<String> getKeys();
 
+  Operation clone();
 }

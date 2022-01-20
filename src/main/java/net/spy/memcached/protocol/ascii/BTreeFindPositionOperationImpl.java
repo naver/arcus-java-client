@@ -28,6 +28,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -108,6 +109,11 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
     }
 
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new BTreeFindPositionOperationImpl(key, get, callback);
   }
 
   @Override

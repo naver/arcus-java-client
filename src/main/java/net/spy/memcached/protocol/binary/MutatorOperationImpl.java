@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
@@ -60,6 +61,11 @@ class MutatorOperationImpl extends OperationImpl implements
 
   public Collection<String> getKeys() {
     return Collections.singleton(key);
+  }
+
+  @Override
+  public Operation clone() {
+    return new MutatorOperationImpl(mutator, key, by, def, exp, callback);
   }
 
   public int getBy() {

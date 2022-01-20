@@ -29,6 +29,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionCountOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -89,6 +90,11 @@ public class CollectionCountOperationImpl extends OperationImpl implements
       transitionState(OperationState.COMPLETE);
       return;
     }
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionCountOperationImpl(key, collectionCount, callback);
   }
 
   public void initialize() {

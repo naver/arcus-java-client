@@ -3,6 +3,7 @@ package net.spy.memcached.protocol.ascii;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 
 /**
@@ -33,4 +34,8 @@ public class ConcatenationOperationImpl extends BaseStoreOperationImpl
     return concatType;
   }
 
+  @Override
+  public Operation clone() {
+    return new ConcatenationOperationImpl(concatType, key, data, callback);
+  }
 }

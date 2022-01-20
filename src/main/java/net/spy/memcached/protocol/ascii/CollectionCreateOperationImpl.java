@@ -32,6 +32,7 @@ import net.spy.memcached.collection.MapCreate;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -87,6 +88,11 @@ public class CollectionCreateOperationImpl extends OperationImpl
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionCreateOperationImpl(key, collectionCreate, callback);
   }
 
   @Override

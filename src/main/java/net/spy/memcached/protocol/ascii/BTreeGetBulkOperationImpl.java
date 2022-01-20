@@ -28,6 +28,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -103,6 +104,11 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
       transitionState(OperationState.COMPLETE);
     }
+  }
+
+  @Override
+  public Operation clone() {
+    return new BTreeGetBulkOperationImpl(getBulk, callback);
   }
 
   @Override

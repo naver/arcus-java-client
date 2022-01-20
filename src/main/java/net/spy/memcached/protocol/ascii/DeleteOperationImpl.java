@@ -27,6 +27,7 @@ import java.util.Collections;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.DeleteOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -66,6 +67,11 @@ final class DeleteOperationImpl extends OperationImpl
     /* ENABLE_REPLICATION end */
     getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new DeleteOperationImpl(key, callback);
   }
 
   @Override

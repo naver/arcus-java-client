@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
 
 class GetOperationImpl extends OperationImpl
@@ -67,5 +68,17 @@ class GetOperationImpl extends OperationImpl
   @Override
   public boolean isPipeOperation() {
     return false;
+  }
+
+  @Override
+  public Operation clone() {
+    if (callback instanceof GetOperation.Callback) {
+      return new GetOperationImpl(key, (GetOperation.Callback)callback);
+    } else if (callback instanceof GetsOperation.Callback) {
+      return new GetOperationImpl(key, (GetsOperation.Callback)callback);
+    }
+
+    assert false : "Unexpected callback type";
+    return null;
   }
 }

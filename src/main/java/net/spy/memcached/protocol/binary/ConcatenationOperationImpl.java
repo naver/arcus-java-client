@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 
@@ -89,5 +90,10 @@ class ConcatenationOperationImpl extends OperationImpl
   @Override
   public boolean isPipeOperation() {
     return false;
+  }
+
+  @Override
+  public Operation clone() {
+    return new ConcatenationOperationImpl(catType, key, data, cas, callback);
   }
 }

@@ -29,6 +29,7 @@ import net.spy.memcached.collection.SetExist;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionExistOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -80,6 +81,12 @@ public class CollectionExistOperationImpl extends OperationImpl
             matchStatus(line, EXIST, NOT_EXIST, NOT_FOUND, NOT_FOUND,
                     TYPE_MISMATCH, UNREADABLE));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionExistOperationImpl(key, subkey, collectionExist,
+        callback);
   }
 
   @Override

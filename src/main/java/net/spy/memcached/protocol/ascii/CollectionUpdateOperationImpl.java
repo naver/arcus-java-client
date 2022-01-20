@@ -31,6 +31,7 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionUpdateOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -100,6 +101,12 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
                     NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
                     EFLAG_MISMATCH, SERVER_ERROR));
     transitionState(OperationState.COMPLETE);
+  }
+
+  @Override
+  public Operation clone() {
+    return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
+        data, callback);
   }
 
   @Override
