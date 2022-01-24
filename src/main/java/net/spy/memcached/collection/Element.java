@@ -80,7 +80,7 @@ public class Element<T> {
    *
    * @return element flag by hex (e.g. 0x01)
    */
-  public String getFlagByHex() {
+  public String getStringEFlag() {
     // convert to hex based on its real byte array
     if (eflag == null) {
       return "";
@@ -94,7 +94,7 @@ public class Element<T> {
    *
    * @return bkey by hex (e.g. 0x01)
    */
-  public String getBkeyByHex() {
+  private String getStringByteArrayBkey() {
     return BTreeUtil.toHex(bkey);
   }
 
@@ -110,10 +110,27 @@ public class Element<T> {
   /**
    * get bkey
    *
+   * @return bkey by string (-1 if not available)
+   */
+  private String getStringLongBkey() {
+    return String.valueOf(getLongBkey());
+  }
+
+  /**
+   * get bkey
+   *
    * @return bkey (-1 if not available)
    */
   public long getLongBkey() {
     return (longBkey == null) ? -1 : longBkey;
+  }
+
+  /**
+   * if byte bkey exist return hex string and if not return type of string long bkey
+   * @return type of hex byte bkey or type of String Long bkey
+   */
+  public String getStringBkey() {
+    return isByteArraysBkey ? getStringByteArrayBkey() : getStringLongBkey();
   }
 
   /**
@@ -130,12 +147,8 @@ public class Element<T> {
    *
    * @return element flag
    */
-  public byte[] getFlag() {
+  public byte[] getEFlag() {
     return eflag;
-  }
-
-  public boolean isByteArraysBkey() {
-    return isByteArraysBkey;
   }
 
   public ElementFlagUpdate getElementFlagUpdate() {
@@ -146,14 +159,10 @@ public class Element<T> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{ \"");
-    if (isByteArraysBkey) {
-      sb.append(getBkeyByHex());
-    } else {
-      sb.append(getLongBkey());
-    }
+    sb.append(getStringBkey());
     sb.append("\" : { ");
 
-    sb.append(" \"eflag\" : \"").append(BTreeUtil.toHex(eflag)).append("\"");
+    sb.append(" \"eflag\" : \"").append(getStringEFlag()).append("\"");
     sb.append(",");
     sb.append(" \"value\" : \"").append(value.toString()).append("\"");
     sb.append(" }");

@@ -144,7 +144,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
         // System.out.println(element.getFlagByHex());
         assertEquals("value" + i, element.getValue());
-        assertEquals("0x01010101", element.getFlagByHex());
+        assertEquals("0x01010101", element.getStringEFlag());
       }
 
     } catch (Exception e) {
@@ -182,7 +182,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
         // System.out.println(element.getFlagByHex());
         assertEquals("value" + i, element.getValue());
-        assertEquals("", element.getFlagByHex());
+        assertEquals("", element.getStringEFlag());
       }
 
     } catch (Exception e) {
