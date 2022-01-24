@@ -86,13 +86,12 @@ public class CollectionExistOperationImpl extends OperationImpl
   public void initialize() {
     String args = collectionExist.stringify();
     byte[] additionalArgs = collectionExist.getAdditionalArgs();
-    ByteBuffer bb = ByteBuffer.allocate(null == additionalArgs ? 0 : additionalArgs.length +
-            +KeyUtil.getKeyBytes(key).length
+    ByteBuffer bb = ByteBuffer.allocate((null == additionalArgs ? 0 : additionalArgs.length)
+            + KeyUtil.getKeyBytes(key).length
             + KeyUtil.getKeyBytes(subkey).length
             + args.length()
             + OVERHEAD);
-    setArguments(bb, collectionExist.getCommand(), key, subkey,
-            null == additionalArgs ? 0 : additionalArgs.length, args);
+    setArguments(bb, collectionExist.getCommand(), key, subkey, args);
 
     if (null != additionalArgs) {
       bb.put(additionalArgs);
