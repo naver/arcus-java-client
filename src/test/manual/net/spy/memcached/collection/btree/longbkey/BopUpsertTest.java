@@ -67,7 +67,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getFlag()));
+      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // upsert
@@ -82,7 +82,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertNull(i.getValue().getFlag());
+      Assert.assertNull(i.getValue().getEFlag());
     }
   }
 
@@ -100,7 +100,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertNull(i.getValue().getFlag());
+      Assert.assertNull(i.getValue().getEFlag());
     }
   }
 
@@ -119,7 +119,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getFlag()));
+      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // upsert
@@ -134,7 +134,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG2, i.getValue().getFlag()));
+      Assert.assertTrue(Arrays.equals(FLAG2, i.getValue().getEFlag()));
     }
   }
 

@@ -99,8 +99,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
         }
 
         capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
-                .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
+        capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
         if (decodedList.get(i) != null) {
           capacity += decodedList.get(i++).length;
         }
@@ -127,9 +126,11 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
           b.append(eflagUpdate.getElementFlagByHex());
         }
 
-        setArguments(bb, COMMAND, key,
-                (element.isByteArraysBkey() ? element.getBkeyByHex()
-                        : String.valueOf(element.getLongBkey())),
+        setArguments(
+                bb,
+                COMMAND,
+                key,
+                (element.getStringBkey()),
                 b.toString(), (value == null ? -1 : value.length),
                 (i < eSize - 1) ? PIPE : "");
         if (value != null) {

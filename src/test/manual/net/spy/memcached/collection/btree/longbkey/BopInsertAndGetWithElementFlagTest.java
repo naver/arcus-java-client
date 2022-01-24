@@ -70,7 +70,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
       Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
       Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getFlag()));
+      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // delete
@@ -106,9 +106,9 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
     Assert.assertEquals(VALUE, map.get(BKEY2).getValue());
     Assert.assertEquals(VALUE, map.get(BKEY3).getValue());
 
-    Assert.assertTrue(Arrays.equals(FLAG, map.get(BKEY).getFlag()));
-    Assert.assertTrue(Arrays.equals(FLAG2, map.get(BKEY2).getFlag()));
-    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getFlag()));
+    Assert.assertTrue(Arrays.equals(FLAG, map.get(BKEY).getEFlag()));
+    Assert.assertTrue(Arrays.equals(FLAG2, map.get(BKEY2).getEFlag()));
+    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
 
     // delete only 2 elements
     Assert.assertTrue(mc.asyncBopDelete(KEY, BKEY, BKEY2,
@@ -120,6 +120,6 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 
     Assert.assertEquals(1, map.size());
     Assert.assertEquals(VALUE, map.get(BKEY3).getValue());
-    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getFlag()));
+    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
   }
 }

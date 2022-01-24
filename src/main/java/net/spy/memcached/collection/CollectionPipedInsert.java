@@ -361,9 +361,8 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       int i = 0;
       for (Element<T> each : elements) {
         capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes((each.isByteArraysBkey() ? each
-                .getBkeyByHex() : String.valueOf(each.getLongBkey()))).length;
-        capacity += KeyUtil.getKeyBytes(each.getFlagByHex()).length;
+        capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
+        capacity += KeyUtil.getKeyBytes(each.getStringEFlag()).length;
         capacity += decodedList.get(i++).length;
         capacity += 128;
       }
@@ -381,9 +380,8 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
                 bb,
                 COMMAND,
                 key,
-                (element.isByteArraysBkey() ? element.getBkeyByHex()
-                        : String.valueOf(element.getLongBkey())),
-                element.getFlagByHex(),
+                element.getStringBkey(),
+                element.getStringEFlag(),
                 value.length,
                 (createKeyIfNotExists) ? "create" : "",
                 (createKeyIfNotExists) ? cd.getFlags() : "",

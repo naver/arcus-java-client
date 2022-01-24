@@ -61,7 +61,7 @@ public class BopGetTest extends BaseIntegrationTest {
     Assert.assertNotNull(el);
 
     Assert.assertEquals("value", el.getValue());
-    Assert.assertEquals("0x01", el.getBkeyByHex());
-    Assert.assertEquals("", el.getFlagByHex());
+    Assert.assertEquals("0x01", el.getStringBkey());
+    Assert.assertEquals("", el.getStringEFlag());
   }
 }
