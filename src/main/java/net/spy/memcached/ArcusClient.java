@@ -2827,7 +2827,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   Object value) {
     validateMKey(mkey);
     MapUpdate<Object> collectionUpdate = new MapUpdate<Object>(value, false);
-    return asyncCollectionUpdate(key, String.valueOf(mkey), collectionUpdate,
+    return asyncCollectionUpdate(key, mkey, collectionUpdate,
             collectionTranscoder);
   }
 
@@ -2836,7 +2836,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       T value, Transcoder<T> tc) {
     validateMKey(mkey);
     MapUpdate<T> collectionUpdate = new MapUpdate<T>(value, false);
-    return asyncCollectionUpdate(key, String.valueOf(mkey), collectionUpdate, tc);
+    return asyncCollectionUpdate(key, mkey, collectionUpdate, tc);
   }
 
   /**
