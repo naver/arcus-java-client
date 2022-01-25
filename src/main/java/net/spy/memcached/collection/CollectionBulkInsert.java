@@ -23,6 +23,7 @@ import java.util.List;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
 
@@ -39,6 +40,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
   protected int itemCount;
 
   protected CollectionAttributes attribute;
+  protected MemcachedNode node;
 
   protected int nextOpIndex = 0;
 
@@ -52,6 +54,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   public int getNextOpIndex() {
     return nextOpIndex;
+  }
+
+  public MemcachedNode getMemcachedNode() {
+    return node;
   }
 
   public abstract ByteBuffer getAsciiCommand();
@@ -68,8 +74,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private final String bkey;
     private final String eflag;
 
-    public BTreeBulkInsert(List<String> keyList, long bkey, byte[] eflag,
-                           T value, CollectionAttributes attr, Transcoder<T> tc) {
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, long bkey,
+                           byte[] eflag, T value, CollectionAttributes attr,
+                           Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
@@ -78,6 +85,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
         }
       }
+      this.node = node;
       this.keyList = keyList;
       this.bkey = String.valueOf(bkey);
       this.eflag = BTreeUtil.toHex(eflag);
@@ -89,9 +97,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
-    public BTreeBulkInsert(List<String> keyList, byte[] bkey,
-                           byte[] eflag, T value, CollectionAttributes attr,
-                           Transcoder<T> tc) {
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList,
+                           byte[] bkey, byte[] eflag, T value,
+                           CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
@@ -100,6 +108,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
               overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
         }
       }
+      this.node = node;
       this.keyList = keyList;
       this.bkey = BTreeUtil.toHex(bkey);
       this.eflag = BTreeUtil.toHex(eflag);
@@ -178,8 +187,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private static final String COMMAND = "mop insert";
     private final String mkey;
 
-    public MapBulkInsert(List<String> keyList, String mkey, T value,
-                         CollectionAttributes attr, Transcoder<T> tc) {
+    public MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
+                         T value, CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
@@ -188,6 +197,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
               overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
         }
       }
+      this.node = node;
       this.keyList = keyList;
       this.mkey = mkey;
       this.value = value;
@@ -262,7 +272,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     private static final String COMMAND = "sop insert";
 
-    public SetBulkInsert(List<String> keyList, T value,
+    public SetBulkInsert(MemcachedNode node, List<String> keyList, T value,
                          CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
@@ -272,6 +282,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
               overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
         }
       }
+      this.node = node;
       this.keyList = keyList;
       this.value = value;
       this.attribute = attr;
@@ -343,8 +354,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private static final String COMMAND = "lop insert";
     private int index;
 
-    public ListBulkInsert(List<String> keyList, int index, T value,
-                          CollectionAttributes attr, Transcoder<T> tc) {
+    public ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
+                          T value, CollectionAttributes attr,
+                          Transcoder<T> tc) {
       if (attr != null) {
         CollectionOverflowAction overflowAction = attr.getOverflowAction();
         if (overflowAction != null
@@ -353,6 +365,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
               overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
         }
       }
+      this.node = node;
       this.keyList = keyList;
       this.index = index;
       this.value = value;

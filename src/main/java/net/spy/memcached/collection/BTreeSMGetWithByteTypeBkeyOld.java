@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.KeyUtil;
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 
   private static final String command = "bop smget";
+
+  protected MemcachedNode node;
 
   protected String str;
 
@@ -50,8 +53,11 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
 
   private ElementFlagFilter eFlagFilter;
 
-  public BTreeSMGetWithByteTypeBkeyOld(List<String> keyList, byte[] from, byte[] to,
-                                       ElementFlagFilter eFlagFilter, int offset, int count) {
+  public BTreeSMGetWithByteTypeBkeyOld(MemcachedNode node, List<String> keyList,
+                                       byte[] from, byte[] to,
+                                       ElementFlagFilter eFlagFilter,
+                                       int offset, int count) {
+    this.node = node;
     this.keyList = keyList;
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
     this.eFlagFilter = eFlagFilter;
@@ -81,11 +87,8 @@ public class BTreeSMGetWithByteTypeBkeyOld<T> implements BTreeSMGet<T> {
     return spaceSeparatedKeys;
   }
 
-  public String getRepresentKey() {
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalStateException("Key list is empty.");
-    }
-    return keyList.get(0);
+  public MemcachedNode getMemcachedNode() {
+    return node;
   }
 
   public List<String> getKeyList() {

@@ -359,6 +359,12 @@ public class MemcachedClient extends SpyThread
     return op;
   }
 
+  protected Operation addOp(final MemcachedNode node, final Operation op) {
+    checkState();
+    conn.addOperation(node, op);
+    return op;
+  }
+
   protected CountDownLatch broadcastOp(final BroadcastOpFactory of) {
     return broadcastOp(of, conn.getLocator().getAll(), true);
   }

@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.MemcachedNode;
+
 import java.util.List;
 
 public interface BTreeGetBulk<T> {
@@ -24,7 +26,7 @@ public interface BTreeGetBulk<T> {
 
   public String getSpaceSeparatedKeys();
 
-  public String getRepresentKey();
+  public MemcachedNode getMemcachedNode();
 
   public List<String> getKeyList();
 

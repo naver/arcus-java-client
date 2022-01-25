@@ -281,7 +281,7 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkey<Object>(
+          new BTreeSMGetWithLongTypeBkey<Object>(null,
               keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
@@ -313,7 +313,7 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationOldImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkeyOld<Object>(
+          new BTreeSMGetWithLongTypeBkeyOld<Object>(null,
               keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
           new BTreeSortMergeGetOperationOld.Callback() {
             @Override
@@ -478,16 +478,18 @@ public class MultibyteKeyTest {
           }
         };
 
-    insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(keyList, 1L, new byte[]{0, 0},
-            new Random().nextInt(), new CollectionAttributes(), new IntegerTranscoder());
+    insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(null, keyList,
+        1L, new byte[]{0, 0}, new Random().nextInt(),
+        new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
 
-    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(keyList, 0, new Random().nextInt(),
-            new CollectionAttributes(), new IntegerTranscoder());
+    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(null, keyList, 0,
+        new Random().nextInt(), new CollectionAttributes(),
+        new IntegerTranscoder());
 
     try {
       opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
@@ -495,8 +497,9 @@ public class MultibyteKeyTest {
       Assert.fail();
     }
 
-    insert = new CollectionBulkInsert.SetBulkInsert<Integer>(keyList, new Random().nextInt(),
-            new CollectionAttributes(), new IntegerTranscoder());
+    insert = new CollectionBulkInsert.SetBulkInsert<Integer>(null, keyList,
+        new Random().nextInt(), new CollectionAttributes(),
+        new IntegerTranscoder());
     try {
       opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -508,7 +511,7 @@ public class MultibyteKeyTest {
   public void BTreeGetBulkOperationImplTest() {
     try {
       opFact.bopGetBulk(
-          new BTreeGetBulkWithLongTypeBkey<Integer>(
+          new BTreeGetBulkWithLongTypeBkey<Integer>(null,
               keyList, 0L, 10L, ElementFlagFilter.DO_NOT_FILTER, 0, 0
           ),
           new BTreeGetBulkOperation.Callback<Integer>() {
