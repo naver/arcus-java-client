@@ -176,12 +176,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     queue.drainTo(rv);
     if (resend) {
       for (Operation o : rv) {
-        if ((o.getState() == OperationState.WRITE_QUEUED ||
-             o.getState() == OperationState.WRITING) && o.getBuffer() != null) {
-          ((Buffer) o.getBuffer()).reset(); // buffer offset reset
-        } else {
-          o.initialize(); // write completed or not yet initialized
-        }
+        resetOperation(o);
       }
     }
 
@@ -207,9 +202,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
        * and it will be cancelled in the code below.
        */
     } else if (op != null) {
-      ByteBuffer buf = op.getBuffer();
-      if (buf != null) {
-        ((Buffer) buf).reset();
+      if (op.getBuffer() != null) {
+        resetOperation(op);
       } else {
         /* This case cannot happen. */
         getLogger().warn("No buffer for current write op, removing");
@@ -668,6 +662,24 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return sb.toString();
   }
 
+  private void resetOperation(Operation o) {
+    switch (o.getState()) {
+      case WRITING:
+        o.resetState(); // reset operation state
+        // fallthrough
+      case WRITE_QUEUED:
+        if (o.getBuffer() != null) {
+          ((Buffer) o.getBuffer()).reset(); // buffer offset reset
+        } else {
+          o.initialize(); // this case cannot happen.
+        }
+        break;
+      default:
+        o.initialize(); // write completed or not yet initialized
+        o.resetState(); // reset operation state
+    }
+  }
+
   /* ENABLE_REPLICATION if */
   public void setReplicaGroup(MemcachedReplicaGroup g) {
     replicaGroup = g;
@@ -706,21 +718,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     int movedOpCount = 0;
     for (Operation op : allOp) {
       op.setHandlingNode(this);
-      switch (op.getState()) {
-        case WRITING:
-          op.resetState(); // reset operation state
-          // fallthrough
-        case WRITE_QUEUED:
-          if (op.getBuffer() != null) {
-            ((Buffer) op.getBuffer()).reset(); // buffer offset reset
-          } else {
-            op.initialize(); // this case cannot happen.
-          }
-          break;
-        default:
-          op.initialize(); // write completed or not yet initialized
-          op.resetState(); // reset operation state
-      }
+      resetOperation(op);
       if (writeQ.offer(op)) {
         op.setMoved(true);
         movedOpCount++;
