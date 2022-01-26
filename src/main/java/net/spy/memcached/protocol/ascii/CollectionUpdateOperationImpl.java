@@ -134,9 +134,8 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug(
-              "Request in ascii protocol: '"
-                      + (new String(bb.array())).replaceAll("\\r\\n",
-                      "\r\n") + "'");
+              "Request in ascii protocol: '%s'",
+              (new String(bb.array())).replaceAll("\\r\\n", "\r\n"));
     }
   }
 

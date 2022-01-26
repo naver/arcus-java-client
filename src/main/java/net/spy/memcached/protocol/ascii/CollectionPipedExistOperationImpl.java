@@ -125,10 +125,8 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
     setBuffer(buffer);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-              "Request in ascii protocol: \n"
-                      + (new String(buffer.array())).replaceAll("\\r\\n",
-                      "\n"));
+      getLogger().debug("Request in ascii protocol: %s",
+              (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
     }
   }
 

@@ -74,9 +74,7 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
 
   @Override
   public void handleLine(String line) {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Got line %s", line);
-    }
+    getLogger().debug("Got line %s", line);
 
     Integer position = null;
 
@@ -99,9 +97,7 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
     } else {
       OperationStatus status = matchStatus(line, NOT_FOUND, UNREADABLE,
               BKEY_MISMATCH, TYPE_MISMATCH, NOT_FOUND_ELEMENT);
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(status);
-      }
+      getLogger().debug(status);
       getCallback().receivedStatus(status);
     }
 
@@ -121,10 +117,8 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-              "Request in ascii protocol: "
-                      + (new String(bb.array()))
-                      .replace("\r\n", "\\r\\n"));
+      getLogger().debug("Request in ascii protocol: %s",
+              (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 

@@ -150,9 +150,7 @@ class BulkService extends SpyObject {
         }
         ret &= f.cancel(true);
 
-        if (getLogger().isDebugEnabled()) {
-          getLogger().debug("Cancel the future. " + f);
-        }
+        getLogger().debug("Cancel the future. %s", f);
       }
       return ret;
     }
