@@ -176,7 +176,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public void setupResend(boolean cancelWrite, String cause) {
+  public void setupResend(String cause) {
     throw new UnsupportedOperationException();
   }
 

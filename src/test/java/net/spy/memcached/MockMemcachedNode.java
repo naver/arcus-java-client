@@ -70,7 +70,7 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
-  public void setupResend(boolean cancelWrite, String cause) {
+  public void setupResend(String cause) {
     // noop
   }
 
