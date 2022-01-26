@@ -191,11 +191,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return destroyQueue(readQ, resend);
   }
 
-  public final void setupResend(boolean cancelWrite, String cause) {
+  public final void setupResend(String cause) {
     // First, reset the current write op, or cancel it if we should
     // be authenticating
     Operation op = getCurrentWriteOp();
-    if ((cancelWrite || shouldAuth) && op != null) {
+    if (shouldAuth && op != null) {
       /*
        * Do not cancel the operation.
        * There is no reason to cancel it first
@@ -221,7 +221,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       }
     }
 
-    while ((cancelWrite || shouldAuth) && hasWriteOp()) {
+    while (shouldAuth && hasWriteOp()) {
       op = removeCurrentWriteOp();
       getLogger().warn("Discarding partially completed op: %s", op);
       op.cancel(cause);
@@ -619,7 +619,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.size() == 0);
-      setupResend(false, cause);
+      setupResend(cause);
     } else {
       authLatch = new CountDownLatch(0);
     }

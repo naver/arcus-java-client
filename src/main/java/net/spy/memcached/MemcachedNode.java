@@ -61,10 +61,8 @@ public interface MemcachedNode {
   /**
    * Clear the queue of currently processing operations by either cancelling
    * them or setting them up to be reapplied after a reconnect.
-   *
-   * @param cancelWrite if true, cancel all operations in write queue
    */
-  void setupResend(boolean cancelWrite, String cause);
+  void setupResend(String cause);
 
   /**
    * Fill the write buffer with data from the next operations in the queue.

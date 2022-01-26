@@ -91,6 +91,11 @@ public class CacheManager extends SpyThread implements Watcher,
 
   public CacheManager(String hostPort, String serviceCode,
                       ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
+    if (cfb.getFailureMode() == FailureMode.Redistribute) {
+      throw new InitializeClientException(
+          "Redistribute failure mode is not compatible with ArcusClient. " +
+          "Use other failure mode.");
+    }
 
     this.zkConnectString = hostPort;
     this.serviceCode = serviceCode;

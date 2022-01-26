@@ -114,6 +114,10 @@ public class ConnectionFactoryBuilder {
   }
   /* ENABLE_REPLICATION end */
 
+  public FailureMode getFailureMode() {
+    return failureMode;
+  }
+
   /**
    * Set the operation queue factory.
    */

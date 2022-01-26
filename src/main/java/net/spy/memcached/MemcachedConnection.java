@@ -281,18 +281,12 @@ public final class MemcachedConnection extends SpyObject {
           break;
         }
       }
-      // Handle the operations added to the node.
+      // removing node is not related to failure mode.
+      // so, cancel operations regardless of failure mode.
       String cause = "node removed.";
-      if (failureMode == FailureMode.Cancel) {
-        cancelOperations(node.destroyReadQueue(false), cause);
-        cancelOperations(node.destroyWriteQueue(false), cause);
-        cancelOperations(node.destroyInputQueue(), cause);
-      } else if (failureMode == FailureMode.Redistribute ||
-                 failureMode == FailureMode.Retry) {
-        redistributeOperations(node.destroyReadQueue(true), cause);
-        redistributeOperations(node.destroyWriteQueue(true), cause);
-        redistributeOperations(node.destroyInputQueue(), cause);
-      }
+      cancelOperations(node.destroyReadQueue(false), cause);
+      cancelOperations(node.destroyWriteQueue(false), cause);
+      cancelOperations(node.destroyInputQueue(), cause);
     }
   }
 
@@ -466,7 +460,7 @@ public final class MemcachedConnection extends SpyObject {
           // Failover
           removeNodes.add(oldMasterNode);
           // move operation: master -> slave. Call setupResend() on master
-          taskList.add(new SetupResendTask(oldMasterNode, false,
+          taskList.add(new SetupResendTask(oldMasterNode,
               "Discarded all pending reading state operation to move operations."));
           taskList.add(new MoveOperationTask(oldMasterNode, oldGroup.getMasterCandidate()));
         }
@@ -496,7 +490,7 @@ public final class MemcachedConnection extends SpyObject {
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master. Call setupResend() on master
-        taskList.add(new SetupResendTask(oldMasterNode, false,
+        taskList.add(new SetupResendTask(oldMasterNode,
             "Discarded all pending reading state operation to move operations."));
         taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
         for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
@@ -899,12 +893,14 @@ public final class MemcachedConnection extends SpyObject {
       reconnectQueue.put(reconTime, qa);
 
       // Need to do a little queue management.
-      qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT, cause);
+      qa.setupResend(cause);
 
       if (type == ReconnDelay.DEFAULT) {
         if (failureMode == FailureMode.Redistribute) {
+          redistributeOperations(qa.destroyWriteQueue(true), cause);
           redistributeOperations(qa.destroyInputQueue(), cause);
         } else if (failureMode == FailureMode.Cancel) {
+          cancelOperations(qa.destroyWriteQueue(false), cause);
           cancelOperations(qa.destroyInputQueue(), cause);
         }
       }
@@ -1319,17 +1315,15 @@ public final class MemcachedConnection extends SpyObject {
 
   private class SetupResendTask implements Task {
     private MemcachedNode node;
-    private boolean cancelWrite;
     private String cause;
 
-    public SetupResendTask(MemcachedNode node, boolean cancelWrite, String cause) {
+    public SetupResendTask(MemcachedNode node, String cause) {
       this.node = node;
-      this.cancelWrite = cancelWrite;
       this.cause = cause;
     }
 
     public void doTask() {
-      node.setupResend(cancelWrite, cause);
+      node.setupResend(cause);
     }
   }
 
