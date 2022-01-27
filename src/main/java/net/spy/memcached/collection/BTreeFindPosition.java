@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +17,8 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.util.BTreeUtil;
+
 /**
  * Ascii protocol implementation for "bop position" (B+Tree find position)
  *
@@ -29,17 +32,17 @@ public class BTreeFindPosition {
 
   private static final String command = "bop position";
 
-  private final BKeyObject bkeyObject;
+  private final String bkey;
   private final BTreeOrder order;
   private String str;
 
   public BTreeFindPosition(long longBKey, BTreeOrder order) {
-    this.bkeyObject = new BKeyObject(longBKey);
+    this.bkey = String.valueOf(longBKey);
     this.order = order;
   }
 
   public BTreeFindPosition(byte[] byteArrayBKey, BTreeOrder order) {
-    this.bkeyObject = new BKeyObject(byteArrayBKey);
+    this.bkey = BTreeUtil.toHex(byteArrayBKey);
     this.order = order;
   }
 
@@ -48,7 +51,7 @@ public class BTreeFindPosition {
       return str;
     }
     StringBuilder b = new StringBuilder();
-    b.append(bkeyObject.getBKeyAsString());
+    b.append(bkey);
     b.append(" ");
     b.append(order.getAscii());
 
@@ -58,10 +61,6 @@ public class BTreeFindPosition {
 
   public String getCommand() {
     return command;
-  }
-
-  public BKeyObject getBkeyObject() {
-    return bkeyObject;
   }
 
   public BTreeOrder getOrder() {

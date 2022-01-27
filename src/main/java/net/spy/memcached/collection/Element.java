@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +25,10 @@ import net.spy.memcached.util.BTreeUtil;
  * @param <T> the expected class of the value
  */
 public class Element<T> {
-  private final byte[] bkey;
-  private final Long longBkey;
+  private BKeyObject bKeyObject;
   private final T value;
   private final byte[] eflag;
   private final ElementFlagUpdate elementFlagUpdate;
-
-  private final boolean isByteArraysBkey;
 
   /**
    * Create an element
@@ -40,38 +38,30 @@ public class Element<T> {
    * @param eflag flag of element (minimun length is 1. maximum length is 31)
    */
   public Element(byte[] bkey, T value, byte[] eflag) {
-    this.bkey = bkey;
-    this.longBkey = null;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
     this.eflag = eflag;
-    this.isByteArraysBkey = true;
     this.elementFlagUpdate = null;
   }
 
   public Element(long bkey, T value, byte[] eflag) {
-    this.bkey = null;
-    this.longBkey = bkey;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
     this.eflag = eflag;
-    this.isByteArraysBkey = false;
     this.elementFlagUpdate = null;
   }
 
   public Element(byte[] bkey, T value, ElementFlagUpdate elementFlagUpdate) {
-    this.bkey = bkey;
-    this.longBkey = null;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
     this.eflag = null;
-    this.isByteArraysBkey = true;
     this.elementFlagUpdate = elementFlagUpdate;
   }
 
   public Element(long bkey, T value, ElementFlagUpdate elementFlagUpdate) {
-    this.bkey = null;
-    this.longBkey = bkey;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
     this.eflag = null;
-    this.isByteArraysBkey = false;
     this.elementFlagUpdate = elementFlagUpdate;
   }
 
@@ -92,37 +82,19 @@ public class Element<T> {
   /**
    * get bkey
    *
-   * @return bkey by hex (e.g. 0x01)
-   */
-  private String getStringByteArrayBkey() {
-    return BTreeUtil.toHex(bkey);
-  }
-
-  /**
-   * get bkey
-   *
    * @return bkey by byte[]
    */
   public byte[] getByteArrayBkey() {
-    return bkey;
+    return bKeyObject.getByteArrayBKeyRaw();
   }
 
   /**
    * get bkey
    *
-   * @return bkey by string (-1 if not available)
-   */
-  private String getStringLongBkey() {
-    return String.valueOf(getLongBkey());
-  }
-
-  /**
-   * get bkey
-   *
-   * @return bkey (-1 if not available)
+   * @return bkey
    */
   public long getLongBkey() {
-    return (longBkey == null) ? -1 : longBkey;
+    return bKeyObject.getLongBKey();
   }
 
   /**
@@ -130,7 +102,7 @@ public class Element<T> {
    * @return type of hex byte bkey or type of String Long bkey
    */
   public String getStringBkey() {
-    return isByteArraysBkey ? getStringByteArrayBkey() : getStringLongBkey();
+    return bKeyObject.toString();
   }
 
   /**

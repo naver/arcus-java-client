@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,42 +17,36 @@
  */
 package net.spy.memcached.collection;
 
-import net.spy.memcached.util.BTreeUtil;
-
 public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
   private String key;
-  private long bkey;
-  private byte[] bytebkey;
+  private BKeyObject bKeyObject;
 
-  public SMGetTrimKey(String key, Object bkey) {
+  public SMGetTrimKey(String key, byte[] bkey) {
     this.key = key;
-    if (bkey instanceof byte[]) {
-      this.bytebkey = new ByteArrayBKey((byte[]) bkey).getBytes();
-      this.bkey = -1;
-    } else {
-      this.bkey = (Long) bkey;
-      this.bytebkey = null;
-    }
+    this.bKeyObject = new BKeyObject(bkey);
+  }
 
+  public SMGetTrimKey(String key, long bkey) {
+    this.key = key;
+    this.bKeyObject = new BKeyObject(bkey);
+  }
+
+  public SMGetTrimKey(String key, BKeyObject bkeyObject) {
+    this.key = key;
+    this.bKeyObject = bkeyObject;
   }
 
   @Override
   public String toString() {
-    return "SMGetElement {KEY:" + key + ", BKEY:"
-            + ((bytebkey == null) ? String.valueOf(bkey) : BTreeUtil.toHex(bytebkey)) + "}";
+    return "SMGetElement {KEY:" + key + ", BKEY:" + bKeyObject + "}";
   }
 
   @Override
   public int compareTo(SMGetTrimKey param) {
     assert param != null;
 
-    int comp;
-        /* compare bkey */
-    if (bytebkey == null) {
-      comp = Long.valueOf(bkey).compareTo(param.getBkey());
-    } else {
-      comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-    }
+    /* compare bkey */
+    int comp = bKeyObject.compareTo(param.bKeyObject);
 
     /* if bkey is equal, then compare key */
     if (comp == 0) {
@@ -61,53 +56,16 @@ public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
     return comp;
   }
 
-  public int compareBkeyTo(SMGetTrimKey param) {
-    assert param != null;
-
-    /* compare bkey */
-    if (bytebkey == null) {
-      return Long.valueOf(bkey).compareTo(param.getBkey());
-    } else {
-      return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-    }
-  }
-
   public String getKey() {
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   public long getBkey() {
-    if (bkey == -1) {
-      throw new IllegalStateException("This element has byte[] bkey. " + toString());
-    }
-    return bkey;
+    return bKeyObject.getLongBKey();
   }
 
   public byte[] getByteBkey() {
-    if (bytebkey == null) {
-      throw new IllegalStateException(
-              "This element has java.lang.Long type bkey. " + toString());
-    }
-    return bytebkey;
+    return bKeyObject.getByteArrayBKeyRaw();
   }
 
-  public Object getBkeyByObject() {
-    if (bytebkey != null) {
-      return bytebkey;
-    } else {
-      return bkey;
-    }
-  }
-
-  public void setBkey(long bkey) {
-    this.bkey = bkey;
-  }
-
-  public boolean hasByteArrayBkey() {
-    return bytebkey != null;
-  }
 }

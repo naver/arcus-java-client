@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +30,13 @@ public class CollectionAttributes extends Attributes {
   private CollectionOverflowAction overflowAction;
   private Boolean readable;
 
-  private Long maxBkeyRange = null;
-  private byte[] maxBkeyRangeByBytes = null;
-  private Long minBkey = null;
-  private byte[] minBkeyByBytes = null;
-  private Long maxBkey = null;
-  private byte[] maxBkeyByBytes = null;
+  //b+tree only attribute
+  private BKeyObject maxBkeyRangeObject = null;
+  private BKeyObject minBkeyObject = null;
+  private BKeyObject maxBkeyObject = null;
   private Long trimmed = null;
 
-  private String str;
+  private String stringCache;
 
   public CollectionAttributes() {
   }
@@ -73,26 +72,21 @@ public class CollectionAttributes extends Attributes {
     if (readable != null) {
       b.append(" readable=").append((readable) ? "on" : "off");
     }
-    if (maxBkeyRange != null || maxBkeyRangeByBytes != null) {
-      if (maxBkeyRange != null) {
-        b.append(" maxbkeyrange=").append(String.valueOf(maxBkeyRange));
-      } else {
-        b.append(" maxbkeyrange=").append(
-                BTreeUtil.toHex(maxBkeyRangeByBytes));
-      }
+    if (maxBkeyRangeObject != null) {
+      b.append(" maxbkeyrange=").append(maxBkeyRangeObject);
     }
 
-    str = (b.length() < 1) ? "" : b.substring(1);
-    return str;
+    stringCache = (b.length() < 1) ? "" : b.substring(1);
+    return stringCache;
   }
 
   @Override
   public String toString() {
-    return (str == null) ? stringify() : str;
+    return (stringCache == null) ? stringify() : stringCache;
   }
 
   public int getLength() {
-    return (str == null) ? stringify().length() : str.length();
+    return (stringCache == null) ? stringify().length() : stringCache.length();
   }
 
   public void setAttribute(String attribute) {
@@ -119,26 +113,27 @@ public class CollectionAttributes extends Attributes {
         readable = "on".equals(value);
       } else if ("maxbkeyrange".equals(name)) {
         if (value.startsWith("0x")) {
-          maxBkeyRangeByBytes = BTreeUtil.hexStringToByteArrays(value.substring(2));
+          maxBkeyRangeObject = new BKeyObject(
+                  BTreeUtil.hexStringToByteArrays(value.substring(2)));
         } else {
-          maxBkeyRange = Long.parseLong(value);
+          maxBkeyRangeObject = new BKeyObject(Long.parseLong(value));
         }
       } else if ("minbkey".equals(name)) {
         if (!value.startsWith("-1")) {
           if (value.startsWith("0x")) {
-            minBkeyByBytes = BTreeUtil.hexStringToByteArrays(value
-                    .substring(2));
+            minBkeyObject = new BKeyObject(
+                    BTreeUtil.hexStringToByteArrays(value.substring(2)));
           } else {
-            minBkey = Long.parseLong(value);
+            minBkeyObject = new BKeyObject(Long.parseLong(value));
           }
         }
       } else if ("maxbkey".equals(name)) {
         if (!value.startsWith("-1")) {
           if (value.startsWith("0x")) {
-            maxBkeyByBytes = BTreeUtil.hexStringToByteArrays(value
-                    .substring(2));
+            maxBkeyObject = new BKeyObject(
+                    BTreeUtil.hexStringToByteArrays(value.substring(2)));
           } else {
-            maxBkey = Long.parseLong(value);
+            maxBkeyObject = new BKeyObject(Long.parseLong(value));
           }
         }
       } else if ("trimmed".equals(name)) {
@@ -150,18 +145,22 @@ public class CollectionAttributes extends Attributes {
     }
   }
 
+  private void clearCache() {
+    this.stringCache = null;
+  }
+
   public void setMaxCount(long maxCount) {
-    this.str = null;
+    clearCache();
     this.maxCount = maxCount;
   }
 
   public void setOverflowAction(CollectionOverflowAction overflowAction) {
-    this.str = null;
+    clearCache();
     this.overflowAction = overflowAction;
   }
 
   public void setReadable(Boolean readable) {
-    this.str = null;
+    clearCache();
     this.readable = readable;
   }
 
@@ -182,36 +181,55 @@ public class CollectionAttributes extends Attributes {
   }
 
   public Long getMaxBkeyRange() {
-    return maxBkeyRange;
+    if (maxBkeyRangeObject == null) {
+      return null;
+    }
+    return maxBkeyRangeObject.getLongBKey();
   }
 
   public void setMaxBkeyRange(Long maxBkeyRange) {
-    this.str = null;
-    this.maxBkeyRange = maxBkeyRange;
+    clearCache();
+    this.maxBkeyRangeObject = new BKeyObject(maxBkeyRange);
   }
 
   public byte[] getMaxBkeyRangeByBytes() {
-    return maxBkeyRangeByBytes;
+    if (maxBkeyRangeObject == null) {
+      return null;
+    }
+    return maxBkeyRangeObject.getByteArrayBKeyRaw();
   }
 
   public void setMaxBkeyRangeByBytes(byte[] maxBkeyRangeByBytes) {
-    this.maxBkeyRangeByBytes = maxBkeyRangeByBytes;
+    clearCache();
+    this.maxBkeyRangeObject = new BKeyObject(maxBkeyRangeByBytes);
   }
 
   public Long getMinBkey() {
-    return minBkey;
+    if (minBkeyObject == null) {
+      return null;
+    }
+    return minBkeyObject.getLongBKey();
   }
 
   public byte[] getMinBkeyByBytes() {
-    return minBkeyByBytes;
+    if (minBkeyObject == null) {
+      return null;
+    }
+    return minBkeyObject.getByteArrayBKeyRaw();
   }
 
   public Long getMaxBkey() {
-    return maxBkey;
+    if (maxBkeyObject == null) {
+      return null;
+    }
+    return maxBkeyObject.getLongBKey();
   }
 
   public byte[] getMaxBkeyByBytes() {
-    return maxBkeyByBytes;
+    if (maxBkeyObject == null) {
+      return null;
+    }
+    return maxBkeyObject.getByteArrayBKeyRaw();
   }
 
   public Long getTrimmed() {

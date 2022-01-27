@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,47 +17,35 @@
  */
 package net.spy.memcached.collection;
 
-import net.spy.memcached.util.BTreeUtil;
-
 public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
   private String key;
-  private long bkey;
-  private byte[] bytebkey;
+  private BKeyObject bKeyObject;
   private T value;
 
   public SMGetElement(String key, long bkey, T value) {
     this.key = key;
-    this.bkey = bkey;
-    this.bytebkey = null;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
   }
 
   public SMGetElement(String key, byte[] bkey, T value) {
     this.key = key;
-    this.bkey = -1;
-    this.bytebkey = bkey;
+    this.bKeyObject = new BKeyObject(bkey);
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return "SMGetElement {KEY:" + key + ", BKEY:"
-            + ((bytebkey == null) ? String.valueOf(bkey) : BTreeUtil.toHex(bytebkey))
-            + ", VALUE:" + value + "}";
+    return "SMGetElement {KEY:" + key + ", BKEY:" + bKeyObject + ", VALUE:" + value + "}";
   }
 
   @Override
   public int compareTo(SMGetElement<T> param) {
     assert param != null;
 
-    int comp;
-        /* compare bkey */
-    if (bytebkey == null) {
-      comp = Long.valueOf(bkey).compareTo(param.getBkey());
-    } else {
-      comp = BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-    }
+    /* compare bkey */
+    int comp = bKeyObject.compareTo(param.bKeyObject);
 
     /* if bkey is equal, then compare key */
     if (comp == 0) {
@@ -70,11 +59,7 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
     assert param != null;
 
     /* compare bkey */
-    if (bytebkey == null) {
-      return Long.valueOf(bkey).compareTo(param.getBkey());
-    } else {
-      return BTreeUtil.compareByteArraysInLexOrder(bytebkey, param.getByteBkey());
-    }
+    return bKeyObject.compareTo(param.bKeyObject);
   }
 
   public int compareKeyTo(SMGetElement<T> param) {
@@ -88,46 +73,19 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   public long getBkey() {
-    if (bkey == -1) {
-      throw new IllegalStateException("This element has byte[] bkey. " + toString());
-    }
-    return bkey;
+    return bKeyObject.getLongBKey();
   }
 
   public byte[] getByteBkey() {
-    if (bytebkey == null) {
-      throw new IllegalStateException(
-              "This element has java.lang.Long type bkey. " + toString());
-    }
-    return bytebkey;
+    return bKeyObject.getByteArrayBKeyRaw();
   }
 
-  public Object getBkeyByObject() {
-    if (bytebkey != null) {
-      return bytebkey;
-    } else {
-      return bkey;
-    }
-  }
-
-  public void setBkey(long bkey) {
-    this.bkey = bkey;
+  public BKeyObject getBkeyObject() {
+    return bKeyObject;
   }
 
   public T getValue() {
     return value;
-  }
-
-  public void setValue(T value) {
-    this.value = value;
-  }
-
-  public boolean hasByteArrayBkey() {
-    return bytebkey != null;
   }
 }

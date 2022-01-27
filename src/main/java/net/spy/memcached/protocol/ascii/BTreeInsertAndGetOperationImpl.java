@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2021 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,11 +275,11 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     String args = get.stringify();
     ByteBuffer bb = ByteBuffer.allocate(dataToStore.length
             + KeyUtil.getKeyBytes(key).length
-            + KeyUtil.getKeyBytes(get.getBkeyObject().getBKeyAsString()).length
+            + KeyUtil.getKeyBytes(get.getBkeyObject().toString()).length
             + KeyUtil.getKeyBytes(get.getElementFlagByHex()).length
             + args.length()
             + OVERHEAD);
-    setArguments(bb, get.getCommand(), key, get.getBkeyObject().getBKeyAsString(),
+    setArguments(bb, get.getCommand(), key, get.getBkeyObject().toString(),
             get.getElementFlagByHex(), dataToStore.length, args);
     bb.put(dataToStore);
     bb.put(CRLF);

@@ -89,4 +89,14 @@ public class BTreeUtilTest extends BaseMockCase {
       }
     });
   }
+
+  public void testMinusLongBkey() {
+    final long bkey = -1;
+    assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
+      @Override
+      public void run() throws Throwable {
+        BTreeUtil.validateBkey(bkey);
+      }
+    });
+  }
 }
