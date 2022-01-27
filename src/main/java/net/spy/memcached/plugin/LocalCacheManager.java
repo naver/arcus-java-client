@@ -72,9 +72,7 @@ public class LocalCacheManager {
       this.cache = new Cache(config, null, null);
       CacheManager.getInstance().addCache(cache);
 
-      if (logger.isInfoEnabled()) {
-        logger.info("Arcus k/v local cache is enabled : %s", cache.toString());
-      }
+      logger.info("Arcus k/v local cache is enabled : %s", cache.toString());
     }
   }
 
@@ -86,9 +84,7 @@ public class LocalCacheManager {
     try {
       Element element = cache.get(key);
       if (null != element) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("ArcusFrontCache: local cache hit for %s", key);
-        }
+        logger.debug("ArcusFrontCache: local cache hit for %s", key);
         @SuppressWarnings("unchecked") T ret = (T) element.getObjectValue();
         return ret;
       }
@@ -111,10 +107,8 @@ public class LocalCacheManager {
 
   public Element getElement(String key) {
     Element element = cache.get(key);
-    if (logger.isDebugEnabled()) {
-      if (null != element) {
-        logger.debug("ArcusFrontCache: local cache hit for %s", key);
-      }
+    if (null != element) {
+      logger.debug("ArcusFrontCache: local cache hit for %s", key);
     }
     return element;
   }
@@ -128,9 +122,7 @@ public class LocalCacheManager {
       cache.put(new Element(k, v));
       return true;
     } catch (Exception e) {
-      if (logger.isInfoEnabled()) {
-        logger.info("failed to put to the local cache : %s", e.getMessage());
-      }
+      logger.info("failed to put to the local cache : %s", e.getMessage());
       return false;
     }
   }

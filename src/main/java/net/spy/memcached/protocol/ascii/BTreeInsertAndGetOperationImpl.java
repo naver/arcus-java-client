@@ -114,9 +114,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
 
   @Override
   public void handleLine(String line) {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Got line %s", line);
-    }
+    getLogger().debug("Got line %s", line);
 
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
@@ -154,9 +152,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
         default:
           status = UNDEFINED_OPERATION;
       }
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug(status);
-      }
+      getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
       return;
@@ -207,9 +203,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
         if (b == '\n') {
           OperationStatus status = matchStatus(byteBuffer.toString(), STORE_AND_GET_ON_DATA);
 
-          if (getLogger().isDebugEnabled()) {
-            getLogger().debug("Get complete!");
-          }
+          getLogger().debug("Get complete!");
           getCallback().receivedStatus(status);
           transitionState(OperationState.COMPLETE);
           data = null;
@@ -229,18 +223,14 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     assert readOffset <= data.length
             : "readOffset is " + readOffset + " data.length is " + data.length;
 
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
-    }
+    getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 
     if (lookingFor == '\0') {
       int toRead = data.length - readOffset;
       int available = bb.remaining();
       toRead = Math.min(toRead, available);
 
-      if (getLogger().isDebugEnabled()) {
-        getLogger().debug("Reading %d bytes", toRead);
-      }
+      getLogger().debug("Reading %d bytes", toRead);
 
       bb.get(data, readOffset, toRead);
       readOffset += toRead;
@@ -297,10 +287,8 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-              "Request in ascii protocol: "
-                      + (new String(bb.array()))
-                      .replace("\r\n", "\\r\\n"));
+      getLogger().debug("Request in ascii protocol: %s",
+              (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 

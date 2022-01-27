@@ -132,9 +132,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
    * Get the cache list asynchronously from the Arcus admin.
    */
   void asyncGetCacheList() {
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Set a new watch on " + (cacheListZPath + serviceCode));
-    }
+    getLogger().debug("Set a new watch on %s%s", cacheListZPath, serviceCode);
 
     zk.getChildren(cacheListZPath + serviceCode, this, this, null);
   }

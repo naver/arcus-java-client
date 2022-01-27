@@ -500,33 +500,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(list, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case OUT_OF_RANGE:
                 rv.set(list, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 break;
             }
           }
@@ -593,27 +583,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(set, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               default:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 break;
             }
           }
@@ -668,27 +650,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
           }
@@ -742,27 +716,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
           }
@@ -829,14 +795,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   cstatus = new CollectionOperationStatus(status);
                 }
                 rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
-                  getLogger().debug("Insertion to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionInsert.getClass()
-                                  .getName() + ", key=" + key
-                                  + ", subkey=" + subkey + ", value="
-                                  + collectionInsert.getValue() + ")");
+                if (!cstatus.isSuccess()) {
+                  getLogger().debug(
+                          "Insertion to the collection failed : %s (type=%s, key=%s, subkey=%s, value=%s)",
+                          cstatus.getMessage(),
+                          collectionInsert.getClass().getName(),
+                          key,
+                          subkey,
+                          collectionInsert.getValue());
                 }
               }
 
@@ -1132,12 +1098,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             rv.set(cstatus.isSuccess(), cstatus);
-            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
-              getLogger().debug("Deletion to the collection failed : "
-                              + cstatus.getMessage()
-                              + " (type="
-                              + collectionDelete.getClass().getName()
-                              + ", key=" + key + ")");
+            if (!cstatus.isSuccess()) {
+              getLogger().debug("Deletion to the collection failed : %s (type=%s, key=%s)",
+                      cstatus.getMessage(),
+                      collectionDelete.getClass().getName(),
+                      key);
             }
           }
 
@@ -1180,13 +1145,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             boolean isExist = (CollectionResponse.EXIST == cstatus.getResponse())
                             ? true : false;
             rv.set(isExist, cstatus);
-            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
-              getLogger().debug("Exist command to the collection failed : "
-                              + cstatus.getMessage()
-                              + " (type="
-                              + collectionExist.getClass().getName()
-                              + ", key=" + key
-                              + ", subkey=" + subkey + ")");
+            if (!cstatus.isSuccess()) {
+              getLogger().debug("Exist command to the collection failed : %s (type=%s, key=%s, subkey=%s)",
+                      cstatus.getMessage(),
+                      collectionExist.getClass().getName(),
+                      key,
+                      subkey);
             }
           }
 
@@ -1491,14 +1455,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             rv.set(cstatus.isSuccess(), cstatus);
-            if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
-              getLogger().debug("Insertion to the collection failed : "
-                              + cstatus.getMessage()
-                              + " (type="
-                              + collectionCreate.getClass().getName()
-                              + ", key=" + key
-                              + ", attribute="
-                              + collectionCreate.toString() + ")");
+            if (!cstatus.isSuccess()) {
+              getLogger().debug("Insertion to the collection failed : %s (type=%s, key=%s, attribute=%s)",
+                              cstatus.getMessage(),
+                              collectionCreate.getClass().getName(),
+                              key,
+                              collectionCreate.toString());
             }
           }
 
@@ -2875,15 +2837,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   cstatus = new CollectionOperationStatus(status);
                 }
                 rv.set(cstatus.isSuccess(), cstatus);
-                if (!cstatus.isSuccess() && getLogger().isDebugEnabled()) {
-                  getLogger().debug("Insertion to the collection failed : "
-                                  + cstatus.getMessage()
-                                  + " (type="
-                                  + collectionUpdate.getClass().getName()
-                                  + ", key=" + key
-                                  + ", subkey=" + subkey
-                                  + ", value=" + collectionUpdate.getNewValue()
-                                  + ")");
+                if (!cstatus.isSuccess()) {
+                  getLogger().debug(
+                          "Insertion to the collection failed : %s (type=%s, key=%s, subkey=%s, value=%s)",
+                          cstatus.getMessage(),
+                          collectionUpdate.getClass().getName(),
+                          key,
+                          subkey,
+                          collectionUpdate.getNewValue());
                 }
               }
 
@@ -3057,27 +3018,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(map, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               default:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
           }
@@ -3177,27 +3130,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         switch (cstatus.getResponse()) {
           case NOT_FOUND:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s) not found : %s", k, cstatus);
-            }
+            getLogger().debug("Key(%s) not found : %s", k, cstatus);
             break;
           case NOT_FOUND_ELEMENT:
             rv.set(map, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Element(%s) not found : %s", k, cstatus);
-            }
+            getLogger().debug("Element(%s) not found : %s", k, cstatus);
             break;
           case UNREADABLE:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-            }
+            getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
             break;
           case TYPE_MISMATCH:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-            }
+            getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
             break;
           default:
             getLogger().warn("Unhandled state: " + status);
@@ -3276,34 +3221,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         switch (cstatus.getResponse()) {
           case NOT_FOUND:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s) not found : %s", k, cstatus);
-            }
+            getLogger().debug("Key(%s) not found : %s", k, cstatus);
             break;
           case NOT_FOUND_ELEMENT:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Element(%s) not found : %s", k, cstatus);
-            }
+            getLogger().debug("Element(%s) not found : %s", k, cstatus);
             break;
           case UNREADABLE:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-            }
+            getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
             break;
           case BKEY_MISMATCH:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
-                      get.getBkeyObject().getType());
-            }
+            getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
+                    get.getBkeyObject().getType());
             break;
           case TYPE_MISMATCH:
             rv.set(null, cstatus);
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-            }
+            getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
             break;
           default:
             getLogger().warn("Unhandled state: " + status);
@@ -3396,34 +3331,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                }
+                getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                }
+                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               case BKEY_MISMATCH:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
-                      get.getBkeyObject().getType());
-                }
+                getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
+                    get.getBkeyObject().getType());
                 break;
               case TYPE_MISMATCH:
                 rv.set(null, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-                }
+                getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
                 break;
               default:
                 getLogger().warn("Unhandled state: " + status);
@@ -3567,9 +3492,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               case TYPE_MISMATCH:
               case BKEY_MISMATCH:
                 rv.set(false, cstatus);
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Request for \"%s\" was not successful : %s", k, cstatus);
-                }
+                getLogger().debug("Request for %s was not successful : %s", k, cstatus);
                 break;
               default:
                 getLogger().warn("Unhandled state: " + status);
@@ -4537,20 +4460,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 rv.set(null, new CollectionOperationStatus(
                         new OperationStatus(false, status.getMessage())));
 
-                if (getLogger().isDebugEnabled()) {
-                  getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s",
-                          k, subkey, status);
-                }
+                getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, subkey, status);
               }
               return;
             }
 
             rv.set(null, new CollectionOperationStatus(status));
 
-            if (getLogger().isDebugEnabled()) {
-              getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s",
-                      k, subkey, status);
-            }
+            getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, subkey, status);
           }
 
           @Override

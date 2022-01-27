@@ -152,9 +152,8 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug(
-              "Request in ascii protocol: \n"
-                      + (new String(buffer.array())).replaceAll("\\r\\n",
-                      "\n"));
+              "Request in ascii protocol: %s",
+                      (new String(buffer.array())).replaceAll("\\r\\n","\n"));
     }
   }
 

@@ -274,8 +274,8 @@ public class CollectionGetOperationImpl extends OperationImpl
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: "
-              + (new String(bb.array())).replace("\r\n", "\\r\\n"));
+      getLogger().debug("Request in ascii protocol: %s",
+              (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 
