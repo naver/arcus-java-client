@@ -69,11 +69,24 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
                              int count) {
     this.node = node;
     this.keyList = keyList;
-    this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.eFlagFilter = eFlagFilter;
     this.offset = offset;
     this.count = count;
     this.reverse = (from > to);
+  }
+
+  protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
+                             long bkey,
+                             ElementFlagFilter eFlagFilter, int offset,
+                             int count) {
+    this.node = node;
+    this.keyList = keyList;
+    this.range = String.valueOf(bkey);
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+    this.reverse = false;
   }
 
   public void setKeySeparator(String keySeparator) {
