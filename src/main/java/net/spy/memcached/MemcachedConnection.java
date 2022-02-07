@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2021 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -460,7 +460,7 @@ public final class MemcachedConnection extends SpyObject {
           // Failover
           removeNodes.add(oldMasterNode);
           // move operation: master -> slave. Call setupResend() on master
-          taskList.add(new SetupResendTask(oldMasterNode,
+          taskList.add(new SetupResendTask(oldMasterNode, false,
               "Discarded all pending reading state operation to move operations."));
           taskList.add(new MoveOperationTask(oldMasterNode, oldGroup.getMasterCandidate()));
         }
@@ -490,7 +490,7 @@ public final class MemcachedConnection extends SpyObject {
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master. Call setupResend() on master
-        taskList.add(new SetupResendTask(oldMasterNode,
+        taskList.add(new SetupResendTask(oldMasterNode, false,
             "Discarded all pending reading state operation to move operations."));
         taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
         for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
@@ -893,14 +893,13 @@ public final class MemcachedConnection extends SpyObject {
       reconnectQueue.put(reconTime, qa);
 
       // Need to do a little queue management.
-      qa.setupResend(cause);
+      qa.setupResend(failureMode == FailureMode.Cancel && type == ReconnDelay.DEFAULT, cause);
 
       if (type == ReconnDelay.DEFAULT) {
         if (failureMode == FailureMode.Redistribute) {
           redistributeOperations(qa.destroyWriteQueue(true), cause);
           redistributeOperations(qa.destroyInputQueue(), cause);
         } else if (failureMode == FailureMode.Cancel) {
-          cancelOperations(qa.destroyWriteQueue(false), cause);
           cancelOperations(qa.destroyInputQueue(), cause);
         }
       }
@@ -1315,15 +1314,17 @@ public final class MemcachedConnection extends SpyObject {
 
   private class SetupResendTask implements Task {
     private MemcachedNode node;
+    private boolean cancelWrite;
     private String cause;
 
-    public SetupResendTask(MemcachedNode node, String cause) {
+    public SetupResendTask(MemcachedNode node, boolean cancelWrite, String cause) {
       this.node = node;
+      this.cancelWrite = cancelWrite;
       this.cause = cause;
     }
 
     public void doTask() {
-      node.setupResend(cause);
+      node.setupResend(cancelWrite, cause);
     }
   }
 

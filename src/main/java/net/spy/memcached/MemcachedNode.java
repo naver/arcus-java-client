@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +62,10 @@ public interface MemcachedNode {
   /**
    * Clear the queue of currently processing operations by either cancelling
    * them or setting them up to be reapplied after a reconnect.
+   *
+   * @param cancelWrite if true, cancel all operations in write queue
    */
-  void setupResend(String cause);
+  void setupResend(boolean cancelWrite, String cause);
 
   /**
    * Fill the write buffer with data from the next operations in the queue.

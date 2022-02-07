@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +71,7 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
-  public void setupResend(String cause) {
+  public void setupResend(boolean cancelWrite, String cause) {
     // noop
   }
 

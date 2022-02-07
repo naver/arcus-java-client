@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2021 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,11 +191,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return destroyQueue(readQ, resend);
   }
 
-  public final void setupResend(String cause) {
+  public final void setupResend(boolean cancelWrite, String cause) {
     // First, reset the current write op, or cancel it if we should
     // be authenticating
     Operation op = getCurrentWriteOp();
-    if (shouldAuth && op != null) {
+    if (cancelWrite || shouldAuth && op != null) {
       /*
        * Do not cancel the operation.
        * There is no reason to cancel it first
@@ -221,7 +221,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       }
     }
 
-    while (shouldAuth && hasWriteOp()) {
+    while ((cancelWrite || shouldAuth) && hasWriteOp()) {
       op = removeCurrentWriteOp();
       getLogger().warn("Discarding partially completed op: %s", op);
       op.cancel(cause);
@@ -619,7 +619,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.size() == 0);
-      setupResend(cause);
+      setupResend(false, cause);
     } else {
       authLatch = new CountDownLatch(0);
     }
