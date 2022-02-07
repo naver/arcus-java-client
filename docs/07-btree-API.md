@@ -50,16 +50,16 @@ B+tree position 관련 연산들은 다음과 같다.
 
 B+tree item에서 사용가능한 bkey 데이터 타입은 아래 두 가지이다.
 
-- long 타입
+- long[0, 양수] 타입
+  - arcus는 b+tree 연산을 위한 bkey의 범위를 unsinged long type의 범위인 0 ~ 4,294,967,295까지 지원한다.
+  - 하지만 java에서 long 자료형은 singed type으로 범위를 –2,147,483,648 ~ 2,147,483,647까지 지원한다.
+  - 그러므로 arcus-java-client에서는 long type의 bkey 범위를 0 ~ 2,147,483,647까지 지원하며, 음수 bkey를 입력하면 `IllegalArgumentException`이 발생한다.
 - byte[1~31] 타입 : byte array크기가 1부터 31까지 어느 것을 사용해도 된다.
-
-byte array 타입의 bkey를 만드는 예는 아래와 같다.
-만약, byte array의 크기가 31을 초과하면 IllegalArgumentException이 발생한다.
-
-```java
-// Bkey로 0x00000001을 사용한다.
-byte[] bkey = new byte[] { 0, 0, 0, 1 }
-```
+  - 만약, byte array의 크기가 31을 초과하면 `IllegalArgumentException`이 발생한다. 
+  ```java
+  // Bkey로 0x00000001을 사용한다.
+  byte[] bkey = new byte[] { 0, 0, 0, 1 }
+  ```
 
 eflag는 현재 b+tree element에만 존재하는 필드이다.
 eflag 데이터 타입은 byte[1~31] 타입만 가능하며, bkey의 byte array 사용 방식과 동일하다.
@@ -310,7 +310,7 @@ try {
 ## B+Tree Element 삽입
 
 B+Tree에 하나의 element를 삽입한다.
-전자는 long 타입의 bkey를, 후자는 최대 31 크기의 byte array 타입의 bkey를 사용한다.
+전자는 0 혹은 양수 long 타입의 bkey를, 후자는 최대 31 크기의 byte array 타입의 bkey를 사용한다.
 
 ```java
 CollectionFuture<Boolean>
@@ -383,7 +383,7 @@ try {
 3. Insert결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
 
-아커스에서 B+tree는 가질 수 있는 최대 엘리먼트 개수가 제한되어 있다. 이 제한 범위 안에서 사용자가 직접 B+tree 크기를 지정할 수도 있는데(maxcount), 이러한 제약조건 때문에 가득 찬 B+tree에 새로운 엘리먼트를 입력하면 설정에 따라 기존의 엘리먼트가 삭제될 수 있다.
+arcus에서 B+tree는 가질 수 있는 최대 엘리먼트 개수가 제한되어 있다. 이 제한 범위 안에서 사용자가 직접 B+tree 크기를 지정할 수도 있는데(maxcount), 이러한 제약조건 때문에 가득 찬 B+tree에 새로운 엘리먼트를 입력하면 설정에 따라 기존의 엘리먼트가 삭제될 수 있다.
 이렇게 암묵적으로 삭제되는 엘리먼트를 입력(insert, upsert)시점에 획득할 수 있는 기능을 제공한다.
 
 ```java
@@ -399,7 +399,7 @@ B+tree에 bkey에 해당하는 엘리먼트를 insert 하거나 upsert 할 때 �
 
 - key: b+tree item의 key
 - bkey: 삽입할 element의 bkey(b+tree key)
-  - bkey는 element의 key로 long또는 byte[1~31] 유형을 사용할 수 있다.
+  - bkey는 element의 key로 long[0, 양수]또는 byte[1~31] 유형을 사용할 수 있다.
   - 0이상의 값으로만 지정할 수 있고. key가 존재하는 상태에서 bkey와 value가 저장된다 하더라도
      key에 설정된 expire time은 변하지 않는다. 
 - eflag: 삽입할 element의 eflag(element flag)
@@ -430,14 +430,15 @@ future.getElement() 객체의 Method |  자료형  | 설명
 getValue()                        | Object  | element의 값
 getByteArrayBkey()                | byte[]  | element bkey 값(byte[])
 getLongBkey()                     | long    | element bkey 값(long)
-isByteArrayBkey()                 | boolean | element bkey byte array 여부
-getFlag()                         | byte[]  | element flag값(byte[])
+getStringBkey()                   | String  | element bkey 값(String)
+getEFlag()                        | byte[]  | element flag 값(byte[])
+getStringEFlag()                  | String  | element flag 값(String)
 
 B+tree에 element 삽입하면서 암묵적으로 trim되는 element를 조회하는 예제는 아래와 같다.
 
 ```java
 private String key = "BopStoreAndGetTest";
-private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L,
+private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L };
 
 public void testInsertAndGetTrimmedLongBKey() throws Exception {
 	// insert test data
@@ -479,7 +480,7 @@ public void testInsertAndGetTrimmedLongBKey() throws Exception {
 
 B+Tree에 하나의 element를 upsert하는 함수들이다.
 Upsert 연산은 해당 element가 없으면 insert하고, 있으면 update하는 연산이다.
-전자는 long bkey를, 후자는 최대 31 크기의 byte array bkey를 사용한다.
+전자는 0 혹은 양수 long bkey를, 후자는 최대 31 크기의 byte array bkey를 사용한다.
 
 ```java
 CollectionFuture<Boolean>
@@ -558,7 +559,7 @@ try {
 ## B+Tree Element 변경
 
 B+Tree에서 하나의 element를 변경하는 함수이다. Element의 eflag 그리고/또는 value를 변경한다.
-전자는 long bkey를, 후자는 최대 31 크기의 byte array bkey를 사용한다.
+전자는 0 혹은 양수 long bkey를, 후자는 최대 31 크기의 byte array bkey를 사용한다.
 
 ```java
 CollectionFuture<Boolean> asyncBopUpdate(String key, long bkey, ElementFlagUpdate eFlagUpdate, Object value)
@@ -893,9 +894,10 @@ result 객체의 Method          | 자료형   | 설명
 getKey()                      | Long    | btree내의 position
 getValue().getValue()         | Object  | element의 값
 getValue().getByteArrayBkey() | byte[]  | element bkey 값(byte[])
-getValue().getLongBkey()      | long    | element bkey 값long)
-getValue().isByteArrayBkey()  | boolean | element bkey 값 byte array 여부
-getValue().getFlag()          | byte[]  | element flag 값(byte[])
+getValue().getLongBkey()      | long    | element bkey 값(long)
+getValue().getStringBkey()    | String  | element bkey 값(String)
+getValue().getEFlag()         | byte[]  | element flag 값(byte[])
+getValue().getStringEFlag()   | String  | element flag 값(String)
 
 B+tree element를 조회하는 예제는 아래와 같다.
 
@@ -1081,7 +1083,7 @@ asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter 
 ```
 
 - keyList: b+tree items의 key list
-- bkey 또는 \<from, to\>: element 조회 대상이 되는 bkey 또는 조회 범위를 나타내는 bkey range 
+- \<from, to\>: element 조회 범위를 나타내는 bkey range 
 - eFlagFilter: eflag에 대한 filter 조건
   - eflag filter 조건을 지정하지 않으려면, ElementFlagFilter.DO_NOT_FILTER를 입력한다.
 - offset, count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 offset과 count 지정
@@ -1106,7 +1108,7 @@ BTreeGetResult.getElements()로 조회한 BTreeElement 객체로부터 개별 el
 
 BTreeElement 객체의 Method  | 자료형	          | 설명
 --------------------------- | -----------------| ----
-getKey()                    | long 또는 byte[] | element의 bkey
+getBkey()                   | long 또는 byte[]  | element의 bkey
 getEFlag()                  | byte[]           | element flag
 getValue()                  | Object           | element의 값
 
@@ -1149,7 +1151,7 @@ for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { //
 
     if (entry.getValue().getElements() != null) { // (4)
         for(Entry<Long, BTreeElement<Long, Object>> el : entry.getValue().getElements().entrySet()) {
-            System.out.println("bkey=" + el.getKey());
+            System.out.println("bkey=" + el.getBkey());
             System.out.println("eflag=" + Arrays.toString(el.getValue().getEflag());
             System.out.println("value=" + el.getValue().getValue());
         }
@@ -1448,7 +1450,7 @@ asyncBopFindPositionWithGet(String key, byte[] byteArrayBKey, BTreeOrder order, 
 ```
 
 - key: b+tree item의 key
-- longBKey: 조회할 element의 bkey(b+tree bkey)
+- longBKey, byteArrayBKey: 조회할 element의 bkey(b+tree bkey)
 - order: longBKey에 해당하는 element의 위치(position) 기준으로 결과를 담을 순서를 정의한다. (오름차순: BTreeOrder.ASC, 내림차순: BTreeOrder.DESC)
 - count: longBKey에 해당하는 element의 위치(position) 기준으로 조회할 주변(앞/뒤 position) element 개수를 지정
 
@@ -1471,8 +1473,9 @@ getKey()                          | integer           | btree내의 position
 getValue().getValue()             | Object            | element의 값
 getValue().getByteArrayBkey()     | byte[]            | element bkey 값(byte[])
 getValue().getLongBkey()          | long              | element bkey 값(long)
-getValue().isByteArrayBkey()      | boolean           | element bkey 값 byte array 여부
-getValue().getFlag()              | byte[]            | element flag 값(byte[])
+getValue().getStringBkey()        | String            | element bkey 값(String)
+getValue().getEFlag()             | byte[]            | element flag 값(byte[])
+getValue().getStringEFlag()       | String            | element flag 값(String)
 
 B+tree에서 position과 element 동시 조회 예제이다.
 ```java
