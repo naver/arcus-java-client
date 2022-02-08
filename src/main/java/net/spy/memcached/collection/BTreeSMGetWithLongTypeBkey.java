@@ -61,13 +61,24 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
                                     SMGetMode smgetMode) {
     this.node = node;
     this.keyList = keyList;
-
-    this.range = String.valueOf(from) + ((to > -1) ? ".." + String.valueOf(to) : "");
-
+    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.eFlagFilter = eFlagFilter;
     this.count = count;
     this.smgetMode = smgetMode;
     this.reverse = (from > to);
+  }
+
+  public BTreeSMGetWithLongTypeBkey(MemcachedNode node, List<String> keyList,
+                                    long bkey,
+                                    ElementFlagFilter eFlagFilter, int count,
+                                    SMGetMode smgetMode) {
+    this.node = node;
+    this.keyList = keyList;
+    this.range = String.valueOf(bkey);
+    this.eFlagFilter = eFlagFilter;
+    this.count = count;
+    this.smgetMode = smgetMode;
+    this.reverse = false;
   }
 
   public void setKeySeparator(String keySeparator) {
