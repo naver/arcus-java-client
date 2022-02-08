@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +19,31 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.util.BTreeUtil;
 
-public class BKeyObject {
+public class BKeyObject implements Comparable<BKeyObject> {
 
   public enum BKeyType {
-    LONG, BYTEARRAY, UNKNOWN
+    LONG, BYTEARRAY
   }
 
-  private BKeyType type = BKeyType.UNKNOWN;
+  private BKeyType type;
   private Long longBKey;
   private ByteArrayBKey byteArrayBKey;
 
-  public BKeyObject() {
-
-  }
-
   public BKeyObject(long longBKey) {
-    setLongBKey(longBKey);
+    BTreeUtil.validateBkey(longBKey);
+    this.type = BKeyType.LONG;
+    this.longBKey = longBKey;
+    this.byteArrayBKey = null;
   }
 
   public BKeyObject(byte[] byteArrayBKey) {
-    setByteArrayBKey(new ByteArrayBKey(byteArrayBKey));
+    this(new ByteArrayBKey(byteArrayBKey));
   }
 
   public BKeyObject(ByteArrayBKey byteArrayBKey) {
-    setByteArrayBKey(byteArrayBKey);
-  }
-
-  public BKeyObject(String bkeyString) {
-    byte[] b = BTreeUtil.hexStringToByteArrays(bkeyString);
-    ByteArrayBKey byteArrayBKey = new ByteArrayBKey(b);
-    setByteArrayBKey(byteArrayBKey);
+    this.type = BKeyType.BYTEARRAY;
+    this.byteArrayBKey = byteArrayBKey;
+    this.longBKey = null;
   }
 
   public BKeyType getType() {
@@ -55,54 +51,53 @@ public class BKeyObject {
   }
 
   public Long getLongBKey() {
-    if (BKeyType.LONG == type) {
+    if (isLong()) {
       return longBKey;
-    } else {
-      return null;
     }
-  }
-
-  public void setLongBKey(long longBKey) {
-    this.type = BKeyType.LONG;
-    this.longBKey = longBKey;
-    this.byteArrayBKey = null;
+    throw new IllegalStateException("This Object has byte[] bkey.");
   }
 
   public ByteArrayBKey getByteArrayBKey() {
-    if (BKeyType.BYTEARRAY == type) {
+    if (isByteArray()) {
       return byteArrayBKey;
-    } else {
-      return null;
     }
+    throw new IllegalStateException(
+            "This Object has java.lang.Long type bkey.");
   }
 
   public byte[] getByteArrayBKeyRaw() {
-    if (BKeyType.BYTEARRAY == type) {
+    if (isByteArray()) {
       return byteArrayBKey.getBytes();
-    } else {
-      return null;
     }
+    throw new IllegalStateException(
+            "This Object has java.lang.Long type bkey.");
   }
 
-  public void setByteArrayBKey(ByteArrayBKey byteArrayBKey) {
-    this.type = BKeyType.BYTEARRAY;
-    this.byteArrayBKey = byteArrayBKey;
-    this.longBKey = null;
+  public boolean isLong() {
+    return type == BKeyType.LONG;
   }
 
-  public String getBKeyAsString() {
-    if (BKeyType.LONG == type) {
-      return String.valueOf(longBKey);
-    } else if (BKeyType.BYTEARRAY == type) {
-      return BTreeUtil.toHex(byteArrayBKey.getBytes());
-    } else {
-      return null;
+  public boolean isByteArray() {
+    return type == BKeyType.BYTEARRAY;
+  }
+
+  @Override
+  public int compareTo(BKeyObject another) {
+    if (isByteArray() && another.isByteArray()) {
+      return byteArrayBKey.compareTo(another.getByteArrayBKey());
+    } else if (isLong() && another.isLong()) {
+      return longBKey.compareTo(another.getLongBKey());
     }
+    throw new IllegalArgumentException(
+            String.format("not supported comparing different type of bkey"));
   }
 
   @Override
   public String toString() {
-    return getBKeyAsString();
+    if (isLong()) {
+      return String.valueOf(longBKey);
+    }
+    return BTreeUtil.toHex(byteArrayBKey.getBytes());
   }
 
 }

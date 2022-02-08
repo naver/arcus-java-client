@@ -47,7 +47,7 @@ public class BTreeSMGetWithLongTypeBkey<T> implements BTreeSMGet<T> {
 
   private String key;
   private int flag;
-  private long subkey;
+  private Long subkey;
   private int dataLength;
 
   private byte[] eflag = null;

@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +84,20 @@ public final class BTreeUtil {
 
   public static void validateBkey(byte[] ...bkeys) {
     for (byte[] bkey : bkeys) {
+      if (bkey == null) {
+        throw new IllegalArgumentException("bkey is null");
+      }
       if (bkey.length > MAX_BKEY_BYTE_ARRAY_SIZE) {
         throw new IllegalArgumentException("bkey size exceeded 31");
+      }
+    }
+  }
+
+  public static void validateBkey(long ...bkeys) {
+    for (long bkey : bkeys) {
+      if (bkey < 0) {
+        throw new IllegalArgumentException(
+                String.format("not supported unsigned long bkey : %s, use byte array bkey", bkey));
       }
     }
   }

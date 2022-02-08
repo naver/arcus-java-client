@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2014 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +69,7 @@ public class BTreeFindPositionWithGet extends CollectionGet {
   public String stringify() {
     if (str == null) {
       StringBuilder b = new StringBuilder();
-      b.append(bkeyObject.getBKeyAsString());
+      b.append(bkeyObject);
       b.append(" ");
       b.append(order.getAscii());
       if (count > 0) {
@@ -116,7 +117,7 @@ public class BTreeFindPositionWithGet extends CollectionGet {
 
     // <bkey>
     if (splited[0].startsWith("0x")) {
-      this.bkey = new BKeyObject(splited[0].substring(2));
+      this.bkey = new BKeyObject(BTreeUtil.hexStringToByteArrays(splited[0].substring(2)));
     } else {
       this.bkey = new BKeyObject(Long.parseLong(splited[0]));
     }

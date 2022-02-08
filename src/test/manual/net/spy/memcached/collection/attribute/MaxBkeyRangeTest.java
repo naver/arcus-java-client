@@ -25,6 +25,9 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
+import org.junit.function.ThrowingRunnable;
+
+import static org.junit.Assert.assertThrows;
 
 public class MaxBkeyRangeTest extends BaseIntegrationTest {
 
@@ -59,18 +62,28 @@ public class MaxBkeyRangeTest extends BaseIntegrationTest {
               attribute).get());
 
       // get current maxbkeyrange
-      CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(btreeAttrs.getMaxBkeyRangeByBytes());
-      Assert.assertEquals(new Long(0), btreeAttrs.getMaxBkeyRange());
+      final CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
+      assertThrows(IllegalStateException.class, new ThrowingRunnable() {
+        @Override
+        public void run() throws Throwable {
+          btreeAttrs.getMaxBkeyRangeByBytes();
+        }
+      });
+      Assert.assertEquals(Long.valueOf(0), btreeAttrs.getMaxBkeyRange());
 
       // change maxbkeyrange
       attribute.setMaxBkeyRange(2L);
       Assert.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
 
       // get current maxbkeyrange
-      CollectionAttributes changedBtreeAttrs = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(btreeAttrs.getMaxBkeyRangeByBytes());
-      Assert.assertEquals(new Long(2),
+      final CollectionAttributes changedBtreeAttrs = mc.asyncGetAttr(KEY).get();
+      assertThrows(IllegalStateException.class, new ThrowingRunnable() {
+        @Override
+        public void run() throws Throwable {
+          changedBtreeAttrs.getMaxBkeyRangeByBytes();
+        }
+      });
+      Assert.assertEquals(Long.valueOf(2),
               changedBtreeAttrs.getMaxBkeyRange());
 
       // insert bkey
@@ -125,7 +138,7 @@ public class MaxBkeyRangeTest extends BaseIntegrationTest {
 
       // get current maxbkeyrange
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(btreeAttrs.getMaxBkeyRangeByBytes());
+      Assert.assertEquals(Long.valueOf(0), btreeAttrs.getMaxBkeyRange());
 
       // change maxbkeyrange
       attribute.setMaxBkeyRangeByBytes(new byte[]{(byte) 2});
