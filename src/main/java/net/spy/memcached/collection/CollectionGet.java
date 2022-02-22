@@ -37,6 +37,10 @@ public abstract class CollectionGet<K> {
     this.delete = delete;
   }
 
+  public boolean isDropIfEmpty() {
+    return dropIfEmpty;
+  }
+
   public String getSubkey() {
     return subkey;
   }

@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2021 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,4 +269,10 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
   public boolean isPipeOperation() {
     return false;
   }
+
+  @Override
+  public boolean isIdempotentOperation() {
+    return true;
+  }
+
 }

@@ -311,4 +311,10 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
   public boolean isPipeOperation() {
     return false;
   }
+
+  @Override
+  public boolean isIdempotentOperation() {
+    return true;
+  }
+
 }
