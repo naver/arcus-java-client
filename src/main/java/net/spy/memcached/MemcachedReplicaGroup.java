@@ -31,6 +31,7 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   private int nextSlaveIndex = -1;
   protected MemcachedNode masterCandidate;
   private final StringBuilder sb = new StringBuilder();
+  private boolean delayedSwitchover = false;
 
   public static final int MAX_REPL_SLAVE_SIZE = 2;
   public static final int MAX_REPL_GROUP_SIZE = MAX_REPL_SLAVE_SIZE + 1;
@@ -136,6 +137,13 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     return node;
   }
 
+  public boolean isDelayedSwitchover() {
+    return delayedSwitchover;
+  }
+
+  public void setDelayedSwitchover(boolean delayedSwitchover) {
+    this.delayedSwitchover = delayedSwitchover;
+  }
 
   private MemcachedNode getNextActiveSlaveNodeRotate() {
     MemcachedNode node = null;

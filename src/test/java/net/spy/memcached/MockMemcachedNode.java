@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,9 +269,15 @@ public class MockMemcachedNode implements MemcachedNode {
   }
 
   @Override
-  public int moveOperations(final MemcachedNode toNode) {
+  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
     // noop
     return 0;
+  }
+
+  @Override
+  public boolean hasNonIdempotentOperationInReadQ() {
+    // noop
+    return false;
   }
   /* ENABLE_REPLICATION end */
 }
