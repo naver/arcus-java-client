@@ -390,10 +390,17 @@ public final class MemcachedConnection extends SpyObject {
      * and update the state of groups based on them.
      */
     Set<String> changedGroups = findChangedGroups(addrs);
-    List<InetSocketAddress> changedGroupAddrs  = findAddrsOfChangedGroups(addrs, changedGroups);
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            ArcusReplNodeAddress.makeGroupAddrsList(changedGroupAddrs);
+            ArcusReplNodeAddress.makeGroupAddrsList(findAddrsOfChangedGroups(addrs, changedGroups));
+
+    // remove invalidated groups in changedGroups
+    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+      if (!ArcusReplNodeAddress.validateGroup(entry)) {
+        changedGroups.remove(entry.getKey());
+      }
+    }
+
     Map<String, MemcachedReplicaGroup> oldAllGroups =
             ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
 
@@ -409,27 +416,21 @@ public final class MemcachedConnection extends SpyObject {
         continue;
       }
 
-      MemcachedNode oldMasterNode = oldGroup.getMasterNode();
-      List<MemcachedNode> oldSlaveNodes = oldGroup.getSlaveNodes();
-
       if (newGroupAddrs == null) {
         // Old group nodes have disappered. Remove the old group nodes.
-        removeNodes.add(oldMasterNode);
-        removeNodes.addAll(oldSlaveNodes);
+        removeNodes.add(oldGroup.getMasterNode());
+        removeNodes.addAll(oldGroup.getSlaveNodes());
         delayedSwitchoverGroups.remove(oldGroup);
-        continue;
-      }
-      if (newGroupAddrs.isEmpty()) {
-        // New group is invalid, do nothing.
         continue;
       }
 
       if (oldGroup.isDelayedSwitchover()) {
-        switchoverMemcachedReplGroup(oldMasterNode, true);
+        switchoverMemcachedReplGroup(oldGroup.getMasterNode(), true);
         delayedSwitchoverGroups.remove(oldGroup);
-        oldMasterNode = oldGroup.getMasterNode();
-        oldSlaveNodes = oldGroup.getSlaveNodes();
       }
+
+      MemcachedNode oldMasterNode = oldGroup.getMasterNode();
+      List<MemcachedNode> oldSlaveNodes = oldGroup.getSlaveNodes();
 
       getLogger().debug("New group nodes : " + newGroupAddrs);
       getLogger().debug("Old group nodes : [" + oldGroup + "]");
@@ -443,33 +444,20 @@ public final class MemcachedConnection extends SpyObject {
       Set<ArcusReplNodeAddress> newSlaveAddrs = getSlaveAddrsFromGroupAddrs(newGroupAddrs);
 
       if (oldMasterAddr.isSameAddress(newMasterAddr)) {
-        if (oldSlaveAddrs.isEmpty()) {
-          for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+        // add newly added slave node
+        for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
+          if (!oldSlaveAddrs.contains(newSlaveAddr)) {
             attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
           }
-        } else if (newSlaveAddrs.isEmpty()) {
-          removeNodes.addAll(oldSlaveNodes);
-          // move operation all slave -> master.
-          for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+        }
+
+        // remove not exist old slave node
+        for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
+          if (!newSlaveAddrs.contains((ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
+            removeNodes.add(oldSlaveNode);
+            // move operation slave -> master.
             taskList.add(new MoveOperationTask(
                 oldSlaveNode, oldMasterNode, false));
-          }
-        } else {
-          // add newly added slave node
-          for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
-            if (!oldSlaveAddrs.contains(newSlaveAddr)) {
-              attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
-            }
-          }
-
-          // remove not exist old slave node
-          for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
-            if (!newSlaveAddrs.contains((ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
-              removeNodes.add(oldSlaveNode);
-              // move operation slave -> master.
-              taskList.add(new MoveOperationTask(
-                  oldSlaveNode, oldMasterNode, false));
-            }
           }
         }
       } else if (oldSlaveAddrs.contains(newMasterAddr)) {
