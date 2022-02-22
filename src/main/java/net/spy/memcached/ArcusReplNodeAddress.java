@@ -131,31 +131,27 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
       }
     }
 
-    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-      // If newGroupNodes is valid, it is sorted by master and slave order.
-      validateGroup(entry);
-    }
     return newAllGroups;
   }
 
-  private static void validateGroup(Map.Entry<String, List<ArcusReplNodeAddress>> group) {
+  public static boolean validateGroup(Map.Entry<String, List<ArcusReplNodeAddress>> group) {
     List<ArcusReplNodeAddress> newGroupNodes = group.getValue();
     int groupSize = newGroupNodes.size();
 
     if (groupSize > MemcachedReplicaGroup.MAX_REPL_GROUP_SIZE) {
       arcusLogger.error("Invalid group " + group.getKey() + " : "
               + " Too many nodes. " + newGroupNodes);
-      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+      return false;
     } else if (groupSize > 1 && hasDuplicatedAddress(newGroupNodes, groupSize)) {
       // Two or more nodes have the same ip and port.
       arcusLogger.error("Invalid group " + group.getKey() + " : "
               + "Two or more nodes have the same ip and port." + newGroupNodes);
-      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+      return false;
     } else if (groupSize > 1 && hasMultiMasters(newGroupNodes)) {
       // Two or more nodes are masters.
       arcusLogger.error("Invalid group " + group.getKey() + " : "
               + "Two or more master nodes exist. " + newGroupNodes);
-      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+      return false;
     } else if (!newGroupNodes.get(0).master) {
       /* This case can occur during the switchover or failover.
        * 1) In the switchover, it occurs after below the first phase.
@@ -167,8 +163,9 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
        */
       arcusLogger.info("Invalid group " + group.getKey() + " : "
               + "Master does not exist. " + newGroupNodes);
-      group.setValue(new ArrayList<ArcusReplNodeAddress>());
+      return false;
     }
+    return true;
   }
 
   public boolean isSameAddress(ArcusReplNodeAddress addr) {

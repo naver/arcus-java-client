@@ -467,7 +467,7 @@ public class CacheManager extends SpyThread implements Watcher,
       // recreate socket list
       socketList.clear();
       for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (entry.getValue().size() > 0) { // valid replica group
+        if (ArcusReplNodeAddress.validateGroup(entry)) {
           socketList.addAll(entry.getValue());
         }
       }
