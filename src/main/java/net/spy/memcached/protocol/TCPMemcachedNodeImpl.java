@@ -1,7 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
- * Copyright 2014-2021 JaM2in Co., Ltd.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -689,7 +689,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return replicaGroup;
   }
 
-  private BlockingQueue<Operation> getAllOperations() {
+  private BlockingQueue<Operation> getAllOperations(boolean cancelNonIdempontent) {
     BlockingQueue<Operation> allOp = new LinkedBlockingQueue<Operation>();
 
     while (hasReadOp()) {
@@ -698,6 +698,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         /* Operation could exist both writeQ and readQ,
          * if all bytes of the operation have not been written yet.
          */
+      } else if (cancelNonIdempontent && !op.isIdempotentOperation()) {
+        op.cancel("by moving idempotent operations only");
       } else {
         allOp.add(op);
       }
@@ -730,8 +732,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return movedOpCount;
   }
 
-  public int moveOperations(final MemcachedNode toNode) {
-    BlockingQueue<Operation> allOp = getAllOperations();
+  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
+    BlockingQueue<Operation> allOp = getAllOperations(cancelNonIdempontent);
     int opCount = allOp.size();
     int movedOpCount = 0;
 
@@ -743,6 +745,18 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
 
     return movedOpCount;
+  }
+
+  public boolean hasNonIdempotentOperationInReadQ() {
+    for (Operation op : readQ) {
+      if (op == getCurrentWriteOp()) {
+        continue;
+      }
+      if (!op.isIdempotentOperation()) {
+        return true;
+      }
+    }
+    return false;
   }
   /* ENABLE_REPLICATION end */
 }
