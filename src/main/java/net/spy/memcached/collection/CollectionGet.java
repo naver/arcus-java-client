@@ -16,10 +16,10 @@
  */
 package net.spy.memcached.collection;
 
-public abstract class CollectionGet<K> {
+public abstract class CollectionGet {
 
   protected boolean delete = false;
-  protected boolean dropIfEmpty = true;
+  protected boolean dropIfEmpty = false;
 
   protected String range;
   protected String str;

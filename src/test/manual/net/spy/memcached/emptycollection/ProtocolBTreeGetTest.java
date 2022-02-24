@@ -26,13 +26,6 @@ public class ProtocolBTreeGetTest extends TestCase {
   private static final long bkey = 10;
 
   public void testStringfy() {
-    // default setting : dropIfEmpty = true
-
-    Assert.assertEquals("10 drop",
-            (new BTreeGet(bkey, true)).stringify());
-    Assert.assertEquals("10",
-            (new BTreeGet(bkey, false)).stringify());
-
     Assert.assertEquals("10 drop", (new BTreeGet(bkey, true, true,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
     Assert.assertEquals("10 delete", (new BTreeGet(bkey, true,
@@ -41,11 +34,6 @@ public class ProtocolBTreeGetTest extends TestCase {
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
     Assert.assertEquals("10", (new BTreeGet(bkey, false, false,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
-
-    Assert.assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
-            1, true)).stringify());
-    Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
-            false)).stringify());
 
     Assert.assertEquals("10..20 1 1 delete", (new BTreeGet(10, 20,
             1, 1, true, false, ElementFlagFilter.DO_NOT_FILTER))

@@ -22,14 +22,10 @@ public class SetGet extends CollectionGet {
 
   protected int count;
 
-  public SetGet(int count, boolean delete) {
+  public SetGet(int count, boolean delete, boolean dropIfEmpty) {
     this.headerCount = 1;
     this.count = count;
     this.delete = delete;
-  }
-
-  public SetGet(int count, boolean delete, boolean dropIfEmpty) {
-    this(count, delete);
     this.dropIfEmpty = dropIfEmpty;
   }
 
