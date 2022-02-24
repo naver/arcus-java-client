@@ -99,20 +99,14 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       String k, v;
       for (String key : keys) {
         k = key;
         v = (String) mc.asyncGet(k).get();
 
-        if (!v.equals(o.get(k))) {
-          errorCount++;
-        }
+        Assert.assertEquals(k + " has unexpected value.", o.get(k), v);
 
         mc.delete(k);
-
-        Assert.assertEquals("Error count is greater than 0.", 0,
-            errorCount);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -160,16 +154,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key);
-        if (!value.equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", value, v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-              errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -215,16 +203,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key);
-        if (!value.equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", value, v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-              errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -270,16 +252,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key);
-        if (!value.equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", value, v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-              errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -325,16 +301,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        if (!value.equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", value, v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-          errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -380,17 +350,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
         Assert.fail(e.getMessage());
       }
 
-      // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        if (!o.get(key).equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", o.get(key), v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-          errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -436,16 +399,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        if (!value.equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", value, v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-          errorCount);
 
       // REMOVE
       for (String key : keys) {
@@ -491,16 +448,10 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // GET
-      int errorCount = 0;
       for (String key : o.keySet()) {
         String v = (String) mc.get(key, transcoder);
-        if (!o.get(key).equals(v)) {
-          errorCount++;
-        }
+        Assert.assertEquals(key + " has unexpected value.", o.get(key), v);
       }
-
-      Assert.assertEquals("Error count is greater than 0.", 0,
-          errorCount);
 
       // REMOVE
       for (String key : o.keySet()) {
