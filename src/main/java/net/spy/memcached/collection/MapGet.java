@@ -28,14 +28,10 @@ public class MapGet extends CollectionGet {
   private String spaceSeparatedKeys;
   protected byte[] additionalArgs;
 
-  public MapGet(List<String> mkeyList, boolean delete) {
+  public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
     this.headerCount = 2;
     this.mkeyList = mkeyList;
     this.delete = delete;
-  }
-
-  public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
-    this(mkeyList, delete);
     this.dropIfEmpty = dropIfEmpty;
   }
 

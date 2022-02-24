@@ -33,10 +33,6 @@ public class ProtocolMapGetTest extends TestCase {
     List<String> mkeyList = new ArrayList<String>();
     mkeyList.add(MKEY);
     Assert.assertEquals("4 1 drop",
-            (new MapGet(mkeyList, true)).stringify());
-    Assert.assertEquals("4 1",
-            (new MapGet(mkeyList, false)).stringify());
-    Assert.assertEquals("4 1 drop",
             (new MapGet(mkeyList, true, true)).stringify());
     Assert.assertEquals("4 1 delete",
             (new MapGet(mkeyList, true, false)).stringify());

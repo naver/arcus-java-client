@@ -18,31 +18,21 @@ package net.spy.memcached.collection;
 
 public class ListGet extends CollectionGet {
 
-  public static final int FIRST = 0;
-  public static final int LAST = -1;
-
   private static final String command = "lop get";
 
-  public ListGet(int index, boolean delete) {
+  private ListGet(String range, boolean delete, boolean dropIfEmpty) {
     this.headerCount = 1;
-    this.range = String.valueOf(index);
+    this.range = range;
     this.delete = delete;
+    this.dropIfEmpty = dropIfEmpty;
   }
 
   public ListGet(int index, boolean delete, boolean dropIfEmpty) {
-    this(index, delete);
-    this.dropIfEmpty = dropIfEmpty;
-  }
-
-  public ListGet(int from, int to, boolean delete) {
-    this.headerCount = 1;
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
-    this.delete = delete;
+    this(String.valueOf(index), delete, dropIfEmpty);
   }
 
   public ListGet(int from, int to, boolean delete, boolean dropIfEmpty) {
-    this(from, to, delete);
-    this.dropIfEmpty = dropIfEmpty;
+    this(from + ".." + to, delete, dropIfEmpty);
   }
 
   public String getRange() {

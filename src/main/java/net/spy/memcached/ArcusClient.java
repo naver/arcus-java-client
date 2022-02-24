@@ -2958,7 +2958,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, bkey, 0, 1, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopExtendedGet(key, get, false, collectionTranscoder);
   }
 
@@ -2967,7 +2967,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, bkey, 0, 1, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopExtendedGet(key, get, false, tc);
   }
 
