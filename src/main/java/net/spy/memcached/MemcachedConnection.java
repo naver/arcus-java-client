@@ -292,7 +292,7 @@ public final class MemcachedConnection extends SpyObject {
       for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
         if (node.equals(each.getValue())) {
           reconnectQueue.remove(each.getKey());
-          break;
+          break; // this break statement can avoid ConcurrentModificationException while iterating the entrySet.
         }
       }
       // removing node is not related to failure mode.
