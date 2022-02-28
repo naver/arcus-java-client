@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +17,18 @@
  */
 package net.spy.memcached;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 import junit.framework.TestCase;
+import net.spy.memcached.internal.ReconnDelay;
+import org.junit.Assert;
 
 /**
  * Test stuff that can be tested within a MemcachedConnection separately.
@@ -132,6 +139,145 @@ public class MemcachedConnectionTest extends TestCase {
   }
 
   public void testAddOperations() throws Exception {
+  }
 
+  public void testReconnectQueue_delayReconnect() throws Exception {
+    MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
+
+    Field reconMapField =
+        MemcachedConnection.ReconnectQueue.class.getDeclaredField("reconMap");
+    reconMapField.setAccessible(true);
+    Map<MemcachedNode, Long> reconMap =
+        (Map<MemcachedNode, Long>) reconMapField.get(reconnectQueue);
+
+    Field reconSortedMapField =
+        MemcachedConnection.ReconnectQueue.class.getDeclaredField("reconSortedMap");
+    reconSortedMapField.setAccessible(true);
+    SortedMap<Long, MemcachedNode> reconSortedMap =
+        (SortedMap<Long, MemcachedNode>) reconSortedMapField.get(reconnectQueue);
+
+    Method newReconnectDelayMethod =
+        MemcachedConnection.ReconnectQueue.class.getDeclaredMethod(
+            "newReconnectDelay", MemcachedNode.class, ReconnDelay.class);
+    newReconnectDelayMethod.setAccessible(true);
+
+    // put test
+    MemcachedNode node = new MockMemcachedNode(
+        InetSocketAddress.createUnresolved("1.1.1.1", 11211));
+    long firstReconnectTime;
+    reconnectQueue.put(node, ReconnDelay.DEFAULT);
+    firstReconnectTime = reconMap.get(node);
+    Assert.assertTrue(firstReconnectTime > System.currentTimeMillis());
+    Assert.assertEquals(reconMap.size(), 1);
+    Assert.assertEquals(reconSortedMap.get(firstReconnectTime), node);
+    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    Assert.assertEquals(reconSortedMap.size(), 1);
+    Assert.assertFalse(reconnectQueue.isEmpty());
+    Assert.assertTrue(reconnectQueue.contains(node));
+    Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 0);
+    Thread.sleep((Long) newReconnectDelayMethod.invoke(
+        reconnectQueue, node, ReconnDelay.DEFAULT) + 10);
+    Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
+
+    // replace test with same node
+    long secondReconnectTime;
+    reconnectQueue.replace(node, ReconnDelay.DEFAULT);
+    secondReconnectTime = reconMap.get(node);
+    Assert.assertEquals(secondReconnectTime, firstReconnectTime);
+    Assert.assertEquals(reconMap.size(), 1);
+    Assert.assertEquals(reconSortedMap.size(), 1);
+    Assert.assertTrue(reconnectQueue.contains(node));
+    Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
+
+    // put test with another node
+    MemcachedNode anotherNode = new MockMemcachedNode(
+        InetSocketAddress.createUnresolved("2.2.2.2", 11211));
+    long anotherReconnectTime;
+    reconnectQueue.put(anotherNode, ReconnDelay.DEFAULT);
+    anotherReconnectTime = reconMap.get(anotherNode);
+    Assert.assertTrue(anotherReconnectTime > System.currentTimeMillis());
+    Assert.assertEquals(reconMap.size(), 2);
+    Assert.assertEquals(reconSortedMap.get(anotherReconnectTime), anotherNode);
+    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    Assert.assertEquals(reconSortedMap.size(), 2);
+    Assert.assertFalse(reconnectQueue.isEmpty());
+    Assert.assertTrue(reconnectQueue.contains(anotherNode));
+    Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(anotherNode));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
+    Thread.sleep((Long) newReconnectDelayMethod.invoke(
+        reconnectQueue, anotherNode, ReconnDelay.DEFAULT) + 10);
+    Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(anotherNode));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 2);
+
+    // remove test
+    reconnectQueue.remove(node);
+    Assert.assertFalse(reconMap.containsKey(node));
+    Assert.assertEquals(reconMap.size(), 1);
+    Assert.assertFalse(reconSortedMap.containsKey(firstReconnectTime));
+    Assert.assertEquals(reconSortedMap.size(), 1);
+    Assert.assertFalse(reconnectQueue.isEmpty());
+    Assert.assertFalse(reconnectQueue.contains(node));
+    Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
+
+    reconnectQueue.remove(anotherNode);
+    Assert.assertFalse(reconMap.containsKey(anotherNode));
+    Assert.assertEquals(reconMap.size(), 0);
+    Assert.assertFalse(reconSortedMap.containsKey(anotherReconnectTime));
+    Assert.assertEquals(reconSortedMap.size(), 0);
+    Assert.assertTrue(reconnectQueue.isEmpty());
+    Assert.assertFalse(reconnectQueue.contains(anotherNode));
+    Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(anotherNode));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 0);
+  }
+
+  public void testReconnectQueue_immediateReconnect() throws Exception {
+    MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
+
+    Field reconMapField =
+        MemcachedConnection.ReconnectQueue.class.getDeclaredField("reconMap");
+    reconMapField.setAccessible(true);
+    Map<MemcachedNode, Long> reconMap =
+        (Map<MemcachedNode, Long>) reconMapField.get(reconnectQueue);
+
+    Field reconSortedMapField =
+        MemcachedConnection.ReconnectQueue.class.getDeclaredField("reconSortedMap");
+    reconSortedMapField.setAccessible(true);
+    SortedMap<Long, MemcachedNode> reconSortedMap =
+        (SortedMap<Long, MemcachedNode>) reconSortedMapField.get(reconnectQueue);
+
+    // put test with delay reconnect
+    MemcachedNode node = new MockMemcachedNode(
+        InetSocketAddress.createUnresolved("1.1.1.1", 11211));
+    long firstReconnectTime;
+    reconnectQueue.put(node, ReconnDelay.DEFAULT);
+    firstReconnectTime = reconMap.get(node);
+    Assert.assertTrue(firstReconnectTime > System.currentTimeMillis());
+    Assert.assertEquals(reconMap.size(), 1);
+    Assert.assertEquals(reconSortedMap.get(firstReconnectTime), node);
+    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    Assert.assertEquals(reconSortedMap.size(), 1);
+    Assert.assertFalse(reconnectQueue.isEmpty());
+    Assert.assertTrue(reconnectQueue.contains(node));
+    Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 0);
+
+    // second put test with immediate reconnect and same node
+    long secondReconnectTime;
+    reconnectQueue.replace(node, ReconnDelay.IMMEDIATE);
+    secondReconnectTime = reconMap.get(node);
+    Assert.assertTrue(secondReconnectTime < firstReconnectTime);
+    Assert.assertEquals(reconMap.size(), 1);
+    Assert.assertFalse(reconSortedMap.containsKey(firstReconnectTime));
+    Assert.assertEquals(reconSortedMap.firstKey(), (Long) secondReconnectTime);
+    Assert.assertEquals(reconSortedMap.size(), 1);
+    Assert.assertFalse(reconnectQueue.isEmpty());
+    Assert.assertTrue(reconnectQueue.contains(node));
+    Thread.sleep(10);
+    Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(node));
+    Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
   }
 }

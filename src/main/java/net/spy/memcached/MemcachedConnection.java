@@ -35,11 +35,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -75,8 +75,6 @@ public final class MemcachedConnection extends SpyObject {
 
   private final int timeoutExceptionThreshold;
   private final int timeoutRatioThreshold;
-  // maximum amount of time to wait between reconnect attempts
-  private final long maxReconnectDelay;
 
   private final String connName;
   private Selector selector = null;
@@ -90,8 +88,7 @@ public final class MemcachedConnection extends SpyObject {
   // have recently been queued.
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
-  // The key is the time at which they are eligible for reconnect
-  private final SortedMap<Long, MemcachedNode> reconnectQueue;
+  private final ReconnectQueue reconnectQueue;
   private final BlockingQueue<String> nodesChangeQueue = new LinkedBlockingQueue<String>();
 
   private final OperationFactory opFactory;
@@ -125,11 +122,9 @@ public final class MemcachedConnection extends SpyObject {
     this.connFactory = f;
     connName = name;
     connObservers.addAll(obs);
-    reconnectQueue = new TreeMap<Long, MemcachedNode>();
     addedQueue = new ConcurrentLinkedQueue<MemcachedNode>();
     failureMode = fm;
     optimizeGetOp = f.shouldOptimize();
-    maxReconnectDelay = f.getMaxReconnectDelay();
     opFactory = opfactory;
     timeoutExceptionThreshold = f.getTimeoutExceptionThreshold();
     timeoutRatioThreshold = f.getTimeoutRatioThreshold();
@@ -139,6 +134,7 @@ public final class MemcachedConnection extends SpyObject {
       connections.add(attachMemcachedNode(connName, sa));
     }
     locator = f.createLocator(connections);
+    reconnectQueue = new ReconnectQueue(f.getMaxReconnectDelay());
   }
 
   /* ENABLE_REPLICATION if */
@@ -215,9 +211,7 @@ public final class MemcachedConnection extends SpyObject {
     if (!nodesChangeQueue.isEmpty()) {
       delay = 1;
     } else if (!reconnectQueue.isEmpty()) {
-      long now = System.currentTimeMillis();
-      long then = reconnectQueue.firstKey();
-      delay = Math.max(then - now, 1);
+      delay = reconnectQueue.getMinDelay();
     }
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled && !delayedSwitchoverGroups.isEmpty()) {
@@ -288,13 +282,8 @@ public final class MemcachedConnection extends SpyObject {
   private void handleNodesToRemove(final List<MemcachedNode> nodesToRemove) {
     for (MemcachedNode node : nodesToRemove) {
       getLogger().info("old memcached node removed %s", node);
-      // Remove the node from the reconnect queue. FIXME(duplicate nodes).
-      for (Entry<Long, MemcachedNode> each : reconnectQueue.entrySet()) {
-        if (node.equals(each.getValue())) {
-          reconnectQueue.remove(each.getKey());
-          break; // this break statement can avoid ConcurrentModificationException while iterating the entrySet.
-        }
-      }
+      reconnectQueue.remove(node);
+
       // removing node is not related to failure mode.
       // so, cancel operations regardless of failure mode.
       String cause = "node removed.";
@@ -888,60 +877,46 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void queueReconnect(MemcachedNode qa, ReconnDelay type, String cause) {
-    if (!shutDown) {
-      getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
-              qa.getReconnectCount());
-      if (qa.getSk() != null) {
-        qa.getSk().cancel();
-        assert !qa.getSk().isValid() : "Cancelled selection key is valid";
+    if (shutDown) {
+      return;
+    }
+    if (reconnectQueue.contains(qa)) {
+      reconnectQueue.replace(qa, type);
+      return;
+    }
+
+    getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
+            qa.getReconnectCount());
+    if (qa.getSk() != null) {
+      qa.getSk().cancel();
+      assert !qa.getSk().isValid() : "Cancelled selection key is valid";
+    }
+    qa.reconnecting();
+    try {
+      if (qa.getChannel() != null) {
+        qa.getChannel().close();
+      } else {
+        getLogger().info("The channel or socket was null for %s", qa);
       }
-      qa.reconnecting();
-      try {
-        if (qa.getChannel() != null) {
-          qa.getChannel().close();
-        } else {
-          getLogger().info("The channel or socket was null for %s", qa);
-        }
-      } catch (IOException e) {
-        getLogger().warn("IOException trying to close a socket", e);
-      }
-      qa.setChannel(null);
+    } catch (IOException e) {
+      getLogger().warn("IOException trying to close a socket", e);
+    }
+    qa.setChannel(null);
 
-      long delay;
-      switch (type) {
-        case IMMEDIATE:
-          delay = 0;
-          break;
-        case DEFAULT:
-        default:
-          delay = (long) Math.min(maxReconnectDelay,
-                  Math.pow(2, qa.getReconnectCount())) * 1000;
-          break;
-      }
-      long reconTime = System.currentTimeMillis() + delay;
+    // Need to do a little queue management.
+    qa.setupResend(cause);
 
-      // Avoid potential condition where two connections are scheduled
-      // for reconnect at the exact same time.  This is expected to be
-      // a rare situation.
-      while (reconnectQueue.containsKey(reconTime)) {
-        reconTime++;
-      }
-
-      reconnectQueue.put(reconTime, qa);
-
-      // Need to do a little queue management.
-      qa.setupResend(cause);
-
-      if (type == ReconnDelay.DEFAULT) {
-        if (failureMode == FailureMode.Redistribute) {
-          redistributeOperations(qa.destroyWriteQueue(true), cause);
-          redistributeOperations(qa.destroyInputQueue(), cause);
-        } else if (failureMode == FailureMode.Cancel) {
-          cancelOperations(qa.destroyWriteQueue(false), cause);
-          cancelOperations(qa.destroyInputQueue(), cause);
-        }
+    if (type == ReconnDelay.DEFAULT) {
+      if (failureMode == FailureMode.Redistribute) {
+        redistributeOperations(qa.destroyWriteQueue(true), cause);
+        redistributeOperations(qa.destroyInputQueue(), cause);
+      } else if (failureMode == FailureMode.Cancel) {
+        cancelOperations(qa.destroyWriteQueue(false), cause);
+        cancelOperations(qa.destroyInputQueue(), cause);
       }
     }
+
+    reconnectQueue.put(qa, type);
   }
 
   private void cancelOperations(Collection<Operation> ops, String cause) {
@@ -969,47 +944,31 @@ public final class MemcachedConnection extends SpyObject {
     }
   }
 
-  private void attemptReconnects() throws IOException {
-    final long now = System.currentTimeMillis();
-    final Map<MemcachedNode, Boolean> seen =
-            new IdentityHashMap<MemcachedNode, Boolean>();
+  private void attemptReconnects() {
     final List<MemcachedNode> rereQueue = new ArrayList<MemcachedNode>();
     SocketChannel ch = null;
-
-    Iterator<MemcachedNode> i = reconnectQueue.headMap(now).values().iterator();
-    while (i.hasNext()) {
-      final MemcachedNode qa = i.next();
-      i.remove();
+    Collection<MemcachedNode> nodes = reconnectQueue.getReconnectNodes();
+    for (MemcachedNode qa : nodes) {
       try {
-        if (qa.getChannel() != null) {
-          getLogger().info("Skipping reconnect request that already reconnected to %s", qa);
-          continue;
-        }
-
-        if (!seen.containsKey(qa)) {
-          seen.put(qa, Boolean.TRUE);
-          getLogger().info("Reconnecting %s", qa);
-          ch = SocketChannel.open();
-          ch.configureBlocking(false);
-          ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
-          ch.socket().setReuseAddress(true);
-          /* The codes above can be replaced by the codes below since java 1.7 */
-          // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
-          // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-          int ops = 0;
-          if (ch.connect(qa.getSocketAddress())) {
-            getLogger().info("Immediately reconnected to %s", qa);
-            connected(qa);
-            addedQueue.offer(qa);
-            assert ch.isConnected();
-          } else {
-            ops = SelectionKey.OP_CONNECT;
-          }
-          qa.registerChannel(ch, ch.register(selector, ops, qa));
-          assert qa.getChannel() == ch : "Channel was lost.";
+        getLogger().info("Reconnecting %s", qa);
+        ch = SocketChannel.open();
+        ch.configureBlocking(false);
+        ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
+        ch.socket().setReuseAddress(true);
+        /* The codes above can be replaced by the codes below since java 1.7 */
+        // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
+        // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        int ops = 0;
+        if (ch.connect(qa.getSocketAddress())) {
+          getLogger().info("Immediately reconnected to %s", qa);
+          connected(qa);
+          addedQueue.offer(qa);
+          assert ch.isConnected();
         } else {
-          getLogger().debug("Skipping duplicate reconnect request for %s", qa);
+          ops = SelectionKey.OP_CONNECT;
         }
+        qa.registerChannel(ch, ch.register(selector, ops, qa));
+        assert qa.getChannel() == ch : "Channel was lost.";
       } catch (SocketException e) {
         getLogger().warn("Error on reconnect", e);
         rereQueue.add(qa);
@@ -1028,6 +987,7 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
     }
+    reconnectQueue.remove(nodes);
     // Requeue any fast-failed connects.
     for (MemcachedNode n : rereQueue) {
       queueReconnect(n, ReconnDelay.DEFAULT, "error on reconnect");
@@ -1343,6 +1303,89 @@ public final class MemcachedConnection extends SpyObject {
 
   public int getAddedQueueSize() {
     return addedQueue.size();
+  }
+
+  public static class ReconnectQueue {
+    // maximum amount of time to wait between reconnect attempts
+    private final long maxReconnectDelay;
+
+    public ReconnectQueue(long maxReconnectDelay) {
+      this.maxReconnectDelay = maxReconnectDelay;
+    }
+
+    private final Map<MemcachedNode, Long/*reconnectTime*/> reconMap =
+        new HashMap<MemcachedNode, Long>();
+    private final NavigableMap<Long/*reconnectTime*/, MemcachedNode> reconSortedMap =
+        new TreeMap<Long, MemcachedNode>();
+
+    private long newReconnectTime(MemcachedNode node, ReconnDelay type) {
+      long newReconTime = System.currentTimeMillis() + newReconnectDelay(node, type);
+      // Avoid potential condition where two connections are scheduled
+      // for reconnect at the exact same time.  This is expected to be
+      // a rare situation.
+      while (reconSortedMap.containsKey(newReconTime)) {
+        newReconTime++;
+      }
+      return newReconTime;
+    }
+
+    private long newReconnectDelay(MemcachedNode node, ReconnDelay type) {
+      return (type == ReconnDelay.IMMEDIATE ? 0 :
+          (long) Math.min(
+              maxReconnectDelay,
+              Math.pow(2, node.getReconnectCount() + 1)) * 1000);
+    }
+
+    public Collection<MemcachedNode> getReconnectNodes() {
+      return reconSortedMap.headMap(System.currentTimeMillis(), true).values();
+    }
+
+    public boolean contains(MemcachedNode node) {
+      return reconMap.containsKey(node);
+    }
+
+    public void replace(MemcachedNode node, ReconnDelay type) {
+      long oldReconTime = reconMap.get(node);
+      long newReconTime = newReconnectTime(node, type);
+      if (newReconTime >= oldReconTime) {
+        return;
+      }
+      reconSortedMap.remove(oldReconTime);
+      put(node, newReconTime);
+    }
+
+    private void put(MemcachedNode node, long newReconTime) {
+      reconMap.put(node, newReconTime);
+      reconSortedMap.put(newReconTime, node);
+    }
+
+    public void put(MemcachedNode node, ReconnDelay type) {
+      put(node, newReconnectTime(node, type));
+    }
+
+    public void remove(MemcachedNode node) {
+      Long reconTime = reconMap.remove(node);
+      if (reconTime != null) {
+        reconSortedMap.remove(reconTime);
+      }
+    }
+
+    public void remove(Collection<MemcachedNode> nodes) {
+      for (MemcachedNode node : nodes) {
+        remove(node);
+      }
+    }
+
+    public boolean isEmpty() {
+      return reconMap.isEmpty();
+    }
+
+    public long getMinDelay() {
+      if (isEmpty()) {
+        return 0;
+      }
+      return Math.max(reconSortedMap.firstKey() - System.currentTimeMillis(), 1);
+    }
   }
 
   /* ENABLE_REPLICATION if */
