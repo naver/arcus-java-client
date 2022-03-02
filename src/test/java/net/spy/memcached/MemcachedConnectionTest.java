@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 import net.spy.memcached.internal.ReconnDelay;
@@ -156,10 +157,10 @@ public class MemcachedConnectionTest extends TestCase {
     SortedMap<Long, MemcachedNode> reconSortedMap =
         (SortedMap<Long, MemcachedNode>) reconSortedMapField.get(reconnectQueue);
 
-    Method newReconnectDelayMethod =
+    Method newReconnectDelayNanosMethod =
         MemcachedConnection.ReconnectQueue.class.getDeclaredMethod(
-            "newReconnectDelay", MemcachedNode.class, ReconnDelay.class);
-    newReconnectDelayMethod.setAccessible(true);
+            "newReconnectDelayNanos", MemcachedNode.class, ReconnDelay.class);
+    newReconnectDelayNanosMethod.setAccessible(true);
 
     // put test
     MemcachedNode node = new MockMemcachedNode(
@@ -167,7 +168,7 @@ public class MemcachedConnectionTest extends TestCase {
     long firstReconnectTime;
     reconnectQueue.put(node, ReconnDelay.DEFAULT);
     firstReconnectTime = reconMap.get(node);
-    Assert.assertTrue(firstReconnectTime > System.currentTimeMillis());
+    Assert.assertTrue(firstReconnectTime > System.nanoTime());
     Assert.assertEquals(reconMap.size(), 1);
     Assert.assertEquals(reconSortedMap.get(firstReconnectTime), node);
     Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
@@ -176,8 +177,9 @@ public class MemcachedConnectionTest extends TestCase {
     Assert.assertTrue(reconnectQueue.contains(node));
     Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(node));
     Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 0);
-    Thread.sleep((Long) newReconnectDelayMethod.invoke(
-        reconnectQueue, node, ReconnDelay.DEFAULT) + 10);
+    Thread.sleep(TimeUnit.NANOSECONDS.toMillis(
+        (Long) newReconnectDelayNanosMethod.invoke(
+            reconnectQueue, node, ReconnDelay.DEFAULT)) + 10);
     Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(node));
     Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
 
@@ -198,7 +200,7 @@ public class MemcachedConnectionTest extends TestCase {
     long anotherReconnectTime;
     reconnectQueue.put(anotherNode, ReconnDelay.DEFAULT);
     anotherReconnectTime = reconMap.get(anotherNode);
-    Assert.assertTrue(anotherReconnectTime > System.currentTimeMillis());
+    Assert.assertTrue(anotherReconnectTime > System.nanoTime());
     Assert.assertEquals(reconMap.size(), 2);
     Assert.assertEquals(reconSortedMap.get(anotherReconnectTime), anotherNode);
     Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
@@ -207,8 +209,9 @@ public class MemcachedConnectionTest extends TestCase {
     Assert.assertTrue(reconnectQueue.contains(anotherNode));
     Assert.assertFalse(reconnectQueue.getReconnectNodes().contains(anotherNode));
     Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 1);
-    Thread.sleep((Long) newReconnectDelayMethod.invoke(
-        reconnectQueue, anotherNode, ReconnDelay.DEFAULT) + 10);
+    Thread.sleep(TimeUnit.NANOSECONDS.toMillis(
+        (Long) newReconnectDelayNanosMethod.invoke(
+            reconnectQueue, node, ReconnDelay.DEFAULT)) + 10);
     Assert.assertTrue(reconnectQueue.getReconnectNodes().contains(anotherNode));
     Assert.assertEquals(reconnectQueue.getReconnectNodes().size(), 2);
 
