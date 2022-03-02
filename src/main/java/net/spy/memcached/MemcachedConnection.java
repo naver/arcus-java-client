@@ -47,6 +47,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -98,9 +99,11 @@ public final class MemcachedConnection extends SpyObject {
   private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
 
   /* ENABLE_REPLICATION if */
+  private static final long DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS = 50;
   private boolean arcusReplEnabled;
   private Map<String, InetSocketAddress> prevAddrMap = null;
-  private final DelayedSwitchoverGroups delayedSwitchoverGroups = new DelayedSwitchoverGroups();
+  private final DelayedSwitchoverGroups delayedSwitchoverGroups =
+      new DelayedSwitchoverGroups(DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS);
   /* ENABLE_REPLICATION end */
 
   /**
@@ -211,11 +214,11 @@ public final class MemcachedConnection extends SpyObject {
     if (!nodesChangeQueue.isEmpty()) {
       delay = 1;
     } else if (!reconnectQueue.isEmpty()) {
-      delay = reconnectQueue.getMinDelay();
+      delay = reconnectQueue.getMinDelayMillis();
     }
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled && !delayedSwitchoverGroups.isEmpty()) {
-      long minSwitchoverDelay = delayedSwitchoverGroups.getMinDelay();
+      long minSwitchoverDelay = delayedSwitchoverGroups.getMinDelayMillis();
       delay = (delay > 0) ? Math.min(minSwitchoverDelay, delay) : minSwitchoverDelay;
     }
     /* ENABLE_REPLICATION end */
@@ -1307,19 +1310,19 @@ public final class MemcachedConnection extends SpyObject {
 
   public static class ReconnectQueue {
     // maximum amount of time to wait between reconnect attempts
-    private final long maxReconnectDelay;
+    private final long maxReconnectDelaySeconds;
 
-    public ReconnectQueue(long maxReconnectDelay) {
-      this.maxReconnectDelay = maxReconnectDelay;
+    public ReconnectQueue(long maxReconnectDelaySeconds) {
+      this.maxReconnectDelaySeconds = maxReconnectDelaySeconds;
     }
 
-    private final Map<MemcachedNode, Long/*reconnectTime*/> reconMap =
+    private final Map<MemcachedNode, Long/*reconnect nano time*/> reconMap =
         new HashMap<MemcachedNode, Long>();
-    private final NavigableMap<Long/*reconnectTime*/, MemcachedNode> reconSortedMap =
+    private final NavigableMap<Long/*reconnect nano time*/, MemcachedNode> reconSortedMap =
         new TreeMap<Long, MemcachedNode>();
 
-    private long newReconnectTime(MemcachedNode node, ReconnDelay type) {
-      long newReconTime = System.currentTimeMillis() + newReconnectDelay(node, type);
+    private long newReconnectNanoTime(MemcachedNode node, ReconnDelay type) {
+      long newReconTime = System.nanoTime() + newReconnectDelayNanos(node, type);
       // Avoid potential condition where two connections are scheduled
       // for reconnect at the exact same time.  This is expected to be
       // a rare situation.
@@ -1329,15 +1332,15 @@ public final class MemcachedConnection extends SpyObject {
       return newReconTime;
     }
 
-    private long newReconnectDelay(MemcachedNode node, ReconnDelay type) {
-      return (type == ReconnDelay.IMMEDIATE ? 0 :
-          (long) Math.min(
-              maxReconnectDelay,
-              Math.pow(2, node.getReconnectCount() + 1)) * 1000);
+    private long newReconnectDelayNanos(MemcachedNode node, ReconnDelay type) {
+      return type == ReconnDelay.IMMEDIATE ? 0 :
+          TimeUnit.SECONDS.toNanos(
+              (long) Math.min(maxReconnectDelaySeconds,
+                              Math.pow(2, node.getReconnectCount() + 1)));
     }
 
     public Collection<MemcachedNode> getReconnectNodes() {
-      return reconSortedMap.headMap(System.currentTimeMillis(), true).values();
+      return reconSortedMap.headMap(System.nanoTime(), true).values();
     }
 
     public boolean contains(MemcachedNode node) {
@@ -1346,7 +1349,7 @@ public final class MemcachedConnection extends SpyObject {
 
     public void replace(MemcachedNode node, ReconnDelay type) {
       long oldReconTime = reconMap.get(node);
-      long newReconTime = newReconnectTime(node, type);
+      long newReconTime = newReconnectNanoTime(node, type);
       if (newReconTime >= oldReconTime) {
         return;
       }
@@ -1360,7 +1363,7 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     public void put(MemcachedNode node, ReconnDelay type) {
-      put(node, newReconnectTime(node, type));
+      put(node, newReconnectNanoTime(node, type));
     }
 
     public void remove(MemcachedNode node) {
@@ -1380,11 +1383,15 @@ public final class MemcachedConnection extends SpyObject {
       return reconMap.isEmpty();
     }
 
-    public long getMinDelay() {
+    public long getMinDelayMillis() {
       if (isEmpty()) {
         return 0;
       }
-      return Math.max(reconSortedMap.firstKey() - System.currentTimeMillis(), 1);
+      return Math.max(
+          TimeUnit.MILLISECONDS.convert(
+              reconSortedMap.firstKey() - System.nanoTime(),
+              TimeUnit.NANOSECONDS),
+          1);
     }
   }
 
@@ -1428,15 +1435,20 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private class DelayedSwitchoverGroups {
-    private static final long DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS = 50;
-    private final SortedMap<Long, MemcachedReplicaGroup> groups =
+    private final long delayedSwitchoverTimeoutNanos;
+    private final SortedMap<Long/*switchover nano time*/, MemcachedReplicaGroup> groups =
         new TreeMap<Long, MemcachedReplicaGroup>();
+
+    public DelayedSwitchoverGroups(long delayedSwitchoverTimeoutMillis) {
+      this.delayedSwitchoverTimeoutNanos = TimeUnit.NANOSECONDS.convert(
+          delayedSwitchoverTimeoutMillis, TimeUnit.MILLISECONDS);
+    }
 
     public void put(MemcachedReplicaGroup group) {
       if (group.isDelayedSwitchover()) {
         return;
       }
-      long delay = System.currentTimeMillis() + DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS;
+      long delay = System.nanoTime() + delayedSwitchoverTimeoutNanos;
       while (groups.containsKey(delay)) {
         delay++;
       }
@@ -1462,15 +1474,19 @@ public final class MemcachedConnection extends SpyObject {
       return groups.isEmpty();
     }
 
-    public long getMinDelay() {
+    public long getMinDelayMillis() {
       if (groups.isEmpty()) {
         return 0;
       }
-      return Math.max(groups.firstKey() - System.currentTimeMillis(), 1);
+      return Math.max(
+          TimeUnit.MILLISECONDS.convert(
+              groups.firstKey() - System.nanoTime(),
+              TimeUnit.NANOSECONDS),
+          1);
     }
 
     public void switchover() {
-      long now = System.currentTimeMillis();
+      long now = System.nanoTime();
       Iterator<Entry<Long, MemcachedReplicaGroup>> iterator = groups.entrySet().iterator();
       while (iterator.hasNext()) {
         Entry<Long, MemcachedReplicaGroup> entry = iterator.next();
