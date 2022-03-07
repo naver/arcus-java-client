@@ -121,7 +121,7 @@ public class MockMemcachedNode implements MemcachedNode {
 
   @Override
   public String getNodeName() {
-    return null;
+    return socketAddress.toString();
   }
 
   public ByteBuffer getRbuf() {

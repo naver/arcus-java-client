@@ -59,7 +59,7 @@ public final class TimedOutMessageFactory {
         rv.append(", ");
       }
       MemcachedNode node = op == null ? null : op.getHandlingNode();
-      rv.append(node == null ? "<unknown>" : node.getSocketAddress());
+      rv.append(node == null ? "<unknown>" : node.getNodeName());
       if (op != null) {
         rv.append(" [").append(op.getState()).append("]");
       }
