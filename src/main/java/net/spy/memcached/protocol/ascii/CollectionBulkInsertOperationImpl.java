@@ -180,7 +180,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
 
   @Override
   public boolean isPipeOperation() {
-    return false;
+    return true;
   }
 
   @Override

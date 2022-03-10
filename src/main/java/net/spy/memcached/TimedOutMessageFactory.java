@@ -20,7 +20,8 @@ public final class TimedOutMessageFactory {
     Operation firstOp = ops.iterator().next();
     if (isBulkOperation(firstOp, ops)) {
       rv.append("bulk ");
-    } else if (firstOp.isPipeOperation()) {
+    }
+    if (firstOp.isPipeOperation()) {
       rv.append("pipe ");
     }
     rv.append(firstOp.getAPIType())
