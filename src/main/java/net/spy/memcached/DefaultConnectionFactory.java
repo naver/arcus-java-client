@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +112,11 @@ public class DefaultConnectionFactory extends SpyObject
    * Maximum timeout ratio for shutdown connection
    */
   public static final int DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD = 0;
+
+  /**
+   * Maximum timeout duration in milliseconds for shutdown connection
+   */
+  public static final int DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD = 0;
 
   /**
    * Maximum number of Front cache elements
@@ -332,6 +338,10 @@ public class DefaultConnectionFactory extends SpyObject
 
   public int getTimeoutRatioThreshold() {
     return DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
+  }
+
+  public int getTimeoutDurationThreshold() {
+    return DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD;
   }
 
   public int getMaxFrontCacheElements() {

@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Corp.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +72,7 @@ public class ConnectionFactoryBuilder {
   //     DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
   private int timeoutExceptionThreshold = 10;
   private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
+  private int timeoutDurationThreshold = 1000;
 
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
@@ -308,6 +310,17 @@ public class ConnectionFactoryBuilder {
     } else {
       timeoutRatioThreshold = to;
     }
+    return this;
+  }
+
+  /**
+   * Set the maximum timeout duration threshold
+   */
+  public ConnectionFactoryBuilder setTimeoutDurationThreshold(int to) {
+    assert (to == 0 || to >= 1000 && to <= 5000) :
+        "Timeout duration threshold must be 0 or 1000~5000 range.";
+    timeoutDurationThreshold = to == 0 ? 0 : // 0 is disable
+        Math.max(Math.min(to, 5000), 1000);
     return this;
   }
 
@@ -579,6 +592,11 @@ public class ConnectionFactoryBuilder {
       @Override
       public int getTimeoutRatioThreshold() {
         return timeoutRatioThreshold;
+      }
+
+      @Override
+      public int getTimeoutDurationThreshold() {
+        return timeoutDurationThreshold;
       }
 
       @Override
