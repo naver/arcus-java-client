@@ -205,6 +205,11 @@ public abstract class ClientBaseCase extends TestCase {
         }
 
         @Override
+        public int getTimeoutDurationThreshold() {
+          return inner.getTimeoutDurationThreshold();
+        }
+
+        @Override
         public int getMaxFrontCacheElements() {
           return inner.getMaxFrontCacheElements();
         }
