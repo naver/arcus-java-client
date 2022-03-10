@@ -76,6 +76,7 @@ public final class MemcachedConnection extends SpyObject {
 
   private final int timeoutExceptionThreshold;
   private final int timeoutRatioThreshold;
+  private final int timeoutDurationThreshold;
 
   private final String connName;
   private Selector selector = null;
@@ -131,6 +132,7 @@ public final class MemcachedConnection extends SpyObject {
     opFactory = opfactory;
     timeoutExceptionThreshold = f.getTimeoutExceptionThreshold();
     timeoutRatioThreshold = f.getTimeoutRatioThreshold();
+    timeoutDurationThreshold = f.getTimeoutDurationThreshold();
     selector = Selector.open();
     List<MemcachedNode> connections = new ArrayList<MemcachedNode>(a.size());
     for (SocketAddress sa : a) {
@@ -256,9 +258,12 @@ public final class MemcachedConnection extends SpyObject {
     // see if any connections blew up with large number of timeouts
     for (SelectionKey sk : selector.keys()) {
       MemcachedNode mn = (MemcachedNode) sk.attachment();
-      if (mn.getContinuousTimeout() > timeoutExceptionThreshold) {
-        getLogger().warn("%s exceeded continuous timeout threshold. >%s (%s)",
-                mn.getSocketAddress().toString(), timeoutExceptionThreshold, mn.getStatus());
+      if (mn.getContinuousTimeout() > timeoutExceptionThreshold &&
+          (timeoutDurationThreshold == 0 || mn.getTimeoutDuration() > timeoutDurationThreshold)) {
+        getLogger().warn(
+            "%s exceeded continuous timeout threshold. >%s(count), >%s(duration) (%s)",
+            mn.getSocketAddress().toString(),
+            timeoutExceptionThreshold, timeoutDurationThreshold, mn.getStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
       } else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold) {
         getLogger().warn("%s exceeded timeout ratio threshold. >%s (%s)",

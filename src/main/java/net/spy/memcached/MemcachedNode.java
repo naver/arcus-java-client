@@ -271,6 +271,8 @@ public interface MemcachedNode {
 
   int getTimeoutRatioNow();
 
+  long getTimeoutDuration();
+
   /**
    * Shutdown the node
    */

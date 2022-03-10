@@ -31,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -75,6 +76,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   // operation Future.get timeout counter
   private final AtomicInteger continuousTimeout = new AtomicInteger(0);
+  private final AtomicLong timeoutStartNanos = new AtomicLong(0);
   private boolean toRatioEnabled = false;
   private int[] toCountArray;
   private final static int MAX_TOCOUNT = 100;   /* to count array size */
@@ -434,6 +436,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     reconnectAttempt++;
     isFirstConnecting = false;
     continuousTimeout.set(0);
+    timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
   }
 
@@ -441,6 +444,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     reconnectAttempt = 0;
     isFirstConnecting = false;
     continuousTimeout.set(0);
+    timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
   }
 
@@ -564,8 +568,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       addTimeoutRatioCount(timedOut);
     }
     if (timedOut && isActive()) {
+      if (timeoutStartNanos.get() == 0) {
+        timeoutStartNanos.set(System.nanoTime());
+      }
       continuousTimeout.incrementAndGet();
     } else {
+      timeoutStartNanos.set(0);
       continuousTimeout.set(0);
     }
   }
@@ -588,6 +596,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       toRatioLock.unlock();
     }
     return ratio;
+  }
+
+  public long getTimeoutDuration() {
+    long tn = timeoutStartNanos.get();
+    if (tn == 0) {
+      return 0;
+    }
+    return TimeUnit.MILLISECONDS.convert(
+        System.nanoTime() - tn,
+        TimeUnit.NANOSECONDS);
   }
 
   public final void fixupOps() {
@@ -658,6 +676,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     sb.append(" #Wops=").append(getWriteQueueSize());
     sb.append(" #Rops=").append(getReadQueueSize());
     sb.append(" #CT=").append(getContinuousTimeout());
+    sb.append(" #TD=").append(getTimeoutDuration());
     sb.append(" #TR=").append(getTimeoutRatioNow());
     return sb.toString();
   }

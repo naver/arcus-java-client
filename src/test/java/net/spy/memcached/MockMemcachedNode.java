@@ -241,6 +241,11 @@ public class MockMemcachedNode implements MemcachedNode {
     return -1; // disabled
   }
 
+  @Override
+  public long getTimeoutDuration() {
+    return 0;
+  }
+
   public void shutdown() throws IOException {
     // noop
   }
