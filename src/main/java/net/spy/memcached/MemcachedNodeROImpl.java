@@ -227,7 +227,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
 
   @Override
   public long getTimeoutDuration() {
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   public void shutdown() throws IOException {
