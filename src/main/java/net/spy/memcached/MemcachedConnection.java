@@ -102,7 +102,6 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_REPLICATION if */
   private static final long DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS = 50;
   private boolean arcusReplEnabled;
-  private Map<String, InetSocketAddress> prevAddrMap = null;
   private final DelayedSwitchoverGroups delayedSwitchoverGroups =
       new DelayedSwitchoverGroups(DELAYED_SWITCHOVER_TIMEOUT_MILLISECONDS);
   /* ENABLE_REPLICATION end */
@@ -326,6 +325,15 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
+  private Map<String, InetSocketAddress> makeAddressMap(Collection<MemcachedNode> nodes) {
+    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
+    for (MemcachedNode node : nodes) {
+      InetSocketAddress isa = (InetSocketAddress) node.getSocketAddress();
+      addrMap.put(isa.toString(), isa);
+    }
+    return addrMap;
+  }
+
   private Map<String, InetSocketAddress> makeAddressMap(List<InetSocketAddress> addresses) {
     Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
     for (InetSocketAddress addr : addresses) {
@@ -336,25 +344,18 @@ public final class MemcachedConnection extends SpyObject {
 
   private Set<String> findChangedGroups(List<InetSocketAddress> addrs) {
     Set<String> changedGroupSet = new HashSet<String>();
+    Map<String, InetSocketAddress> curAddrMap = makeAddressMap(locator.getAll());
     Map<String, InetSocketAddress> newAddrMap = makeAddressMap(addrs);
-    if (prevAddrMap == null) {
-      for (InetSocketAddress address : newAddrMap.values()) {
-        ArcusReplNodeAddress a = (ArcusReplNodeAddress) address;
-        changedGroupSet.add(a.getGroupName());
-      }
-    } else {
-      for (String newAddrString : newAddrMap.keySet()) {
-        if (prevAddrMap.remove(newAddrString) == null) {
-          ArcusReplNodeAddress a = (ArcusReplNodeAddress) newAddrMap.get(newAddrString);
-          changedGroupSet.add(a.getGroupName());
-        }
-      }
-      for (String prevAddrString : prevAddrMap.keySet()) {
-        ArcusReplNodeAddress a = (ArcusReplNodeAddress) prevAddrMap.get(prevAddrString);
+    for (String newAddr : newAddrMap.keySet()) {
+      if (curAddrMap.remove(newAddr) == null) { /* added node */
+        ArcusReplNodeAddress a = (ArcusReplNodeAddress) newAddrMap.get(newAddr);
         changedGroupSet.add(a.getGroupName());
       }
     }
-    prevAddrMap = newAddrMap;
+    for (String curAddr : curAddrMap.keySet()) { /* removed node */
+      ArcusReplNodeAddress a = (ArcusReplNodeAddress) curAddrMap.get(curAddr);
+      changedGroupSet.add(a.getGroupName());
+    }
     return changedGroupSet;
   }
 
