@@ -54,9 +54,9 @@ import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
-import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 
 /**
@@ -955,11 +955,12 @@ public final class MemcachedConnection extends SpyObject {
 
   private void attemptReconnects() {
     final List<MemcachedNode> rereQueue = new ArrayList<MemcachedNode>();
+    final long nanoTime = System.nanoTime();
     SocketChannel ch = null;
-    Collection<MemcachedNode> nodes = reconnectQueue.getReconnectNodes();
-    for (MemcachedNode qa : nodes) {
+    MemcachedNode node = reconnectQueue.popReady(nanoTime);
+    while (node != null) {
       try {
-        getLogger().info("Reconnecting %s", qa);
+        getLogger().info("Reconnecting %s", node);
         ch = SocketChannel.open();
         ch.configureBlocking(false);
         ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
@@ -968,21 +969,21 @@ public final class MemcachedConnection extends SpyObject {
         // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
         // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
         int ops = 0;
-        if (ch.connect(qa.getSocketAddress())) {
-          getLogger().info("Immediately reconnected to %s", qa);
-          connected(qa);
-          addedQueue.offer(qa);
+        if (ch.connect(node.getSocketAddress())) {
+          getLogger().info("Immediately reconnected to %s", node);
+          connected(node);
+          addedQueue.offer(node);
           assert ch.isConnected();
         } else {
           ops = SelectionKey.OP_CONNECT;
         }
-        qa.registerChannel(ch, ch.register(selector, ops, qa));
-        assert qa.getChannel() == ch : "Channel was lost.";
+        node.registerChannel(ch, ch.register(selector, ops, node));
+        assert node.getChannel() == ch : "Channel was lost.";
       } catch (SocketException e) {
         getLogger().warn("Error on reconnect", e);
-        rereQueue.add(qa);
+        rereQueue.add(node);
       } catch (Exception e) {
-        getLogger().error("Exception on reconnect, lost node %s", qa, e);
+        getLogger().error("Exception on reconnect, lost node %s", node, e);
       } finally {
         //it's possible that above code will leak file descriptors under abnormal
         //conditions (when ch.open() fails and throws IOException.
@@ -991,12 +992,12 @@ public final class MemcachedConnection extends SpyObject {
           try {
             ch.close();
           } catch (IOException x) {
-            getLogger().error("Exception closing channel: %s", qa, x);
+            getLogger().error("Exception closing channel: %s", node, x);
           }
         }
       }
+      node = reconnectQueue.popReady(nanoTime);
     }
-    reconnectQueue.remove(nodes);
     // Requeue any fast-failed connects.
     for (MemcachedNode n : rereQueue) {
       queueReconnect(n, ReconnDelay.DEFAULT, "error on reconnect");
@@ -1345,10 +1346,6 @@ public final class MemcachedConnection extends SpyObject {
                               Math.pow(2, node.getReconnectCount() + 1)));
     }
 
-    public Collection<MemcachedNode> getReconnectNodes() {
-      return reconSortedMap.headMap(System.nanoTime(), true).values();
-    }
-
     public boolean contains(MemcachedNode node) {
       return reconMap.containsKey(node);
     }
@@ -1379,10 +1376,13 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
 
-    public void remove(Collection<MemcachedNode> nodes) {
-      for (MemcachedNode node : nodes) {
-        remove(node);
+    public MemcachedNode popReady(long nanoTime) {
+      Entry<Long, MemcachedNode> entry = reconSortedMap.firstEntry();
+      if (entry == null || nanoTime < entry.getKey()) {
+        return null;
       }
+      remove(entry.getValue());
+      return entry.getValue();
     }
 
     public boolean isEmpty() {
