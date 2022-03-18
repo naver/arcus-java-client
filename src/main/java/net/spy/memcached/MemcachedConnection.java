@@ -925,7 +925,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
 
-    reconnectQueue.put(qa, type);
+    reconnectQueue.add(qa, type);
   }
 
   private void cancelOperations(Collection<Operation> ops, String cause) {
@@ -1329,7 +1329,12 @@ public final class MemcachedConnection extends SpyObject {
         new TreeMap<Long, MemcachedNode>();
 
     private long newReconnectNanoTime(MemcachedNode node, ReconnDelay type) {
-      long newReconTime = System.nanoTime() + newReconnectDelayNanos(node, type);
+      long newReconTime = System.nanoTime();
+      if (type == ReconnDelay.DEFAULT) {
+        newReconTime += TimeUnit.SECONDS.toNanos(
+            (long) Math.min(maxReconnectDelaySeconds,
+                Math.pow(2, node.getReconnectCount() + 1)));
+      }
       // Avoid potential condition where two connections are scheduled
       // for reconnect at the exact same time.  This is expected to be
       // a rare situation.
@@ -1339,13 +1344,6 @@ public final class MemcachedConnection extends SpyObject {
       return newReconTime;
     }
 
-    private long newReconnectDelayNanos(MemcachedNode node, ReconnDelay type) {
-      return type == ReconnDelay.IMMEDIATE ? 0 :
-          TimeUnit.SECONDS.toNanos(
-              (long) Math.min(maxReconnectDelaySeconds,
-                              Math.pow(2, node.getReconnectCount() + 1)));
-    }
-
     public boolean contains(MemcachedNode node) {
       return reconMap.containsKey(node);
     }
@@ -1353,20 +1351,17 @@ public final class MemcachedConnection extends SpyObject {
     public void replace(MemcachedNode node, ReconnDelay type) {
       long oldReconTime = reconMap.get(node);
       long newReconTime = newReconnectNanoTime(node, type);
-      if (newReconTime >= oldReconTime) {
-        return;
+      if (newReconTime < oldReconTime) {
+        reconSortedMap.remove(oldReconTime);
+        reconMap.put(node, newReconTime);
+        reconSortedMap.put(newReconTime, node);
       }
-      reconSortedMap.remove(oldReconTime);
-      put(node, newReconTime);
     }
 
-    private void put(MemcachedNode node, long newReconTime) {
-      reconMap.put(node, newReconTime);
-      reconSortedMap.put(newReconTime, node);
-    }
-
-    public void put(MemcachedNode node, ReconnDelay type) {
-      put(node, newReconnectNanoTime(node, type));
+    public void add(MemcachedNode node, ReconnDelay type) {
+      Long reconTime = newReconnectNanoTime(node, type);
+      reconMap.put(node, reconTime);
+      reconSortedMap.put(reconTime, node);
     }
 
     public void remove(MemcachedNode node) {
