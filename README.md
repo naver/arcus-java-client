@@ -1,4 +1,4 @@
-## arcus-java-client: Arcus Java Client [![Build Status](https://travis-ci.org/naver/arcus-java-client.svg?branch=develop)](https://travis-ci.org/naver/arcus-java-client)
+## arcus-java-client: Arcus Java Client [![CI][ciBadge]][ciLink] [![License][liBadge]][liLink]
 
 This is a fork of [spymemcached][spymemcached] with the following modifications
 to support Arcus memcached cloud.
@@ -158,3 +158,8 @@ Refer to PATENTS file in this directory to get the patent information.
 Under the Apache License 2.0, a perpetual, worldwide, non-exclusive,
 no-charge, royalty-free, irrevocable patent license is granted to any user for any usage.
 You can see the specifics on the grant of patent license in LICENSE file in this directory.
+
+[ciBadge]: https://github.com/naver/arcus-java-client/actions/workflows/ci.yml/badge.svg
+[ciLink]: https://github.com/naver/arcus-java-client/actions/workflows/ci.yml
+[liBadge]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
+[liLink]: https://github.com/naver/arcus-java-client/blob/master/LICENSE
