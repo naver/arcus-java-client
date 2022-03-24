@@ -1,4 +1,4 @@
-name: ARCUS Client Test
+name: CI
 
 on:
   push:
