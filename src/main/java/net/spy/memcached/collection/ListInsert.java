@@ -20,13 +20,8 @@ public class ListInsert<T> extends CollectionInsert<T> {
 
   private static final String command = "lop insert";
 
-  public ListInsert() {
-    super();
-  }
-
-  public ListInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode,
-                    CollectionAttributes attr) {
-    super(value, null, createKeyIfNotExists, requestMode, attr);
+  public ListInsert(T value, RequestMode requestMode, CollectionAttributes attr) {
+    super(CollectionType.list, value, null, requestMode, attr);
   }
 
   public String getCommand() {

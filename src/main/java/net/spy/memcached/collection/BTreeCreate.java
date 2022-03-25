@@ -20,13 +20,9 @@ public class BTreeCreate extends CollectionCreate {
 
   private static final String command = "bop create";
 
-  public BTreeCreate() {
-    super();
-  }
-
   public BTreeCreate(int flags, Integer expTime, Long maxCount,
                      CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
-    super(flags, expTime, maxCount, overflowAction, readable, noreply);
+    super(CollectionType.btree, flags, expTime, maxCount, overflowAction, readable, noreply);
   }
 
   public String getCommand() {

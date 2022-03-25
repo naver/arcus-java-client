@@ -20,44 +20,20 @@ import net.spy.memcached.util.BTreeUtil;
 
 public abstract class CollectionInsert<T> {
 
-  protected boolean createKeyIfNotExists = false;
   protected int flags = 0;
   protected T value;
   protected RequestMode requestMode;
-
   protected CollectionAttributes attribute;
-
   protected byte[] elementFlag;
-
   protected String str;
 
   public CollectionInsert() {
   }
 
-  public CollectionInsert(T value, byte[] elementFlag, boolean createKeyIfNotExists,
+  public CollectionInsert(CollectionType type, T value, byte[] elementFlag,
                           RequestMode requestMode, CollectionAttributes attr) {
-    if (attr != null) {
-      CollectionOverflowAction overflowAction = attr.getOverflowAction();
-      if (overflowAction != null) {
-        if ((this instanceof SetInsert) &&
-                !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
-        } else if ((this instanceof MapInsert) &&
-                !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
-        } else if ((this instanceof ListInsert) &&
-                !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-        } else if (((this instanceof BTreeInsert) || (this instanceof BTreeUpsert)
-            || (this instanceof BTreeInsertAndGet))
-            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is available overflow action in " + CollectionType.btree + ".");
-        }
-      }
+    if (attr != null) { /* item creation option */
+      CollectionCreate.checkOverflowAction(type, attr.getOverflowAction());
     }
     if (elementFlag != null) {
       if (elementFlag.length < 1 || elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
@@ -68,7 +44,6 @@ public abstract class CollectionInsert<T> {
 
     this.value = value;
     this.elementFlag = elementFlag;
-    this.createKeyIfNotExists = createKeyIfNotExists;
     this.requestMode = requestMode;
     this.attribute = attr;
   }
@@ -80,27 +55,8 @@ public abstract class CollectionInsert<T> {
 
     StringBuilder b = new StringBuilder();
 
-    if (createKeyIfNotExists) {
-      b.append("create ").append(flags);
-      if (attribute != null) {
-        b.append(" ")
-                .append((attribute.getExpireTime() == null) ?
-                    CollectionAttributes.DEFAULT_EXPIRETIME : attribute.getExpireTime());
-        b.append(" ")
-                .append((attribute.getMaxCount() == null) ?
-                    CollectionAttributes.DEFAULT_MAXCOUNT : attribute.getMaxCount());
-
-        if (null != attribute.getOverflowAction()) {
-          b.append(" ").append(attribute.getOverflowAction());
-        }
-
-        if (null != attribute.getReadable() && !attribute.getReadable()) {
-          b.append(" ").append("unreadable");
-        }
-      } else {
-        b.append(" ").append(CollectionAttributes.DEFAULT_EXPIRETIME);
-        b.append(" ").append(CollectionAttributes.DEFAULT_MAXCOUNT);
-      }
+    if (attribute != null) {
+      b.append(CollectionCreate.makeCreateClause(attribute, flags));
     }
 
     // an optional request mode like noreply, pipe and getrim
@@ -121,14 +77,6 @@ public abstract class CollectionInsert<T> {
       return "";
     }
     return BTreeUtil.toHex(elementFlag);
-  }
-
-  public boolean iscreateKeyIfNotExists() {
-    return createKeyIfNotExists;
-  }
-
-  public void setcreateKeyIfNotExists(boolean createKeyIfNotExists) {
-    this.createKeyIfNotExists = createKeyIfNotExists;
   }
 
   public int getFlags() {

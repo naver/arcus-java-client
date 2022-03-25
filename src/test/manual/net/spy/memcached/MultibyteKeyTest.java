@@ -360,8 +360,7 @@ public class MultibyteKeyTest {
     }
     CollectionPipedInsert<Integer> insert =
         new CollectionPipedInsert.ByteArraysBTreePipedInsert<Integer>(
-            MULTIBYTE_KEY, elements, false, new CollectionAttributes(),
-            new IntegerTranscoder());
+            MULTIBYTE_KEY, elements, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -373,8 +372,7 @@ public class MultibyteKeyTest {
       elementsMap.put(Long.valueOf(i), new Random().nextInt());
     }
     insert = new CollectionPipedInsert.BTreePipedInsert<Integer>(
-            MULTIBYTE_KEY, elementsMap, false, new CollectionAttributes(),
-            new IntegerTranscoder());
+            MULTIBYTE_KEY, elementsMap, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -386,7 +384,7 @@ public class MultibyteKeyTest {
       elementsList.add(new Random().nextInt());
     }
     insert = new CollectionPipedInsert.ListPipedInsert<Integer>(
-            MULTIBYTE_KEY, 0, elementsList, false, new CollectionAttributes(),
+            MULTIBYTE_KEY, 0, elementsList, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
@@ -399,7 +397,7 @@ public class MultibyteKeyTest {
       elementsSet.add(new Random().nextInt());
     }
     insert = new CollectionPipedInsert.SetPipedInsert<Integer>(
-            MULTIBYTE_KEY, elementsSet, false, new CollectionAttributes(), new IntegerTranscoder());
+            MULTIBYTE_KEY, elementsSet, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {

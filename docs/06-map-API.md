@@ -399,8 +399,6 @@ elements.put("mkey1", "value1");
 elements.put("mkey2", "value2");
 elements.put("mkey3", "value3");
 
-boolean createKeyIfNotExists = true;
-
 if (elements.size() > mc.getMaxPipedItemCount()) { // (1)
     System.out.println("insert 할 아이템 개수는 mc.getMaxPipedItemCount개를 초과할 수 없다.");
     return;

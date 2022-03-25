@@ -57,16 +57,14 @@ public class BTreeInsertAndGet<T> extends BTreeInsert<T> {
 
   public BTreeInsertAndGet(Command cmd, long bkey, byte[] eFlag, T value,
                            CollectionAttributes attributesForCreate) {
-    super(value, eFlag, attributesForCreate != null, RequestMode.GET_TRIM,
-            attributesForCreate);
+    super(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     this.cmd = cmd;
     this.bkeyObject = new BKeyObject(bkey);
   }
 
   public BTreeInsertAndGet(Command cmd, byte[] bkey, byte[] eFlag, T value,
                            CollectionAttributes attributesForCreate) {
-    super(value, eFlag, attributesForCreate != null, RequestMode.GET_TRIM,
-            attributesForCreate);
+    super(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     this.cmd = cmd;
     this.bkeyObject = new BKeyObject(bkey);
   }
