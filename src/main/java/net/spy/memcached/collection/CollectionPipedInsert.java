@@ -34,7 +34,6 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public static final int MAX_PIPED_ITEM_COUNT = 500;
 
   protected String key;
-  protected boolean createKeyIfNotExists;
   protected Transcoder<T> tc;
   protected int itemCount;
 
@@ -68,20 +67,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     private int index;
 
     public ListPipedInsert(String key, int index, Collection<T> list,
-                           boolean createKeyIfNotExists, CollectionAttributes attr,
-                           Transcoder<T> tc) {
-      if (createKeyIfNotExists) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-                !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-        }
+                           CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
       this.key = key;
       this.index = index;
       this.list = list;
-      this.createKeyIfNotExists = createKeyIfNotExists;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = list.size();
@@ -110,26 +102,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int eSize = encodedList.size();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (int i = this.nextOpIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, index, each.length,
-            (createKeyIfNotExists) ?
-                "create" : "",
-            (createKeyIfNotExists) ?
-                cd.getFlags() : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getExpireTime() != null) ?
-                    attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getMaxCount() != null) ?
-                    attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getOverflowAction() != null) ?
-                    attribute.getOverflowAction() : "" : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ?
-                    "unreadable" : "" : "",
-            (i < eSize - 1) ? PIPE : "");
+                     createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(each);
         bb.put(CRLF);
       }
@@ -153,19 +131,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     private static final String COMMAND = "sop insert";
     private Collection<T> set;
 
-    public SetPipedInsert(String key, Collection<T> set, boolean createKeyIfNotExists,
+    public SetPipedInsert(String key, Collection<T> set,
                           CollectionAttributes attr, Transcoder<T> tc) {
-      if (createKeyIfNotExists) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-                !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
-        }
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
       this.key = key;
       this.set = set;
-      this.createKeyIfNotExists = createKeyIfNotExists;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = set.size();
@@ -194,27 +166,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int eSize = encodedList.size();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (int i = this.nextOpIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
-
         setArguments(bb, COMMAND, key, each.length,
-            (createKeyIfNotExists) ?
-                "create" : "",
-            (createKeyIfNotExists) ?
-                cd.getFlags() : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getExpireTime() != null) ?
-                    attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getMaxCount() != null) ?
-                    attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getOverflowAction() != null) ?
-                    attribute.getOverflowAction() : "" : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ?
-                    "unreadable" : "" : "",
-            (i < eSize - 1) ? PIPE : "");
+                     createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(each);
         bb.put(CRLF);
       }
@@ -237,19 +194,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     private static final String COMMAND = "bop insert";
     private Map<Long, T> map;
 
-    public BTreePipedInsert(String key, Map<Long, T> map, boolean createKeyIfNotExists,
+    public BTreePipedInsert(String key, Map<Long, T> map,
                             CollectionAttributes attr, Transcoder<T> tc) {
-      if (createKeyIfNotExists) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-                !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
-        }
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
       this.key = key;
       this.map = map;
-      this.createKeyIfNotExists = createKeyIfNotExists;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = map.size();
@@ -281,28 +232,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       // create ascii operation string
       int keySize = map.keySet().size();
       List<Long> keyList = new ArrayList<Long>(map.keySet());
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < keySize; i++) {
         Long bkey = keyList.get(i);
         byte[] value = decodedList.get(i);
-
         setArguments(bb, COMMAND, key, bkey, value.length,
-            (createKeyIfNotExists) ?
-                "create" : "",
-            (createKeyIfNotExists) ?
-                cd.getFlags() : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getExpireTime() != null) ?
-                    attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getMaxCount() != null) ?
-                    attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getOverflowAction() != null) ?
-                    attribute.getOverflowAction() : "" : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ?
-                    "unreadable" : "" : "",
-            (i < keySize - 1) ? PIPE : "");
+                     createOption, (i < keySize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -328,19 +264,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     private List<Element<T>> elements;
 
     public ByteArraysBTreePipedInsert(String key, List<Element<T>> elements,
-                                      boolean createKeyIfNotExists, CollectionAttributes attr,
-                                      Transcoder<T> tc) {
-      if (createKeyIfNotExists) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-                !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
-        }
+                                      CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
       this.key = key;
       this.elements = elements;
-      this.createKeyIfNotExists = createKeyIfNotExists;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = elements.size();
@@ -372,35 +301,14 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int eSize = elements.size();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < eSize; i++) {
         Element<T> element = elements.get(i);
         byte[] value = decodedList.get(i);
-
-        setArguments(
-                bb,
-                COMMAND,
-                key,
-                element.getStringBkey(),
-                element.getStringEFlag(),
-                value.length,
-                (createKeyIfNotExists) ? "create" : "",
-                (createKeyIfNotExists) ? cd.getFlags() : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getExpireTime() != null) ? attribute
-                        .getExpireTime()
-                        : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getMaxCount() != null) ? attribute
-                        .getMaxCount()
-                        : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getOverflowAction() != null) ? attribute
-                        .getOverflowAction().toString()
-                        : "" : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getReadable() != null && !attribute.getReadable()) ?
-                        "unreadable" : "" : "",
-                (i < eSize - 1) ? PIPE : "");
+        setArguments(bb, COMMAND, key,
+                     element.getStringBkey(), element.getStringEFlag(), value.length,
+                     createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -425,19 +333,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
     private Map<String, T> map;
 
     public MapPipedInsert(String key, Map<String, T> map,
-                          boolean createKeyIfNotExists, CollectionAttributes attr,
-                          Transcoder<T> tc) {
-      if (createKeyIfNotExists) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-                !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
-        }
+                          CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
       this.key = key;
       this.map = map;
-      this.createKeyIfNotExists = createKeyIfNotExists;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = map.size();
@@ -469,28 +370,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       // create ascii operation string
       int mkeySize = map.keySet().size();
       List<String> keyList = new ArrayList<String>(map.keySet());
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < mkeySize; i++) {
         String mkey = keyList.get(i);
         byte[] value = encodedList.get(i);
-
         setArguments(bb, COMMAND, key, mkey, value.length,
-            (createKeyIfNotExists) ?
-                "create" : "",
-            (createKeyIfNotExists) ?
-                cd.getFlags() : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getExpireTime() != null) ?
-                    attribute.getExpireTime() : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getMaxCount() != null) ?
-                    attribute.getMaxCount() : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getOverflowAction() != null) ?
-                    attribute.getOverflowAction() : "" : "",
-            (createKeyIfNotExists) ?
-                (attribute != null && attribute.getReadable() != null && !attribute.getReadable()) ?
-                    "unreadable" : "" : "",
-            (i < mkeySize - 1) ? PIPE : "");
+                     createOption, (i < mkeySize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -512,14 +398,6 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
   public void setKey(String key) {
     this.key = key;
-  }
-
-  public boolean iscreateKeyIfNotExists() {
-    return createKeyIfNotExists;
-  }
-
-  public void setcreateKeyIfNotExists(boolean createKeyIfNotExists) {
-    this.createKeyIfNotExists = createKeyIfNotExists;
   }
 
   public int getItemCount() {

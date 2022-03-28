@@ -1002,8 +1002,6 @@ elements.add(new Element<Object>(1L, "VALUE1", new byte[] { 1, 1 }));
 elements.add(new Element<Object>(2L, "VALUE2", new byte[] { 1, 1 }));
 elements.add(new Element<Object>(3L, "VALUE3", new byte[] { 1, 1 }));
 
-boolean createKeyIfNotExists = true;
-
 if (elements.size() > mc.getMaxPipedItemCount()) { // (1)
     System.out.println("insert 할 아이템 개수는 mc.getMaxPipedItemCount개를 초과할 수 없다.");
     return;

@@ -26,31 +26,10 @@ public abstract class CollectionCreate {
 
   protected String str;
 
-  public CollectionCreate() {
-  }
-
-  public CollectionCreate(int flags, Integer expTime, Long maxCount,
+  public CollectionCreate(CollectionType type, int flags, Integer expTime, Long maxCount,
                           CollectionOverflowAction overflowAction, Boolean readable,
                           boolean noreply) {
-    if (overflowAction != null) {
-      if ((this instanceof SetCreate) &&
-              !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(
-            overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
-      } else if ((this instanceof ListCreate) &&
-              !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(
-            overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-      } else if ((this instanceof MapCreate) &&
-              !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(
-            overflowAction + " is unavailable overflow action in" + CollectionType.map + ".");
-      } else if ((this instanceof BTreeCreate) &&
-              !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-        throw new IllegalArgumentException(
-            overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
-      }
-    }
+    checkOverflowAction(type, overflowAction);
     this.flags = flags;
     this.expTime = (null == expTime) ? CollectionAttributes.DEFAULT_EXPIRETIME : expTime;
     this.maxCount = (null == maxCount) ? CollectionAttributes.DEFAULT_MAXCOUNT : maxCount;
@@ -67,7 +46,6 @@ public abstract class CollectionCreate {
     StringBuilder b = new StringBuilder();
 
     b.append(flags);
-    //TODO:collection insert with creation option
     b.append(' ').append(expTime);
     b.append(' ').append(maxCount);
 
@@ -85,6 +63,32 @@ public abstract class CollectionCreate {
 
     str = b.toString();
     return str;
+  }
+
+  public static String makeCreateClause(CollectionAttributes attribute, int flags) {
+    if (attribute == null) {
+      return null;
+    }
+    StringBuilder b = new StringBuilder();
+    b.append("create ").append(flags)
+        .append(" ").append((attribute.getExpireTime() == null) ?
+            CollectionAttributes.DEFAULT_EXPIRETIME : attribute.getExpireTime())
+        .append(" ").append((attribute.getMaxCount() == null) ?
+            CollectionAttributes.DEFAULT_MAXCOUNT : attribute.getMaxCount());
+    if (attribute.getOverflowAction() != null) {
+      b.append(" ").append(attribute.getOverflowAction());
+    }
+    if (attribute.getReadable() != null && !attribute.getReadable()) {
+      b.append(" ").append("unreadable");
+    }
+    return b.toString();
+  }
+
+  public static void checkOverflowAction(CollectionType type, CollectionOverflowAction action) {
+    if (action != null && !type.isAvailableOverflowAction(action)) {
+      throw new IllegalArgumentException(
+          action + " is unavailable overflow action in " + type + ".");
+    }
   }
 
   public String toString() {

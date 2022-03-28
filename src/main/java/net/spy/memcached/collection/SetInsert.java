@@ -20,12 +20,8 @@ public class SetInsert<T> extends CollectionInsert<T> {
 
   private static final String command = "sop insert";
 
-  public SetInsert() {
-  }
-
-  public SetInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode,
-                   CollectionAttributes attr) {
-    super(value, null, createKeyIfNotExists, requestMode, attr);
+  public SetInsert(T value, RequestMode requestMode, CollectionAttributes attr) {
+    super(CollectionType.set, value, null, requestMode, attr);
   }
 
   public String getCommand() {

@@ -20,9 +20,8 @@ public class MapInsert<T> extends CollectionInsert<T> {
 
   private static final String command = "mop insert";
 
-  public MapInsert(T value, boolean createKeyIfNotExists, RequestMode requestMode,
-                   CollectionAttributes attr) {
-    super(value, null, createKeyIfNotExists, requestMode, attr);
+  public MapInsert(T value, RequestMode requestMode, CollectionAttributes attr) {
+    super(CollectionType.map, value, null, requestMode, attr);
   }
 
   public String getCommand() {

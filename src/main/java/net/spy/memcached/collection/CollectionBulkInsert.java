@@ -30,12 +30,10 @@ import net.spy.memcached.util.BTreeUtil;
 public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   public static final String PIPE = "pipe";
-  public static final int MAX_PIPED_ITEM_COUNT = 500;
 
   protected List<String> keyList;
   protected T value;
   protected CachedData cachedData;
-  protected boolean createKeyIfNotExists;
   protected Transcoder<T> tc;
   protected int itemCount;
 
@@ -74,50 +72,30 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private final String bkey;
     private final String eflag;
 
-    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, long bkey,
-                           byte[] eflag, T value, CollectionAttributes attr,
-                           Transcoder<T> tc) {
-      if (attr != null) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null
-            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
-        }
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
+                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
       this.node = node;
       this.keyList = keyList;
-      this.bkey = String.valueOf(bkey);
+      this.bkey = bkey;
       this.eflag = BTreeUtil.toHex(eflag);
       this.value = value;
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = keyList.size();
-      this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
 
-    public BTreeBulkInsert(MemcachedNode node, List<String> keyList,
-                           byte[] bkey, byte[] eflag, T value,
-                           CollectionAttributes attr, Transcoder<T> tc) {
-      if (attr != null) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null
-            && !CollectionType.btree.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.btree + ".");
-        }
-      }
-      this.node = node;
-      this.keyList = keyList;
-      this.bkey = BTreeUtil.toHex(bkey);
-      this.eflag = BTreeUtil.toHex(eflag);
-      this.value = value;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = keyList.size();
-      this.createKeyIfNotExists = (attr != null);
-      this.cachedData = tc.encode(value);
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, Long bkey,
+                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
+      this(node, keyList, String.valueOf(bkey), eflag, value, attr, tc);
+    }
+
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, byte[] bkey,
+                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
+      this(node, keyList, BTreeUtil.toHex(bkey), eflag, value, attr, tc);
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -137,36 +115,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int kSize = this.keyList.size();
+      byte[] value = cachedData.getData();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
-        byte[] value = cachedData.getData();
-
-        setArguments(
-                bb,
-                COMMAND,
-                key,
-                bkey,
-                (eflag != null) ? eflag : "",
-                value.length,
-                (createKeyIfNotExists) ? "create" : "",
-                (createKeyIfNotExists) ? cachedData.getFlags() : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getExpireTime() != null) ? attribute
-                        .getExpireTime()
-                        : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getMaxCount() != null) ? attribute
-                        .getMaxCount()
-                        : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getOverflowAction() != null) ? attribute
-                        .getOverflowAction()
-                        : "" : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getReadable() != null && !attribute.getReadable()) ?
-                        "unreadable"
-                        : "" : "",
-                (i < kSize - 1) ? PIPE : "");
+        setArguments(bb, COMMAND, key, bkey, (eflag != null) ? eflag : "", value.length,
+                     createOption,  (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -189,13 +144,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
                          T value, CollectionAttributes attr, Transcoder<T> tc) {
-      if (attr != null) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null
-            && !CollectionType.map.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.map + ".");
-        }
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
       this.node = node;
       this.keyList = keyList;
@@ -204,7 +154,6 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = keyList.size();
-      this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
 
@@ -224,35 +173,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int kSize = this.keyList.size();
+      byte[] value = cachedData.getData();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
-        byte[] value = cachedData.getData();
-
-        setArguments(
-                bb,
-                COMMAND,
-                key,
-                mkey,
-                value.length,
-                (createKeyIfNotExists) ? "create" : "",
-                (createKeyIfNotExists) ? cachedData.getFlags() : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getExpireTime() != null) ? attribute
-                        .getExpireTime()
-                        : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getMaxCount() != null) ? attribute
-                        .getMaxCount()
-                        : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getOverflowAction() != null) ? attribute
-                        .getOverflowAction()
-                        : "" : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getReadable() != null && !attribute.getReadable()) ?
-                        "unreadable"
-                        : "" : "",
-                (i < kSize - 1) ? PIPE : "");
+        setArguments(bb, COMMAND, key, mkey, value.length,
+                     createOption, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -274,13 +201,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public SetBulkInsert(MemcachedNode node, List<String> keyList, T value,
                          CollectionAttributes attr, Transcoder<T> tc) {
-      if (attr != null) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null &&
-            !CollectionType.set.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.set + ".");
-        }
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
       this.node = node;
       this.keyList = keyList;
@@ -288,7 +210,6 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = keyList.size();
-      this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
 
@@ -307,34 +228,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int kSize = this.keyList.size();
+      byte[] value = cachedData.getData();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
-        byte[] value = cachedData.getData();
-
-        setArguments(
-                bb,
-                COMMAND,
-                key,
-                value.length,
-                (createKeyIfNotExists) ? "create" : "",
-                (createKeyIfNotExists) ? cachedData.getFlags() : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getExpireTime() != null) ? attribute
-                        .getExpireTime()
-                        : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getMaxCount() != null) ? attribute
-                        .getMaxCount()
-                        : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getOverflowAction() != null) ? attribute
-                        .getOverflowAction()
-                        : "" : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getReadable() != null && !attribute.getReadable()) ?
-                        "unreadable"
-                        : "" : "",
-                (i < kSize - 1) ? PIPE : "");
+        setArguments(bb, COMMAND, key, value.length,
+                     createOption, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -355,15 +255,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private int index;
 
     public ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
-                          T value, CollectionAttributes attr,
-                          Transcoder<T> tc) {
-      if (attr != null) {
-        CollectionOverflowAction overflowAction = attr.getOverflowAction();
-        if (overflowAction != null
-            && !CollectionType.list.isAvailableOverflowAction(overflowAction)) {
-          throw new IllegalArgumentException(
-              overflowAction + " is unavailable overflow action in " + CollectionType.list + ".");
-        }
+                          T value, CollectionAttributes attr, Transcoder<T> tc) {
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
       this.node = node;
       this.keyList = keyList;
@@ -372,7 +266,6 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.attribute = attr;
       this.tc = tc;
       this.itemCount = keyList.size();
-      this.createKeyIfNotExists = (attr != null);
       this.cachedData = tc.encode(value);
     }
 
@@ -392,35 +285,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
       // create ascii operation string
       int kSize = keyList.size();
+      byte[] value = cachedData.getData();
+      String createOption = attribute != null ?
+          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = this.keyList.get(i);
-        byte[] value = cachedData.getData();
-
-        setArguments(
-                bb,
-                COMMAND,
-                key,
-                index,
-                value.length,
-                (createKeyIfNotExists) ? "create" : "",
-                (createKeyIfNotExists) ? cachedData.getFlags() : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getExpireTime() != null) ? attribute
-                        .getExpireTime()
-                        : CollectionAttributes.DEFAULT_EXPIRETIME : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getMaxCount() != null) ? attribute
-                        .getMaxCount()
-                        : CollectionAttributes.DEFAULT_MAXCOUNT : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getOverflowAction() != null) ? attribute
-                        .getOverflowAction()
-                        : "" : "",
-                (createKeyIfNotExists) ? (attribute != null && attribute
-                        .getReadable() != null && !attribute.getReadable()) ?
-                        "unreadable"
-                        : "" : "",
-                (i < kSize - 1) ? PIPE : "");
+        setArguments(bb, COMMAND, key, index, value.length,
+                     createOption, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }

@@ -20,13 +20,8 @@ public class BTreeUpsert<T> extends CollectionInsert<T> {
 
   private static final String command = "bop upsert";
 
-  public BTreeUpsert() {
-    super();
-  }
-
-  public BTreeUpsert(T value, byte[] eFlag, boolean createKeyIfNotExists,
-                     RequestMode requestMode, CollectionAttributes attr) {
-    super(value, eFlag, createKeyIfNotExists, requestMode, attr);
+  public BTreeUpsert(T value, byte[] eFlag, RequestMode requestMode, CollectionAttributes attr) {
+    super(CollectionType.btree, value, eFlag, requestMode, attr);
   }
 
   public String getCommand() {

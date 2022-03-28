@@ -20,12 +20,8 @@ public class SetCreate extends CollectionCreate {
 
   private static final String command = "sop create";
 
-  public SetCreate() {
-    super();
-  }
-
   public SetCreate(int flags, Integer expTime, Long maxCount, Boolean readable, boolean noreply) {
-    super(flags, expTime, maxCount, null, readable, noreply);
+    super(CollectionType.set, flags, expTime, maxCount, null, readable, noreply);
   }
 
   public String getCommand() {
