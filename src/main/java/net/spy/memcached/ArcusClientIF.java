@@ -366,10 +366,11 @@ public interface ArcusClientIF {
    *  List<String> keyList = getKeyListShouldHaveValue();
    *  String value = "Some-value";
    *  int index = 0;
-   *  boolean createKeyIfNotExists = true;
+   *  CollectionAttributes collectionAttributes = new CollectionAttributes();
+   *  collectionAttributes.setExpireTime(30);
    *
    *  Future<Map<String, CollectionOperationStatus>> future = client.asyncLopInsertBulk(keyList,
-   *    index, value, createKeyIfNotExists);
+   *    index, value, collectionAttributes);
    *
    *  Map<String, CollectionOperationStatus> failedList = null;
    *  try {
@@ -421,10 +422,11 @@ public interface ArcusClientIF {
    *
    *  List<String> keyList = getKeyListShouldHaveValue();
    *  String value = "Some-value";
-   *  boolean createKeyIfNotExists = true;
+   *  CollectionAttributes collectionAttributes = new CollectionAttributes();
+   *  collectionAttributes.setExpireTime(30);
    *
    *  Future<Map<String, CollectionOperationStatus>> future = client.asyncSopInsertBulk(keyList,
-   *    value, createKeyIfNotExists);
+   *    value, collectionAttributes);
    *
    *  Map<String, CollectionOperationStatus> failedList = null;
    *  try {
