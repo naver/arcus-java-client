@@ -636,14 +636,24 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
+  public void closeChannel() throws IOException {
+    sk.cancel();
+    sk.attach(null);
+    sk = null;
+    try {
+      shutdown();
+    } finally {
+      channel = null;
+    }
+  }
+
   public final void shutdown() throws IOException {
     if (channel != null) {
       channel.close();
-      sk = null;
       if (toWrite > 0) {
         getLogger().warn(
-                "Shut down with %d bytes remaining to write",
-                toWrite);
+            "Shut down with %d bytes remaining to write",
+            toWrite);
       }
       getLogger().debug("Shut down channel %s", channel);
     }

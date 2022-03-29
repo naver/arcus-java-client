@@ -256,7 +256,12 @@ public final class MemcachedConnection extends SpyObject {
 
     // see if any connections blew up with large number of timeouts
     for (SelectionKey sk : selector.keys()) {
-      MemcachedNode mn = (MemcachedNode) sk.attachment();
+      Object attachment = sk.attachment();
+      // attachment might be null, because some node has already closed the channel to reconnect.
+      if (attachment == null) {
+        continue;
+      }
+      MemcachedNode mn = (MemcachedNode) attachment;
       if (mn.getContinuousTimeout() > timeoutExceptionThreshold &&
           (timeoutDurationThreshold == 0 || mn.getTimeoutDuration() > timeoutDurationThreshold)) {
         getLogger().warn(
@@ -897,21 +902,12 @@ public final class MemcachedConnection extends SpyObject {
 
     getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
             qa.getReconnectCount());
-    if (qa.getSk() != null) {
-      qa.getSk().cancel();
-      assert !qa.getSk().isValid() : "Cancelled selection key is valid";
-    }
-    qa.reconnecting();
     try {
-      if (qa.getChannel() != null) {
-        qa.getChannel().close();
-      } else {
-        getLogger().info("The channel or socket was null for %s", qa);
-      }
+      qa.closeChannel();
     } catch (IOException e) {
       getLogger().warn("IOException trying to close a socket", e);
     }
-    qa.setChannel(null);
+    qa.reconnecting();
 
     // Need to do a little queue management.
     qa.setupResend(cause);
@@ -1195,7 +1191,11 @@ public final class MemcachedConnection extends SpyObject {
     Selector s = selector.wakeup();
     assert s == selector : "Wakeup returned the wrong selector.";
     for (MemcachedNode qa : locator.getAll()) {
-      qa.shutdown();
+      try {
+        qa.shutdown();
+      } catch (IOException e) {
+        getLogger().error("Exception closing channel: %s", qa, e);
+      }
     }
     selector.close();
     getLogger().debug("Shut down selector %s", selector);

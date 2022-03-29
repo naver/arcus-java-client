@@ -269,6 +269,12 @@ public interface MemcachedNode {
   long getTimeoutDuration();
 
   /**
+   * Close the socket channel of the node.
+   * This method is only used for I/O thread to close channel.
+   */
+  void closeChannel() throws IOException;
+
+  /**
    * Shutdown the node
    */
   void shutdown() throws IOException;
