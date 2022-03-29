@@ -129,14 +129,13 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public TCPMemcachedNodeImpl(String name,
-                              SocketAddress sa, SocketChannel c,
+                              SocketAddress sa,
                               int bufSize, BlockingQueue<Operation> rq,
                               BlockingQueue<Operation> wq, BlockingQueue<Operation> iq,
                               long opQueueMaxBlockTime, boolean waitForAuth,
                               boolean asciiProtocol) {
     super();
     assert sa != null : "No SocketAddress";
-    assert c != null : "No SocketChannel";
     assert bufSize > 0 : "Invalid buffer size: " + bufSize;
     assert rq != null : "No operation read queue";
     assert wq != null : "No operation write queue";
@@ -144,7 +143,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
     this.name = name;
     setSocketAddress(sa);
-    setChannel(c);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
     ((Buffer) getWbuf()).clear();
@@ -469,11 +467,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
             + ", topWop=" + getCurrentWriteOp()
             + ", toWrite=" + toWrite
             + ", interested=" + sops + "}";
-  }
-
-  public final void registerChannel(SocketChannel ch, SelectionKey skey) {
-    setChannel(ch);
-    setSk(skey);
   }
 
   public final void setChannel(SocketChannel to) {

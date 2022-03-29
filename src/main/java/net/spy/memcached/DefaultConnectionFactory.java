@@ -20,7 +20,6 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -214,12 +213,12 @@ public class DefaultConnectionFactory extends SpyObject
 
   public MemcachedNode createMemcachedNode(String name,
                                            SocketAddress sa,
-                                           SocketChannel c, int bufSize) {
+                                           int bufSize) {
 
     OperationFactory of = getOperationFactory();
     if (of instanceof AsciiOperationFactory) {
       return new AsciiMemcachedNodeImpl(name,
-              sa, c, bufSize,
+              sa, bufSize,
               createReadOperationQueue(),
               createWriteOperationQueue(),
               createOperationQueue(),
@@ -230,7 +229,7 @@ public class DefaultConnectionFactory extends SpyObject
         doAuth = true;
       }
       return new BinaryMemcachedNodeImpl(name,
-              sa, c, bufSize,
+              sa, bufSize,
               createReadOperationQueue(),
               createWriteOperationQueue(),
               createOperationQueue(),

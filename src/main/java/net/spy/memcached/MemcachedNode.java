@@ -176,11 +176,6 @@ public interface MemcachedNode {
   int getReconnectCount();
 
   /**
-   * Register a channel with this node.
-   */
-  void registerChannel(SocketChannel ch, SelectionKey selectionKey);
-
-  /**
    * Set the SocketChannel this node uses.
    */
   void setChannel(SocketChannel to);

@@ -15,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- *
- */
 package net.spy.memcached;
 
 import java.io.IOException;
@@ -134,10 +131,6 @@ public class MemcachedNodeROImpl implements MemcachedNode {
   }
 
   public void reconnecting() {
-    throw new UnsupportedOperationException();
-  }
-
-  public void registerChannel(SocketChannel ch, SelectionKey selectionKey) {
     throw new UnsupportedOperationException();
   }
 
