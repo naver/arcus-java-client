@@ -959,6 +959,14 @@ public final class MemcachedConnection extends SpyObject {
     SocketChannel ch = null;
     MemcachedNode node = reconnectQueue.popReady(nanoTime);
     while (node != null) {
+      if (node.getChannel() != null) {
+        // Below the code cannot be executed.
+        // Because the reconnect queue are not allowed to add the same node.
+        // But if this logger is called, there is a bug in reconnect queue.
+        getLogger().warn(
+            "Skipping reconnect request that already reconnected to %s", node);
+        continue;
+      }
       try {
         getLogger().info("Reconnecting %s", node);
         ch = SocketChannel.open();
@@ -968,16 +976,16 @@ public final class MemcachedConnection extends SpyObject {
         /* The codes above can be replaced by the codes below since java 1.7 */
         // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
         // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        node.setChannel(ch);
         int ops = 0;
         if (ch.connect(node.getSocketAddress())) {
           getLogger().info("Immediately reconnected to %s", node);
           connected(node);
           addedQueue.offer(node);
-          assert ch.isConnected();
         } else {
           ops = SelectionKey.OP_CONNECT;
         }
-        node.registerChannel(ch, ch.register(selector, ops, node));
+        node.setSk(ch.register(selector, ops, node));
         assert node.getChannel() == ch : "Channel was lost.";
       } catch (SocketException e) {
         getLogger().warn("Error on reconnect", e);
