@@ -583,19 +583,20 @@ public final class MemcachedConnection extends SpyObject {
 
   MemcachedNode attachMemcachedNode(String name,
                                     SocketAddress sa) throws IOException {
-    SocketChannel ch = SocketChannel.open();
-    ch.configureBlocking(false);
-    MemcachedNode qa = connFactory.createMemcachedNode(name, sa, ch, connFactory.getReadBufSize());
+    MemcachedNode qa = connFactory.createMemcachedNode(name, sa, connFactory.getReadBufSize());
     if (timeoutRatioThreshold > 0) {
       qa.enableTimeoutRatio();
     }
-    int ops = 0;
+
+    SocketChannel ch = SocketChannel.open();
+    ch.configureBlocking(false);
     ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
     ch.socket().setReuseAddress(true);
     /* The codes above can be replaced by the codes below since java 1.7 */
     // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
     // ch.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-
+    qa.setChannel(ch);
+    int ops = 0;
     // Initially I had attempted to skirt this by queueing every
     // connect, but it considerably slowed down start time.
     try {

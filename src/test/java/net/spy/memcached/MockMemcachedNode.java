@@ -15,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- *
- */
 package net.spy.memcached;
 
 import java.io.IOException;
@@ -150,10 +147,6 @@ public class MockMemcachedNode implements MemcachedNode {
 
   public int getReconnectCount() {
     return 0;
-  }
-
-  public void registerChannel(SocketChannel ch, SelectionKey selectionKey) {
-    // noop
   }
 
   public void setChannel(SocketChannel to) {

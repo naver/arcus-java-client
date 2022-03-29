@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +20,6 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,8 +100,8 @@ public abstract class ClientBaseCase extends TestCase {
         @Override
         public MemcachedNode createMemcachedNode(String name,
                                                  SocketAddress sa,
-                                                 SocketChannel c, int bufSize) {
-          return inner.createMemcachedNode(name, sa, c, bufSize);
+                                                 int bufSize) {
+          return inner.createMemcachedNode(name, sa, bufSize);
         }
 
         @Override

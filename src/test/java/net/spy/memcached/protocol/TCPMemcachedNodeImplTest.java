@@ -22,10 +22,10 @@ import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -67,14 +67,12 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     TCPMemcachedNodeImpl fromNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
         "tcp node impl test node",
         InetSocketAddress.createUnresolved("127.0.0.1", 11211),
-        SocketChannel.open(),
         4096
     );
 
     TCPMemcachedNodeImpl toNode = (TCPMemcachedNodeImpl) factory.createMemcachedNode(
         "tcp node impl test node",
         InetSocketAddress.createUnresolved("127.0.0.2", 11211),
-        SocketChannel.open(),
         4096
     );
 
