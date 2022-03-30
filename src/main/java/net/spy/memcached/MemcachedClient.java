@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2201,6 +2202,13 @@ public class MemcachedClient extends SpyThread
         logRunException(e);
       }
     }
+
+    try {
+      conn.shutdown();
+    } catch (IOException e) {
+      getLogger().warn("exception while shutting down", e);
+    }
+
     getLogger().info("Shut down memcached client");
   }
 
@@ -2236,15 +2244,11 @@ public class MemcachedClient extends SpyThread
       }
     } finally {
       // But always begin the shutdown sequence
-      try {
-        setName(baseName + " - SHUTTING DOWN (telling client)");
-        running = false;
-        conn.shutdown();
-        setName(baseName + " - SHUTTING DOWN (informed client)");
-        tcService.shutdown();
-      } catch (IOException e) {
-        getLogger().warn("exception while shutting down", e);
-      }
+      setName(baseName + " - SHUTTING DOWN (telling client)");
+      running = false;
+      conn.wakeUpSelector();
+      setName(baseName + " - SHUTTING DOWN (informed client)");
+      tcService.shutdown();
     }
     return rv;
   }

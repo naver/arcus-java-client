@@ -84,7 +84,6 @@ public final class MemcachedConnection extends SpyObject {
   private final FailureMode failureMode;
   // If true, optimization will collapse multiple sequential get ops
   private final boolean optimizeGetOp;
-  private volatile boolean shutDown = false;
 
   // AddedQueue is used to track the QueueAttachments for which operations
   // have recently been queued.
@@ -200,10 +199,6 @@ public final class MemcachedConnection extends SpyObject {
    * MemcachedClient calls this method to handle IO over the connections.
    */
   public void handleIO() throws IOException {
-    if (shutDown) {
-      throw new IOException("No IO while shut down");
-    }
-
     // add versionOp to the node that need it.
     addVersionOpToVersionAbsentNodes();
 
@@ -228,7 +223,7 @@ public final class MemcachedConnection extends SpyObject {
     int selected = selector.select(delay);
     Set<SelectionKey> selectedKeys = selector.selectedKeys();
 
-    if (selectedKeys.isEmpty() && !shutDown) {
+    if (selectedKeys.isEmpty()) {
       getLogger().debug("No selectors ready, interrupted: " + Thread.interrupted());
       if (++emptySelects > DOUBLE_CHECK_EMPTY) {
         for (SelectionKey sk : selector.keys()) {
@@ -256,7 +251,12 @@ public final class MemcachedConnection extends SpyObject {
 
     // see if any connections blew up with large number of timeouts
     for (SelectionKey sk : selector.keys()) {
-      MemcachedNode mn = (MemcachedNode) sk.attachment();
+      Object attachment = sk.attachment();
+      // attachment might be null, because some node has already closed the channel to reconnect.
+      if (attachment == null) {
+        continue;
+      }
+      MemcachedNode mn = (MemcachedNode) attachment;
       if (mn.getContinuousTimeout() > timeoutExceptionThreshold &&
           (timeoutDurationThreshold == 0 || mn.getTimeoutDuration() > timeoutDurationThreshold)) {
         getLogger().warn(
@@ -281,7 +281,7 @@ public final class MemcachedConnection extends SpyObject {
     // Deal with the memcached server group that's been added by CacheManager.
     handleNodesChangeQueue();
 
-    if (!shutDown && !reconnectQueue.isEmpty()) {
+    if (!reconnectQueue.isEmpty()) {
       attemptReconnects();
     }
   }
@@ -779,11 +779,9 @@ public final class MemcachedConnection extends SpyObject {
       }
     } catch (ClosedChannelException e) {
       // Note, not all channel closes end up here
-      if (!shutDown) {
-        getLogger().warn("Closed channel and not shutting down.  "
-                + "Queueing reconnect on %s", qa, e);
-        lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
-      }
+      getLogger().warn("Closed channel.  "
+              + "Queueing reconnect on %s", qa, e);
+      lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
     } catch (ConnectException e) {
       // Failures to establish a connection should attempt a reconnect
       // without signaling the observers.
@@ -887,9 +885,6 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void queueReconnect(MemcachedNode qa, ReconnDelay type, String cause) {
-    if (shutDown) {
-      return;
-    }
     if (reconnectQueue.contains(qa)) {
       reconnectQueue.replace(qa, type);
       return;
@@ -897,21 +892,12 @@ public final class MemcachedConnection extends SpyObject {
 
     getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
             qa.getReconnectCount());
-    if (qa.getSk() != null) {
-      qa.getSk().cancel();
-      assert !qa.getSk().isValid() : "Cancelled selection key is valid";
-    }
-    qa.reconnecting();
     try {
-      if (qa.getChannel() != null) {
-        qa.getChannel().close();
-      } else {
-        getLogger().info("The channel or socket was null for %s", qa);
-      }
+      qa.closeChannel();
     } catch (IOException e) {
       getLogger().warn("IOException trying to close a socket", e);
     }
-    qa.setChannel(null);
+    qa.reconnecting();
 
     // Need to do a little queue management.
     qa.setupResend(cause);
@@ -1187,15 +1173,22 @@ public final class MemcachedConnection extends SpyObject {
     return latch;
   }
 
+  public void wakeUpSelector() {
+    if (selector != null) {
+      selector.wakeup();
+    }
+  }
+
   /**
    * Shut down all of the connections.
    */
   public void shutdown() throws IOException {
-    shutDown = true;
-    Selector s = selector.wakeup();
-    assert s == selector : "Wakeup returned the wrong selector.";
     for (MemcachedNode qa : locator.getAll()) {
-      qa.shutdown();
+      try {
+        qa.shutdown();
+      } catch (IOException e) {
+        getLogger().error("Exception closing channel: %s", qa, e);
+      }
     }
     selector.close();
     getLogger().debug("Shut down selector %s", selector);

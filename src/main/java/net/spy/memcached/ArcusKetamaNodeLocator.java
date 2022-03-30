@@ -18,7 +18,6 @@
 package net.spy.memcached;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -161,15 +160,10 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         updateHash(node, true);
 
         try {
-          SelectionKey sk = node.getSk();
-          if (sk != null) {
-            sk.attach(null);
-          }
-          node.shutdown();
+          node.closeChannel();
         } catch (IOException e) {
           getLogger().error(
-                  "Failed to shutdown the node : " + node.toString());
-          node.setSk(null);
+                  "Failed to closeChannel the node : " + node);
         }
       }
     } finally {

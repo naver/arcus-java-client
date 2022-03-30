@@ -239,6 +239,11 @@ public class MockMemcachedNode implements MemcachedNode {
     return 0;
   }
 
+  @Override
+  public void closeChannel() throws IOException {
+    // noop
+  }
+
   public void shutdown() throws IOException {
     // noop
   }

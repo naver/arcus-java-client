@@ -223,6 +223,11 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public void closeChannel() throws IOException {
+    throw new UnsupportedOperationException();
+  }
+
   public void shutdown() throws IOException {
     throw new UnsupportedOperationException();
   }
