@@ -226,6 +226,8 @@ public final class MemcachedConnection extends SpyObject {
     if (selectedKeys.isEmpty()) {
       getLogger().debug("No selectors ready, interrupted: " + Thread.interrupted());
       if (++emptySelects > DOUBLE_CHECK_EMPTY) {
+        getLogger().info(
+            "Reached to the double check of emptySelect. Selected with delay of %dms", delay);
         for (SelectionKey sk : selector.keys()) {
           getLogger().info("%s has %s, interested in %s",
                   sk, sk.readyOps(), sk.interestOps());
