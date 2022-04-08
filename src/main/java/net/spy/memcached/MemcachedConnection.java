@@ -1500,6 +1500,7 @@ public final class MemcachedConnection extends SpyObject {
         } else {
           switchoverMemcachedReplGroup(entry.getValue().getMasterNode(), true);
           iterator.remove();
+          entry.getValue().setDelayedSwitchover(false);
         }
       }
     }
