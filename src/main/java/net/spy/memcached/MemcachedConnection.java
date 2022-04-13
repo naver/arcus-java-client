@@ -425,8 +425,8 @@ public final class MemcachedConnection extends SpyObject {
       }
 
       if (oldGroup.isDelayedSwitchover()) {
-        switchoverMemcachedReplGroup(oldGroup.getMasterNode(), true);
         delayedSwitchoverGroups.remove(oldGroup);
+        switchoverMemcachedReplGroup(oldGroup.getMasterNode(), true);
       }
 
       MemcachedNode oldMasterNode = oldGroup.getMasterNode();
@@ -855,8 +855,8 @@ public final class MemcachedConnection extends SpyObject {
       /* ENABLE_REPLICATION if */
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
         ((Buffer) rbuf).clear();
-        switchoverMemcachedReplGroup(qa, false);
         delayedSwitchoverGroups.remove(qa.getReplicaGroup());
+        switchoverMemcachedReplGroup(qa, false);
         break;
       }
       /* ENABLE_REPLICATION end */
@@ -868,6 +868,17 @@ public final class MemcachedConnection extends SpyObject {
       // so we'll queue a reconnect if disconnected via an IOException
       throw new IOException("Disconnected unexpected, will reconnect.");
     }
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      if (currentOp == null) { /* readQ is empty */
+        if (qa.getReplicaGroup().isDelayedSwitchover() &&
+            qa.getReplicaGroup().masterNode == qa) {
+          delayedSwitchoverGroups.remove(qa.getReplicaGroup());
+          switchoverMemcachedReplGroup(qa, false);
+        }
+      }
+    }
+    /* ENABLE_REPLICATION end */
   }
 
   // Make a debug string out of the given buffer's values
@@ -891,6 +902,17 @@ public final class MemcachedConnection extends SpyObject {
       reconnectQueue.replace(qa, type);
       return;
     }
+
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      if (qa.getReplicaGroup().isDelayedSwitchover() &&
+          qa.getReplicaGroup().getMasterNode() == qa) {
+        delayedSwitchoverGroups.remove(qa.getReplicaGroup());
+        switchoverMemcachedReplGroup(qa, true);
+        return;
+      }
+    }
+    /* ENABLE_REPLICATION end */
 
     getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
             qa.getReconnectCount());
@@ -1498,9 +1520,9 @@ public final class MemcachedConnection extends SpyObject {
         if (now < entry.getKey()) {
           return;
         } else {
-          switchoverMemcachedReplGroup(entry.getValue().getMasterNode(), true);
           iterator.remove();
           entry.getValue().setDelayedSwitchover(false);
+          switchoverMemcachedReplGroup(entry.getValue().getMasterNode(), true);
         }
       }
     }
