@@ -1,3 +1,85 @@
+2022-04-26 [version 1.13.3]
+	* [FEATURE] print select delay in case of too many empty selected keys.
+	* [FEATURE] shutdown client more gracefully.
+	* [FEATURE] add closeChannel interface in MemcachedNode.
+	* [FEATURE] apply Github-CI to test client.
+	* [FEATURE] return true from isPipeOperation() of
+	            CollectionBulkInsertOperationImpl.
+	* [FEATURE] add timeout duration threshold.
+	* [FEATURE] use System.nanoTime() instead of System.currentTimeMillis()
+	            in MemcachedConnection.
+	* [FEATURE] prevent duplicate nodes from being added into the reconnect queue.
+	* [FEATURE] delayed switchover task from switchover event of zookeeper.
+	* [FEATURE] add isIdempotentOperation in Operation interface.
+	* [FEATURE] block to use redistribute failure mode in ArcusClient.
+	* [FEATURE] add bkey validation.
+	* [FEATURE] upgrade log4j version for security vulnerabilities.
+	* [FEATURE] support cancel failure mode in mget, mgets operation.
+	* [FEATURE] support expanded replication group.
+	* [FEATURE] add node version statistics for monitoring mbean
+	* [FEATURE] update node statistics when the cache list changes.
+	* [FEATURE] throw exception if memcached nodes do not exist at first.
+	* [ENHANCE] do switchover task immediately if readQ is empty or
+	            node is going to be reconnected.
+	* [ENHANCE] Enhance timeout exception message.
+	* [ENHANCE] Remove getRepresentKey() and add getMemcachedNode() to
+	            BTreeSMGet to skip key iteration for searching MemcachedNode.
+	* [ENHANCE] filter duplicated operation from not writeQ but readQ.
+	* [ENHANCE] do not rearrange list when removing addresses of changed
+	            replicaion groups.
+	* [ENHANCE] add the TimeoutException message to broad casting operation.
+	* [FIX] set channel to node first before connecting  it in assertion mode.
+	* [FIX] change the fast shutdown time.
+	* [FIX] fix ConcurrentModificationException in removing entry of reconnect map.
+	* [FIX] removed prevAddrMap field to update cachelist correctly.
+	* [FIX] resolve ConcurrentModificationException occurs in handleNodesToRemove.
+	* [FIX] reset operation state in resend.
+	* [FIX] change the order of moveOperation and ChangeRole on switchover.
+	* [FIX] remove unnecessary String.valueOf in ArcusClient.asyncMopUpdate.
+	* [FIX] CollectionOperationImpl command buffer.
+	* [FIX] update node name when switchover.
+	* [FIX] fixed long type string to unsigned long type string on bkey.
+	* [FIX] Operation command buffer size.
+	* [FIX] reset operation state in writing state when moving operations to
+	        new master node.
+	* [FIX] fixed parsing only one result after switchover in pipe operation.
+	* [FIX] add null check in attachment removal of selection key.
+	* [FIX] do not create connection pool array if node address is empty.
+	* [FIX] on the bulk operation only the timed out operation set the timed out.
+	* [CLEANUP] remove socket channel argument in MemcachedNode constructor.
+	* [CLEANUP] remove createKeyIfNotExist field and duplicate codes in
+	            collection insert classes.
+	* [CLEANUP] refactored ReconnectQueue of MemcachedConnection.
+	* [CLEANUP] add comment about avoiding ConcurrentModificationException.
+	* [CLEANUP] refactored CollectionGet.
+	* [CLEANUP] refactored updateReplConnections in MemcachedConnection.
+	* [CLEANUP] separate constructor for searching condition.
+	* [CLEANUP] refactored bkey.
+	* [CLEANUP] isDebugEnabled and isInfoEnabled flag to print debug log.
+	* [CLEANUP] refactored get exist bkey.
+	* [CLEANUP] fixed the code indentation.
+	* [CLEANUP] refactored the method for validating replication group.
+	* [CLEANUP] refactored the method to checking switchover.
+	* [CLEANUP] refactored the cache list update functions of replication cluster.
+	* [CLEANUP] return immutable collection of node and groups.
+	* [CLEANUP] re-naming variables and methods in MemcachedConnection more clearly.
+	* [CLEANUP] removed readBufferSize argument in MemcachedConnection().
+	* [CLEANUP] refactor ArcusClient initialization codes.
+	* [CLEANUP] incorrect indentation.
+	* [CLEANUP] removed hashAlgorithm argument from ArcusKetamaLocator constructor.
+	* [CLEANUP] removed unnecessary log warn message in getAllOperations().
+	* [TEST] fix build error in ClientBaseCase test class.
+	* [TEST] use assertEquals to check unexpected value from get operation in
+	         BulkStoreTest.
+	* [DOC] update btree api doc.
+	* [DOC] add ci and license badge.
+	* [DOC] fixed percent encoding
+	* [DOC] add description of collection attribute.
+	* [DOC] add the precaution about character encoding.
+	* [DOC] Update docs (fix typo, fix outdated code sample). 
+	* [DOC] add jdk requirements to README.md.
+	* [DOC] fix invalid javadoc param.
+
 2021-05-08 [version 1.13.2]
 	* [FIX] do not use default transcoder.
 
