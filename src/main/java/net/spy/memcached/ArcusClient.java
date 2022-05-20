@@ -202,6 +202,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
   private static final int MAX_MKEY_LENGTH = 250;
 
+  private static final int SHUTDOWN_TIMEOUT_MILLISECONDS = 2000;
+
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -361,7 +363,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public void shutdown() {
-    super.shutdown();
+    super.shutdown(SHUTDOWN_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
     // Connect to Arcus server directly, cache manager may be null.
     if (cacheManager != null) {
       cacheManager.shutdown();
