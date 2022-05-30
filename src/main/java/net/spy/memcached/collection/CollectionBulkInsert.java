@@ -73,14 +73,14 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private final String eflag;
 
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
-                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
+                           String eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
       this.node = node;
       this.keyList = keyList;
       this.bkey = bkey;
-      this.eflag = BTreeUtil.toHex(eflag);
+      this.eflag = eflag;
       this.value = value;
       this.attribute = attr;
       this.tc = tc;
@@ -90,12 +90,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, Long bkey,
                            byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, String.valueOf(bkey), eflag, value, attr, tc);
+      this(node, keyList, String.valueOf(bkey), BTreeUtil.toHex(eflag), value, attr, tc);
     }
 
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, byte[] bkey,
                            byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, BTreeUtil.toHex(bkey), eflag, value, attr, tc);
+      this(node, keyList, BTreeUtil.toHex(bkey), BTreeUtil.toHex(eflag), value, attr, tc);
     }
 
     public ByteBuffer getAsciiCommand() {

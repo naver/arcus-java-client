@@ -37,10 +37,10 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   protected List<String> keyList;
   protected String range;
+  protected boolean reverse;
   protected ElementFlagFilter eFlagFilter;
   protected int offset = -1;
   protected int count;
-  protected boolean reverse;
 
   protected Map<Integer, T> map;
 
@@ -51,42 +51,31 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   protected byte[] eflag = null;
 
   protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
-                             byte[] from, byte[] to,
+                             String range, boolean reverse,
                              ElementFlagFilter eFlagFilter, int offset,
                              int count) {
     this.node = node;
     this.keyList = keyList;
-    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
+    this.range = range;
+    this.reverse = reverse;
     this.eFlagFilter = eFlagFilter;
     this.offset = offset;
     this.count = count;
-    this.reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
   }
 
   protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
                              long from, long to,
                              ElementFlagFilter eFlagFilter, int offset,
                              int count) {
-    this.node = node;
-    this.keyList = keyList;
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
-    this.eFlagFilter = eFlagFilter;
-    this.offset = offset;
-    this.count = count;
-    this.reverse = (from > to);
+    this(node, keyList, from + ".." + to, from > to, eFlagFilter, offset, count);
   }
 
   protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
-                             long bkey,
+                             byte[] from, byte[] to,
                              ElementFlagFilter eFlagFilter, int offset,
                              int count) {
-    this.node = node;
-    this.keyList = keyList;
-    this.range = String.valueOf(bkey);
-    this.eFlagFilter = eFlagFilter;
-    this.offset = offset;
-    this.count = count;
-    this.reverse = false;
+    this(node, keyList, BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
+        BTreeUtil.compareByteArraysInLexOrder(from, to) > 0, eFlagFilter, offset, count);
   }
 
   public void setKeySeparator(String keySeparator) {
