@@ -372,6 +372,18 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
+  public final boolean addOpToWriteQ(Operation op) {
+    op.setHandlingNode(this);
+    resetOperation(op);
+    if (!writeQ.offer(op)) {
+      op.cancel("write queue overflow");
+      return false;
+    }
+    op.setMoved(true);
+    addOpCount += 1;
+    return true;
+  }
+
   public final void insertOp(Operation op) {
     ArrayList<Operation> tmp = new ArrayList<Operation>(
             inputQueue.size() + 1);
@@ -740,29 +752,15 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return allOp;
   }
 
-  public int addAllOpToWriteQ(BlockingQueue<Operation> allOp) {
-    int movedOpCount = 0;
-    for (Operation op : allOp) {
-      op.setHandlingNode(this);
-      resetOperation(op);
-      if (writeQ.offer(op)) {
-        op.setMoved(true);
-        movedOpCount++;
-      } else {
-        op.cancel("by moving operations");
-      }
-    }
-    addOpCount += movedOpCount;
-    return movedOpCount;
-  }
-
   public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
     BlockingQueue<Operation> allOp = getAllOperations(cancelNonIdempontent);
     int opCount = allOp.size();
     int movedOpCount = 0;
 
     if (opCount > 0) {
-      movedOpCount = toNode.addAllOpToWriteQ(allOp);
+      for (Operation op : allOp) {
+        movedOpCount += toNode.addOpToWriteQ(op) ? 1 : 0;
+      }
       getLogger().info("Total %d operations have been moved to %s "
               + "and %d operations have been canceled.",
           movedOpCount, toNode, opCount - movedOpCount);

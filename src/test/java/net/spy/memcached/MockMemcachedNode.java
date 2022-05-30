@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.ops.Operation;
 
@@ -106,6 +105,11 @@ public class MockMemcachedNode implements MemcachedNode {
 
   public void addOpToInputQ(Operation op) {
     // noop
+  }
+
+  public boolean addOpToWriteQ(Operation op) {
+    // noop
+    return false;
   }
 
   public void insertOp(Operation op) {
@@ -263,12 +267,6 @@ public class MockMemcachedNode implements MemcachedNode {
   public MemcachedReplicaGroup getReplicaGroup() {
     // noop
     return null;
-  }
-
-  @Override
-  public int addAllOpToWriteQ(BlockingQueue<Operation> allOp) {
-    // noop
-    return 0;
   }
 
   @Override
