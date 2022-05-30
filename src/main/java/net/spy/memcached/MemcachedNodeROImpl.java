@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.ops.Operation;
 
@@ -51,6 +50,10 @@ public class MemcachedNodeROImpl implements MemcachedNode {
   }
 
   public void addOpToInputQ(Operation op) {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean addOpToWriteQ(Operation op) {
     throw new UnsupportedOperationException();
   }
 
@@ -242,10 +245,6 @@ public class MemcachedNodeROImpl implements MemcachedNode {
   }
 
   public MemcachedReplicaGroup getReplicaGroup() {
-    throw new UnsupportedOperationException();
-  }
-
-  public int addAllOpToWriteQ(BlockingQueue<Operation> allOp) {
     throw new UnsupportedOperationException();
   }
 

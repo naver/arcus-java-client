@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.ops.Operation;
 
@@ -115,6 +114,13 @@ public interface MemcachedNode {
    * never be added to the queue, but this is not checked.
    */
   void addOpToInputQ(Operation op);
+
+  /**
+   * Add an operation to the write queue. It is used to process operation in prior to
+   * operations in input queue. For example, when the switchover occurs,
+   * the operation moved to the new master must be prioritized.
+   */
+  boolean addOpToWriteQ(Operation op);
 
   /**
    * Insert an operation to the beginning of the queue.
@@ -290,8 +296,6 @@ public interface MemcachedNode {
   void setReplicaGroup(MemcachedReplicaGroup g);
 
   MemcachedReplicaGroup getReplicaGroup();
-
-  int addAllOpToWriteQ(BlockingQueue<Operation> allOp);
 
   int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent);
 
