@@ -17,14 +17,4 @@ public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
     super(CMD, c, new HashSet<String>(k));
     setAPIType(APIType.MGET);
   }
-
-  @Override
-  public boolean isBulkOperation() {
-    return true;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
 }
