@@ -70,7 +70,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
     for (MemcachedReplicaGroup group : allGroups.values()) {
-      updateHash(group, false);
+      insertHash(group);
     }
 
     /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
@@ -224,7 +224,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           mrg = new MemcachedReplicaGroupImpl(node);
           getLogger().info("new memcached replica group added %s", mrg.getGroupName());
           allGroups.put(mrg.getGroupName(), mrg);
-          updateHash(mrg, false);
+          insertHash(mrg);
         } else {
           mrg.setMemcachedNode(node);
         }
@@ -243,7 +243,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedReplicaGroup group : toDeleteGroup) {
         getLogger().info("old memcached replica group removed %s", group.getGroupName());
         allGroups.remove(group.getGroupName());
-        updateHash(group, true);
+        removeHash(group);
       }
     } finally {
       lock.unlock();
@@ -256,30 +256,40 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     lock.unlock();
   }
 
-  private void updateHash(MemcachedReplicaGroup group, boolean remove) {
+  private Long getKetamaHashPoint(byte[] digest, int h) {
+    return ((long) (digest[3 + h * 4] & 0xFF) << 24)
+         | ((long) (digest[2 + h * 4] & 0xFF) << 16)
+         | ((long) (digest[1 + h * 4] & 0xFF) << 8)
+         | (digest[h * 4] & 0xFF);
+  }
+
+  private void insertHash(MemcachedReplicaGroup group) {
     // Ketama does some special work with md5 where it reuses chunks.
     for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
       byte[] digest = HashAlgorithm.computeMd5(config.getKeyForGroup(group, i));
-
       for (int h = 0; h < 4; h++) {
-        Long k = ((long) (digest[3 + h * 4] & 0xFF) << 24)
-                | ((long) (digest[2 + h * 4] & 0xFF) << 16)
-                | ((long) (digest[1 + h * 4] & 0xFF) << 8)
-                | (digest[h * 4] & 0xFF);
-
+        Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
-        if (remove) {
-          nodeSet.remove(group);
-          if (nodeSet.size() == 0) {
-            ketamaGroups.remove(k);
-          }
-        } else {
-          if (nodeSet == null) {
-            nodeSet = new TreeSet<MemcachedReplicaGroup>(
-                    new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-            ketamaGroups.put(k, nodeSet);
-          }
-          nodeSet.add(group);
+        if (nodeSet == null) {
+          nodeSet = new TreeSet<MemcachedReplicaGroup>(
+              new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
+          ketamaGroups.put(k, nodeSet);
+        }
+        nodeSet.add(group);
+      }
+    }
+  }
+
+  private void removeHash(MemcachedReplicaGroup group) {
+    // Ketama does some special work with md5 where it reuses chunks.
+    for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
+      byte[] digest = HashAlgorithm.computeMd5(config.getKeyForGroup(group, i));
+      for (int h = 0; h < 4; h++) {
+        Long k = getKetamaHashPoint(digest, h);
+        SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
+        nodeSet.remove(group);
+        if (nodeSet.size() == 0) {
+          ketamaGroups.remove(k);
         }
       }
     }

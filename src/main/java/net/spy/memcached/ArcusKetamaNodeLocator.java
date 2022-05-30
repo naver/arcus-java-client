@@ -58,7 +58,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
     for (MemcachedNode node : nodes) {
-      updateHash(node, false);
+      insertHash(node);
     }
 
     /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
@@ -151,14 +151,13 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       // Add memcached nodes.
       for (MemcachedNode node : toAttach) {
         allNodes.add(node);
-        updateHash(node, false);
+        insertHash(node);
       }
 
       // Remove memcached nodes.
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
-        updateHash(node, true);
-
+        removeHash(node);
         try {
           node.closeChannel();
         } catch (IOException e) {
@@ -171,41 +170,45 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     }
   }
 
-  private void updateHash(MemcachedNode node, boolean remove) {
-    if (!remove) {
-      config.insertNode(node);
-    }
+  private Long getKetamaHashPoint(byte[] digest, int h) {
+    return ((long) (digest[3 + h * 4] & 0xFF) << 24)
+         | ((long) (digest[2 + h * 4] & 0xFF) << 16)
+         | ((long) (digest[1 + h * 4] & 0xFF) << 8)
+         | (digest[h * 4] & 0xFF);
+  }
 
+  private void insertHash(MemcachedNode node) {
+    config.insertNode(node);
     // Ketama does some special work with md5 where it reuses chunks.
     for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
-
       byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node, i));
       for (int h = 0; h < 4; h++) {
-        Long k = ((long) (digest[3 + h * 4] & 0xFF) << 24)
-                | ((long) (digest[2 + h * 4] & 0xFF) << 16)
-                | ((long) (digest[1 + h * 4] & 0xFF) << 8)
-                | (digest[h * 4] & 0xFF);
-
+        Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
-        if (remove) {
-          assert nodeSet != null;
-          nodeSet.remove(node);
-          if (nodeSet.size() == 0) {
-            ketamaNodes.remove(k);
-          }
-        } else {
-          if (nodeSet == null) {
-            nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
-            ketamaNodes.put(k, nodeSet);
-          }
-          nodeSet.add(node);
+        if (nodeSet == null) {
+          nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+          ketamaNodes.put(k, nodeSet);
+        }
+        nodeSet.add(node);
+      }
+    }
+  }
+
+  private void removeHash(MemcachedNode node) {
+    // Ketama does some special work with md5 where it reuses chunks.
+    for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
+      byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(node, i));
+      for (int h = 0; h < 4; h++) {
+        Long k = getKetamaHashPoint(digest, h);
+        SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
+        assert nodeSet != null;
+        nodeSet.remove(node);
+        if (nodeSet.size() == 0) {
+          ketamaNodes.remove(k);
         }
       }
     }
-
-    if (remove) {
-      config.removeNode(node);
-    }
+    config.removeNode(node);
   }
 
   class KetamaIterator implements Iterator<MemcachedNode> {
