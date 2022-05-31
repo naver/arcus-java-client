@@ -1,7 +1,6 @@
 package net.spy.memcached;
 
 import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.DeleteOperation;
 
@@ -33,15 +32,10 @@ public final class TimedOutMessageFactory {
   /**
    * check bulk operation or not
    * @param op operation
-   * @param ops number of operation (used in GetOpeartion, StoreOperationImpl, DeleteOperationImpl)
+   * @param ops number of operation (used in StoreOperationImpl, DeleteOperationImpl)
    */
   private static boolean isBulkOperation(Operation op, Collection<Operation> ops) {
-    if (op instanceof GetOperation) {
-      GetOperation gop = (GetOperation) op;
-      return gop.getKeys().size() > 1;
-    } else if (op instanceof StoreOperation) {
-      return ops.size() > 1;
-    } else if (op instanceof DeleteOperation) {
+    if (op instanceof StoreOperation || op instanceof DeleteOperation) {
       return ops.size() > 1;
     }
     return op.isBulkOperation();

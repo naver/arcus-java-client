@@ -480,7 +480,7 @@ public class MultibyteKeyTest {
         1L, new byte[]{0, 0}, new Random().nextInt(),
         new CollectionAttributes(), new IntegerTranscoder());
     try {
-      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -490,7 +490,7 @@ public class MultibyteKeyTest {
         new IntegerTranscoder());
 
     try {
-      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
@@ -499,7 +499,7 @@ public class MultibyteKeyTest {
         new Random().nextInt(), new CollectionAttributes(),
         new IntegerTranscoder());
     try {
-      opFact.collectionBulkInsert(insert.getKeyList(), insert, cbsCallback).initialize();
+      opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }

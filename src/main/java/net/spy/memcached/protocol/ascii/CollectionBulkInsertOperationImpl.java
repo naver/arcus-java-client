@@ -19,8 +19,6 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionResponse;
@@ -63,7 +61,6 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected final String key;
   protected final CollectionBulkInsert<?> insert;
   protected final CollectionBulkInsertOperation.Callback cb;
 
@@ -71,10 +68,8 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   protected int index = 0;
   protected boolean successAll = true;
 
-  public CollectionBulkInsertOperationImpl(List<String> keyList,
-                                           CollectionBulkInsert<?> insert, OperationCallback cb) {
+  public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);
-    this.key = keyList.get(0);
     this.insert = insert;
     this.cb = (Callback) cb;
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
@@ -166,7 +161,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   }
 
   public Collection<String> getKeys() {
-    return Collections.singleton(key);
+    return insert.getKeyList();
   }
 
   public CollectionBulkInsert<?> getInsert() {

@@ -4060,7 +4060,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(insertList.size());
 
     for (final CollectionBulkInsert<T> insert : insertList) {
-      Operation op = opFact.collectionBulkInsert(insert.getKeyList(),
+      Operation op = opFact.collectionBulkInsert(
               insert, new CollectionBulkInsertOperation.Callback() {
                 public void receivedStatus(OperationStatus status) {
 

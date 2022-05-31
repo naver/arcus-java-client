@@ -218,7 +218,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
 
   @Override
   public boolean isBulkOperation() {
-    return false;
+    return keys.size() > 1;
   }
 
   @Override
