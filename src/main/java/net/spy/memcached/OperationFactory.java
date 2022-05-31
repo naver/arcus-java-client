@@ -17,7 +17,6 @@
 package net.spy.memcached;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -466,13 +465,11 @@ public interface OperationFactory {
   /**
    * Bulk insert operation for collection items.
    *
-   * @param key    collection item's key
    * @param insert operation parameters (element values, and so on)
    * @param cb     the status callback
    * @return a new CollectionBulkInsertOperation
    */
-  CollectionBulkInsertOperation collectionBulkInsert(List<String> key,
-                                                     CollectionBulkInsert<?> insert,
+  CollectionBulkInsertOperation collectionBulkInsert(CollectionBulkInsert<?> insert,
                                                      OperationCallback cb);
 
   /**

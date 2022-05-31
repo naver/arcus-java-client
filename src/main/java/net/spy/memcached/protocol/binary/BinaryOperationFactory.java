@@ -17,7 +17,6 @@
 package net.spy.memcached.protocol.binary;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -302,9 +301,8 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionBulkInsertOperation collectionBulkInsert(
-          List<String> key, CollectionBulkInsert<?> insert,
-          OperationCallback cb) {
+  public CollectionBulkInsertOperation collectionBulkInsert(CollectionBulkInsert<?> insert,
+                                                            OperationCallback cb) {
     throw new RuntimeException(
             "Collection piped insert2 operation is not supported in binary protocol yet.");
   }

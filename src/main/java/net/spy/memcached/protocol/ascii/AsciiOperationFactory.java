@@ -17,7 +17,6 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -259,10 +258,9 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionBulkInsertOperation collectionBulkInsert(List<String> key,
-                                                            CollectionBulkInsert<?> insert,
+  public CollectionBulkInsertOperation collectionBulkInsert(CollectionBulkInsert<?> insert,
                                                             OperationCallback cb) {
-    return new CollectionBulkInsertOperationImpl(key, insert, cb);
+    return new CollectionBulkInsertOperationImpl(insert, cb);
   }
 
   @Override
