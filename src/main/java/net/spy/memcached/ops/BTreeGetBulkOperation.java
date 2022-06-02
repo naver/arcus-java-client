@@ -16,7 +16,11 @@
  */
 package net.spy.memcached.ops;
 
+import net.spy.memcached.collection.BTreeGetBulk;
+
 public interface BTreeGetBulkOperation extends KeyedOperation {
+  BTreeGetBulk<?> getBulk();
+
   interface Callback extends OperationCallback {
     void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data);
 

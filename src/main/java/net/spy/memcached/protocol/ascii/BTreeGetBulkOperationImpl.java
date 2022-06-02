@@ -250,6 +250,11 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   }
 
   @Override
+  public BTreeGetBulk<?> getBulk() {
+    return getBulk;
+  }
+
+  @Override
   public boolean isBulkOperation() {
     return true;
   }

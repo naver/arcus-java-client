@@ -1,6 +1,7 @@
 /*
  * arcus-java-client : Arcus Java client
  * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +17,15 @@
  */
 package net.spy.memcached.ops;
 
-import net.spy.memcached.collection.BTreeSMGet;
+public class MultiCollectionBulkInsertOperationCallback extends MultiOperationCallback
+    implements CollectionBulkInsertOperation.Callback {
 
-public interface BTreeSortMergeGetOperation extends KeyedOperation {
-  BTreeSMGet<?> getSMGet();
+  public MultiCollectionBulkInsertOperationCallback(OperationCallback original, int todo) {
+    super(original, todo);
+  }
 
-  interface Callback extends OperationCallback {
-    void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data);
-
-    void gotMissedKey(String key, OperationStatus cause);
-
-    void gotTrimmedKey(String key, Object subkey);
+  @Override
+  public void gotStatus(String key, OperationStatus status) {
+    ((CollectionBulkInsertOperation.Callback) originalCallback).gotStatus(key, status);
   }
 }

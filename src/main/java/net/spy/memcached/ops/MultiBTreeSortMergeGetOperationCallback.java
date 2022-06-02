@@ -17,20 +17,26 @@
  */
 package net.spy.memcached.ops;
 
-/**
- * MultiOperationCallback for get operations.
- */
-public class MultiGetsOperationCallback extends MultiOperationCallback
-        implements GetsOperation.Callback {
+public class MultiBTreeSortMergeGetOperationCallback extends MultiOperationCallback
+    implements BTreeSortMergeGetOperation.Callback {
 
-  public MultiGetsOperationCallback(OperationCallback original, int todo) {
+  public MultiBTreeSortMergeGetOperationCallback(OperationCallback original, int todo) {
     super(original, todo);
   }
 
   @Override
-  public void gotData(String key, int flags, long cas, byte[] data) {
-    ((GetsOperation.Callback) originalCallback).gotData(
-            key, flags, cas, data);
+  public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+    ((BTreeSortMergeGetOperation.Callback) originalCallback).gotData(key, flags,
+        subkey, eflag, data);
   }
 
+  @Override
+  public void gotMissedKey(String key, OperationStatus cause) {
+    ((BTreeSortMergeGetOperation.Callback) originalCallback).gotMissedKey(key, cause);
+  }
+
+  @Override
+  public void gotTrimmedKey(String key, Object subkey) {
+    ((BTreeSortMergeGetOperation.Callback) originalCallback).gotTrimmedKey(key, subkey);
+  }
 }

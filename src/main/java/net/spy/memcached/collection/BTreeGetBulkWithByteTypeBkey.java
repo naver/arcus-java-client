@@ -31,11 +31,24 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
         eFlagFilter, offset, count);
   }
 
+  private BTreeGetBulkWithByteTypeBkey(MemcachedNode node, List<String> keyList,
+                                       String range,
+                                       ElementFlagFilter eFlagFilter,
+                                       int offset, int count) {
+    super(node, keyList, range, eFlagFilter, offset, count);
+  }
+
   public byte[] getSubkey() {
     return (byte[]) subkey;
   }
 
   protected Object decodeSubkey(String subkey) {
     return BTreeUtil.hexStringToByteArrays(subkey.substring(2));
+  }
+
+  @Override
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList) {
+    return new BTreeGetBulkWithByteTypeBkey<T>(node, keyList,
+        range, eFlagFilter, offset, count);
   }
 }

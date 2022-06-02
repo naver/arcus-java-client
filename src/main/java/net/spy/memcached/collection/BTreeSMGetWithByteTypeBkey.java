@@ -31,6 +31,13 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
         eFlagFilter, count, smgetMode);
   }
 
+  private BTreeSMGetWithByteTypeBkey(MemcachedNode node, List<String> keyList,
+                                     String range,
+                                     ElementFlagFilter eFlagFilter,
+                                     int count, SMGetMode smgetMode) {
+    super(node, keyList, range, eFlagFilter, count, smgetMode);
+  }
+
   @Override
   public byte[] getSubkey() {
     return (byte[]) subkey;
@@ -39,5 +46,11 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
   @Override
   protected Object decodeSubkey(String subkey) {
     return BTreeUtil.hexStringToByteArrays(subkey.substring(2));
+  }
+
+  @Override
+  public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList) {
+    return new BTreeSMGetWithByteTypeBkey<T>(node, keyList,
+        range, eFlagFilter, count, smgetMode);
   }
 }
