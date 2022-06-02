@@ -140,6 +140,7 @@ public class MemcachedConnectionTest extends TestCase {
   public void testAddOperations() throws Exception {
   }
 
+  @SuppressWarnings("unchecked")
   public void testReconnectQueue_delayReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
@@ -213,6 +214,7 @@ public class MemcachedConnectionTest extends TestCase {
     Assert.assertFalse(reconnectQueue.contains(node));
   }
 
+  @SuppressWarnings("unchecked")
   public void testReconnectQueue_immediateReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
