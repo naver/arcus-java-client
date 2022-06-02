@@ -90,5 +90,4 @@ class GetOperationImpl extends OperationImpl
   public boolean isIdempotentOperation() {
     return true;
   }
-
 }

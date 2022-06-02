@@ -30,6 +30,15 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
+  /* ENABLE_MIGRATION if */
+  private BTreeGetBulkWithByteTypeBkey(MemcachedNode node, List<String> keyList,
+                                      String range, boolean reverse,
+                                      ElementFlagFilter eFlagFilter, int offset,
+                                      int count) {
+    super(node, keyList, range, reverse, eFlagFilter, offset, count);
+  }
+  /* ENABLE_MIGRATION end */
+
   public byte[] getSubkey() {
     return (byte[]) subkey;
   }
@@ -58,4 +67,11 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
       this.flag = Integer.valueOf(splited[3]);
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> redirectKeys) {
+    return new BTreeGetBulkWithByteTypeBkey<T>(node, redirectKeys, range, reverse, eFlagFilter, offset, count);
+  }
+  /* ENABLE_MIGRATION end */
 }

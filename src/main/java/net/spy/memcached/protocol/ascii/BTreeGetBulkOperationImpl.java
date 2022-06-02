@@ -246,9 +246,17 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     getCallback().receivedStatus(GET_CANCELED);
   }
 
+  @Override
   public Collection<String> getKeys() {
     return getBulk.getKeyList();
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public BTreeGetBulk<?> getBulk() {
+    return getBulk;
+  }
+  /* ENABLE_MIGRATION end */
 
   @Override
   public boolean isBulkOperation() {

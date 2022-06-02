@@ -42,6 +42,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   protected int nextOpIndex = 0;
 
+  /* ENABLE_MIGRATION if */
+  protected List<Integer> redirectKeyIndexes;
+  /* ENABLE_MIGRATION end */
+
   /**
    * set next index of operation
    * that will be processed after when operation moved by switchover
@@ -61,6 +65,15 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
   public abstract ByteBuffer getAsciiCommand();
 
   public abstract ByteBuffer getBinaryCommand();
+
+  /* ENABLE_MIGRATION if */
+  public abstract CollectionBulkInsert<T> clone(MemcachedNode node,
+                                                List<String> redirectKeys, List<Integer> redirectKeyIndexes);
+
+  public Integer getRedirectKeyIndex(int index) {
+    return redirectKeyIndexes.get(index);
+  }
+  /* ENABLE_MIGRATION end */
 
   /**
    *
@@ -135,6 +148,16 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> redirectKeys, List<Integer> redirectKeyIndexes) {
+      final CollectionBulkInsert<T> insert = new BTreeBulkInsert<T>(node, redirectKeys, bkey, eflag, value, attribute, tc);
+      insert.redirectKeyIndexes = redirectKeyIndexes;
+      return insert;
+    }
+    /* ENABLE_MIGRATION end */
   }
 
   public static class MapBulkInsert<T> extends CollectionBulkInsert<T> {
@@ -193,6 +216,16 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> redirectKeys, List<Integer> redirectKeyIndexes) {
+      final CollectionBulkInsert<T> insert = new MapBulkInsert<T>(node, redirectKeys, mkey, value, attribute, tc);
+      insert.redirectKeyIndexes = redirectKeyIndexes;
+      return insert;
+    }
+    /* ENABLE_MIGRATION end */
   }
 
   public static class SetBulkInsert<T> extends CollectionBulkInsert<T> {
@@ -247,6 +280,16 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> redirectKeys, List<Integer> redirectKeyIndexes) {
+      final CollectionBulkInsert<T> insert = new SetBulkInsert<T>(node, redirectKeys, value, attribute, tc);
+      insert.redirectKeyIndexes = redirectKeyIndexes;
+      return insert;
+    }
+    /* ENABLE_MIGRATION end */
   }
 
   public static class ListBulkInsert<T> extends CollectionBulkInsert<T> {
@@ -305,6 +348,16 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    /* ENABLE_MIGRATION if */
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> redirectKeys, List<Integer> redirectKeyIndexes) {
+      final CollectionBulkInsert<T> insert = new ListBulkInsert<T>(node, redirectKeys, index, value, attribute, tc);
+      insert.redirectKeyIndexes = redirectKeyIndexes;
+      return insert;
+    }
+    /* ENABLE_MIGRATION end */
   }
 
   public List<String> getKeyList() {

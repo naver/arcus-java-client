@@ -231,4 +231,10 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return true;
   }
 
+  /* ENABLE_MIGRATION if */
+  @Override
+  public boolean isMGetOperation() {
+    return cmd.equals("mget") || cmd.equals("mgets");
+  }
+  /* ENABLE_MIGRATION end */
 }

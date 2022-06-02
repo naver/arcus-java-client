@@ -131,4 +131,8 @@ public interface Operation {
   boolean isIdempotentOperation();
 
   APIType getAPIType();
+
+  /* ENABLE_MIGRATION if */
+  boolean isMGetOperation();
+  /* ENABLE_MIGRATION end */
 }

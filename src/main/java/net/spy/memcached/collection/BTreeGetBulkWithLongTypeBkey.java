@@ -30,6 +30,15 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
+  /* ENABLE_MIGRATION if */
+  private BTreeGetBulkWithLongTypeBkey(MemcachedNode node, List<String> keyList,
+                                       String range, boolean reverse,
+                                       ElementFlagFilter eFlagFilter, int offset,
+                                       int count) {
+    super(node, keyList, range, reverse, eFlagFilter, offset, count);
+  }
+  /* ENABLE_MIGRATION end */
+
   public Long getSubkey() {
     return (Long) subkey;
   }
@@ -59,4 +68,10 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     }
   }
 
+  /* ENABLE_MIGRATION if */
+  @Override
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> redirectKeys) {
+    return new BTreeGetBulkWithLongTypeBkey<T>(node, redirectKeys, range, reverse, eFlagFilter, offset, count);
+  }
+  /* ENABLE_MIGRATION end */
 }

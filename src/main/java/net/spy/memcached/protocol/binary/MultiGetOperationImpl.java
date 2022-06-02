@@ -145,5 +145,4 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
   public boolean isIdempotentOperation() {
     return true;
   }
-
 }

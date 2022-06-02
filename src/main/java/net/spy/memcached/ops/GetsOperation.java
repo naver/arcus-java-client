@@ -5,7 +5,6 @@ package net.spy.memcached.ops;
  * Gets operation (get with CAS identifier support).
  */
 public interface GetsOperation extends KeyedOperation {
-
   /**
    * Operation callback for the Gets request.
    */

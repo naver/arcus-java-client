@@ -51,4 +51,8 @@ public interface BTreeGetBulk<T> {
   public void decodeItemHeader(String itemHeader);
 
   public void decodeKeyHeader(String keyHeader);
+
+  /* ENABLE_MIGRATION if */
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> redirectKeys);
+  /* ENABLE_MIGRATION end */
 }

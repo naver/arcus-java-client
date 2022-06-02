@@ -261,6 +261,12 @@ public abstract class BaseOperationImpl extends SpyObject {
     this.apiType = type;
   }
 
+  /* ENABLE_MIGRATION if */
+  public boolean isMGetOperation() {
+    return false;
+  }
+  /* ENABLE_MIGRATION end */
+
   public abstract boolean isBulkOperation();
 
   public abstract boolean isPipeOperation();
