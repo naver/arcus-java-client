@@ -36,6 +36,9 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
   protected Transcoder<T> tc;
   protected int itemCount;
   protected int nextOpIndex = 0;
+  /* ENABLE_MIGRATION if */
+  protected int redirectIndex = 0;
+  /* ENABLE_MIGRATION end */
 
   /**
    * set next index of operation
@@ -48,6 +51,12 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
   public int getNextOpIndex() {
     return nextOpIndex;
   }
+
+  /* ENABLE_MIGRATION if */
+  public void setRedirectIndex(int i) {
+    this.redirectIndex = i;
+  }
+  /* ENABLE_MIGRATION end */
 
   public abstract ByteBuffer getAsciiCommand();
 
@@ -110,7 +119,8 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
       int eSize = elements.size();
-      for (i = this.nextOpIndex; i < eSize; i++) {
+      int index = nextOpIndex > 0 ? nextOpIndex : redirectIndex;
+      for (i = index; i < eSize; i++) {
         Element<T> element = elements.get(i);
         value = decodedList.get(i);
         eflagUpdate = element.getElementFlagUpdate();
@@ -195,7 +205,8 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
       // create ascii operation string
       int mkeySize = elements.keySet().size();
       List<String> keyList = new ArrayList<String>(elements.keySet());
-      for (i = this.nextOpIndex; i < mkeySize; i++) {
+      int index = nextOpIndex > 0 ? nextOpIndex : redirectIndex;
+      for (i = index; i < mkeySize; i++) {
         String mkey = keyList.get(i);
         value = encodedList.get(i);
         b = new StringBuilder();

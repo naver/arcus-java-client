@@ -148,11 +148,11 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
           }
         }
       }
-      /* ENABLE_REPLICATION if */
-      if (getState() == OperationState.MOVING) {
+      /* ENABLE_REPLICATION or ENABLE_MIGRATION if */
+      if (getState() == OperationState.MOVING || getState() == OperationState.REDIRECT) {
         break;
       }
-      /* ENABLE_REPLICATION end */
+      /* ENABLE_REPLICATION or ENABLE_MIGRATION end */
     }
   }
 

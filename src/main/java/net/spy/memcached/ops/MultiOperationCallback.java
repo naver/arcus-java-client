@@ -11,8 +11,8 @@ package net.spy.memcached.ops;
  */
 public abstract class MultiOperationCallback implements OperationCallback {
 
-  private OperationStatus mostRecentStatus = null;
-  private int remaining = 0;
+  private OperationStatus mostRecentStatus;
+  private int remaining;
   protected final OperationCallback originalCallback;
 
   /**
@@ -27,6 +27,12 @@ public abstract class MultiOperationCallback implements OperationCallback {
     remaining = todo;
   }
 
+  public MultiOperationCallback(OperationCallback original, OperationStatus status, int todo) {
+    this(original, todo);
+    mostRecentStatus = status;
+  }
+
+  @Override
   public void complete() {
     if (--remaining == 0) {
       originalCallback.receivedStatus(mostRecentStatus);
@@ -34,8 +40,18 @@ public abstract class MultiOperationCallback implements OperationCallback {
     }
   }
 
+  @Override
   public void receivedStatus(OperationStatus status) {
-    mostRecentStatus = status;
+    if (mostRecentStatus == null) {
+      mostRecentStatus = status;
+    } else {
+      if (!status.isSuccess()) {
+        mostRecentStatus = status;
+      }
+    }
   }
 
+  public OperationCallback getCallback() {
+    return originalCallback;
+  }
 }

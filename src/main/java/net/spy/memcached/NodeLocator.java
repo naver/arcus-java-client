@@ -46,6 +46,18 @@ public interface NodeLocator {
    */
   Collection<MemcachedNode> getAll();
 
+  /* ENABLE_MIGRATION if */
+  /**
+   * Get all alter memcached nodes.
+   */
+  Collection<MemcachedNode> getAlterAll();
+
+  /**
+   * Get all exist memcached nodes.
+   */
+  Collection<MemcachedNode> getExistAll();
+  /* ENABLE_MIGRATION if */
+
   /**
    * Create a read-only copy of this NodeLocator.
    */
@@ -56,4 +68,10 @@ public interface NodeLocator {
    * only available in ArcusKetamaNodeLocator.
    */
   void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
+
+  /* ENABLE_MIGRATION if */
+  void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type);
+
+  boolean updateMigration(Long spoint, Long epoint);
+  /* ENABLE_MIGRATION end */
 }

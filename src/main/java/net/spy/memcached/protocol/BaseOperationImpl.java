@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
+import net.spy.memcached.RedirectHandler;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationException;
@@ -57,6 +58,10 @@ public abstract class BaseOperationImpl extends SpyObject {
   /* ENABLE_REPLICATION if */
   private boolean moved = false;
   /* ENABLE_REPLICATION end */
+
+  /* ENABLE_MIGRATION if */
+  protected RedirectHandler redirectHandler;
+  /* ENABLE_MIGRATION end */
 
   public BaseOperationImpl() {
     super();
@@ -151,6 +156,34 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
   /* ENABLE_REPLICATION end */
 
+  /* ENABLE_MIGRATION if */
+  public final RedirectHandler getRedirectHandler() {
+    return redirectHandler;
+  }
+
+  protected final void addRedirectSingleKeyOperation(String response, String key) {
+    if (redirectHandler == null) {
+      redirectHandler = new RedirectHandler.RedirectHandlerSingleKey();
+    }
+    redirectHandler.addRedirectKey(response, key, null);
+  }
+
+  protected final void addRedirectMultiKeyOperation(String response, String key, Integer keyIndex) {
+    if (redirectHandler == null) {
+      redirectHandler = new RedirectHandler.RedirectHandlerMultiKey();
+    }
+    redirectHandler.addRedirectKey(response, key, keyIndex);
+  }
+
+  protected final void setPreviousOperationStatus(OperationStatus operationStatus) {
+    redirectHandler.setOperationStatus(operationStatus);
+  }
+
+  protected final boolean needRedirect() {
+    return redirectHandler != null;
+  }
+  /* ENABLE_MIGRATION end */
+
   public final ByteBuffer getBuffer() {
     return cmd;
   }
@@ -176,11 +209,11 @@ public abstract class BaseOperationImpl extends SpyObject {
       cmd = null;
     }
     if (state == OperationState.COMPLETE) {
-      /* ENABLE_REPLICATION if */
+      /* ENABLE_REPLICATION or ENABLE_MIGRATION if */
       if (moved) {
         getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
       }
-      /* ENABLE_REPLICATION end */
+      /* ENABLE_REPLICATION or ENABLE_MIGRATION end */
       callback.complete();
     }
   }

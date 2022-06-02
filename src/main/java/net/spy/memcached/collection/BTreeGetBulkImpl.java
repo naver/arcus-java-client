@@ -78,6 +78,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
         BTreeUtil.compareByteArraysInLexOrder(from, to) > 0, eFlagFilter, offset, count);
   }
 
+  protected BTreeGetBulkImpl(BTreeGetBulkImpl<T> bTreeGetBulk) {
+    this(bTreeGetBulk.node, bTreeGetBulk.keyList, bTreeGetBulk.range, bTreeGetBulk.reverse,
+        bTreeGetBulk.eFlagFilter, bTreeGetBulk.offset, bTreeGetBulk.count);
+  }
+
   public void setKeySeparator(String keySeparator) {
     this.keySeparator = keySeparator;
   }
@@ -105,6 +110,11 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   public List<String> getKeyList() {
     return keyList;
+  }
+
+  public void setRedirect(MemcachedNode owner, List<String> redirectKeys) {
+    this.node = owner;
+    this.keyList = redirectKeys;
   }
 
   public String stringify() {

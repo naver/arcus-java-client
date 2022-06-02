@@ -46,15 +46,23 @@ import org.apache.zookeeper.ZooDefs.Ids;
  * previous ketama node
  */
 public class CacheManager extends SpyThread implements Watcher,
-        CacheMonitor.CacheMonitorListener {
+        CacheMonitor.CacheMonitorListener, MigrationMonitor.MigrationMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
   private static final String ARCUS_BASE_CLIENT_LIST_ZPATH = "/arcus/client_list/";
+
+  /* ENABLE_MIGRATION if */
+  private static final String ARCUS_BASE_CLOUD_STAT_ZPATH = "/arcus/cloud_stat/";
+  /* ENABLE_MIGRATION end */
 
   /* ENABLE_REPLICATION if */
   private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
   private static final String ARCUS_REPL_CLIENT_LIST_ZPATH = "/arcus_repl/client_list/";
+
+  /* ENABLE_MIGRATION if */
+  private static final String ARCUS_REPL_CLOUD_STAT_ZPATH = "/arcus_repl/cloud_stat/";
+  /* ENABLE_MIGRATION end */
   /* ENABLE_REPLICATION end */
 
   private static final int ZK_SESSION_TIMEOUT = 15000;
@@ -75,6 +83,10 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private final CountDownLatch clientInitLatch;
 
+  /* ENABLE_MIGRATION if */
+  private final CountDownLatch migrationInitLatch;
+  /* ENABLE_MIGRATION end */
+
   private final ConnectionFactoryBuilder cfb;
 
   private final int waitTimeForConnect;
@@ -88,6 +100,11 @@ public class CacheManager extends SpyThread implements Watcher,
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled = false;
   /* ENABLE_REPLICATION end */
+
+  /* ENABLE_MIGRATION if */
+  private MigrationMonitor migrationMonitor;
+  private boolean arcusMigrEnabled = false;
+  /* ENABLE_MIGRATION end */
 
   public CacheManager(String hostPort, String serviceCode,
                       ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
@@ -104,9 +121,11 @@ public class CacheManager extends SpyThread implements Watcher,
     this.waitTimeForConnect = waitTimeForConnect;
 
     this.clientInitLatch = new CountDownLatch(1);
+    this.migrationInitLatch = new CountDownLatch(1);
     initZooKeeperClient();
     try {
       clientInitLatch.await();
+      migrationInitLatch.await();
       if (client == null) { // initArcusClient() failure
         shutdownZooKeeperClient();
         throw new InitializeClientException("Can't initialize Arcus client.");
@@ -132,6 +151,17 @@ public class CacheManager extends SpyThread implements Watcher,
     /* ENABLE_REPLICATION end */
     return ARCUS_BASE_CACHE_LIST_ZPATH;
   }
+
+  /* ENABLE_MIGRATION if */
+  private String getCloudStatZPath() {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      return ARCUS_REPL_CLOUD_STAT_ZPATH;
+    }
+    /* ENABLE_REPLICATION end */
+    return ARCUS_BASE_CLOUD_STAT_ZPATH;
+  }
+  /* ENABLE_MIGRATION end */
 
   private String getClientListZPath() {
     /* ENABLE_REPLICATION if */
@@ -186,6 +216,18 @@ public class CacheManager extends SpyThread implements Watcher,
         }
       }
 
+      /* ENABLE_MIGRATION if */
+      if (zk.exists(getCloudStatZPath() + serviceCode, false) != null) {
+        arcusMigrEnabled = true;
+        cfb.internalArcusMigrEnabled(true);
+        getLogger().info("Migration feature is enabled.");
+      } else {
+        arcusMigrEnabled = false;
+        migrationInitLatch.countDown();
+        getLogger().info("Migration feature is disabled.");
+      }
+      /* ENABLE_MIGRATION end */
+
       String path = getClientInfo();
       if (path.isEmpty()) {
         getLogger().fatal("Can't create the znode of client info (" + path + ")");
@@ -198,6 +240,12 @@ public class CacheManager extends SpyThread implements Watcher,
 
       // create the cache monitor
       cacheMonitor = new CacheMonitor(zk, getCacheListZPath(), serviceCode, this);
+
+      /* ENABLE_MIGRATION if */
+      if (arcusMigrEnabled) {
+        migrationMonitor = new MigrationMonitor(zk, getCloudStatZPath(), serviceCode, this);
+      }
+      /* ENABLE_MIGRATION end */
     } catch (NotExistsServiceCodeException e) {
       shutdownZooKeeperClient();
       throw e;
@@ -279,7 +327,7 @@ public class CacheManager extends SpyThread implements Watcher,
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
-        if (!cacheMonitor.isDead()) {
+        if (!cacheMonitor.isDead() || !migrationMonitor.isDead()) {
           try {
             wait();
           } catch (InterruptedException e) {
@@ -390,6 +438,51 @@ public class CacheManager extends SpyThread implements Watcher,
       conn.putNodesChangeQueue(addrs);
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public void commandAlterListChange(List<String> children) {
+    String addrs = getAddressListString(children);
+    if (migrationInitLatch.getCount() == 1) {
+      try {
+        for (ArcusClient ac : client) {
+          MemcachedConnection conn = ac.getMemcachedConnection();
+          conn.prepareAlterConnections(arcusReplEnabled ?
+              ArcusReplNodeAddress.getAddresses(addrs) : AddrUtil.getAddresses(addrs));
+        }
+      } catch (IOException e) {
+        getLogger().fatal("Arcus Connection has critical problems." +
+            " contact arcus manager.", e);
+        /* shutdown created ArcusClient */
+        for (ArcusClient ac : client) {
+          ac.shutdown();
+        }
+        client = null;
+        return;
+      }
+      migrationInitLatch.countDown();
+    } else {
+      for (ArcusClient ac : client) {
+        MemcachedConnection conn = ac.getMemcachedConnection();
+        conn.putAlterNodesChangeQueue(addrs);
+      }
+    }
+  }
+
+  public void setMigrationTypeAndState(MigrationType type, MigrationState state) {
+    if (client != null && state == MigrationState.PREPARED) {
+      for (ArcusClient ac : client) {
+        MemcachedConnection conn = ac.getMemcachedConnection();
+        conn.setMigrationStateAndType(type, state);
+      }
+      /* migrationInitLatch.countDown() after read all alter_list. see commandAlterListChange(). */
+    } else {
+      if (migrationInitLatch.getCount() == 1) {
+        migrationInitLatch.countDown();
+      }
+    }
+  }
+  /* ENABLE_MIGRATION end */
 
   public List<String> getPrevCacheList() {
     return this.prevCacheList;

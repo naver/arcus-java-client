@@ -91,4 +91,8 @@ class GetOperationImpl extends OperationImpl
     return true;
   }
 
+  @Override
+  public boolean isMGetOperation() {
+    return false;
+  }
 }

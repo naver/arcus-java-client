@@ -25,6 +25,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionBulkInsertOperation;
+import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -68,10 +69,15 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   protected int index = 0;
   protected boolean successAll = true;
 
+  /* ENABLE_MIGRATION if */
+  private boolean redirecting;
+  /* ENABLE_MIGRATION end */
+
   public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);
     this.insert = insert;
     this.cb = (Callback) cb;
+    this.redirecting = cb instanceof MultiOperationCallback;
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert) {
@@ -95,17 +101,41 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectMultiKeyOperation(line, insert.getKeyList().get(index), index);
+      if (insert.getItemCount() == 1) {
+        insert.setNextOpIndex(0);
+        setPreviousOperationStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.REDIRECT);
+      }
+      index++;
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (insert.getItemCount() - insert.getNextOpIndex() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus((successAll) ? END : FAILED_END);
-      } else {
-        cb.gotStatus(index, status);
-        cb.receivedStatus(FAILED_END);
+      if (!status.isSuccess()) {
+        /* ENABLE_MIGRATION if */
+        if (redirecting) {
+          cb.gotStatus(insert.getRedirectKeyIndex(index), status);
+        /* ENABLE_MIGRATION end */
+        } else {
+          cb.gotStatus(index, status);
+        }
+        successAll = false;
       }
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        insert.setNextOpIndex(0);
+        setPreviousOperationStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
+      cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -118,8 +148,16 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        insert.setNextOpIndex(0);
+        transitionState(OperationState.REDIRECT);
+        return;
+      /* ENABLE_MIGRATION end */
+      } else {
+        cb.receivedStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.COMPLETE);
+      }
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 
@@ -136,7 +174,13 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
+        /* ENABLE_MIGRATION if */
+        if (redirecting) {
+          cb.gotStatus(insert.getRedirectKeyIndex(index), status);
+        /* ENABLE_MIGRATION end */
+        } else {
+          cb.gotStatus(index, status);
+        }
         successAll = false;
       }
 

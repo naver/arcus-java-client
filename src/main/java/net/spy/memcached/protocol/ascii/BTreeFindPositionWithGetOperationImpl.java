@@ -88,6 +88,14 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
   public void handleLine(String line) {
     getLogger().debug("Got line %s", line);
 
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
+
     /*
       VALUE <position> <flags> <count> <index>\r\n
       <bkey> [<eflag>] <bytes> <data>\r\n

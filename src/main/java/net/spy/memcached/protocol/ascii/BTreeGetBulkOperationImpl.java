@@ -73,6 +73,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   protected byte lookingFor = '\0';
   protected int spaceCount = 0;
   protected int elementCount = 0;
+  protected int index = 0;
 
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);
@@ -99,6 +100,12 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       OperationStatus status = matchStatus(line, END);
 
       getLogger().debug(status);
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       getCallback().receivedStatus(status);
 
       transitionState(OperationState.COMPLETE);
@@ -115,6 +122,13 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   private final void readKey(String line) {
     String[] chunk = line.split(" ");
+    /* ENABLE_MIGRATION if */
+    if (chunk[2].startsWith("NOT_MY_KEY")) {
+      addRedirectMultiKeyOperation(line, getBulk.getKeyList().get(index), index);
+      index++;
+      return;
+    }
+    /* ENABLE_MIGRATION end */
 
     OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
             NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
@@ -248,6 +262,10 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   public Collection<String> getKeys() {
     return getBulk.getKeyList();
+  }
+
+  public BTreeGetBulk<?> getBulk() {
+    return getBulk;
   }
 
   @Override

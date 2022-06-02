@@ -19,6 +19,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -41,6 +42,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
   private final String cmd;
   private final Collection<String> keys;
   private String currentKey = null;
+  /* ENABLE_MIGRATION if */
+  private int keyIndex = 0;
+  /* ENABLE_MIGRATION end */
   private long casValue = 0;
   private int currentFlags = 0;
   private byte[] data = null;
@@ -66,6 +70,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
   public final void handleLine(String line) {
     if (line.equals("END")) {
       getLogger().debug("Get complete!");
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       getCallback().receivedStatus(END);
       transitionState(OperationState.COMPLETE);
       data = null;
@@ -82,6 +92,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
       readOffset = 0;
       getLogger().debug("Set read type to data");
       setReadType(OperationReadType.DATA);
+      keyIndex++;
+    /* ENABLE_MIGRATION if */
+    } else if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectMultiKeyOperation(line, ((ArrayList<String>) keys).get(keyIndex), keyIndex);
+      keyIndex++;
+    /* ENABLE_MIGRATION end */
     } else {
       assert false : "Unknown line type: " + line;
     }
@@ -159,6 +175,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
     ByteBuffer b;
 
     String keysString = generateKeysString();
+    /* ENABLE_MIGRATION if */
+    keyIndex = 0;
+    if (redirectHandler != null) {
+      redirectHandler = null;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (cmd.equals("get") || cmd.equals("gets")) {
       // make command string, for example,
@@ -231,4 +253,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return true;
   }
 
+  public boolean isMGetOperation() {
+    return cmd.equals("mget") || cmd.equals("mgets");
+  }
 }
