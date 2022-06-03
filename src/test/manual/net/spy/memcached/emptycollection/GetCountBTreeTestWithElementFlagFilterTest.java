@@ -24,7 +24,7 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import net.spy.memcached.internal.CollectionFuture;
 
-public class GetCountBTreeTestWithElementFlagFilter extends BaseIntegrationTest {
+public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
