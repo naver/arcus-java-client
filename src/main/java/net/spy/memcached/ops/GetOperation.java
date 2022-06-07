@@ -6,6 +6,7 @@ package net.spy.memcached.ops;
  */
 public interface GetOperation extends KeyedOperation {
 
+  boolean isMGetOperation();
   /**
    * Operation callback for the get request.
    */

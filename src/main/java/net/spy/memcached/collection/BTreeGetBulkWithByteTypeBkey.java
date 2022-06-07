@@ -30,6 +30,10 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, from, to, eFlagFilter, offset, count);
   }
 
+  public BTreeGetBulkWithByteTypeBkey(BTreeGetBulkImpl bTreeGetBulk) {
+    super(bTreeGetBulk);
+  }
+
   public byte[] getSubkey() {
     return (byte[]) subkey;
   }

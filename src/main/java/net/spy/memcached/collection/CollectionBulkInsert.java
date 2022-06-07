@@ -42,6 +42,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   protected int nextOpIndex = 0;
 
+  /* ENABLE_MIGRATION if */
+  private List<Integer> redirectKeyIndexes;
+  /* ENABLE_MIGRATION end */
+
   /**
    * set next index of operation
    * that will be processed after when operation moved by switchover
@@ -61,6 +65,20 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
   public abstract ByteBuffer getAsciiCommand();
 
   public abstract ByteBuffer getBinaryCommand();
+
+  /* ENABLE_MIGRATION if */
+  public Integer getRedirectKeyIndex(int index) {
+    return redirectKeyIndexes.get(index);
+  }
+
+  public final void setRedirect(MemcachedNode node,
+                                List<String> redirectKeys, List<Integer> redirectKeyIndexes) {
+    this.node = node;
+    this.redirectKeyIndexes = redirectKeyIndexes;
+    keyList = redirectKeys;
+    itemCount = keyList.size();
+  }
+  /* ENABLE_MIGRATION end */
 
   /**
    *
@@ -96,6 +114,11 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, byte[] bkey,
                            byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
       this(node, keyList, BTreeUtil.toHex(bkey), BTreeUtil.toHex(eflag), value, attr, tc);
+    }
+
+    public BTreeBulkInsert(BTreeBulkInsert<T> insert) {
+      this(insert.node, insert.keyList, insert.bkey, insert.eflag, insert.value,
+          insert.attribute, insert.tc);
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -157,6 +180,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
+    public MapBulkInsert(MapBulkInsert<T> insert) {
+      this(insert.node, insert.keyList, insert.mkey, insert.value, insert.attribute, insert.tc);
+    }
+
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
@@ -213,6 +240,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.cachedData = tc.encode(value);
     }
 
+    public SetBulkInsert(SetBulkInsert<T> insert) {
+      this(insert.node, insert.keyList, insert.value, insert.attribute, insert.tc);
+    }
+
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
@@ -267,6 +298,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       this.tc = tc;
       this.itemCount = keyList.size();
       this.cachedData = tc.encode(value);
+    }
+
+    public ListBulkInsert(ListBulkInsert<T> insert) {
+      this(insert.node, insert.keyList, insert.index, insert.value, insert.attribute, insert.tc);
     }
 
     public ByteBuffer getAsciiCommand() {

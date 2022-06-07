@@ -231,4 +231,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return true;
   }
 
+  public boolean isMGetOperation() {
+    return cmd.equals("mget") || cmd.equals("mgets");
+  }
 }
