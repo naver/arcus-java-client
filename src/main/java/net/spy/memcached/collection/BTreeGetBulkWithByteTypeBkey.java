@@ -27,7 +27,8 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
                                       byte[] from, byte[] to,
                                       ElementFlagFilter eFlagFilter,
                                       int offset, int count) {
-    super(node, keyList, from, to, eFlagFilter, offset, count);
+    super(node, keyList, BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
+        BTreeUtil.compareByteArraysInLexOrder(from, to) > 0, eFlagFilter, offset, count);
   }
 
   public byte[] getSubkey() {
