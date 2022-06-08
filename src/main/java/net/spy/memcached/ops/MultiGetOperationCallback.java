@@ -10,6 +10,7 @@ public class MultiGetOperationCallback extends MultiOperationCallback
     super(original, todo);
   }
 
+  @Override
   public void gotData(String key, int flags, byte[] data) {
     ((GetOperation.Callback) originalCallback).gotData(key, flags, data);
   }
