@@ -27,6 +27,7 @@ public abstract class MultiOperationCallback implements OperationCallback {
     remaining = todo;
   }
 
+  @Override
   public void complete() {
     if (--remaining == 0) {
       originalCallback.receivedStatus(mostRecentStatus);
@@ -34,6 +35,7 @@ public abstract class MultiOperationCallback implements OperationCallback {
     }
   }
 
+  @Override
   public void receivedStatus(OperationStatus status) {
     mostRecentStatus = status;
   }
