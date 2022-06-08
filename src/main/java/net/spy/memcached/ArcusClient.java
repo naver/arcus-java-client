@@ -4193,7 +4193,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             entry.getValue(), from, to, eFlagFilter, offset, count));
     }
 
-    return btreeGetBulk(getBulkList, offset, count, (from > to), tc);
+    return btreeGetBulk(getBulkList, (from > to), tc);
   }
 
   public CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
@@ -4233,22 +4233,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
 
-    return btreeGetBulkByteArrayBKey(getBulkList, offset, count, reverse, tc);
+    return btreeGetBulkByteArrayBKey(getBulkList, reverse, tc);
   }
 
   /**
    * Generic bulk get operation for b+tree items. Public methods call this method.
    *
    * @param getBulkList list of operation parameters (item keys, element key range, and so on)
-   * @param offset      start index of the elements
-   * @param count       number of elements to fetch
    * @param reverse     forward or backward
    * @param tc          transcoder to serialize and unserialize value
    * @return future holding the map of item key and the fetched elements from that key
    */
   private <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>> btreeGetBulk(
-          final List<BTreeGetBulk<T>> getBulkList, final int offset,
-          final int count, final boolean reverse, final Transcoder<T> tc) {
+          final List<BTreeGetBulk<T>> getBulkList,
+          final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
@@ -4296,16 +4294,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Public methods call this method.
    *
    * @param getBulkList list of operation parameters (item keys, element key range, and so on)
-   * @param offset      start index of the elements
-   * @param count       number of elements to fetch
    * @param reverse     forward or backward
    * @param tc          transcoder to serialize and unserialize value
    * @return future holding the map of item key and the fetched elements from that key
    */
   private <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>
       btreeGetBulkByteArrayBKey(
-          final List<BTreeGetBulk<T>> getBulkList, final int offset,
-          final int count, final boolean reverse, final Transcoder<T> tc) {
+          final List<BTreeGetBulk<T>> getBulkList,
+          final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
