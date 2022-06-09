@@ -42,11 +42,11 @@ for(int i = 1; i < 300; i++) {
   keyList.add("key"+i);
 }
 
+Map<String, Object> map = null;
 BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keyList);
 
-Map<String, Object> map = null;
 try {
-  future.get(6, TimeUnit.MILLISECONDS);
+  map = future.get(6, TimeUnit.MILLISECONDS);
 } catch (ExecutionException e) {
   e.printStackTrace();
 } catch (TimeoutException e) {

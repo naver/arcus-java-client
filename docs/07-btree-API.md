@@ -715,11 +715,11 @@ CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by)
 CollectionFuture<Long> asyncBopIncr(String key, Byte[] bkey, int by)
 CollectionFuture<Long> asyncBopDecr(String key, Byte[] bkey, int by)
 
-CollectionFuture<Long> asyncBopIncr(String key, long subkey, int by, long initial, byte[] eFlag);
-CollectionFuture<Long> asyncBopDecr(String key, long subkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopIncr(String key, long bkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by, long initial, byte[] eFlag);
 
-CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey, int by, long initial, byte[] eFlag);
-CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey, int by, long initial, byte[] eFlag);
+CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey, int by, long initial, byte[] eFlag);
 ```
 
 - key: b+tree item의 key
@@ -903,8 +903,8 @@ B+tree element를 조회하는 예제는 아래와 같다.
 
 ```java
 String key = "Prefix:BTreeKey";
-long from = 1L;
-long to = 6L;
+long bkeyFrom = 1L;
+long bkeyTo = 6L;
 int offset = 2;
 int count = 3;
 boolean withDelete = false;
@@ -913,7 +913,7 @@ ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal, new byte[] 
 CollectionFuture<Map<Long, Element<Object>>> future = null;
 
 try {
-    future = client.asyncBopGet(key, from, to, filter, offset, count, withDelete, dropIfEmpty); // (1)
+    future = client.asyncBopGet(key, bkeyFrom, bkeyTo, filter, offset, count, withDelete, dropIfEmpty); // (1)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -927,7 +927,7 @@ try {
 
     CollectionResponse response = future.getOperationStatus().getResponse(); // (3)
     if (response.equals(CollectionResponse.NOT_FOUND)) {
-        System.out.println("Key가 없습니다.(Key에 저장된 B+ tree가 없음.");
+        System.out.println("Key가 없습니다.(Key를 가진 아이템이 없습니다.)");
     } else if (response.equals(CollectionResponse.NOT_FOUND_ELEMENT)) {
         System.out.println("Key에 B+ tree는 존재하지만 저장된 값 중 조건에 맞는 것이 없음.");
     }
@@ -1124,14 +1124,14 @@ final List<String> keyList = new ArrayList<String>() {
 ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 long bkeyFrom = 0L;
 long bkeyTo = 100L;
-int queryCount = 10;
 int offset = 0;
+int count = 10;
 
 CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> future = null;
 Map<String, BTreeGetResult<Long, Object>> results = null;
 
 try {
-    future = mc.asyncBopGetBulk(keyList, from, to, filter, offset, count); // (1)
+    future = mc.asyncBopGetBulk(keyList, bkeyFrom, bkeyTo, filter, offset, count); // (1)
     results = future.get(1000L, TimeUnit.MILLISECONDS);
 } catch (InterruptedException e) {
     future.cancel(true);
@@ -1144,14 +1144,19 @@ try {
 if (results == null) return;
 
 for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { // (2)
-    System.out.println("key=" + entry.getKey());
-    System.out.println("result code=" + entry.getValue().getCollectionResponse().getMessage()); // (3)
+    String key = entry.getKey();
+    BTreeGetResult<Long, Object> bTreeGetResult = entry.getValue();
+    
+    System.out.println("key=" + key);
+    System.out.println("result code=" + bTreeGetResult.getCollectionResponse().getMessage()); // (3)
 
-    if (entry.getValue().getElements() != null) { // (4)
-        for(Entry<Long, BTreeElement<Long, Object>> el : entry.getValue().getElements().entrySet()) {
-            System.out.println("bkey=" + el.getBkey());
-            System.out.println("eflag=" + Arrays.toString(el.getValue().getEflag());
-            System.out.println("value=" + el.getValue().getValue());
+    if (bTreeGetResult.getElements() != null) { // (4)
+        for(Entry<Long, BTreeElement<Long, Object>> el : bTreeGetResult.getElements().entrySet()) {
+            BTreeElement<Long, Object> bTreeElement = el.getValue();
+            
+            System.out.println("bkey=" + bTreeElement.getBkey());
+            System.out.println("eflag=" + Arrays.toString(bTreeElement.getEflag());
+            System.out.println("value=" + bTreeElement.getValue());
         }
     }
 }
@@ -1251,13 +1256,13 @@ List<String> keyList = new ArrayList<String>() {{
 
 long bkeyFrom = 0L; // (1)
 long bkeyTo = 100L;
-int queryCount = 10;
+int count = 10;
 
 SMGetMode smgetMode = SMGetMode.DUPLICATE;
 SMGetFuture<List<SMGetElement<Object>>> future = null;
 
 try {
-    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode); // (2)
+    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, count, smgetMode); // (2)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -1424,13 +1429,16 @@ public void testLongBKeyMultiple() throws Exception {
 
     assertEquals(4, result.size());
     assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
-
-    int count = 0;
+    
+    int elementCount = 0;
     for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-        int currPos = posFrom + count++;
-        assertEquals("invalid index", currPos, each.getKey().intValue());
-        assertEquals("invalid bkey", longBkeys[currPos], each.getValue().getLongBkey());
-        assertEquals("invalid value", "val", each.getValue().getValue());
+        int currPos = posFrom + elementCount++;
+        int resultPosition = each.getKey();
+        Element<Object> element = each.getValue();
+        
+        assertEquals("invalid index", currPos, resultPosition);
+        assertEquals("invalid bkey", longBkeys[currPos], element.getLongBkey());
+        assertEquals("invalid value", "val", element.getValue());
     }
 }
 ```
@@ -1480,49 +1488,52 @@ B+tree에서 position과 element 동시 조회 예제이다.
 String key = "BopFindPositionWithGetTest";
 
 public void testLongBKey() throws Exception {
-        long longBkey, resultBkey;
-        int  totCount = 100;
-        int  pwgCount = 10;
-        int  rstCount;
-        int  position, i;
+    long longBkey, resultBkey;
+    int  totCount = 100;
+    int  pwgCount = 10;
+    int  rstCount;
+    int  position, i;
 
-        // totCount개의 테스트 데이터를 insert한다.
-        CollectionAttributes attrs = new CollectionAttributes();
-        for (i = 0; i < totCount; i++) {
-                longBkey = (long)i;
-                arcusClient.asyncBopInsert(key, longBkey, null, "val", attrs).get();
+    // totCount개의 테스트 데이터를 insert한다.
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (i = 0; i < totCount; i++) {
+        longBkey = (long)i;
+        arcusClient.asyncBopInsert(key, longBkey, null, "val", attrs).get();
+    }
+
+    for (i = 0; i < totCount; i++) {
+        // longBkey를 bkey로 가지는 element의 position을 기준으로 주변(앞/뒤 position) element들을 pwgCount만큼 조회
+        longBkey = (long)i;
+        CollectionFuture<Map<Integer, Element<Object>>> f = arcusClient
+                .asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, pwgCount);
+        Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
+
+        if (i >= pwgCount && i < (totCount-pwgCount)) {
+            rstCount = pwgCount + 1 + pwgCount;
+        } else {
+            if (i < pwgCount)
+            rstCount = i + 1 + pwgCount;
+            else
+            rstCount = pwgCount + 1 + ((totCount-1)-i);
         }
+        assertEquals(rstCount, result.size());
+        assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-        for (i = 0; i < totCount; i++) {
-                // longBkey를 bkey로 가지는 element의 position을 기준으로 주변(앞/뒤 position) element들을 pwgCount만큼 조회
-                longBkey = (long)i;
-                CollectionFuture<Map<Integer, Element<Object>>> f = arcusClient
-                                .asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, pwgCount);
-                Map<Integer, Element<Object>> result = f.get(1000, TimeUnit.MILLISECONDS);
-
-                if (i >= pwgCount && i < (totCount-pwgCount)) {
-                        rstCount = pwgCount + 1 + pwgCount;
-                } else {
-                        if (i < pwgCount)
-                        rstCount = i + 1 + pwgCount;
-                        else
-                        rstCount = pwgCount + 1 + ((totCount-1)-i);
-                }
-                assertEquals(rstCount, result.size());
-                assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
-
-                if (i < pwgCount) {
-                        position = 0;
-                } else {
-                        position = i - pwgCount;
-                }
-                resultBkey = position;
-                for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-                        assertEquals("invalid position", position, each.getKey().intValue());
-                        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
-                        assertEquals("invalid value", "val", each.getValue().getValue());
-                        position++; resultBkey++;
-                }
+        if (i < pwgCount) {
+            position = 0;
+        } else {
+            position = i - pwgCount;
         }
+        resultBkey = position;
+        for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+            int resultPosition = each.getKey();
+            Element<Object> element = each.getValue();
+            
+            assertEquals("invalid position", position, resultPosition);
+            assertEquals("invalid bkey", resultBkey, element.getLongBkey());
+            assertEquals("invalid value", "val", element.getValue());
+            position++; resultBkey++;
+        }
+    }
 }
 ```
