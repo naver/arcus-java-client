@@ -4,10 +4,10 @@ This is a fork of [spymemcached][spymemcached] with the following modifications
 to support Arcus memcached cloud.
 
 - Collection data types
-	- List: A doubly-linked list.
-	- Set: An unordered set of unique data.
-	- Map: An unordered set of <field, value>.
-	- B+Tree: A B+Tree structure similar to sorted map.
+    - List: A doubly-linked list.
+    - Set: An unordered set of unique data.
+    - Map: An unordered set of <field, value>.
+    - B+Tree: A B+Tree structure similar to sorted map.
 - ZooKeeper based clustering
 
 [spymemcached]: https://code.google.com/p/spymemcached/ "spymemcached"
@@ -25,11 +25,11 @@ To use it, add the following dependency to your pom.xml.
 
 ```xml
 <dependencies>
-	<dependency>
-		<groupId>com.navercorp.arcus</groupId>
-		<artifactId>arcus-java-client</artifactId>
-		<version>1.13.3</version>
-	</dependency>
+    <dependency>
+        <groupId>com.navercorp.arcus</groupId>
+        <artifactId>arcus-java-client</artifactId>
+        <version>1.13.3</version>
+    </dependency>
 </dependencies>
 ```
 

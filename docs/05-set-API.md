@@ -60,23 +60,23 @@ String key = "Sample:EmptySet";
 CollectionFuture<Boolean> future = null;
 CollectionAttributes attribute = new CollectionAttributes();
 try {
-	future = client.asyncSopCreate(key, ElementValueType.OTHERS,
-			attribute); // (1)
+    future = client.asyncSopCreate(key, ElementValueType.OTHERS,
+            attribute); // (1)
 } catch (IllegalStateException e) {
-	// handle exception
+    // handle exception
 }
 if (future == null)
-	return;
+    return;
 try {
-	Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
-	System.out.println(result);
-	System.out.println(future.getOperationStatus().getResponse()); // (3)
+    Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+    System.out.println(result);
+    System.out.println(future.getOperationStatus().getResponse()); // (3)
 } catch (TimeoutException e) {
-	future.cancel(true);
+    future.cancel(true);
 } catch (InterruptedException e) {
-	future.cancel(true);
+    future.cancel(true);
 } catch (ExecutionException e) {
-	future.cancel(true);
+    future.cancel(true);
 }
 ```
 
