@@ -90,9 +90,9 @@ eflag filter 조건에서 compare/bitwise 연산이 수행될 eflag의 전체/�
 
 compare 연산자                                | 설명
 --------------------------------------------- | ----
-ElementFlagFilter.CompOperands.Equal	      | 일치
-ElementFlagFilter.CompOperands.NotEqual	      | 일치하지 않음
-ElementFlagFilter.CompOperands.LessThan	      | 작은 것
+ElementFlagFilter.CompOperands.Equal          | 일치
+ElementFlagFilter.CompOperands.NotEqual          | 일치하지 않음
+ElementFlagFilter.CompOperands.LessThan          | 작은 것
 ElementFlagFilter.CompOperands.LessOrEqual    | 작거나 같은 것
 ElementFlagFilter.CompOperands.GreaterThan    | 큰 것
 ElementFlagFilter.CompOperands.GreaterOrEqual | 크거나 같은 것
@@ -101,9 +101,9 @@ ElementFlagFilter.CompOperands.GreaterOrEqual | 크거나 같은 것
 
 | bitwise 연산자                              | 설명
 |-------------------------------------------- | ----
-ElementFlagFilter.BitwiseOperands.AND	      | AND 연산
-ElementFlagFilter.BitwiseOperands.OR	      | OR 연산
-ElementFlagFilter.BitwiseOperands.XOR	      | XOR 연산
+ElementFlagFilter.BitwiseOperands.AND          | AND 연산
+ElementFlagFilter.BitwiseOperands.OR          | OR 연산
+ElementFlagFilter.BitwiseOperands.XOR          | XOR 연산
 
 ### ElementFlagFilter 메소드
 
@@ -441,38 +441,38 @@ private String key = "BopStoreAndGetTest";
 private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L };
 
 public void testInsertAndGetTrimmedLongBKey() throws Exception {
-	// insert test data
-	CollectionAttributes attrs = new CollectionAttributes();
-	attrs.setMaxCount(10);
-	attrs.setOverflowAction(CollectionOverflowAction.smallest_trim);
-	for (long each : longBkeys) {
-		mc.asyncBopInsert(key, each, null, "val", attrs).get();
-	}
+    // insert test data
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(10);
+    attrs.setOverflowAction(CollectionOverflowAction.smallest_trim);
+    for (long each : longBkeys) {
+        mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
 
-	// cause an overflow
-	assertTrue(mc.asyncBopInsert(key, 1000, null, "val", null).get());
-	
-	// expecting that bkey 10 was trimmed out and the first bkey is 11 
-	Map<Integer, Element<Object>> posMap = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, 0).get();
-	assertNotNull(posMap);
-	assertNotNull(posMap.get(0)); // the first element
-	assertEquals(11L, posMap.get(0).getLongBkey());
+    // cause an overflow
+    assertTrue(mc.asyncBopInsert(key, 1000, null, "val", null).get());
+    
+    // expecting that bkey 10 was trimmed out and the first bkey is 11 
+    Map<Integer, Element<Object>> posMap = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, 0).get();
+    assertNotNull(posMap);
+    assertNotNull(posMap.get(0)); // the first element
+    assertEquals(11L, posMap.get(0).getLongBkey());
 
-	// then cause an overflow again and get a trimmed object
-	// it would be a bkey(11)
-	BTreeStoreAndGetFuture<Boolean, Object> f = mc.asyncBopInsertAndGetTrimmed(key, 2000, null, "val", null);
-	boolean succeeded = f.get();
-	Element<Object> element = f.getElement();
-	assertTrue(succeeded);
-	assertNotNull(element);
-	assertEquals(11L, element.getLongBkey());
-	System.out.println("The insertion was succeeded and an element " + f.getElement() + " was trimmed out");
-	
-	// finally check the first bkey which is expected to be 12 
-	posMap = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, 0).get();
-	assertNotNull(posMap);
-	assertNotNull(posMap.get(0)); // the first element
-	assertEquals(12L, posMap.get(0).getLongBkey());
+    // then cause an overflow again and get a trimmed object
+    // it would be a bkey(11)
+    BTreeStoreAndGetFuture<Boolean, Object> f = mc.asyncBopInsertAndGetTrimmed(key, 2000, null, "val", null);
+    boolean succeeded = f.get();
+    Element<Object> element = f.getElement();
+    assertTrue(succeeded);
+    assertNotNull(element);
+    assertEquals(11L, element.getLongBkey());
+    System.out.println("The insertion was succeeded and an element " + f.getElement() + " was trimmed out");
+    
+    // finally check the first bkey which is expected to be 12 
+    posMap = mc.asyncBopGetByPosition(key, BTreeOrder.ASC, 0).get();
+    assertNotNull(posMap);
+    assertNotNull(posMap.get(0)); // the first element
+    assertEquals(12L, posMap.get(0).getLongBkey());
 }
 ```
 
@@ -1104,7 +1104,7 @@ null                         | CollectionResponse.UNREADABLE           | 해당 
 
 BTreeGetResult.getElements()로 조회한 BTreeElement 객체로부터 개별 element의 bkey, eflag, value를 조회할 수 있다.
 
-BTreeElement 객체의 Method  | 자료형	          | 설명
+BTreeElement 객체의 Method  | 자료형              | 설명
 --------------------------- | -----------------| ----
 getBkey()                   | long 또는 byte[]  | element의 bkey
 getEFlag()                  | byte[]           | element flag
@@ -1340,37 +1340,37 @@ String key = "BopFindPositionTest";
 long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L };
 
 public void testLongBKeyAsc() throws Exception {
-	// insert
-	CollectionAttributes attrs = new CollectionAttributes();
-	for (long each : longBkeys) {
-		arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
-	}
-	
-	// bop position
-	for (int i=0; i<longBkeys.length; i++) {
-		CollectionFuture<Integer> f = arcusClient.asyncBopFindPosition(key, longBkeys[i], BTreeOrder.ASC);
-		Integer position = f.get();
-		assertNotNull(position);
-		assertEquals(CollectionResponse.OK, f.getOperationStatus().getResponse());
-		assertEquals(i, position.intValue());
-	}
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (long each : longBkeys) {
+        arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
+    
+    // bop position
+    for (int i=0; i<longBkeys.length; i++) {
+        CollectionFuture<Integer> f = arcusClient.asyncBopFindPosition(key, longBkeys[i], BTreeOrder.ASC);
+        Integer position = f.get();
+        assertNotNull(position);
+        assertEquals(CollectionResponse.OK, f.getOperationStatus().getResponse());
+        assertEquals(i, position.intValue());
+    }
 }
 
 public void testLongBKeyDesc() throws Exception {
-	// insert
-	CollectionAttributes attrs = new CollectionAttributes();
-	for (long each : longBkeys) {
-		arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
-	}
-	
-	// bop position
-	for (int i=0; i<longBkeys.length; i++) {
-		CollectionFuture<Integer> f = arcusClient.asyncBopFindPosition(key, longBkeys[i], BTreeOrder.DESC);
-		Integer position = f.get();
-		assertNotNull(position);
-		assertEquals(CollectionResponse.OK, f.getOperationStatus().getResponse());
-		assertEquals("invalid position", longBkeys.length-i-1, position.intValue());
-	}
+    // insert
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (long each : longBkeys) {
+        arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
+    
+    // bop position
+    for (int i=0; i<longBkeys.length; i++) {
+        CollectionFuture<Integer> f = arcusClient.asyncBopFindPosition(key, longBkeys[i], BTreeOrder.DESC);
+        Integer position = f.get();
+        assertNotNull(position);
+        assertEquals(CollectionResponse.OK, f.getOperationStatus().getResponse());
+        assertEquals("invalid position", longBkeys.length-i-1, position.intValue());
+    }
 }
 ```
 
@@ -1408,30 +1408,30 @@ String key = "BopGetByPositionTest";
 long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L };
 
 public void testLongBKeyMultiple() throws Exception {
-	// 10개의 테스트 데이터를 insert 한다.
-	CollectionAttributes attrs = new CollectionAttributes();
-	for (long each : longBkeys) {
-		arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
-	}
-	
-	// 테스트 : 5 부터 8 위치의 엘리먼트를 조회한다.
-	int posFrom = 5;
-	int posTo = 8;
-	CollectionFuture<Map<Integer, Element<Object>>> f = arcusClient
-			.asyncBopGetByPosition(key, BTreeOrder.ASC, posFrom, posTo);
-	Map<Integer, Element<Object>> result = f.get(1000,
-			TimeUnit.MILLISECONDS);
+    // 10개의 테스트 데이터를 insert 한다.
+    CollectionAttributes attrs = new CollectionAttributes();
+    for (long each : longBkeys) {
+        arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
+    
+    // 테스트 : 5 부터 8 위치의 엘리먼트를 조회한다.
+    int posFrom = 5;
+    int posTo = 8;
+    CollectionFuture<Map<Integer, Element<Object>>> f = arcusClient
+            .asyncBopGetByPosition(key, BTreeOrder.ASC, posFrom, posTo);
+    Map<Integer, Element<Object>> result = f.get(1000,
+            TimeUnit.MILLISECONDS);
 
-	assertEquals(4, result.size());
-	assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
+    assertEquals(4, result.size());
+    assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
 
-	int count = 0;
-	for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-		int currPos = posFrom + count++;
-		assertEquals("invalid index", currPos, each.getKey().intValue());
-		assertEquals("invalid bkey", longBkeys[currPos], each.getValue().getLongBkey());
-		assertEquals("invalid value", "val", each.getValue().getValue());
-	}
+    int count = 0;
+    for (Entry<Integer, Element<Object>> each : result.entrySet()) {
+        int currPos = posFrom + count++;
+        assertEquals("invalid index", currPos, each.getKey().intValue());
+        assertEquals("invalid bkey", longBkeys[currPos], each.getValue().getLongBkey());
+        assertEquals("invalid value", "val", each.getValue().getValue());
+    }
 }
 ```
 
