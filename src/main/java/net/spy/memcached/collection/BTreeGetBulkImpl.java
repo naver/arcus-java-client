@@ -125,6 +125,32 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     return str;
   }
 
+  public void decodeItemHeader(String itemHeader) {
+    String[] splited = itemHeader.split(" ");
+
+    if (splited.length == 3) {
+      // ELEMENT <bkey> <bytes>
+      this.subkey = decodeSubkey(splited[1]);
+      this.dataLength = Integer.parseInt(splited[2]);
+      this.eflag = null;
+    } else if (splited.length == 4) {
+      // ELEMENT <bkey> <eflag> <bytes>
+      this.subkey = decodeSubkey(splited[1]);
+      this.eflag = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
+      this.dataLength = Integer.parseInt(splited[3]);
+    }
+  }
+
+  public void decodeKeyHeader(String keyHeader) {
+    // VALUE <key> <status> [<flags> <ecount>]
+    String[] splited = keyHeader.split(" ");
+    this.key = splited[1];
+
+    if (splited.length == 5) {
+      this.flag = Integer.parseInt(splited[3]);
+    }
+  }
+
   public String getCommand() {
     return command;
   }
@@ -152,4 +178,6 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   public byte[] getEFlag() {
     return eflag;
   }
+
+  protected abstract Object decodeSubkey(String subkey);
 }
