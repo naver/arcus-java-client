@@ -35,28 +35,7 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
     return (byte[]) subkey;
   }
 
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-
-    if (splited.length == 3) {
-      // ELEMENT <bkey> <bytes>
-      this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-      this.dataLength = Integer.parseInt(splited[2]);
-      this.eflag = null;
-    } else if (splited.length == 4) {
-      // ELEMENT <bkey> <eflag> <bytes>
-      this.subkey = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-      this.eflag = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
-      this.dataLength = Integer.parseInt(splited[3]);
-    }
-  }
-
-  @Override
-  public void decodeKeyHeader(String keyHeader) {
-    String[] splited = keyHeader.split(" ");
-    this.key = splited[1];
-    if (splited.length == 5) {
-      this.flag = Integer.valueOf(splited[3]);
-    }
+  protected Object decodeSubkey(String subkey) {
+    return BTreeUtil.hexStringToByteArrays(subkey.substring(2));
   }
 }
