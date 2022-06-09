@@ -38,10 +38,6 @@ public interface BTreeGetBulk<T> {
 
   public boolean keyHeaderReady(int spaceCount);
 
-  public String getKey();
-
-  public int getFlag();
-
   public Object getSubkey();
 
   public int getDataLength();
@@ -49,6 +45,4 @@ public interface BTreeGetBulk<T> {
   public byte[] getEFlag();
 
   public void decodeItemHeader(String itemHeader);
-
-  public void decodeKeyHeader(String keyHeader);
 }

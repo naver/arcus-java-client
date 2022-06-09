@@ -44,8 +44,6 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   protected Map<Integer, T> map;
 
-  protected String key;
-  protected int flag;
   protected Object subkey;
   protected int dataLength;
   protected byte[] eflag = null;
@@ -141,16 +139,6 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     }
   }
 
-  public void decodeKeyHeader(String keyHeader) {
-    // VALUE <key> <status> [<flags> <ecount>]
-    String[] splited = keyHeader.split(" ");
-    this.key = splited[1];
-
-    if (splited.length == 5) {
-      this.flag = Integer.parseInt(splited[3]);
-    }
-  }
-
   public String getCommand() {
     return command;
   }
@@ -161,14 +149,6 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   public boolean keyHeaderReady(int spaceCount) {
     return spaceCount == 3 || spaceCount == 5;
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public int getFlag() {
-    return flag;
   }
 
   public int getDataLength() {

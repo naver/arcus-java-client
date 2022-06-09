@@ -67,12 +67,14 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   protected final BTreeGetBulk<?> getBulk;
 
+  protected String key;
   protected int flags = 0;
+  protected int elementCount = 0;
+
   protected byte[] data = null;
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
   protected int spaceCount = 0;
-  protected int elementCount = 0;
 
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);
@@ -91,7 +93,20 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       END\r\n
     */
     if (line.startsWith("VALUE ")) {
-      readKey(line);
+      String[] chunk = line.split(" ");
+      OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
+          NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
+          UNREADABLE);
+
+      key = chunk[1];
+      if (chunk.length > 3) {
+        flags = Integer.parseInt(chunk[3]);
+        elementCount = Integer.parseInt(chunk[4]);
+      }
+
+      BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
+      cb.gotKey(key, elementCount, status);
+
       if (elementCount > 0) {
         setReadType(OperationReadType.DATA);
       }
@@ -107,27 +122,6 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   @Override
   public final void handleRead(ByteBuffer bb) {
-    readValue(bb);
-    if (elementCount == 0) {
-      setReadType(OperationReadType.LINE);
-    }
-  }
-
-  private final void readKey(String line) {
-    String[] chunk = line.split(" ");
-
-    OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
-            NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
-            UNREADABLE);
-
-    getBulk.decodeKeyHeader(line);
-    elementCount = (chunk.length > 3) ? Integer.parseInt(chunk[4]) : 0;
-
-    BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
-    cb.gotKey(chunk[1], elementCount, status);
-  }
-
-  private final void readValue(ByteBuffer bb) {
     if (lookingFor == '\0' && data == null) {
       for (int i = 0; bb.remaining() > 0; i++) {
         byte b = bb.get();
@@ -185,7 +179,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     if (lookingFor == '\0' && readOffset == data.length) {
       BTreeGetBulkOperation.Callback cb = (BTreeGetBulkOperation.Callback) getCallback();
       cb.gotElement(
-          getBulk.getKey(), getBulk.getSubkey(), getBulk.getFlag(), getBulk.getEFlag(), data);
+          key, getBulk.getSubkey(), flags, getBulk.getEFlag(), data);
       lookingFor = '\r';
     }
 
@@ -213,6 +207,10 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
         readOffset = 0;
         elementCount--;
       }
+    }
+
+    if (elementCount == 0) {
+      setReadType(OperationReadType.LINE);
     }
   }
 
