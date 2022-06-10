@@ -464,7 +464,7 @@ public class MultibyteKeyTest {
     CollectionBulkInsertOperation.Callback cbsCallback =
         new CollectionBulkInsertOperation.Callback() {
           @Override
-          public void gotStatus(Integer index, OperationStatus status) {
+          public void gotStatus(String key, OperationStatus status) {
           }
 
           @Override
