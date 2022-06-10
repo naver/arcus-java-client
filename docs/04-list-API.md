@@ -194,13 +194,13 @@ List에서 index가 0부터 10까지의 element를 삭제하는 예제이다.
 
 ```java
 String key = "Sample:List";
-int from = 0;
-int to = 10;
+int indexFrom = 0;
+int indexTo = 10;
 boolean dropIfEmpty = false;
 CollectionFuture<Boolean> future = null;
 
 try {
-    future = client.asyncLopDelete(key, from, to, dropIfEmpty); // (1)
+    future = client.asyncLopDelete(key, indexFrom, indexTo, dropIfEmpty); // (1)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -264,14 +264,14 @@ List element를 조회하는 예제는 아래와 같다.
 
 ```java
 String key = "Sample:List";
-int from = 0;
-int to = 5;
+int indexFrom = 0;
+int indexTo = 5;
 boolean withDelete = false;
 boolean dropIfEmpty = false;
 CollectionFuture<List<Object>> future = null;
 
 try {
-    future = client.asyncLopGet(key, from, to, withDelete, dropIfEmpty); // (1)
+    future = client.asyncLopGet(key, indexFrom, indexTo, withDelete, dropIfEmpty); // (1)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -286,7 +286,7 @@ try {
     System.out.println(response);
 
     if (response.equals(CollectionResponse.NOT_FOUND)) {
-        System.out.println("Key가 없습니다.(Key에 저장된 List가 없습니다.");
+        System.out.println("Key가 없습니다.(Key를 가진 아이템이 없습니다.)");
     } else if (response.equals(CollectionResponse.NOT_FOUND_ELEMENT)) {
         System.out.println("Key는 존재하지만 List에 저장된 값 중 조건에 맞는 것이 없습니다.");
     }

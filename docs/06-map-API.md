@@ -228,12 +228,12 @@ False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 map이
 
 ```java
 String key = "Prefix:MapKey";
-String mkey1 = "mkey1";
+String mkey = "mkey1";
 boolean dropIfEmpty = true;
 CollectionFuture<Boolean> future = null;
 
 try {
-    future = client.asyncMopDelete(key, mkey1, dropIfEmpty); // (1)
+    future = client.asyncMopDelete(key, mkey, dropIfEmpty); // (1)
 } catch (IllegalStateException e) {
     // handle exception
 }
@@ -331,7 +331,7 @@ try {
 
     CollectionResponse response = future.getOperationStatus().getResponse(); // (3)
     if (response.equals(CollectionResponse.NOT_FOUND)) {
-        System.out.println("Key가 없습니다.(Key에 저장된 Map이 없음.");
+        System.out.println("Key가 없습니다.(Key를 가진 아이템이 없습니다.)");
     } else if (response.equals(CollectionResponse.NOT_FOUND_ELEMENT)) {
         System.out.println("Key에 map은 존재하지만 저장된 값 중 조건에 맞는 것이 없음.");
     }

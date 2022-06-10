@@ -264,7 +264,7 @@ try {
     System.out.println(response);
 
     if (response.equals(CollectionResponse.NOT_FOUND)) {
-        System.out.println("Key가 없습니다.(Key에 저장된 Set이 없습니다.");
+        System.out.println("Key가 없습니다.(Key를 가진 아이템이 없습니다.)");
     } else if (response.equals(CollectionResponse.NOT_EXIST)) {
         System.out.println("Key는 존재하지만 Set에 요청한 값이 없습니다.");
     }
