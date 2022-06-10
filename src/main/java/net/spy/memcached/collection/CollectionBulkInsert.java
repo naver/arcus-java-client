@@ -307,6 +307,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     }
   }
 
+  public String getKey(int index) {
+    return this.keyList.get(index);
+  }
+
   public List<String> getKeyList() {
     return this.keyList;
   }

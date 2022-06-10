@@ -4070,13 +4070,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   latch.countDown();
                 }
 
-                public void gotStatus(Integer index, OperationStatus status) {
+                public void gotStatus(String key, OperationStatus status) {
                   if (!status.isSuccess()) {
                     if (status instanceof CollectionOperationStatus) {
-                      failedResult.put(insert.getKeyList().get(index),
+                      failedResult.put(key,
                               (CollectionOperationStatus) status);
                     } else {
-                      failedResult.put(insert.getKeyList().get(index),
+                      failedResult.put(key,
                               new CollectionOperationStatus(status));
                     }
                   }

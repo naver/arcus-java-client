@@ -103,7 +103,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       if (status.isSuccess()) {
         cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
-        cb.gotStatus(index, status);
+        cb.gotStatus(insert.getKey(index), status);
         cb.receivedStatus(FAILED_END);
       }
       transitionState(OperationState.COMPLETE);
@@ -136,7 +136,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
+        cb.gotStatus(insert.getKey(index), status);
         successAll = false;
       }
 
