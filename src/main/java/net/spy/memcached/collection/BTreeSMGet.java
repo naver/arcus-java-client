@@ -40,7 +40,7 @@ public interface BTreeSMGet<T> {
 
   public String getKey();
 
-  public int getFlag();
+  public int getFlags();
 
   public Object getSubkey();
 

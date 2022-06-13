@@ -1,0 +1,176 @@
+/*
+ * arcus-java-client : Arcus Java client
+ * Copyright 2010-2014 NAVER Corp.
+ * Copyright 2014-2022 JaM2in Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package net.spy.memcached.collection;
+
+import net.spy.memcached.KeyUtil;
+import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.util.BTreeUtil;
+
+import java.util.List;
+
+public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
+  private static final String command = "bop smget";
+
+  private final MemcachedNode node;
+  protected String str;
+
+  private String keySeparator;
+  private String spaceSeparatedKeys;
+
+  protected List<String> keyList;
+  protected String range;
+  protected boolean reverse;
+  protected ElementFlagFilter eFlagFilter;
+  protected int offset = -1;
+  protected int count;
+  protected SMGetMode smgetMode = null;
+
+  protected String key;
+  protected int flags;
+  protected Object subkey;
+  protected int dataLength;
+  protected byte[] eflag = null;
+
+  public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
+                        String range, boolean reverse,
+                        ElementFlagFilter eFlagFilter, int count,
+                        SMGetMode smgetMode) {
+    this.node = node;
+    this.keyList = keyList;
+    this.range = range;
+    this.reverse = reverse;
+    this.eFlagFilter = eFlagFilter;
+    this.count = count;
+    this.smgetMode = smgetMode;
+  }
+
+  public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
+                        String range, boolean reverse,
+                        ElementFlagFilter eFlagFilter,
+                        int offset, int count) {
+    this.node = node;
+    this.keyList = keyList;
+    this.range = range;
+    this.reverse = reverse;
+    this.eFlagFilter = eFlagFilter;
+    this.offset = offset;
+    this.count = count;
+  }
+
+  public void setKeySeparator(String keySeparator) {
+    this.keySeparator = keySeparator;
+  }
+
+  public String getSpaceSeparatedKeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    int numkeys = keyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(keyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(keySeparator);
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
+  }
+
+  public MemcachedNode getMemcachedNode() {
+    return node;
+  }
+
+  public List<String> getKeyList() {
+    return keyList;
+  }
+
+  public String stringify() {
+    if (str != null) {
+      return str;
+    }
+    StringBuilder b = new StringBuilder();
+    b.append(KeyUtil.getKeyBytes(getSpaceSeparatedKeys()).length);
+    b.append(" ").append(keyList.size());
+    b.append(" ").append(range);
+    if (eFlagFilter != null) {
+      b.append(" ").append(eFlagFilter);
+    }
+    if (smgetMode != null) { // new smget
+      b.append(" ").append(count);
+      b.append(" ").append(smgetMode.getMode());
+    } else { // old smget
+      if (offset > 0) {
+        b.append(" ").append(offset);
+      }
+      b.append(" ").append(count);
+    }
+    str = b.toString();
+    return str;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public boolean headerReady(int spaceCount) {
+    return headerCount == spaceCount;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public int getFlags() {
+    return flags;
+  }
+
+  public int getDataLength() {
+    return dataLength;
+  }
+
+  public boolean isReverse() {
+    return reverse;
+  }
+
+  public boolean hasEflag() {
+    return eflag != null;
+  }
+
+  public void decodeItemHeader(String itemHeader) {
+    String[] splited = itemHeader.split(" ");
+    // <key> <flags> <bkey> [<eflag>] <bytes> <data>
+
+    this.key = splited[0];
+    this.flags = Integer.parseInt(splited[1]);
+    this.subkey = decodeSubkey(splited[2]);
+
+    if (splited.length == 5) {
+      // <key> <flags> <bkey> <bytes> <data>
+      this.eflag = null;
+      this.dataLength = Integer.parseInt(splited[3]);
+    } else if (splited.length == 6) {
+      // <key> <flags> <bkey> <eflag> <bytes> <data>
+      this.eflag = BTreeUtil.hexStringToByteArrays(splited[3].substring(2));
+      this.dataLength = Integer.parseInt(splited[4]);
+    }
+  }
+
+  protected abstract Object decodeSubkey(String subkey);
+}
