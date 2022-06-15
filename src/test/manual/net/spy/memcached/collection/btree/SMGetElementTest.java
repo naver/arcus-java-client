@@ -4,6 +4,7 @@ import net.spy.memcached.collection.SMGetElement;
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -12,17 +13,19 @@ public class SMGetElementTest {
 
   private static final String KEY = "test";
   private static final String VALUE = "testValue";
+  private static final byte[] EFLAG = {1, 8, 16, 32, 64};
 
   @Test
   public void createWithLongBkey() {
     //given
     long bkey = 1;
 
-    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, VALUE);
+    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(KEY, element.getKey());
     assertEquals(bkey, element.getBkey());
+    assertArrayEquals(EFLAG, element.getEflag());
     assertThrows(IllegalStateException.class, new ThrowingRunnable() {
       @Override
       public void run() throws Throwable {
@@ -37,11 +40,12 @@ public class SMGetElementTest {
     //given
     byte[] bkey = {0x34};
 
-    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, VALUE);
+    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(KEY, element.getKey());
     assertEquals(bkey, element.getByteBkey());
+    assertArrayEquals(EFLAG, element.getEflag());
     assertThrows(IllegalStateException.class, new ThrowingRunnable() {
       @Override
       public void run() throws Throwable {
@@ -56,8 +60,8 @@ public class SMGetElementTest {
     //given
     long bkey = 2;
 
-    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, VALUE);
-    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, bkey, VALUE);
+    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
+    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(0, element.compareTo(anotherElement));
@@ -69,8 +73,8 @@ public class SMGetElementTest {
     long bkey = 2;
     long anotherBkey = 1;
 
-    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, VALUE);
-    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, anotherBkey, VALUE);
+    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
+    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, anotherBkey, EFLAG, VALUE);
 
     //when, then
     assertTrue(element.compareBkeyTo(anotherElement) > 0);

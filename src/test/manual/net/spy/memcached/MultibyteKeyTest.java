@@ -285,7 +285,7 @@ public class MultibyteKeyTest {
               keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
-            public void gotData(String key, Object subkey, int flags, byte[] data) {
+            public void gotData(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -317,7 +317,7 @@ public class MultibyteKeyTest {
               keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
           new BTreeSortMergeGetOperationOld.Callback() {
             @Override
-            public void gotData(String key, Object subkey, int flags, byte[] data) {
+            public void gotData(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
             }
 
             @Override

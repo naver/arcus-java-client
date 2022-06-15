@@ -17,26 +17,35 @@
  */
 package net.spy.memcached.collection;
 
+import net.spy.memcached.util.BTreeUtil;
+
 public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
-  private String key;
-  private BKeyObject bKeyObject;
-  private T value;
+  private final String key;
+  private final BKeyObject bKeyObject;
+  private final byte[] eflag;
+  private final T value;
 
-  public SMGetElement(String key, long bkey, T value) {
+  public SMGetElement(String key, long bkey, byte[] eflag, T value) {
     this.key = key;
     this.bKeyObject = new BKeyObject(bkey);
+    this.eflag = eflag;
     this.value = value;
   }
 
-  public SMGetElement(String key, byte[] bkey, T value) {
+  public SMGetElement(String key, byte[] bkey, byte[] eflag, T value) {
     this.key = key;
     this.bKeyObject = new BKeyObject(bkey);
+    this.eflag = eflag;
     this.value = value;
   }
 
   @Override
   public String toString() {
+    if (eflag != null) {
+      return "SMGetElement {KEY:" + key + ", BKEY:" + bKeyObject
+          + ", EFLAG: " + BTreeUtil.toHex(eflag) +  ", VALUE:" + value + "}";
+    }
     return "SMGetElement {KEY:" + key + ", BKEY:" + bKeyObject + ", VALUE:" + value + "}";
   }
 
@@ -83,6 +92,10 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
 
   public BKeyObject getBkeyObject() {
     return bKeyObject;
+  }
+
+  public byte[] getEflag() {
+    return eflag;
   }
 
   public T getValue() {
