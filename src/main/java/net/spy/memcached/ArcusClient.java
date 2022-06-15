@@ -2354,7 +2354,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotData(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+        public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
           if (stopCollect.get()) {
             return;
           }
@@ -2615,7 +2615,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotData(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+        public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
           if (stopCollect.get()) {
             return;
           }
@@ -4275,7 +4275,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+        public void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
           result.get(key).addElement(
                   new BTreeElement<Long, T>((Long) subkey, eflag,
                           tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
@@ -4331,7 +4331,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotElement(String key, Object subkey, int flags, byte[] eflag, byte[] data) {
+        public void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
           result.get(key).addElement(
                   new BTreeElement<ByteArrayBKey, T>(
                           new ByteArrayBKey((byte[]) subkey),
