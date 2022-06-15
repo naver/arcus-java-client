@@ -18,7 +18,7 @@ package net.spy.memcached.ops;
 
 public interface BTreeSortMergeGetOperation extends KeyedOperation {
   interface Callback extends OperationCallback {
-    void gotData(String key, Object subkey, int flags, byte[] eflag, byte[] data);
+    void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data);
 
     void gotMissedKey(String key, OperationStatus cause);
 

@@ -179,7 +179,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     if (lookingFor == '\0' && readOffset == data.length) {
       BTreeGetBulkOperation.Callback cb = (BTreeGetBulkOperation.Callback) getCallback();
       cb.gotElement(
-          key, getBulk.getSubkey(), flags, getBulk.getEFlag(), data);
+          key, flags, getBulk.getSubkey(), getBulk.getEFlag(), data);
       lookingFor = '\r';
     }
 
