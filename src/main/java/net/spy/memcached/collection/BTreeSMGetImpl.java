@@ -149,8 +149,8 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
     return reverse;
   }
 
-  public boolean hasEflag() {
-    return eflag != null;
+  public byte[] getEflag() {
+    return eflag;
   }
 
   public void decodeItemHeader(String itemHeader) {

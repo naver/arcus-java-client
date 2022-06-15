@@ -48,7 +48,7 @@ public interface BTreeSMGet<T> {
 
   public boolean isReverse();
 
-  public boolean hasEflag();
+  public byte[] getEflag();
 
   public void decodeItemHeader(String itemHeader);
 }
