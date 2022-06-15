@@ -527,7 +527,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags, byte[] data) {
+          public void gotData(String key, int flags, String subkey, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             list.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
@@ -606,7 +606,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags, byte[] data) {
+          public void gotData(String key, int flags, String subkey, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             set.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
@@ -673,7 +673,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags, byte[] data) {
+          public void gotData(String key, int flags, String subkey, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             long longSubkey = Long.parseLong(subkey);
             map.put(longSubkey, new Element<T>(longSubkey,
@@ -739,7 +739,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags, byte[] data) {
+          public void gotData(String key, int flags, String subkey, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             map.put(subkey, tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
@@ -3032,7 +3032,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, String subkey, int flags, byte[] data) {
+          public void gotData(String key, int flags, String subkey, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             byte[] bkey = BTreeUtil.hexStringToByteArrays(subkey);
             Element<T> element = new Element<T>(bkey,

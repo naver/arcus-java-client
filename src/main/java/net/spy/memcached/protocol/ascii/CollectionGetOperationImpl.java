@@ -217,7 +217,7 @@ public class CollectionGetOperationImpl extends OperationImpl
     if (lookingFor == '\0' && readOffset == data.length) {
       CollectionGetOperation.Callback cb =
               (CollectionGetOperation.Callback) getCallback();
-      cb.gotData(key, collectionGet.getSubkey(), flags, data);
+      cb.gotData(key, flags, collectionGet.getSubkey(), data);
       lookingFor = '\r';
     }
 
