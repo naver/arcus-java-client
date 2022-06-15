@@ -155,18 +155,18 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
 
   public void decodeItemHeader(String itemHeader) {
     String[] splited = itemHeader.split(" ");
-    // <key> <flags> <bkey> [<eflag>] <bytes> <data>
+    // <key> <flags> <bkey> [<eflag>] <bytes>
 
     this.key = splited[0];
     this.flags = Integer.parseInt(splited[1]);
     this.subkey = decodeSubkey(splited[2]);
 
-    if (splited.length == 5) {
-      // <key> <flags> <bkey> <bytes> <data>
+    if (splited.length == 4) {
+      // <key> <flags> <bkey> <bytes>
       this.eflag = null;
       this.dataLength = Integer.parseInt(splited[3]);
-    } else if (splited.length == 6) {
-      // <key> <flags> <bkey> <eflag> <bytes> <data>
+    } else if (splited.length == 5) {
+      // <key> <flags> <bkey> <eflag> <bytes>
       this.eflag = BTreeUtil.hexStringToByteArrays(splited[3].substring(2));
       this.dataLength = Integer.parseInt(splited[4]);
     }
