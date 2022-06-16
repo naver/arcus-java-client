@@ -27,49 +27,50 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private static final String command = "bop smget";
 
   private final MemcachedNode node;
-  protected String str;
+  private String str;
 
   private String keySeparator;
   private String spaceSeparatedKeys;
 
-  protected List<String> keyList;
-  protected String range;
-  protected boolean reverse;
-  protected ElementFlagFilter eFlagFilter;
-  protected int offset = -1;
-  protected int count;
-  protected SMGetMode smgetMode = null;
+  private final List<String> keyList;
+  private final String range;
+  private final ElementFlagFilter eFlagFilter;
+  private final int offset;
+  private final int count;
+  private final SMGetMode smgetMode;
 
-  protected String key;
-  protected int flags;
+  private String key;
+  private int flags;
   protected Object subkey;
-  protected int dataLength;
-  protected byte[] eflag = null;
+  private int dataLength;
+  private byte[] eflag = null;
 
   public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
-                        String range, boolean reverse,
+                        String range,
                         ElementFlagFilter eFlagFilter, int count,
                         SMGetMode smgetMode) {
-    this.node = node;
-    this.keyList = keyList;
-    this.range = range;
-    this.reverse = reverse;
-    this.eFlagFilter = eFlagFilter;
-    this.count = count;
-    this.smgetMode = smgetMode;
+    this(node, keyList, range, eFlagFilter, -1, count, smgetMode);
   }
 
   public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
-                        String range, boolean reverse,
+                        String range,
                         ElementFlagFilter eFlagFilter,
                         int offset, int count) {
+    this(node, keyList, range, eFlagFilter, offset, count, null);
+  }
+
+  private BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
+                         String range,
+                         ElementFlagFilter eFlagFilter,
+                         int offset, int count,
+                         SMGetMode smgetMode) {
     this.node = node;
     this.keyList = keyList;
     this.range = range;
-    this.reverse = reverse;
     this.eFlagFilter = eFlagFilter;
     this.offset = offset;
     this.count = count;
+    this.smgetMode = smgetMode;
   }
 
   public void setKeySeparator(String keySeparator) {
@@ -143,10 +144,6 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
 
   public int getDataLength() {
     return dataLength;
-  }
-
-  public boolean isReverse() {
-    return reverse;
   }
 
   public byte[] getEflag() {
