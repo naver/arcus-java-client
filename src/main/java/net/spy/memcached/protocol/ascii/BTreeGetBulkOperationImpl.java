@@ -104,7 +104,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
         elementCount = Integer.parseInt(chunk[4]);
       }
 
-      BTreeGetBulkOperation.Callback<?> cb = ((BTreeGetBulkOperation.Callback<?>) getCallback());
+      BTreeGetBulkOperation.Callback cb = ((BTreeGetBulkOperation.Callback) getCallback());
       cb.gotKey(key, elementCount, status);
 
       if (elementCount > 0) {

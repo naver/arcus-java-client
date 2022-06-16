@@ -479,7 +479,7 @@ public interface OperationFactory {
    * @param cb  the callback that will contain the results
    * @return a new BTreeGetBulkOperation
    */
-  BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get, BTreeGetBulkOperation.Callback<?> cb);
+  BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get, BTreeGetBulkOperation.Callback cb);
 
   /**
    * Get operation for b+tree items using positions.

@@ -4254,7 +4254,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new ConcurrentHashMap<String, BTreeGetResult<Long, T>>();
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
-      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback<T>() {
+      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
         @Override
         public void receivedStatus(OperationStatus status) {
         }
@@ -4309,7 +4309,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new ConcurrentHashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
-      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback<T>() {
+      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
         @Override
         public void receivedStatus(OperationStatus status) {
         }
