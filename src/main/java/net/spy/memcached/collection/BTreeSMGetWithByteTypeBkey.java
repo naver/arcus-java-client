@@ -25,8 +25,8 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
 
   public BTreeSMGetWithByteTypeBkey(MemcachedNode node, List<String> keyList,
                                     byte[] from, byte[] to,
-                                    ElementFlagFilter eFlagFilter, int count,
-                                    SMGetMode smgetMode) {
+                                    ElementFlagFilter eFlagFilter,
+                                    int count, SMGetMode smgetMode) {
     super(node, keyList, BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
         eFlagFilter, count, smgetMode);
   }
