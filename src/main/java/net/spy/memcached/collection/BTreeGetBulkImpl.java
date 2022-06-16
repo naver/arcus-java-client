@@ -17,7 +17,6 @@
 package net.spy.memcached.collection;
 
 import java.util.List;
-import java.util.Map;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.MemcachedNode;
@@ -27,35 +26,28 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
 
   private static final String command = "bop mget";
 
-  private MemcachedNode node;
+  private final MemcachedNode node;
+  private String str;
 
   private String keySeparator;
   private String spaceSeparatedKeys;
 
-  protected String str;
-  protected int lenKeys;
-
-  protected List<String> keyList;
-  protected String range;
-  protected boolean reverse;
-  protected ElementFlagFilter eFlagFilter;
-  protected int offset = -1;
-  protected int count;
-
-  protected Map<Integer, T> map;
+  private final List<String> keyList;
+  private final String range;
+  private final ElementFlagFilter eFlagFilter;
+  private final int offset;
+  private final int count;
 
   protected Object subkey;
-  protected int dataLength;
-  protected byte[] eflag = null;
+  private int dataLength;
+  private byte[] eflag = null;
 
   protected BTreeGetBulkImpl(MemcachedNode node, List<String> keyList,
-                             String range, boolean reverse,
-                             ElementFlagFilter eFlagFilter, int offset,
-                             int count) {
+                             String range, ElementFlagFilter eFlagFilter,
+                             int offset, int count) {
     this.node = node;
     this.keyList = keyList;
     this.range = range;
-    this.reverse = reverse;
     this.eFlagFilter = eFlagFilter;
     this.offset = offset;
     this.count = count;

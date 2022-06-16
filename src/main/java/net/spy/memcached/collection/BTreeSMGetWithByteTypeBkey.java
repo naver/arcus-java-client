@@ -28,7 +28,7 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
                                     ElementFlagFilter eFlagFilter, int count,
                                     SMGetMode smgetMode) {
     super(node, keyList, BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
-        (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0), eFlagFilter, count, smgetMode);
+        eFlagFilter, count, smgetMode);
   }
 
   @Override
