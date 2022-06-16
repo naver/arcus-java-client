@@ -24,8 +24,8 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
 
   public BTreeSMGetWithLongTypeBkey(MemcachedNode node, List<String> keyList,
                                     long from, long to,
-                                    ElementFlagFilter eFlagFilter, int count,
-                                    SMGetMode smgetMode) {
+                                    ElementFlagFilter eFlagFilter,
+                                    int count, SMGetMode smgetMode) {
     super(node, keyList, from + ".." + to, eFlagFilter, count, smgetMode);
   }
 
