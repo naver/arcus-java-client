@@ -4063,7 +4063,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       Operation op = opFact.collectionBulkInsert(
               insert, new CollectionBulkInsertOperation.Callback() {
                 public void receivedStatus(OperationStatus status) {
-
+                  // Nothing to do here because the user MUST search the result Map instance.
                 }
 
                 public void complete() {
@@ -4257,6 +4257,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
         @Override
         public void receivedStatus(OperationStatus status) {
+          // Nothing to do here because the user MUST search the result Map instance.
         }
 
         @Override
