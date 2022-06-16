@@ -49,4 +49,6 @@ public interface BTreeSMGet<T> {
   public byte[] getEflag();
 
   public void decodeItemHeader(String itemHeader);
+
+  public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList);
 }

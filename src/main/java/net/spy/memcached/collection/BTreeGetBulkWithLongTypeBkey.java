@@ -29,11 +29,24 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, from + ".." + to, eFlagFilter, offset, count);
   }
 
+  private BTreeGetBulkWithLongTypeBkey(MemcachedNode node, List<String> keyList,
+                                       String range,
+                                       ElementFlagFilter eFlagFilter,
+                                       int offset, int count) {
+    super(node, keyList, range, eFlagFilter, offset, count);
+  }
+
   public Long getSubkey() {
     return (Long) subkey;
   }
 
   protected Object decodeSubkey(String subkey) {
     return Long.parseLong(subkey);
+  }
+
+  @Override
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList) {
+    return new BTreeGetBulkWithLongTypeBkey<T>(node, keyList,
+        range, eFlagFilter, offset, count);
   }
 }

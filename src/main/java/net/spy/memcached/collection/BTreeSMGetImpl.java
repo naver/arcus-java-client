@@ -33,11 +33,11 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private String spaceSeparatedKeys;
 
   private final List<String> keyList;
-  private final String range;
-  private final ElementFlagFilter eFlagFilter;
-  private final int offset;
-  private final int count;
-  private final SMGetMode smgetMode;
+  protected final String range;
+  protected final ElementFlagFilter eFlagFilter;
+  protected final int offset;
+  protected final int count;
+  protected final SMGetMode smgetMode;
 
   private String key;
   private int flags;

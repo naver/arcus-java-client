@@ -45,4 +45,6 @@ public interface BTreeGetBulk<T> {
   public byte[] getEFlag();
 
   public void decodeItemHeader(String itemHeader);
+
+  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList);
 }

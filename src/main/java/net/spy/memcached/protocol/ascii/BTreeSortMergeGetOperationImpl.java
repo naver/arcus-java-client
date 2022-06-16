@@ -431,6 +431,11 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     return smGet.getKeyList();
   }
 
+  @Override
+  public BTreeSMGet<?> getSMGet() {
+    return smGet;
+  }
+
   private enum ReadState {
     VALUE,
     MISSED_KEYS,

@@ -17,6 +17,7 @@
 package net.spy.memcached;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -68,6 +69,7 @@ import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.KeyedOperation;
+import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
@@ -359,6 +361,10 @@ public interface OperationFactory {
    */
   Collection<Operation> clone(KeyedOperation op);
 
+  MultiOperationCallback createMultiOperationCallback(KeyedOperation op, int count);
+
+  Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
+                                List<Integer> keyIndexes, MultiOperationCallback mcb);
   /**
    * Create operation for collection items.
    *

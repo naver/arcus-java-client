@@ -33,10 +33,10 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   private String spaceSeparatedKeys;
 
   private final List<String> keyList;
-  private final String range;
-  private final ElementFlagFilter eFlagFilter;
-  private final int offset;
-  private final int count;
+  protected final String range;
+  protected final ElementFlagFilter eFlagFilter;
+  protected final int offset;
+  protected final int count;
 
   protected Object subkey;
   private int dataLength;

@@ -62,6 +62,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
   public abstract ByteBuffer getBinaryCommand();
 
+  public abstract CollectionBulkInsert<T> clone(MemcachedNode node,
+                                                List<String> keyList);
+
   /**
    *
    */
@@ -135,6 +138,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> keyList) {
+      return new BTreeBulkInsert<T>(node, keyList,
+          bkey, eflag, value, attribute, tc);
+    }
   }
 
   public static class MapBulkInsert<T> extends CollectionBulkInsert<T> {
@@ -193,6 +203,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
     }
+
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> keyList) {
+      return new MapBulkInsert<T>(node, keyList,
+          mkey, value, attribute, tc);
+    }
   }
 
   public static class SetBulkInsert<T> extends CollectionBulkInsert<T> {
@@ -246,6 +263,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
+    }
+
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> keyList) {
+      return new SetBulkInsert<T>(node, keyList,
+          value, attribute, tc);
     }
   }
 
@@ -304,6 +328,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public ByteBuffer getBinaryCommand() {
       throw new RuntimeException("not supported in binary protocol yet.");
+    }
+
+    @Override
+    public CollectionBulkInsert<T> clone(MemcachedNode node,
+                                         List<String> keyList) {
+      return new ListBulkInsert<T>(node, keyList,
+          index, value, attribute, tc);
     }
   }
 

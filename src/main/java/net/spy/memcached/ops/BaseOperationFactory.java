@@ -18,8 +18,13 @@ package net.spy.memcached.ops;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.OperationFactory;
+import net.spy.memcached.collection.BTreeGetBulk;
+import net.spy.memcached.collection.BTreeSMGet;
+import net.spy.memcached.collection.CollectionBulkInsert;
 
 /**
  * Base class for operation factories.
@@ -103,5 +108,58 @@ public abstract class BaseOperationFactory implements OperationFactory {
       assert false : "Unhandled operation type: " + op.getClass();
     }
     return rv;
+  }
+
+  @Override
+  public MultiOperationCallback createMultiOperationCallback(KeyedOperation op, int count) {
+    OperationCallback originalCallback = op.getCallback();
+    if (op instanceof GetOperation) {
+      return new MultiGetOperationCallback(originalCallback, count);
+    } else if (op instanceof GetsOperation) {
+      return new MultiGetsOperationCallback(originalCallback, count);
+    } else if (op instanceof CollectionBulkInsertOperation) {
+      return new MultiCollectionBulkInsertOperationCallback(originalCallback, count);
+    } else if (op instanceof BTreeGetBulkOperation) {
+      return new MultiBTreeGetBulkOperationCallback(originalCallback, count);
+    } else if (op instanceof BTreeSortMergeGetOperation) {
+      return new MultiBTreeSortMergeGetOperationCallback(originalCallback, count);
+    } else {
+      assert false : "Unhandled operation type: " + op.getClass();
+    }
+    return null;
+  }
+
+  @Override
+  public Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
+                                       List<Integer> keyIndexes, MultiOperationCallback mcb) {
+    assert !op.isCancelled() : "Attempted to clone a canceled op";
+    assert !op.hasErrored() : "Attempted to clone an errored op";
+
+    List<String> originalKeys = (List<String>) op.getKeys();
+    List<String> redirectKeys = new ArrayList<String>();
+
+    for (Integer idx : keyIndexes) {
+      redirectKeys.add(originalKeys.get(idx));
+    }
+
+    if (op instanceof GetOperation) {
+      // If MemcachedNode supports this clone feature, it should support mget operation too.
+      return mget(redirectKeys, (GetOperation.Callback) mcb);
+    } else if (op instanceof GetsOperation) {
+      //If MemcachedNode supports this clone feature, it should support mgets operation too.
+      return mgets(redirectKeys, (GetsOperation.Callback) mcb);
+    } else if (op instanceof CollectionBulkInsertOperation) {
+      final CollectionBulkInsert<?> insert = ((CollectionBulkInsertOperation) op).getInsert();
+      return collectionBulkInsert(insert.clone(node, redirectKeys), mcb);
+    } else if (op instanceof BTreeGetBulkOperation) {
+      final BTreeGetBulk<?> getbulk = ((BTreeGetBulkOperation) op).getBulk();
+      return bopGetBulk(getbulk.clone(node, redirectKeys), (BTreeGetBulkOperation.Callback) mcb);
+    } else if (op instanceof BTreeSortMergeGetOperation) {
+      final BTreeSMGet<?> smGet = ((BTreeSortMergeGetOperation) op).getSMGet();
+      return bopsmget(smGet.clone(node, redirectKeys), (BTreeSortMergeGetOperation.Callback) mcb);
+    } else {
+      assert false : "Unhandled operation type: " + op.getClass();
+    }
+    return null;
   }
 }

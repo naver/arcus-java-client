@@ -29,6 +29,13 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
     super(node, keyList, from + ".." + to, eFlagFilter, count, smgetMode);
   }
 
+  private BTreeSMGetWithLongTypeBkey(MemcachedNode node, List<String> keyList,
+                                     String range,
+                                     ElementFlagFilter eFlagFilter,
+                                     int count, SMGetMode smgetMode) {
+    super(node, keyList, range, eFlagFilter, count, smgetMode);
+  }
+
   @Override
   public Long getSubkey() {
     return (Long) subkey;
@@ -37,5 +44,11 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
   @Override
   protected Object decodeSubkey(String subkey) {
     return Long.parseLong(subkey);
+  }
+
+  @Override
+  public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList) {
+    return new BTreeSMGetWithLongTypeBkey<T>(node, keyList,
+        range, eFlagFilter, count, smgetMode);
   }
 }
