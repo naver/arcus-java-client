@@ -265,7 +265,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> getBulk,
-                                          BTreeGetBulkOperation.Callback<?> cb) {
+                                          BTreeGetBulkOperation.Callback cb) {
     return new BTreeGetBulkOperationImpl(getBulk, cb);
   }
 

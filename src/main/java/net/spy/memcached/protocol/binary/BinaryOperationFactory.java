@@ -309,7 +309,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public BTreeGetBulkOperation bopGetBulk(BTreeGetBulk<?> get,
-                                          BTreeGetBulkOperation.Callback<?> cb) {
+                                          BTreeGetBulkOperation.Callback cb) {
     throw new RuntimeException(
             "BTree get bulk operation is not supported in binary protocol yet.");
   }

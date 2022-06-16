@@ -17,7 +17,7 @@
 package net.spy.memcached.ops;
 
 public interface BTreeGetBulkOperation extends KeyedOperation {
-  interface Callback<K> extends OperationCallback {
+  interface Callback extends OperationCallback {
     void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data);
 
     void gotKey(String key, int elementCount, OperationStatus status);

@@ -512,7 +512,7 @@ public class MultibyteKeyTest {
           new BTreeGetBulkWithLongTypeBkey<Integer>(null,
               keyList, 0L, 10L, ElementFlagFilter.DO_NOT_FILTER, 0, 0
           ),
-          new BTreeGetBulkOperation.Callback<Integer>() {
+          new BTreeGetBulkOperation.Callback() {
             @Override
             public void gotElement(String key, int flags, Object subkey,
                                    byte[] eflag, byte[] data) {
