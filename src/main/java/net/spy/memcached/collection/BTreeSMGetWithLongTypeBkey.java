@@ -26,7 +26,7 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
                                     long from, long to,
                                     ElementFlagFilter eFlagFilter, int count,
                                     SMGetMode smgetMode) {
-    super(node, keyList, from + ".." + to, (from > to), eFlagFilter, count, smgetMode);
+    super(node, keyList, from + ".." + to, eFlagFilter, count, smgetMode);
   }
 
   @Override

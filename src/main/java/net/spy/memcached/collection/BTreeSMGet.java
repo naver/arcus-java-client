@@ -46,8 +46,6 @@ public interface BTreeSMGet<T> {
 
   public int getDataLength();
 
-  public boolean isReverse();
-
   public byte[] getEflag();
 
   public void decodeItemHeader(String itemHeader);
