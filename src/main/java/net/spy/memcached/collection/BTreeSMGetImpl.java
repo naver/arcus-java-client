@@ -47,8 +47,8 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
 
   public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
                         String range,
-                        ElementFlagFilter eFlagFilter, int count,
-                        SMGetMode smgetMode) {
+                        ElementFlagFilter eFlagFilter,
+                        int count, SMGetMode smgetMode) {
     this(node, keyList, range, eFlagFilter, -1, count, smgetMode);
   }
 
