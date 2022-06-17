@@ -327,36 +327,22 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  private Map<String, InetSocketAddress> makeAddressMap(Collection<MemcachedNode> nodes) {
-    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
-    for (MemcachedNode node : nodes) {
-      InetSocketAddress isa = (InetSocketAddress) node.getSocketAddress();
-      addrMap.put(isa.toString(), isa);
-    }
-    return addrMap;
-  }
-
-  private Map<String, InetSocketAddress> makeAddressMap(List<InetSocketAddress> addresses) {
-    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
-    for (InetSocketAddress addr : addresses) {
-      addrMap.put(addr.toString(), addr);
-    }
-    return addrMap;
-  }
-
   private Set<String> findChangedGroups(List<InetSocketAddress> addrs,
                                         Collection<MemcachedNode> nodes) {
+    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
+    for (InetSocketAddress each : addrs) {
+      addrMap.put(each.toString(), each);
+    }
+
     Set<String> changedGroupSet = new HashSet<String>();
-    Map<String, InetSocketAddress> curAddrMap = makeAddressMap(nodes);
-    Map<String, InetSocketAddress> newAddrMap = makeAddressMap(addrs);
-    for (String newAddr : newAddrMap.keySet()) {
-      if (curAddrMap.remove(newAddr) == null) { /* added node */
-        ArcusReplNodeAddress a = (ArcusReplNodeAddress) newAddrMap.get(newAddr);
-        changedGroupSet.add(a.getGroupName());
+    for (MemcachedNode node : nodes) {
+      String nodeAddr = ((InetSocketAddress) node.getSocketAddress()).toString();
+      if (addrMap.remove(nodeAddr) == null) { // removed node
+        changedGroupSet.add(node.getReplicaGroup().getGroupName());
       }
     }
-    for (String curAddr : curAddrMap.keySet()) { /* removed node */
-      ArcusReplNodeAddress a = (ArcusReplNodeAddress) curAddrMap.get(curAddr);
+    for (String addr : addrMap.keySet()) { // newly added node
+      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addrMap.get(addr);
       changedGroupSet.add(a.getGroupName());
     }
     return changedGroupSet;
