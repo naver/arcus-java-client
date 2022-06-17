@@ -1143,6 +1143,7 @@ public class MemcachedClient extends SpyThread
         if (!status.isSuccess()) {
           getLogger().warn("Unsuccessful get:  %s", status);
         }
+        // Nothing to do here because the user MUST search the result Map instance.
       }
 
       public void gotData(String k, int flags, byte[] data) {
@@ -1278,6 +1279,7 @@ public class MemcachedClient extends SpyThread
         if (!status.isSuccess()) {
           getLogger().warn("Unsuccessful gets:  %s", status);
         }
+        // Nothing to do here because the user MUST search the result Map instance.
       }
 
       public void gotData(String k, int flags, long cas, byte[] data) {
