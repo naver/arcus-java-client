@@ -344,9 +344,10 @@ public final class MemcachedConnection extends SpyObject {
     return addrMap;
   }
 
-  private Set<String> findChangedGroups(List<InetSocketAddress> addrs) {
+  private Set<String> findChangedGroups(List<InetSocketAddress> addrs,
+                                        Collection<MemcachedNode> nodes) {
     Set<String> changedGroupSet = new HashSet<String>();
-    Map<String, InetSocketAddress> curAddrMap = makeAddressMap(locator.getAll());
+    Map<String, InetSocketAddress> curAddrMap = makeAddressMap(nodes);
     Map<String, InetSocketAddress> newAddrMap = makeAddressMap(addrs);
     for (String newAddr : newAddrMap.keySet()) {
       if (curAddrMap.remove(newAddr) == null) { /* added node */
@@ -389,7 +390,7 @@ public final class MemcachedConnection extends SpyObject {
      * we find out the changed groups with the comparision of previous and current znode list,
      * and update the state of groups based on them.
      */
-    Set<String> changedGroups = findChangedGroups(addrs);
+    Set<String> changedGroups = findChangedGroups(addrs, locator.getAll());
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
             ArcusReplNodeAddress.makeGroupAddrsList(findAddrsOfChangedGroups(addrs, changedGroups));
@@ -526,8 +527,8 @@ public final class MemcachedConnection extends SpyObject {
     ((ArcusReplKetamaNodeLocator) locator).update(attachNodes, removeNodes, changeRoleGroups);
 
     // do task after locator update
-    for (Task t : taskList) {
-      t.doTask();
+    for (Task task : taskList) {
+      task.doTask();
     }
 
     // Remove the unavailable nodes.
