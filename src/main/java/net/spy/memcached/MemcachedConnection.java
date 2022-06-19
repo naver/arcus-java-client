@@ -134,7 +134,7 @@ public final class MemcachedConnection extends SpyObject {
     selector = Selector.open();
     List<MemcachedNode> connections = new ArrayList<MemcachedNode>(a.size());
     for (SocketAddress sa : a) {
-      connections.add(attachMemcachedNode(connName, sa));
+      connections.add(makeMemcachedNode(connName, sa));
     }
     locator = f.createLocator(connections);
     reconnectQueue = new ReconnectQueue(f.getMaxReconnectDelay());
@@ -316,7 +316,7 @@ public final class MemcachedConnection extends SpyObject {
 
     // Make connections to the newly added nodes.
     for (SocketAddress sa : addrs) {
-      attachNodes.add(attachMemcachedNode(connName, sa));
+      attachNodes.add(attachMemcachedNode(sa));
     }
 
     // Update the hash.
@@ -398,7 +398,7 @@ public final class MemcachedConnection extends SpyObject {
       if (oldGroup == null) {
         // Newly added group
         for (ArcusReplNodeAddress newAddr : newGroupAddrs) {
-          attachNodes.add(attachMemcachedNode(connName, newAddr));
+          attachNodes.add(attachMemcachedNode(newAddr));
         }
         continue;
       }
@@ -434,7 +434,7 @@ public final class MemcachedConnection extends SpyObject {
         // add newly added slave node
         for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
           if (!oldSlaveAddrs.contains(newSlaveAddr)) {
-            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+            attachNodes.add(attachMemcachedNode(newSlaveAddr));
           }
         }
 
@@ -476,7 +476,7 @@ public final class MemcachedConnection extends SpyObject {
         // add newly added slave node
         for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
           if (!oldSlaveAddrs.contains(newSlaveAddr) && !oldMasterAddr.isSameAddress(newSlaveAddr)) {
-            attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+            attachNodes.add(attachMemcachedNode(newSlaveAddr));
           }
         }
         // remove not exist old slave node
@@ -492,10 +492,10 @@ public final class MemcachedConnection extends SpyObject {
         }
       } else {
         // Old master has gone away. And, new group has appeared.
-        MemcachedNode newMasterNode = attachMemcachedNode(connName, newMasterAddr);
+        MemcachedNode newMasterNode = attachMemcachedNode(newMasterAddr);
         attachNodes.add(newMasterNode);
         for (ArcusReplNodeAddress newSlaveAddr : newSlaveAddrs) {
-          attachNodes.add(attachMemcachedNode(connName, newSlaveAddr));
+          attachNodes.add(attachMemcachedNode(newSlaveAddr));
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master.
@@ -570,8 +570,12 @@ public final class MemcachedConnection extends SpyObject {
   }
   /* ENABLE_REPLICATION end */
 
-  MemcachedNode attachMemcachedNode(String name,
-                                    SocketAddress sa) throws IOException {
+  private MemcachedNode attachMemcachedNode(SocketAddress sa) throws IOException {
+    return makeMemcachedNode(connName, sa);
+  }
+
+  private MemcachedNode makeMemcachedNode(String name,
+                                          SocketAddress sa) throws IOException {
     MemcachedNode qa = connFactory.createMemcachedNode(name, sa, connFactory.getReadBufSize());
     if (timeoutRatioThreshold > 0) {
       qa.enableTimeoutRatio();
