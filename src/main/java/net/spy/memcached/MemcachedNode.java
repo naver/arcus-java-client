@@ -297,7 +297,7 @@ public interface MemcachedNode {
 
   MemcachedReplicaGroup getReplicaGroup();
 
-  int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent);
+  int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempotent);
 
   boolean hasNonIdempotentOperationInReadQ();
   /* ENABLE_REPLICATION end */

@@ -547,7 +547,7 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_REPLICATION if */
-  private void switchoverMemcachedReplGroup(MemcachedNode node, boolean cancelNonIdempontent) {
+  private void switchoverMemcachedReplGroup(MemcachedNode node, boolean cancelNonIdempotent) {
     MemcachedReplicaGroup group = node.getReplicaGroup();
 
     /*  must keep the following execution order when switchover
@@ -560,7 +560,7 @@ public final class MemcachedConnection extends SpyObject {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
       }
-      node.moveOperations(group.getMasterNode(), cancelNonIdempontent);
+      node.moveOperations(group.getMasterNode(), cancelNonIdempotent);
       addedQueue.offer(group.getMasterNode());
       queueReconnect(node, ReconnDelay.IMMEDIATE,
           "Discarded all pending reading state operation to move operations.");
@@ -1433,16 +1433,16 @@ public final class MemcachedConnection extends SpyObject {
   private class MoveOperationTask implements Task {
     private final MemcachedNode from;
     private final MemcachedNode to;
-    private final boolean cancelNonIdempontent;
+    private final boolean cancelNonIdempotent;
 
-    public MoveOperationTask(MemcachedNode from, MemcachedNode to, boolean cancelNonIdempontent) {
+    public MoveOperationTask(MemcachedNode from, MemcachedNode to, boolean cancelNonIdempotent) {
       this.from = from;
       this.to = to;
-      this.cancelNonIdempontent = cancelNonIdempontent;
+      this.cancelNonIdempotent = cancelNonIdempotent;
     }
 
     public void doTask() {
-      if (from.moveOperations(to, cancelNonIdempontent) > 0) {
+      if (from.moveOperations(to, cancelNonIdempotent) > 0) {
         addedQueue.offer(to);
       }
     }

@@ -248,7 +248,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
+  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempotent) {
     throw new UnsupportedOperationException();
   }
 

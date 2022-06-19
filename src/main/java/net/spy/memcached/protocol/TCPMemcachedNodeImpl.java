@@ -725,7 +725,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return replicaGroup;
   }
 
-  private BlockingQueue<Operation> getAllOperations(boolean cancelNonIdempontent) {
+  private BlockingQueue<Operation> getAllOperations(boolean cancelNonIdempotent) {
     BlockingQueue<Operation> allOp = new LinkedBlockingQueue<Operation>();
 
     while (hasReadOp()) {
@@ -734,7 +734,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         /* Operation could exist both writeQ and readQ,
          * if all bytes of the operation have not been written yet.
          */
-      } else if (cancelNonIdempontent && !op.isIdempotentOperation()) {
+      } else if (cancelNonIdempotent && !op.isIdempotentOperation()) {
         op.cancel("by moving idempotent operations only");
       } else {
         allOp.add(op);
@@ -752,8 +752,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return allOp;
   }
 
-  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
-    BlockingQueue<Operation> allOp = getAllOperations(cancelNonIdempontent);
+  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempotent) {
+    BlockingQueue<Operation> allOp = getAllOperations(cancelNonIdempotent);
     int opCount = allOp.size();
     int movedOpCount = 0;
 
