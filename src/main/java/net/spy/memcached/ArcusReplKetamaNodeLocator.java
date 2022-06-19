@@ -199,10 +199,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       // Remove memcached nodes.
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
-        MemcachedReplicaGroup mrg =
-                allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
-        mrg.deleteMemcachedNode(node);
-
+        removeNodeFromGroup(node);
         try {
           node.closeChannel();
         } catch (IOException e) {
@@ -218,16 +215,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       // Add memcached nodes.
       for (MemcachedNode node : toAttach) {
         allNodes.add(node);
-        MemcachedReplicaGroup mrg =
-                allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
-        if (mrg == null) {
-          mrg = new MemcachedReplicaGroupImpl(node);
-          getLogger().info("new memcached replica group added %s", mrg.getGroupName());
-          allGroups.put(mrg.getGroupName(), mrg);
-          insertHash(mrg);
-        } else {
-          mrg.setMemcachedNode(node);
-        }
+        insertNodeIntoGroup(node);
       }
 
       // Delete empty group
@@ -254,6 +242,25 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     lock.lock();
     group.changeRole();
     lock.unlock();
+  }
+
+  private void insertNodeIntoGroup(MemcachedNode node) {
+    MemcachedReplicaGroup mrg;
+    mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
+    if (mrg == null) {
+      mrg = new MemcachedReplicaGroupImpl(node);
+      getLogger().info("new memcached replica group added %s", mrg.getGroupName());
+      allGroups.put(mrg.getGroupName(), mrg);
+      insertHash(mrg);
+    } else {
+      mrg.setMemcachedNode(node);
+    }
+  }
+
+  private void removeNodeFromGroup(MemcachedNode node) {
+    MemcachedReplicaGroup mrg;
+    mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
+    mrg.deleteMemcachedNode(node);
   }
 
   private Long getKetamaHashPoint(byte[] digest, int h) {
