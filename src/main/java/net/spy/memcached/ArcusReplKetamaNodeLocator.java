@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   private final HashMap<String, MemcachedReplicaGroup> allGroups;
   private final Collection<MemcachedNode> allNodes;
 
+  private final Collection<MemcachedReplicaGroup> toDeleteGroups;
   private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
   private final ArcusReplKetamaNodeLocatorConfiguration config
           = new ArcusReplKetamaNodeLocatorConfiguration();
@@ -57,7 +59,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     for (MemcachedNode node : nodes) {
       MemcachedReplicaGroup mrg =
               allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
-
       if (mrg == null) {
         mrg = new MemcachedReplicaGroupImpl(node);
         getLogger().info("new memcached replica group added %s", mrg.getGroupName());
@@ -72,9 +73,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     for (MemcachedReplicaGroup group : allGroups.values()) {
       insertHash(group);
     }
-
     /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
     assert ketamaGroups.size() <= (numReps * allGroups.size());
+
+    // prepare toDeleteGroups
+    toDeleteGroups = new HashSet<MemcachedReplicaGroup>();
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
@@ -84,6 +87,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     ketamaGroups = kg;
     allGroups = ag;
     allNodes = an;
+    toDeleteGroups = new HashSet<MemcachedReplicaGroup>();
   }
 
   public Collection<MemcachedNode> getAll() {
@@ -219,20 +223,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
 
       // Delete empty group
-      List<MemcachedReplicaGroup> toDeleteGroup = new ArrayList<MemcachedReplicaGroup>();
-
-      for (Map.Entry<String, MemcachedReplicaGroup> entry : allGroups.entrySet()) {
-        MemcachedReplicaGroup group = entry.getValue();
-        if (group.isEmptyGroup()) {
-          toDeleteGroup.add(group);
-        }
-      }
-
-      for (MemcachedReplicaGroup group : toDeleteGroup) {
+      for (MemcachedReplicaGroup group : toDeleteGroups) {
         getLogger().info("old memcached replica group removed %s", group.getGroupName());
         allGroups.remove(group.getGroupName());
         removeHash(group);
       }
+      toDeleteGroups.clear();
     } finally {
       lock.unlock();
     }
@@ -253,6 +249,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       allGroups.put(mrg.getGroupName(), mrg);
       insertHash(mrg);
     } else {
+      if (mrg.isEmptyGroup()) {
+        toDeleteGroups.remove(mrg);
+      }
       mrg.setMemcachedNode(node);
     }
   }
@@ -261,6 +260,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     MemcachedReplicaGroup mrg;
     mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
     mrg.deleteMemcachedNode(node);
+    if (mrg.isEmptyGroup()) {
+      toDeleteGroups.add(mrg);
+    }
   }
 
   private Long getKetamaHashPoint(byte[] digest, int h) {
