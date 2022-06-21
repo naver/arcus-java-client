@@ -16,6 +16,8 @@
  */
 package net.spy.memcached;
 
+import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -73,6 +75,30 @@ public final class ArrayModNodeLocator implements NodeLocator {
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
     throw new UnsupportedOperationException("update not supported");
   }
+
+  /* ENABLE_MIGRATION if */
+  public Collection<MemcachedNode> getAlterAll() {
+    return new ArrayList<MemcachedNode>();
+  }
+
+  public MemcachedNode getAlterNode(SocketAddress sa) {
+    return null;
+  }
+
+  public void updateAlter(Collection<MemcachedNode> toDelete) {
+    throw new UnsupportedOperationException("updateAlter not supported");
+  }
+
+  @Override
+  public void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type) {
+    throw new UnsupportedOperationException("prepareMigration not supported");
+  }
+
+  @Override
+  public void updateMigration(Long spoint, Long epoint) {
+    throw new UnsupportedOperationException("updateMigration not supported");
+  }
+  /* ENABLE_MIGRATION end */
 
   private int getServerForKey(String key) {
     int rv = (int) (hashAlg.hash(key) % nodes.length);

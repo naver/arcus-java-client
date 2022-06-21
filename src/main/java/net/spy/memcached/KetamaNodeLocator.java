@@ -16,6 +16,7 @@
  */
 package net.spy.memcached;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -150,6 +151,30 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
   public SortedMap<Long, MemcachedNode> getKetamaNodes() {
     return Collections.unmodifiableSortedMap(ketamaNodes);
   }
+
+  /* ENABLE_MIGRATION if */
+  public Collection<MemcachedNode> getAlterAll() {
+    return new ArrayList<MemcachedNode>();
+  }
+
+  public MemcachedNode getAlterNode(SocketAddress sa) {
+    return null;
+  }
+
+  public void updateAlter(Collection<MemcachedNode> toDelete) {
+    throw new UnsupportedOperationException("updateAlter not supported");
+  }
+
+  @Override
+  public void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type) {
+    throw new UnsupportedOperationException("prepareMigration not supported");
+  }
+
+  @Override
+  public void updateMigration(Long spoint, Long epoint) {
+    throw new UnsupportedOperationException("updateMigration not supported");
+  }
+  /* ENABLE_MIGRATION end */
 
   class KetamaIterator implements Iterator<MemcachedNode> {
 
