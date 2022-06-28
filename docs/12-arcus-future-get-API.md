@@ -23,7 +23,7 @@ V get(long timeout, TimeUnit unit)
 - 연산 작업 처리 도중 위와 언급한 예외 이외에 다른 예외가 발생하면 `ExecutionException`을 발생시킨다.
 
 ## getSome
-`asyncBulkGet()`, `asyncBulkGets()` API 연산을 통해 반환받는 BulkGetFuture에서는 `getSome()` API를 지원한다.  
+`asyncGetBulk()`, `asyncGetsBulk()` API 연산을 통해 반환받는 BulkGetFuture에서는 `getSome()` API를 지원한다.  
 이 API는 timeout이 발생하면 `get()` API와 같이 데이터를 버리고 null을 반환하는 것이 아니라,
 그 시점까지 처리된 결과를 반환한다 (partial). 따라서, 응용에서는 반환된 데이터를 사용할 수 있고, 
 반환되지 않은 데이터만 백엔드 데이터베이스에서 조회하면 되므로 리소스의 낭비를 줄일 수 있다.
