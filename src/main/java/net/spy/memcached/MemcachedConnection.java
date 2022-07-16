@@ -600,7 +600,9 @@ public final class MemcachedConnection extends SpyObject {
     if (mgType == MigrationType.JOIN) {
       /* Only joining nodes can be attached */
       MemcachedNode node = locator.getAlterNode(sa);
-      return node;
+      if (node != null) {
+        return node;
+      }
     }
     /* ENABLE_MIGRATION end */
     return makeMemcachedNode(connName, sa);

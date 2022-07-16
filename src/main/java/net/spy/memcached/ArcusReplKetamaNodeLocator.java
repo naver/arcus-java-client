@@ -134,12 +134,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public MemcachedNode getAlterNode(SocketAddress sa) {
-    /* The alter node to attach must be found */
+    /* The alter node to attach should be found */
     for (MemcachedNode node : alterNodes) {
       if (sa.equals(node.getSocketAddress())) {
         return node;
       }
     }
+    /* If a slave node has started during migration, it may not exist */ 
     return null;
   }
   /* ENABLE_MIGRATION end */
