@@ -290,6 +290,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   /* ENABLE_MIGRATION if */
   public void updateAlter(Collection<MemcachedNode> toDelete) {
     assert migrationType == MigrationType.JOIN;
+    lock.lock();
     try {
       // Remove the failed or left alter nodes.
       for (MemcachedNode node : toDelete) {
