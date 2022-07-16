@@ -140,11 +140,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         return node;
       }
     }
-    for (MemcachedNode node : allNodes) {
-      if (sa.equals(node.getSocketAddress())) {
-        return node;
-      }
-    }
     return null;
   }
   /* ENABLE_MIGRATION end */
