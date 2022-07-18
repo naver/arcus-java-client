@@ -1692,6 +1692,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Boolean> asyncMopDelete(String key,
+                                                  List<String> mkeyList,
+                                                  boolean dropIfEmpty) {
+    if (mkeyList == null) {
+      throw new IllegalArgumentException("mkeyList is null");
+    }
+    for (int i = 0; i < mkeyList.size(); i++) {
+      validateMKey(mkeyList.get(i));
+    }
+    MapDelete delete = new MapDelete(mkeyList, false, dropIfEmpty);
+    return asyncCollectionDelete(key, delete);
+  }
+
+  @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
                                                   boolean dropIfEmpty) {
     ListDelete delete = new ListDelete(index, false, dropIfEmpty);
