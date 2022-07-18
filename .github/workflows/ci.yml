@@ -12,7 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     steps:
-    - run: lsb_release -a
     - uses: actions/checkout@v3
     - name: Set up JDK 11
       uses: actions/setup-java@v2
@@ -44,6 +43,8 @@ jobs:
         virtualenv -p /usr/bin/python2.7 venv
         
         source venv/bin/activate
+    - name: Update apt-get
+      run: sudo apt-get update
     - name: Install ARCUS Dependencies
       run: sudo apt-get install -qq build-essential autoconf automake libtool libcppunit-dev python-setuptools python-dev ant
     - name: Cache Maven Dependencies
