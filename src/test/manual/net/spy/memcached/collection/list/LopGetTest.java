@@ -100,4 +100,17 @@ public class LopGetTest extends BaseIntegrationTest {
     assertNull(rlist);
   }
 
+  public void testLopGet_simple() throws Exception {
+    CollectionAttributes attrs = null;
+
+    // get all elements
+    List<Object> list = mc.asyncLopGet(key, 0, 9).get(1000,
+            TimeUnit.MILLISECONDS);
+
+    assertEquals(list.size(), 9);
+
+    // get count of the list and compare with count of items after using get method
+    attrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(9, attrs.getCount().intValue());
+  }
 }

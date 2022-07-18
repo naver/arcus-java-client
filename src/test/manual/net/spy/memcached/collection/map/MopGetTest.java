@@ -114,4 +114,23 @@ public class MopGetTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS);
     assertNull(rmap);
   }
+
+  public void testMopGet_simple() throws Exception {
+    CollectionAttributes attrs = null;
+
+    List<String> mKeyList = new ArrayList<String>();
+    for (int i = 0; i <= 9; i++) {
+      mKeyList.add(String.valueOf(i));
+    }
+
+    // get all elements
+    Map<String, Object> list = mc.asyncMopGet(key, mKeyList).get(1000,
+            TimeUnit.MILLISECONDS);
+
+    assertEquals(list.size(), 9);
+
+    // get count of the map and compare with count of items after using get method
+    attrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
+    assertEquals(9, attrs.getCount().intValue());
+  }
 }
