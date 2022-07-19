@@ -16,6 +16,7 @@
  */
 package net.spy.memcached;
 
+import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -56,4 +57,32 @@ public interface NodeLocator {
    * only available in ArcusKetamaNodeLocator.
    */
   void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
+
+  /* ENABLE_MIGRATION if */
+  /**
+   * Get all alter memcached nodes.
+   */
+  Collection<MemcachedNode> getAlterAll();
+
+  /**
+   * Get an alter memcached node which contains the given socket address.
+   */
+  MemcachedNode getAlterNode(SocketAddress sa);
+
+  /**
+   * Remove the alter nodes which have failed down.
+   */
+  void updateAlter(Collection<MemcachedNode> toAttach,
+                   Collection<MemcachedNode> toDelete);
+
+  /**
+   * Prepare migration with alter nodes and migration type.
+   */
+  void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type);
+
+  /**
+   * Update(or reflect) the migratoin range in ketama hash ring.
+   */
+  void updateMigration(Long spoint, Long epoint);
+  /* ENABLE_MIGRATION end */
 }
