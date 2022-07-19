@@ -830,7 +830,8 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public CollectionFuture<Boolean> asyncMopDelete(String key, List<String> mkeyList, boolean dropIfEmpty) {
+  public CollectionFuture<Boolean> asyncMopDelete(String key, List<String> mkeyList,
+                                                  boolean dropIfEmpty) {
     return this.getClient().asyncMopDelete(key, mkeyList, dropIfEmpty);
   }
 
