@@ -263,12 +263,12 @@ public final class MemcachedConnection extends SpyObject {
           (timeoutDurationThreshold == 0 || mn.getTimeoutDuration() > timeoutDurationThreshold)) {
         getLogger().warn(
             "%s exceeded continuous timeout threshold. >%s(count), >%s(duration) (%s)",
-            mn.getSocketAddress().toString(),
+            mn.getNodeName(),
             timeoutExceptionThreshold, timeoutDurationThreshold, mn.getStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
       } else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold) {
         getLogger().warn("%s exceeded timeout ratio threshold. >%s (%s)",
-                mn.getSocketAddress().toString(), timeoutRatioThreshold, mn.getStatus());
+                mn.getNodeName(), timeoutRatioThreshold, mn.getStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
       }
     }
