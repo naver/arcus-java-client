@@ -861,6 +861,19 @@ public interface ArcusClientIF {
                                                   boolean dropIfEmpty);
 
   /**
+   * Deletes items on given mkey list in the map.
+   *
+   * @param key         key of a map
+   * @param mkeyList    mkeyList
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
+   * @return whether or not the operation was performed
+   */
+  public CollectionFuture<Boolean> asyncMopDelete(String key,
+                                                  List<String> mkeyList,
+                                                  boolean dropIfEmpty);
+
+  /**
    * Deletes an item on given index in the list.
    *
    * @param key         key of a list
