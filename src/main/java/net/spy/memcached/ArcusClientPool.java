@@ -700,10 +700,8 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
-                                                           boolean withDelete,
-                                                           boolean dropIfEmpty) {
-    return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty);
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
+    return this.getClient().asyncMopGet(key);
   }
 
   @Override
@@ -714,6 +712,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
+    return this.getClient().asyncMopGet(key, mkey);
+  }
+
+  @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey,
                                                            boolean withDelete,
                                                            boolean dropIfEmpty) {
@@ -721,11 +724,20 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
-                                                          boolean withDelete,
-                                                          boolean dropIfEmpty,
-                                                          Transcoder<T> tc) {
-    return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty, tc);
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
+    return this.getClient().asyncMopGet(key, mkeyList);
+  }
+
+  @Override
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
+                                                           boolean withDelete,
+                                                           boolean dropIfEmpty) {
+    return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
+    return this.getClient().asyncMopGet(key, tc);
   }
 
   @Override
@@ -738,10 +750,36 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
+                                                          Transcoder<T> tc) {
+    return this.getClient().asyncMopGet(key, mkey, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
                                                           boolean withDelete,
                                                           boolean dropIfEmpty,
                                                           Transcoder<T> tc) {
     return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+                                                          Transcoder<T> tc) {
+    return this.getClient().asyncMopGet(key, mkeyList, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+                                                          boolean withDelete,
+                                                          boolean dropIfEmpty,
+                                                          Transcoder<T> tc) {
+    return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty, tc);
+  }
+
+  @Override
+  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
+    return this.getClient()
+            .asyncLopGet(key, index);
   }
 
   @Override
@@ -750,6 +788,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
                                                     boolean dropIfEmpty) {
     return this.getClient()
             .asyncLopGet(key, index, withDelete, dropIfEmpty);
+  }
+
+  @Override
+  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
+    return this.getClient().asyncLopGet(key, from, to);
   }
 
   @Override
@@ -762,12 +805,22 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
+    return this.getClient().asyncLopGet(key, index, tc);
+  }
+
+  @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
                                                    boolean withDelete,
                                                    boolean dropIfEmpty,
                                                    Transcoder<T> tc) {
     return this.getClient().asyncLopGet(key, index, withDelete,
             dropIfEmpty, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to, Transcoder<T> tc) {
+    return this.getClient().asyncLopGet(key, from, to, tc);
   }
 
   @Override
@@ -781,12 +834,23 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
+    return this.getClient()
+            .asyncSopGet(key, count);
+  }
+
+  @Override
   public CollectionFuture<Set<Object>> asyncSopGet(String key,
                                                    int count,
                                                    boolean withDelete,
                                                    boolean dropIfEmpty) {
     return this.getClient()
             .asyncSopGet(key, count, withDelete, dropIfEmpty);
+  }
+
+  @Override
+  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
+    return this.getClient().asyncSopGet(key, count, tc);
   }
 
   @Override

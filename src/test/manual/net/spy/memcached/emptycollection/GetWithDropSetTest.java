@@ -105,4 +105,27 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
       Assert.fail(e.getMessage());
     }
   }
+
+  public void testGetWithoutDeleteAndDropOptions() {
+    try {
+      // check attr
+      assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
+
+      //get value
+      assertTrue(mc.asyncSopGet(KEY, 10).get()
+              .contains(VALUE));
+
+      // check exists
+      assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+              .getCount());
+
+      // get value again
+      assertTrue(mc.asyncSopGet(KEY, 10).get()
+              .contains(VALUE));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
 }

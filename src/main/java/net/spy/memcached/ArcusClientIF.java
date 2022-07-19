@@ -603,6 +603,14 @@ public interface ArcusClientIF {
    * Retrieves all items from the map
    *
    * @param key         key of a map
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key);
+
+  /**
+   * Retrieves all items from the map
+   *
+   * @param key         key of a map
    * @param withDelete  true to remove the returned item in the map
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false map will remain empty even if all the elements are removed
@@ -610,6 +618,15 @@ public interface ArcusClientIF {
    */
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves an item on given mkey in the map.
+   *
+   * @param key         key of a map
+   * @param mkey        mkey of a map
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey);
 
   /**
    * Retrieves an item on given mkey in the map.
@@ -629,6 +646,15 @@ public interface ArcusClientIF {
    *
    * @param key         key of a map
    * @param mkeyList    mkeyList
+   * @return a future that will hold the return value map of the fetch.
+   */
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList);
+
+  /**
+   * Retrieves items on given mkey list in the map.
+   *
+   * @param key         key of a map
+   * @param mkeyList    mkeyList
    * @param withDelete  true to remove the returned item in the map
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false map will remain empty even if all the elements are removed
@@ -636,6 +662,17 @@ public interface ArcusClientIF {
    */
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
                                                            boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves all items from the map
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a map
+   * @param tc          a transcoder to decode returned values
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
+                                                          Transcoder<T> tc);
 
   /**
    * Retrieves all items from the map
@@ -650,6 +687,18 @@ public interface ArcusClientIF {
    */
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           boolean withDelete, boolean dropIfEmpty,
+                                                          Transcoder<T> tc);
+
+  /**
+   * Retrieves an item on given mkey in the map.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a map
+   * @param mkey        mkey of a map
+   * @param tc          a transcoder to decode returned values
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
                                                           Transcoder<T> tc);
 
   /**
@@ -674,6 +723,18 @@ public interface ArcusClientIF {
    * @param <T>         the expected class of the value
    * @param key         key of a map
    * @param mkeyList    mkeyList
+   * @param tc          a transcoder to decode returned values
+   * @return a future that will hold the return value map of the fetch.
+   */
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+                                                          Transcoder<T> tc);
+
+  /**
+   * Retrieves items on given mkey list in the map.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a map
+   * @param mkeyList    mkeyList
    * @param withDelete  true to remove the returned item in the map
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false map will remain empty even if all the elements are removed
@@ -689,6 +750,15 @@ public interface ArcusClientIF {
    *
    * @param key         key of a list
    * @param index       list index
+   * @return a future that will hold the return value list of the fetch
+   */
+  public CollectionFuture<List<Object>> asyncLopGet(String key, int index);
+
+  /**
+   * Retrieves an item on given index in the list.
+   *
+   * @param key         key of a list
+   * @param index       list index
    * @param withDelete  true to remove the returned item in the list
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false list will remain empty even if all the elements are removed
@@ -696,6 +766,17 @@ public interface ArcusClientIF {
    */
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
                                                     boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves items on given index range(from..to) in the list.
+   *
+   * @param key         key of a list
+   * @param from        the first index to delete
+   * @param to          the last index to delete
+   * @return a future that will hold the return value list of the fetch
+   */
+  public CollectionFuture<List<Object>> asyncLopGet(String key,
+                                                    int from, int to);
 
   /**
    * Retrieves items on given index range(from..to) in the list.
@@ -718,6 +799,18 @@ public interface ArcusClientIF {
    * @param <T>         the expected class of the value
    * @param key         key of a list
    * @param index       list index
+   * @param tc          a tranacoder to decode returned value
+   * @return a future that will hold the return value list of the fetch
+   */
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
+                                                   Transcoder<T> tc);
+
+  /**
+   * Retrieves an item on given index in the list.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a list
+   * @param index       list index
    * @param withDelete  true to remove the returned item in the list
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false list will remain empty even if all the elements are removed
@@ -726,6 +819,20 @@ public interface ArcusClientIF {
    */
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
                                                    boolean withDelete, boolean dropIfEmpty,
+                                                   Transcoder<T> tc);
+
+  /**
+   * Retrieves items on given index range(from..to) in the list. (Arcus 1.6 and above)
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a list
+   * @param from        the first index to delete
+   * @param to          the last index to delete
+   * @param tc          a transcoder to decode the returned values
+   * @return a future that will hold the return value list of the fetch
+   */
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key,
+                                                   int from, int to,
                                                    Transcoder<T> tc);
 
   /**
@@ -751,6 +858,15 @@ public interface ArcusClientIF {
    *
    * @param key         key of a set
    * @param count       number of items to fetch
+   * @return a future that will hold the return value set of the fetch
+   */
+  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count);
+
+  /**
+   * Retrieves count number of random items in the set.
+   *
+   * @param key         key of a set
+   * @param count       number of items to fetch
    * @param withDelete  true to remove the returned item in the set
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false set will remain empty even if all the elements are removed
@@ -758,6 +874,18 @@ public interface ArcusClientIF {
    */
   public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
                                                    boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves count number of random items in the set.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a set
+   * @param count       number of items to fetch
+   * @param tc          a tranacoder to decode returned value
+   * @return a future that will hold the return value set of the fetch
+   */
+  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
+                                                  Transcoder<T> tc);
 
   /**
    * Retrieves count number of random items in the set.

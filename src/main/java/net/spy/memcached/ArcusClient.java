@@ -1527,12 +1527,22 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
+    return asyncMopGet(key, false, false);
+  }
+
+  @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            boolean withDelete,
                                                            boolean dropIfEmpty) {
     List<String> mkeyList = new ArrayList<String>();
     MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
     return asyncMopGet(key, get, collectionTranscoder);
+  }
+
+  @Override
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
+    return asyncMopGet(key, mkey, false, false);
   }
 
   @Override
@@ -1551,6 +1561,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
+    return asyncMopGet(key, mkeyList, false, false);
+  }
+
+  @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
                                                            List<String> mkeyList,
                                                            boolean withDelete,
@@ -1566,12 +1581,22 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
+    return asyncMopGet(key, false, false, tc);
+  }
+
+  @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           boolean withDelete, boolean dropIfEmpty,
                                                           Transcoder<T> tc) {
     List<String> mkeyList = new ArrayList<String>();
     MapGet get = new MapGet(mkeyList, withDelete, dropIfEmpty);
     return asyncMopGet(key, get, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey, Transcoder<T> tc) {
+    return asyncMopGet(key, mkey, false, false, tc);
   }
 
   @Override
@@ -1590,6 +1615,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList, Transcoder<T> tc) {
+    return asyncMopGet(key, mkeyList, false, false, tc);
+  }
+
+  @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
                                                           List<String> mkeyList,
                                                           boolean withDelete, boolean dropIfEmpty,
@@ -1605,10 +1635,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
+    return asyncLopGet(key, index, false, false);
+  }
+
+  @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
                                                     boolean withDelete, boolean dropIfEmpty) {
     ListGet get = new ListGet(index, withDelete, dropIfEmpty);
     return asyncLopGet(key, get, collectionTranscoder);
+  }
+
+  @Override
+  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
+    return asyncLopGet(key, from, to, false, false);
   }
 
   @Override
@@ -1620,11 +1660,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
+    return asyncLopGet(key, index, false, false, tc);
+  }
+  @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
                                                    boolean withDelete, boolean dropIfEmpty,
                                                    Transcoder<T> tc) {
     ListGet get = new ListGet(index, withDelete, dropIfEmpty);
     return asyncLopGet(key, get, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to, Transcoder<T> tc) {
+    return asyncLopGet(key, from, to, false, false, tc);
   }
 
   @Override
@@ -1637,10 +1686,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
+    return asyncSopGet(key, count, false, false);
+  }
+
+  @Override
   public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
                                                    boolean withDelete, boolean dropIfEmpty) {
     SetGet get = new SetGet(count, withDelete, dropIfEmpty);
     return asyncSopGet(key, get, collectionTranscoder);
+  }
+
+  @Override
+  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
+    return asyncSopGet(key, count, false, false, tc);
   }
 
   @Override
