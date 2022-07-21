@@ -306,7 +306,7 @@ public final class MemcachedConnection extends SpyObject {
     if (arcusMigrEnabled) {
       handleAlterNodesChangeQueue();
     }
-    /* ENABLE_MIGRATION if */
+    /* ENABLE_MIGRATION end */
 
     if (!reconnectQueue.isEmpty()) {
       attemptReconnects();
