@@ -1477,6 +1477,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key, long bkey,
+                                                                  ElementFlagFilter eFlagFilter) {
+    return asyncBopGet(key, bkey, eFlagFilter, false, false);
+  }
+
+  @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
                                                                   long bkey,
                                                                   ElementFlagFilter eFlagFilter,
@@ -1485,6 +1491,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopGet(key, get, false, collectionTranscoder);
+  }
+
+  @Override
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count) {
+    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
   }
 
   @Override
@@ -1504,12 +1518,29 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
                                                                  long bkey,
                                                                  ElementFlagFilter eFlagFilter,
+                                                                 Transcoder<T> tc) {
+    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
                                                                  boolean withDelete,
                                                                  boolean dropIfEmpty,
                                                                  Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopGet(key, get, false, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
+                                                                 Transcoder<T> tc) {
+    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false, tc);
   }
 
   @Override
@@ -3008,11 +3039,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
+    return asyncBopGet(key, bkey, eFlagFilter, false, false);
+  }
+
+  @Override
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
     return asyncBopExtendedGet(key, get, false, collectionTranscoder);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
+    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
   }
 
   @Override
@@ -3026,12 +3069,27 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-      String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-      int offset, int count, boolean withDelete, boolean dropIfEmpty) {
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count) {
+    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
+  }
+
+  @Override
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count, boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
     boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
     return asyncBopExtendedGet(key, get, reverse, collectionTranscoder);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+          int count, Transcoder<T> tc) {
+    return asyncBopGet(key, from, to, eFlagFilter, offset, count,
+            false, false, tc);
   }
 
   @Override

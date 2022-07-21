@@ -64,7 +64,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
       Map<Long, Element<Object>> result = mc.asyncBopGet(key, 0,
               maxcount + 1000, ElementFlagFilter.DO_NOT_FILTER, 0,
-              maxcount + 1000, false, false).get(10000,
+              maxcount + 1000).get(10000,
               TimeUnit.MILLISECONDS);
       assertEquals(maxcount, result.size());
       assertTrue(mc.asyncBopDelete(key, 0, 20000,
