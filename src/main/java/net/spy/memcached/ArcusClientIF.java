@@ -1911,92 +1911,92 @@ public interface ArcusClientIF {
    * Increment the element's value in b+tree.
    *
    * @param key    b+tree item's key
-   * @param subkey element's key
+   * @param bkey element's key
    * @param by     increment amount
    * @return future holding the incremented value
    */
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey, int by);
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey, int by);
 
   /**
    * Increment the element's value in b+tree.
    *
    * @param key    b+tree item's key
-   * @param subkey element's key (byte-array type key)
+   * @param bkey element's key (byte-array type key)
    * @param by     increment amount
    * @return future holding the incremented value
    */
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey, int by);
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey, int by);
 
   /**
    * Increment the element's value in b+tree.
    *
    * @param key     b+tree item's key
-   * @param subkey  element's key (byte-array type key)
+   * @param bkey  element's key (byte-array type key)
    * @param by      increment amount
    * @param initial optional element's initial value
    * @param eFlag   optional element flag
    * @return future holding the incremented value
    */
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by, long initial, byte[] eFlag);
 
   /**
    * Increment the element's value in b+tree.
    *
    * @param key     b+tree item's key
-   * @param subkey  element's key (byte-array type key)
+   * @param bkey  element's key (byte-array type key)
    * @param by      increment amount
    * @param initial optional element's initial value
    * @param eFlag   optional element flag
    * @return future holding the incremented value
    */
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag);
 
   /**
    * Decrement the element's value in b+tree.
    *
    * @param key    b+tree item's key
-   * @param subkey element's key
+   * @param bkey element's key
    * @param by     decrement amount
    * @return future holding the decremented value
    */
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey, int by);
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by);
 
   /**
    * Decrement the element's value in b+tree.
    *
    * @param key    b+tree item's key
-   * @param subkey element's key (byte-array type key)
+   * @param bkey element's key (byte-array type key)
    * @param by     decrement amount
    * @return future holding the decremented value
    */
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by);
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey, int by);
 
   /**
    * Decrement the element's value in b+tree.
    *
    * @param key     b+tree item's key
-   * @param subkey  element's key (byte-array type key)
+   * @param bkey  element's key (byte-array type key)
    * @param by      decrement amount
    * @param initial optional element's initial value
    * @param eFlag   optional element flag
    * @return future holding the decremented value
    */
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by, long initial, byte[] eFlag);
 
   /**
    * Decrement the element's value in b+tree.
    *
    * @param key     b+tree item's key
-   * @param subkey  element's key (byte-array type key)
+   * @param bkey  element's key (byte-array type key)
    * @param by      decrement amount
    * @param initial optional element's initial value
    * @param eFlag   optional element flag
    * @return future holding the decremented value
    */
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag);
 
   /**
