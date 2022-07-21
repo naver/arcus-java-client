@@ -52,4 +52,8 @@ public final class AddrUtil {
     assert !addrs.isEmpty() : "No addrs found";
     return addrs;
   }
+
+  public static InetSocketAddress getAddress(String s) {
+    return getAddresses(s).get(0);
+  }
 }

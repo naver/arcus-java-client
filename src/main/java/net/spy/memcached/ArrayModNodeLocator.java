@@ -81,6 +81,10 @@ public final class ArrayModNodeLocator implements NodeLocator {
     return new ArrayList<MemcachedNode>();
   }
 
+  public Collection<MemcachedNode> getExistAll() {
+    return new ArrayList<MemcachedNode>();
+  }
+
   public MemcachedNode getAlterNode(SocketAddress sa) {
     return null;
   }
@@ -94,7 +98,7 @@ public final class ArrayModNodeLocator implements NodeLocator {
     throw new UnsupportedOperationException("prepareMigration not supported");
   }
 
-  public void updateMigration(Long spoint, Long epoint) {
+  public boolean updateMigration(Long spoint, Long epoint) {
     throw new UnsupportedOperationException("updateMigration not supported");
   }
   /* ENABLE_MIGRATION end */

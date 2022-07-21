@@ -53,6 +53,7 @@ import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.KeyedOperation;
+import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
@@ -968,6 +969,17 @@ public final class MemcachedConnection extends SpyObject {
         break;
       }
       /* ENABLE_REPLICATION end */
+      /* ENABLE_MIGRATION if */
+      if (currentOp != null && currentOp.getState() == OperationState.REDIRECT) {
+        ((Buffer) rbuf).clear();
+        qa.removeCurrentReadOp();
+        if (currentOp == qa.getCurrentWriteOp()) { /* partially written */
+          qa.removeCurrentWriteOp();
+        }
+        redirectOperation(currentOp);
+        break;
+      }
+      /* ENABLE_MIGRATION end */
       ((Buffer) rbuf).clear();
       read = channel.read(rbuf);
     }
@@ -987,6 +999,133 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
     /* ENABLE_REPLICATION end */
+  }
+
+  /* ENABLE_MIGRATION if */
+  /* There is a possibility that NOT_MY_KEY will be received
+   * regardless of migration in the future. (to solve old hashring problem by zookeeper disconnect)
+   */
+  private void redirectOperation(Operation op) {
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Redirect Operation. op=" + op);
+    }
+    /* Get RedirectHandler */
+    RedirectHandler rh = op.getRedirectHandler();
+    if (rh == null) {
+      /* Probably code bug */
+      op.cancel("Redirect failure. RedirectHandler is not registered.");
+      return;
+    }
+
+    /* Hashring update by migration */
+    if (!locator.updateMigration(rh.getMigrationBasePoint(), rh.getMigrationEndPoint())) {
+      op.cancel("Redirect failure. Hashring update error.");
+      return;
+    }
+
+    /* Redirect operation */
+    boolean success;
+    if (rh instanceof RedirectHandler.RedirectHandlerSingleKey) {
+      success = redirectSingleKeyOperation((RedirectHandler.RedirectHandlerSingleKey) rh, op);
+    } else {
+      success = redirectMultiKeyOperation((RedirectHandler.RedirectHandlerMultiKey) rh, op);
+    }
+    if (success) {
+      Selector s = selector.wakeup();
+      assert s == selector : "Wakeup returned the wrong selector.";
+    }
+  }
+
+  public boolean redirectSingleKeyOperation(
+      RedirectHandler.RedirectHandlerSingleKey redirectHandler, Operation op) {
+    String owner = redirectHandler.getOwner();
+    MemcachedNode ownerNode;
+    if (owner != null) {
+      ownerNode = getOwnerNodeByName(owner);
+    } else { /* single key pipe operation */
+      ownerNode = findNodeByKey(redirectHandler.getKey()); /* hashring lookup */
+    }
+    if (ownerNode == null) {
+      op.cancel("Redirect failure. No node.");
+      return false;
+    }
+    if ((!ownerNode.isActive() && !ownerNode.isFirstConnecting()) &&
+        failureMode == FailureMode.Cancel) {
+      op.cancel("Redirect failure. Inactive node.");
+      return false;
+    }
+    ownerNode.addOpToWriteQ(op);
+    addedQueue.offer(ownerNode);
+    return true;
+  }
+
+  public boolean redirectMultiKeyOperation(RedirectHandler.RedirectHandlerMultiKey redirectHandler,
+                                           Operation op) {
+    Map<MemcachedNode, ArrayList<Integer>> ownerToKeys = redirectHandler.groupRedirectKeys(this);
+    if (ownerToKeys == null) {
+      return false;
+    }
+
+    MemcachedNode ownerNode;
+    Map<MemcachedNode, Operation> ops = new HashMap<MemcachedNode, Operation>();
+    MultiOperationCallback mcb = opFactory.createMultiOperationCallback((KeyedOperation) op,
+        ownerToKeys.size());
+    for (Map.Entry<MemcachedNode, ArrayList<Integer>> entry : ownerToKeys.entrySet()) {
+      ownerNode = entry.getKey();
+      if (ownerNode == null) {
+        op.cancel("Redirect failure. No node.");
+        return false;
+      }
+      if ((!ownerNode.isActive() && !ownerNode.isFirstConnecting()) &&
+          failureMode == FailureMode.Cancel) {
+        op.cancel("inactive node");
+        return false;
+      }
+      ops.put(ownerNode,
+          opFactory.cloneMultiOperation(
+              (KeyedOperation) op, ownerNode, entry.getValue(), mcb));
+    }
+    for (Map.Entry<MemcachedNode, Operation> entry : ops.entrySet()) {
+      ownerNode = entry.getKey();
+      ownerNode.addOpToWriteQ(entry.getValue());
+      addedQueue.offer(ownerNode);
+    }
+    return true;
+  }
+
+  public MemcachedNode getOwnerNodeByName(String name) {
+    /* OwnerNode is a importer. Importer by migration type :
+       JOIN : joining node, LEAVE : existing node.
+     */
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      MemcachedReplicaGroup group;
+      if (mgType == MigrationType.JOIN) {
+        group = ((ArcusReplKetamaNodeLocator) locator).getAlterGroups().get(name);
+      } else { /* MigrationType.LEAVE */
+        group = ((ArcusReplKetamaNodeLocator) locator).getExistGroups().get(name);
+      }
+      if (group != null) {
+        return group.getMasterNode();
+      }
+      /* ENABLE_REPLICATION end */
+    } else {
+      InetSocketAddress ownerAddress = AddrUtil.getAddress(name);
+      if (mgType == MigrationType.JOIN) {
+        for (MemcachedNode node : locator.getAlterAll()) {
+          if (node.getSocketAddress().equals(ownerAddress)) {
+            return node;
+          }
+        }
+      } else { /* MigrationType.LEAVE */
+        for (MemcachedNode node : locator.getExistAll()) {
+          if (node.getSocketAddress().equals(ownerAddress)) {
+            return node;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   // Make a debug string out of the given buffer's values

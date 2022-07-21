@@ -133,6 +133,19 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     return Collections.unmodifiableCollection(alterNodes);
   }
 
+  public Collection<MemcachedNode> getExistAll() {
+    return new ArrayList<MemcachedNode>();
+  }
+
+  public Map<String, MemcachedReplicaGroup> getAlterGroups() {
+    return Collections.unmodifiableMap(alterGroups);
+  }
+
+  public Map<String, MemcachedReplicaGroup> getExistGroups() {
+    return Collections.unmodifiableMap(existGroups);
+  }
+  /* ENABLE_MIGRATION end */
+
   public MemcachedNode getAlterNode(SocketAddress sa) {
     /* The alter node to attach should be found */
     for (MemcachedNode node : alterNodes) {
@@ -767,7 +780,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     getLogger().info("Applied LEAVE range. spoint=" + spoint + ", epoint=" + epoint);
   }
 
-  public void updateMigration(Long spoint, Long epoint) {
+  public boolean updateMigration(Long spoint, Long epoint) {
     if (migrationInProgress && needToMigrateRange(spoint, epoint)) {
       if (migrationType == MigrationType.JOIN) {
         migrateJoinRange(spoint, epoint);
@@ -775,6 +788,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         migrateLeaveRange(spoint, epoint);
       }
     }
+    return true;
   }
   /* ENABLE_MIGRATION end */
 

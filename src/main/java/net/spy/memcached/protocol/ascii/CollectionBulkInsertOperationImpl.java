@@ -72,6 +72,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     super(cb);
     this.insert = insert;
     this.cb = (Callback) cb;
+
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert) {
@@ -95,17 +96,35 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectMultiKeyOperation(line, insert.getKeyList().get(index), index);
+      if (insert.getItemCount() == 1) {
+        insert.setNextOpIndex(0);
+        setPreviousOperationStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.REDIRECT);
+      }
+      index++;
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (insert.getItemCount() - insert.getNextOpIndex() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus((successAll) ? END : FAILED_END);
-      } else {
+      if (!status.isSuccess()) {
         cb.gotStatus(insert.getKey(index), status);
-        cb.receivedStatus(FAILED_END);
+        successAll = false;
       }
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        insert.setNextOpIndex(0);
+        setPreviousOperationStatus((successAll) ? END : FAILED_END);
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
+      cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -118,6 +137,13 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        insert.setNextOpIndex(0);
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

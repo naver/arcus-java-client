@@ -102,7 +102,17 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectSingleKeyOperation(line, key);
+      insert.setRedirectIndex(index);
+      if (insert.getItemCount() == 1) {
+        insert.setNextOpIndex(0);
+        transitionState(OperationState.REDIRECT);
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (insert.getItemCount() - insert.getNextOpIndex() == 1) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
@@ -125,6 +135,12 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {
@@ -154,6 +170,11 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
   public void initialize() {
     ByteBuffer buffer = insert.getAsciiCommand();
     setBuffer(buffer);
+    /* ENABLE_MIGRATION if */
+    if (redirectHandler != null) {
+      redirectHandler = null;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Request in ascii protocol: %s",

@@ -79,6 +79,17 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
     assert getState() == OperationState.READING : "Read ``" + line
             + "'' when in " + getState() + " state";
 
+    /* ENABLE_MIGRATION if */
+    if (line.startsWith("NOT_MY_KEY")) {
+      addRedirectSingleKeyOperation(line, key);
+      setPipedExist.setRedirectIndex(index);
+      if (setPipedExist.getItemCount() == 1) {
+        transitionState(OperationState.REDIRECT);
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
+
     if (setPipedExist.getItemCount() == 1) {
       OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
               NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
@@ -96,6 +107,12 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {
@@ -124,6 +141,11 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
   public void initialize() {
     ByteBuffer buffer = setPipedExist.getAsciiCommand();
     setBuffer(buffer);
+    /* ENABLE_MIGRATION if */
+    if (redirectHandler != null) {
+      redirectHandler = null;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Request in ascii protocol: %s",

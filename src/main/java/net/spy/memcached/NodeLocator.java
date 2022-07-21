@@ -65,6 +65,11 @@ public interface NodeLocator {
   Collection<MemcachedNode> getAlterAll();
 
   /**
+   * Get all exist memcached nodes.
+   */
+  Collection<MemcachedNode> getExistAll();
+
+  /**
    * Get an alter memcached node which contains the given socket address.
    */
   MemcachedNode getAlterNode(SocketAddress sa);
@@ -83,6 +88,6 @@ public interface NodeLocator {
   /**
    * Update(or reflect) the migratoin range in ketama hash ring.
    */
-  void updateMigration(Long spoint, Long epoint);
+  boolean updateMigration(Long spoint, Long epoint);
   /* ENABLE_MIGRATION end */
 }

@@ -40,7 +40,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   protected CollectionAttributes attribute;
 
   protected int nextOpIndex = 0;
-
+  /* ENABLE_MIGRATION if */
+  protected int redirectIndex = 0;
+  /* ENABLE_MIGRATION end */
   /**
    * set next index of operation
    * that will be processed after when operation moved by switchover
@@ -52,6 +54,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public int getNextOpIndex() {
     return nextOpIndex;
   }
+
+  /* ENABLE_MIGRATION if */
+  public void setRedirectIndex(int i) {
+    this.redirectIndex = i;
+  }
+  /* ENABLE_MIGRATION end */
 
   public abstract ByteBuffer getAsciiCommand();
 
@@ -104,7 +112,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       int eSize = encodedList.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (int i = this.nextOpIndex; i < eSize; i++) {
+      for (int i = nextOpIndex > 0 ? nextOpIndex : redirectIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, index, each.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
@@ -168,7 +176,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       int eSize = encodedList.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (int i = this.nextOpIndex; i < eSize; i++) {
+      for (int i = nextOpIndex > 0 ? nextOpIndex : redirectIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, each.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
@@ -234,7 +242,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       List<Long> keyList = new ArrayList<Long>(map.keySet());
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < keySize; i++) {
+      for (i = nextOpIndex > 0 ? nextOpIndex : redirectIndex; i < keySize; i++) {
         Long bkey = keyList.get(i);
         byte[] value = decodedList.get(i);
         setArguments(bb, COMMAND, key, bkey, value.length,
@@ -303,7 +311,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       int eSize = elements.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < eSize; i++) {
+      for (i = nextOpIndex > 0 ? nextOpIndex : redirectIndex; i < eSize; i++) {
         Element<T> element = elements.get(i);
         byte[] value = decodedList.get(i);
         setArguments(bb, COMMAND, key,
@@ -372,7 +380,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       List<String> keyList = new ArrayList<String>(map.keySet());
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < mkeySize; i++) {
+      for (i = nextOpIndex > 0 ? nextOpIndex : redirectIndex; i < mkeySize; i++) {
         String mkey = keyList.get(i);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key, mkey, value.length,
