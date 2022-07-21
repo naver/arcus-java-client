@@ -712,8 +712,8 @@ Element의 값은 String 형의 숫자이어야 한다.
 CollectionFuture<Long> asyncBopIncr(String key, long bkey, int by)
 CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by)
 
-CollectionFuture<Long> asyncBopIncr(String key, Byte[] bkey, int by)
-CollectionFuture<Long> asyncBopDecr(String key, Byte[] bkey, int by)
+CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey, int by)
+CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey, int by)
 
 CollectionFuture<Long> asyncBopIncr(String key, long bkey, int by, long initial, byte[] eFlag);
 CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by, long initial, byte[] eFlag);
