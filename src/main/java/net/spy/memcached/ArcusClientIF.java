@@ -511,6 +511,18 @@ public interface ArcusClientIF {
    * @param key         key of a b+tree
    * @param bkey        bkey
    * @param eFlagFilter element flag filter
+   * @return a future that will hold the return value map of the fetch.
+   */
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+                                                                  long bkey,
+                                                                  ElementFlagFilter eFlagFilter);
+
+  /**
+   * Retrieves an item on given bkey in the b+tree.
+   *
+   * @param key         key of a b+tree
+   * @param bkey        bkey
+   * @param eFlagFilter element flag filter
    * @param withDelete  true to remove the returned item in the b+tree
    * @param dropIfEmpty true to remove the key when all elements are removed. false b+
    *                    tree will remain empty even if all the elements are removed
@@ -521,6 +533,28 @@ public interface ArcusClientIF {
                                                                   ElementFlagFilter eFlagFilter,
                                                                   boolean withDelete,
                                                                   boolean dropIfEmpty);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count);
 
   /**
    * Retrieves count number of items in given bkey range(from..to)
@@ -556,6 +590,21 @@ public interface ArcusClientIF {
    * @param key         key of a b+tree
    * @param bkey        bkey
    * @param eFlagFilter element flag filter
+   * @param tc          a transcoder to decode returned values
+   * @return a future that will hold the return value map of the fetch.
+   */
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 Transcoder<T> tc);
+
+  /**
+   * Retrieves an item on given bkey in the b+tree.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a b+tree
+   * @param bkey        bkey
+   * @param eFlagFilter element flag filter
    * @param withDelete  true to remove the returned item in the b+tree
    * @param dropIfEmpty true to remove the key when all elements are removed.
    *                    false b+ tree will remain empty even if all the elements are removed
@@ -567,6 +616,31 @@ public interface ArcusClientIF {
                                                                  ElementFlagFilter eFlagFilter,
                                                                  boolean withDelete,
                                                                  boolean dropIfEmpty,
+                                                                 Transcoder<T> tc);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @param tc          a transcoder to decode returned values
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
                                                                  Transcoder<T> tc);
 
   /**
@@ -1549,57 +1623,6 @@ public interface ArcusClientIF {
                                                       Transcoder<T> tc);
 
   /**
-   * Retrieves count number of items in given bkey range(from..to)
-   * from offset in the b+tree.
-   * The returned map from the future should be sorted by the given range.
-   * <pre>{@code
-   *  from >= to : in descending order
-   *  from < to  : in ascending order
-   * }</pre>
-   *
-   * @param key         key of a b+tree
-   * @param from        the first bkey
-   * @param to          the last bkey
-   * @param eFlagFilter element flag filter
-   * @param offset      0-based offset
-   * @param count       number of returning values (0 to all)
-   * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty false to remove the key when all elements are removed.
-   *                    true b+ tree will remain empty even if all the elements are removed
-   * @return a future that will hold the return value map of the fetch
-   */
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
-          int count, boolean withDelete, boolean dropIfEmpty);
-
-  /**
-   * Retrieves count number of items in given bkey range(from..to)
-   * from offset in the b+tree.
-   * The returned map from the future should be sorted by the given range.
-   * <pre>{@code
-   *  from >= to : in descending order
-   *  from < to  : in ascending order
-   * }</pre>
-   *
-   * @param <T>         the expected class of the value
-   * @param key         key of a b+tree
-   * @param from        the first bkey
-   * @param to          the last bkey
-   * @param eFlagFilter element flag filter
-   * @param offset      0-based offset
-   * @param count       number of returning values (0 to all)
-   * @param withDelete  true to remove the returned item in the b+tree
-   * @param dropIfEmpty false to remove the key when all elements are removed.
-   *                    true b+ tree will remain empty even if all the elements are removed
-   * @param tc          transcoder to decode value
-   * @return a future that will hold the return value map of the fetch
-   */
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
-          int count, boolean withDelete, boolean dropIfEmpty,
-          Transcoder<T> tc);
-
-  /**
    * Update or insert an element.
    *
    * Element that matched both key and bkey criteria will updated. If element
@@ -1748,6 +1771,18 @@ public interface ArcusClientIF {
    * @param key         key of a b+tree
    * @param bkey        bkey of an element
    * @param eFlagFilter element flag filter
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] bkey,
+          ElementFlagFilter eFlagFilter);
+
+  /**
+   * Retrieves count number of items in given bkey in the b+tree.
+   *
+   * @param key         key of a b+tree
+   * @param bkey        bkey of an element
+   * @param eFlagFilter element flag filter
    * @param withDelete  true to remove the returned item in the b+tree
    * @param dropIfEmpty false to remove the key when all elements are removed. true b+
    *                    tree will remain empty even if all the elements are removed
@@ -1756,6 +1791,20 @@ public interface ArcusClientIF {
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
           String key, byte[] bkey,
           ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves count number of items in given bkey in the b+tree.
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a b+tree
+   * @param bkey        bkey of an element
+   * @param eFlagFilter element flag filter
+   * @param tc          transcoder to decode value
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] bkey,
+          ElementFlagFilter eFlagFilter, Transcoder<T> tc);
 
   /**
    * Retrieves count number of items in given bkey in the b+tree.
@@ -1773,6 +1822,101 @@ public interface ArcusClientIF {
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
           String key, byte[] bkey,
           ElementFlagFilter eFlagFilter, boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+          int count);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @param withDelete  true to remove the returned item in the b+tree
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
+   * @return a future that will hold the return value map of the fetch
+   */
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+          int count, boolean withDelete, boolean dropIfEmpty);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @param tc          transcoder to decode value
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+          int count, Transcoder<T> tc);
+
+  /**
+   * Retrieves count number of items in given bkey range(from..to)
+   * from offset in the b+tree.
+   * The returned map from the future should be sorted by the given range.
+   * <pre>{@code
+   *  from >= to : in descending order
+   *  from < to  : in ascending order
+   * }</pre>
+   *
+   * @param <T>         the expected class of the value
+   * @param key         key of a b+tree
+   * @param from        the first bkey
+   * @param to          the last bkey
+   * @param eFlagFilter element flag filter
+   * @param offset      0-based offset
+   * @param count       number of returning values (0 to all)
+   * @param withDelete  true to remove the returned item in the b+tree
+   * @param dropIfEmpty false to remove the key when all elements are removed.
+   *                    true b+ tree will remain empty even if all the elements are removed
+   * @param tc          transcoder to decode value
+   * @return a future that will hold the return value map of the fetch
+   */
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+          int count, boolean withDelete, boolean dropIfEmpty,
+          Transcoder<T> tc);
 
   /**
    * Get elements that matched both filter and bkey range criteria from

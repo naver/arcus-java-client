@@ -659,11 +659,27 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
                                                                   long bkey,
+                                                                  ElementFlagFilter eFlagFilter) {
+    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
+  }
+
+  @Override
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+                                                                  long bkey,
                                                                   ElementFlagFilter eFlagFilter,
                                                                   boolean withDelete,
                                                                   boolean dropIfEmpty) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty);
+  }
+
+  @Override
+  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+                                                                  long from, long to,
+                                                                  ElementFlagFilter eFlagFilter,
+                                                                  int offset, int count) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count);
   }
 
   @Override
@@ -678,13 +694,32 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key, long bkey,
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long bkey,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 Transcoder<T> tc) {
+    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long bkey,
                                                                  ElementFlagFilter eFlagFilter,
                                                                  boolean withDelete,
                                                                  boolean dropIfEmpty,
                                                                  Transcoder<T> tc) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+                                                                 long from, long to,
+                                                                 ElementFlagFilter eFlagFilter,
+                                                                 int offset, int count,
+                                                                 Transcoder<T> tc) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count, tc);
   }
 
   @Override
@@ -1121,23 +1156,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int offset, int count, boolean withDelete, boolean dropIfEmpty) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count, withDelete, dropIfEmpty);
-  }
-
-  @Override
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int offset, int count, boolean withDelete, boolean dropIfEmpty,
-          Transcoder<T> tc) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count, withDelete, dropIfEmpty, tc);
-  }
-
-  @Override
   public CollectionFuture<Boolean> asyncBopDelete(String key, byte[] from,
                                                   byte[] to, ElementFlagFilter eFlagFilter,
                                                   int count,
@@ -1274,10 +1292,38 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
+    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
+  }
+
+  @Override
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty);
+  }
+
+  @Override
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count);
+  }
+
+  @Override
+  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count, boolean withDelete, boolean dropIfEmpty) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count, withDelete, dropIfEmpty);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
+    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
   }
 
   @Override
@@ -1286,6 +1332,23 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
     return this.getClient().asyncBopGet(key, bkey, eFlagFilter, withDelete,
             dropIfEmpty, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count, Transcoder<T> tc) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int offset, int count, boolean withDelete, boolean dropIfEmpty,
+          Transcoder<T> tc) {
+    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+            count, withDelete, dropIfEmpty, tc);
   }
 
   @Override
