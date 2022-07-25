@@ -122,6 +122,13 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
 
     /*
       VALUE <flags> <count>\r\n

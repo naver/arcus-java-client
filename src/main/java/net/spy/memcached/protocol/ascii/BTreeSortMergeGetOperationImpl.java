@@ -317,16 +317,27 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
                   BKEY_MISMATCH);
 
           if (status.isSuccess()) {
+            /* ENABLE_MIGRATION if */
+            if (needRedirect()) {
+              transitionState(OperationState.REDIRECT);
+              return;
+            }
+            /* ENABLE_MIGRATION end */
             getCallback().receivedStatus(status);
             transitionState(OperationState.COMPLETE);
             return;
           } else if (count < lineCount) {
             // <key> [<cause>]\r\n
-            String chunk[] = new String(byteBuffer.toByteArray()).split(" ");
+            String line = new String(byteBuffer.toByteArray());
+            String chunk[] = line.split(" ");
             if (chunk.length == 2) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
                       .gotMissedKey(chunk[0], matchStatus(chunk[1],
                               NOT_FOUND, UNREADABLE, OUT_OF_RANGE));
+              /* ENABLE_MIGRATION if */
+            } else if (hasNotMyKey(chunk[1])) {
+              addRedirectMultiKeyOperation(getNotMyKey(line), chunk[0]);
+              /* ENABLE_MIGRATION end */
             } else {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
                       .gotMissedKey(chunk[0], new CollectionOperationStatus(false,
@@ -335,6 +346,12 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             count++;
           } else {
             /* unexpected response */
+            /* ENABLE_MIGRATION if */
+            if (needRedirect()) {
+              transitionState(OperationState.REDIRECT);
+              return;
+            }
+            /* ENABLE_MIGRATION end */
             getCallback().receivedStatus(status);
             transitionState(OperationState.COMPLETE);
             return;
@@ -366,6 +383,12 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
                   TYPE_MISMATCH, BKEY_MISMATCH);
 
           if (status.isSuccess()) {
+            /* ENABLE_MIGRATION if */
+            if (needRedirect()) {
+              transitionState(OperationState.REDIRECT);
+              return;
+            }
+            /* ENABLE_MIGRATION end */
             getCallback().receivedStatus(status);
             transitionState(OperationState.COMPLETE);
             return;
@@ -384,6 +407,12 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             count++;
           } else {
             /* unexpected response */
+            /* ENABLE_MIGRATION if */
+            if (needRedirect()) {
+              transitionState(OperationState.REDIRECT);
+              return;
+            }
+            /* ENABLE_MIGRATION end */
             getCallback().receivedStatus(status);
             transitionState(OperationState.COMPLETE);
             return;

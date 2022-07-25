@@ -70,6 +70,13 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(matchStatus(line, STORED, NOT_FOUND, EXISTS));
     transitionState(OperationState.COMPLETE);
   }

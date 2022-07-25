@@ -88,7 +88,13 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     try {
       // <result value>\r\n
       Long.valueOf(line);

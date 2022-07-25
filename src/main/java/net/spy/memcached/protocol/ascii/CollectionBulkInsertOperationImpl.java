@@ -95,7 +95,17 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
-
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectMultiKeyOperation(line, insert.getKey(index));
+      if (insert.isNotPiped()) {
+        transitionState(OperationState.REDIRECT);
+      } else {
+        index++;
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (insert.isNotPiped()) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
@@ -117,6 +127,12 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

@@ -69,6 +69,13 @@ public class CollectionCountOperationImpl extends OperationImpl implements
   }
 
   public void handleLine(String line) {
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (line.startsWith("COUNT=")) {
       // COUNT=<count>\r\n
       getLogger().debug("Got line %s", line);
