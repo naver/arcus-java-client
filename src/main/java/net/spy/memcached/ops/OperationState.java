@@ -40,6 +40,13 @@ public enum OperationState {
   /**
    * State indicating this operation will be moved by switchover or failover
    */
-  MOVING
+  MOVING,
   /* ENABLE_REPLICATION end */
+
+  /* ENABLE_MIGRATION if */
+  /**
+   * State indicating this operation will be redirected by migration
+   */
+  REDIRECT
+  /* ENABLE_MIGRATION end */
 }

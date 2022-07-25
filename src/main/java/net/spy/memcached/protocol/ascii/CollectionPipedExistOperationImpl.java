@@ -79,6 +79,20 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
     assert getState() == OperationState.READING : "Read ``" + line
             + "'' when in " + getState() + " state";
 
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      if (setPipedExist.isNotPiped()) {
+        transitionState(OperationState.REDIRECT);
+      } else {
+        setPipedExist.setNextOpIndex(index);
+        // Not need to call (index++) because if a line has NOT_MY_KEY,
+        // then following all lines should have NOT_MY_KEY too.
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
+
     if (setPipedExist.isNotPiped()) {
       OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
               NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
@@ -96,6 +110,12 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

@@ -153,6 +153,11 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
         break;
       }
       /* ENABLE_REPLICATION end */
+      /* ENABLE_MIGRATION if */
+      if (getState() == OperationState.REDIRECT) {
+        break;
+      }
+      /* ENABLE_MIGRATION end */
     }
   }
 
@@ -161,4 +166,14 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   protected boolean hasSwitchedOver(String line) {
     return line.startsWith("SWITCHOVER") || line.startsWith("REPL_SLAVE");
   }
+
+  /* ENABLE_MIGRATION if */
+  protected boolean hasNotMyKey(String line) {
+    return line.startsWith("NOT_MY_KEY");
+  }
+
+  protected String getNotMyKey(String line) {
+    return line.substring(line.indexOf("NOT_MY_KEY"));
+  }
+  /* ENABLE_MIGRATION end */
 }

@@ -85,6 +85,13 @@ public class CollectionCreateOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
     transitionState(OperationState.COMPLETE);
   }

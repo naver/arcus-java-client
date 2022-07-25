@@ -102,6 +102,19 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      if (insert.isNotPiped()) {
+        transitionState(OperationState.REDIRECT);
+      } else {
+        insert.setNextOpIndex(index);
+        // Not need to call (index++) because if a line has NOT_MY_KEY,
+        // then following all lines should have NOT_MY_KEY too.
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (insert.isNotPiped()) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
@@ -125,6 +138,12 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

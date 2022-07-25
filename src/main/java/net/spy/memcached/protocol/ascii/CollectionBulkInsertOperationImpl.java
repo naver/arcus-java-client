@@ -95,6 +95,20 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectMultiKeyOperation(line, insert.getKey(index));
+      if (insert.isNotPiped()) {
+        transitionState(OperationState.REDIRECT);
+      } else {
+        // NOT need to call setNextOpIndex()
+        // because multi key operation will be cloned with redirect keys.
+        // nextOpIndex will be discarded when operation is cloned.
+        index++;
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (insert.isNotPiped()) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
@@ -104,6 +118,12 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
         cb.gotStatus(insert.getKey(index), status);
         successAll = false;
       }
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
@@ -117,6 +137,12 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

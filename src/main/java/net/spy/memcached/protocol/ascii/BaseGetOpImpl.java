@@ -46,6 +46,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
   private byte[] data = null;
   private int readOffset = 0;
   private byte lookingFor = '\0';
+  /* ENABLE_MIGRATION if */
+  private String notMyKeyLine = null;
+  /* ENABLE_MIGRATION end */
 
   public BaseGetOpImpl(String c,
                        OperationCallback cb, Collection<String> k) {
@@ -66,6 +69,13 @@ abstract class BaseGetOpImpl extends OperationImpl {
   public final void handleLine(String line) {
     if (line.equals("END")) {
       getLogger().debug("Get complete!");
+      /* ENABLE_MIGRATION if */
+      notMyKeyLine = null;
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       getCallback().receivedStatus(END);
       transitionState(OperationState.COMPLETE);
       data = null;
@@ -82,6 +92,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
       readOffset = 0;
       getLogger().debug("Set read type to data");
       setReadType(OperationReadType.DATA);
+      /* ENABLE_MIGRATION if */
+    } else if (hasNotMyKey(line)) {
+      notMyKeyLine = line;
+    } else if (notMyKeyLine != null) {
+      addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
+      /* ENABLE_MIGRATION end */
     } else {
       assert false : "Unknown line type: " + line;
     }

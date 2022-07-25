@@ -94,6 +94,14 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     */
     if (line.startsWith("VALUE ")) {
       String[] chunk = line.split(" ");
+
+      /* ENABLE_MIGRATION if */
+      if (hasNotMyKey(chunk[2])) {
+        addRedirectMultiKeyOperation(getNotMyKey(line), chunk[1]);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
+
       OperationStatus status = matchStatus(chunk[2], OK, TRIMMED, NOT_FOUND,
           NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH,
           UNREADABLE);
@@ -114,6 +122,12 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
       OperationStatus status = matchStatus(line, END);
 
       getLogger().debug(status);
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       getCallback().receivedStatus(status);
 
       transitionState(OperationState.COMPLETE);

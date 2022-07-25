@@ -62,6 +62,13 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
   @Override
   public void handleLine(String line) {
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     if (line.startsWith("ATTR ")) {
       getLogger().debug("Got line %s", line);
 
