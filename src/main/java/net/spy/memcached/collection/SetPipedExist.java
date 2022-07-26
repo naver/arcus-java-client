@@ -56,7 +56,7 @@ public class SetPipedExist<T> extends CollectionObject {
   public ByteBuffer getAsciiCommand() {
     int capacity = 0;
 
-    // decode values
+    // encode values
     List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
     CachedData cd = null;
     for (T each : values) {

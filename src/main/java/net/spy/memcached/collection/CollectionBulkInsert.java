@@ -27,40 +27,33 @@ import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
 
-public abstract class CollectionBulkInsert<T> extends CollectionObject {
+public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
-  public static final String PIPE = "pipe";
+  protected final MemcachedNode node;
+  protected final List<String> keyList;
+  protected final CollectionAttributes attribute;
+  protected final CachedData cachedData;
 
-  protected List<String> keyList;
-  protected T value;
-  protected CachedData cachedData;
-  protected Transcoder<T> tc;
-  protected int itemCount;
-
-  protected CollectionAttributes attribute;
-  protected MemcachedNode node;
-
-  protected int nextOpIndex = 0;
-
-  /**
-   * set next index of operation
-   * that will be processed after when operation moved by switchover
-   */
-  public void setNextOpIndex(int i) {
-    this.nextOpIndex = i;
+  protected CollectionBulkInsert(MemcachedNode node, List<String> keyList,
+                                 CollectionAttributes attribute, CachedData cachedData) {
+    super(keyList.size());
+    this.node = node;
+    this.keyList = keyList;
+    this.attribute = attribute;
+    this.cachedData = cachedData;
   }
 
-  public int getNextOpIndex() {
-    return nextOpIndex;
+  public String getKey(int index) {
+    return this.keyList.get(index);
+  }
+
+  public List<String> getKeyList() {
+    return this.keyList;
   }
 
   public MemcachedNode getMemcachedNode() {
     return node;
   }
-
-  public abstract ByteBuffer getAsciiCommand();
-
-  public abstract ByteBuffer getBinaryCommand();
 
   public abstract CollectionBulkInsert<T> clone(MemcachedNode node,
                                                 List<String> keyList);
@@ -75,30 +68,24 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
     private final String bkey;
     private final String eflag;
 
-    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
-                           String eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      if (attr != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
-      }
-      this.node = node;
-      this.keyList = keyList;
-      this.bkey = bkey;
-      this.eflag = eflag;
-      this.value = value;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = keyList.size();
-      this.cachedData = tc.encode(value);
-    }
-
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, Long bkey,
                            byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, String.valueOf(bkey), BTreeUtil.toHex(eflag), value, attr, tc);
+      this(node, keyList, String.valueOf(bkey), BTreeUtil.toHex(eflag), attr, tc.encode(value));
     }
 
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, byte[] bkey,
                            byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, BTreeUtil.toHex(bkey), BTreeUtil.toHex(eflag), value, attr, tc);
+      this(node, keyList, BTreeUtil.toHex(bkey), BTreeUtil.toHex(eflag), attr, tc.encode(value));
+    }
+
+    protected BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
+                              String eflag, CollectionAttributes attr, CachedData cachedData) {
+      super(node, keyList, attr, cachedData);
+      if (attr != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
+      }
+      this.bkey = bkey;
+      this.eflag = eflag;
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -135,15 +122,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       return bb;
     }
 
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new BTreeBulkInsert<T>(node, keyList,
-          bkey, eflag, value, attribute, tc);
+      return new BTreeBulkInsert<T>(node, keyList, bkey, eflag, attribute, cachedData);
     }
   }
 
@@ -154,17 +136,16 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
                          T value, CollectionAttributes attr, Transcoder<T> tc) {
+      this(node, keyList, mkey, attr, tc.encode(value));
+    }
+
+    protected MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
+                            CollectionAttributes attr, CachedData cachedData) {
+      super(node, keyList, attr, cachedData);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
-      this.node = node;
-      this.keyList = keyList;
       this.mkey = mkey;
-      this.value = value;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = keyList.size();
-      this.cachedData = tc.encode(value);
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -200,15 +181,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       return bb;
     }
 
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new MapBulkInsert<T>(node, keyList,
-          mkey, value, attribute, tc);
+      return new MapBulkInsert<T>(node, keyList, mkey, attribute, cachedData);
     }
   }
 
@@ -218,16 +194,15 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
 
     public SetBulkInsert(MemcachedNode node, List<String> keyList, T value,
                          CollectionAttributes attr, Transcoder<T> tc) {
+      this(node, keyList, attr, tc.encode(value));
+    }
+
+    protected SetBulkInsert(MemcachedNode node, List<String> keyList,
+                            CollectionAttributes attr, CachedData cachedData) {
+      super(node, keyList, attr, cachedData);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
-      this.node = node;
-      this.keyList = keyList;
-      this.value = value;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = keyList.size();
-      this.cachedData = tc.encode(value);
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -261,36 +236,30 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       return bb;
     }
 
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new SetBulkInsert<T>(node, keyList,
-          value, attribute, tc);
+      return new SetBulkInsert<T>(node, keyList, attribute, cachedData);
     }
   }
 
   public static class ListBulkInsert<T> extends CollectionBulkInsert<T> {
 
     private static final String COMMAND = "lop insert";
-    private int index;
+    private final int index;
 
     public ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
                           T value, CollectionAttributes attr, Transcoder<T> tc) {
+      this(node, keyList, index, attr, tc.encode(value));
+    }
+
+    protected ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
+                             CollectionAttributes attr, CachedData cachedData) {
+      super(node, keyList, attr, cachedData);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
-      this.node = node;
-      this.keyList = keyList;
       this.index = index;
-      this.value = value;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = keyList.size();
-      this.cachedData = tc.encode(value);
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -326,27 +295,10 @@ public abstract class CollectionBulkInsert<T> extends CollectionObject {
       return bb;
     }
 
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new ListBulkInsert<T>(node, keyList,
-          index, value, attribute, tc);
+      return new ListBulkInsert<T>(node, keyList, index, attribute, cachedData);
     }
-  }
-
-  public String getKey(int index) {
-    return this.keyList.get(index);
-  }
-
-  public List<String> getKeyList() {
-    return this.keyList;
-  }
-
-  public int getItemCount() {
-    return this.itemCount;
   }
 }

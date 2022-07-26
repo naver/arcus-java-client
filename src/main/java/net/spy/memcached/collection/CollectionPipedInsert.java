@@ -28,34 +28,21 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
 
-public abstract class CollectionPipedInsert<T> extends CollectionObject {
+public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
-  public static final String PIPE = "pipe";
   public static final int MAX_PIPED_ITEM_COUNT = 500;
 
-  protected String key;
-  protected Transcoder<T> tc;
-  protected int itemCount;
+  protected final String key;
+  protected final CollectionAttributes attribute;
+  protected final Transcoder<T> tc;
 
-  protected CollectionAttributes attribute;
-
-  protected int nextOpIndex = 0;
-
-  /**
-   * set next index of operation
-   * that will be processed after when operation moved by switchover
-   */
-  public void setNextOpIndex(int i) {
-    this.nextOpIndex = i;
+  protected CollectionPipedInsert(String key, CollectionAttributes attribute,
+                                  Transcoder<T> tc, int itemCount) {
+    super(itemCount);
+    this.key = key;
+    this.attribute = attribute;
+    this.tc = tc;
   }
-
-  public int getNextOpIndex() {
-    return nextOpIndex;
-  }
-
-  public abstract ByteBuffer getAsciiCommand();
-
-  public abstract ByteBuffer getBinaryCommand();
 
   /**
    *
@@ -63,26 +50,23 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public static class ListPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "lop insert";
-    private Collection<T> list;
-    private int index;
+    private final Collection<T> list;
+    private final int index;
 
     public ListPipedInsert(String key, int index, Collection<T> list,
                            CollectionAttributes attr, Transcoder<T> tc) {
+      super(key, attr, tc, list.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
-      this.key = key;
       this.index = index;
       this.list = list;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = list.size();
     }
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
-      // decode values
+      // encode values
       List<byte[]> encodedList = new ArrayList<byte[]>(list.size());
       CachedData cd = null;
       for (T each : list) {
@@ -117,10 +101,6 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       return bb;
     }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
   }
 
   /**
@@ -129,24 +109,21 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public static class SetPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "sop insert";
-    private Collection<T> set;
+    private final Collection<T> set;
 
     public SetPipedInsert(String key, Collection<T> set,
                           CollectionAttributes attr, Transcoder<T> tc) {
+      super(key, attr, tc, set.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
-      this.key = key;
       this.set = set;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = set.size();
     }
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
-      // decode values
+      // encode values
       List<byte[]> encodedList = new ArrayList<byte[]>(set.size());
       CachedData cd = null;
       for (T each : set) {
@@ -171,18 +148,15 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       for (int i = this.nextOpIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, each.length,
-                     createOption, (i < eSize - 1) ? PIPE : "");
+            createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(each);
         bb.put(CRLF);
       }
+
       // flip the buffer
       ((Buffer) bb).flip();
 
       return bb;
-    }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
     }
   }
 
@@ -192,29 +166,26 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public static class BTreePipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "bop insert";
-    private Map<Long, T> map;
+    private final Map<Long, T> map;
 
     public BTreePipedInsert(String key, Map<Long, T> map,
                             CollectionAttributes attr, Transcoder<T> tc) {
+      super(key, attr, tc, map.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
-      this.key = key;
       this.map = map;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = map.size();
     }
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
-      // decode parameters
-      List<byte[]> decodedList = new ArrayList<byte[]>(map.size());
+      // encode parameters
+      List<byte[]> encodedList = new ArrayList<byte[]>(map.size());
       CachedData cd = null;
       for (T each : map.values()) {
         cd = tc.encode(each);
-        decodedList.add(cd.getData());
+        encodedList.add(cd.getData());
       }
 
       // estimate the buffer capacity
@@ -222,7 +193,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       for (Long eachBkey : map.keySet()) {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes(String.valueOf(eachBkey)).length;
-        capacity += decodedList.get(i++).length;
+        capacity += encodedList.get(i++).length;
         capacity += 128;
       }
 
@@ -236,9 +207,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < keySize; i++) {
         Long bkey = keyList.get(i);
-        byte[] value = decodedList.get(i);
+        byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key, bkey, value.length,
-                     createOption, (i < keySize - 1) ? PIPE : "");
+            createOption, (i < keySize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -247,10 +218,6 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
       ((Buffer) bb).flip();
 
       return bb;
-    }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
     }
   }
 
@@ -261,29 +228,26 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
           CollectionPipedInsert<T> {
 
     private static final String COMMAND = "bop insert";
-    private List<Element<T>> elements;
+    private final List<Element<T>> elements;
 
     public ByteArraysBTreePipedInsert(String key, List<Element<T>> elements,
                                       CollectionAttributes attr, Transcoder<T> tc) {
+      super(key, attr, tc, elements.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
-      this.key = key;
       this.elements = elements;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = elements.size();
     }
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
-      // decode parameters
-      List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
+      // encode parameters
+      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
       CachedData cd = null;
       for (Element<T> each : elements) {
         cd = tc.encode(each.getValue());
-        decodedList.add(cd.getData());
+        encodedList.add(cd.getData());
       }
 
       // estimate the buffer capacity
@@ -292,7 +256,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
         capacity += KeyUtil.getKeyBytes(each.getStringEFlag()).length;
-        capacity += decodedList.get(i++).length;
+        capacity += encodedList.get(i++).length;
         capacity += 128;
       }
 
@@ -305,7 +269,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < eSize; i++) {
         Element<T> element = elements.get(i);
-        byte[] value = decodedList.get(i);
+        byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key,
                      element.getStringBkey(), element.getStringEFlag(), value.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
@@ -318,10 +282,6 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       return bb;
     }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
   }
 
   /**
@@ -330,18 +290,15 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
   public static class MapPipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "mop insert";
-    private Map<String, T> map;
+    private final Map<String, T> map;
 
     public MapPipedInsert(String key, Map<String, T> map,
                           CollectionAttributes attr, Transcoder<T> tc) {
+      super(key, attr, tc, map.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
-      this.key = key;
       this.map = map;
-      this.attribute = attr;
-      this.tc = tc;
-      this.itemCount = map.size();
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -386,21 +343,5 @@ public abstract class CollectionPipedInsert<T> extends CollectionObject {
 
       return bb;
     }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public int getItemCount() {
-    return this.itemCount;
   }
 }

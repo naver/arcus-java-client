@@ -99,7 +99,7 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
     }
     /* ENABLE_REPLICATION end */
 
-    if (update.getItemCount() - update.getNextOpIndex() == 1) {
+    if (update.isNotPiped()) {
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
               NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
               BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
