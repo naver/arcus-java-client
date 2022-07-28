@@ -27,57 +27,42 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
 
-public abstract class CollectionPipedUpdate<T> extends CollectionObject {
+public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
 
-  public static final String PIPE = "pipe";
   public static final int MAX_PIPED_ITEM_COUNT = 500;
 
-  protected String key;
-  protected Transcoder<T> tc;
-  protected int itemCount;
-  protected int nextOpIndex = 0;
+  protected final String key;
+  protected final Transcoder<T> tc;
 
-  /**
-   * set next index of operation
-   * that will be processed after when operation moved by switchover
-   */
-  public void setNextOpIndex(int i) {
-    this.nextOpIndex = i;
+  protected CollectionPipedUpdate(String key, Transcoder<T> tc, int itemCount) {
+    super(itemCount);
+    this.key = key;
+    this.tc = tc;
   }
-
-  public int getNextOpIndex() {
-    return nextOpIndex;
-  }
-
-  public abstract ByteBuffer getAsciiCommand();
-
-  public abstract ByteBuffer getBinaryCommand();
 
   public static class BTreePipedUpdate<T> extends CollectionPipedUpdate<T> {
 
     private static final String COMMAND = "bop update";
-    private List<Element<T>> elements;
+    private final List<Element<T>> elements;
 
     public BTreePipedUpdate(String key, List<Element<T>> elements,
                             Transcoder<T> tc) {
-      this.key = key;
+      super(key, tc, elements.size());
       this.elements = elements;
-      this.tc = tc;
-      this.itemCount = elements.size();
     }
 
     public ByteBuffer getAsciiCommand() {
       int capacity = 0;
 
-      // decode parameters
-      List<byte[]> decodedList = new ArrayList<byte[]>(elements.size());
+      // encode parameters
+      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
       CachedData cd = null;
       for (Element<T> each : elements) {
         if (each.getValue() != null) {
           cd = tc.encode(each.getValue());
-          decodedList.add(cd.getData());
+          encodedList.add(cd.getData());
         } else {
-          decodedList.add(null);
+          encodedList.add(null);
         }
       }
 
@@ -100,8 +85,8 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
         capacity += KeyUtil.getKeyBytes(key).length;
         capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
-        if (decodedList.get(i) != null) {
-          capacity += decodedList.get(i++).length;
+        if (encodedList.get(i) != null) {
+          capacity += encodedList.get(i++).length;
         }
         capacity += 64;
       }
@@ -112,7 +97,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
       int eSize = elements.size();
       for (i = this.nextOpIndex; i < eSize; i++) {
         Element<T> element = elements.get(i);
-        value = decodedList.get(i);
+        value = encodedList.get(i);
         eflagUpdate = element.getElementFlagUpdate();
         b = new StringBuilder();
 
@@ -146,24 +131,18 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
       return bb;
     }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
   }
 
 
   public static class MapPipedUpdate<T> extends CollectionPipedUpdate<T> {
 
     private static final String COMMAND = "mop update";
-    private Map<String, T> elements;
+    private final Map<String, T> elements;
 
     public MapPipedUpdate(String key, Map<String, T> elements,
                           Transcoder<T> tc) {
-      this.key = key;
+      super(key, tc, elements.size());
       this.elements = elements;
-      this.tc = tc;
-      this.itemCount = elements.size();
     }
 
     public ByteBuffer getAsciiCommand() {
@@ -216,21 +195,5 @@ public abstract class CollectionPipedUpdate<T> extends CollectionObject {
 
       return bb;
     }
-
-    public ByteBuffer getBinaryCommand() {
-      throw new RuntimeException("not supported in binary protocol yet.");
-    }
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public int getItemCount() {
-    return this.itemCount;
   }
 }

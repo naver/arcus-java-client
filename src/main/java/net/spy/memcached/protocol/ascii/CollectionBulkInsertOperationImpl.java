@@ -96,7 +96,7 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     }
     /* ENABLE_REPLICATION end */
 
-    if (insert.getItemCount() - insert.getNextOpIndex() == 1) {
+    if (insert.isNotPiped()) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
