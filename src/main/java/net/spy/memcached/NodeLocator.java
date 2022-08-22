@@ -70,6 +70,13 @@ public interface NodeLocator {
   MemcachedNode getAlterNode(SocketAddress sa);
 
   /**
+   * Get an owner node by owner name.
+   * @return OwnerNode is a importer. Importer by migration type
+   * JOIN : joining node, LEAVE : existing node.
+   */
+  MemcachedNode getOwnerNode(String owner, MigrationType mgType);
+
+  /**
    * Remove the alter nodes which have failed down.
    */
   void updateAlter(Collection<MemcachedNode> toAttach,

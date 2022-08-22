@@ -18,6 +18,7 @@
 package net.spy.memcached;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,6 +117,24 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     for (MemcachedNode node : alterNodes) {
       if (sa.equals(node.getSocketAddress())) {
         return node;
+      }
+    }
+    return null;
+  }
+
+  public MemcachedNode getOwnerNode(String owner, MigrationType mgType) {
+    InetSocketAddress ownerAddress = AddrUtil.getAddress(owner);
+    if (mgType == MigrationType.JOIN) {
+      for (MemcachedNode node : alterNodes) {
+        if (node.getSocketAddress().equals(ownerAddress)) {
+          return node;
+        }
+      }
+    } else { /* MigrationType.LEAVE */
+      for (MemcachedNode node : existNodes) {
+        if (node.getSocketAddress().equals(ownerAddress)) {
+          return node;
+        }
       }
     }
     return null;

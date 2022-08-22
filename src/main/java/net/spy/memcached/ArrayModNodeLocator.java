@@ -85,6 +85,10 @@ public final class ArrayModNodeLocator implements NodeLocator {
     return null;
   }
 
+  public MemcachedNode getOwnerNode(String owner, MigrationType mgType) {
+    return null;
+  }
+
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {
     throw new UnsupportedOperationException("updateAlter not supported");
