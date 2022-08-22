@@ -38,6 +38,12 @@ public class SetPipedExist<T> extends CollectionObject {
   private final Transcoder<T> tc;
   private int itemCount;
 
+  protected int nextOpIndex = 0;
+
+  public void setNextOpIndex(int i) {
+    this.nextOpIndex = i;
+  }
+
   public List<T> getValues() {
     return this.values;
   }
@@ -76,7 +82,7 @@ public class SetPipedExist<T> extends CollectionObject {
 
     // create ascii operation string
     int eSize = encodedList.size();
-    for (int i = 0; i < eSize; i++) {
+    for (int i = this.nextOpIndex; i < eSize; i++) {
       byte[] each = encodedList.get(i);
 
       setArguments(bb, COMMAND, key, each.length,
