@@ -131,22 +131,15 @@ public abstract class BaseOperationFactory implements OperationFactory {
 
   @Override
   public Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
-                                       List<Integer> keyIndexes, MultiOperationCallback mcb) {
+                                       List<String> redirectKeys, MultiOperationCallback mcb) {
     assert !op.isCancelled() : "Attempted to clone a canceled op";
     assert !op.hasErrored() : "Attempted to clone an errored op";
-
-    List<String> originalKeys = (List<String>) op.getKeys();
-    List<String> redirectKeys = new ArrayList<String>();
-
-    for (Integer idx : keyIndexes) {
-      redirectKeys.add(originalKeys.get(idx));
-    }
 
     if (op instanceof GetOperation) {
       // If MemcachedNode supports this clone feature, it should support mget operation too.
       return mget(redirectKeys, (GetOperation.Callback) mcb);
     } else if (op instanceof GetsOperation) {
-      //If MemcachedNode supports this clone feature, it should support mgets operation too.
+      // If MemcachedNode supports this clone feature, it should support mgets operation too.
       return mgets(redirectKeys, (GetsOperation.Callback) mcb);
     } else if (op instanceof CollectionBulkInsertOperation) {
       final CollectionBulkInsert<?> insert = ((CollectionBulkInsertOperation) op).getInsert();
