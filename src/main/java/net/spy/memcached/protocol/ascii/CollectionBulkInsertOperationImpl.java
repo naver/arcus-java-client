@@ -100,12 +100,11 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus((successAll) ? END : FAILED_END);
-      } else {
+      if (!status.isSuccess()) {
         cb.gotStatus(insert.getKey(index), status);
-        cb.receivedStatus(FAILED_END);
+        successAll = false;
       }
+      cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
