@@ -79,7 +79,7 @@ public class CollectionPipedExistOperationImpl extends OperationImpl implements
     assert getState() == OperationState.READING : "Read ``" + line
             + "'' when in " + getState() + " state";
 
-    if (setPipedExist.getItemCount() == 1) {
+    if (setPipedExist.isNotPiped()) {
       OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
               NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
       cb.gotStatus(index, status);

@@ -26,37 +26,25 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.transcoders.Transcoder;
 
-public class SetPipedExist<T> extends CollectionObject {
+public class SetPipedExist<T> extends CollectionPipe {
 
   public static final int MAX_PIPED_ITEM_COUNT = 500;
 
   private static final String COMMAND = "sop exist";
-  private static final String PIPE = "pipe";
 
   private final String key;
   private final List<T> values;
   private final Transcoder<T> tc;
-  private int itemCount;
-
-  protected int nextOpIndex = 0;
-
-  public void setNextOpIndex(int i) {
-    this.nextOpIndex = i;
-  }
 
   public List<T> getValues() {
     return this.values;
   }
 
-  public int getItemCount() {
-    return this.itemCount;
-  }
-
   public SetPipedExist(String key, List<T> values, Transcoder<T> tc) {
+    super(values.size());
     this.key = key;
     this.values = values;
     this.tc = tc;
-    this.itemCount = values.size();
   }
 
   public ByteBuffer getAsciiCommand() {
@@ -94,9 +82,5 @@ public class SetPipedExist<T> extends CollectionObject {
     ((Buffer) bb).flip();
 
     return bb;
-  }
-
-  public ByteBuffer getBinaryCommand() {
-    throw new RuntimeException("not supported in binary protocol yet.");
   }
 }
