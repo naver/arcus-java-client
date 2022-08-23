@@ -143,6 +143,19 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     /* If a slave node has started during migration, it may not exist */ 
     return null;
   }
+
+  public MemcachedNode getOwnerNode(String owner, MigrationType mgType) {
+    MemcachedReplicaGroup group;
+    if (mgType == MigrationType.JOIN) {
+      group = alterGroups.get(owner);
+    } else { /* MigrationType.LEAVE */
+      group = existGroups.get(owner);
+    }
+    if (group != null) {
+      return group.getMasterNode();
+    }
+    return null;
+  }
   /* ENABLE_MIGRATION end */
 
   public Collection<MemcachedNode> getMasterNodes() {
