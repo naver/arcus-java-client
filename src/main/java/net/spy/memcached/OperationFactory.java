@@ -364,7 +364,7 @@ public interface OperationFactory {
   MultiOperationCallback createMultiOperationCallback(KeyedOperation op, int count);
 
   Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
-                                List<Integer> keyIndexes, MultiOperationCallback mcb);
+                                List<String> redirectKeys, MultiOperationCallback mcb);
   /**
    * Create operation for collection items.
    *
