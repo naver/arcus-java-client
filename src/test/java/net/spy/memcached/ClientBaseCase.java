@@ -59,6 +59,8 @@ public abstract class ClientBaseCase extends TestCase {
   protected static boolean SHUTDOWN_AFTER_EACH_TEST = USE_ZK;
 
   static {
+    LoggerSetter.setLog4JLogger();
+
     System.out.println("---------------------------------------------");
     System.out.println("[ArcusClient initialization info.]");
     System.out.println("USE_ZK=" + USE_ZK);
