@@ -960,15 +960,14 @@ public final class MemcachedConnection extends SpyObject {
         /* ENABLE_REPLICATION end */
         }
       }
+      ((Buffer) rbuf).clear();
       /* ENABLE_REPLICATION if */
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
-        ((Buffer) rbuf).clear();
         delayedSwitchoverGroups.remove(qa.getReplicaGroup());
         switchoverMemcachedReplGroup(qa, false);
         break;
       }
       /* ENABLE_REPLICATION end */
-      ((Buffer) rbuf).clear();
       read = channel.read(rbuf);
     }
     if (read < 0) {
