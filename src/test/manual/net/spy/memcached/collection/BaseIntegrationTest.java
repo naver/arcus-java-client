@@ -27,6 +27,7 @@ import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionObserver;
 
+import net.spy.memcached.LoggerSetter;
 import org.junit.Ignore;
 
 @Ignore
@@ -49,6 +50,8 @@ public class BaseIntegrationTest extends TestCase {
   protected ArcusClient mc = null;
 
   static {
+    LoggerSetter.setLog4JLogger();
+
     System.out.println("---------------------------------------------");
     System.out.println("[ArcusClient initialization info.]");
     System.out.println("\tUSE_ZK = " + USE_ZK);
@@ -67,8 +70,6 @@ public class BaseIntegrationTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     try {
-      System.setProperty("net.spy.log.LoggerImpl",
-              "net.spy.memcached.compat.log.Log4JLogger");
       System.setProperty("arcus.mbean", "true");
       if (USE_ZK) {
         openFromZK();
