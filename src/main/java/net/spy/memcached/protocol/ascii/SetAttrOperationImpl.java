@@ -77,6 +77,13 @@ class SetAttrOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(
             matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
                     ATTR_ERROR_BAD_VALUE));

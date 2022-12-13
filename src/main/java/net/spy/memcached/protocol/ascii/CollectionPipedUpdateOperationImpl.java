@@ -98,6 +98,18 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      // Only one NOT_MY_KEY is provided in response of single key piped operation when redirection.
+      addRedirectSingleKeyOperation(line, key);
+      if (update.isNotPiped()) {
+        transitionState(OperationState.REDIRECT);
+      } else {
+        update.setNextOpIndex(index);
+      }
+      return;
+    }
+    /* ENABLE_MIGRATION end */
 
     if (update.isNotPiped()) {
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
@@ -121,6 +133,12 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       END|PIPE_ERROR <error_string>\r\n
     */
     if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
+      /* ENABLE_MIGRATION if */
+      if (needRedirect()) {
+        transitionState(OperationState.REDIRECT);
+        return;
+      }
+      /* ENABLE_MIGRATION end */
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {

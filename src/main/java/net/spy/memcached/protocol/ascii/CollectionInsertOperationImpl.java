@@ -105,6 +105,14 @@ public class CollectionInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
+
     getCallback().receivedStatus(
             matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
                     ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,

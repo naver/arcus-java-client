@@ -91,6 +91,13 @@ public class CollectionDeleteOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
             NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
             BKEY_MISMATCH);

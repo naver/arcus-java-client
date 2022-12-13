@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
+import net.spy.memcached.RedirectHandler;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationException;
@@ -57,6 +58,10 @@ public abstract class BaseOperationImpl extends SpyObject {
   /* ENABLE_REPLICATION if */
   private boolean moved = false;
   /* ENABLE_REPLICATION end */
+
+  /* ENABLE_MIGRATION if */
+  private RedirectHandler redirectHandler = null;
+  /* ENABLE_MIGRATION end */
 
   public BaseOperationImpl() {
     super();
@@ -150,6 +155,33 @@ public abstract class BaseOperationImpl extends SpyObject {
     transitionState(OperationState.MOVING);
   }
   /* ENABLE_REPLICATION end */
+
+  /* ENABLE_MIGRATION if */
+  public final RedirectHandler getAndClearRedirectHandler() {
+    RedirectHandler redirectHandler = this.redirectHandler;
+    this.redirectHandler = null;
+
+    return redirectHandler;
+  }
+
+  protected final void addRedirectSingleKeyOperation(String response, String key) {
+    if (redirectHandler == null) {
+      redirectHandler = new RedirectHandler.RedirectHandlerSingleKey();
+    }
+    redirectHandler.addRedirectKey(response, key);
+  }
+
+  protected final void addRedirectMultiKeyOperation(String response, String key) {
+    if (redirectHandler == null) {
+      redirectHandler = new RedirectHandler.RedirectHandlerMultiKey();
+    }
+    redirectHandler.addRedirectKey(response, key);
+  }
+
+  protected final boolean needRedirect() {
+    return redirectHandler != null;
+  }
+  /* ENABLE_MIGRATION end */
 
   public final ByteBuffer getBuffer() {
     return cmd;

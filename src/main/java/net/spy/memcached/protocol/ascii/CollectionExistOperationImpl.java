@@ -76,6 +76,13 @@ public class CollectionExistOperationImpl extends OperationImpl
   public void handleLine(String line) {
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
+    /* ENABLE_MIGRATION if */
+    if (hasNotMyKey(line)) {
+      addRedirectSingleKeyOperation(line, key);
+      transitionState(OperationState.REDIRECT);
+      return;
+    }
+    /* ENABLE_MIGRATION end */
     getCallback().receivedStatus(
             matchStatus(line, EXIST, NOT_EXIST, NOT_FOUND, NOT_FOUND,
                     TYPE_MISMATCH, UNREADABLE));
