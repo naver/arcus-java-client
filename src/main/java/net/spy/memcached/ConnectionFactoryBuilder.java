@@ -89,7 +89,27 @@ public class ConnectionFactoryBuilder {
 
   private ReadPriority readPriority = ReadPriority.MASTER;
   private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
+  /* ENABLE_REPLICATION end */
 
+  /* ENABLE_MIGRATION if */
+  private boolean arcusMigrationCheck = false; // for arcus users
+  private boolean arcusMigrEnabled = false; // for internal
+
+  public void internalArcusMigrEnabled(boolean b) {
+    arcusMigrEnabled = b;
+  }
+
+  public ConnectionFactoryBuilder setArcusMigrationCheck(boolean enable) {
+    arcusMigrationCheck = enable;
+    return this;
+  }
+
+  public boolean getArcusMigrationCheck() {
+    return arcusMigrationCheck;
+  }
+  /* ENABLE_MIGRATION end */
+
+  /* ENABLE_REPLICATION if */
   /* Called by cache manager after checking ZK nodes */
   public void internalArcusReplEnabled(boolean b) {
     arcusReplEnabled = b;
@@ -460,6 +480,9 @@ public class ConnectionFactoryBuilder {
               throws IOException {
         MemcachedConnection c = super.createConnection(name, addrs);
         c.setArcusReplEnabled(arcusReplEnabled);
+        /* ENABLE_MIGRATION if */
+        c.setArcusMigrEnabled(arcusMigrEnabled);
+        /* ENABLE_MIGRATION end */
         return c;
       }
       /* ENABLE_REPLICATION end */

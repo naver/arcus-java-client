@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,15 +47,23 @@ import org.apache.zookeeper.ZooDefs.Ids;
  * previous ketama node
  */
 public class CacheManager extends SpyThread implements Watcher,
-        CacheMonitor.CacheMonitorListener {
+        CacheMonitor.CacheMonitorListener, MigrationMonitor.MigrationMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
   private static final String ARCUS_BASE_CLIENT_LIST_ZPATH = "/arcus/client_list/";
+
+  /* ENABLE_MIGRATION if */
+  private static final String ARCUS_BASE_CLOUD_STAT_ZPATH = "/arcus/cloud_stat/";
+  /* ENABLE_MIGRATION end */
 
   /* ENABLE_REPLICATION if */
   private static final String ARCUS_REPL_CACHE_LIST_ZPATH = "/arcus_repl/cache_list/";
 
   private static final String ARCUS_REPL_CLIENT_LIST_ZPATH = "/arcus_repl/client_list/";
+
+  /* ENABLE_MIGRATION if */
+  private static final String ARCUS_REPL_CLOUD_STAT_ZPATH = "/arcus_repl/cloud_stat/";
+  /* ENABLE_MIGRATION end */
   /* ENABLE_REPLICATION end */
 
   private static final int ZK_SESSION_TIMEOUT = 15000;
@@ -87,6 +96,18 @@ public class CacheManager extends SpyThread implements Watcher,
   private boolean arcusReplEnabled = false;
   /* ENABLE_REPLICATION end */
 
+  /* ENABLE_MIGRATION if */
+  private boolean arcusMigrEnabled = false;
+
+  private MigrationMonitor migrationMonitor;
+
+  private MigrationType type = MigrationType.UNKNOWN;
+
+  private MigrationState state = MigrationState.UNKNOWN;
+
+  private boolean startup = true;
+  /* ENABLE_MIGRATION end */
+
   public CacheManager(String hostPort, String serviceCode,
                       ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
     if (cfb.getFailureMode() == FailureMode.Redistribute) {
@@ -101,12 +122,14 @@ public class CacheManager extends SpyThread implements Watcher,
     this.poolSize = poolSize;
     this.waitTimeForConnect = waitTimeForConnect;
 
-    initZooKeeperClient(true);
+    initZooKeeperClient();
 
-    if (this.client == null) { // initArcusClient() failure
+    if (this.client == null) {
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't initialize Arcus client.");
     }
+
+    this.startup = false;
 
     setName("Cache Manager IO for " + serviceCode + "@" + hostPort);
     setDaemon(true);
@@ -124,6 +147,17 @@ public class CacheManager extends SpyThread implements Watcher,
     /* ENABLE_REPLICATION end */
     return ARCUS_BASE_CACHE_LIST_ZPATH;
   }
+
+  /* ENABLE_MIGRATION if */
+  private String getCloudStatZPath() {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      return ARCUS_REPL_CLOUD_STAT_ZPATH;
+    }
+    /* ENABLE_REPLICATION end */
+    return ARCUS_BASE_CLOUD_STAT_ZPATH;
+  }
+  /* ENABLE_MIGRATION end */
 
   private String getClientListZPath() {
     /* ENABLE_REPLICATION if */
@@ -159,7 +193,7 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
-  private void initZooKeeperClient(boolean startup) {
+  private void initZooKeeperClient() {
     getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, zkConnectString);
     connectZooKeeper();
     try {
@@ -182,6 +216,19 @@ public class CacheManager extends SpyThread implements Watcher,
         }
       }
 
+      /* ENABLE_MIGRATION if */
+      if (cfb.getArcusMigrationCheck() &&
+          zk.exists(getCloudStatZPath() + serviceCode, false) != null) {
+        arcusMigrEnabled = true;
+        cfb.internalArcusMigrEnabled(true);
+        getLogger().info("Migration feature is enabled.");
+      } else {
+        arcusMigrEnabled = false;
+        cfb.internalArcusMigrEnabled(false);
+        getLogger().info("Migration feature is disabled.");
+      }
+      /* ENABLE_MIGRATION end */
+
       String path = getClientInfo();
       if (path.isEmpty()) {
         getLogger().fatal("Can't create the znode of client info (" + path + ")");
@@ -194,6 +241,12 @@ public class CacheManager extends SpyThread implements Watcher,
 
       // create the cache monitor
       cacheMonitor = new CacheMonitor(zk, getCacheListZPath(), serviceCode, startup, this);
+
+      /* ENABLE_MIGRATION if */
+      if (client != null && arcusMigrEnabled) {
+        initMigrationMonitor();
+      }
+      /* ENABLE_MIGRATION end */
     } catch (NotExistsServiceCodeException e) {
       shutdownZooKeeperClient();
       throw e;
@@ -204,6 +257,10 @@ public class CacheManager extends SpyThread implements Watcher,
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't initialize Arcus client.", e);
     }
+  }
+
+  private void initMigrationMonitor() throws InterruptedException {
+    migrationMonitor = new MigrationMonitor(zk, getCloudStatZPath(), serviceCode, startup, this);
   }
 
   private String getClientInfo() {
@@ -275,13 +332,13 @@ public class CacheManager extends SpyThread implements Watcher,
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
+        long retrySleepTime = 0;
         if (cacheMonitor.isDead()) {
-          long retrySleepTime = 0;
           try {
             getLogger().warn("Unexpected disconnection from Arcus admin. " +
                 "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
             shutdownZooKeeperClient();
-            initZooKeeperClient(false);
+            initZooKeeperClient();
           } catch (AdminConnectTimeoutException e) {
             retrySleepTime = 1000L; // 1 second
           } catch (NotExistsServiceCodeException e) {
@@ -293,19 +350,24 @@ public class CacheManager extends SpyThread implements Watcher,
             getLogger().warn("upexpected exception is caught while reconnet to Arcus admin: %s",
                 e.getMessage());
           }
-          if (retrySleepTime > 0) { // retry is needed
-            try {
-              Thread.sleep(retrySleepTime);
-            } catch (InterruptedException e) {
-              getLogger().warn("Cache mananger thread is interrupted while sleep: %s",
-                  e.getMessage());
-            }
+          /* ENABLE_MIGRATION if */
+        } else if (migrationMonitor != null && migrationMonitor.isDead()) {
+          try {
+            getLogger().warn("Unexpected shutdown of MigrationMonitor. " +
+                    "Trying to recreate MigrationMonitor.");
+            initMigrationMonitor();
+          } catch (InterruptedException e) {
+            retrySleepTime = 5000L; // 5 second
+          } catch (Exception e) {
+            retrySleepTime = 1000L; // 1 second
+            getLogger().warn("Unexpected exception is caught while recreate MigrationMonitor: %s",
+                e.getMessage());
           }
-          continue;
         }
+        /* ENABLE_MIGRATION end */
 
         try {
-          wait();
+          wait(retrySleepTime);
         } catch (InterruptedException e) {
           getLogger().warn("Cache mananger thread is interrupted while wait: %s",
               e.getMessage());
@@ -386,6 +448,142 @@ public class CacheManager extends SpyThread implements Watcher,
       conn.putNodesChangeQueue(addrs);
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  @Override
+  public boolean commandCloudStatChange(List<String> children) {
+    // return true if STATE == PREPARED.
+    if (children.size() == 0) {
+      /*
+       * case 1 : No child znode in clout_stat znode.
+       * case 2 : Starting migration.
+       */
+
+      clearMigrationTypeAndState();
+      return false;
+    }
+
+    AbstractMap.SimpleEntry<MigrationType, MigrationState> typeAndState =
+        validateCloudStatZNodes(children);
+    if (typeAndState == null) {
+      return false;
+    }
+
+    MigrationType newType = typeAndState.getKey();
+    MigrationState newState = typeAndState.getValue();
+    getLogger().info("MigrationMonitor reads cloud_stat. type=" + newType + ", state=" + newState);
+
+    if (type != MigrationType.UNKNOWN && type != newType) {
+      getLogger().error("The cloud_stat type mismatch. curType=" + type + ", newType=" + newType);
+      clearMigrationTypeAndState();
+      return false;
+    }
+
+    type = newType;
+
+    if (state == newState) {
+      // TODO: call clearMigrationTypeAndState or not.
+      return false;
+    }
+
+    state = newState;
+
+    for (ArcusClient ac : client) {
+      MemcachedConnection conn = ac.getMemcachedConnection();
+      conn.setMigrationTypeAndState(type, state);
+    }
+
+    /* All alter_list has been registered.
+     * Read the alter_list and pass it to the IO Thread to prepare for the migration.
+     */
+    return state == MigrationState.PREPARED;
+  }
+
+  @Override
+  public boolean commandAlterListChange(List<String> children) {
+    // return false if this method is failed.
+    String addrs = getAddressListString(children);
+    if (startup) {
+      try {
+        for (ArcusClient ac : client) {
+          MemcachedConnection conn = ac.getMemcachedConnection();
+          conn.prepareAlterConnections(arcusReplEnabled ?
+              ArcusReplNodeAddress.getAddresses(addrs) : AddrUtil.getAddresses(addrs));
+        }
+        return true;
+      } catch (IOException e) {
+        getLogger().fatal("Cannot initialize alter_list znode.", e);
+        return false; // startup && caught exception => return false
+      }
+    }
+    for (ArcusClient ac : client) {
+      MemcachedConnection conn = ac.getMemcachedConnection();
+      conn.putAlterNodesChangeQueue(addrs);
+    }
+    return true;
+  }
+
+  private void clearMigrationTypeAndState() {
+    if (type != MigrationType.UNKNOWN || state != MigrationState.UNKNOWN) {
+      type = MigrationType.UNKNOWN;
+      state = MigrationState.UNKNOWN;
+
+      for (ArcusClient ac : client) {
+        MemcachedConnection conn = ac.getMemcachedConnection();
+        conn.setMigrationTypeAndState(type, state);
+      }
+    }
+  }
+
+  private AbstractMap.SimpleEntry<MigrationType, MigrationState> validateCloudStatZNodes(
+      List<String> children) {
+    /* There are following znodes in cloud_stat :
+     * INTERNAL, STATE, alter_list
+     */
+    int child_count = 3;
+    int valid_count = 0;
+    if (children.size() < child_count) {
+      return null;
+    }
+
+    MigrationType type = MigrationType.UNKNOWN;
+    MigrationState state = MigrationState.UNKNOWN;
+
+    for (String znode : children) {
+      if (znode.equals("INTERNAL") || znode.equals("alter_list")) {
+        valid_count++;
+        continue;
+      }
+
+      /* STATE znode format:
+       * STATE^<JOIN|LEAVE>^<BEGIN|PREPARED|DONE>
+       */
+      if (znode.startsWith("STATE^")) {
+        String[] tokens = znode.split("\\^");
+        if (tokens.length < 3) {
+          break;
+        }
+
+        type = MigrationType.fromString(tokens[1]);
+        if (type == MigrationType.UNKNOWN) {
+          break;
+        }
+
+        state = MigrationState.fromString(tokens[2]);
+        if (state == MigrationState.UNKNOWN) {
+          break;
+        }
+
+        valid_count++;
+      }
+    }
+    if (valid_count != child_count) {
+      getLogger().warn("Invalid cloud_stat znodes.");
+      return null;
+    }
+    return new AbstractMap.SimpleEntry<MigrationType, MigrationState>(type, state);
+  }
+  /* ENABLE_MIGRATION end */
 
   public List<String> getPrevCacheList() {
     return this.prevCacheList;
