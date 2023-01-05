@@ -718,9 +718,8 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
       if (addrs.isEmpty()) { // end of migration
-        this.mgType = MigrationType.UNKNOWN;
-        this.mgState = MigrationState.UNKNOWN;
-        this.mgInProgress = false;
+        mgState = MigrationState.DONE;
+        mgInProgress = false;
       }
     }
   }
@@ -734,7 +733,7 @@ public final class MemcachedConnection extends SpyObject {
     return AddrUtil.getAddresses(s);
   }
 
-  private void prepareAlterConnections(List<InetSocketAddress> addrs) throws IOException {
+  public void prepareAlterConnections(List<InetSocketAddress> addrs) throws IOException {
     getLogger().info("Prepare connection of alter nodes. addrs=" + addrs);
     List<MemcachedNode> alterNodes = new ArrayList<MemcachedNode>();
     if (mgType == MigrationType.JOIN) {
