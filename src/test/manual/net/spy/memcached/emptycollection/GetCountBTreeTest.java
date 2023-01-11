@@ -137,7 +137,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -145,7 +145,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
               BKEY, BKEY, ElementFlagFilter.DO_NOT_FILTER);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(1), count);
+      Assert.assertEquals(Integer.valueOf(1), count);
       Assert.assertEquals(CollectionResponse.END, future
               .getOperationStatus().getResponse());
     } catch (Exception e) {
@@ -169,7 +169,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -177,7 +177,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
               BKEY, BKEY + 1, ElementFlagFilter.DO_NOT_FILTER);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(2), count);
+      Assert.assertEquals(Integer.valueOf(2), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -199,7 +199,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -207,7 +207,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
               BKEY + 3, BKEY + 3, ElementFlagFilter.DO_NOT_FILTER);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(0), count);
+      Assert.assertEquals(Integer.valueOf(0), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -229,7 +229,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -237,7 +237,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
               BKEY + 2, BKEY + 3, ElementFlagFilter.DO_NOT_FILTER);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(0), count);
+      Assert.assertEquals(Integer.valueOf(0), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());

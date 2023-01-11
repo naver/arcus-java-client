@@ -42,7 +42,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=true
@@ -50,7 +50,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
               .get().get(INDEX));
 
       // check exists
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value againg
@@ -65,7 +65,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -75,7 +75,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
       Assert.assertNotNull(attr);
-      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
 
       // get value again
       CollectionFuture<List<Object>> asyncLopGet = mc.asyncLopGet(KEY,
@@ -92,7 +92,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false

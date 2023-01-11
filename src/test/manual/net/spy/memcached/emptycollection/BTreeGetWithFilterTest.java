@@ -56,7 +56,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
               CompOperands.Equal, "flag".getBytes());
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -68,7 +68,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
       Assert.assertNotNull(attr);
-      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
 
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
@@ -87,7 +87,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
       filter.setBitOperand(BitWiseOperands.AND, "flag".getBytes());
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -115,7 +115,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
               CompOperands.Equal, "flag".getBytes());
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -126,7 +126,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
       Assert.assertNotNull(attr);
-      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
 
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
@@ -145,7 +145,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
       filter.setBitOperand(BitWiseOperands.AND, "flag".getBytes());
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -172,7 +172,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
               CompOperands.Equal, "flag".getBytes());
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false

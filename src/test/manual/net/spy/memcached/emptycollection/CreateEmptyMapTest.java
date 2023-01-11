@@ -50,9 +50,9 @@ public class CreateEmptyMapTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(4000), attr.getMaxCount());
-      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -74,8 +74,8 @@ public class CreateEmptyMapTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(10000), attr.getMaxCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(10000), attr.getMaxCount());
       Assert.assertEquals(CollectionOverflowAction.error,
               attr.getOverflowAction());
     } catch (Exception e) {

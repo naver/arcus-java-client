@@ -66,9 +66,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(3333),
+      Assert.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(new Long(10), collectionAttributes.getCount());
+      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
@@ -106,9 +106,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(new Long(10), collectionAttributes.getCount());
+      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
@@ -139,9 +139,9 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(new Long(10), collectionAttributes.getCount());
+      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();

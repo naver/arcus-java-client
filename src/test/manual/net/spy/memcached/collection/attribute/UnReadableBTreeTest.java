@@ -58,9 +58,9 @@ public class UnReadableBTreeTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(4000), attr.getMaxCount());
-      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
       Assert.assertFalse(attr.getReadable());
 
       // insert an item
@@ -105,9 +105,9 @@ public class UnReadableBTreeTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(4000), attr.getMaxCount());
-      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
       Assert.assertTrue(attr.getReadable());
 
       // insert an item

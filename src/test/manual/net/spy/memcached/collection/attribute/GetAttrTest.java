@@ -37,7 +37,7 @@ public class GetAttrTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS);
 
     assertNotNull(rattrs);
-    assertEquals(new Integer(0), rattrs.getFlags());
+    assertEquals(Integer.valueOf(0), rattrs.getFlags());
     assertEquals(CollectionType.kv, rattrs.getType());
   }
 
