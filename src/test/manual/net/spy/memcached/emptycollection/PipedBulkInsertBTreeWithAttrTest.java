@@ -70,7 +70,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(3333),
+      Assert.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
@@ -103,7 +103,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       e.printStackTrace();
@@ -128,7 +128,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       e.printStackTrace();

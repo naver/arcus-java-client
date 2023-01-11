@@ -105,7 +105,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -113,7 +113,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
               BKEY, BKEY, filter);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(1), count);
+      Assert.assertEquals(Integer.valueOf(1), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -139,7 +139,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -147,7 +147,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
               BKEY, BKEY2, filter);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(1), count);
+      Assert.assertEquals(Integer.valueOf(1), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -174,7 +174,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult2);
 
       // check count in attributes
-      Assert.assertEquals(new Long(2), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(2), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get btree item count
@@ -182,7 +182,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
               BKEY, BKEY, filter);
       Integer count = future.get();
       Assert.assertNotNull(count);
-      Assert.assertEquals(new Integer(1), count);
+      Assert.assertEquals(Integer.valueOf(1), count);
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());

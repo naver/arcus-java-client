@@ -78,13 +78,13 @@ public class LopInsertDataType extends BaseIntegrationTest {
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
 
     // Then insert another items with different data types
-    assertTrue(mc.asyncLopInsert(key, -1, new Integer(100), null).get(1000,
+    assertTrue(mc.asyncLopInsert(key, -1, 100, null).get(1000,
             TimeUnit.MILLISECONDS));
 
-    assertTrue(mc.asyncLopInsert(key, -1, new Long(101L), null).get(1000,
+    assertTrue(mc.asyncLopInsert(key, -1, 101L, null).get(1000,
             TimeUnit.MILLISECONDS));
 
-    assertTrue(mc.asyncLopInsert(key, -1, new Character('f'), null).get(
+    assertTrue(mc.asyncLopInsert(key, -1, 'f', null).get(
             1000, TimeUnit.MILLISECONDS));
 
     // Retrieve items from the list and check they're in same data type
@@ -99,7 +99,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
 
   public void testLopInsert_DifferentDataType_ErrorCase() throws Exception {
     // First, create a list and insert one item in it
-    assertTrue(mc.asyncLopInsert(key, 0, new Character('a'),
+    assertTrue(mc.asyncLopInsert(key, 0, 'a',
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
 
     // Then insert an another item with different data type
