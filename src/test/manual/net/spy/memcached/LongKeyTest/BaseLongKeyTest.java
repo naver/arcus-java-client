@@ -1,6 +1,6 @@
 package net.spy.memcached.LongKeyTest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;

@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 public class ElementFlagFilterTest extends TestCase {

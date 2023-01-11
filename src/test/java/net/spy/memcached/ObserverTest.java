@@ -10,7 +10,7 @@ import net.spy.memcached.compat.SpyObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runner.RunWith;
 
 import static org.junit.Assume.assumeTrue;
@@ -18,7 +18,7 @@ import static org.junit.Assume.assumeTrue;
 /**
  * Test observer hooks.
  */
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ObserverTest extends ClientBaseCase {
 
   @Before
