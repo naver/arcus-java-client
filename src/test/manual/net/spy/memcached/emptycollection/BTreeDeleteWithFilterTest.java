@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -54,7 +54,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult);
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // delete one bkey
@@ -62,7 +62,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(delete);
 
       // check attr again
-      Assert.assertEquals(new Long(0), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(0), mc.asyncGetAttr(KEY).get()
               .getCount());
     } catch (Exception e) {
       e.printStackTrace();
@@ -80,7 +80,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
       Assert.assertTrue(insertResult);
 
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // delete one bkey
@@ -88,7 +88,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
       Assert.assertFalse(delete);
 
       // check attr again
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
     } catch (Exception e) {
       e.printStackTrace();

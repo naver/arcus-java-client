@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
@@ -68,6 +68,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       try {
         mc.asyncStoreBulk(StoreType.set, null, 60);
       } catch (Exception e) {
+        e.printStackTrace();
         assertEquals("Map is null.", e.getMessage());
       }
 
@@ -124,6 +125,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       try {
         mc.asyncStoreBulk(StoreType.set, null, 60, value);
       } catch (Exception e) {
+        e.printStackTrace();
         assertEquals("Key list is null.", e.getMessage());
       }
 
@@ -384,6 +386,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // Store
+      @SuppressWarnings("deprecation")
       Future<Map<String, CollectionOperationStatus>> future = mc
           .asyncSetBulk(Arrays.asList(keys), 60, value, transcoder);
 
@@ -433,6 +436,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       //  Store
+      @SuppressWarnings("deprecation")
       Future<Map<String, CollectionOperationStatus>> future = mc
           .asyncSetBulk(o, 60, transcoder);
 

@@ -18,7 +18,7 @@ package net.spy.memcached.collection.btree;
 
 import java.util.concurrent.ExecutionException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagUpdate;

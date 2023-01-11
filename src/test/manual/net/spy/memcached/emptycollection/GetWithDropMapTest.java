@@ -18,7 +18,7 @@ package net.spy.memcached.emptycollection;
 
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
@@ -41,7 +41,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=false
@@ -50,7 +50,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
               mc.asyncMopGet(KEY, MKEY, false, false).get().get(MKEY));
 
       // check exists
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again
@@ -66,7 +66,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -77,7 +77,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
       // check exists empty map
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
       Assert.assertNotNull(attr);
-      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
 
       Map<String, Object> map = mc.asyncMopGet(KEY, MKEY, false, false).get();
       Assert.assertNotNull(map);
@@ -91,7 +91,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=true

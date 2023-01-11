@@ -19,7 +19,7 @@ package net.spy.memcached.test;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 
 public class MutateWithDefaultTest extends BaseIntegrationTest {

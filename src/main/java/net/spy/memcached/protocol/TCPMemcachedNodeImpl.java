@@ -49,7 +49,7 @@ import net.spy.memcached.ops.OperationState;
 public abstract class TCPMemcachedNodeImpl extends SpyObject
         implements MemcachedNode {
 
-  private String name;
+  private final String name;
   private SocketAddress socketAddress;
   private final ByteBuffer rbuf;
   private final ByteBuffer wbuf;
@@ -59,7 +59,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private final long opQueueMaxBlockTime;
   // This has been declared volatile so it can be used as an availability
   // indicator.
-  private volatile int reconnectAttempt = 1;
+  private final AtomicInteger reconnectAttempt = new AtomicInteger(1);
   private boolean isFirstConnecting = true;
   private SocketChannel channel;
   private int toWrite = 0;
@@ -83,12 +83,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private int toCountIdx;         /* to count array index */
   private int toRatioMax;         /* maximum timeout ratio */
   private int toRatioNow;         /* current timeout ratio */
-  private Lock toRatioLock = new ReentrantLock();
+  private final Lock toRatioLock = new ReentrantLock();
 
   /* # of operations added into inputQueue as a hint.
    * If we need a correct count, AtomicLong object must be used.
    */
-  private volatile long addOpCount;
+  private final AtomicLong addOpCount;
 
   /* ENABLE_REPLICATION if */
   private MemcachedReplicaGroup replicaGroup;
@@ -149,7 +149,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     readQ = rq;
     writeQ = wq;
     inputQueue = iq;
-    addOpCount = 0;
+    addOpCount = new AtomicLong(0);
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
@@ -234,7 +234,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   // Prepare the pending operations.  Return true if there are any pending
   // ops
-  private boolean preparePending() {
+  private void preparePending() {
     // Copy the input queue into the write queue.
     copyInputQueue();
 
@@ -245,7 +245,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       removeCurrentWriteOp();
       nextOp = getCurrentWriteOp();
     }
-    return nextOp != null;
   }
 
   public final void fillWriteBuffer(boolean shouldOptimize) {
@@ -363,7 +362,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         throw new IllegalStateException("Timed out waiting to add "
                 + op + "(max wait=" + opQueueMaxBlockTime + "ms)");
       }
-      addOpCount += 1;
+      addOpCount.incrementAndGet();
     } catch (InterruptedException e) {
       // Restore the interrupted status
       Thread.currentThread().interrupt();
@@ -380,7 +379,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       return false;
     }
     op.setMoved(true);
-    addOpCount += 1;
+    addOpCount.incrementAndGet();
     return true;
   }
 
@@ -390,7 +389,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     tmp.add(op);
     inputQueue.drainTo(tmp);
     inputQueue.addAll(tmp);
-    addOpCount += 1;
+    addOpCount.incrementAndGet();
   }
 
   public final int getSelectionOps() {
@@ -435,7 +434,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final boolean isActive() {
-    return reconnectAttempt == 0 && getChannel() != null && getChannel().isConnected();
+    return reconnectAttempt.get() == 0 && getChannel() != null && getChannel().isConnected();
   }
 
   public final boolean isFirstConnecting() {
@@ -443,7 +442,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void reconnecting() {
-    reconnectAttempt++;
+    reconnectAttempt.incrementAndGet();
     isFirstConnecting = false;
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
@@ -451,7 +450,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void connected() {
-    reconnectAttempt = 0;
+    reconnectAttempt.set(0);
     isFirstConnecting = false;
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
@@ -459,7 +458,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final int getReconnectCount() {
-    return reconnectAttempt;
+    return reconnectAttempt.get();
   }
 
   @Override
@@ -687,17 +686,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   @Override
   public String getStatus() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("#Tops=").append(addOpCount);
-    sb.append(" #iq=").append(getInputQueueSize());
-    sb.append(" #Wops=").append(getWriteQueueSize());
-    sb.append(" #Rops=").append(getReadQueueSize());
-    sb.append(" #CT=").append(getContinuousTimeout());
-    sb.append(" #TD=").append(getTimeoutDuration());
-    sb.append(" #TR=").append(getTimeoutRatioNow());
-    return sb.toString();
+    return "#Tops=" + addOpCount +
+        " #iq=" + getInputQueueSize() +
+        " #Wops=" + getWriteQueueSize() +
+        " #Rops=" + getReadQueueSize() +
+        " #CT=" + getContinuousTimeout() +
+        " #TD=" + getTimeoutDuration() +
+        " #TR=" + getTimeoutRatioNow();
   }
 
+  @SuppressWarnings("fallthrough")
   private void resetOperation(Operation o) {
     switch (o.getState()) {
       case WRITING:

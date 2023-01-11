@@ -29,7 +29,7 @@ public class ConsistentHashingTest extends TestCase {
    * Simulate dropping from (totalNodes) to (totalNodes-1).
    * Ensure hashing is consistent between the the two scenarios.
    *
-   * @param totalNodes
+   * @param totalNodes totalNodes
    */
   private void runThisManyNodes(final int totalNodes) {
     final String[] stringNodes = generateAddresses(totalNodes);
@@ -95,14 +95,14 @@ public class ConsistentHashingTest extends TestCase {
     String port = ":11211 ";
     int last = (int) ((now % 100) + 3);
 
-    StringBuffer prefix = new StringBuffer();
+    StringBuilder prefix = new StringBuilder();
     prefix.append(first);
     prefix.append(".");
     prefix.append(second);
     prefix.append(".1.");
 
     // Don't protect the possible range too much, as we are our own client.
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int ix = 0; ix < maxSize - 1; ix++) {
       buf.append(prefix);
       buf.append(last + ix);

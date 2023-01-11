@@ -78,7 +78,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
   protected int spaceCount = 0;
 
   protected ReadState readState = ReadState.VALUE;
-  private int processedValueCount = 0;
 
   public BTreeSortMergeGetOperationImpl(BTreeSMGet<?> smGet,
                                         OperationCallback cb) {
@@ -169,16 +168,16 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     // Decode a collection data header.
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Handle spaces.
         if (b == ' ') {
 
           // Adjust space count if item header has a element flag.
-          String[] chunk = new String(byteBuffer.toByteArray())
+          String[] chunk = byteBuffer.toString()
                   .split(" ");
-          if (chunk.length == smGet.headerCount) {
+          if (chunk.length == BTreeSMGet.headerCount) {
             if (chunk[3].startsWith("0x")) {
               spaceCount--;
             }
@@ -187,12 +186,10 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           spaceCount++;
           if (smGet.headerReady(spaceCount)) {
             // <key> <flags> <bkey> [<eflag>] <bytes> <data>\r\n
-            smGet.decodeItemHeader(new String(byteBuffer
-                    .toByteArray()));
+            smGet.decodeItemHeader(byteBuffer.toString());
             data = new byte[smGet.getDataLength()];
             byteBuffer.reset();
             spaceCount = 0;
-            processedValueCount++;
             break;
           }
         }
@@ -204,7 +201,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
         // Finish the operation.
         if (b == '\n') {
-          String sep = new String(byteBuffer.toByteArray());
+          String sep = byteBuffer.toString();
           if (sep.startsWith("MISSED_KEYS")) {
             readState = ReadState.MISSED_KEYS;
             byteBuffer.reset();
@@ -289,7 +286,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
   private final void readMissedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Ready to finish.
@@ -299,7 +296,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
         // Finish the operation.
         if (b == '\n') {
-          String sep = new String(byteBuffer.toByteArray());
+          String sep = byteBuffer.toString();
           if (sep.startsWith("TRIMMED_KEYS")) {
             readState = ReadState.TRIMMED_KEYS;
             byteBuffer.reset();
@@ -328,10 +325,10 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           } else if (count < lineCount) {
             // <key> [<cause>]\r\n
-            String line = new String(byteBuffer.toByteArray());
-            String chunk[] = line.split(" ");
+            String line = byteBuffer.toString();
+            String[] chunk = line.split(" ");
             if (chunk.length == 2) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                       .gotMissedKey(chunk[0], matchStatus(chunk[1],
                               NOT_FOUND, UNREADABLE, OUT_OF_RANGE));
               /* ENABLE_MIGRATION if */
@@ -339,7 +336,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
               addRedirectMultiKeyOperation(getNotMyKey(line), chunk[0]);
               /* ENABLE_MIGRATION end */
             } else {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                       .gotMissedKey(chunk[0], new CollectionOperationStatus(false,
                               "UNDEFINED", CollectionResponse.UNDEFINED));
             }
@@ -368,7 +365,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
   private final void readTrimmedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Ready to finish.
@@ -394,13 +391,13 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           } else if (count < lineCount) {
             // <key> <bkey>\r\n
-            String[] chunk = new String(byteBuffer.toByteArray())
+            String[] chunk = byteBuffer.toString()
                     .split(" ");
             if (smGet instanceof BTreeSMGetWithLongTypeBkey) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                   .gotTrimmedKey(chunk[0], Long.parseLong(chunk[1]));
             } else if (smGet instanceof BTreeSMGetWithByteTypeBkey) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                   .gotTrimmedKey(chunk[0],
                       BTreeUtil.hexStringToByteArrays(chunk[1].substring(2)));
             }

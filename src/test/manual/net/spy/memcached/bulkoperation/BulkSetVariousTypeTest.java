@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -32,7 +32,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
   private static class MyBean implements Serializable {
     private static final long serialVersionUID = -5977830942924286134L;
 
-    private String name;
+    private final String name;
 
     public MyBean(String name) {
       this.name = name;
@@ -44,6 +44,18 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
         return this.name.equals(((MyBean) obj).name);
       }
       return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return toString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return "MyBean{" +
+          "name='" + name + '\'' +
+          '}';
     }
   }
 
@@ -59,6 +71,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
         mc.delete(key[0]);
 
         // SET
+        @SuppressWarnings("deprecation")
         Future<Map<String, CollectionOperationStatus>> future = mc
                 .asyncSetBulk(Arrays.asList(key), 60, valueList[i]);
 
@@ -74,7 +87,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
         // GET
         Object v = mc.get(key[0]);
-        Assert.assertEquals(String.format("K=%s, V=%s", key, v),
+        Assert.assertEquals(String.format("K=%s, V=%s", Arrays.toString(key), v),
                 valueList[i], v);
       }
     } catch (Exception e) {

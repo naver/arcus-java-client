@@ -29,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Test the TCPMemcachedNodeImpl
@@ -52,7 +53,7 @@ public class TCPMemcachedNodeImplTest extends TestCase {
       throws Exception {
     Field field = TCPMemcachedNodeImpl.class.getDeclaredField("addOpCount");
     field.setAccessible(true);
-    return field.getLong(node);
+    return ((AtomicLong) field.get(node)).get();
   }
 
   public void testMoveOperations() throws Exception {
@@ -76,28 +77,26 @@ public class TCPMemcachedNodeImplTest extends TestCase {
         4096
     );
 
-    List<Operation> fromOperations = new LinkedList<Operation>() {{
-        for (int i = 0; i < fromAllOpCount; i++) {
-          Operation op = factory.getOperationFactory().get(
-              "cacheKey=" + i,
-              new GetOperation.Callback() {
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+    List<Operation> fromOperations = new LinkedList<Operation>();
+    for (int i = 0; i < fromAllOpCount; i++) {
+      Operation op = factory.getOperationFactory().get(
+          "cacheKey=" + i,
+          new GetOperation.Callback() {
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void gotData(String key, int flags, byte[] data) {
-                }
+            @Override
+            public void gotData(String key, int flags, byte[] data) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              });
-          op.initialize();
-          add(op);
-        }
-      }
-    };
+            @Override
+            public void complete() {
+            }
+          });
+      op.initialize();
+      fromOperations.add(op);
+    }
 
     for (int i = 0; i < fromAllOpCount; i++) {
       if (fromNode.getReadQueueSize() < fromReadOpCount) {

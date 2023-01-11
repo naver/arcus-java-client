@@ -19,7 +19,7 @@ package net.spy.memcached.collection.btree;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementMultiFlagsFilter;

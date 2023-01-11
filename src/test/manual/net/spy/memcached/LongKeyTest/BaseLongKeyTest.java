@@ -1,6 +1,6 @@
 package net.spy.memcached.LongKeyTest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -21,23 +21,24 @@ import java.util.Map;
 
 public class BaseLongKeyTest extends BaseIntegrationTest {
 
-  private int keySize = 200;
-  private char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-  private final List<String> keys = new ArrayList<String>() {
-    {
-      int defaultKeyLenght = 4000 - 10; // MAX_KEY_LENGTH - key index string length
-      for (int i = 0; i < keySize; i++) {
-        StringBuilder sb = new StringBuilder();
-        Random random = new Random();
-        for (int j = 0; j < defaultKeyLenght; j++) {
-          char c = chars[random.nextInt(chars.length)];
-          sb.append(c);
-        }
-        sb.append(i);
-        add(sb.toString());
+  private final int keySize = 200;
+  private final List<String> keys = new ArrayList<String>();
+
+  public BaseLongKeyTest() {
+    int defaultKeyLenght = 4000 - 10; // MAX_KEY_LENGTH - key index string length
+    char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+
+    for (int i = 0; i < keySize; i++) {
+      StringBuilder sb = new StringBuilder();
+      Random random = new Random();
+      for (int j = 0; j < defaultKeyLenght; j++) {
+        char c = chars[random.nextInt(chars.length)];
+        sb.append(c);
       }
+      sb.append(i);
+      keys.add(sb.toString());
     }
-  };
+  }
 
   public void testKV_Long() throws Exception {
     // KV Set

@@ -19,7 +19,7 @@ package net.spy.memcached.emptycollection;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -64,7 +64,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(3333),
+      Assert.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
@@ -97,7 +97,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       e.printStackTrace();
@@ -122,7 +122,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       e.printStackTrace();

@@ -16,7 +16,7 @@
  */
 package net.spy.memcached;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCount;

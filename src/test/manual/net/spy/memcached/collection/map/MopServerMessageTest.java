@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MopServerMessageTest extends BaseIntegrationTest {
 
-  private String key = "MopServerMessageTest";
+  private final String key = "MopServerMessageTest";
 
   @Override
   protected void setUp() throws Exception {
@@ -36,7 +36,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
   }
 
   public void testNotFound() throws Exception {
-    CollectionFuture<Map<String, Object>> future = (CollectionFuture<Map<String, Object>>) mc
+    CollectionFuture<Map<String, Object>> future = mc
             .asyncMopGet(key, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -46,7 +46,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
   }
 
   public void testCreatedStored() throws Exception {
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -56,11 +56,11 @@ public class MopServerMessageTest extends BaseIntegrationTest {
   }
 
   public void testStored() throws Exception {
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-    future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "1", 1,
+    future = mc.asyncMopInsert(key, "1", 1,
             new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -70,7 +70,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
   }
 
   public void testOverflowed() throws Exception {
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -78,11 +78,11 @@ public class MopServerMessageTest extends BaseIntegrationTest {
             new CollectionAttributes(null, 2L, CollectionOverflowAction.error))
             .get(1000, TimeUnit.MILLISECONDS));
 
-    future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "1", 1,
+    future = mc.asyncMopInsert(key, "1", 1,
             new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-    future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "2", 1,
+    future = mc.asyncMopInsert(key, "2", 1,
             new CollectionAttributes());
     assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -93,12 +93,12 @@ public class MopServerMessageTest extends BaseIntegrationTest {
 
   public void testDeletedDropped() throws Exception {
     // create
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // delete
-    future = (CollectionFuture<Boolean>) mc.asyncMopDelete(key, true);
+    future = mc.asyncMopDelete(key, true);
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     OperationStatus status = future.getOperationStatus();
@@ -108,17 +108,17 @@ public class MopServerMessageTest extends BaseIntegrationTest {
 
   public void testDeleted() throws Exception {
     // create
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // insert
-    future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "1", "bbb",
+    future = mc.asyncMopInsert(key, "1", "bbb",
             new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // delete
-    future = (CollectionFuture<Boolean>) mc.asyncMopDelete(key, "0", false);
+    future = mc.asyncMopDelete(key, "0", false);
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     OperationStatus status = future.getOperationStatus();
@@ -128,12 +128,12 @@ public class MopServerMessageTest extends BaseIntegrationTest {
 
   public void testDeletedDroppedAfterRetrieval() throws Exception {
     // create
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // get
-    CollectionFuture<Map<String, Object>> future2 = (CollectionFuture<Map<String, Object>>) mc
+    CollectionFuture<Map<String, Object>> future2 = mc
             .asyncMopGet(key, true, true);
     assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 
@@ -144,17 +144,17 @@ public class MopServerMessageTest extends BaseIntegrationTest {
 
   public void testDeletedAfterRetrieval() throws Exception {
     // create
-    CollectionFuture<Boolean> future = (CollectionFuture<Boolean>) mc
+    CollectionFuture<Boolean> future = mc
             .asyncMopInsert(key, "0", "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // insert
-    future = (CollectionFuture<Boolean>) mc.asyncMopInsert(key, "1", "bbb",
+    future = mc.asyncMopInsert(key, "1", "bbb",
             new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     // get
-    CollectionFuture<Map<String, Object>> future2 = (CollectionFuture<Map<String, Object>>) mc
+    CollectionFuture<Map<String, Object>> future2 = mc
             .asyncMopGet(key, true, false);
     assertNotNull(future2.get(1000, TimeUnit.MILLISECONDS));
 

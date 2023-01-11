@@ -18,7 +18,7 @@ package net.spy.memcached.collection.attribute;
 
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -59,9 +59,9 @@ public class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(4000), attr.getMaxCount());
-      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
       Assert.assertFalse(attr.getReadable());
 
       // insert an item
@@ -109,9 +109,9 @@ public class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(new Long(0), attr.getCount());
-      Assert.assertEquals(new Long(4000), attr.getMaxCount());
-      Assert.assertEquals(new Integer(0), attr.getExpireTime());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
       Assert.assertTrue(attr.getReadable());
 
       // insert an item

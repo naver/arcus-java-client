@@ -18,7 +18,7 @@ package net.spy.memcached.emptycollection;
 
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -60,7 +60,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(3333),
+      Assert.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
@@ -88,7 +88,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(4000),
+      Assert.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       Assert.fail(e.getMessage());
@@ -114,7 +114,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(new Long(3333),
+      Assert.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time

@@ -18,7 +18,7 @@ package net.spy.memcached.emptycollection;
 
 import java.util.Set;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
@@ -40,7 +40,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=true
@@ -48,7 +48,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
               .contains(VALUE));
 
       // check exists
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again
@@ -63,7 +63,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -73,7 +73,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
       Assert.assertNotNull(attr);
-      Assert.assertEquals(new Long(0), attr.getCount());
+      Assert.assertEquals(Long.valueOf(0), attr.getCount());
 
       Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
       Assert.assertNotNull(set);
@@ -87,7 +87,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
   public void testGetWithtDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
@@ -109,7 +109,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
   public void testGetWithoutDeleteAndDropOptions() {
     try {
       // check attr
-      assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       //get value
@@ -117,7 +117,7 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
               .contains(VALUE));
 
       // check exists
-      assertEquals(new Long(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again

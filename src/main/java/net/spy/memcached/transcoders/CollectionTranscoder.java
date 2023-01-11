@@ -83,25 +83,25 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     } else if (flags != 0 && data != null) {
       switch (flags) {
         case SPECIAL_BOOLEAN:
-          rv = Boolean.valueOf(tu.decodeBoolean(data));
+          rv = tu.decodeBoolean(data);
           break;
         case SPECIAL_INT:
-          rv = new Integer(tu.decodeInt(data));
+          rv = tu.decodeInt(data);
           break;
         case SPECIAL_LONG:
-          rv = new Long(tu.decodeLong(data));
+          rv = tu.decodeLong(data);
           break;
         case SPECIAL_DATE:
           rv = new Date(tu.decodeLong(data));
           break;
         case SPECIAL_BYTE:
-          rv = new Byte(tu.decodeByte(data));
+          rv = tu.decodeByte(data);
           break;
         case SPECIAL_FLOAT:
-          rv = new Float(Float.intBitsToFloat(tu.decodeInt(data)));
+          rv = Float.intBitsToFloat(tu.decodeInt(data));
           break;
         case SPECIAL_DOUBLE:
-          rv = new Double(Double.longBitsToDouble(tu.decodeLong(data)));
+          rv = Double.longBitsToDouble(tu.decodeLong(data));
           break;
         case SPECIAL_BYTEARRAY:
           rv = data;

@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BTreeDelete;

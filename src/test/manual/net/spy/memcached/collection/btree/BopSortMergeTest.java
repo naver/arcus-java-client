@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection.btree;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
@@ -36,29 +36,26 @@ import java.util.concurrent.TimeUnit;
 
 public class BopSortMergeTest extends BaseIntegrationTest {
 
-  private List<String> keyList3 = new ArrayList<String>() {
-    {
-      add("key0");
-      add("key1");
-      add("key2");
-    }
-  };
+  private final List<String> keyList3 = new ArrayList<String>();
+  private final List<String> keyList2 = new ArrayList<String>();
 
-  private List<String> keyList2 = new ArrayList<String>() {
-    {
-      add("key0");
-      add("key1");
-    }
-  };
+  public BopSortMergeTest() {
+    keyList3.add("key0");
+    keyList3.add("key1");
+    keyList3.add("key2");
+
+    keyList2.add("key0");
+    keyList2.add("key1");
+  }
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    for (int i = 0; i < keyList3.size(); i++) {
-      mc.delete(keyList3.get(i));
+    for (String s : keyList3) {
+      mc.delete(s);
     }
-    for (int i = 0; i < keyList2.size(); i++) {
-      mc.delete(keyList2.get(i));
+    for (String s : keyList2) {
+      mc.delete(s);
     }
   }
 

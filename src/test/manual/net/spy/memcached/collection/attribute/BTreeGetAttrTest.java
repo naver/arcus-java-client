@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.collection.attribute;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
@@ -60,7 +60,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
       // get trimmed
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getTrimmed() != null) { // not support
-        Assert.assertEquals(new Long(0L), btreeAttrs.getTrimmed());
+        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getTrimmed());
       }
 
       Assert.assertTrue(mc.asyncBopInsert(KEY, 3L, EFLAG, VALUE,
@@ -71,7 +71,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
       // get trimmed
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getTrimmed() != null) { // not support
-        Assert.assertEquals(new Long(1L), btreeAttrs.getTrimmed());
+        Assert.assertEquals(Long.valueOf(1L), btreeAttrs.getTrimmed());
       }
 
     } catch (Exception e) {
@@ -93,8 +93,8 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getMinBkey() != null) { // not support
-        Assert.assertEquals(new Long(0L), btreeAttrs.getMinBkey());
-        Assert.assertEquals(new Long(0L), btreeAttrs.getMaxBkey());
+        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
+        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMaxBkey());
       }
 
       Assert.assertTrue(mc.asyncBopInsert(KEY, 1L, EFLAG, VALUE, null)
@@ -104,8 +104,8 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getMinBkey() != null) { // not support
-        Assert.assertEquals(new Long(0L), btreeAttrs.getMinBkey());
-        Assert.assertEquals(new Long(2L), btreeAttrs.getMaxBkey());
+        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
+        Assert.assertEquals(Long.valueOf(2L), btreeAttrs.getMaxBkey());
       }
     } catch (Exception e) {
       Assert.fail(e.getMessage());
