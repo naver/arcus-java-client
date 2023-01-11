@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;

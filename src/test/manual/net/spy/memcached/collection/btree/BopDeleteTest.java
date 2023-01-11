@@ -19,7 +19,7 @@ package net.spy.memcached.collection.btree;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BTreeElement;
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;

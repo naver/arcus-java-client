@@ -39,8 +39,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -56,7 +56,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ArcusTimeoutMessageTest extends TestCase {
   private ArcusClient mc = null;
 
@@ -193,6 +193,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
       map.put(key + i, i);
     }
 
+    @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> f = mc.asyncSetBulk(map, 30);
 
     try {
@@ -219,6 +220,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
       map.put(key + i, i);
     }
 
+    @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> f = mc.asyncSetBulk(map, 30);
 
     try {

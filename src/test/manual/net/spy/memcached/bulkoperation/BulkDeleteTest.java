@@ -16,7 +16,7 @@
  */
 package net.spy.memcached.bulkoperation;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;

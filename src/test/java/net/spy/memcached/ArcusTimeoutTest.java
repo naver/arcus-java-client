@@ -30,7 +30,7 @@ import net.spy.memcached.ops.OperationStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-@RunWith(JUnit4ClassRunner.class)
+@RunWith(BlockJUnit4ClassRunner.class)
 public class ArcusTimeoutTest extends TestCase {
   private ArcusClient mc = null;
 
@@ -101,6 +101,7 @@ public class ArcusTimeoutTest extends TestCase {
     }
 
     String value = "MyValue";
+    @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, value);
     future.get(1L, TimeUnit.MILLISECONDS);
@@ -118,6 +119,7 @@ public class ArcusTimeoutTest extends TestCase {
 
     String value = "MyValue";
 
+    @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, value);
     future.get(1L, TimeUnit.MILLISECONDS);
