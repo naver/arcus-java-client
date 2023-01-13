@@ -124,7 +124,7 @@ class BulkService extends SpyObject {
 
     protected final int keyCount;
 
-    public BulkWorker(Collection keys, long timeout, ArcusClient[] clientList) {
+    public BulkWorker(Collection<?> keys, long timeout, ArcusClient[] clientList) {
       this.future = new ArrayList<Future<Boolean>>(keys.size());
       this.operationTimeout = timeout;
       this.clientList = clientList;
