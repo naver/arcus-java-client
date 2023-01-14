@@ -389,7 +389,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
   private void removeHash(MemcachedReplicaGroup group) {
     /* ENABLE_MIGRATION if */
+    /* DISABLE_AUTO_MIGRATION
     boolean callAutoLeaveAbort = false;
+    */
     if (migrationInProgress) {
       if (alterGroups.remove(group.getGroupName()) != null) {
         /* A leaving group is down or has left */
@@ -399,11 +401,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
       if (existGroups.remove(group.getGroupName()) != null) {
         /* An existing group is down */
+        /* DISABLE_AUTO_MIGRATION
         if (migrationType == MigrationType.JOIN) {
           automaticJoinCompletion(group);
         } else {
           callAutoLeaveAbort = true;
         }
+        */
       } else {
         /* A joined group is down : do nothing */
       }
@@ -425,9 +429,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
 
     /* ENABLE_MIGRATION if */
+    /* DISABLE_AUTO_MIGRATION
     if (callAutoLeaveAbort) {
       automaticLeaveAbort(group);
     }
+    */
     /* ENABLE_MIGRATION end */
   }
 
@@ -571,6 +577,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
   }
 
+  /* DISABLE_AUTO_MIGRATION
   private void automaticJoinCompletion(MemcachedReplicaGroup mine) {
     getLogger().info("Started automatic join completion. group=" + mine.getGroupName());
     for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
@@ -610,7 +617,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
 
       getLogger().info("Started automatic leave abort. group=" + mine.getGroupName());
-      /* abort (newBasePoint ~ migrationBasePoint) leaved hpoints */
+      // abort (newBasePoint ~ migrationBasePoint) leaved hpoints
       insertAlterHashRange(newBasePoint, migrationBasePoint, true); // inclusive: true
       migrationBasePoint = newBasePoint;
       if (migrationBasePoint == migrationLastPoint) {
@@ -620,6 +627,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       getLogger().info("Completed automatic leave abort. group=" + mine.getGroupName());
     }
   }
+  */
 
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {

@@ -277,7 +277,9 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private void removeHash(MemcachedNode node) {
     /* ENABLE_MIGRATION if */
+    /* DISABLE_AUTO_MIGRATION
     boolean callAutoLeaveAbort = false;
+    */
     if (migrationInProgress) {
       if (alterNodes.remove(node)) {
         /* A leaving node is down or has left */
@@ -287,11 +289,13 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       }
       if (existNodes.remove(node)) {
         /* An existing node is down */
+        /* DISABLE_AUTO_MIGRATION
         if (migrationType == MigrationType.JOIN) {
           automaticJoinCompletion(node);
         } else {
           callAutoLeaveAbort = true;
         }
+        */
       } else {
         /* A joined node is down : do nothing */
       }
@@ -315,9 +319,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config.removeNode(node);
 
     /* ENABLE_MIGRATION if */
+    /* DISABLE_AUTO_MIGRATION
     if (callAutoLeaveAbort) {
       automaticLeaveAbort(node);
     }
+    */
     /* ENABLE_MIGRATION end */
   }
 
@@ -461,6 +467,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     }
   }
 
+  /* DISABLE_AUTO_MIGRATION
   private void automaticJoinCompletion(MemcachedNode mine) {
     getLogger().info("Started automatic join completion. node=" + mine.getNodeName());
     for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
@@ -500,7 +507,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       }
 
       getLogger().info("Started automatic leave abort. node=" + mine.getNodeName());
-      /* abort (newBasePoint ~ migrationBasePoint) leaved hpoints */
+      // abort (newBasePoint ~ migrationBasePoint) leaved hpoints
       insertAlterHashRange(newBasePoint, migrationBasePoint, true); // inclusive: true
       migrationBasePoint = newBasePoint;
       if (migrationBasePoint == migrationLastPoint) {
@@ -510,6 +517,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       getLogger().info("Completed automatic leave abort. node=" + mine.getNodeName());
     }
   }
+  */
 
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {
