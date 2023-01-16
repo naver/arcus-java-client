@@ -76,28 +76,26 @@ public class TCPMemcachedNodeImplTest extends TestCase {
         4096
     );
 
-    List<Operation> fromOperations = new LinkedList<Operation>() {{
-        for (int i = 0; i < fromAllOpCount; i++) {
-          Operation op = factory.getOperationFactory().get(
-              "cacheKey=" + i,
-              new GetOperation.Callback() {
-                @Override
-                public void receivedStatus(OperationStatus status) {
-                }
+    List<Operation> fromOperations = new LinkedList<Operation>();
+    for (int i = 0; i < fromAllOpCount; i++) {
+      Operation op = factory.getOperationFactory().get(
+          "cacheKey=" + i,
+          new GetOperation.Callback() {
+            @Override
+            public void receivedStatus(OperationStatus status) {
+            }
 
-                @Override
-                public void gotData(String key, int flags, byte[] data) {
-                }
+            @Override
+            public void gotData(String key, int flags, byte[] data) {
+            }
 
-                @Override
-                public void complete() {
-                }
-              });
-          op.initialize();
-          add(op);
-        }
-      }
-    };
+            @Override
+            public void complete() {
+            }
+          });
+      op.initialize();
+      fromOperations.add(op);
+    }
 
     for (int i = 0; i < fromAllOpCount; i++) {
       if (fromNode.getReadQueueSize() < fromReadOpCount) {
