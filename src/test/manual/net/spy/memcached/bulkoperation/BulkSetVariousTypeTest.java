@@ -59,6 +59,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
         mc.delete(key[0]);
 
         // SET
+        @SuppressWarnings("deprecation")
         Future<Map<String, CollectionOperationStatus>> future = mc
                 .asyncSetBulk(Arrays.asList(key), 60, valueList[i]);
 
