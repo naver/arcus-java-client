@@ -163,7 +163,6 @@ public class ArcusTimeoutMessageTest extends TestCase {
   @Test
   public void storeWithoutBulkMessage() {
     String key = "KEY";
-    int keySize = 100;
     String value = "value";
 
     OperationFuture<Boolean> f
@@ -185,7 +184,6 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void setBulkWithBulkMessage() {
     String key = "KEY";
     int keySize = 100;
-    String value = "value";
 
     Map<String, Object> map = new HashMap<String, Object>();
 
@@ -212,7 +210,6 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void setBulkWithoutBulkMessage() {
     String key = "KEY";
     int keySize = 1;
-    String value = "value";
 
     Map<String, Object> map = new HashMap<String, Object>();
 
