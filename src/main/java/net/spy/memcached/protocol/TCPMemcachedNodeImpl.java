@@ -687,15 +687,13 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   @Override
   public String getStatus() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("#Tops=").append(addOpCount);
-    sb.append(" #iq=").append(getInputQueueSize());
-    sb.append(" #Wops=").append(getWriteQueueSize());
-    sb.append(" #Rops=").append(getReadQueueSize());
-    sb.append(" #CT=").append(getContinuousTimeout());
-    sb.append(" #TD=").append(getTimeoutDuration());
-    sb.append(" #TR=").append(getTimeoutRatioNow());
-    return sb.toString();
+    return "#Tops=" + addOpCount +
+        " #iq=" + getInputQueueSize() +
+        " #Wops=" + getWriteQueueSize() +
+        " #Rops=" + getReadQueueSize() +
+        " #CT=" + getContinuousTimeout() +
+        " #TD=" + getTimeoutDuration() +
+        " #TR=" + getTimeoutRatioNow();
   }
 
   private void resetOperation(Operation o) {
