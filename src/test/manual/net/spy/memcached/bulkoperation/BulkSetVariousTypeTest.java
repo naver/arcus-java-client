@@ -32,7 +32,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
   private static class MyBean implements Serializable {
     private static final long serialVersionUID = -5977830942924286134L;
 
-    private String name;
+    private final String name;
 
     public MyBean(String name) {
       this.name = name;
