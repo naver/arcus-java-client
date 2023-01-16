@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MopServerMessageTest extends BaseIntegrationTest {
 
-  private String key = "MopServerMessageTest";
+  private final String key = "MopServerMessageTest";
 
   @Override
   protected void setUp() throws Exception {

@@ -49,7 +49,7 @@ import net.spy.memcached.ops.OperationState;
 public abstract class TCPMemcachedNodeImpl extends SpyObject
         implements MemcachedNode {
 
-  private String name;
+  private final String name;
   private SocketAddress socketAddress;
   private final ByteBuffer rbuf;
   private final ByteBuffer wbuf;
@@ -83,7 +83,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private int toCountIdx;         /* to count array index */
   private int toRatioMax;         /* maximum timeout ratio */
   private int toRatioNow;         /* current timeout ratio */
-  private Lock toRatioLock = new ReentrantLock();
+  private final Lock toRatioLock = new ReentrantLock();
 
   /* # of operations added into inputQueue as a hint.
    * If we need a correct count, AtomicLong object must be used.
