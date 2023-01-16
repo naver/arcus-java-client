@@ -18,7 +18,6 @@ package net.spy.memcached.emptycollection;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -258,8 +257,8 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertTrue(Arrays.equals(value, (byte[]) map.get(BKEY)
-              .getValue()));
+      Assert.assertArrayEquals(value, (byte[]) map.get(BKEY)
+          .getValue());
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -283,7 +282,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertTrue(value.equals(map.get(BKEY).getValue()));
+      Assert.assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
