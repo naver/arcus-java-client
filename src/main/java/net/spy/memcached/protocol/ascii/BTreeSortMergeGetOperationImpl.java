@@ -329,7 +329,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           } else if (count < lineCount) {
             // <key> [<cause>]\r\n
             String line = new String(byteBuffer.toByteArray());
-            String chunk[] = line.split(" ");
+            String[] chunk = line.split(" ");
             if (chunk.length == 2) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
                       .gotMissedKey(chunk[0], matchStatus(chunk[1],
