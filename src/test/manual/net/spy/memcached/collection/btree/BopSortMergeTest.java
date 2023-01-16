@@ -36,20 +36,17 @@ import java.util.concurrent.TimeUnit;
 
 public class BopSortMergeTest extends BaseIntegrationTest {
 
-  private List<String> keyList3 = new ArrayList<String>() {
-    {
-      add("key0");
-      add("key1");
-      add("key2");
-    }
-  };
+  private final List<String> keyList3 = new ArrayList<String>();
+  private final List<String> keyList2 = new ArrayList<String>();
 
-  private List<String> keyList2 = new ArrayList<String>() {
-    {
-      add("key0");
-      add("key1");
-    }
-  };
+  public BopSortMergeTest() {
+    keyList3.add("key0");
+    keyList3.add("key1");
+    keyList3.add("key2");
+
+    keyList2.add("key0");
+    keyList2.add("key1");
+  }
 
   @Override
   protected void setUp() throws Exception {
