@@ -358,9 +358,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String key = "key";
     int valueCount = 500;
     Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "MyValue";
-    }
+    Arrays.fill(valueList, "MyValue");
 
     // SET
     Future<Map<Integer, CollectionOperationStatus>> f = mc.asyncLopPipedInsertBulk(
