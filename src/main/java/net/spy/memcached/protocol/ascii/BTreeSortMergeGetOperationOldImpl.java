@@ -217,8 +217,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
     }
 
     if (lookingFor == '\0' && readOffset == data.length) {
-      BTreeSortMergeGetOperationOld.Callback cb =
-          (BTreeSortMergeGetOperationOld.Callback) getCallback();
+      Callback cb = (Callback) getCallback();
       cb.gotData(smGet.getKey(), smGet.getFlags(), smGet.getSubkey(), smGet.getEflag(), data);
       lookingFor = '\r';
     }
@@ -271,8 +270,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
             transitionState(OperationState.COMPLETE);
             return;
           } else {
-            ((BTreeSortMergeGetOperationOld.Callback) getCallback())
-                    .gotMissedKey(byteBuffer.toByteArray());
+            ((Callback) getCallback()).gotMissedKey(byteBuffer.toByteArray());
           }
           byteBuffer.reset();
         } else {

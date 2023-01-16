@@ -255,7 +255,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     }
 
     if (lookingFor == '\0' && readOffset == data.length && count < lineCount) {
-      BTreeSortMergeGetOperation.Callback cb = (BTreeSortMergeGetOperation.Callback) getCallback();
+      Callback cb = (Callback) getCallback();
       cb.gotData(smGet.getKey(), smGet.getFlags(), smGet.getSubkey(), smGet.getEflag(), data);
       lookingFor = '\r';
     }
@@ -331,7 +331,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             String line = new String(byteBuffer.toByteArray());
             String chunk[] = line.split(" ");
             if (chunk.length == 2) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                       .gotMissedKey(chunk[0], matchStatus(chunk[1],
                               NOT_FOUND, UNREADABLE, OUT_OF_RANGE));
               /* ENABLE_MIGRATION if */
@@ -339,7 +339,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
               addRedirectMultiKeyOperation(getNotMyKey(line), chunk[0]);
               /* ENABLE_MIGRATION end */
             } else {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                       .gotMissedKey(chunk[0], new CollectionOperationStatus(false,
                               "UNDEFINED", CollectionResponse.UNDEFINED));
             }
@@ -397,10 +397,10 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             String[] chunk = new String(byteBuffer.toByteArray())
                     .split(" ");
             if (smGet instanceof BTreeSMGetWithLongTypeBkey) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                   .gotTrimmedKey(chunk[0], Long.parseLong(chunk[1]));
             } else if (smGet instanceof BTreeSMGetWithByteTypeBkey) {
-              ((BTreeSortMergeGetOperation.Callback) getCallback())
+              ((Callback) getCallback())
                   .gotTrimmedKey(chunk[0],
                       BTreeUtil.hexStringToByteArrays(chunk[1].substring(2)));
             }
