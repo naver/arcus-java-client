@@ -45,6 +45,18 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
       }
       return false;
     }
+
+    @Override
+    public int hashCode() {
+      return toString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return "MyBean{" +
+          "name='" + name + '\'' +
+          '}';
+    }
   }
 
   public void testInsertAndGet() {
