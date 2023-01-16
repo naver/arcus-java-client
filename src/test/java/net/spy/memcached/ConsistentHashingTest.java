@@ -29,7 +29,7 @@ public class ConsistentHashingTest extends TestCase {
    * Simulate dropping from (totalNodes) to (totalNodes-1).
    * Ensure hashing is consistent between the the two scenarios.
    *
-   * @param totalNodes
+   * @param totalNodes totalNodes
    */
   private void runThisManyNodes(final int totalNodes) {
     final String[] stringNodes = generateAddresses(totalNodes);
