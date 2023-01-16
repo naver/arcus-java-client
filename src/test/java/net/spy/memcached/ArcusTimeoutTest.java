@@ -100,10 +100,9 @@ public class ArcusTimeoutTest extends TestCase {
       keys[i] = "MyKey" + i;
     }
 
-    String value = "MyValue";
     @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, value);
+            Arrays.asList(keys), 60, "MyValue");
     future.get(1L, TimeUnit.MILLISECONDS);
   }
 
@@ -117,11 +116,9 @@ public class ArcusTimeoutTest extends TestCase {
       keys[i] = "MyKey" + i;
     }
 
-    String value = "MyValue";
-
     @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, value);
+            Arrays.asList(keys), 60, "MyValue");
     future.get(1L, TimeUnit.MILLISECONDS);
   }
 

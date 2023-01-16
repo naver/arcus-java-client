@@ -71,7 +71,6 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
   protected int spaceCount = 0;
 
   protected int readState = 0; // 0 : value, 1 : missed keys
-  private int processedValueCount = 0;
 
   public BTreeSortMergeGetOperationOldImpl(BTreeSMGet<?> smGet,
                                            OperationCallback cb) {
@@ -157,7 +156,6 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
             data = new byte[smGet.getDataLength()];
             byteBuffer.reset();
             spaceCount = 0;
-            processedValueCount++;
             break;
           }
         }
