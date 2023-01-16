@@ -97,12 +97,12 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
       // System.out.println(map2.size());
       Assert.assertTrue(map2.isEmpty());
 
-      for (int i = 0; i < elementCount; i++) {
+      for (long i = 0; i < elementCount; i++) {
         assertEquals(
                 "updated" + i,
                 mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
                         false, false).get(1000L, TimeUnit.MILLISECONDS)
-                        .get(new Long(i)).getValue());
+                        .get(i).getValue());
       }
 
     } catch (Exception e) {
@@ -136,11 +136,11 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
       // System.out.println(map2.size());
       Assert.assertTrue(map2.isEmpty());
 
-      for (int i = 0; i < elementCount; i++) {
+      for (long i = 0; i < elementCount; i++) {
         Element<Object> element = mc
                 .asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
                         false, false).get(1000L, TimeUnit.MILLISECONDS)
-                .get(new Long(i));
+                .get(i);
 
         // System.out.println(element.getFlagByHex());
         assertEquals("value" + i, element.getValue());
@@ -174,11 +174,11 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
       // System.out.println(map2.size());
       Assert.assertTrue(map2.isEmpty());
 
-      for (int i = 0; i < elementCount; i++) {
+      for (long i = 0; i < elementCount; i++) {
         Element<Object> element = mc
                 .asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
                         false, false).get(1000L, TimeUnit.MILLISECONDS)
-                .get(new Long(i));
+                .get(i);
 
         // System.out.println(element.getFlagByHex());
         assertEquals("value" + i, element.getValue());
@@ -223,12 +223,12 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, map2.get(0)
               .getResponse());
 
-      for (int i = 600; i < elementCount; i++) {
+      for (long i = 600; i < elementCount; i++) {
         assertEquals(
                 "updated" + i,
                 mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
                         false, false).get(1000L, TimeUnit.MILLISECONDS)
-                        .get(new Long(i)).getValue());
+                        .get(i).getValue());
       }
 
     } catch (Exception e) {
