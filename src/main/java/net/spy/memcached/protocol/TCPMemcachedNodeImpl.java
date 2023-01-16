@@ -234,7 +234,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   // Prepare the pending operations.  Return true if there are any pending
   // ops
-  private boolean preparePending() {
+  private void preparePending() {
     // Copy the input queue into the write queue.
     copyInputQueue();
 
@@ -245,7 +245,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       removeCurrentWriteOp();
       nextOp = getCurrentWriteOp();
     }
-    return nextOp != null;
   }
 
   public final void fillWriteBuffer(boolean shouldOptimize) {
