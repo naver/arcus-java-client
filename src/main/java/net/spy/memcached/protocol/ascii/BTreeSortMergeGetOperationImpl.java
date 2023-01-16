@@ -178,7 +178,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           // Adjust space count if item header has a element flag.
           String[] chunk = new String(byteBuffer.toByteArray())
                   .split(" ");
-          if (chunk.length == smGet.headerCount) {
+          if (chunk.length == BTreeSMGet.headerCount) {
             if (chunk[3].startsWith("0x")) {
               spaceCount--;
             }
