@@ -87,7 +87,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
         // GET
         Object v = mc.get(key[0]);
-        Assert.assertEquals(String.format("K=%s, V=%s", key, v),
+        Assert.assertEquals(String.format("K=%s, V=%s", Arrays.toString(key), v),
                 valueList[i], v);
       }
     } catch (Exception e) {
