@@ -698,6 +698,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return sb.toString();
   }
 
+  @SuppressWarnings("fallthrough")
   private void resetOperation(Operation o) {
     switch (o.getState()) {
       case WRITING:
