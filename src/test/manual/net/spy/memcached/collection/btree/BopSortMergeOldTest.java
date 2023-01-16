@@ -50,12 +50,12 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    for (int i = 0; i < keyList3.size(); i++) {
-      mc.delete(keyList3.get(i));
+    for (String s : keyList3) {
+      mc.delete(s);
     }
 
-    for (int i = 0; i < keyList2.size(); i++) {
-      mc.delete(keyList2.get(i));
+    for (String s : keyList2) {
+      mc.delete(s);
     }
   }
 

@@ -168,7 +168,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     // Decode a collection data header.
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Handle spaces.
@@ -287,7 +287,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
   private final void readMissedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Ready to finish.
@@ -366,7 +366,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
   private final void readTrimmedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.remaining() > 0) {
         byte b = bb.get();
 
         // Ready to finish.
