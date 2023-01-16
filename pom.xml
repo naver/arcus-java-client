@@ -129,6 +129,14 @@
                     <debug>true</debug>
                     <optimize>true</optimize>
                     <encoding>utf-8</encoding>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-options</arg> <!-- For warning about old java version 6. -->
+                        <arg>-Xlint:-processing</arg> <!-- For meaningless warning about annotations -->
+                        <arg>-Werror</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
