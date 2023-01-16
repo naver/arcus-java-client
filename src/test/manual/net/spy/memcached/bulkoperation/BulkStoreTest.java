@@ -68,6 +68,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       try {
         mc.asyncStoreBulk(StoreType.set, null, 60);
       } catch (Exception e) {
+        e.printStackTrace();
         assertEquals("Map is null.", e.getMessage());
       }
 
@@ -124,6 +125,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       try {
         mc.asyncStoreBulk(StoreType.set, null, 60, value);
       } catch (Exception e) {
+        e.printStackTrace();
         assertEquals("Key list is null.", e.getMessage());
       }
 
