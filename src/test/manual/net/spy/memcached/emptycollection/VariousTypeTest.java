@@ -342,26 +342,42 @@ public class VariousTypeTest extends BaseIntegrationTest {
 
       UserDefinedClass c = (UserDefinedClass) o;
 
-      boolean eq = this.i == c.i;
-
-      if (this.list == null && c.list == null) {
-        return eq;
+      if (this.i != c.i) {
+        return false;
       }
 
-      eq &= this.list.size() == c.list.size();
+      if (this.list == null && c.list == null) {
+        return true;
+      }
 
-      if (!eq) {
-        return eq;
+      if (this.list == null || c.list == null) {
+        return false;
+      }
+
+      if (this.list.size() != c.list.size()) {
+        return false;
       }
 
       for (int i = 0; i < this.list.size(); i++) {
-        eq &= this.list.get(i).equals(c.list.get(i));
-        if (!eq) {
-          return eq;
+        if (!this.list.get(i).equals(c.list.get(i))) {
+          return false;
         }
       }
 
-      return eq;
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return toString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return "UserDefinedClass{" +
+          "i=" + i +
+          ", list=" + list +
+          '}';
     }
   }
 }
