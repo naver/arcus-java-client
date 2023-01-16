@@ -6,7 +6,7 @@ import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.SLF4JLogger;
 import net.spy.memcached.compat.log.SunLogger;
 
-public class LoggerSetter {
+public final class LoggerSetter {
   private LoggerSetter() {}
 
   public static <T extends Logger> void setLogger(Class<T> logger) {
