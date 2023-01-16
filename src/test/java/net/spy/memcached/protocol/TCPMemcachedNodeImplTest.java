@@ -29,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Test the TCPMemcachedNodeImpl
@@ -52,7 +53,7 @@ public class TCPMemcachedNodeImplTest extends TestCase {
       throws Exception {
     Field field = TCPMemcachedNodeImpl.class.getDeclaredField("addOpCount");
     field.setAccessible(true);
-    return field.getLong(node);
+    return ((AtomicLong) field.get(node)).get();
   }
 
   public void testMoveOperations() throws Exception {
