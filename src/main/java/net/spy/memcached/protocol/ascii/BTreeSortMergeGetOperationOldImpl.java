@@ -141,8 +141,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
         if (b == ' ') {
 
           // Adjust space count if item header has a element flag.
-          String[] chunk = new String(byteBuffer.toByteArray())
-                  .split(" ");
+          String[] chunk = byteBuffer.toString().split(" ");
           if (chunk.length == BTreeSMGet.headerCount) {
             if (chunk[3].startsWith("0x")) {
               spaceCount--;
@@ -151,8 +150,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
 
           spaceCount++;
           if (smGet.headerReady(spaceCount)) {
-            smGet.decodeItemHeader(new String(byteBuffer
-                    .toByteArray()));
+            smGet.decodeItemHeader(byteBuffer.toString());
             data = new byte[smGet.getDataLength()];
             byteBuffer.reset();
             spaceCount = 0;
@@ -168,8 +166,7 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
         // Finish the operation.
         if (b == '\n') {
 
-          if ((new String(byteBuffer.toByteArray()))
-                  .startsWith("MISSED_KEYS")) {
+          if ((byteBuffer.toString()).startsWith("MISSED_KEYS")) {
             readState = 1;
             byteBuffer.reset();
             spaceCount = 0;
