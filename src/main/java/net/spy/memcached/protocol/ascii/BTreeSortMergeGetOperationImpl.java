@@ -175,8 +175,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
         if (b == ' ') {
 
           // Adjust space count if item header has a element flag.
-          String[] chunk = new String(byteBuffer.toByteArray())
-                  .split(" ");
+          String[] chunk = byteBuffer.toString().split(" ");
           if (chunk.length == BTreeSMGet.headerCount) {
             if (chunk[3].startsWith("0x")) {
               spaceCount--;
@@ -186,8 +185,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           spaceCount++;
           if (smGet.headerReady(spaceCount)) {
             // <key> <flags> <bkey> [<eflag>] <bytes> <data>\r\n
-            smGet.decodeItemHeader(new String(byteBuffer
-                    .toByteArray()));
+            smGet.decodeItemHeader(byteBuffer.toString());
             data = new byte[smGet.getDataLength()];
             byteBuffer.reset();
             spaceCount = 0;
@@ -202,7 +200,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
         // Finish the operation.
         if (b == '\n') {
-          String sep = new String(byteBuffer.toByteArray());
+          String sep = byteBuffer.toString();
           if (sep.startsWith("MISSED_KEYS")) {
             readState = ReadState.MISSED_KEYS;
             byteBuffer.reset();
@@ -297,7 +295,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
         // Finish the operation.
         if (b == '\n') {
-          String sep = new String(byteBuffer.toByteArray());
+          String sep = byteBuffer.toString();
           if (sep.startsWith("TRIMMED_KEYS")) {
             readState = ReadState.TRIMMED_KEYS;
             byteBuffer.reset();
@@ -326,7 +324,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           } else if (count < lineCount) {
             // <key> [<cause>]\r\n
-            String line = new String(byteBuffer.toByteArray());
+            String line = byteBuffer.toString();
             String[] chunk = line.split(" ");
             if (chunk.length == 2) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
@@ -392,8 +390,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
             return;
           } else if (count < lineCount) {
             // <key> <bkey>\r\n
-            String[] chunk = new String(byteBuffer.toByteArray())
-                    .split(" ");
+            String[] chunk = byteBuffer.toString().split(" ");
             if (smGet instanceof BTreeSMGetWithLongTypeBkey) {
               ((BTreeSortMergeGetOperation.Callback) getCallback())
                   .gotTrimmedKey(chunk[0], Long.parseLong(chunk[1]));
