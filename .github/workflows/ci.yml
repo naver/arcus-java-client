@@ -18,14 +18,9 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-        cache: maven
+        cache: 'maven'
     - name: Install ARCUS Dependencies
       run: sudo apt-get install -qq build-essential autoconf automake libtool libcppunit-dev python-setuptools python-dev ant
-    - name: Cache Maven Dependencies
-      uses: actions/cache@v3.0.0
-      with:
-        path: ~/.m2
-        key: ${{runner.os}}-maven
     - name: Cache ARCUS Directory
       id: arcus-cache
       uses: actions/cache@v3.0.0
