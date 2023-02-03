@@ -17,6 +17,7 @@
 package net.spy.memcached;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import net.spy.memcached.compat.SpyObject;
 
@@ -43,6 +44,8 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
   private final CacheMonitorListener listener;
 
+  private final CountDownLatch clientInitLatch;
+
   /**
    * Constructor
    *
@@ -51,18 +54,29 @@ public class CacheMonitor extends SpyObject implements Watcher,
    * @param serviceCode     service code (or cloud name) to identify each cloud
    * @param listener        Callback listener
    */
-  public CacheMonitor(ZooKeeper zk, String cacheListZPath, String serviceCode,
-                      CacheMonitorListener listener) {
+  public CacheMonitor(ZooKeeper zk, String cacheListZPath,
+                      String serviceCode, boolean startup,
+                      CacheMonitorListener listener) throws InterruptedException {
     this.zk = zk;
     this.cacheListZPath = cacheListZPath;
     this.serviceCode = serviceCode;
     this.listener = listener;
+
+    if (startup) {
+      this.clientInitLatch = new CountDownLatch(1);
+    } else {
+      this.clientInitLatch = new CountDownLatch(0);
+    }
 
     getLogger().info("Initializing the CacheMonitor.");
 
     // Get the cache list from the Arcus admin asynchronously.
     // Returning list would be processed in processResult().
     asyncGetCacheList();
+
+    if (startup) {
+      this.clientInitLatch.await();
+    }
   }
 
   /**
@@ -98,33 +112,43 @@ public class CacheMonitor extends SpyObject implements Watcher,
    */
   public void processResult(int rc, String path, Object ctx,
                             List<String> children) {
+    boolean countDown = false;
+
     switch (Code.get(rc)) {
       case OK:
         listener.commandCacheListChange(children);
-        return;
+        countDown = true;
+        break;
       case NONODE:
         getLogger().fatal(
             "Cannot find your service code. Please contact Arcus support to solve this problem. "
             + getInfo());
-        return;
+        countDown = true;
+        break;
       case SESSIONEXPIRED:
         getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
         shutdown();
-        return;
+        countDown = true;
+        break;
       case NOAUTH:
         getLogger().fatal("Authorization failed " + getInfo());
         shutdown();
-        return;
+        countDown = true;
+        break;
       case CONNECTIONLOSS:
         getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
         asyncGetCacheList();
-        return;
+        break;
       default:
         getLogger().warn(
             "Ignoring an unexpected event from the Arcus admin. code="
             + Code.get(rc) + ", " + getInfo());
         asyncGetCacheList();
-        return;
+        break;
+    }
+
+    if (countDown && clientInitLatch.getCount() == 1) {
+      clientInitLatch.countDown();
     }
   }
 
