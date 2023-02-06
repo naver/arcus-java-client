@@ -50,7 +50,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
     children = new ArrayList<String>();
 
     cacheMonitor = new CacheMonitor(zooKeeper, ARCUS_BASE_CACHE_LIST_ZPATH,
-            serviceCode, (CacheMonitorListener) listener.proxy());
+            serviceCode, true, (CacheMonitorListener) listener.proxy());
   }
 
   @Override

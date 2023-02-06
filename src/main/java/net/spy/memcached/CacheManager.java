@@ -73,8 +73,6 @@ public class CacheManager extends SpyThread implements Watcher,
 
   private ArcusClient[] client;
 
-  private final CountDownLatch clientInitLatch;
-
   private final ConnectionFactoryBuilder cfb;
 
   private final int waitTimeForConnect;
@@ -103,17 +101,11 @@ public class CacheManager extends SpyThread implements Watcher,
     this.poolSize = poolSize;
     this.waitTimeForConnect = waitTimeForConnect;
 
-    this.clientInitLatch = new CountDownLatch(1);
-    initZooKeeperClient();
-    try {
-      clientInitLatch.await();
-      if (client == null) { // initArcusClient() failure
-        shutdownZooKeeperClient();
-        throw new InitializeClientException("Can't initialize Arcus client.");
-      }
-    } catch (InterruptedException e) {
+    initZooKeeperClient(true);
+
+    if (this.client == null) { // initArcusClient() failure
       shutdownZooKeeperClient();
-      throw new InitializeClientException("Can't initialize Arcus client.", e);
+      throw new InitializeClientException("Can't initialize Arcus client.");
     }
 
     setName("Cache Manager IO for " + serviceCode + "@" + hostPort);
@@ -167,7 +159,7 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
-  private void initZooKeeperClient() {
+  private void initZooKeeperClient(boolean startup) {
     getLogger().info("Trying to connect to Arcus admin(%s@%s)", serviceCode, zkConnectString);
     connectZooKeeper();
     try {
@@ -179,6 +171,10 @@ public class CacheManager extends SpyThread implements Watcher,
       } else {
       /* ENABLE_REPLICATION end */
         if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
+          /* ENABLE_REPLICATION if */
+          arcusReplEnabled = false;
+          cfb.internalArcusReplEnabled(false);
+          /* ENABLE_REPLICATION end */
           getLogger().info("Connected to Arcus cluster (seriveCode=%s)", serviceCode);
         } else {
           getLogger().fatal("Service code not found. (%s)", serviceCode);
@@ -190,14 +186,14 @@ public class CacheManager extends SpyThread implements Watcher,
       if (path.isEmpty()) {
         getLogger().fatal("Can't create the znode of client info (" + path + ")");
         throw new InitializeClientException("Can't create client info");
-      } else {
-        if (zk.exists(path, false) == null) {
-          zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-        }
+      }
+
+      if (zk.exists(path, false) == null) {
+        zk.create(path, null, Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
       }
 
       // create the cache monitor
-      cacheMonitor = new CacheMonitor(zk, getCacheListZPath(), serviceCode, this);
+      cacheMonitor = new CacheMonitor(zk, getCacheListZPath(), serviceCode, startup, this);
     } catch (NotExistsServiceCodeException e) {
       shutdownZooKeeperClient();
       throw e;
@@ -279,20 +275,13 @@ public class CacheManager extends SpyThread implements Watcher,
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
-        if (!cacheMonitor.isDead()) {
-          try {
-            wait();
-          } catch (InterruptedException e) {
-            getLogger().warn("Cache mananger thread is interrupted while wait: %s",
-                e.getMessage());
-          }
-        } else {
+        if (cacheMonitor.isDead()) {
           long retrySleepTime = 0;
           try {
             getLogger().warn("Unexpected disconnection from Arcus admin. " +
-                    "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
+                "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
             shutdownZooKeeperClient();
-            initZooKeeperClient();
+            initZooKeeperClient(false);
           } catch (AdminConnectTimeoutException e) {
             retrySleepTime = 1000L; // 1 second
           } catch (NotExistsServiceCodeException e) {
@@ -302,16 +291,24 @@ public class CacheManager extends SpyThread implements Watcher,
           } catch (Exception e) {
             retrySleepTime = 1000L; // 1 second
             getLogger().warn("upexpected exception is caught while reconnet to Arcus admin: %s",
-                             e.getMessage());
+                e.getMessage());
           }
           if (retrySleepTime > 0) { // retry is needed
             try {
               Thread.sleep(retrySleepTime);
             } catch (InterruptedException e) {
               getLogger().warn("Cache mananger thread is interrupted while sleep: %s",
-                               e.getMessage());
+                  e.getMessage());
             }
           }
+          continue;
+        }
+
+        try {
+          wait();
+        } catch (InterruptedException e) {
+          getLogger().warn("Cache mananger thread is interrupted while wait: %s",
+              e.getMessage());
         }
       }
     }
@@ -381,7 +378,6 @@ public class CacheManager extends SpyThread implements Watcher,
       if (!addrs.isEmpty()) {
         initArcusClient(addrs);
       }
-      this.clientInitLatch.countDown();
       return;
     }
 
