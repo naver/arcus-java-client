@@ -123,6 +123,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
         getLogger().fatal(
             "Cannot find your service code. Please contact Arcus support to solve this problem. "
             + getInfo());
+        shutdown();
         countDown = true;
         break;
       case SESSIONEXPIRED:
