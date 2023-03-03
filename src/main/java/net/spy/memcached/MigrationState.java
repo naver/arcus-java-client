@@ -4,6 +4,5 @@ public enum MigrationState {
   UNKNOWN,
   BEGIN,
   PREPARED,
-  PROGRESS,
   DONE
 }

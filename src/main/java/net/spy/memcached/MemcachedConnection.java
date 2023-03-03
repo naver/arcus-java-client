@@ -106,6 +106,7 @@ public final class MemcachedConnection extends SpyObject {
   private boolean arcusMigrEnabled = false;
   private MigrationType mgType = MigrationType.UNKNOWN;
   private MigrationState mgState = MigrationState.UNKNOWN;
+  private boolean mgInProgress = false;
   /* ENABLE_MIGRATION end */
 
   /* ENABLE_REPLICATION if */
@@ -169,6 +170,9 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   void setMigrationTypeAndState(MigrationType type, MigrationState state) {
+    if (state != this.mgState && state == MigrationState.PREPARED) {
+      this.mgInProgress = false;
+    }
     this.mgType = type;
     this.mgState = state;
   }
@@ -704,16 +708,19 @@ public final class MemcachedConnection extends SpyObject {
     if (!alterNodesChangeQueue.isEmpty()) {
       String addrs = alterNodesChangeQueue.poll();
       if (mgState == MigrationState.PREPARED) {
-        /* prepare connections of alter nodes */
-        prepareAlterConnections(convertToSocketAddresses(addrs));
-        mgState = MigrationState.PROGRESS;
-      } else if (mgState == MigrationState.PROGRESS) {
-        /* check joining node down */
-        updateAlterConnections(convertToSocketAddresses(addrs));
+        if (!mgInProgress) {
+          /* prepare connections of alter nodes */
+          prepareAlterConnections(convertToSocketAddresses(addrs));
+          mgInProgress = true;
+        } else {
+          /* check joining node down */
+          updateAlterConnections(convertToSocketAddresses(addrs));
+        }
       }
       if (addrs.isEmpty()) { // end of migration
         this.mgType = MigrationType.UNKNOWN;
         this.mgState = MigrationState.UNKNOWN;
+        this.mgInProgress = false;
       }
     }
   }
