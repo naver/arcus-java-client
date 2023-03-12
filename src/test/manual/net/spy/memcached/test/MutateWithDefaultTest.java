@@ -29,7 +29,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    mc.delete(key);
+    mc.delete(key).get();
   }
 
   public void testIncr() {

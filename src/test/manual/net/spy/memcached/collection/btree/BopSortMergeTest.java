@@ -52,10 +52,10 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   protected void setUp() throws Exception {
     super.setUp();
     for (String s : keyList3) {
-      mc.delete(s);
+      mc.delete(s).get();
     }
     for (String s : keyList2) {
-      mc.delete(s);
+      mc.delete(s).get();
     }
   }
 

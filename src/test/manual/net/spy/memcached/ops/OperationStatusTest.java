@@ -9,7 +9,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    mc.flush();
+    mc.flush().get();
   }
 
   public void testStore_success() throws Exception {
