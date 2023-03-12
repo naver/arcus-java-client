@@ -29,7 +29,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true);
+    mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true).get();
   }
 
   public void testAfterSuccess() throws Exception {

@@ -42,7 +42,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   protected void setUp() throws Exception {
     super.setUp();
     keyList.add(key);
-    mc.delete(key);
+    mc.delete(key).get();
       // mc.asyncBopDelete(key, 0, 20000, ElementFlagFilter.DO_NOT_FILTER,
       // 0, true).get(1000, TimeUnit.MILLISECONDS);
   }
