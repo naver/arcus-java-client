@@ -62,13 +62,13 @@ public class CacheMonitor extends SpyObject implements Watcher,
     this.serviceCode = serviceCode;
     this.listener = listener;
 
+    getLogger().info("Initializing the CacheMonitor.");
+
     if (startup) {
       this.clientInitLatch = new CountDownLatch(1);
     } else {
       this.clientInitLatch = new CountDownLatch(0);
     }
-
-    getLogger().info("Initializing the CacheMonitor.");
 
     // Get the cache list from the Arcus admin asynchronously.
     // Returning list would be processed in processResult().
@@ -112,43 +112,41 @@ public class CacheMonitor extends SpyObject implements Watcher,
    */
   public void processResult(int rc, String path, Object ctx,
                             List<String> children) {
-    boolean countDown = false;
+    boolean doCountDown = true;
 
     switch (Code.get(rc)) {
       case OK:
         listener.commandCacheListChange(children);
-        countDown = true;
         break;
       case NONODE:
         getLogger().fatal(
             "Cannot find your service code. Please contact Arcus support to solve this problem. "
             + getInfo());
         shutdown();
-        countDown = true;
         break;
       case SESSIONEXPIRED:
         getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
         shutdown();
-        countDown = true;
         break;
       case NOAUTH:
         getLogger().fatal("Authorization failed " + getInfo());
         shutdown();
-        countDown = true;
         break;
       case CONNECTIONLOSS:
         getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
         asyncGetCacheList();
+        doCountDown = false;
         break;
       default:
         getLogger().warn(
             "Ignoring an unexpected event from the Arcus admin. code="
             + Code.get(rc) + ", " + getInfo());
         asyncGetCacheList();
+        doCountDown = false;
         break;
     }
 
-    if (countDown && clientInitLatch.getCount() == 1) {
+    if (doCountDown && clientInitLatch.getCount() > 0) {
       clientInitLatch.countDown();
     }
   }
@@ -185,6 +183,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
     if (zk != null) {
       zkSessionId = "0x" + Long.toHexString(zk.getSessionId());
     }
-    return "[serviceCode=" + serviceCode + ", adminSessionId=" + zkSessionId + "]";
+    return "[monitor=CacheMonitor" +
+        ", serviceCode=" + serviceCode +
+        ", adminSessionId=" + zkSessionId + "]";
   }
+
 }
