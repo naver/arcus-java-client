@@ -159,15 +159,8 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
     // Insert more than maxcount
     for (int i = 1; i <= maxcount + 10; i++) {
-      /*
-       * Set log level to DEBUG temporarily to dig issue below.
-       * https://github.com/naver/arcus-java-client/issues/534
-       * Remove Configurator.setRootLevel() and this comment when issue have resolved.
-       */
-      Configurator.setRootLevel(Level.TRACE);
       assertTrue(mc.asyncBopInsert(key, i, null, "item" + i, null).get(
               1000, TimeUnit.MILLISECONDS));
-      Configurator.setRootLevel(Level.INFO);
     }
 
     Map<Long, Element<Object>> result = mc.asyncBopGet(key, 0,
