@@ -41,7 +41,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
     // Test
     for (int maxcount = 50000; maxcount <= 10000; maxcount += 1000) {
       // Create a B+ Tree
-      mc.asyncSopInsert(key, "item0", new CollectionAttributes());
+      mc.asyncSopInsert(key, "item0", new CollectionAttributes()).get();
 
       // Set maxcount
       CollectionAttributes attrs = new CollectionAttributes();
@@ -73,7 +73,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
   public void testSopGet_AvailableOverflowAction() throws Exception {
     // Create a set
-    mc.asyncSopInsert(key, "item0", new CollectionAttributes());
+    mc.asyncSopInsert(key, "item0", new CollectionAttributes()).get();
 
     // Set OverflowAction
     // error

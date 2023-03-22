@@ -42,7 +42,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
     // Test
     for (int maxcount = 100; maxcount <= 200; maxcount += 100) {
       // Create a map
-      mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes());
+      mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
 
       // Set maxcount
       CollectionAttributes attrs = new CollectionAttributes();
@@ -65,7 +65,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
 
   public void testMopGet_Overflow() throws Exception {
     // Create a map
-    mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes());
+    mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -95,7 +95,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
 
   public void testMopGet_AvailableOverflowAction() throws Exception {
     // Create a set
-    mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes());
+    mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
 
     // Set OverflowAction
     // error

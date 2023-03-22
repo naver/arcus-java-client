@@ -40,7 +40,7 @@ public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
             true).get();
 
     // Create a B+ Tree
-    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
     int maxcount = 10;
 

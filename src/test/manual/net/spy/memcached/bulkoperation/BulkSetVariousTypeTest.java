@@ -68,7 +68,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
       for (int i = 0; i < valueList.length; i++) {
         String[] key = new String[]{keyPrefix + i};
         // REMOVE
-        mc.delete(key[0]);
+        mc.delete(key[0]).get();
 
         // SET
         @SuppressWarnings("deprecation")

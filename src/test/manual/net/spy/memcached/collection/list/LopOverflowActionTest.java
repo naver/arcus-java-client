@@ -40,7 +40,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
     // Test
     for (int maxcount = 100; maxcount <= 200; maxcount += 100) {
       // Create a list
-      mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes());
+      mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
 
       // Set maxcount
       CollectionAttributes attrs = new CollectionAttributes();
@@ -63,7 +63,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_Overflow() throws Exception {
     // Create a List
-    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes());
+    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -93,7 +93,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_HeadTrim() throws Exception {
     // Create a List
-    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes());
+    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -122,7 +122,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_TailTrim() throws Exception {
     // Create a List
-    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes());
+    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -151,7 +151,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_HeadTrim_OutOfRange() throws Exception {
     // Create a set
-    mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes());
+    mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes()).get();
 
     // head_trim
     assertFalse(mc.asyncSetAttr(key,
@@ -167,7 +167,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_TailTrim_OutOfRange() throws Exception {
     // Create a set
-    mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes());
+    mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes()).get();
 
     // tail_trim
     assertFalse(mc.asyncSetAttr(key,
@@ -183,7 +183,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
 
   public void testLopGet_AvailableOverflowAction() throws Exception {
     // Create a set
-    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes());
+    mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
 
     // Set OverflowAction
     // error
