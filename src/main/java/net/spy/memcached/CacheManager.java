@@ -130,7 +130,7 @@ public class CacheManager extends SpyThread implements Watcher,
     }
 
     /* ENABLE_MIGRATION if */
-    if (isMigrationMonitorDead()) { // initMigrationMonitor() failure
+    if (this.arcusMigrEnabled && isMigrationMonitorDead()) { // initMigrationMonitor() failure
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't initialize Migration Monitor.");
     }
@@ -358,7 +358,7 @@ public class CacheManager extends SpyThread implements Watcher,
                 e.getMessage());
           }
           /* ENABLE_MIGRATION if */
-        } else if (isMigrationMonitorDead()) {
+        } else if (arcusMigrEnabled && isMigrationMonitorDead()) {
           try {
             getLogger().warn("Unexpected shutdown of MigrationMonitor. " +
                     "Trying to recreate MigrationMonitor.");
@@ -592,7 +592,7 @@ public class CacheManager extends SpyThread implements Watcher,
   }
 
   private boolean isMigrationMonitorDead() {
-    return arcusMigrEnabled && (migrationMonitor == null || migrationMonitor.isDead());
+    return migrationMonitor == null || migrationMonitor.isDead();
   }
   /* ENABLE_MIGRATION end */
 
