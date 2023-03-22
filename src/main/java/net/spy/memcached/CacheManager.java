@@ -124,10 +124,17 @@ public class CacheManager extends SpyThread implements Watcher,
 
     initZooKeeperClient();
 
-    if (this.client == null) {
+    if (this.client == null) {  // initArcusClient() failure
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't initialize Arcus client.");
     }
+
+    /* ENABLE_MIGRATION if */
+    if (isMigrationMonitorDead()) { // initMigrationMonitor() failure
+      shutdownZooKeeperClient();
+      throw new InitializeClientException("Can't initialize Migration Monitor.");
+    }
+    /* ENABLE_MIGRATION end */
 
     this.startup = false;
 
@@ -351,7 +358,7 @@ public class CacheManager extends SpyThread implements Watcher,
                 e.getMessage());
           }
           /* ENABLE_MIGRATION if */
-        } else if (migrationMonitor != null && migrationMonitor.isDead()) {
+        } else if (isMigrationMonitorDead()) {
           try {
             getLogger().warn("Unexpected shutdown of MigrationMonitor. " +
                     "Trying to recreate MigrationMonitor.");
@@ -363,8 +370,8 @@ public class CacheManager extends SpyThread implements Watcher,
             getLogger().warn("Unexpected exception is caught while recreate MigrationMonitor: %s",
                 e.getMessage());
           }
+          /* ENABLE_MIGRATION end */
         }
-        /* ENABLE_MIGRATION end */
 
         try {
           wait(retrySleepTime);
@@ -582,6 +589,10 @@ public class CacheManager extends SpyThread implements Watcher,
       return null;
     }
     return new AbstractMap.SimpleEntry<MigrationType, MigrationState>(type, state);
+  }
+
+  private boolean isMigrationMonitorDead() {
+    return arcusMigrEnabled && (migrationMonitor == null || migrationMonitor.isDead());
   }
   /* ENABLE_MIGRATION end */
 
