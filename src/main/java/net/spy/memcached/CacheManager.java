@@ -340,7 +340,10 @@ public class CacheManager extends SpyThread implements Watcher,
     synchronized (this) {
       while (!shutdownRequested) {
         long retrySleepTime = 0;
+        boolean isDead = false;
+
         if (cacheMonitor.isDead()) {
+          isDead = true;
           try {
             getLogger().warn("Unexpected disconnection from Arcus admin. " +
                 "Trying to reconnect to Arcus admin. CacheList =" + prevCacheList);
@@ -359,6 +362,7 @@ public class CacheManager extends SpyThread implements Watcher,
           }
           /* ENABLE_MIGRATION if */
         } else if (arcusMigrEnabled && isMigrationMonitorDead()) {
+          isDead = true;
           try {
             getLogger().warn("Unexpected shutdown of MigrationMonitor. " +
                     "Trying to recreate MigrationMonitor.");
@@ -373,16 +377,29 @@ public class CacheManager extends SpyThread implements Watcher,
           /* ENABLE_MIGRATION end */
         }
 
-        try {
-          wait(retrySleepTime);
-        } catch (InterruptedException e) {
-          getLogger().warn("Cache mananger thread is interrupted while wait: %s",
-              e.getMessage());
+        long start = System.currentTimeMillis();
+        waitBeforeRetryMonitorCheck(retrySleepTime);
+        long end = System.currentTimeMillis();
+
+        if (isDead && retrySleepTime == 0) {
+          long elapsed = end - start;
+          if (elapsed < 1000L) {
+            waitBeforeRetryMonitorCheck(1000L - elapsed);
+          }
         }
       }
     }
     getLogger().info("Close cache manager.");
     shutdownZooKeeperClient();
+  }
+
+  private void waitBeforeRetryMonitorCheck(long retrySleepTime) {
+    try {
+      wait(retrySleepTime);
+    } catch (InterruptedException e) {
+      getLogger().warn("Cache mananger thread is interrupted while wait: %s",
+          e.getMessage());
+    }
   }
 
   public void closing() {
