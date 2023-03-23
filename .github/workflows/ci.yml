@@ -93,5 +93,7 @@ jobs:
         set -e
         rm -rf ~/arcus/zookeeper/data
         cd ~/arcus/scripts && echo -e ${ARCUS_CONF} > conf/test.conf && ./arcus.sh quicksetup conf/test.conf
+    - name: Build ARCUS Client
+      run: mvn install -DskipTests
     - name: Test ARCUS Client
       run: mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212 && mvn test -DUSE_ZK=true
