@@ -30,8 +30,6 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 
 public class BopOverflowActionTest extends BaseIntegrationTest {
 
