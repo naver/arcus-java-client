@@ -155,7 +155,11 @@ public class MemcachedThreadBench extends TestCase {
 
       long begin = System.currentTimeMillis();
       for (int i = stat.start; i < stat.start + stat.runs; i++) {
-        mc.set("" + i + keyBase, 3600, object);
+        try {
+          mc.set("" + i + keyBase, 3600, object).get();
+        } catch (Exception e) {
+          fail(e.getMessage());
+        }
         if (total.incrementAndGet() >= MAX_QUEUE) {
           flush();
         }

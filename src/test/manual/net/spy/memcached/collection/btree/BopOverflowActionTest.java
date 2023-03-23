@@ -77,7 +77,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_Overflow() throws Exception {
     // Create a B+ Tree
-    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -112,7 +112,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_LargestTrim() throws Exception {
     // Create a B+ Tree
-    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -147,7 +147,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_SmallestTrim() throws Exception {
     // Create a B+ Tree
-    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
     int maxcount = 100;
 
@@ -182,7 +182,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_SmallestTrim_OutOfRange() throws Exception {
     // Create a set
-    mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes());
+    mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
 
     // smallest_trim
     assertTrue(mc.asyncSetAttr(key,
@@ -199,7 +199,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_LargestTrim_OutOfRange() throws Exception {
     // Create a set
-    mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes());
+    mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
 
     // largest_trim
     assertTrue(mc.asyncSetAttr(key,
@@ -216,7 +216,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
   public void testBopGet_AvailableOverflowAction() throws Exception {
     // Create a set
-    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+    mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
     // Set OverflowAction
     // error

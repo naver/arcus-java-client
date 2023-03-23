@@ -42,7 +42,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
     try {
       // REMOVE
-      mc.asyncMopDelete(key, true);
+      mc.asyncMopDelete(key, true).get();
 
       // SET
       Future<Map<Integer, CollectionOperationStatus>> future = mc

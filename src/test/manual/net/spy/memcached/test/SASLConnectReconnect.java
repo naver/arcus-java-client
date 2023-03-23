@@ -3,6 +3,7 @@ package net.spy.memcached.test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -19,6 +20,7 @@ import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * A very simple test of using SASL PLAIN auth and ensuring that operations are
@@ -110,7 +112,11 @@ public class SASLConnectReconnect {
   public void verifySetAndGet() {
     int iterations = 20;
     for (int i = 0; i < iterations; i++) {
-      mc.set("test" + i, 0, "test" + i);
+      try {
+        mc.set("test" + i, 0, "test" + i).get();
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
     }
 
     for (int i = 0; i < iterations; i++) {
@@ -125,7 +131,7 @@ public class SASLConnectReconnect {
   public void verifySetAndGet2(int iterations) {
     try {
       for (int i = 0; i <= iterations; i++) {
-        mc.set("me" + i, 0, "me" + i);
+        mc.set("me" + i, 0, "me" + i).get();
       }
 
       for (int i = 0; i < iterations; i++) {

@@ -45,7 +45,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
     try {
       // REMOVE
       mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
-              true);
+              true).get();
 
       // SET
       Future<Map<Integer, CollectionOperationStatus>> future = mc

@@ -32,8 +32,8 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    mc.asyncSopDelete(key, "aaa", true);
-    mc.asyncSopDelete(key, "bbbb", true);
+    mc.asyncSopDelete(key, "aaa", true).get();
+    mc.asyncSopDelete(key, "bbbb", true).get();
   }
 
   public void testNotFound() throws Exception {

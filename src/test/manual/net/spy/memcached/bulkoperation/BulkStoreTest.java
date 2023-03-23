@@ -81,7 +81,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       // SET
@@ -107,7 +107,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
         Assert.assertEquals(k + " has unexpected value.", o.get(k), v);
 
-        mc.delete(k);
+        mc.delete(k).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -137,7 +137,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       // SET
@@ -163,7 +163,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -186,7 +186,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       // ADD
@@ -212,7 +212,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -235,7 +235,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // SET
       for (String key : keys) {
-        mc.set(key, 60, "oldValue");
+        mc.set(key, 60, "oldValue").get();
       }
 
       // REPLACE
@@ -261,7 +261,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -284,7 +284,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       //  Store
@@ -310,7 +310,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -334,7 +334,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       // Store
@@ -359,7 +359,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -382,7 +382,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       // Store
@@ -409,7 +409,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -432,7 +432,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : keys) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
 
       //  Store
@@ -459,7 +459,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
       // REMOVE
       for (String key : o.keySet()) {
-        mc.delete(key);
+        mc.delete(key).get();
       }
     } catch (Exception e) {
       e.printStackTrace();

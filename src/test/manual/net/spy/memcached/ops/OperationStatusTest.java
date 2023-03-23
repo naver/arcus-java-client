@@ -25,9 +25,9 @@ public class OperationStatusTest extends BaseIntegrationTest {
     OperationFuture<Boolean> prependOperationFuture = mc.prepend(10, "abc", appendValue);
     OperationFuture<Boolean> appendOperationFuture = mc.append(10, "abc", appendValue);
 
-    mc.add("bcc", EXP, value);
-    mc.add("cbd", EXP, "2222");
-    mc.add("efg", EXP, "3333");
+    mc.add("bcc", EXP, value).get();
+    mc.add("cbd", EXP, "2222").get();
+    mc.add("efg", EXP, "3333").get();
 
     //then
     assertEquals(StatusCode.SUCCESS, addOperationFuture.getStatus().getStatusCode());
@@ -44,7 +44,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     String appendValue = "plus";
 
     //when
-    mc.add("abc", EXP, value);
+    mc.add("abc", EXP, value).get();
 
     // add already stored key
     OperationFuture<Boolean> addOperationFuture = mc.add("abc", EXP, replaceValue);
@@ -67,7 +67,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     String key = "key";
     String value = "65";
     int value2 = 61;
-    mc.set(key, EXP, value);
+    mc.set(key, EXP, value).get();
 
     //when
     OperationFuture<Long> incrOperationFuture = mc.asyncIncr(key, value2);
@@ -83,7 +83,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     int value = 1;
     int value2 = 2;
 
-    mc.set("abc", EXP, value);
+    mc.set("abc", EXP, value).get();
 
     //when
     OperationFuture<Long> incrOperationFuture = mc.asyncIncr("bc", value2);
@@ -98,7 +98,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     //given
     String value = "example";
 
-    mc.add("abc", EXP, value);
+    mc.add("abc", EXP, value).get();
 
     //when
     OperationFuture<Boolean> deleteOperationFuture = mc.delete("abc");
@@ -111,7 +111,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     //given
     String value = "example";
 
-    mc.add("abc", EXP, value);
+    mc.add("abc", EXP, value).get();
 
     //when
     OperationFuture<Boolean> deleteOperationFuture = mc.delete("bc");

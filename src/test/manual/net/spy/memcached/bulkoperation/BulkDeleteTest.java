@@ -68,7 +68,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
 
         // SET
         for (String key : keys) {
-          mc.set(key, 60, value);
+          mc.set(key, 60, value).get();
         }
 
         // Bulk delete
@@ -116,9 +116,9 @@ public class BulkDeleteTest extends BaseIntegrationTest {
 
         for (int i = 0; i < keys.length; i++) {
           if (i % 2 == 0) {
-            mc.set(keys[i], 60, "value");
+            mc.set(keys[i], 60, "value").get();
           } else {
-            mc.delete(keys[i]);
+            mc.delete(keys[i]).get();
           }
         }
 
