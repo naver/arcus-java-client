@@ -134,4 +134,6 @@ public interface Operation {
   /* ENABLE_MIGRATION end */
 
   APIType getAPIType();
+
+  String toString();
 }

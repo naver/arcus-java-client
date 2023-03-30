@@ -439,11 +439,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replace("\r\n", "\\r\\n"));
-    }
   }
 
   @Override

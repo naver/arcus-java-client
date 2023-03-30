@@ -163,11 +163,6 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   public void initialize() {
     ByteBuffer buffer = insert.getAsciiCommand();
     setBuffer(buffer);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
-    }
   }
 
   @Override
@@ -196,6 +191,11 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
   @Override
   public boolean isIdempotentOperation() {
     return !(insert instanceof CollectionBulkInsert.ListBulkInsert);
+  }
+
+  @Override
+  protected boolean hasValue() {
+    return true;
   }
 
 }

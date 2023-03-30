@@ -168,12 +168,6 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
   public void initialize() {
     ByteBuffer buffer = update.getAsciiCommand();
     setBuffer(buffer);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-              "Request in ascii protocol: %s",
-                      (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
-    }
   }
 
   @Override
@@ -201,6 +195,11 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
 
   @Override
   public boolean isIdempotentOperation() {
+    return true;
+  }
+
+  @Override
+  protected boolean hasValue() {
     return true;
   }
 

@@ -55,4 +55,9 @@ final class StoreOperationImpl extends BaseStoreOperationImpl
     return true;
   }
 
+  @Override
+  protected boolean hasValue() {
+    return true;
+  }
+
 }

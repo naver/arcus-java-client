@@ -23,6 +23,7 @@
 
 package net.spy.memcached.compat.log;
 
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,13 +36,19 @@ import java.util.Date;
 public class DefaultLogger extends AbstractLogger {
 
   private final SimpleDateFormat df;
+  private final PrintStream stream;
 
   /**
    * Get an instance of DefaultLogger.
    */
   public DefaultLogger(String name) {
+    this(name, System.err);
+  }
+
+  protected DefaultLogger(String name, PrintStream stream) {
     super(name);
-    df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    this.df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    this.stream = stream;
   }
 
   /**
@@ -73,12 +80,13 @@ public class DefaultLogger extends AbstractLogger {
    */
   @Override
   public synchronized void log(Level level, Object message, Throwable e) {
-    if (level == Level.INFO
-            || level == Level.WARN
-            || level == Level.ERROR
-            || level == Level.FATAL) {
-      System.err.printf("%s %s %s:  %s\n",
-              df.format(new Date()), level.name(), getName(), message);
+    if (level == Level.FATAL
+        || level == Level.ERROR
+        || level == Level.WARN
+        || level == Level.INFO
+        || (level == Level.DEBUG && isDebugEnabled())
+        || (level == Level.TRACE && isTraceEnabled())) {
+      stream.printf("%s %s %s:  %s\n", df.format(new Date()), level.name(), getName(), message);
       if (e != null) {
         e.printStackTrace();
       }

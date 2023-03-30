@@ -72,6 +72,10 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
 
   static class TestOperation extends BaseOperationImpl implements Operation {
 
+    public TestOperation() {
+      super(false);
+    }
+
     @Override
     public void initialize() {
       throw new RuntimeException("Not implemented.");
@@ -95,6 +99,11 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     @Override
     public boolean isIdempotentOperation() {
       return false;
+    }
+
+    @Override
+    protected boolean hasValue() {
+      return true;
     }
   }
 }

@@ -107,11 +107,6 @@ public class CollectionExistOperationImpl extends OperationImpl
 
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replaceAll("\\r\\n", ""));
-    }
   }
 
   @Override
@@ -143,6 +138,11 @@ public class CollectionExistOperationImpl extends OperationImpl
 
   @Override
   public boolean isIdempotentOperation() {
+    return true;
+  }
+
+  @Override
+  protected boolean hasValue() {
     return true;
   }
 

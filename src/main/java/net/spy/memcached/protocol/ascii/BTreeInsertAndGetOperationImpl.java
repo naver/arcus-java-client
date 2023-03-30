@@ -292,11 +292,6 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     bb.put(CRLF);
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replace("\r\n", "\\r\\n"));
-    }
   }
 
   @Override
@@ -321,6 +316,11 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
 
   @Override
   public boolean isIdempotentOperation() {
+    return true;
+  }
+
+  @Override
+  protected boolean hasValue() {
     return true;
   }
 

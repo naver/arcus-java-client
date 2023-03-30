@@ -135,11 +135,6 @@ public class CollectionInsertOperationImpl extends OperationImpl
     bb.put(CRLF);
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replace("\r\n", "\\r\\n"));
-    }
   }
 
   @Override
@@ -176,6 +171,11 @@ public class CollectionInsertOperationImpl extends OperationImpl
   @Override
   public boolean isIdempotentOperation() {
     return !(collectionInsert instanceof ListInsert);
+  }
+
+  @Override
+  protected boolean hasValue() {
+    return true;
   }
 
 }

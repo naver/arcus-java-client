@@ -92,7 +92,7 @@ abstract class OperationImpl extends BaseOperationImpl {
    * @param cb
    */
   protected OperationImpl(int c, int o, OperationCallback cb) {
-    super();
+    super(false);
     cmd = c;
     opaque = o;
     setCallback(cb);
@@ -302,6 +302,11 @@ abstract class OperationImpl extends BaseOperationImpl {
 
     ((Buffer) bb).flip();
     setBuffer(bb);
+  }
+
+  @Override
+  protected boolean hasValue() {
+    return true;
   }
 
   /**

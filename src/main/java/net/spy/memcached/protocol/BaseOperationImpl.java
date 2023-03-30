@@ -20,6 +20,7 @@ package net.spy.memcached.protocol;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
@@ -47,6 +48,8 @@ public abstract class BaseOperationImpl extends SpyObject {
           new CancelledOperationStatus();
   private OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
+  private String cmdString = null;
+  private final boolean isAscii;
   private boolean cancelled = false;
   private String cancelCause = null;
   private OperationException exception = null;
@@ -60,8 +63,9 @@ public abstract class BaseOperationImpl extends SpyObject {
   private RedirectHandler redirectHandler = null;
   /* ENABLE_MIGRATION end */
 
-  public BaseOperationImpl() {
+  public BaseOperationImpl(boolean isAscii) {
     super();
+    this.isAscii = isAscii;
   }
 
   /**
@@ -202,13 +206,46 @@ public abstract class BaseOperationImpl extends SpyObject {
     assert to != null : "Trying to set buffer to null";
     cmd = to;
     ((Buffer) cmd).mark();
+
+    if (getLogger().isDebugEnabled()) {
+      if (cmdString == null) {
+        cmdString = generateCmdString();
+      }
+      if (isAscii) {
+        getLogger().debug("Request in ascii protocol: %s", cmdString);
+      }
+    }
+  }
+
+  private String generateCmdString() {
+    String result = null;
+    if (isAscii) {
+      String temp = new String(cmd.array(), Charset.forName("UTF-8")).trim();
+      String[] lines = temp.split("\r\n");
+
+      if (lines.length > 0) {
+        result = lines[0].trim();
+
+        if (lines.length > 1 && !hasValue()) {
+          result += "\\r\\n" + lines[1].trim();
+        }
+      }
+    } else {
+      result = "Binary" + this.getClass().getSimpleName();
+    }
+    return result;
   }
 
   /**
    * Transition the state of this operation to the given state.
    */
   protected final void transitionState(OperationState newState) {
-    getLogger().debug("Transitioned state from %s to %s", state, newState);
+    getLogger().debug("Transitioned state from %s to %s, op=%s, node=%s",
+        state,
+        newState,
+        this,
+        getHandlingNode());
+
     state = newState;
     // Discard our buffer when we no longer need it.
     if (state != OperationState.WRITE_QUEUED &&
@@ -299,4 +336,21 @@ public abstract class BaseOperationImpl extends SpyObject {
   public abstract boolean isBulkOperation();
 
   public abstract boolean isPipeOperation();
+
+  protected abstract boolean hasValue();
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(this.getClass().getSimpleName()).append("{")
+        .append("hashCode=").append(hashCode())
+        .append(", state=").append(getState());
+
+    if (cmdString != null) {
+      builder.append(", cmd=").append(cmdString);
+    }
+
+    builder.append("}");
+    return builder.toString();
+  }
 }

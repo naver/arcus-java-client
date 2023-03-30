@@ -132,11 +132,6 @@ public class CollectionDeleteOperationImpl extends OperationImpl
 
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replace("\r\n", "\\r\\n"));
-    }
   }
 
   @Override
@@ -165,6 +160,11 @@ public class CollectionDeleteOperationImpl extends OperationImpl
   @Override
   public boolean isIdempotentOperation() {
     return !(collectionDelete instanceof ListDelete);
+  }
+
+  @Override
+  protected boolean hasValue() {
+    return true;
   }
 
 }

@@ -125,11 +125,6 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
     setArguments(bb, cmd, key, args);
     ((Buffer) bb).flip();
     setBuffer(bb);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replace("\r\n", "\\r\\n"));
-    }
   }
 
   @Override

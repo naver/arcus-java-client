@@ -55,4 +55,9 @@ public class ConcatenationOperationImpl extends BaseStoreOperationImpl
     return false;
   }
 
+  @Override
+  protected boolean hasValue() {
+    return true;
+  }
+
 }

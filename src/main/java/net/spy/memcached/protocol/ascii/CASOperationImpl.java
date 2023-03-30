@@ -149,4 +149,9 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     return true;
   }
 
+  @Override
+  protected boolean hasValue() {
+    return true;
+  }
+
 }

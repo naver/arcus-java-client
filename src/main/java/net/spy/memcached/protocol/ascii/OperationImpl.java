@@ -44,11 +44,11 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   private boolean foundCr = false;
 
   protected OperationImpl() {
-    super();
+    super(true);
   }
 
   protected OperationImpl(OperationCallback cb) {
-    super();
+    super(true);
     callback = cb;
   }
 
@@ -142,8 +142,21 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
           byteBuffer.reset();
           OperationErrorType eType = classifyError(line);
           if (eType != null) {
+            getLogger().debug(
+                "line=%s, eType=%s, op=%s, node=%s",
+                line,
+                eType,
+                this,
+                getHandlingNode());
+
             handleError(eType, line);
           } else {
+            getLogger().debug(
+                "line=%s, op=%s, node=%s",
+                line,
+                this,
+                getHandlingNode());
+
             handleLine(line);
           }
         }
@@ -176,4 +189,10 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     return line.substring(line.indexOf("NOT_MY_KEY"));
   }
   /* ENABLE_MIGRATION end */
+
+  @Override
+  protected boolean hasValue() {
+    return false;
+  }
+
 }
