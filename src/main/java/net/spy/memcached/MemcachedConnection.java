@@ -724,7 +724,6 @@ public final class MemcachedConnection extends SpyObject {
         if (!mgInProgress) {
           /* prepare connections of alter nodes */
           prepareAlterConnections(convertToSocketAddresses(addrs));
-          mgInProgress = true;
         } else {
           /* check joining node down */
           updateAlterConnections(convertToSocketAddresses(addrs));
@@ -761,6 +760,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
     locator.prepareMigration(alterNodes, mgType);
+    mgInProgress = true;
   }
 
   private void updateAlterConnections(List<InetSocketAddress> addrs) throws IOException {
