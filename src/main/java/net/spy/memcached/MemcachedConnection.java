@@ -965,26 +965,27 @@ public final class MemcachedConnection extends SpyObject {
         } else if (currentOp.getState() == OperationState.MOVING) {
           break;
         /* ENABLE_REPLICATION end */
+        /* ENABLE_MIGRATION if */
+        } else if (currentOp.getState() == OperationState.REDIRECT) {
+          Operation op = qa.removeCurrentReadOp();
+          assert op == currentOp : "Expected to pop " + currentOp + " got " + op;
+          if (currentOp == qa.getCurrentWriteOp()) { /* partially written */
+            qa.removeCurrentWriteOp();
+          }
+          redirectOperation(currentOp);
+          currentOp = qa.getCurrentReadOp();
         }
+        /* ENABLE_MIGRATION end */
       }
-      ((Buffer) rbuf).clear();
       /* ENABLE_REPLICATION if */
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
+        ((Buffer) rbuf).clear();
         delayedSwitchoverGroups.remove(qa.getReplicaGroup());
         switchoverMemcachedReplGroup(qa, false);
         break;
       }
       /* ENABLE_REPLICATION end */
-      /* ENABLE_MIGRATION if */
-      if (currentOp != null && currentOp.getState() == OperationState.REDIRECT) {
-        qa.removeCurrentReadOp();
-        if (currentOp == qa.getCurrentWriteOp()) { /* partially written */
-          qa.removeCurrentWriteOp();
-        }
-        redirectOperation(currentOp);
-        break;
-      }
-      /* ENABLE_MIGRATION end */
+      ((Buffer) rbuf).clear();
       read = channel.read(rbuf);
     }
     if (read < 0) {
