@@ -69,8 +69,6 @@ public interface Operation {
    * reset operation state to WRITE_QUEUED
    */
   void resetState();
-
-  void setMoved(boolean s);
   /* ENABLE_REPLICATION end */
 
   /**
