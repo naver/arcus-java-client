@@ -374,7 +374,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       op.cancel("write queue overflow");
       return false;
     }
-    op.setMoved(true);
     addOpCount.incrementAndGet();
     return true;
   }

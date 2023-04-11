@@ -55,9 +55,6 @@ public abstract class BaseOperationImpl extends SpyObject {
 
   private OperationType opType = OperationType.UNDEFINED;
   private APIType apiType = APIType.UNDEFINED;
-  /* ENABLE_REPLICATION if */
-  private boolean moved = false;
-  /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */
   private RedirectHandler redirectHandler = null;
@@ -125,10 +122,6 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public final void resetState() {
     transitionState(OperationState.WRITE_QUEUED);
-  }
-
-  public final void setMoved(boolean m) {
-    this.moved = m;
   }
 
   protected final void receivedMoveOperations(String cause) {
@@ -208,11 +201,6 @@ public abstract class BaseOperationImpl extends SpyObject {
       cmd = null;
     }
     if (state == OperationState.COMPLETE) {
-      /* ENABLE_REPLICATION if */
-      if (moved) {
-        getLogger().debug("Operation move completed : %s at %s", this, getHandlingNode());
-      }
-      /* ENABLE_REPLICATION end */
       callback.complete();
     }
   }
