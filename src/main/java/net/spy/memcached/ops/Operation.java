@@ -68,7 +68,7 @@ public interface Operation {
   /**
    * reset operation state to WRITE_QUEUED
    */
-  void resetState();
+  void reset();
   /* ENABLE_REPLICATION end */
 
   /**

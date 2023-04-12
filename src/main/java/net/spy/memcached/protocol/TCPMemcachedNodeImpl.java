@@ -172,7 +172,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     queue.drainTo(rv);
     if (resend) {
       for (Operation o : rv) {
-        resetOperation(o);
+        o.reset();
       }
     }
 
@@ -199,7 +199,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
        */
     } else if (op != null) {
       if (op.getBuffer() != null) {
-        resetOperation(op);
+        op.reset();
       } else {
         /* This case cannot happen. */
         getLogger().warn("No buffer for current write op, removing");
@@ -343,6 +343,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void addOpToInputQ(Operation op) {
+    op.setHandlingNode(this);
+    op.initialize();
     try {
       if (!authLatch.await(1, TimeUnit.SECONDS)) {
         op.cancel("authentication timeout");
@@ -369,7 +371,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final boolean addOpToWriteQ(Operation op) {
     op.setHandlingNode(this);
-    resetOperation(op);
+    op.reset();
     if (!writeQ.offer(op)) {
       op.cancel("write queue overflow");
       return false;
@@ -379,6 +381,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void insertOp(Operation op) {
+    op.setHandlingNode(this);
+    op.initialize();
     ArrayList<Operation> tmp = new ArrayList<Operation>(
             inputQueue.size() + 1);
     tmp.add(op);
@@ -688,25 +692,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         " #CT=" + getContinuousTimeout() +
         " #TD=" + getTimeoutDuration() +
         " #TR=" + getTimeoutRatioNow();
-  }
-
-  @SuppressWarnings("fallthrough")
-  private void resetOperation(Operation o) {
-    switch (o.getState()) {
-      case WRITING:
-        o.resetState(); // reset operation state
-        // fallthrough
-      case WRITE_QUEUED:
-        if (o.getBuffer() != null) {
-          ((Buffer) o.getBuffer()).reset(); // buffer offset reset
-        } else {
-          o.initialize(); // this case cannot happen.
-        }
-        break;
-      default:
-        o.initialize(); // write completed or not yet initialized
-        o.resetState(); // reset operation state
-    }
   }
 
   /* ENABLE_REPLICATION if */
