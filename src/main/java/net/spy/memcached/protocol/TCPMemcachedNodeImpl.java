@@ -462,8 +462,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     if (getSk() != null && getSk().isValid()) {
       sops = getSk().interestOps();
     }
-    int rsize = readQ.size() + (optimizedOp == null ? 0 : 1);
-    int wsize = writeQ.size();
+    int rsize = readQ.size();
+    int wsize = writeQ.size() + (optimizedOp == null ? 0 : 1);
     int isize = inputQueue.size();
     return "{QA name=" + getNodeName()
             + ", #Rops=" + rsize
@@ -672,7 +672,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public int getWriteQueueSize() {
-    return writeQ.size();
+    return writeQ.size() + (optimizedOp == null ? 0 : 1);
   }
 
   public int getReadQueueSize() {
