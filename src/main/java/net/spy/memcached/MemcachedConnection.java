@@ -1426,8 +1426,6 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   public void insertOperation(final MemcachedNode node, final Operation o) {
-    o.setHandlingNode(node);
-    o.initialize();
     node.insertOp(o);
     addedQueue.offer(node);
     Selector s = selector.wakeup();
@@ -1440,13 +1438,11 @@ public final class MemcachedConnection extends SpyObject {
       o.cancel("no node");
       return;
     }
-    o.setHandlingNode(node);
     if ((!node.isActive() && !node.isFirstConnecting()) &&
         failureMode == FailureMode.Cancel) {
       o.cancel("inactive node");
       return;
     }
-    o.initialize();
     node.addOpToInputQ(o);
     addedQueue.offer(node);
     Selector s = selector.wakeup();
@@ -1458,8 +1454,6 @@ public final class MemcachedConnection extends SpyObject {
     for (Map.Entry<MemcachedNode, Operation> me : ops.entrySet()) {
       final MemcachedNode node = me.getKey();
       Operation o = me.getValue();
-      o.setHandlingNode(node);
-      o.initialize();
       node.addOpToInputQ(o);
       addedQueue.offer(node);
     }
@@ -1482,8 +1476,6 @@ public final class MemcachedConnection extends SpyObject {
     final CountDownLatch latch = new CountDownLatch(locator.getAll().size());
     for (MemcachedNode node : nodes) {
       Operation op = of.newOp(node, latch);
-      op.setHandlingNode(node);
-      op.initialize();
       node.addOpToInputQ(op);
       addedQueue.offer(node);
     }

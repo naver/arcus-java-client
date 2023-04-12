@@ -120,8 +120,23 @@ public abstract class BaseOperationImpl extends SpyObject {
   /**
    * reset operation state to WRITE_QUEUED
    */
-  public final void resetState() {
-    transitionState(OperationState.WRITE_QUEUED);
+  @SuppressWarnings("fallthrough")
+  public final void reset() {
+    switch (getState()) {
+      case WRITING:
+        transitionState(OperationState.WRITE_QUEUED); // reset operation state
+        // fallthrough
+      case WRITE_QUEUED:
+        if (getBuffer() != null) {
+          ((Buffer) getBuffer()).reset(); // buffer offset reset
+        } else {
+          initialize(); // this case cannot happen.
+        }
+        break;
+      default:
+        initialize(); // write completed or not yet initialized
+        transitionState(OperationState.WRITE_QUEUED); // reset operation state
+    }
   }
 
   protected final void receivedMoveOperations(String cause) {
