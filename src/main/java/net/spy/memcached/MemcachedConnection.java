@@ -323,6 +323,19 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().info("old memcached node removed %s", node);
       reconnectQueue.remove(node);
 
+      /* ENABLE_MIGRATION if */
+      if (mgType == MigrationType.LEAVE) {
+        if (node.hasReadOp()) {
+          redistributeOperationsForMigration(node.destroyReadQueue(false));
+        }
+        if (node.hasWriteOp()) {
+          redistributeOperationsForMigration(node.destroyWriteQueue(false));
+        }
+        redistributeOperationsForMigration(node.destroyInputQueue());
+        continue;
+      }
+      /* ENABLE_MIGRATION end */
+
       // removing node is not related to failure mode.
       // so, cancel operations regardless of failure mode.
       String cause = "node removed.";
@@ -777,7 +790,7 @@ public final class MemcachedConnection extends SpyObject {
     locator.updateAlter(attachNodes, removeNodes);
 
     // Remove the unavailable nodes.
-    handleNodesToRemove(removeNodes);
+    // handleNodesToRemove(removeNodes);
   }
   /* ENABLE_MIGRATION end */
 
@@ -1039,61 +1052,78 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private boolean redirectSingleKeyOperation(
-      RedirectHandler.RedirectHandlerSingleKey redirectHandler, Operation op) {
+      RedirectHandler.RedirectHandlerSingleKey redirectHandler,
+      Operation op) {
+
     String owner = redirectHandler.getOwner();
-    MemcachedNode ownerNode;
     if (owner != null) {
-      ownerNode = findNodeByOwner(owner);
+      return redirectSingleKeyOperation(findNodeByOwner(owner), op);
     } else { /* single key pipe operation */
-      ownerNode = findNodeByKey(redirectHandler.getKey()); /* hashring lookup */
+      return redirectSingleKeyOperation(redirectHandler.getKey(), op); /* hashring lookup */
     }
-    if (ownerNode == null) {
+  }
+
+  private boolean redirectSingleKeyOperation(String key, Operation op) {
+    return redirectSingleKeyOperation(findNodeByKey(key), op);
+  }
+
+  private boolean redirectSingleKeyOperation(MemcachedNode node, Operation op) {
+    if (node == null) {
       op.cancel("Redirect failure. No node.");
       return false;
     }
-    if (!ownerNode.isActive() && !ownerNode.isFirstConnecting()) {
+    if (!node.isActive() && !node.isFirstConnecting()) {
       op.cancel("Redirect failure. Inactive node.");
       return false;
     }
-    ownerNode.addOpToWriteQ(op);
-    addedQueue.offer(ownerNode);
+    node.addOpToWriteQ(op);
+    addedQueue.offer(node);
     return true;
   }
 
-  private boolean redirectMultiKeyOperation(RedirectHandler.RedirectHandlerMultiKey redirectHandler,
-                                           Operation op) {
-    Map<MemcachedNode, List<String>> ownerToKeys = redirectHandler.groupRedirectKeys(this);
-    if (ownerToKeys == null) {
-      op.cancel("Redirect failure. No ownerToKeys.");
+  private boolean redirectMultiKeyOperation(
+      RedirectHandler.RedirectHandlerMultiKey redirectHandler,
+      Operation op) {
+
+    Map<MemcachedNode, List<String>> keysByNode = redirectHandler.groupRedirectKeys(this);
+    return redirectMultiKeyOperation(keysByNode, op);
+  }
+
+  private boolean redirectMultiKeyOperation(Map<MemcachedNode, List<String>> keysByNode,
+                                            Operation op) {
+
+    if (keysByNode == null || keysByNode.isEmpty()) {
+      op.cancel("Redirect failure. No keysByNode.");
       return false;
     }
 
-    MemcachedNode ownerNode;
+    MemcachedNode node = null;
     Map<MemcachedNode, Operation> ops = new HashMap<MemcachedNode, Operation>();
     MultiOperationCallback mcb = opFactory.createMultiOperationCallback(
-        (KeyedOperation) op, ownerToKeys.size());
-    for (Map.Entry<MemcachedNode, List<String>> entry : ownerToKeys.entrySet()) {
-      ownerNode = entry.getKey();
+        (KeyedOperation) op, keysByNode.size());
+
+    for (Map.Entry<MemcachedNode, List<String>> entry : keysByNode.entrySet()) {
+      node = entry.getKey();
       Operation clonedOp = opFactory.cloneMultiOperation(
-          (KeyedOperation) op, ownerNode, entry.getValue(), mcb
+          (KeyedOperation) op, node, entry.getValue(), mcb
       );
-      if (ownerNode == null) {
+      if (node == null) {
         clonedOp.cancel("Redirect failure. No node.");
         continue;
       }
-      if (!ownerNode.isActive() && !ownerNode.isFirstConnecting()) {
+      if (!node.isActive() && !node.isFirstConnecting()) {
         clonedOp.cancel("Redirect failure. Inactive node.");
         continue;
       }
-      ops.put(ownerNode, clonedOp);
+      ops.put(node, clonedOp);
     }
     if (ops.isEmpty()) {
       return false;
     }
     for (Map.Entry<MemcachedNode, Operation> entry : ops.entrySet()) {
-      ownerNode = entry.getKey();
-      ownerNode.addOpToWriteQ(entry.getValue());
-      addedQueue.offer(ownerNode);
+      node = entry.getKey();
+      node.addOpToWriteQ(entry.getValue());
+      addedQueue.offer(node);
     }
     return true;
   }
@@ -1185,6 +1215,49 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
   }
+
+  /* ENABLE_MIGRATION if */
+  private void redistributeOperationsForMigration(Collection<Operation> ops) {
+    boolean success = false;
+    for (Operation op : ops) {
+      if (op instanceof KeyedOperation) {
+        KeyedOperation ko = (KeyedOperation) op;
+        Collection<String> keys = ko.getKeys();
+
+        if (keys.size() == 1) {
+          String key = keys.toArray()[0].toString();
+          success = success || redirectSingleKeyOperation(key, op);
+        } else {
+          Map<MemcachedNode, List<String>> nodeByKeys = groupKeysByNode(keys);
+          success = success || redirectMultiKeyOperation(nodeByKeys, op);
+        }
+      } else {
+        op.cancel("by redistribution.");
+      }
+    }
+    if (success) {
+      Selector s = selector.wakeup();
+      assert s == selector : "Wakeup returned the wrong selector.";
+    }
+  }
+
+  public Map<MemcachedNode, List<String>> groupKeysByNode(Collection<String> keys) {
+    Map<MemcachedNode, List<String>> keysByNode = new HashMap<MemcachedNode, List<String>>();
+    for (String key : keys) {
+      MemcachedNode node = findNodeByKey(key);
+      if (node == null) {
+        return null;
+      }
+      List<String> k = keysByNode.get(node);
+      if (k == null) {
+        k = new ArrayList<String>();
+        keysByNode.put(node, k);
+      }
+      k.add(key);
+    }
+    return keysByNode;
+  }
+  /* ENABLE_MIGRATION end */
 
   private void attemptReconnects() {
     final List<MemcachedNode> rereQueue = new ArrayList<MemcachedNode>();

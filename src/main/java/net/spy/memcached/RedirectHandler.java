@@ -24,8 +24,8 @@ import java.util.Map;
 
 public abstract class RedirectHandler {
 
-  private Long spoint;
-  private Long epoint;
+  private Long spoint = null;
+  private Long epoint = null;
 
   public abstract void addRedirectKey(String response, String key);
 
@@ -67,6 +67,7 @@ public abstract class RedirectHandler {
   }
 
   public static class RedirectHandlerMultiKey extends RedirectHandler {
+    public static final String UNKNOWN_OWNER = "none";
 
     private final Map<String, List<String>> keysByOwner =
         new HashMap<String, List<String>>();
@@ -75,8 +76,12 @@ public abstract class RedirectHandler {
     public void addRedirectKey(String response, String key) {
       String owner = parseRedirectResponse(response);
       if (owner == null) {
-        owner = "none";
+        owner = UNKNOWN_OWNER;
       }
+      addToKeysByOwnerMap(key, owner);
+    }
+
+    private void addToKeysByOwnerMap(String key, String owner) {
       List<String> keys = keysByOwner.get(owner);
       if (keys == null) {
         keys = new ArrayList<String>();
@@ -86,32 +91,30 @@ public abstract class RedirectHandler {
     }
 
     public Map<MemcachedNode, List<String>> groupRedirectKeys(
-            MemcachedConnection conn) {
-      Map<MemcachedNode, List<String>> keysByNode =
-          new HashMap<MemcachedNode, List<String>>();
-      List<String> keysWithoutOwner = keysByOwner.remove("none");
+        MemcachedConnection conn) {
+
+      Map<MemcachedNode, List<String>> keysByNode = null;
+      List<String> keysWithoutOwner = keysByOwner.remove(UNKNOWN_OWNER);
+      if (keysWithoutOwner != null) {
+        keysByNode = conn.groupKeysByNode(keysWithoutOwner);
+        if (keysByNode == null) {
+          return null;
+        }
+      } else {
+        keysByNode = new HashMap<MemcachedNode, List<String>>();
+      }
       for (Map.Entry<String, List<String>> entry : keysByOwner.entrySet()) {
         MemcachedNode node = conn.findNodeByOwner(entry.getKey());
         if (node == null) {
           return null;
         }
-        keysByNode.put(node, entry.getValue());
-      }
-      if (keysWithoutOwner != null) {
-        for (String key : keysWithoutOwner) {
-          MemcachedNode node = conn.findNodeByKey(key);
-          if (node == null) {
-            return null;
-          }
-          List<String> keys = keysByNode.get(node);
-          if (keys == null) {
-            keys = new ArrayList<String>();
-            keysByNode.put(node, keys);
-          }
-          keys.add(key);
+        List<String> keys = keysByNode.get(node);
+        if (keys != null) {
+          keys.addAll(entry.getValue());
+        } else {
+          keysByNode.put(node, entry.getValue());
         }
       }
-
       return keysByNode;
     }
   }
