@@ -534,15 +534,15 @@ public class CacheManager extends SpyThread implements Watcher,
           conn.prepareAlterConnections(arcusReplEnabled ?
               ArcusReplNodeAddress.getAddresses(addrs) : AddrUtil.getAddresses(addrs));
         }
-        return true;
       } catch (IOException e) {
         getLogger().fatal("Cannot initialize alter_list znode.", e);
         return false; // startup && caught exception => return false
       }
-    }
-    for (ArcusClient ac : client) {
-      MemcachedConnection conn = ac.getMemcachedConnection();
-      conn.putAlterNodesChangeQueue(addrs);
+    } else {
+      for (ArcusClient ac : client) {
+        MemcachedConnection conn = ac.getMemcachedConnection();
+        conn.putAlterNodesChangeQueue(addrs);
+      }
     }
     return true;
   }
