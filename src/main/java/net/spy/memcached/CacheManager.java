@@ -469,7 +469,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
     for (ArcusClient ac : client) {
       MemcachedConnection conn = ac.getMemcachedConnection();
-      conn.putNodesChangeQueue(addrs);
+      conn.setCacheNodesChange(addrs);
     }
   }
 
@@ -541,7 +541,7 @@ public class CacheManager extends SpyThread implements Watcher,
     } else {
       for (ArcusClient ac : client) {
         MemcachedConnection conn = ac.getMemcachedConnection();
-        conn.putAlterNodesChangeQueue(addrs);
+        conn.setAlterNodesChange(addrs);
       }
     }
     return true;

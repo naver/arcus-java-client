@@ -43,11 +43,10 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -91,9 +90,9 @@ public final class MemcachedConnection extends SpyObject {
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   private final ReconnectQueue reconnectQueue;
-  private final BlockingQueue<String> nodesChangeQueue = new LinkedBlockingQueue<String>();
+  private final AtomicReference<String> cacheNodesChange = new AtomicReference<String>(null);
   /* ENABLE_MIGRATION if */
-  private final BlockingQueue<String> alterNodesChangeQueue = new LinkedBlockingQueue<String>();
+  private final AtomicReference<String> alterNodesChange = new AtomicReference<String>(null);
   /* ENABLE_MIGRATION end */
 
   private final OperationFactory opFactory;
@@ -232,7 +231,7 @@ public final class MemcachedConnection extends SpyObject {
     getLogger().debug("Done dealing with queue.");
 
     long delay = 0;
-    if (!nodesChangeQueue.isEmpty()) {
+    if (cacheNodesChange.get() != null) {
       delay = 1;
     } else if (!reconnectQueue.isEmpty()) {
       delay = reconnectQueue.getMinDelayMillis();
@@ -306,10 +305,10 @@ public final class MemcachedConnection extends SpyObject {
     /* ENABLE_REPLICATION end */
 
     // Deal with the memcached server group that's been added by CacheManager.
-    handleNodesChangeQueue();
+    handleCacheNodesChange();
     /* ENABLE_MIGRATION if */
     if (arcusMigrEnabled) {
-      handleAlterNodesChangeQueue();
+      handleAlterNodesChange();
     }
     /* ENABLE_MIGRATION end */
 
@@ -688,48 +687,53 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   // Called by CacheManger to add the memcached server group.
-  public void putNodesChangeQueue(String addrs) {
-    nodesChangeQueue.offer(addrs);
+  public void setCacheNodesChange(String addrs) {
+    String old = cacheNodesChange.getAndSet(addrs);
+    if (old != null) {
+      getLogger().info("Ignored previous cache nodes change.");
+    }
     selector.wakeup();
   }
 
   // Handle the memcached server group that's been added by CacheManager.
-  void handleNodesChangeQueue() throws IOException {
-    if (!nodesChangeQueue.isEmpty()) {
-      String addrs = nodesChangeQueue.poll();
-
+  void handleCacheNodesChange() throws IOException {
+    String cacheList = cacheNodesChange.getAndSet(null);
+    if (cacheList != null) {
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
       if (arcusReplEnabled) {
-        updateReplConnections(ArcusReplNodeAddress.getAddresses(addrs));
+        updateReplConnections(ArcusReplNodeAddress.getAddresses(cacheList));
         return;
       }
       /* ENABLE_REPLICATION end */
-      updateConnections(AddrUtil.getAddresses(addrs));
+      updateConnections(AddrUtil.getAddresses(cacheList));
     }
   }
 
   /* ENABLE_MIGRATION if */
   /* Called by CacheManger to add the alter memcached server group. */
-  public void putAlterNodesChangeQueue(String addrs) {
-    alterNodesChangeQueue.offer(addrs);
+  public void setAlterNodesChange(String addrs) {
+    String old = alterNodesChange.getAndSet(addrs);
+    if (old != null) {
+      getLogger().info("Ignored previous alter nodes change.");
+    }
     selector.wakeup();
   }
 
   /* Handle the alter memcached server group that's been added by CacheManager. */
-  private void handleAlterNodesChangeQueue() throws IOException {
-    if (!alterNodesChangeQueue.isEmpty()) {
-      String addrs = alterNodesChangeQueue.poll();
+  private void handleAlterNodesChange() throws IOException {
+    String alterList = alterNodesChange.getAndSet(null);
+    if (alterList != null) {
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
           // prepare connections of alter nodes
-          prepareAlterConnections(convertToSocketAddresses(addrs));
+          prepareAlterConnections(convertToSocketAddresses(alterList));
         } else {
           // check joining node down
-          updateAlterConnections(convertToSocketAddresses(addrs));
+          updateAlterConnections(convertToSocketAddresses(alterList));
         }
       }
-      if (addrs.isEmpty()) { // end of migration
+      if (alterList.isEmpty()) { // end of migration
         mgState = MigrationState.DONE;
         mgInProgress = false;
       }
