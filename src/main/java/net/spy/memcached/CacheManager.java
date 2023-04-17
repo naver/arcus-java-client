@@ -106,6 +106,8 @@ public class CacheManager extends SpyThread implements Watcher,
   private MigrationState state = MigrationState.UNKNOWN;
 
   private boolean startup = true;
+
+  private boolean readingCacheList = false;
   /* ENABLE_MIGRATION end */
 
   public CacheManager(String hostPort, String serviceCode,
@@ -475,6 +477,11 @@ public class CacheManager extends SpyThread implements Watcher,
 
   /* ENABLE_MIGRATION if */
   @Override
+  public void setReadingCacheList(boolean reading) {
+    readingCacheList = reading;
+  }
+
+  @Override
   public boolean commandCloudStatChange(List<String> children) {
     // return true if STATE == PREPARED.
     if (children.size() == 0) {
@@ -541,7 +548,7 @@ public class CacheManager extends SpyThread implements Watcher,
     } else {
       for (ArcusClient ac : client) {
         MemcachedConnection conn = ac.getMemcachedConnection();
-        conn.setAlterNodesChange(addrs);
+        conn.setAlterNodesChange(addrs, readingCacheList);
       }
     }
     return true;

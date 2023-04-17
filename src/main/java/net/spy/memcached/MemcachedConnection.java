@@ -93,6 +93,7 @@ public final class MemcachedConnection extends SpyObject {
   private final AtomicReference<String> cacheNodesChange = new AtomicReference<String>(null);
   /* ENABLE_MIGRATION if */
   private final AtomicReference<String> alterNodesChange = new AtomicReference<String>(null);
+  private final AtomicReference<String> delayedAlterNodesChange = new AtomicReference<String>(null);
   /* ENABLE_MIGRATION end */
 
   private final OperationFactory opFactory;
@@ -306,11 +307,6 @@ public final class MemcachedConnection extends SpyObject {
 
     // Deal with the memcached server group that's been added by CacheManager.
     handleCacheNodesChange();
-    /* ENABLE_MIGRATION if */
-    if (arcusMigrEnabled) {
-      handleAlterNodesChange();
-    }
-    /* ENABLE_MIGRATION end */
 
     if (!reconnectQueue.isEmpty()) {
       attemptReconnects();
@@ -686,17 +682,19 @@ public final class MemcachedConnection extends SpyObject {
     addOperation(node, op);
   }
 
-  // Called by CacheManger to add the memcached server group.
-  public void setCacheNodesChange(String addrs) {
-    String old = cacheNodesChange.getAndSet(addrs);
-    if (old != null) {
-      getLogger().info("Ignored previous cache nodes change.");
-    }
-    selector.wakeup();
-  }
-
   // Handle the memcached server group that's been added by CacheManager.
   void handleCacheNodesChange() throws IOException {
+    /* ENABLE_MIGRATION if */
+    /*
+     * handleCacheNodesChange() and handleAlterNodesChange() have been integrated
+     * to fix bug that occurs when Context Switching from Java Client IO Thread to ZK IO Thread
+     * is executed after handleCacheNodesChange() and before handleAlterNodesChange().
+     * If change of cache_list and alter_list are received when after handleCacheNodesChange()
+     * and before handleAlterNodesChange(), there MUST be bug because alter_list change
+     * will be applied without application of dependent cache_list change.
+     */
+    String alterList = alterNodesChange.getAndSet(null);
+    /* ENABLE_MIGRATION end */
     String cacheList = cacheNodesChange.getAndSet(null);
     if (cacheList != null) {
       // Update the memcached server group.
@@ -708,22 +706,8 @@ public final class MemcachedConnection extends SpyObject {
       /* ENABLE_REPLICATION end */
       updateConnections(AddrUtil.getAddresses(cacheList));
     }
-  }
-
-  /* ENABLE_MIGRATION if */
-  /* Called by CacheManger to add the alter memcached server group. */
-  public void setAlterNodesChange(String addrs) {
-    String old = alterNodesChange.getAndSet(addrs);
-    if (old != null) {
-      getLogger().info("Ignored previous alter nodes change.");
-    }
-    selector.wakeup();
-  }
-
-  /* Handle the alter memcached server group that's been added by CacheManager. */
-  private void handleAlterNodesChange() throws IOException {
-    String alterList = alterNodesChange.getAndSet(null);
-    if (alterList != null) {
+    /* ENABLE_MIGRATION if */
+    if (arcusMigrEnabled && alterList != null) {
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
           // prepare connections of alter nodes
@@ -737,6 +721,40 @@ public final class MemcachedConnection extends SpyObject {
         mgState = MigrationState.DONE;
         mgInProgress = false;
       }
+    }
+    /* ENABLE_MIGRATION end */
+  }
+
+  // Called by CacheManger to add the memcached server group.
+  public void setCacheNodesChange(String addrs) {
+    String old = cacheNodesChange.getAndSet(addrs);
+    if (old != null) {
+      getLogger().info("Ignored previous cache nodes change.");
+    }
+    /* ENABLE_MIGRATION if */
+    old = delayedAlterNodesChange.getAndSet(null);
+    if (old != null) {
+      alterNodesChange.set(old);
+    }
+    /* ENABLE_MIGRATION end */
+    selector.wakeup();
+  }
+
+  /* ENABLE_MIGRATION if */
+  /* Called by CacheManger to add the alter memcached server group. */
+  public void setAlterNodesChange(String addrs, boolean readingCacheList) {
+    if (readingCacheList) {
+      String old = delayedAlterNodesChange.getAndSet(addrs);
+      if (old != null) {
+        getLogger().info("Ignored previous delayed alter nodes change.");
+      }
+    } else {
+      String old = alterNodesChange.getAndSet(addrs);
+      if (old != null) {
+        getLogger().info("Ignored previous alter nodes change.");
+      }
+      delayedAlterNodesChange.set(null);
+      selector.wakeup();
     }
   }
 
@@ -802,7 +820,7 @@ public final class MemcachedConnection extends SpyObject {
     locator.updateAlter(attachNodes, removeNodes);
 
     // Remove the unavailable nodes.
-    // handleNodesToRemove(removeNodes);
+    handleNodesToRemove(removeNodes);
   }
   /* ENABLE_MIGRATION end */
 

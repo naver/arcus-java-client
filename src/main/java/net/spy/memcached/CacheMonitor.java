@@ -92,6 +92,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
 
     List<String> getPrevCacheList();
 
+    /* ENABLE_MIGRATION if */
+    void setReadingCacheList(boolean reading);
+    /* ENABLE_MIGRATION end */
+
     /**
      * The ZooKeeper session is no longer valid.
      */
@@ -113,6 +117,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
   public void processResult(int rc, String path, Object ctx,
                             List<String> children) {
     boolean doCountDown = true;
+    /* ENABLE_MIGRATION if */
+    listener.setReadingCacheList(false);
+    /* ENABLE_MIGRATION end */
 
     switch (Code.get(rc)) {
       case OK:
@@ -158,6 +165,9 @@ public class CacheMonitor extends SpyObject implements Watcher,
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Set a new watch on " + cacheListZPath);
     }
+    /* ENABLE_MIGRATION if */
+    listener.setReadingCacheList(true);
+    /* ENABLE_MIGRATION end */
     zk.getChildren(cacheListZPath, this, this, null);
   }
 
