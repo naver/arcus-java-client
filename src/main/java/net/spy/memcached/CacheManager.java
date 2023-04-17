@@ -106,6 +106,10 @@ public class CacheManager extends SpyThread implements Watcher,
   private MigrationState state = MigrationState.UNKNOWN;
 
   private boolean startup = true;
+
+  private boolean readingCacheList = false;
+
+  private List<String> delayedAlterList = null;
   /* ENABLE_MIGRATION end */
 
   public CacheManager(String hostPort, String serviceCode,
@@ -469,11 +473,22 @@ public class CacheManager extends SpyThread implements Watcher,
 
     for (ArcusClient ac : client) {
       MemcachedConnection conn = ac.getMemcachedConnection();
-      conn.putNodesChangeQueue(addrs);
+      conn.putNodesChange(addrs);
     }
+
+    /* ENABLE_MIGRATION if */
+    if (delayedAlterList != null) {
+      commandAlterListChange(delayedAlterList);
+    }
+    /* ENABLE_MIGRATION end */
   }
 
   /* ENABLE_MIGRATION if */
+  @Override
+  public void setReadingCacheList(boolean reading) {
+    readingCacheList = reading;
+  }
+
   @Override
   public boolean commandCloudStatChange(List<String> children) {
     // return true if STATE == PREPARED.
@@ -526,6 +541,12 @@ public class CacheManager extends SpyThread implements Watcher,
   @Override
   public boolean commandAlterListChange(List<String> children) {
     // return false if this method is failed.
+    if (readingCacheList) {
+      delayedAlterList = children;
+      return true;
+    }
+    delayedAlterList = null;
+
     String addrs = getAddressListString(children);
     if (startup) {
       try {
@@ -541,7 +562,7 @@ public class CacheManager extends SpyThread implements Watcher,
     } else {
       for (ArcusClient ac : client) {
         MemcachedConnection conn = ac.getMemcachedConnection();
-        conn.putAlterNodesChangeQueue(addrs);
+        conn.putAlterNodesChange(addrs);
       }
     }
     return true;

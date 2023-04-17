@@ -64,27 +64,28 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211");
-    conn.putNodesChangeQueue("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213");
-    conn.putNodesChangeQueue("0.0.0.0:11212");
+    conn.putNodesChange("0.0.0.0:11211");
+    conn.putNodesChange("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213");
+    // conn.putNodesChange("0.0.0.0:11212");
 
     // 1st test (nodes=1)
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
-    assertTrue(1 == locator.getAll().size());
+    // assertTrue(1 == locator.getAll().size());
 
     // 2nd test (nodes=3)
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
-    assertTrue(3 == locator.getAll().size());
+    // assertTrue(3 == locator.getAll().size());
 
     // 3rd test (nodes=1)
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
-    assertTrue(1 == locator.getAll().size());
+    // assertTrue(1 == locator.getAll().size());
+    assertTrue(3 == locator.getAll().size());
   }
 
   public void testNodesChangeQueue_empty() throws Exception {
@@ -92,7 +93,7 @@ public class MemcachedConnectionTest extends TestCase {
     // on servers in the queue
 
     // test
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
     assertTrue(0 == locator.getAll().size());
@@ -101,10 +102,10 @@ public class MemcachedConnectionTest extends TestCase {
   public void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
-      conn.putNodesChangeQueue("");
+      conn.putNodesChange("");
 
       // test
-      conn.handleNodesChangeQueue();
+      conn.handleNodesChange();
 
       // should not be here!
       //fail();
@@ -116,10 +117,10 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue_redundent() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211,0.0.0.0:11211");
+    conn.putNodesChange("0.0.0.0:11211,0.0.0.0:11211");
 
     // test
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
     assertTrue(2 == locator.getAll().size());
@@ -127,11 +128,11 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue_twice() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211");
-    conn.putNodesChangeQueue("0.0.0.0:11211");
+    conn.putNodesChange("0.0.0.0:11211");
+    conn.putNodesChange("0.0.0.0:11211");
 
     // test
-    conn.handleNodesChangeQueue();
+    conn.handleNodesChange();
 
     // then
     assertTrue(1 == locator.getAll().size());
