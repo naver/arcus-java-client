@@ -20,6 +20,7 @@ package net.spy.memcached.protocol.ascii;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.KeyUtil;
@@ -103,7 +104,31 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     bb.put(CRLF);
   }
 
-  OperationErrorType classifyError(String line) {
+  private String getLineFromBuffer(ByteBuffer data) throws UnsupportedEncodingException {
+    boolean lineFound = false;
+    while (data.remaining() > 0) {
+      byte b = data.get();
+      if (b == '\r') {
+        foundCr = true;
+      } else if (b == '\n') {
+        assert foundCr : "got a \\n without a \\r";
+        foundCr = false;
+        lineFound = true;
+        break;
+      } else {
+        assert !foundCr : "got a \\r without a \\n";
+        byteBuffer.write(b);
+      }
+    }
+    if (lineFound) {
+      String line = byteBuffer.toString(CHARSET);
+      byteBuffer.reset();
+      return line;
+    }
+    return null;
+  }
+
+  private OperationErrorType classifyError(String line) {
     OperationErrorType rv = null;
     if (line.startsWith("ERROR")) {
       rv = OperationErrorType.GENERAL;
@@ -118,46 +143,26 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   @Override
   public void readFromBuffer(ByteBuffer data) throws IOException {
     // Loop while there's data remaining to get it all drained.
-    while (getState() != OperationState.COMPLETE && data.remaining() > 0) {
-      if (readType == OperationReadType.DATA) {
+    while (data.remaining() > 0) {
+      if (getState() == OperationState.COMPLETE ||
+          getState() == OperationState.MOVING || // ENABLE_REPLICATION
+          getState() == OperationState.REDIRECT) { // ENABLE_MIGRATION
+        return;
+      }
+      if (readType == OperationReadType.LINE) {
+        String line = getLineFromBuffer(data);
+        if (line == null) {
+          continue;
+        }
+        OperationErrorType eType = classifyError(line);
+        if (eType != null) {
+          handleError(eType, line);
+        } else {
+          handleLine(line);
+        }
+      } else { // OperationReadType.DATA
         handleRead(data);
-      } else {
-        int offset = -1;
-        for (int i = 0; data.remaining() > 0; i++) {
-          byte b = data.get();
-          if (b == '\r') {
-            foundCr = true;
-          } else if (b == '\n') {
-            assert foundCr : "got a \\n without a \\r";
-            offset = i;
-            foundCr = false;
-            break;
-          } else {
-            assert !foundCr : "got a \\r without a \\n";
-            byteBuffer.write(b);
-          }
-        }
-        if (offset >= 0) {
-          String line = new String(byteBuffer.toByteArray(), CHARSET);
-          byteBuffer.reset();
-          OperationErrorType eType = classifyError(line);
-          if (eType != null) {
-            handleError(eType, line);
-          } else {
-            handleLine(line);
-          }
-        }
       }
-      /* ENABLE_REPLICATION if */
-      if (getState() == OperationState.MOVING) {
-        break;
-      }
-      /* ENABLE_REPLICATION end */
-      /* ENABLE_MIGRATION if */
-      if (getState() == OperationState.REDIRECT) {
-        break;
-      }
-      /* ENABLE_MIGRATION end */
     }
   }
 
