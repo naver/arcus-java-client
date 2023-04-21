@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -64,9 +65,9 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211");
-    conn.putNodesChangeQueue("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213");
-    conn.putNodesChangeQueue("0.0.0.0:11212");
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11211"));
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11211", "0.0.0.0:11212", "0.0.0.0:11213"));
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11212"));
 
     // 1st test (nodes=1)
     conn.handleNodesChangeQueue();
@@ -101,7 +102,7 @@ public class MemcachedConnectionTest extends TestCase {
   public void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
-      conn.putNodesChangeQueue("");
+      conn.putNodesChangeQueue(new ArrayList<String>());
 
       // test
       conn.handleNodesChangeQueue();
@@ -116,7 +117,7 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue_redundent() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211,0.0.0.0:11211");
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11211", "0.0.0.0:11211"));
 
     // test
     conn.handleNodesChangeQueue();
@@ -127,8 +128,8 @@ public class MemcachedConnectionTest extends TestCase {
 
   public void testNodesChangeQueue_twice() throws Exception {
     // when
-    conn.putNodesChangeQueue("0.0.0.0:11211");
-    conn.putNodesChangeQueue("0.0.0.0:11211");
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11211"));
+    conn.putNodesChangeQueue(Arrays.asList("0.0.0.0:11211"));
 
     // test
     conn.handleNodesChangeQueue();

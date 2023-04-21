@@ -91,9 +91,11 @@ public final class MemcachedConnection extends SpyObject {
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   private final ReconnectQueue reconnectQueue;
-  private final BlockingQueue<String> nodesChangeQueue = new LinkedBlockingQueue<String>();
+  private final BlockingQueue<List<String>> nodesChangeQueue =
+          new LinkedBlockingQueue<List<String>>();
   /* ENABLE_MIGRATION if */
-  private final BlockingQueue<String> alterNodesChangeQueue = new LinkedBlockingQueue<String>();
+  private final BlockingQueue<List<String>> alterNodesChangeQueue =
+          new LinkedBlockingQueue<List<String>>();
   /* ENABLE_MIGRATION end */
 
   private final OperationFactory opFactory;
@@ -688,7 +690,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   // Called by CacheManger to add the memcached server group.
-  public void putNodesChangeQueue(String addrs) {
+  public void putNodesChangeQueue(List<String> addrs) {
     nodesChangeQueue.offer(addrs);
     selector.wakeup();
   }
@@ -696,7 +698,7 @@ public final class MemcachedConnection extends SpyObject {
   // Handle the memcached server group that's been added by CacheManager.
   void handleNodesChangeQueue() throws IOException {
     if (!nodesChangeQueue.isEmpty()) {
-      String addrs = nodesChangeQueue.poll();
+      List<String> addrs = nodesChangeQueue.poll();
 
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
@@ -711,7 +713,7 @@ public final class MemcachedConnection extends SpyObject {
 
   /* ENABLE_MIGRATION if */
   /* Called by CacheManger to add the alter memcached server group. */
-  public void putAlterNodesChangeQueue(String addrs) {
+  public void putAlterNodesChangeQueue(List<String> addrs) {
     alterNodesChangeQueue.offer(addrs);
     selector.wakeup();
   }
@@ -719,7 +721,7 @@ public final class MemcachedConnection extends SpyObject {
   /* Handle the alter memcached server group that's been added by CacheManager. */
   private void handleAlterNodesChangeQueue() throws IOException {
     if (!alterNodesChangeQueue.isEmpty()) {
-      String addrs = alterNodesChangeQueue.poll();
+      List<String> addrs = alterNodesChangeQueue.poll();
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
           /* prepare connections of alter nodes */
@@ -736,7 +738,7 @@ public final class MemcachedConnection extends SpyObject {
     }
   }
 
-  private List<InetSocketAddress> convertToSocketAddresses(String s) {
+  private List<InetSocketAddress> convertToSocketAddresses(List<String> s) {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       return ArcusReplNodeAddress.getAddresses(s);

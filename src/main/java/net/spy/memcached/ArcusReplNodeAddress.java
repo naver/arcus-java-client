@@ -69,22 +69,41 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     return new ArcusReplNodeAddress(group, master, ip, port);
   }
 
-  private static List<InetSocketAddress> parseNodeNames(String s) {
-    List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+  private static ArcusReplNodeAddress parseNodeName(String s) {
+    String[] temp = s.split("\\^");
+    String group = temp[0];
+    boolean master = temp[1].equals("M");
+    String ipport = temp[2];
+    // We may throw null pointer exception if the string has
+    // an unexpected format.  Abort the whole method instead of
+    // trying to ignore malformed strings.
+    // Is this the right behavior?  FIXM
+    return ArcusReplNodeAddress.create(group, master, ipport);
+  }
 
-    for (String node : s.split(",")) {
-      String[] temp = node.split("\\^");
-      String group = temp[0];
-      boolean master = temp[1].equals("M");
-      String ipport = temp[2];
-      // We may throw null pointer exception if the string has
-      // an unexpected format.  Abort the whole method instead of
-      // trying to ignore malformed strings.
-      // Is this the right behavior?  FIXME
+  // Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
+  // Znode names are group^{M,S}^ip:port-hostname
+  static List<InetSocketAddress> getAddresses(List<String> addressList) {
+    List<InetSocketAddress> list = null;
 
-      addrs.add(ArcusReplNodeAddress.create(group, master, ipport));
+    if (addressList != null && !addressList.isEmpty()) {
+      try {
+        list = new ArrayList<InetSocketAddress>();
+        for (String node : addressList) {
+          list.add(parseNodeName(node));
+        }
+      } catch (Exception e) {
+        // May see an exception if nodes do not follow the replication naming convention
+        arcusLogger.error("Exception caught while parsing node" +
+                " addresses. cache_list=" + addressList + "\n" + e);
+        e.printStackTrace();
+        list = null;
+      }
     }
-    return addrs;
+    if (list == null) {
+      list = new ArrayList<InetSocketAddress>(0);
+    }
+    return list;
   }
 
   // Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
@@ -93,16 +112,20 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     List<InetSocketAddress> list = null;
 
     if (s != null && !s.isEmpty()) {
+      String[] addrs = s.split(",");
       try {
-        list = parseNodeNames(s);
+        list = new ArrayList<InetSocketAddress>();
+        for (String node : addrs) {
+          list.add(parseNodeName(node));
+        }
       } catch (Exception e) {
         // May see an exception if nodes do not follow the replication naming convention
         arcusLogger.error("Exception caught while parsing node" +
                 " addresses. cache_list=" + s + "\n" + e);
         e.printStackTrace();
+        list = null;
       }
     }
-
     if (list == null) {
       list = new ArrayList<InetSocketAddress>(0);
     }
