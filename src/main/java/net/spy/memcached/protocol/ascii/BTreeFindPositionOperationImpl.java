@@ -55,11 +55,6 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
   protected final String key;
   protected final BTreeFindPosition get;
 
-  protected byte[] data = null;
-  protected int readOffset = 0;
-  protected byte lookingFor = '\0';
-  protected int spaceCount = 0;
-
   public BTreeFindPositionOperationImpl(String key, BTreeFindPosition get,
                                         OperationCallback cb) {
     super(cb);
