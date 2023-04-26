@@ -204,7 +204,7 @@ public class MigrationMonitor extends SpyObject implements Watcher {
       case CONNECTIONLOSS:
         getLogger().warn(
             "Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
-        asyncGetCloudStat();
+        asyncGetAlterList();
         doCountDown = false;
         break;
       default:
