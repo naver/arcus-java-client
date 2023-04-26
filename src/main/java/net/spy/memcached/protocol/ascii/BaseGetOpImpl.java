@@ -92,12 +92,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
       readOffset = 0;
       getLogger().debug("Set read type to data");
       setReadType(OperationReadType.DATA);
-      /* ENABLE_MIGRATION if */
+    /* ENABLE_MIGRATION if */
     } else if (hasNotMyKey(line)) {
       notMyKeyLine = line;
     } else if (notMyKeyLine != null) {
       addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
-      /* ENABLE_MIGRATION end */
+    /* ENABLE_MIGRATION end */
     } else {
       assert false : "Unknown line type: " + line;
     }
@@ -108,11 +108,10 @@ abstract class BaseGetOpImpl extends OperationImpl {
     assert currentKey != null;
     assert data != null;
     // This will be the case, because we'll clear them when it's not.
-    assert readOffset <= data.length
-            : "readOffset is " + readOffset + " data.length is " + data.length;
+    assert readOffset <= data.length : "readOffset is " + readOffset
+        + " data.length is " + data.length;
 
-    getLogger().debug("readOffset: %d, length: %d",
-            readOffset, data.length);
+    getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
     // If we're not looking for termination, we're still looking for data
     if (lookingFor == '\0') {
       int toRead = data.length - readOffset;
@@ -151,8 +150,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
             lookingFor = '\0';
             break;
           default:
-            assert false : "Looking for unexpected char: "
-                    + (char) lookingFor;
+            assert false : "Looking for unexpected char: " + (char) lookingFor;
         }
       } while (lookingFor != '\0' && b.hasRemaining());
       // Completed the read, reset stuff.
@@ -177,20 +175,17 @@ abstract class BaseGetOpImpl extends OperationImpl {
     String keysString = generateKeysString();
 
     if (cmd.equals("get") || cmd.equals("gets")) {
-      // make command string, for example,
-      // "get <keys...>\r\n"
+      // syntax: get <keys...>\r\n
       commandBuilder.append(cmd);
       commandBuilder.append(' ');
       commandBuilder.append(keysString);
       commandBuilder.append(RN_STRING);
     } else {
-      assert (cmd.equals("mget") || cmd.equals("mgets")) : "Unknown Command " + cmd;
-
+      assert (cmd.equals("mget") || cmd.equals("mgets"))
+          : "Unknown Command " + cmd;
+      // syntax: mget <lenKeys> <numkeys>\r\n<keys>\r\n
       int lenKeys = keysString.getBytes().length;
       int numKeys = keys.size();
-
-      // make command string, for example,
-      // "mget <lenKeys> <numkeys>\r\n<keys>\r\n"
       commandBuilder.append(cmd);
       commandBuilder.append(' ');
       commandBuilder.append(String.valueOf(lenKeys));
