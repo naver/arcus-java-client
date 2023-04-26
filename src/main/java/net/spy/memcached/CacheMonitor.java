@@ -58,7 +58,7 @@ public class CacheMonitor extends SpyObject implements Watcher,
                       String serviceCode, boolean startup,
                       CacheMonitorListener listener) throws InterruptedException {
     this.zk = zk;
-    this.cacheListZPath = cacheListZPath;
+    this.cacheListZPath = cacheListZPath + serviceCode;
     this.serviceCode = serviceCode;
     this.listener = listener;
 
@@ -155,9 +155,10 @@ public class CacheMonitor extends SpyObject implements Watcher,
    * Get the cache list asynchronously from the Arcus admin.
    */
   void asyncGetCacheList() {
-    getLogger().debug("Set a new watch on %s%s", cacheListZPath, serviceCode);
-
-    zk.getChildren(cacheListZPath + serviceCode, this, this, null);
+    if (getLogger().isDebugEnabled()) {
+      getLogger().debug("Set a new watch on " + cacheListZPath);
+    }
+    zk.getChildren(cacheListZPath, this, this, null);
   }
 
   /**

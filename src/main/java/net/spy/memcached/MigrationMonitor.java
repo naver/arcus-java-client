@@ -122,9 +122,7 @@ public class MigrationMonitor extends SpyObject implements Watcher {
    * Processes every event from the ZooKeeper.
    */
   public void process(WatchedEvent event) {
-    Event.EventType type = event.getType();
-
-    if (type == Event.EventType.NodeChildrenChanged) {
+    if (event.getType() == Event.EventType.NodeChildrenChanged) {
       String path = event.getPath();
       if (cloudStatZPath.equals(path)) {
         asyncGetCloudStat();
@@ -193,8 +191,7 @@ public class MigrationMonitor extends SpyObject implements Watcher {
         getLogger().info("Cannot find the alter_list znode. Stop watching. " + getInfo());
         break;
       case SESSIONEXPIRED:
-        getLogger().warn("Session expired. Reconnect to the Arcus admin. "
-            + getInfo());
+        getLogger().warn("Session expired. Reconnect to the Arcus admin. " + getInfo());
         shutdown();
         break;
       case NOAUTH:
