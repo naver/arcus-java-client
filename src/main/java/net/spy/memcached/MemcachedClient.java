@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,6 @@ import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.BulkGetFuture;
-import net.spy.memcached.internal.CheckedOperationTimeoutException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
@@ -1587,18 +1585,7 @@ public class MemcachedClient extends SpyThread
     }, nodes);
     try {
       if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
-        Collection<Operation> timedoutOps = new HashSet<Operation>();
-        for (Operation op : ops) {
-          if (op.getState() != OperationState.COMPLETE) {
-            MemcachedConnection.opTimedOut(op);
-            timedoutOps.add(op);
-          } else {
-            MemcachedConnection.opSucceeded(op);
-          }
-        }
-        if (timedoutOps.size() > 0) {
-          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
-        }
+        ArcusClient.noneKeyOpTimeOutHandlerWithUnChecked(operationTimeout, ops);
       } else {
         MemcachedConnection.opsSucceeded(ops);
       }
@@ -1676,18 +1663,7 @@ public class MemcachedClient extends SpyThread
     }, nodes);
     try {
       if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
-        Collection<Operation> timedoutOps = new HashSet<Operation>();
-        for (Operation op : ops) {
-          if (op.getState() != OperationState.COMPLETE) {
-            MemcachedConnection.opTimedOut(op);
-            timedoutOps.add(op);
-          } else {
-            MemcachedConnection.opSucceeded(op);
-          }
-        }
-        if (timedoutOps.size() > 0) {
-          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
-        }
+        ArcusClient.noneKeyOpTimeOutHandlerWithUnChecked(operationTimeout, ops);
       } else {
         MemcachedConnection.opsSucceeded(ops);
       }
@@ -2061,19 +2037,7 @@ public class MemcachedClient extends SpyThread
       public Boolean get(long duration, TimeUnit units)
               throws InterruptedException, TimeoutException, ExecutionException {
         if (!blatch.await(duration, units)) {
-          // whenever timeout occurs, continuous timeout counter will increase by 1.
-          Collection<Operation> timedoutOps = new HashSet<Operation>();
-          for (Operation op : ops) {
-            if (op.getState() != OperationState.COMPLETE) {
-              MemcachedConnection.opTimedOut(op);
-              timedoutOps.add(op);
-            } else {
-              MemcachedConnection.opSucceeded(op);
-            }
-          }
-          if (timedoutOps.size() > 0) {
-            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-          }
+          ArcusClient.noneKeyOpTimeOutHandlerWithChecked(duration, units, ops);
         } else {
           // continuous timeout counter will be reset
           MemcachedConnection.opsSucceeded(ops);
@@ -2142,18 +2106,7 @@ public class MemcachedClient extends SpyThread
 
     try {
       if (!blatch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
-        Collection<Operation> timedoutOps = new HashSet<Operation>();
-        for (Operation op : ops) {
-          if (op.getState() != OperationState.COMPLETE) {
-            MemcachedConnection.opTimedOut(op);
-            timedoutOps.add(op);
-          } else {
-            MemcachedConnection.opSucceeded(op);
-          }
-        }
-        if (timedoutOps.size() > 0) {
-          throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, timedoutOps);
-        }
+        ArcusClient.noneKeyOpTimeOutHandlerWithUnChecked(operationTimeout, ops);
       } else {
         MemcachedConnection.opsSucceeded(ops);
       }

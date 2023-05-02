@@ -1,5 +1,6 @@
 package net.spy.memcached.internal;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -7,7 +8,6 @@ import net.spy.memcached.ops.OperationState;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -53,18 +53,7 @@ public abstract class BulkOperationFuture<T>
                             TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
-      for (Operation op : ops) {
-        if (op.getState() != OperationState.COMPLETE) {
-          timedoutOps.add(op);
-        } else {
-          MemcachedConnection.opSucceeded(op);
-        }
-      }
-      if (timedoutOps.size() > 0) {
-        MemcachedConnection.opsTimedOut(timedoutOps);
-        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-      }
+      ArcusClient.bulkOpTimeOutHandler(duration, units, ops);
     } else {
       // continuous timeout counter will be reset
       MemcachedConnection.opsSucceeded(ops);
