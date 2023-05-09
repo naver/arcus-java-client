@@ -1173,15 +1173,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> keyList,
                                                                          final int exp, final T o,
                                                                          final Transcoder<T> tc) {
-    if (keyList == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    } else if (keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
-
-    for (final String key : keyList) {
-      validateKey(key);
-    }
+    validateKeys(keyList);
 
     final CachedData co = tc.encode(o);
     final CountDownLatch blatch = new CountDownLatch(keyList.size());
@@ -1270,15 +1262,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                  final List<String> keyList,
                                                                  final int exp, final T o,
                                                                  final Transcoder<T> tc) {
-    if (keyList == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    } else if (keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
-
-    for (final String key : keyList) {
-      validateKey(key);
-    }
+    validateKeys(keyList);
 
     final CachedData co = tc.encode(o);
     final CountDownLatch latch = new CountDownLatch(keyList.size());
@@ -1361,15 +1345,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> keyList) {
-    if (keyList == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    } else if (keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
-
-    for (final String key : keyList) {
-      validateKey(key);
-    }
+    validateKeys(keyList);
 
     final CountDownLatch latch = new CountDownLatch(keyList.size());
     final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
@@ -2191,9 +2167,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int offset, int count) {
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
@@ -2225,9 +2200,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode) {
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
     if (count < 1) {
       throw new IllegalArgumentException("Count must be larger than 0.");
     }
@@ -2259,15 +2233,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Map<String, Integer> chunkCount = new HashMap<String, Integer>();
     Map<String, Entry<MemcachedNode, List<String>>> result = new HashMap<String,
         Entry<MemcachedNode, List<String>>>();
-    Set<String> keySet = new HashSet<String>();
 
     MemcachedConnection conn = getMemcachedConnection();
 
     for (String k : keyList) {
-      validateKey(k);
-      if (!keySet.add(k)) {
-        throw new IllegalArgumentException("Duplicate keys exist in key list.");
-      }
       MemcachedNode qa = conn.findNodeByKey(k);
       String node;
       if (qa == null) {
@@ -3867,9 +3836,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int offset, int count) {
     BTreeUtil.validateBkey(from, to);
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
     if (count < 1) {
       throw new IllegalArgumentException("Count must be larger than 0.");
     }
@@ -3901,9 +3869,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode) {
     BTreeUtil.validateBkey(from, to);
-    if (keyList == null || keyList.isEmpty()) {
-      throw new IllegalArgumentException("Key list is empty.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
     if (count < 1) {
       throw new IllegalArgumentException("Count must be larger than 0.");
     }
@@ -4079,6 +4046,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
     BTreeUtil.validateBkey(bkey);
+    validateKeys(keyList);
+    checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
 
@@ -4107,6 +4076,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
     BTreeUtil.validateBkey(bkey);
+    validateKeys(keyList);
+    checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
@@ -4134,6 +4105,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
 
     validateMKey(mkey);
+    validateKeys(keyList);
+    checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
 
@@ -4160,6 +4133,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> Future<Map<String, CollectionOperationStatus>> asyncSopInsertBulk(
           List<String> keyList, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+    validateKeys(keyList);
+    checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
@@ -4186,6 +4161,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> Future<Map<String, CollectionOperationStatus>> asyncLopInsertBulk(
           List<String> keyList, int index, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+    validateKeys(keyList);
+    checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
@@ -4329,9 +4306,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>> asyncBopGetBulk(
           List<String> keyList, long from, long to,
           ElementFlagFilter eFlagFilter, int offset, int count, Transcoder<T> tc) {
-    if (keyList == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
@@ -4367,9 +4343,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           ElementFlagFilter eFlagFilter, int offset, int count,
           Transcoder<T> tc) {
     BTreeUtil.validateBkey(from, to);
-    if (keyList == null) {
-      throw new IllegalArgumentException("Key list is null.");
-    }
+    validateKeys(keyList);
+    checkDupKey(keyList);
+
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
@@ -4616,6 +4592,30 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(k, op);
     return rv;
+  }
+
+  private void validateKeys(Collection<String> keyList) {
+    if (keyList == null) {
+      throw new IllegalArgumentException("Key list is null.");
+    } else if (keyList.isEmpty()) {
+      throw new IllegalArgumentException("Key list is empty.");
+    }
+
+    for (String key : keyList) {
+      validateKey(key);
+    }
+  }
+
+  private void checkDupKey(Collection<String> keyList) {
+    /*
+     * Dup Check -> insure elements sequentially added to keyList
+     * */
+    HashSet<String> keySet = new HashSet<String>();
+    for (String key : keyList) {
+      if (!keySet.add(key)) {
+        throw new IllegalArgumentException("Duplicate keys exist in key list.");
+      }
+    }
   }
 
   /**

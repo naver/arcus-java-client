@@ -266,10 +266,14 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> f = null;
 
       // empty key list
-      f = mc.asyncBopGetBulk(new ArrayList<String>(), new byte[]{0},
-              new byte[]{10}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-      results = f.get(1000L, TimeUnit.MILLISECONDS);
-      Assert.assertEquals(0, results.size());
+      try {
+        f = mc.asyncBopGetBulk(new ArrayList<String>(), new byte[]{0},
+                new byte[]{10}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+        results = f.get(1000L, TimeUnit.MILLISECONDS);
+      } catch (IllegalArgumentException e) {
+        // test success
+        Assert.assertEquals("Key list is empty.", e.getMessage());
+      }
 
       // max key list
       try {
