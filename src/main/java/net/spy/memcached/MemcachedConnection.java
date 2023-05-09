@@ -288,11 +288,11 @@ public final class MemcachedConnection extends SpyObject {
         getLogger().warn(
             "%s exceeded continuous timeout threshold. >%s(count), >%s(duration) (%s)",
             mn.getNodeName(),
-            timeoutExceptionThreshold, timeoutDurationThreshold, mn.getStatus());
+            timeoutExceptionThreshold, timeoutDurationThreshold, mn.getOpQueueStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
       } else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold) {
         getLogger().warn("%s exceeded timeout ratio threshold. >%s (%s)",
-                mn.getNodeName(), timeoutRatioThreshold, mn.getStatus());
+                mn.getNodeName(), timeoutRatioThreshold, mn.getOpQueueStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
       }
     }

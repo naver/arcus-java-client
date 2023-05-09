@@ -466,13 +466,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     if (getSk() != null && getSk().isValid()) {
       sops = getSk().interestOps();
     }
-    int rsize = readQ.size();
-    int wsize = writeQ.size() + (optimizedOp == null ? 0 : 1);
-    int isize = inputQueue.size();
     return "{QA name=" + getNodeName()
-            + ", #Rops=" + rsize
-            + ", #Wops=" + wsize
-            + ", #iq=" + isize
+            + ", #Tops=" + addOpCount
+            + ", #iq=" + getInputQueueSize()
+            + ", #Wops=" + getWriteQueueSize()
+            + ", #Rops=" + getReadQueueSize()
+            + ", #CT=" + getContinuousTimeout()
+            + ", #TD=" + getTimeoutDuration()
+            + ", #TR=" + getTimeoutRatioNow()
             + ", topRop=" + getCurrentReadOp()
             + ", topWop=" + getCurrentWriteOp()
             + ", toWrite=" + toWrite
@@ -684,7 +685,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   @Override
-  public String getStatus() {
+  public String getOpQueueStatus() {
     return "#Tops=" + addOpCount +
         " #iq=" + getInputQueueSize() +
         " #Wops=" + getWriteQueueSize() +

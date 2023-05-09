@@ -290,7 +290,7 @@ public interface MemcachedNode {
    *
    * @return status string
    */
-  String getStatus();
+  String getOpQueueStatus();
 
   /* ENABLE_REPLICATION if */
   void setReplicaGroup(MemcachedReplicaGroup g);

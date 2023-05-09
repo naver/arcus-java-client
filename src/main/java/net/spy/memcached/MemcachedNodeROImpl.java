@@ -235,7 +235,7 @@ public class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public String getStatus() {
+  public String getOpQueueStatus() {
     throw new UnsupportedOperationException();
   }
 
