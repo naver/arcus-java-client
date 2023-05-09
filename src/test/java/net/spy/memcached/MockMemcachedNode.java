@@ -253,7 +253,7 @@ public class MockMemcachedNode implements MemcachedNode {
   }
 
   @Override
-  public String getStatus() {
+  public String getOpQueueStatus() {
     return "MOCK_STATE";
   }
   /* ENABLE_REPLICATION if */

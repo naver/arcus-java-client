@@ -59,7 +59,7 @@ public final class TimedOutMessageFactory {
         rv.append(" [").append(op.getState()).append("]");
       }
       if (node != null) {
-        rv.append(" [").append(node.getStatus()).append("]");
+        rv.append(" [").append(node.getOpQueueStatus()).append("]");
       }
     }
     return rv.toString();
