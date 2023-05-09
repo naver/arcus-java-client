@@ -457,7 +457,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
       mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
       fail("This should be an exception");
     } catch (Exception e) {
-      assertEquals("Key list is empty.", e.getMessage());
+      assertEquals("Key list is null.", e.getMessage());
     }
 
     // keylist is empty
