@@ -1030,15 +1030,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             if (op.getState() != OperationState.COMPLETE) {
               timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
             }
           }
           if (timedoutOps.size() > 0) {
             MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
             throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
           }
+        } else {
+          // continuous timeout counter will be reset only once in pipe
+          MemcachedConnection.opSucceeded(ops.iterator().next());
         }
-        // continuous timeout counter will be reset only once in pipe
-        MemcachedConnection.opSucceeded(ops.iterator().next());
 
         for (Operation op : ops) {
           if (op != null && op.hasErrored()) {
@@ -3993,16 +3996,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           for (Operation op : ops) {
             if (op.getState() != OperationState.COMPLETE) {
               timedoutOps.add(op);
+            } else {
+              MemcachedConnection.opSucceeded(op);
             }
           }
           if (timedoutOps.size() > 0) {
             MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
             throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
           }
+        } else {
+          // continuous timeout counter will be reset only once in pipe
+          MemcachedConnection.opSucceeded(ops.iterator().next());
         }
-        // continuous timeout counter will be reset only once in pipe
-        MemcachedConnection.opSucceeded(ops.iterator().next());
-
         for (Operation op : ops) {
           if (op != null && op.hasErrored()) {
             throw new ExecutionException(op.getException());
