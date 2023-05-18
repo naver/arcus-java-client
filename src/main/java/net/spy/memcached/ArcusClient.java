@@ -126,6 +126,7 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.BulkOperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.internal.PipeOperationFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -997,74 +998,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       ops.add(op);
     }
 
-    return new CollectionFuture<Map<Integer, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          op.cancel("by application.");
-          rv |= op.getState() == OperationState.WRITE_QUEUED;
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-
-        if (!latch.await(duration, units)) {
-          pipeOpTimeOutHandler(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset only once in pipe
-          MemcachedConnection.opSucceeded(ops.iterator().next());
-        }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return mergedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        for (OperationStatus status : mergedOperationStatus) {
-          if (!status.isSuccess()) {
-            return new CollectionOperationStatus(status);
-          }
-        }
-        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return new PipeOperationFuture<Map<Integer, CollectionOperationStatus>>(
+            latch, operationTimeout, ops, mergedOperationStatus, mergedResult);
   }
 
   /**
@@ -2330,38 +2265,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Get the sublist of elements from the smget result.
-   *
-   * @param mergedResult smget result (list of elements)
-   * @param offset       start index, negative offset indicates "start from the tail"
-   * @param count        number of elements to get
-   * @return list of elements
-   */
-  private <T> List<SMGetElement<T>> getSubList(
-          final List<SMGetElement<T>> mergedResult, int offset, int count) {
-    if (mergedResult.size() > count) {
-      int toIndex = (count + offset > mergedResult.size())
-                  ? mergedResult.size() : count + offset;
-      if (offset > toIndex) {
-        return Collections.emptyList();
-      }
-      return mergedResult.subList(offset, toIndex);
-    } else {
-      if (offset > 0) {
-        int toIndex = (count + offset > mergedResult.size())
-                    ? mergedResult.size() : count + offset;
-
-        if (offset > toIndex) {
-          return Collections.emptyList();
-        }
-        return mergedResult.subList(offset, toIndex);
-      } else {
-        return mergedResult;
-      }
-    }
-  }
-
-  /**
    * Generic smget operation for b+tree items. Public smget methods call this method.
    *
    * @param smGetList smget parameters (keys, eflags, and so on)
@@ -2379,6 +2282,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final String TRIMMED = "TRIMMED";
     final String DUPLICATED = "DUPLICATED";
     final String DUPLICATED_TRIMMED = "DUPLICATED_TRIMMED";
+
+    final int smGetListSize;
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
@@ -2404,6 +2309,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
     final AtomicBoolean mergedTrim = new AtomicBoolean(false);
     final AtomicBoolean stopCollect = new AtomicBoolean(false);
+
+    final List<SMGetElement<T>> subList;
 
     for (BTreeSMGet<T> smGet : smGetList) {
       Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperationOld.Callback() {
@@ -2530,58 +2437,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       addOp(smGet.getMemcachedNode(), op);
     }
 
-    return new SMGetFuture<List<SMGetElement<T>>>(ops, operationTimeout) {
-      @Override
-      public List<SMGetElement<T>> get(long duration, TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
+    subList = getSubList(mergedResult, offset, count);
+    smGetListSize = smGetList.size();
 
-        if (!blatch.await(duration, units)) {
-          bulkOpTimeOutHandler(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset
-          MemcachedConnection.opsSucceeded(ops);
-        }
+    return new SMGetFuture<List<SMGetElement<T>>>(
+            ops, operationTimeout,
+            blatch, smGetListSize,
+            mergedResult, subList,
+            missedKeys, mergedTrimmedKeys,
+            failedOperationStatus, resultOperationStatus);
 
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        if (smGetList.size() == 1) {
-          return mergedResult;
-        }
-
-        return getSubList(mergedResult, offset, count);
-      }
-
-      @Override
-      public List<String> getMissedKeyList() {
-        return missedKeyList;
-      }
-
-      @Override
-      public Map<String, CollectionOperationStatus> getMissedKeys() {
-        return missedKeys;
-      }
-
-      @Override
-      public List<SMGetTrimKey> getTrimmedKeys() {
-        return mergedTrimmedKeys;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        if (failedOperationStatus.size() > 0) {
-          return new CollectionOperationStatus(failedOperationStatus.get(0));
-        }
-        return new CollectionOperationStatus(resultOperationStatus.get(0));
-      }
-    };
   }
 
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
@@ -2592,6 +2457,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final String TRIMMED = "TRIMMED";
     final String DUPLICATED = "DUPLICATED";
     final String DUPLICATED_TRIMMED = "DUPLICATED_TRIMMED";
+
+    final int smGetListSize;
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
@@ -2617,6 +2484,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final AtomicBoolean stopCollect = new AtomicBoolean(false);
     // if processedSMGetCount is 0, then all smget is done.
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
+
+    final List<SMGetElement<T>> subList;
 
     for (BTreeSMGet<T> smGet : smGetList) {
       Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
@@ -2792,58 +2661,48 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       addOp(smGet.getMemcachedNode(), op);
     }
 
-    return new SMGetFuture<List<SMGetElement<T>>>(ops, operationTimeout) {
-      @Override
-      public List<SMGetElement<T>> get(long duration, TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
+    subList = getSubList(mergedResult, 0, count);
+    smGetListSize = smGetList.size();
 
-        if (!blatch.await(duration, units)) {
-          bulkOpTimeOutHandler(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset
-          MemcachedConnection.opsSucceeded(ops);
+    return new SMGetFuture<List<SMGetElement<T>>>(
+            ops, operationTimeout,
+            blatch, smGetListSize,
+            mergedResult, subList,
+            missedKeys, mergedTrimmedKeys,
+            failedOperationStatus, resultOperationStatus);
+  }
+
+  /**
+   * Get the sublist of elements from the smget result.
+   *
+   * @param mergedResult smget result (list of elements)
+   * @param offset       start index, negative offset indicates "start from the tail"
+   * @param count        number of elements to get
+   * @return list of elements
+   */
+  public <T> List<SMGetElement<T>> getSubList(
+          final List<SMGetElement<T>> mergedResult, int offset, int count) {
+
+    if (mergedResult.size() > count) {
+      int toIndex = (count + offset > mergedResult.size())
+              ? mergedResult.size() : count + offset;
+      if (offset > toIndex) {
+        return Collections.emptyList();
+      }
+      return mergedResult.subList(offset, toIndex);
+    } else {
+      if (offset > 0) {
+        int toIndex = (count + offset > mergedResult.size())
+                ? mergedResult.size() : count + offset;
+
+        if (offset > toIndex) {
+          return Collections.emptyList();
         }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        if (smGetList.size() == 1) {
-          return mergedResult;
-        }
-
-        return getSubList(mergedResult, 0, count);
+        return mergedResult.subList(offset, toIndex);
+      } else {
+        return mergedResult;
       }
-
-      @Override
-      public List<String> getMissedKeyList() {
-        return missedKeyList;
-      }
-
-      @Override
-      public Map<String, CollectionOperationStatus> getMissedKeys() {
-        return missedKeys;
-      }
-
-      @Override
-      public List<SMGetTrimKey> getTrimmedKeys() {
-        return mergedTrimmedKeys;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        if (failedOperationStatus.size() > 0) {
-          return new CollectionOperationStatus(failedOperationStatus.get(0));
-        }
-        return new CollectionOperationStatus(resultOperationStatus.get(0));
-      }
-    };
+    }
   }
 
   @Override
@@ -3985,73 +3844,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       ops.add(op);
     }
 
-    return new CollectionFuture<Map<Integer, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          op.cancel("by application.");
-          rv |= op.getState() == OperationState.WRITE_QUEUED;
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-
-        if (!latch.await(duration, units)) {
-          pipeOpTimeOutHandler(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset only once in pipe
-          MemcachedConnection.opSucceeded(ops.iterator().next());
-        }
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return mergedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        for (OperationStatus status : mergedOperationStatus) {
-          if (!status.isSuccess()) {
-            return new CollectionOperationStatus(status);
-          }
-        }
-        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return new PipeOperationFuture<Map<Integer, CollectionOperationStatus>>(
+            latch, operationTimeout, ops, mergedOperationStatus, mergedResult);
   }
 
   @Override

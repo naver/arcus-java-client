@@ -19,34 +19,101 @@ package net.spy.memcached.internal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CountDownLatch;
 
+import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
+import net.spy.memcached.ops.OperationStatus;
 
-public abstract class SMGetFuture<T> implements Future<T> {
+import static net.spy.memcached.ArcusClient.bulkOpTimeOutHandler;
+
+public class SMGetFuture<T> implements Future<T> {
 
   private final Collection<Operation> ops;
   private final long timeout;
 
-  public SMGetFuture(Collection<Operation> ops, long timeout) {
+  private final CountDownLatch broadcastLatch;
+
+  private final int smGetListSize;
+
+  private final T mergedResult;
+
+  private final T subListResult;
+
+  private final Map<String, CollectionOperationStatus> missedKeys;
+
+  private final List<SMGetTrimKey> mergedTrimKeys;
+
+  private final List<OperationStatus> failedOperationStatus;
+
+  private final List<OperationStatus> resultOperationStatus;
+
+
+  public SMGetFuture(Collection<Operation> ops, long timeout,
+                     CountDownLatch broadcastLatch,
+                     int smGetListSize,
+                     T mergedResult, T subListResult,
+                     Map<String, CollectionOperationStatus> missedKeys,
+                     List<SMGetTrimKey> mergedTrimKeys,
+                     List<OperationStatus> failedOperationStatus,
+                     List<OperationStatus> resultOperationStatus) {
     this.ops = ops;
     this.timeout = timeout;
+    this.broadcastLatch = broadcastLatch;
+    this.smGetListSize = smGetListSize;
+    this.mergedResult = mergedResult;
+    this.subListResult = subListResult;
+    this.missedKeys = missedKeys;
+    this.mergedTrimKeys = mergedTrimKeys;
+    this.failedOperationStatus = failedOperationStatus;
+    this.resultOperationStatus = resultOperationStatus;
   }
 
-  @Override
   public T get() throws InterruptedException, ExecutionException {
     try {
       return get(timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e);
     }
+  }
+
+  @Override
+  public T get(long duration, TimeUnit units)
+          throws InterruptedException, TimeoutException, ExecutionException {
+
+    if (!broadcastLatch.await(duration, units)) {
+      bulkOpTimeOutHandler(duration, units, ops);
+    } else {
+      // continuous timeout counter will be reset
+      MemcachedConnection.opsSucceeded(ops);
+    }
+
+    for (Operation op : ops) {
+      if (op != null && op.hasErrored()) {
+        throw new ExecutionException(op.getException());
+      }
+
+      if (op != null && op.isCancelled()) {
+        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+      }
+    }
+
+    if (smGetListSize == 1) {
+      return mergedResult;
+    }
+
+    return subListResult;
   }
 
   @Override
@@ -78,11 +145,24 @@ public abstract class SMGetFuture<T> implements Future<T> {
     return true;
   }
 
-  public abstract Map<String, CollectionOperationStatus> getMissedKeys();
+  public Map<String, CollectionOperationStatus> getMissedKeys() {
+    return missedKeys;
+  }
 
-  public abstract List<String> getMissedKeyList();
+  public List<String> getMissedKeyList() {
+    Set<String> keyList = missedKeys.keySet();
+    return Collections.synchronizedList(new ArrayList<String>(keyList));
+  }
 
-  public abstract List<SMGetTrimKey> getTrimmedKeys();
+  public List<SMGetTrimKey> getTrimmedKeys() {
+    return mergedTrimKeys;
+  }
 
-  public abstract CollectionOperationStatus getOperationStatus();
+  public CollectionOperationStatus getOperationStatus() {
+    if (failedOperationStatus.size() > 0) {
+      return new CollectionOperationStatus(failedOperationStatus.get(0));
+    }
+    return new CollectionOperationStatus(resultOperationStatus.get(0));
+  }
+
 }
