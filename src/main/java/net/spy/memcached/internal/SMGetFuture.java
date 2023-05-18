@@ -23,22 +23,19 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.CountDownLatch;
 
 import net.spy.memcached.MemcachedConnection;
-import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 
 import static net.spy.memcached.ArcusClient.bulkOpTimeOutHandler;
 
-public class SMGetFuture<T> implements Future<T> {
+public class SMGetFuture<T> extends CollectionBulkFuture<T> {
 
   private final Collection<Operation> ops;
   private final long timeout;
@@ -68,6 +65,7 @@ public class SMGetFuture<T> implements Future<T> {
                      List<SMGetTrimKey> mergedTrimKeys,
                      List<OperationStatus> failedOperationStatus,
                      List<OperationStatus> resultOperationStatus) {
+    super(ops, timeout, broadcastLatch, mergedResult);
     this.ops = ops;
     this.timeout = timeout;
     this.broadcastLatch = broadcastLatch;
@@ -78,14 +76,6 @@ public class SMGetFuture<T> implements Future<T> {
     this.mergedTrimKeys = mergedTrimKeys;
     this.failedOperationStatus = failedOperationStatus;
     this.resultOperationStatus = resultOperationStatus;
-  }
-
-  public T get() throws InterruptedException, ExecutionException {
-    try {
-      return get(timeout, TimeUnit.MILLISECONDS);
-    } catch (TimeoutException e) {
-      throw new OperationTimeoutException(e);
-    }
   }
 
   @Override
@@ -117,32 +107,12 @@ public class SMGetFuture<T> implements Future<T> {
   }
 
   @Override
-  public boolean cancel(boolean ign) {
-    boolean rv = false;
-    for (Operation op : ops) {
-      op.cancel("by application.");
-      rv |= op.getState() == OperationState.WRITE_QUEUED;
-    }
-    return rv;
-  }
-
-  @Override
   public boolean isCancelled() {
     boolean rv = false;
     for (Operation op : ops) {
       rv |= op.isCancelled();
     }
     return rv;
-  }
-
-  @Override
-  public boolean isDone() {
-    for (Operation op : ops) {
-      if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-        return false;
-      }
-    }
-    return true;
   }
 
   public Map<String, CollectionOperationStatus> getMissedKeys() {

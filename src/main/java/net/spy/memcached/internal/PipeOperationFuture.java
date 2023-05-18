@@ -22,7 +22,7 @@ public class PipeOperationFuture<T> extends CollectionFuture<T> {
 
   private final List<OperationStatus> mergedOperationStatus;
 
-  private final T rv;
+  private final T result;
 
   public PipeOperationFuture(CountDownLatch l, long opTimeout,
                              ConcurrentLinkedQueue<Operation> ops,
@@ -31,7 +31,7 @@ public class PipeOperationFuture<T> extends CollectionFuture<T> {
     super(l, opTimeout);
     this.ops = ops;
     this.mergedOperationStatus = mergedOperationStatus;
-    this.rv = mergedResult;
+    this.result = mergedResult;
   }
 
   @Override
@@ -64,7 +64,7 @@ public class PipeOperationFuture<T> extends CollectionFuture<T> {
         throw new ExecutionException(new RuntimeException(op.getCancelCause()));
       }
     }
-    return rv;
+    return result;
   }
 
   @Override

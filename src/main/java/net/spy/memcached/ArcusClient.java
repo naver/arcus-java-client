@@ -127,6 +127,7 @@ import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.BulkOperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.internal.PipeOperationFuture;
+import net.spy.memcached.internal.CollectionInsertBulkFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -4028,68 +4029,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     // return future
-    return new CollectionFuture<Map<String, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          op.cancel("by application.");
-          rv |= op.getState() == OperationState.WRITE_QUEUED;
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<String, CollectionOperationStatus> get(long duration,
-                                                        TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-        if (!latch.await(duration, units)) {
-          bulkOpTimeOutHandler(duration, units, ops);
-        } else {
-          // continuous timeout counter will be reset
-          MemcachedConnection.opsSucceeded(ops);
-        }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return failedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        return null;
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return new CollectionInsertBulkFuture<Map<String, CollectionOperationStatus>>(
+            ops, operationTimeout, latch, failedResult);
   }
 
   public CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> asyncBopGetBulk(
