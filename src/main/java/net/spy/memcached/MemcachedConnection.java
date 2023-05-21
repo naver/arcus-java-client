@@ -722,10 +722,10 @@ public final class MemcachedConnection extends SpyObject {
       String addrs = alterNodesChangeQueue.poll();
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
-          /* prepare connections of alter nodes */
+          // prepare connections of alter nodes
           prepareAlterConnections(convertToSocketAddresses(addrs));
         } else {
-          /* check joining node down */
+          // check joining node down
           updateAlterConnections(convertToSocketAddresses(addrs));
         }
       }
@@ -752,7 +752,7 @@ public final class MemcachedConnection extends SpyObject {
       for (SocketAddress sa : addrs) {
         alterNodes.add(makeMemcachedNode(connName, sa));
       }
-    } else { /* MigrationType.LEAVE */
+    } else { // MigrationType.LEAVE
       for (MemcachedNode node : locator.getAll()) {
         if (addrs.contains(node.getSocketAddress())) {
           alterNodes.add(node);
@@ -988,7 +988,7 @@ public final class MemcachedConnection extends SpyObject {
         } else if (currentOp.getState() == OperationState.REDIRECT) {
           Operation op = qa.removeCurrentReadOp();
           assert op == currentOp : "Expected to pop " + currentOp + " got " + op;
-          if (currentOp == qa.getCurrentWriteOp()) { /* partially written */
+          if (currentOp == qa.getCurrentWriteOp()) { // partially written
             qa.removeCurrentWriteOp();
           }
           redirectOperation(currentOp);
@@ -1014,7 +1014,7 @@ public final class MemcachedConnection extends SpyObject {
     }
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
-      if (currentOp == null) { /* readQ is empty */
+      if (currentOp == null) { // readQ is empty
         if (qa.getReplicaGroup().isDelayedSwitchover() &&
             qa.getReplicaGroup().masterNode == qa) {
           delayedSwitchoverGroups.remove(qa.getReplicaGroup());
@@ -1033,18 +1033,18 @@ public final class MemcachedConnection extends SpyObject {
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Redirect Operation. op=" + op);
     }
-    /* Get RedirectHandler */
+    // Get RedirectHandler
     RedirectHandler rh = op.getAndClearRedirectHandler();
     if (rh == null) {
-      /* Probably code bug */
+      // Probably code bug
       op.cancel("Redirect failure. RedirectHandler is not registered.");
       return;
     }
 
-    /* Hashring update by migration */
+    // Hashring update by migration
     locator.updateMigration(rh.getMigrationBasePoint(), rh.getMigrationEndPoint());
 
-    /* Redirect operation */
+    // Redirect operation
     boolean success;
     if (rh instanceof RedirectHandler.RedirectHandlerSingleKey) {
       success = redirectSingleKeyOperation((RedirectHandler.RedirectHandlerSingleKey) rh, op);
@@ -1064,8 +1064,8 @@ public final class MemcachedConnection extends SpyObject {
     String owner = redirectHandler.getOwner();
     if (owner != null) {
       return redirectSingleKeyOperation(findNodeByOwner(owner), op);
-    } else { /* single key pipe operation */
-      return redirectSingleKeyOperation(redirectHandler.getKey(), op); /* hashring lookup */
+    } else { // single key pipe operation
+      return redirectSingleKeyOperation(redirectHandler.getKey(), op); // hashring lookup
     }
   }
 

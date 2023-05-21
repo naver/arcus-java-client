@@ -69,14 +69,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     ketamaGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
     allGroups = new HashMap<String, MemcachedReplicaGroup>();
 
-    /* ENABLE_MIGRATION if */
-    alterNodes = new HashSet<MemcachedNode>();
-    ketamaAlterGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
-    alterGroups = new HashMap<String, MemcachedReplicaGroup>();
-    existGroups = new HashMap<String, MemcachedReplicaGroup>();
-    clearMigration();
-    /* ENABLE_MIGRATION end */
-
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
       MemcachedReplicaGroup mrg =
@@ -95,11 +87,19 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     for (MemcachedReplicaGroup group : allGroups.values()) {
       insertHash(group);
     }
-    /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
+    // ketamaNodes.size() < numReps*nodes.size() : hash collision
     assert ketamaGroups.size() <= (numReps * allGroups.size());
 
     // prepare toDeleteGroups
     toDeleteGroups = new HashSet<MemcachedReplicaGroup>();
+
+    /* ENABLE_MIGRATION if */
+    alterNodes = new HashSet<MemcachedNode>();
+    ketamaAlterGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
+    alterGroups = new HashMap<String, MemcachedReplicaGroup>();
+    existGroups = new HashMap<String, MemcachedReplicaGroup>();
+    clearMigration();
+    /* ENABLE_MIGRATION end */
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
@@ -134,13 +134,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public MemcachedNode getAlterNode(SocketAddress sa) {
-    /* The alter node to attach should be found */
+    // The alter node to attach should be found
     for (MemcachedNode node : alterNodes) {
       if (sa.equals(node.getSocketAddress())) {
         return node;
       }
     }
-    /* If a slave node has started during migration, it may not exist */ 
+    // If a slave node has started during migration, it may not exist
     return null;
   }
 
@@ -148,7 +148,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     MemcachedReplicaGroup group;
     if (mgType == MigrationType.JOIN) {
       group = alterGroups.get(owner);
-    } else { /* MigrationType.LEAVE */
+    } else { // MigrationType.LEAVE
       group = existGroups.get(owner);
     }
     if (group != null) {
@@ -342,7 +342,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     /* ENABLE_MIGRATION if */
     if (migrationInProgress) {
       alterNodes.remove(node);
-      /* go downward */
+      // go downward
     }
     /* ENABLE_MIGRATION end */
 
@@ -394,13 +394,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     */
     if (migrationInProgress) {
       if (alterGroups.remove(group.getGroupName()) != null) {
-        /* A leaving group is down or has left */
+        // A leaving group is down or has left
         assert migrationType == MigrationType.LEAVE;
         removeHashOfAlter(group);
         return;
       }
       if (existGroups.remove(group.getGroupName()) != null) {
-        /* An existing group is down */
+        // An existing group is down
         /* DISABLE_AUTO_MIGRATION
         if (migrationType == MigrationType.JOIN) {
           automaticJoinCompletion(group);
@@ -409,9 +409,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         }
         */
       } else {
-        /* A joined group is down : do nothing */
+        // A joined group is down : do nothing
       }
-      /* go downward */
+      // go downward
     }
     /* ENABLE_MIGRATION end */
 
@@ -633,14 +633,14 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
                           Collection<MemcachedNode> toDelete) {
     lock.lock();
     try {
-      // Add the alter nodes with slave role */
+      // Add the alter nodes with slave role
       for (MemcachedNode node : toAttach) {
         String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
         MemcachedReplicaGroup mrg = alterGroups.get(groupName);
         if (mrg == null) {
           mrg = allGroups.get(groupName);
         }
-        if (mrg == null) { // close the unknown alter node (FIXME) */
+        if (mrg == null) { // close the unknown alter node (FIXME)
           try {
             node.closeChannel();
           } catch (IOException e) {
@@ -818,7 +818,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       long tmpKey = hashAlg.hash((numTries++) + key);
       // This echos the implementation of Long.hashCode()
       hashVal += (int) (tmpKey ^ (tmpKey >>> 32));
-      hashVal &= 0xffffffffL; /* truncate to 32-bits */
+      hashVal &= 0xffffffffL; // truncate to 32-bits
       remainingTries--;
     }
 

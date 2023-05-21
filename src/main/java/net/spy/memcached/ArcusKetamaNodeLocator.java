@@ -70,21 +70,21 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     ketamaNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     config = conf;
 
-    /* ENABLE_MIGRATION if */
-    existNodes = new HashSet<MemcachedNode>();
-    alterNodes = new HashSet<MemcachedNode>();
-    ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
-    clearMigration();
-    /* ENABLE_MIGRATION end */
-
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
     for (MemcachedNode node : nodes) {
       insertHash(node);
     }
 
-    /* ketamaNodes.size() < numReps*nodes.size() : hash collision */
+    // ketamaNodes.size() < numReps*nodes.size() : hash collision
     assert ketamaNodes.size() <= numReps * nodes.size();
+
+    /* ENABLE_MIGRATION if */
+    existNodes = new HashSet<MemcachedNode>();
+    alterNodes = new HashSet<MemcachedNode>();
+    ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
+    clearMigration();
+    /* ENABLE_MIGRATION end */
   }
 
   private ArcusKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedNode>> smn,
@@ -113,7 +113,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public MemcachedNode getAlterNode(SocketAddress sa) {
-    /* The alter node to attach must be found */
+    // The alter node to attach must be found
     for (MemcachedNode node : alterNodes) {
       if (sa.equals(node.getSocketAddress())) {
         return node;
@@ -130,7 +130,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           return node;
         }
       }
-    } else { /* MigrationType.LEAVE */
+    } else { // MigrationType.LEAVE
       for (MemcachedNode node : existNodes) {
         if (node.getSocketAddress().equals(ownerAddress)) {
           return node;
@@ -282,13 +282,13 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     */
     if (migrationInProgress) {
       if (alterNodes.remove(node)) {
-        /* A leaving node is down or has left */
+        // A leaving node is down or has left
         assert migrationType == MigrationType.LEAVE;
         removeHashOfAlter(node);
         return;
       }
       if (existNodes.remove(node)) {
-        /* An existing node is down */
+        // An existing node is down
         /* DISABLE_AUTO_MIGRATION
         if (migrationType == MigrationType.JOIN) {
           automaticJoinCompletion(node);
@@ -297,9 +297,9 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         }
         */
       } else {
-        /* A joined node is down : do nothing */
+        // A joined node is down : do nothing
       }
-      /* go downward */
+      // go downward
     }
     /* ENABLE_MIGRATION end */
 
@@ -665,7 +665,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       long tmpKey = hashAlg.hash((numTries++) + key);
       // This echos the implementation of Long.hashCode()
       hashVal += (int) (tmpKey ^ (tmpKey >>> 32));
-      hashVal &= 0xffffffffL; /* truncate to 32-bits */
+      hashVal &= 0xffffffffL; // truncate to 32-bits
       remainingTries--;
     }
 
