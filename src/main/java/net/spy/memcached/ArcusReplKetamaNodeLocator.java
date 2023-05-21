@@ -71,8 +71,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
-      MemcachedReplicaGroup mrg =
-              allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
+      MemcachedReplicaGroup mrg;
+      mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
       if (mrg == null) {
         mrg = new MemcachedReplicaGroupImpl(node);
         getLogger().info("new memcached replica group added %s", mrg.getGroupName());
@@ -641,6 +641,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           mrg = allGroups.get(groupName);
         }
         if (mrg == null) { // close the unknown alter node (FIXME)
+          getLogger().warn("Unknown alter node to attach : " + node);
           try {
             node.closeChannel();
           } catch (IOException e) {
@@ -653,14 +654,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
       // Remove the failed or left alter nodes.
       for (MemcachedNode node : toDelete) {
-        if (alterNodes.remove(node)) {
-          MemcachedReplicaGroup mrg;
-          mrg = alterGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
-          if (mrg != null) {
-            mrg.deleteMemcachedNode(node);
-            if (mrg.isEmptyGroup()) {
-              removeHashOfAlter(mrg);
-            }
+        alterNodes.remove(node);
+        MemcachedReplicaGroup mrg;
+        mrg = alterGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
+        if (mrg != null) {
+          mrg.deleteMemcachedNode(node);
+          if (mrg.isEmptyGroup()) {
+            removeHashOfAlter(mrg);
           }
         }
         try {
