@@ -787,6 +787,7 @@ public final class MemcachedConnection extends SpyObject {
       // Make connections to the newly added alter nodes with slave role.
       for (SocketAddress sa : addrs) {
         attachNodes.add(makeMemcachedNode(connName, sa));
+        getLogger().info("Address of new alter node to attach: %s.", sa.toString());
       }
     }
     /* ENABLE_REPLICATION end */
