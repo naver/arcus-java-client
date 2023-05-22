@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -91,6 +92,7 @@ public class CacheManager extends SpyThread implements Watcher,
   private volatile boolean shutdownRequested = false;
 
   private List<String> prevCacheList;
+  private List<String> prevAlterList;
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled = false;
@@ -408,17 +410,11 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
-  private String getAddressListString(List<String> children) {
-    StringBuilder addrs = new StringBuilder();
+  private void trimCacheZNodeList(List<String> children) {
     for (int i = 0; i < children.size(); i++) {
       String[] temp = children.get(i).split("-");
-      if (i != 0) {
-        addrs.append(",").append(temp[0]);
-      } else {
-        addrs.append(temp[0]);
-      }
+      children.set(i, temp[0]);
     }
-    return addrs.toString();
   }
 
   /**
@@ -444,7 +440,10 @@ public class CacheManager extends SpyThread implements Watcher,
     }
 
     // Store the current children.
-    prevCacheList = children;
+    prevCacheList = new ArrayList<String>(children);
+
+    // trim the hostname at the back of znode strings
+    trimCacheZNodeList(children);
 
     /* ENABLE_REPLICATION if */
     // children is the current list of znodes in the cache_list directory
@@ -458,18 +457,17 @@ public class CacheManager extends SpyThread implements Watcher,
     // Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
     // by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
     /* ENABLE_REPLICATION end */
-    String addrs = getAddressListString(children);
 
     if (client == null) {
-      if (!addrs.isEmpty()) {
-        initArcusClient(addrs);
+      if (!children.isEmpty()) {
+        initArcusClient(children);
       }
       return;
     }
 
     for (ArcusClient ac : client) {
       MemcachedConnection conn = ac.getMemcachedConnection();
-      conn.putNodesChangeQueue(addrs);
+      conn.putNodesChangeQueue(children);
     }
   }
 
@@ -525,14 +523,25 @@ public class CacheManager extends SpyThread implements Watcher,
 
   @Override
   public boolean commandAlterListChange(List<String> children) {
+
+    if (!children.equals(prevAlterList)) {
+      getLogger().warn("Alter list has been changed : "
+              + "From=" + prevAlterList + ", "
+              + "To=" + children + ", ");
+    }
+
+    prevAlterList = new ArrayList<String>(children);
+
+    // trim the hostname at the back of znode strings
+    trimCacheZNodeList(children);
+
     // return false if this method is failed.
-    String addrs = getAddressListString(children);
     if (startup) {
       try {
         for (ArcusClient ac : client) {
           MemcachedConnection conn = ac.getMemcachedConnection();
           conn.prepareAlterConnections(arcusReplEnabled ?
-              ArcusReplNodeAddress.getAddresses(addrs) : AddrUtil.getAddresses(addrs));
+              ArcusReplNodeAddress.getAddresses(children) : AddrUtil.getAddresses(children));
         }
       } catch (IOException e) {
         getLogger().fatal("Cannot initialize alter_list znode.", e);
@@ -541,7 +550,7 @@ public class CacheManager extends SpyThread implements Watcher,
     } else {
       for (ArcusClient ac : client) {
         MemcachedConnection conn = ac.getMemcachedConnection();
-        conn.putAlterNodesChangeQueue(addrs);
+        conn.putAlterNodesChangeQueue(children);
       }
     }
     return true;
@@ -630,7 +639,7 @@ public class CacheManager extends SpyThread implements Watcher,
    *
    * @param addrs current available Memcached Addresses
    */
-  private void initArcusClient(String addrs) {
+  private void initArcusClient(List<String> addrs) {
     List<InetSocketAddress> socketList = getSocketAddressList(addrs);
     int addrCount = socketList.size();
 
@@ -678,7 +687,7 @@ public class CacheManager extends SpyThread implements Watcher,
 
   }
 
-  private List<InetSocketAddress> getSocketAddressList(String addrs) {
+  private List<InetSocketAddress> getSocketAddressList(List<String> addrs) {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       List<InetSocketAddress> socketList = ArcusReplNodeAddress.getAddresses(addrs);

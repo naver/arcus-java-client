@@ -21,6 +21,34 @@ public final class AddrUtil {
    * Note that colon-delimited IPv6 is also supported.
    * For example:  ::1:11211
    */
+  public static List<InetSocketAddress> getAddresses(List<String> addressList) {
+    ArrayList<InetSocketAddress> addrs =
+            new ArrayList<InetSocketAddress>();
+
+    if (addressList == null || addressList.isEmpty()) {
+      return addrs;
+    }
+
+    for (String addr : addressList) {
+      String hoststuff = addr.trim();
+      if (hoststuff.equals("")) {
+        continue;
+      }
+
+      int finalColon = hoststuff.lastIndexOf(':');
+      if (finalColon < 1) {
+        throw new IllegalArgumentException("Invalid server ``"
+                + hoststuff + "'' in list:  " + addressList.toString());
+      }
+      String hostPart = hoststuff.substring(0, finalColon);
+      String portNum = hoststuff.substring(finalColon + 1);
+
+      addrs.add(new InetSocketAddress(hostPart,
+              Integer.parseInt(portNum)));
+    }
+    return addrs;
+  }
+
   public static List<InetSocketAddress> getAddresses(String s) {
     if (s == null) {
       throw new NullPointerException("Null host list");
@@ -49,7 +77,6 @@ public final class AddrUtil {
       addrs.add(new InetSocketAddress(hostPart,
               Integer.parseInt(portNum)));
     }
-    assert !addrs.isEmpty() : "No addrs found";
     return addrs;
   }
 
