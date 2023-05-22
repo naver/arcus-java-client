@@ -97,7 +97,7 @@ public class CacheManager extends SpyThread implements Watcher,
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */
-  private boolean arcusMigrEnabled = false;
+  private boolean arcusMigrEnabled = true;
 
   private MigrationMonitor migrationMonitor;
 
@@ -234,8 +234,8 @@ public class CacheManager extends SpyThread implements Watcher,
         cfb.internalArcusMigrEnabled(true);
         getLogger().info("Migration feature is enabled.");
       } else {
-        arcusMigrEnabled = false;
-        cfb.internalArcusMigrEnabled(false);
+        arcusMigrEnabled = true;
+        cfb.internalArcusMigrEnabled(true);
         getLogger().info("Migration feature is disabled.");
       }
       /* ENABLE_MIGRATION end */

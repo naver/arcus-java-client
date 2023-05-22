@@ -98,7 +98,7 @@ public final class MemcachedConnection extends SpyObject {
   private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
 
   /* ENABLE_MIGRATION if */
-  private boolean arcusMigrEnabled = false;
+  private boolean arcusMigrEnabled = true;
   private MigrationType mgType = MigrationType.UNKNOWN;
   private MigrationState mgState = MigrationState.UNKNOWN;
   private boolean mgInProgress = false;
@@ -161,7 +161,7 @@ public final class MemcachedConnection extends SpyObject {
 
   /* ENABLE_MIGRATION if */
   void setArcusMigrEnabled(boolean b) {
-    arcusMigrEnabled = b;
+    arcusMigrEnabled = true;
   }
 
   void setMigrationTypeAndState(MigrationType type, MigrationState state) {

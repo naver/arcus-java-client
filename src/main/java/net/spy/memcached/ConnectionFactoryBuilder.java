@@ -92,15 +92,15 @@ public class ConnectionFactoryBuilder {
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */
-  private boolean arcusMigrationCheck = false; // for arcus users
-  private boolean arcusMigrEnabled = false; // for internal
+  private boolean arcusMigrationCheck = true; // for arcus users
+  private boolean arcusMigrEnabled = true; // for internal
 
   public void internalArcusMigrEnabled(boolean b) {
-    arcusMigrEnabled = b;
+    arcusMigrEnabled = true;
   }
 
   public ConnectionFactoryBuilder setArcusMigrationCheck(boolean enable) {
-    arcusMigrationCheck = enable;
+    arcusMigrationCheck = true;
     return this;
   }
 
