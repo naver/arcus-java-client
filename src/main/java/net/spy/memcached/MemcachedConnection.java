@@ -776,9 +776,11 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
     }
-    for (MemcachedNode node : locator.getAll()) {
-      if (addrs.contains(node.getSocketAddress())) {
-        addrs.remove(node.getSocketAddress());
+    if (mgType == MigrationType.JOIN) {
+      for (MemcachedNode node : locator.getAll()) {
+        if (addrs.contains(node.getSocketAddress())) {
+          addrs.remove(node.getSocketAddress());
+        }
       }
     }
 
