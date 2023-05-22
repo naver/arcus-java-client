@@ -148,6 +148,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     MemcachedReplicaGroup group;
     if (mgType == MigrationType.JOIN) {
       group = alterGroups.get(owner);
+      if (group == null) {
+        group = allGroups.get(owner);
+      }
     } else { // MigrationType.LEAVE
       group = existGroups.get(owner);
     }
