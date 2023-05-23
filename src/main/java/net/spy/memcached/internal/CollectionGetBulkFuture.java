@@ -100,11 +100,12 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
 
   @Override
   public boolean isCancelled() {
-    boolean rv = false;
     for (Operation op : ops) {
-      rv |= op.isCancelled();
+      if (op.isCancelled()) {
+        return true;
+      }
     }
-    return rv;
+    return false;
   }
 
   @Override
