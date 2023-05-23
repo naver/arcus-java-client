@@ -392,9 +392,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
   private void removeHash(MemcachedReplicaGroup group) {
     /* ENABLE_MIGRATION if */
-    /* DISABLE_AUTO_MIGRATION
-    boolean callAutoLeaveAbort = false;
-    */
     if (migrationInProgress) {
       if (alterGroups.remove(group.getGroupName()) != null) {
         // A leaving group is down or has left
@@ -404,13 +401,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
       if (existGroups.remove(group.getGroupName()) != null) {
         // An existing group is down
-        /* DISABLE_AUTO_MIGRATION
-        if (migrationType == MigrationType.JOIN) {
-          automaticJoinCompletion(group);
-        } else {
-          callAutoLeaveAbort = true;
-        }
-        */
       } else {
         // A joined group is down : do nothing
       }
@@ -430,14 +420,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         }
       }
     }
-
-    /* ENABLE_MIGRATION if */
-    /* DISABLE_AUTO_MIGRATION
-    if (callAutoLeaveAbort) {
-      automaticLeaveAbort(group);
-    }
-    */
-    /* ENABLE_MIGRATION end */
   }
 
   /* ENABLE_MIGRATION if */
@@ -579,58 +561,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       moveAlterHashRangeFromExistToAlter(spoint, inclusive, 0xFFFFFFFFL, true);
     }
   }
-
-  /* DISABLE_AUTO_MIGRATION
-  private void automaticJoinCompletion(MemcachedReplicaGroup mine) {
-    getLogger().info("Started automatic join completion. group=" + mine.getGroupName());
-    for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
-      byte[] digest = HashAlgorithm.computeMd5(config.getKeyForGroup(mine, i));
-      for (int h = 0; h < 4; h++) {
-        Long currPoint = getKetamaHashPoint(digest, h);
-        SortedSet<MemcachedReplicaGroup> existSet = ketamaGroups.get(currPoint);
-        assert existSet != null && existSet.size() > 0;
-        if (existSet.size() == 1 || existSet.first() == mine) { // visible (FIXME)
-          Long prevPoint = ketamaGroups.lowerKey(currPoint);
-          insertAlterHashRange(prevPoint, currPoint, true); // inclusive: true
-        }
-      }
-    }
-    getLogger().info("Completed automatic join completion. group=" + mine.getGroupName());
-  }
-
-  private Long findMigrationBasePointLEAVE() {
-    Long key = ketamaGroups.lastKey();
-    while (key != null) {
-      for (MemcachedReplicaGroup group : ketamaGroups.get(key)) {
-        if (existGroups.containsKey(group.getGroupName())) {
-          break;
-        }
-      }
-      key = ketamaGroups.lowerKey(key);
-    }
-    assert key != null;
-    return key;
-  }
-
-  private void automaticLeaveAbort(MemcachedReplicaGroup mine) {
-    if (migrationBasePoint != -1L && existGroups.size() > 0) {
-      Long newBasePoint = findMigrationBasePointLEAVE();
-      if (newBasePoint == migrationBasePoint) {
-        return; // nothing to abort
-      }
-
-      getLogger().info("Started automatic leave abort. group=" + mine.getGroupName());
-      // abort (newBasePoint ~ migrationBasePoint) leaved hpoints
-      insertAlterHashRange(newBasePoint, migrationBasePoint, true); // inclusive: true
-      migrationBasePoint = newBasePoint;
-      if (migrationBasePoint == migrationLastPoint) {
-        migrationBasePoint = -1L;
-        migrationLastPoint = -1L;
-      }
-      getLogger().info("Completed automatic leave abort. group=" + mine.getGroupName());
-    }
-  }
-  */
 
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {

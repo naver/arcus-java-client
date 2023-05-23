@@ -282,9 +282,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private void removeHash(MemcachedNode node) {
     /* ENABLE_MIGRATION if */
-    /* DISABLE_AUTO_MIGRATION
-    boolean callAutoLeaveAbort = false;
-    */
     if (migrationInProgress) {
       if (alterNodes.remove(node)) {
         // A leaving node is down or has left
@@ -294,13 +291,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       }
       if (existNodes.remove(node)) {
         // An existing node is down
-        /* DISABLE_AUTO_MIGRATION
-        if (migrationType == MigrationType.JOIN) {
-          automaticJoinCompletion(node);
-        } else {
-          callAutoLeaveAbort = true;
-        }
-        */
       } else {
         // A joined node is down : do nothing
       }
@@ -322,14 +312,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       }
     }
     config.removeNode(node);
-
-    /* ENABLE_MIGRATION if */
-    /* DISABLE_AUTO_MIGRATION
-    if (callAutoLeaveAbort) {
-      automaticLeaveAbort(node);
-    }
-    */
-    /* ENABLE_MIGRATION end */
   }
 
   /* ENABLE_MIGRATION if */
@@ -471,58 +453,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       moveAlterHashRangeFromExistToAlter(spoint, inclusive, 0xFFFFFFFFL, true);
     }
   }
-
-  /* DISABLE_AUTO_MIGRATION
-  private void automaticJoinCompletion(MemcachedNode mine) {
-    getLogger().info("Started automatic join completion. node=" + mine.getNodeName());
-    for (int i = 0; i < config.getNodeRepetitions() / 4; i++) {
-      byte[] digest = HashAlgorithm.computeMd5(config.getKeyForNode(mine, i));
-      for (int h = 0; h < 4; h++) {
-        Long currPoint = getKetamaHashPoint(digest, h);
-        SortedSet<MemcachedNode> existSet = ketamaNodes.get(currPoint);
-        assert existSet != null && existSet.size() > 0;
-        if (existSet.size() == 1 || existSet.first() == mine) { // visible (FIXME)
-          Long prevPoint = ketamaNodes.lowerKey(currPoint);
-          insertAlterHashRange(prevPoint, currPoint, true); // inclusive: true
-        }
-      }
-    }
-    getLogger().info("Completed automatic join completion. node=" + mine.getNodeName());
-  }
-
-  private Long findMigrationBasePointLEAVE() {
-    Long key = ketamaNodes.lastKey();
-    while (key != null) {
-      for (MemcachedNode node : ketamaNodes.get(key)) {
-        if (existNodes.contains(node)) {
-          break;
-        }
-      }
-      key = ketamaNodes.lowerKey(key);
-    }
-    assert key != null;
-    return key;
-  }
-
-  private void automaticLeaveAbort(MemcachedNode mine) {
-    if (migrationBasePoint != -1L && existNodes.size() > 0) {
-      Long newBasePoint = findMigrationBasePointLEAVE();
-      if (newBasePoint == migrationBasePoint) {
-        return; // nothing to abort
-      }
-
-      getLogger().info("Started automatic leave abort. node=" + mine.getNodeName());
-      // abort (newBasePoint ~ migrationBasePoint) leaved hpoints
-      insertAlterHashRange(newBasePoint, migrationBasePoint, true); // inclusive: true
-      migrationBasePoint = newBasePoint;
-      if (migrationBasePoint == migrationLastPoint) {
-        migrationBasePoint = -1L;
-        migrationLastPoint = -1L;
-      }
-      getLogger().info("Completed automatic leave abort. node=" + mine.getNodeName());
-    }
-  }
-  */
 
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {
