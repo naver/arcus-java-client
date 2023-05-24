@@ -46,7 +46,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedNode>> ketamaAlterNodes;
   private Collection<MemcachedNode> alterNodes;
-  private Collection<MemcachedNode> existNodes;
 
   private MigrationType migrationType;
   private Long migrationBasePoint;
@@ -80,7 +79,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     assert ketamaNodes.size() <= numReps * nodes.size();
 
     /* ENABLE_MIGRATION if */
-    existNodes = new HashSet<MemcachedNode>();
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     clearMigration();
@@ -96,7 +94,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config = conf;
 
     /* ENABLE_MIGRATION if */
-    existNodes = new HashSet<MemcachedNode>();
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     clearMigration();
@@ -136,7 +133,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         }
       }
     } else { // MigrationType.LEAVE
-      for (MemcachedNode node : existNodes) {
+      for (MemcachedNode node : allNodes) {
         if (node.getSocketAddress().equals(ownerAddress)) {
           return node;
         }
@@ -289,12 +286,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         removeHashOfAlter(node);
         return;
       }
-      if (existNodes.remove(node)) {
-        // An existing node is down
-      } else {
-        // A joined node is down : do nothing
-      }
-      // go downward
+      // An existing or joined node is down. go downward
     }
     /* ENABLE_MIGRATION end */
 
@@ -479,7 +471,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   private void clearMigration() {
-    existNodes.clear();
     alterNodes.clear();
     ketamaAlterNodes.clear();
     migrationBasePoint = -1L;
@@ -496,23 +487,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     migrationType = type;
     migrationInProgress = true;
 
-    /* prepare alterNodes, ketamaAlterNodes and existNodes */
-    if (type == MigrationType.JOIN) {
-      for (MemcachedNode node : toAlter) {
-        alterNodes.add(node);
+    /* prepare alterNodes and ketamaAlterNodes */
+    for (MemcachedNode node : toAlter) {
+      alterNodes.add(node);
+      if (type == MigrationType.JOIN) {
         prepareHashOfJOIN(node);
-      }
-      for (MemcachedNode node : allNodes) {
-        existNodes.add(node);
-      }
-    } else { // MigrationType.LEAVE
-      for (MemcachedNode node : toAlter) {
-        alterNodes.add(node);
-      }
-      for (MemcachedNode node : allNodes) {
-        if (!alterNodes.contains(node)) {
-          existNodes.add(node);
-        }
       }
     }
   }

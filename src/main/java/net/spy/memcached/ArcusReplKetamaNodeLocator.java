@@ -47,7 +47,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaAlterGroups;
   private HashMap<String, MemcachedReplicaGroup> alterGroups;
-  private HashMap<String, MemcachedReplicaGroup> existGroups;
   private HashSet<MemcachedNode> alterNodes;
 
   private MigrationType migrationType;
@@ -97,7 +96,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
     alterGroups = new HashMap<String, MemcachedReplicaGroup>();
-    existGroups = new HashMap<String, MemcachedReplicaGroup>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
@@ -115,7 +113,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterGroups = new TreeMap<Long, SortedSet<MemcachedReplicaGroup>>();
     alterGroups = new HashMap<String, MemcachedReplicaGroup>();
-    existGroups = new HashMap<String, MemcachedReplicaGroup>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
@@ -152,7 +149,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         group = allGroups.get(owner);
       }
     } else { // MigrationType.LEAVE
-      group = existGroups.get(owner);
+      group = allGroups.get(owner);
     }
     if (group != null) {
       return group.getMasterNode();
@@ -399,12 +396,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         removeHashOfAlter(group);
         return;
       }
-      if (existGroups.remove(group.getGroupName()) != null) {
-        // An existing group is down
-      } else {
-        // A joined group is down : do nothing
-      }
-      // go downward
+      // An existing or joined group is down. go downward. 
     }
     /* ENABLE_MIGRATION end */
 
@@ -614,7 +606,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   private void clearMigration() {
     alterNodes.clear();
     alterGroups.clear();
-    existGroups.clear();
     ketamaAlterGroups.clear();
     migrationBasePoint = -1L;
     migrationLastPoint = -1L;
@@ -630,12 +621,11 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     migrationType = type;
     migrationInProgress = true;
 
-    MemcachedReplicaGroup mrg;
     if (type == MigrationType.JOIN) {
       for (MemcachedNode node : toAlter) {
         alterNodes.add(node);
         String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
-        mrg = alterGroups.get(groupName);
+        MemcachedReplicaGroup mrg = alterGroups.get(groupName);
         if (mrg == null) {
           mrg = new MemcachedReplicaGroupImpl(node);
           alterGroups.put(groupName, mrg);
@@ -644,24 +634,14 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           mrg.setMemcachedNode(node);
         }
       }
-      for (String groupName : allGroups.keySet()) {
-        mrg = allGroups.get(groupName);
-        existGroups.put(groupName, mrg);
-      }
     } else { // MigrationType.LEAVE
       for (MemcachedNode node : toAlter) {
         alterNodes.add(node);
         String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
-        mrg = alterGroups.get(groupName);
+        MemcachedReplicaGroup mrg = alterGroups.get(groupName);
         if (mrg == null) {
           mrg = allGroups.get(groupName);
           alterGroups.put(groupName, mrg);
-        }
-      }
-      for (String groupName : allGroups.keySet()) {
-        if (!alterGroups.containsKey(groupName)) {
-          mrg = allGroups.get(groupName);
-          existGroups.put(groupName, mrg);
         }
       }
     }
