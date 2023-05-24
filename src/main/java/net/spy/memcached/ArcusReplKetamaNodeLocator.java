@@ -484,8 +484,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   /* Move an alter hash range from ketamaAlterNodes to ketamaNodes */
-  private void moveAlterHashRangeFromAlterToExist(Long spoint, boolean sInclusive,
-                                                  Long epoint, boolean eInclusive) {
+  private void moveHashRangeFromAlterToExist(Long spoint, boolean sInclusive,
+                                             Long epoint, boolean eInclusive) {
     NavigableMap<Long, SortedSet<MemcachedReplicaGroup>> moveRange
         = ketamaAlterGroups.subMap(spoint, sInclusive, epoint, eInclusive);
 
@@ -506,7 +506,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   /* Move an alter hash range from ketamaNode to ketamaAlterNodes */
-  private void moveAlterHashRangeFromExistToAlter(Long spoint, boolean sInclusive,
+  private void moveHashRangeFromExistToAlter(Long spoint, boolean sInclusive,
                                              Long epoint, boolean eInclusive) {
     NavigableMap<Long, SortedSet<MemcachedReplicaGroup>> moveRange
         = ketamaGroups.subMap(spoint, sInclusive, epoint, eInclusive);
@@ -533,24 +533,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
     for (Long key : removeList) {
       ketamaGroups.remove(key);
-    }
-  }
-
-  private void insertAlterHashRange(Long spoint, Long epoint, boolean inclusive) {
-    if (spoint < epoint) {
-      moveAlterHashRangeFromAlterToExist(spoint, inclusive, epoint, true);
-    } else {
-      moveAlterHashRangeFromAlterToExist(spoint, inclusive, 0xFFFFFFFFL, true);
-      moveAlterHashRangeFromAlterToExist(0L, true, epoint, true);
-    }
-  }
-
-  private void removeAlterHashRange(Long spoint, Long epoint, boolean inclusive) {
-    if (spoint < epoint) {
-      moveAlterHashRangeFromExistToAlter(spoint, inclusive, epoint, true);
-    } else {
-      moveAlterHashRangeFromExistToAlter(0L, true, epoint, true);
-      moveAlterHashRangeFromExistToAlter(spoint, inclusive, 0xFFFFFFFFL, true);
     }
   }
 
@@ -669,7 +651,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     return false;
   }
 
-  private void migrateJoinRange(Long spoint, Long epoint) {
+  private void migrateJoinHashRange(Long spoint, Long epoint) {
     lock.lock();
     try {
       if (migrationLastPoint == -1) {
@@ -677,7 +659,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       } else {
         spoint = migrationLastPoint;
       }
-      insertAlterHashRange(spoint, epoint, false); // inclusive: false
+      if (spoint < epoint) {
+        moveHashRangeFromAlterToExist(spoint, false, epoint, true);
+      } else {
+        moveHashRangeFromAlterToExist(spoint, false, 0xFFFFFFFFL, true);
+        moveHashRangeFromAlterToExist(0L, true, epoint, true);
+      }
       migrationLastPoint = epoint;
     } finally {
       lock.unlock();
@@ -685,7 +672,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     getLogger().info("Applied JOIN range. spoint=" + spoint + ", epoint=" + epoint);
   }
 
-  private void migrateLeaveRange(Long spoint, Long epoint) {
+  private void migrateLeaveHashRange(Long spoint, Long epoint) {
     lock.lock();
     try {
       if (migrationLastPoint == -1) {
@@ -693,7 +680,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       } else {
         epoint = migrationLastPoint;
       }
-      removeAlterHashRange(spoint, epoint, false); // inclusive: false
+      if (spoint < epoint) {
+        moveHashRangeFromExistToAlter(spoint, false, epoint, true);
+      } else {
+        moveHashRangeFromExistToAlter(0L, true, epoint, true);
+        moveHashRangeFromExistToAlter(spoint, false, 0xFFFFFFFFL, true);
+      }
       migrationLastPoint = spoint;
     } finally {
       lock.unlock();
@@ -704,9 +696,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   public void updateMigration(Long spoint, Long epoint) {
     if (migrationInProgress && needToMigrateRange(spoint, epoint)) {
       if (migrationType == MigrationType.JOIN) {
-        migrateJoinRange(spoint, epoint);
+        migrateJoinHashRange(spoint, epoint);
       } else {
-        migrateLeaveRange(spoint, epoint);
+        migrateLeaveHashRange(spoint, epoint);
       }
     }
   }
