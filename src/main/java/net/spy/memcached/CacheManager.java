@@ -276,8 +276,10 @@ public class CacheManager extends SpyThread implements Watcher,
     String path = getClientListZPath() + serviceCode + "/";
 
     // create the ephemeral znode
-    // /arcus/client_list/{service_code}/{client hostname}_{ip address}
-    // _{pool size}_java_{client version}_{YYYYMMDDHHIISS}_{zk session id}"
+    // /arcus/client_list/{service_code}/
+    // {client hostname}_{ip address}_
+    // {pool size}_java_{client version}_{YYYYMMDDHHIISS}
+    // _{zk session id}_jre={jre version}"
 
     // get host info
     String hostInfo;
@@ -300,6 +302,13 @@ public class CacheManager extends SpyThread implements Watcher,
     } catch (Exception e) {
       getLogger().fatal("Can't get time and zk session id.", e);
       restInfo = "00000000000000_0";
+    }
+
+    try {
+      restInfo += "_jre=" + System.getProperty("java.version");
+    } catch (Exception e) {
+      getLogger().fatal("Can't get java version.", e);
+      restInfo += "_jre=null";
     }
     path = path + restInfo;
 
