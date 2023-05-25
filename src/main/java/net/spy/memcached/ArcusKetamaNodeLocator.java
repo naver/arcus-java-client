@@ -45,7 +45,8 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedNode>> ketamaAlterNodes;
-  private Collection<MemcachedNode> alterNodes;
+  private HashSet<MemcachedNode> alterNodes;
+  private HashSet<MemcachedNode> existNodes;
 
   private MigrationType migrationType;
   private Long migrationBasePoint;
@@ -79,6 +80,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     assert ketamaNodes.size() <= numReps * nodes.size();
 
     /* ENABLE_MIGRATION if */
+    existNodes = new HashSet<MemcachedNode>();
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     clearMigration();
@@ -94,6 +96,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config = conf;
 
     /* ENABLE_MIGRATION if */
+    existNodes = new HashSet<MemcachedNode>();
     alterNodes = new HashSet<MemcachedNode>();
     ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
     clearMigration();
@@ -133,7 +136,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         }
       }
     } else { // MigrationType.LEAVE
-      for (MemcachedNode node : allNodes) {
+      for (MemcachedNode node : existNodes) {
         if (node.getSocketAddress().equals(ownerAddress)) {
           return node;
         }
@@ -377,7 +380,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config.removeNode(node); // unregister the node in config
   }
 
-  /* Move an alter hash range from ketamaAlterNodes to ketamaNodes */
+  /* Move the hash range of joining nodes from ketamaAlterNodes to ketamaNodes */
   private void moveHashRangeFromAlterToExist(Long spoint, boolean sInclusive,
                                              Long epoint, boolean eInclusive) {
     NavigableMap<Long, SortedSet<MemcachedNode>> moveRange
@@ -398,7 +401,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     }
   }
 
-  /* Move an alter hash range from ketamaNode to ketamaAlterNodes */
+  /* Move the hash range of leaving nodes from ketamaNode to ketamaAlterNodes */
   private void moveHashRangeFromExistToAlter(Long spoint, boolean sInclusive,
                                              Long epoint, boolean eInclusive) {
     NavigableMap<Long, SortedSet<MemcachedNode>> moveRange
@@ -409,7 +412,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       Iterator<MemcachedNode> nodeIter = entry.getValue().iterator();
       while (nodeIter.hasNext()) {
         MemcachedNode node = nodeIter.next();
-        if (alterNodes.contains(node)) {
+        if (!existNodes.contains(node)) {
           nodeIter.remove(); // leaving => leaved
           SortedSet<MemcachedNode> alterSet = ketamaAlterNodes.get(entry.getKey());
           if (alterSet == null) {
@@ -453,6 +456,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   private void clearMigration() {
+    existNodes.clear();
     alterNodes.clear();
     ketamaAlterNodes.clear();
     migrationBasePoint = -1L;
@@ -469,11 +473,23 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     migrationType = type;
     migrationInProgress = true;
 
-    /* prepare alterNodes and ketamaAlterNodes */
-    for (MemcachedNode node : toAlter) {
-      alterNodes.add(node);
-      if (type == MigrationType.JOIN) {
+    /* prepare existNodes, alterNodes and ketamaAlterNodes */
+    if (type == MigrationType.JOIN) {
+      for (MemcachedNode node : toAlter) {
+        alterNodes.add(node);
         prepareHashOfJOIN(node);
+      }
+      for (MemcachedNode node : allNodes) {
+        existNodes.add(node);
+      }
+    } else { // MigrationType.LEAVE
+      for (MemcachedNode node : toAlter) {
+        alterNodes.add(node);
+      }
+      for (MemcachedNode node : allNodes) {
+        if (!alterNodes.contains(node)) {
+          existNodes.add(node);
+        }
       }
     }
   }
