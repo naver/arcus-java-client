@@ -49,6 +49,16 @@ public abstract class BulkOperationFuture<T>
   }
 
   @Override
+  public boolean isDone() {
+    for (Operation op : ops) {
+      if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public Map<String, T> get(long duration,
                             TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
