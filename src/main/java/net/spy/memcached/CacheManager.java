@@ -275,11 +275,10 @@ public class CacheManager extends SpyThread implements Watcher,
   private String getClientInfo() {
     String path = getClientListZPath() + serviceCode + "/";
 
-    // create the ephemeral znode
-    // /arcus/client_list/{service_code}/
-    // {client hostname}_{ip address}_
-    // {pool size}_java_{client version}_{YYYYMMDDHHIISS}
-    // _{zk session id}_jre={jre version}"
+    // create an ephemeral znode with the following client info.
+    // {client hostname}_{ip address}_{pool size}_java_{client version}_
+    // {YYYYMMDDHHIISS}_{zk session id}
+    // _jre={jre version}
 
     // get host info
     String hostInfo;
@@ -290,10 +289,10 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().fatal("Can't get client host info.", e);
       hostInfo = "unknown-host_0.0.0.0_";
     }
-    path = path + hostInfo
-         + this.poolSize + "_java_" + ArcusClient.getVersion() + "_";
+    hostInfo = hostInfo
+             + this.poolSize + "_java_" + ArcusClient.getVersion() + "_";
 
-    // get time and zk session id
+    // get create time and zk session id
     String restInfo;
     try {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -304,15 +303,16 @@ public class CacheManager extends SpyThread implements Watcher,
       restInfo = "00000000000000_0";
     }
 
+    // get jre info (additional)
+    String jreInfo;
     try {
-      restInfo += "_jre=" + System.getProperty("java.version");
+      jreInfo = "_jre=" + System.getProperty("java.version");
     } catch (Exception e) {
       getLogger().fatal("Can't get java version.", e);
-      restInfo += "_jre=null";
+      jreInfo = "_jre=null";
     }
-    path = path + restInfo;
 
-    return path;
+    return path + hostInfo + restInfo + jreInfo;
   }
 
   /***************************************************************************
