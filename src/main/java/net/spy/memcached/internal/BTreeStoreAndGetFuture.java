@@ -43,7 +43,7 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
 
   public void set(T o, CollectionOperationStatus status) {
     objRef.set(o);
-    opStatus = status;
+    collectionOpStatus = status;
   }
 
   public Element<E> getElement() {
