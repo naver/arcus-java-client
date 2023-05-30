@@ -17,16 +17,9 @@
 package net.spy.memcached.internal;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import net.spy.memcached.MemcachedConnection;
-import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
 /**
@@ -36,13 +29,8 @@ import net.spy.memcached.ops.OperationState;
  *
  * @param <T> Type of object returned from this future.
  */
-public class CollectionFuture<T> implements Future<T> {
-
-  protected final CountDownLatch latch;
-  protected final AtomicReference<T> objRef;
-  protected final long timeout;
-  protected Operation op;
-  protected CollectionOperationStatus opStatus;
+public class CollectionFuture<T> extends OperationFuture<T> {
+  protected CollectionOperationStatus collectionOpStatus;
 
   public CollectionFuture(CountDownLatch l, long opTimeout) {
     this(l, new AtomicReference<T>(null), opTimeout);
@@ -50,70 +38,16 @@ public class CollectionFuture<T> implements Future<T> {
 
   public CollectionFuture(CountDownLatch l, AtomicReference<T> oref,
                           long opTimeout) {
-    super();
-    latch = l;
-    objRef = oref;
-    timeout = opTimeout;
-  }
-
-  public boolean cancel(boolean ign) {
-    assert op != null : "No operation";
-    op.cancel("by application.");
-    // This isn't exactly correct, but it's close enough.  If we're in
-    // a writing state, we *probably* haven't started.
-    return op.getState() == OperationState.WRITE_QUEUED;
-  }
-
-  public T get() throws InterruptedException, ExecutionException {
-    try {
-      return get(timeout, TimeUnit.MILLISECONDS);
-    } catch (TimeoutException e) {
-      throw new OperationTimeoutException(e);
-    }
-  }
-
-  public T get(long duration, TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-    if (!latch.await(duration, units)) {
-      // whenever timeout occurs, continuous timeout counter will increase by 1.
-      MemcachedConnection.opTimedOut(op);
-      throw new CheckedOperationTimeoutException(duration, units, op);
-    } else {
-      // continuous timeout counter will be reset
-      MemcachedConnection.opSucceeded(op);
-    }
-    if (op != null && op.hasErrored()) {
-      throw new ExecutionException(op.getException());
-    }
-    if (op != null && op.isCancelled()) {
-      throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-    }
-
-    return objRef.get();
+    super(l, oref, opTimeout);
   }
 
   public void set(T o, CollectionOperationStatus status) {
     objRef.set(o);
-    opStatus = status;
-  }
-
-  public void setOperation(Operation to) {
-    op = to;
-  }
-
-  public boolean isCancelled() {
-    assert op != null : "No operation";
-    return op.isCancelled();
-  }
-
-  public boolean isDone() {
-    assert op != null : "No operation";
-    return latch.getCount() == 0 ||
-            op.isCancelled() || op.getState() == OperationState.COMPLETE;
+    collectionOpStatus = status;
   }
 
   public CollectionOperationStatus getOperationStatus() {
-    return (op.getState() == OperationState.COMPLETE) ? opStatus : null;
+    return (op.getState() == OperationState.COMPLETE) ? collectionOpStatus : null;
   }
 
 }

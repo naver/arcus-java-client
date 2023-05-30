@@ -41,10 +41,10 @@ import net.spy.memcached.ops.StatusCode;
 public class OperationFuture<T> extends SpyObject implements Future<T> {
 
   protected final CountDownLatch latch;
-  private final AtomicReference<T> objRef;
+  protected final AtomicReference<T> objRef;
   protected OperationStatus status;
-  private final long timeout;
-  private Operation op;
+  protected final long timeout;
+  protected Operation op;
 
   public OperationFuture(CountDownLatch l, long opTimeout) {
     this(l, new AtomicReference<T>(null), opTimeout);
@@ -55,7 +55,6 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
     super();
     latch = l;
     objRef = oref;
-    status = null;
     timeout = opTimeout;
   }
 
