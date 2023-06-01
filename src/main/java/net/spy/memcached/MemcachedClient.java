@@ -366,6 +366,13 @@ public class MemcachedClient extends SpyThread
     return op;
   }
 
+  protected void addOpMap(final Map<String, Operation> opMap) {
+    checkState();
+    for (Map.Entry<String, Operation> me : opMap.entrySet()) {
+      conn.addOperation(me.getKey(), me.getValue());
+    }
+  }
+
   protected CountDownLatch broadcastOp(final BroadcastOpFactory of) {
     return broadcastOp(of, conn.getLocator().getAll(), true);
   }
