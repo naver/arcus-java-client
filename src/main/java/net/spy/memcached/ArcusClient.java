@@ -1170,39 +1170,43 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Deprecated
   @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> key,
+  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(final List<String> keyList,
                                                                          final int exp, final T o,
                                                                          final Transcoder<T> tc) {
-    if (key == null) {
+    if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
-    } else if (key.isEmpty()) {
+    } else if (keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
 
+    for (final String key : keyList) {
+      validateKey(key);
+    }
+
     final CachedData co = tc.encode(o);
+    final CountDownLatch blatch = new CountDownLatch(keyList.size());
+    final BulkOperationFuture<CollectionOperationStatus> rv = new BulkOperationFuture<CollectionOperationStatus>(blatch, operationTimeout);
+    final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
-    final CountDownLatch blatch = new CountDownLatch(key.size());
+    for (final String key : keyList) {
+      Operation op = opFact.store(StoreType.set, key, co.getFlags(), exp, co.getData(),
+          new OperationCallback() {
+            public void receivedStatus(OperationStatus val) {
+              if (!val.isSuccess()) {
+                rv.addFailedResult(key, new CollectionOperationStatus(false, String
+                        .valueOf(val.isSuccess()), CollectionResponse.END));
+              }
+            }
 
-    return new BulkOperationFuture<CollectionOperationStatus>(key, blatch, operationTimeout) {
-      @Override
-      public Operation createOp(final String k) {
-        Operation op = opFact.store(StoreType.set, k, co.getFlags(),
-                exp, co.getData(), new OperationCallback() {
-                  public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess()) {
-                      failedResult.put(k, new CollectionOperationStatus(false, String
-                          .valueOf(val.isSuccess()), CollectionResponse.END));
-                    }
-                  }
-
-                  public void complete() {
-                    blatch.countDown();
-                  }
-                });
-        addOp(k, op);
-        return op;
-      }
-    };
+            public void complete() {
+              blatch.countDown();
+            }
+          });
+      opMap.put(key, op);
+    }
+    rv.setOperations(opMap.values());
+    addOpMap(opMap);
+    return rv;
   }
 
   @Deprecated
@@ -1223,30 +1227,34 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Map is empty.");
     }
 
-    final CountDownLatch blatch = new CountDownLatch(o.size());
+    for (final String key : o.keySet()) {
+      validateKey(key);
+    }
 
-    return new BulkOperationFuture<CollectionOperationStatus>(o.keySet(), blatch,
-            operationTimeout) {
-      @Override
-      public Operation createOp(final String k) {
-        CachedData co = tc.encode(o.get(k));
-        Operation op = opFact.store(StoreType.set, k, co.getFlags(),
-                exp, co.getData(), new OperationCallback() {
-                  public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess()) {
-                      failedResult.put(k, new CollectionOperationStatus(false, String
+    final CountDownLatch latch = new CountDownLatch(o.size());
+    final BulkOperationFuture<CollectionOperationStatus> rv = new BulkOperationFuture<CollectionOperationStatus>(latch, operationTimeout);
+    final Map<String, Operation> opMap = new HashMap<String, Operation>();
+
+    for (final String key : o.keySet()) {
+      final CachedData co = tc.encode(o.get(key));
+      Operation op = opFact.store(StoreType.set, key, co.getFlags(), exp, co.getData(),
+            new OperationCallback() {
+              public void receivedStatus(OperationStatus val) {
+                if (!val.isSuccess()) {
+                  rv.addFailedResult(key, new CollectionOperationStatus(false, String
                           .valueOf(val.isSuccess()), CollectionResponse.END));
-                    }
-                  }
+                }
+              }
 
-                  public void complete() {
-                    blatch.countDown();
-                  }
-                });
-        addOp(k, op);
-        return op;
-      }
-    };
+              public void complete() {
+                latch.countDown();
+              }
+            });
+      opMap.put(key, op);
+    }
+    rv.setOperations(opMap.values());
+    addOpMap(opMap);
+    return rv;
   }
 
   @Deprecated
@@ -1259,38 +1267,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(final StoreType type,
-                                                                 final List<String> key,
+                                                                 final List<String> keyList,
                                                                  final int exp, final T o,
                                                                  final Transcoder<T> tc) {
-    if (key == null) {
+    if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
-    } else if (key.isEmpty()) {
+    } else if (keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
 
+    for (final String key : keyList) {
+      validateKey(key);
+    }
+
     final CachedData co = tc.encode(o);
+    final CountDownLatch latch = new CountDownLatch(keyList.size());
+    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
-    final CountDownLatch blatch = new CountDownLatch(key.size());
+    for (final String key : keyList) {
+      Operation op = opFact.store(type, key, co.getFlags(), exp, co.getData(),
+            new OperationCallback() {
+              public void receivedStatus(OperationStatus val) {
+                if (!val.isSuccess()) {
+                  rv.addFailedResult(key, val);
+                }
+              }
 
-    return new BulkOperationFuture<OperationStatus>(key, blatch, operationTimeout) {
-      @Override
-      public Operation createOp(final String k) {
-        Operation op = opFact.store(type, k, co.getFlags(),
-                exp, co.getData(), new OperationCallback() {
-                  public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess()) {
-                      failedResult.put(k, val);
-                    }
-                  }
-
-                  public void complete() {
-                    blatch.countDown();
-                  }
-                });
-        addOp(k, op);
-        return op;
-      }
-    };
+              public void complete() {
+                latch.countDown();
+              }
+            });
+      opMap.put(key, op);
+    }
+    rv.setOperations(opMap.values());
+    addOpMap(opMap);
+    return rv;
   }
 
   @Override
@@ -1311,28 +1323,33 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Map is empty.");
     }
 
-    final CountDownLatch blatch = new CountDownLatch(o.size());
+    for (final String key : o.keySet()) {
+      validateKey(key);
+    }
 
-    return new BulkOperationFuture<OperationStatus>(o.keySet(), blatch, operationTimeout) {
-      @Override
-      public Operation createOp(final String k) {
-        CachedData co = tc.encode(o.get(k));
-        Operation op = opFact.store(type, k, co.getFlags(),
-                exp, co.getData(), new OperationCallback() {
-                  public void receivedStatus(OperationStatus val) {
-                    if (!val.isSuccess()) {
-                      failedResult.put(k, val);
-                    }
-                  }
+    final CountDownLatch latch = new CountDownLatch(o.size());
+    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
-                  public void complete() {
-                    blatch.countDown();
-                  }
-                });
-        addOp(k, op);
-        return op;
-      }
-    };
+    for (final String key : o.keySet()) {
+      CachedData co = tc.encode(o.get(key));
+      Operation op = opFact.store(type, key, co.getFlags(), exp, co.getData(),
+          new OperationCallback() {
+            public void receivedStatus(OperationStatus val) {
+              if (!val.isSuccess()) {
+                rv.addFailedResult(key, val);
+              }
+            }
+
+            public void complete() {
+              latch.countDown();
+            }
+          });
+      opMap.put(key, op);
+    }
+    rv.setOperations(opMap.values());
+    addOpMap(opMap);
+    return rv;
   }
 
   @Override
@@ -1343,33 +1360,38 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key) {
-    if (key == null) {
+  public Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> keyList) {
+    if (keyList == null) {
       throw new IllegalArgumentException("Key list is null.");
-    } else if (key.isEmpty()) {
+    } else if (keyList.isEmpty()) {
       throw new IllegalArgumentException("Key list is empty.");
     }
 
-    final CountDownLatch blatch = new CountDownLatch(key.size());
+    for (final String key : keyList) {
+      validateKey(key);
+    }
 
-    return new BulkOperationFuture<OperationStatus>(key, blatch, operationTimeout) {
-      @Override
-      public Operation createOp(final String k) {
-        Operation op = opFact.delete(k, new OperationCallback() {
+    final CountDownLatch latch = new CountDownLatch(keyList.size());
+    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final Map<String, Operation> opMap = new HashMap<String, Operation>();
+
+    for (final String key : keyList) {
+      Operation op = opFact.delete(key, new OperationCallback() {
           public void receivedStatus(OperationStatus val) {
             if (!val.isSuccess()) {
-              failedResult.put(k, val);
+              rv.addFailedResult(key, val);
             }
           }
 
           public void complete() {
-            blatch.countDown();
+            latch.countDown();
           }
-        });
-        addOp(k, op);
-        return op;
-      }
-    };
+      });
+      opMap.put(key, op);
+    }
+    rv.setOperations(opMap.values());
+    addOpMap(opMap);
+    return rv;
   }
 
   @Override

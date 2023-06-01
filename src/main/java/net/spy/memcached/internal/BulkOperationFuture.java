@@ -1,6 +1,7 @@
 package net.spy.memcached.internal;
 
 import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -13,19 +14,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
-public abstract class BulkOperationFuture<T>
-        extends OperationFuture<Map<String, T>> {
-  protected final Map<String, T> failedResult =
-          new HashMap<String, T>();
+public class BulkOperationFuture<T> implements Future<Map<String, T>> {
+  protected final Map<String, T> failedResult = new HashMap<String, T>();
   protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
+  protected final long timeout;
+  protected final CountDownLatch latch;
 
-  public BulkOperationFuture(Collection<String> keys, CountDownLatch l, long timeout) {
-    super(l, timeout);
-
-    for (String key : keys) {
-      ops.add(createOp(key));
-    }
+  public BulkOperationFuture(CountDownLatch l, long timeout) {
+    this.latch = l;
+    this.timeout = timeout;
   }
 
   @Override
@@ -56,6 +55,15 @@ public abstract class BulkOperationFuture<T>
       }
     }
     return true;
+  }
+
+  @Override
+  public Map<String, T> get() throws InterruptedException, ExecutionException {
+    try {
+      return get(timeout, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException e) {
+      throw new OperationTimeoutException(e);
+    }
   }
 
   @Override
@@ -93,5 +101,11 @@ public abstract class BulkOperationFuture<T>
     return failedResult;
   }
 
-  public abstract Operation createOp(String key);
+  public void setOperations(Collection<Operation> ops) {
+    this.ops.addAll(ops);
+  }
+
+  public void addFailedResult(String key, T value) {
+    failedResult.put(key, value);
+  }
 }
