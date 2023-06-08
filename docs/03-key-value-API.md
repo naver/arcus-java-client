@@ -84,7 +84,7 @@ expiration은 key가 현재 시간부터 expire 될 때까지의 시간(초 단�
 
 저장에 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.
 
-future.get(key).getStatusCode() | 설명
+future.get().get(key).getStatusCode() | 설명
 --------------------------------| ---------
 StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item이 없음)
 StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
