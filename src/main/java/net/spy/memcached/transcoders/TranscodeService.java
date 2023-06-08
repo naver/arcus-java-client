@@ -2,6 +2,7 @@ package net.spy.memcached.transcoders;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -50,6 +51,13 @@ public class TranscodeService extends SpyObject {
     return task;
   }
 
+  public <T> CompletableFuture<T> reactiveDecode(final Transcoder<T> tc,
+                                                    final CachedData cachedData) {
+
+    assert !pool.isShutdown() : "Pool has already shut down.";
+
+    return CompletableFuture.supplyAsync(() -> tc.decode(cachedData), pool);
+  }
   /**
    * Perform a decode.
    */
