@@ -43,12 +43,13 @@ import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
+import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
-import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -231,6 +232,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   @Override
   public GetFuture<Object> asyncGet(String key) {
     return this.getClient().asyncGet(key);
+  }
+
+  @Override
+  public ReactiveOperationFuture<Object> reactiveAsyncGet(String key) {
+    return this.getClient().reactiveAsyncGet(key);
   }
 
   @Override

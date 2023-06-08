@@ -19,33 +19,6 @@
 
 package net.spy.memcached;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedSelectorException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.ConcurrentModificationException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.Callable;
-
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
@@ -69,8 +42,39 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.LocalCacheManager;
+import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.ClosedSelectorException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl.END;
 
 /**
  * Client to a memcached server.
@@ -934,6 +938,51 @@ public class MemcachedClient extends SpyThread
     return rv;
   }
 
+  public <T> ReactiveOperationFuture<T> reactiveAsyncGet(final String key, final Transcoder<T> tc) {
+
+    final CountDownLatch latch = new CountDownLatch(1);
+    final ReactiveOperationFuture<T> rv = new ReactiveOperationFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.reactiveGet(key,
+        new GetOperation.Callback() {
+          private volatile T val = null;
+          private volatile boolean readComplete = false;
+          private final AtomicInteger encodeTarget = new AtomicInteger(0);
+          public void receivedStatus(OperationStatus status) {
+            rv.set(val, status);
+          }
+
+          public void gotData(String k, int flags, byte[] data) {
+            assert key.equals(k) : "Wrong key returned";
+            encodeTarget.incrementAndGet();
+            tcService.reactiveDecode(tc,
+                    new CachedData(flags, data, tc.getMaxSize())).thenAccept((decodedData) -> {
+                      val = decodedData;
+                      if (encodeTarget.decrementAndGet() == 0 && readComplete) {
+                        receivedStatus(END);
+                        complete();
+                      }
+                    });
+          }
+
+          public void readComplete() {
+            readComplete = true;
+          }
+
+          public void complete() {
+            if (encodeTarget.intValue() == 0) {
+              if (localCacheManager != null) {
+                localCacheManager.put(key, val);
+              }
+              latch.countDown();
+              rv.complete(val);
+            }
+          }
+        });
+    rv.setOperation(op);
+    addOp(key, op);
+    return rv;
+  }
   /**
    * Get the given key asynchronously and decode with the default
    * transcoder.
@@ -945,6 +994,11 @@ public class MemcachedClient extends SpyThread
    */
   public GetFuture<Object> asyncGet(final String key) {
     return asyncGet(key, transcoder);
+  }
+
+  @Override
+  public ReactiveOperationFuture<Object> reactiveAsyncGet(String key) {
+    return reactiveAsyncGet(key, transcoder);
   }
 
   /**

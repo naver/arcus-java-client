@@ -20,11 +20,7 @@ package net.spy.memcached.protocol.ascii;
 import java.net.SocketAddress;
 import java.util.concurrent.BlockingQueue;
 
-import net.spy.memcached.ops.GetOperation;
-import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.OperationState;
-import net.spy.memcached.protocol.ProxyCallback;
 import net.spy.memcached.protocol.TCPMemcachedNodeImpl;
 
 /**
@@ -42,9 +38,11 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
 
   @Override
   protected void optimize() {
+    // GetOperation이 여러개 입력될 경우 async처리가 안되는 bulk로 변경되는
+    // 기능으로 인해 asyncGet이 의도한대로 수행되지 않아 주석처리
     // make sure there are at least two get operations in a row before
     // attempting to optimize them.
-    Operation nxtOp = writeQ.peek();
+    /* Operation nxtOp = writeQ.peek();
     if (nxtOp instanceof GetOperation && nxtOp.getAPIType() != APIType.MGET) {
       optimizedOp = writeQ.remove();
       nxtOp = writeQ.peek();
@@ -69,7 +67,7 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
         getLogger().debug("Set up %s with %s keys and %s callbacks",
                 this, pcb.numKeys(), pcb.numCallbacks());
       }
-    }
+    }*/
   }
 
 }
