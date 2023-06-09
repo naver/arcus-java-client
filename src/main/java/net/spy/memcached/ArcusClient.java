@@ -4624,6 +4624,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return version string
    */
   public static String getVersion() {
+
     if (VERSION == null) {
       VERSION = "NONE";
 
