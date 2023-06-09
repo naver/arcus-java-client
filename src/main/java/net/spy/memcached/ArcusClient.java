@@ -184,7 +184,7 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
 
-  private static String VERSION;
+  private static String VERSION = "INIT";
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);
   private static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
   private static final String DEFAULT_ARCUS_CLIENT_NAME = "ArcusClient";
@@ -4624,30 +4624,37 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @return version string
    */
   public static String getVersion() {
-    if (VERSION == null) {
-      VERSION = "NONE";
-
-      Enumeration<URL> resEnum;
-      try {
-        resEnum = Thread.currentThread()
-            .getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
-        while (resEnum.hasMoreElements()) {
-          URL url = resEnum.nextElement();
-          InputStream is = url.openStream();
-          if (is != null) {
-            Manifest manifest = new Manifest(is);
-            java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
-            String version = mainAttribs.getValue("Arcusclient-Version");
-            if (version != null) {
-              VERSION = version;
+    if (!VERSION.equals("INIT")) {
+      return VERSION;
+    }
+    synchronized (VERSION) {
+      if (VERSION.equals("INIT")) {
+        Enumeration<URL> resEnum;
+        try {
+          resEnum = Thread.currentThread()
+                  .getContextClassLoader().getResources(JarFile.MANIFEST_NAME);
+          while (resEnum.hasMoreElements()) {
+            URL url = resEnum.nextElement();
+            InputStream is = url.openStream();
+            if (is != null) {
+              Manifest manifest = new Manifest(is);
+              java.util.jar.Attributes mainAttribs = manifest.getMainAttributes();
+              String version = mainAttribs.getValue("Arcusclient-Version");
+              if (version != null) {
+                VERSION = version;
+                break;
+              }
             }
           }
+        } catch (Exception e) {
+          // Failed to get version.
+        } finally {
+          if (VERSION.equals("INIT")) {
+            VERSION = "NONE";
+          }
         }
-      } catch (Exception e) {
-        // Failed to get version.
       }
     }
-
     return VERSION;
   }
 }
