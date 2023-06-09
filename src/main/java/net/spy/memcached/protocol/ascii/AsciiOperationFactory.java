@@ -95,7 +95,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   public GetOperation get(String key, GetOperation.Callback cb) {
-    return new GetOperationImpl(key, cb);
+    return new ReactiveGetOperationImpl(key, cb);
   }
 
   public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {

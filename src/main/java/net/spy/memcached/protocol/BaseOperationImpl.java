@@ -45,13 +45,13 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
-  private OperationState state = OperationState.WRITE_QUEUED;
+  protected OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
-  private boolean cancelled = false;
-  private String cancelCause = null;
+  protected boolean cancelled = false;
+  protected String cancelCause = null;
   private OperationException exception = null;
   protected OperationCallback callback = null;
-  private volatile MemcachedNode handlingNode = null;
+  protected volatile MemcachedNode handlingNode = null;
 
   private OperationType opType = OperationType.UNDEFINED;
   private APIType apiType = APIType.UNDEFINED;
@@ -90,7 +90,7 @@ public abstract class BaseOperationImpl extends SpyObject {
     return exception;
   }
 
-  public final void cancel(String cause) {
+  public void cancel(String cause) {
     cancelled = true;
     if (handlingNode != null) {
       cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
@@ -207,7 +207,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   /**
    * Transition the state of this operation to the given state.
    */
-  protected final void transitionState(OperationState newState) {
+  public void transitionState(OperationState newState) {
     getLogger().debug("Transitioned state from %s to %s", state, newState);
     state = newState;
     // Discard our buffer when we no longer need it.

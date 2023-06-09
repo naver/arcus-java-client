@@ -49,12 +49,7 @@ import java.util.concurrent.Callable;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
-import net.spy.memcached.internal.BulkFuture;
-import net.spy.memcached.internal.BulkGetFuture;
-import net.spy.memcached.internal.CheckedOperationTimeoutException;
-import net.spy.memcached.internal.GetFuture;
-import net.spy.memcached.internal.OperationFuture;
-import net.spy.memcached.internal.SingleElementInfiniteIterator;
+import net.spy.memcached.internal.*;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -69,8 +64,11 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.LocalCacheManager;
+import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
+
+import static net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl.END;
 
 /**
  * Client to a memcached server.
@@ -902,14 +900,14 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout);
+    final ReactiveOperationFuture<T> rv = new ReactiveOperationFuture<>(latch, operationTimeout);
 
     Operation op = opFact.get(key,
         new GetOperation.Callback() {
-          private Future<T> val = null;
+          private volatile T val = null;
 
           public void receivedStatus(OperationStatus status) {
             rv.set(val, status);
@@ -917,15 +915,20 @@ public class MemcachedClient extends SpyThread
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            val = tcService.decode(tc,
-                    new CachedData(flags, data, tc.getMaxSize()));
+            tcService.decode(tc,
+                    new CachedData(flags, data, tc.getMaxSize()), (decodedData) -> {
+                      val = decodedData;
+                      receivedStatus(END);
+                      complete();
+                    });
           }
 
           public void complete() {
             // FIXME weird...
             if (localCacheManager != null) {
-              localCacheManager.put(key, val, operationTimeout);
+              localCacheManager.put(key, val);
             }
+            rv.complete(val);
             latch.countDown();
           }
         });
@@ -943,7 +946,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public GetFuture<Object> asyncGet(final String key) {
+  public Future<Object> asyncGet(final String key) {
     return asyncGet(key, transcoder);
   }
 
@@ -1848,7 +1851,7 @@ public class MemcachedClient extends SpyThread
   private OperationFuture<Long> asyncMutate(Mutator m, String key, int by, long def,
                                    int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Long> rv = new OperationFuture<Long>(
+    final OperationFuture<Long> rv = new OperationFuture<>(
             latch, operationTimeout);
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
         new OperationCallback() {
