@@ -1185,7 +1185,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CachedData co = tc.encode(o);
     final CountDownLatch blatch = new CountDownLatch(keyList.size());
-    final BulkOperationFuture<CollectionOperationStatus> rv = new BulkOperationFuture<CollectionOperationStatus>(blatch, operationTimeout);
+    final BulkOperationFuture<String, CollectionOperationStatus> rv =
+            new BulkOperationFuture<String, CollectionOperationStatus>(blatch, operationTimeout);
     final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
     for (final String key : keyList) {
@@ -1232,7 +1233,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(o.size());
-    final BulkOperationFuture<CollectionOperationStatus> rv = new BulkOperationFuture<CollectionOperationStatus>(latch, operationTimeout);
+    final BulkOperationFuture<String, CollectionOperationStatus> rv =
+            new BulkOperationFuture<String, CollectionOperationStatus>(latch, operationTimeout);
     final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
     for (final String key : o.keySet()) {
@@ -1282,7 +1284,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CachedData co = tc.encode(o);
     final CountDownLatch latch = new CountDownLatch(keyList.size());
-    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final BulkOperationFuture<String, OperationStatus> rv =
+            new BulkOperationFuture<String, OperationStatus>(latch, operationTimeout);
     final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
     for (final String key : keyList) {
@@ -1328,7 +1331,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(o.size());
-    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final BulkOperationFuture<String, OperationStatus> rv =
+            new BulkOperationFuture<String, OperationStatus>(latch, operationTimeout);
     final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
     for (final String key : o.keySet()) {
@@ -1372,7 +1376,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(keyList.size());
-    final BulkOperationFuture<OperationStatus> rv = new BulkOperationFuture<OperationStatus>(latch, operationTimeout);
+    final BulkOperationFuture<String, OperationStatus> rv =
+            new BulkOperationFuture<String, OperationStatus>(latch, operationTimeout);
     final Map<String, Operation> opMap = new HashMap<String, Operation>();
 
     for (final String key : keyList) {

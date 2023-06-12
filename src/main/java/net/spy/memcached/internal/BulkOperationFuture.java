@@ -16,8 +16,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Future;
 
-public class BulkOperationFuture<T> implements Future<Map<String, T>> {
-  protected final Map<String, T> failedResult = new HashMap<String, T>();
+public class BulkOperationFuture<K, V> implements Future<Map<K, V>> {
+  protected final Map<K, V> failedResult = new HashMap<K, V>();
   protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
   protected final long timeout;
   protected final CountDownLatch latch;
@@ -58,7 +58,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
   }
 
   @Override
-  public Map<String, T> get() throws InterruptedException, ExecutionException {
+  public Map<K, V> get() throws InterruptedException, ExecutionException {
     try {
       return get(timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
@@ -67,7 +67,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
   }
 
   @Override
-  public Map<String, T> get(long duration,
+  public Map<K, V> get(long duration,
                             TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
@@ -105,7 +105,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
     this.ops.addAll(ops);
   }
 
-  public void addFailedResult(String key, T value) {
+  public void addFailedResult(K key, V value) {
     failedResult.put(key, value);
   }
 }
