@@ -126,6 +126,7 @@ import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.internal.PipedCollectionFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -948,15 +949,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedUpdate(
           final String key, final List<CollectionPipedUpdate<T>> updateList) {
 
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-
     final CountDownLatch latch = new CountDownLatch(updateList.size());
-
-    final List<CollectionOperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<CollectionOperationStatus>(updateList.size()));
-
-    final Map<Integer, CollectionOperationStatus> mergedResult =
-        new ConcurrentHashMap<Integer, CollectionOperationStatus>();
+    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout, updateList.size());
 
     for (int i = 0; i < updateList.size(); i++) {
       final CollectionPipedUpdate<T> update = updateList.get(i);
@@ -974,7 +969,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().warn("Unhandled state: " + status);
                 cstatus = new CollectionOperationStatus(status);
               }
-              mergedOperationStatus.add(cstatus);
+              rv.addOperationStatus(cstatus);
             }
 
             // complete
@@ -985,97 +980,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
               if (status instanceof CollectionOperationStatus) {
-                mergedResult.put(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
                                 (CollectionOperationStatus) status);
               } else {
-                mergedResult.put(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
                                 new CollectionOperationStatus(status));
               }
             }
           });
       addOp(key, op);
-      ops.add(op);
+      rv.addOperation(op);
     }
-
-    return new CollectionFuture<Map<Integer, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          op.cancel("by application.");
-          rv |= op.getState() == OperationState.WRITE_QUEUED;
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-
-        if (!latch.await(duration, units)) {
-          Collection<Operation> timedoutOps = new HashSet<Operation>();
-          for (Operation op : ops) {
-            if (op.getState() != OperationState.COMPLETE) {
-              timedoutOps.add(op);
-            } else {
-              MemcachedConnection.opSucceeded(op);
-            }
-          }
-          if (timedoutOps.size() > 0) {
-            MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
-            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-          }
-        } else {
-          // continuous timeout counter will be reset only once in pipe
-          MemcachedConnection.opSucceeded(ops.iterator().next());
-        }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return mergedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        for (CollectionOperationStatus status : mergedOperationStatus) {
-          if (!status.isSuccess()) {
-            return status;
-          }
-        }
-        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return rv;
   }
 
   /**
@@ -3903,15 +3819,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedInsert(
           final String key, final List<CollectionPipedInsert<T>> insertList) {
 
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-
     final CountDownLatch latch = new CountDownLatch(insertList.size());
-
-    final List<CollectionOperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<CollectionOperationStatus>(insertList.size()));
-
-    final Map<Integer, CollectionOperationStatus> mergedResult =
-        new ConcurrentHashMap<Integer, CollectionOperationStatus>();
+    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout, insertList.size());
 
     for (int i = 0; i < insertList.size(); i++) {
       final CollectionPipedInsert<T> insert = insertList.get(i);
@@ -3929,7 +3839,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().warn("Unhandled state: " + status);
                 cstatus = new CollectionOperationStatus(status);
               }
-              mergedOperationStatus.add(cstatus);
+              rv.addOperationStatus(cstatus);
             }
 
             // complete
@@ -3940,96 +3850,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
               if (status instanceof CollectionOperationStatus) {
-                mergedResult.put(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
                                 (CollectionOperationStatus) status);
               } else {
-                mergedResult.put(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
                                 new CollectionOperationStatus(status));
               }
             }
           });
       addOp(key, op);
-      ops.add(op);
+      rv.addOperation(op);
     }
-
-    return new CollectionFuture<Map<Integer, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          op.cancel("by application.");
-          rv |= op.getState() == OperationState.WRITE_QUEUED;
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<Integer, CollectionOperationStatus> get(long duration,
-                                                         TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-
-        if (!latch.await(duration, units)) {
-          Collection<Operation> timedoutOps = new HashSet<Operation>();
-          for (Operation op : ops) {
-            if (op.getState() != OperationState.COMPLETE) {
-              timedoutOps.add(op);
-            } else {
-              MemcachedConnection.opSucceeded(op);
-            }
-          }
-          if (timedoutOps.size() > 0) {
-            MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
-            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-          }
-        } else {
-          // continuous timeout counter will be reset only once in pipe
-          MemcachedConnection.opSucceeded(ops.iterator().next());
-        }
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return mergedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        for (CollectionOperationStatus status : mergedOperationStatus) {
-          if (!status.isSuccess()) {
-            return status;
-          }
-        }
-        return new CollectionOperationStatus(true, "END", CollectionResponse.END);
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return rv;
   }
 
   @Override
