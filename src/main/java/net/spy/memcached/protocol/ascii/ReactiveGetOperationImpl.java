@@ -39,7 +39,9 @@ public class ReactiveGetOperationImpl extends GetOperationImpl implements GetOpe
         return;
       }
       /* ENABLE_MIGRATION end */
-      if (!valueRead) {
+      if (valueRead) {
+        transitionState(OperationState.READ_COMPLETE);
+      } else {
         transitionState(OperationState.COMPLETE);
       }
       data = null;
@@ -64,8 +66,8 @@ public class ReactiveGetOperationImpl extends GetOperationImpl implements GetOpe
       addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
       /* ENABLE_MIGRATION end */
     } else {
-      data = null;
-//      assert false : "Unknown line type: " + line;
+//      data = null;
+      assert false : "Unknown line type: " + line;
     }
   }
 

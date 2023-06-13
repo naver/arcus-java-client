@@ -35,6 +35,7 @@ public enum OperationState {
   /**
    * State indicating this operation is complete.
    */
+  READ_COMPLETE,
   COMPLETE,
   /* ENABLE_REPLICATION if */
   /**

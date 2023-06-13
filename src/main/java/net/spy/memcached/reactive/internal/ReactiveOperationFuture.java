@@ -110,6 +110,9 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
   public void set(T o, OperationStatus s) {
     objRef.set(o);
     status = s;
+  }
+
+  public void transitionStateComplete() {
     ((BaseOperationImpl) op).transitionState(OperationState.COMPLETE);
   }
 
