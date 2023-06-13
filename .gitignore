@@ -7,5 +7,3 @@ devtools/
 junit*
 *.iml
 *~
-build
-.gradle

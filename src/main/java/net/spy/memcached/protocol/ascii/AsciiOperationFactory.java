@@ -94,8 +94,13 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new FlushOperationImpl(delay, cb);
   }
 
+  @Override
+  public ReactiveGetOperationImpl reactiveGet(String key, GetOperation.Callback callback) {
+    return new ReactiveGetOperationImpl(key, callback);
+  }
+
   public GetOperation get(String key, GetOperation.Callback cb) {
-    return new ReactiveGetOperationImpl(key, cb);
+    return new GetOperationImpl(key, cb);
   }
 
   public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {

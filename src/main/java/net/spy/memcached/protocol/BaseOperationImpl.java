@@ -90,7 +90,7 @@ public abstract class BaseOperationImpl extends SpyObject {
     return exception;
   }
 
-  public void cancel(String cause) {
+  public final void cancel(String cause) {
     cancelled = true;
     if (handlingNode != null) {
       cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
@@ -207,7 +207,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   /**
    * Transition the state of this operation to the given state.
    */
-  public void transitionState(OperationState newState) {
+  protected final void transitionState(OperationState newState) {
     getLogger().debug("Transitioned state from %s to %s", state, newState);
     state = newState;
     // Discard our buffer when we no longer need it.

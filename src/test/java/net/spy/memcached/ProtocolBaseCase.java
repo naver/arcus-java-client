@@ -36,7 +36,6 @@ import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
-import org.junit.Assert;
 
 
 public abstract class ProtocolBaseCase extends ClientBaseCase {
@@ -283,7 +282,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testParallelSetAutoMultiGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
-      public Boolean call() {
+      public Boolean call() throws Exception {
         client.set("testparallel", 5, "parallelvalue");
         for (int i = 0; i < 10; i++) {
           assertEquals("parallelvalue", client.get("testparallel"));
@@ -646,9 +645,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testImmediateDelete() throws Exception {
     assertNull(client.get("test1"));
-    client.set("test1", 5, "test1value").get();
+    client.set("test1", 5, "test1value");
     assertEquals("test1value", client.get("test1"));
-    client.delete("test1").get();
+    client.delete("test1");
     assertNull(client.get("test1"));
   }
 
@@ -706,7 +705,11 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     } catch (OperationTimeoutException e) {
       System.out.println("Got a timeout.");
     }
-    Assert.assertEquals(value, client.asyncGet(key).get(1, TimeUnit.SECONDS));
+    if (value.equals(client.asyncGet(key).get(1, TimeUnit.SECONDS))) {
+      System.out.println("Got the right value.");
+    } else {
+      throw new Exception("Didn't get the expected value.");
+    }
   }
 
   public void testGracefulShutdownTooSlow() throws Exception {

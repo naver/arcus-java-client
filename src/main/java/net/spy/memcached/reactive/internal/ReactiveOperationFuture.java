@@ -23,7 +23,6 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
-import net.spy.memcached.protocol.BaseOperationImpl;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -110,7 +109,6 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
   public void set(T o, OperationStatus s) {
     objRef.set(o);
     status = s;
-    ((BaseOperationImpl) op).transitionState(OperationState.COMPLETE);
   }
 
   public void setOperation(Operation to) {

@@ -144,7 +144,8 @@ public abstract class OperationImpl extends BaseOperationImpl implements Operati
   public void readFromBuffer(ByteBuffer data) throws IOException {
     // Loop while there's data remaining to get it all drained.
     while (data.remaining() > 0) {
-      if (getState() == OperationState.COMPLETE ||
+      if (getState() == OperationState.READ_COMPLETE ||
+          getState() == OperationState.COMPLETE ||
           getState() == OperationState.MOVING || // ENABLE_REPLICATION
           getState() == OperationState.REDIRECT) { // ENABLE_MIGRATION
         return;

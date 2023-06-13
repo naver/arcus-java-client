@@ -2,12 +2,16 @@
 
 package net.spy.memcached.protocol.ascii;
 
-import net.spy.memcached.ops.*;
+
+import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.OperationState;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 
 /**
  * Operation for retrieving data.
@@ -39,7 +43,9 @@ public class ReactiveGetOperationImpl extends GetOperationImpl implements GetOpe
         return;
       }
       /* ENABLE_MIGRATION end */
-      if (!valueRead) {
+      if (valueRead) {
+        transitionState(OperationState.READ_COMPLETE);
+      } else {
         transitionState(OperationState.COMPLETE);
       }
       data = null;
@@ -64,8 +70,7 @@ public class ReactiveGetOperationImpl extends GetOperationImpl implements GetOpe
       addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
       /* ENABLE_MIGRATION end */
     } else {
-      data = null;
-//      assert false : "Unknown line type: " + line;
+      assert false : "Unknown line type: " + line;
     }
   }
 
@@ -128,31 +133,6 @@ public class ReactiveGetOperationImpl extends GetOperationImpl implements GetOpe
         getLogger().debug("Setting read type back to line.");
         setReadType(OperationReadType.LINE);
       }
-    }
-  }
-
-  @Override
-  public final void cancel(String cause) {
-    cancelled = true;
-    if (handlingNode != null) {
-      cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
-    } else {
-      cancelCause = "Cancelled (" + cause + ")";
-    }
-    getCallback().receivedStatus(CANCELLED);
-    callback.complete();
-  }
-  @Override
-  public final void transitionState(OperationState newState) {
-    getLogger().debug("Transitioned state from %s to %s", state, newState);
-    state = newState;
-    // Discard our buffer when we no longer need it.
-    if (state != OperationState.WRITE_QUEUED &&
-            state != OperationState.WRITING) {
-      cmd = null;
-    }
-    if (state == OperationState.COMPLETE) {
-      callback.complete();
     }
   }
 }

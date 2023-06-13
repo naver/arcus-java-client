@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ConcurrentModificationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -49,7 +50,12 @@ import java.util.concurrent.Callable;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
-import net.spy.memcached.internal.*;
+import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.BulkGetFuture;
+import net.spy.memcached.internal.CheckedOperationTimeoutException;
+import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.internal.SingleElementInfiniteIterator;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -890,6 +896,39 @@ public class MemcachedClient extends SpyThread
     return asyncStore(StoreType.replace, key, exp, o, transcoder);
   }
 
+  @Override
+  public <T> GetFuture<T> asyncGet(String key, Transcoder<T> tc) {
+
+    final CountDownLatch latch = new CountDownLatch(1);
+    final GetFuture<T> rv = new GetFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.get(key,
+            new GetOperation.Callback() {
+            private volatile Future<T> val = null;
+
+            public void receivedStatus(OperationStatus status) {
+              rv.set(val, status);
+            }
+
+            public void gotData(String k, int flags, byte[] data) {
+              assert key.equals(k) : "Wrong key returned";
+              val = tcService.decode(tc,
+                      new CachedData(flags, data, tc.getMaxSize()));
+            }
+
+            public void complete() {
+              // FIXME weird...
+              if (localCacheManager != null) {
+                localCacheManager.put(key, val, operationTimeout);
+              }
+              latch.countDown();
+            }
+          });
+    rv.setOperation(op);
+    addOp(key, op);
+    return rv;
+  }
+
   /**
    * Get the given key asynchronously.
    *
@@ -900,12 +939,12 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> ReactiveOperationFuture<T> reactiveAsyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final ReactiveOperationFuture<T> rv = new ReactiveOperationFuture<>(latch, operationTimeout);
 
-    Operation op = opFact.get(key,
+    Operation op = opFact.reactiveGet(key,
         new GetOperation.Callback() {
           private volatile T val = null;
 
@@ -915,8 +954,8 @@ public class MemcachedClient extends SpyThread
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            tcService.decode(tc,
-                    new CachedData(flags, data, tc.getMaxSize()), (decodedData) -> {
+            tcService.reactiveDecode(tc,
+                    new CachedData(flags, data, tc.getMaxSize())).thenAccept((decodedData) -> {
                       val = decodedData;
                       receivedStatus(END);
                       complete();
@@ -928,8 +967,8 @@ public class MemcachedClient extends SpyThread
             if (localCacheManager != null) {
               localCacheManager.put(key, val);
             }
-            rv.complete(val);
             latch.countDown();
+            rv.complete(val);
           }
         });
     rv.setOperation(op);
@@ -948,6 +987,11 @@ public class MemcachedClient extends SpyThread
    */
   public Future<Object> asyncGet(final String key) {
     return asyncGet(key, transcoder);
+  }
+
+  @Override
+  public CompletableFuture<Object> reactiveAsyncGet(String key) {
+    return reactiveAsyncGet(key, transcoder);
   }
 
   /**
@@ -1851,7 +1895,7 @@ public class MemcachedClient extends SpyThread
   private OperationFuture<Long> asyncMutate(Mutator m, String key, int by, long def,
                                    int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Long> rv = new OperationFuture<>(
+    final OperationFuture<Long> rv = new OperationFuture<Long>(
             latch, operationTimeout);
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
         new OperationCallback() {

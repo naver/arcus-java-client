@@ -98,7 +98,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void getWithoutBulkMessage() {
     String key = "KEY";
 
-    Future<Object> f = mc.asyncGet(key);
+    GetFuture<Object> f = mc.asyncGet(key);
 
     try {
       f.get(1L, TimeUnit.MILLISECONDS);
