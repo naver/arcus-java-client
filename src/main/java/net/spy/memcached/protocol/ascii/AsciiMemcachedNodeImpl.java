@@ -44,7 +44,7 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
   protected void optimize() {
     // make sure there are at least two get operations in a row before
     // attempting to optimize them.
-    Operation nxtOp = writeQ.peek();
+    /*Operation nxtOp = writeQ.peek();
     if (nxtOp instanceof GetOperation && nxtOp.getAPIType() != APIType.MGET) {
       optimizedOp = writeQ.remove();
       nxtOp = writeQ.peek();
@@ -69,7 +69,7 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
         getLogger().debug("Set up %s with %s keys and %s callbacks",
                 this, pcb.numKeys(), pcb.numCallbacks());
       }
-    }
+    }*/
   }
 
 }

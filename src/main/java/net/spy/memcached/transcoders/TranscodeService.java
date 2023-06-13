@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import net.spy.memcached.CASValue;
 import net.spy.memcached.CachedData;
@@ -50,6 +51,20 @@ public class TranscodeService extends SpyObject {
     return task;
   }
 
+  public <T> Future<Void> decode(final Transcoder<T> tc,
+                                 final CachedData cachedData, Consumer<T> func) {
+
+    assert !pool.isShutdown() : "Pool has already shut down.";
+
+    TranscodeService.Task<Void> task = new TranscodeService.Task<>(
+            () -> {
+              func.accept(tc.decode(cachedData));
+              return null;
+            });
+
+    this.pool.execute(task);
+    return task;
+  }
   /**
    * Perform a decode.
    */

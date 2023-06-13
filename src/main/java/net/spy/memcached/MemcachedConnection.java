@@ -998,7 +998,8 @@ public final class MemcachedConnection extends SpyObject {
           throw new IllegalStateException("No read operation.");
         }
         currentOp.readFromBuffer(rbuf);
-        if (currentOp.getState() == OperationState.COMPLETE) {
+        if (currentOp.getState() == OperationState.READ_COMPLETE ||
+                currentOp.getState() == OperationState.COMPLETE) {
           getLogger().debug("Completed read op: %s and giving the next %d bytes",
                   currentOp, rbuf.remaining());
           Operation op = qa.removeCurrentReadOp();

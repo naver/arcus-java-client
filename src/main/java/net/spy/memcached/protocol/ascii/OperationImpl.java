@@ -35,14 +35,14 @@ import net.spy.memcached.protocol.BaseOperationImpl;
 /**
  * Operations on a memcached connection.
  */
-abstract class OperationImpl extends BaseOperationImpl implements Operation {
+public abstract class OperationImpl extends BaseOperationImpl implements Operation {
 
   protected static final byte[] CRLF = {'\r', '\n'};
-  private static final String CHARSET = "UTF-8";
+  protected static final String CHARSET = "UTF-8";
 
-  private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-  private OperationReadType readType = OperationReadType.LINE;
-  private boolean foundCr = false;
+  protected final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+  protected OperationReadType readType = OperationReadType.LINE;
+  protected boolean foundCr = false;
 
   protected OperationImpl() {
     super();
@@ -104,7 +104,7 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     bb.put(CRLF);
   }
 
-  private String getLineFromBuffer(ByteBuffer data) throws UnsupportedEncodingException {
+  protected String getLineFromBuffer(ByteBuffer data) throws UnsupportedEncodingException {
     boolean lineFound = false;
     while (data.remaining() > 0) {
       byte b = data.get();
@@ -128,7 +128,7 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     return null;
   }
 
-  private OperationErrorType classifyError(String line) {
+  protected OperationErrorType classifyError(String line) {
     OperationErrorType rv = null;
     if (line.startsWith("ERROR")) {
       rv = OperationErrorType.GENERAL;
@@ -144,7 +144,8 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
   public void readFromBuffer(ByteBuffer data) throws IOException {
     // Loop while there's data remaining to get it all drained.
     while (data.remaining() > 0) {
-      if (getState() == OperationState.COMPLETE ||
+      if (getState() == OperationState.READ_COMPLETE ||
+          getState() == OperationState.COMPLETE ||
           getState() == OperationState.MOVING || // ENABLE_REPLICATION
           getState() == OperationState.REDIRECT) { // ENABLE_MIGRATION
         return;
