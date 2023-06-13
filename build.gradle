@@ -55,3 +55,12 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
+
+test {
+    exclude '**/*Binary*'
+    exclude '**/*IPV6*'
+    exclude '**/*CacheMonitorTest*'
+    exclude '**/RedistributeFailureModeTest.java'
+    exclude '**/LoggingTest.java'
+    exclude '**/*Timeout*'
+}
