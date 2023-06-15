@@ -819,126 +819,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Generic pipelined insert operation for collection items.
-   * Public methods for collection items call this method.
-   *
-   * @param key   collection item's key
-   * @param insert operation parameters (values, attributes, and so on)
-   * @return future holding the success/failure codes of individual operations and their index
-   */
-  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedInsert(
-          final String key, final CollectionPipedInsert<T> insert) {
-
-    if (insert.getItemCount() == 0) {
-      throw new IllegalArgumentException(
-              "The number of piped operations must be larger than 0.");
-    }
-    if (insert.getItemCount() > CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      throw new IllegalArgumentException(
-              "The number of piped operations must not exceed a maximum of "
-                      + CollectionPipedInsert.MAX_PIPED_ITEM_COUNT + ".");
-    }
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, CollectionOperationStatus>> rv =
-            new CollectionFuture<Map<Integer, CollectionOperationStatus>>(latch, operationTimeout);
-
-    Operation op = opFact.collectionPipedInsert(key, insert,
-        new CollectionPipedInsertOperation.Callback() {
-          private final Map<Integer, CollectionOperationStatus> result =
-                  new TreeMap<Integer, CollectionOperationStatus>();
-
-          public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
-            rv.set(result, cstatus);
-          }
-
-          public void complete() {
-            latch.countDown();
-          }
-
-          public void gotStatus(Integer index, OperationStatus status) {
-            if (status instanceof CollectionOperationStatus) {
-              result.put(index, (CollectionOperationStatus) status);
-            } else {
-              result.put(index, new CollectionOperationStatus(status));
-            }
-          }
-        });
-
-    rv.setOperation(op);
-    addOp(key, op);
-    return rv;
-  }
-
-  /**
-   * Generic pipelined update operation for collection items.
-   * Public methods for collection items call this method.
-   *
-   * @param key    collection item's key
-   * @param update operation parameters (values and so on)
-   * @return future holding the success/failure codes of individual operations and their index
-   */
-  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedUpdate(
-          final String key, final CollectionPipedUpdate<T> update) {
-
-    if (update.getItemCount() == 0) {
-      throw new IllegalArgumentException(
-              "The number of piped operations must be larger than 0.");
-    }
-    if (update.getItemCount() > CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
-      throw new IllegalArgumentException(
-              "The number of piped operations must not exceed a maximum of "
-                      + CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT + ".");
-    }
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, CollectionOperationStatus>> rv =
-        new CollectionFuture<Map<Integer, CollectionOperationStatus>>(latch, operationTimeout);
-
-    Operation op = opFact.collectionPipedUpdate(key, update,
-        new CollectionPipedUpdateOperation.Callback() {
-          private final Map<Integer, CollectionOperationStatus> result =
-              new TreeMap<Integer, CollectionOperationStatus>();
-
-          public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
-            rv.set(result, cstatus);
-          }
-
-          public void complete() {
-            latch.countDown();
-          }
-
-          public void gotStatus(Integer index, OperationStatus status) {
-            if (status instanceof CollectionOperationStatus) {
-              result.put(index, (CollectionOperationStatus) status);
-            } else {
-              result.put(index, new CollectionOperationStatus(status));
-            }
-          }
-        });
-
-    rv.setOperation(op);
-    addOp(key, op);
-    return rv;
-  }
-
-  /**
    * Generic pipelined update operation for collection items.
    * Public methods for collection items call this method.
    *
@@ -1876,6 +1756,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
+          String key, List<Element<Object>> elements,
+          CollectionAttributes attributesForCreate) {
+    return asyncBopPipedInsertBulk(key, elements, attributesForCreate, collectionTranscoder);
+  }
+
+  @Override
   public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
           String key, Map<String, Object> elements,
           CollectionAttributes attributesForCreate) {
@@ -1900,85 +1787,124 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
           String key, Map<Long, T> elements,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      BTreePipedInsert<T> insert = new BTreePipedInsert<T>(key, elements, attributesForCreate, tc);
-      return asyncCollectionPipedInsert(key, insert);
-    } else {
-      List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
 
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+
+    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
+      insertList.add(new BTreePipedInsert<T>(key, elements, attributesForCreate, tc));
+    } else {
       PartitionedMap<Long, T> list = new PartitionedMap<Long, T>(
               elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-
-      for (int i = 0; i < list.size(); i++) {
-        insertList.add(new BTreePipedInsert<T>(key, list.get(i), attributesForCreate, tc));
+      for (Map<Long, T> elementMap : list) {
+        insertList.add(new BTreePipedInsert<T>(key, elementMap, attributesForCreate, tc));
       }
-      return asyncCollectionPipedInsert(key, insertList);
     }
+    return asyncCollectionPipedInsert(key, insertList);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
+          String key, List<Element<T>> elements,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+
+    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
+      insertList.add(new ByteArraysBTreePipedInsert<T>(key, elements, attributesForCreate, tc));
+    } else {
+      PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
+              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
+      for (List<Element<T>> elementList : list) {
+        insertList.add(new ByteArraysBTreePipedInsert<T>(key, elementList, attributesForCreate, tc));
+      }
+    }
+    return asyncCollectionPipedInsert(key, insertList);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedInsertBulk(
           String key, Map<String, T> elements,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
     for (Map.Entry<String, T> checkMKey : elements.entrySet()) {
       validateMKey(checkMKey.getKey());
     }
+
+    List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+
     if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      MapPipedInsert<T> insert = new MapPipedInsert<T>(key, elements, attributesForCreate, tc);
-      return asyncCollectionPipedInsert(key, insert);
+      insertList.add(new MapPipedInsert<T>(key, elements, attributesForCreate, tc));
     } else {
-      List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
       PartitionedMap<String, T> list = new PartitionedMap<String, T>(
               elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-
-      for (int i = 0; i < list.size(); i++) {
-        insertList.add(new MapPipedInsert<T>(key, list.get(i), attributesForCreate, tc));
+      for (Map<String, T> elementMap : list) {
+        insertList.add(new MapPipedInsert<T>(key, elementMap, attributesForCreate, tc));
       }
-      return asyncCollectionPipedInsert(key, insertList);
     }
+    return asyncCollectionPipedInsert(key, insertList);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncLopPipedInsertBulk(
           String key, int index, List<T> valueList,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (valueList.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+
     if (valueList.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      ListPipedInsert<T> insert = new ListPipedInsert<T>(key, index, valueList, attributesForCreate, tc);
-      return asyncCollectionPipedInsert(key, insert);
+      insertList.add(new ListPipedInsert<T>(key, index, valueList, attributesForCreate, tc));
     } else {
       PartitionedList<T> list = new PartitionedList<T>(valueList,
               CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-
-      List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>(
-              list.size());
-
-      for (int i = 0; i < list.size(); i++) {
-        insertList.add(new ListPipedInsert<T>(key, index, list.get(i), attributesForCreate, tc));
+      for (List<T> elementList : list) {
+        insertList.add(new ListPipedInsert<T>(key, index, elementList, attributesForCreate, tc));
       }
-      return asyncCollectionPipedInsert(key, insertList);
     }
+    return asyncCollectionPipedInsert(key, insertList);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncSopPipedInsertBulk(
           String key, List<T> valueList,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (valueList.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+
     if (valueList.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      SetPipedInsert<T> insert = new SetPipedInsert<T>(key, valueList, attributesForCreate, tc);
-      return asyncCollectionPipedInsert(key, insert);
+      insertList.add(new SetPipedInsert<T>(key, valueList, attributesForCreate, tc));
     } else {
       PartitionedList<T> list = new PartitionedList<T>(valueList,
               CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-
-      List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>(
-              list.size());
-
-      for (int i = 0; i < list.size(); i++) {
-        insertList.add(new SetPipedInsert<T>(key, list.get(i), attributesForCreate, tc));
+      for (List<T> elementList : list) {
+        insertList.add(new SetPipedInsert<T>(key, elementList, attributesForCreate, tc));
       }
-
-      return asyncCollectionPipedInsert(key, insertList);
     }
+    return asyncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -2855,23 +2781,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpdateBulk(
           String key, List<Element<T>> elements, Transcoder<T> tc) {
 
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedUpdate<T>> updateList = new ArrayList<CollectionPipedUpdate<T>>();
+
     if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
-      CollectionPipedUpdate<T> collectionPipedUpdate = new BTreePipedUpdate<T>(
-              key, elements, tc);
-      return asyncCollectionPipedUpdate(key, collectionPipedUpdate);
+      updateList.add(new BTreePipedUpdate<T>(key, elements, tc));
     } else {
       PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
               elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
-
-      List<CollectionPipedUpdate<T>> collectionPipedUpdateList =
-          new ArrayList<CollectionPipedUpdate<T>>(list.size());
-
-      for (int i = 0; i < list.size(); i++) {
-        collectionPipedUpdateList.add(new BTreePipedUpdate<T>(key, list.get(i), tc));
+      for (List<Element<T>> elementList : list) {
+        updateList.add(new BTreePipedUpdate<T>(key, elementList, tc));
       }
-
-      return asyncCollectionPipedUpdate(key, collectionPipedUpdateList);
     }
+    return asyncCollectionPipedUpdate(key, updateList);
   }
 
   @Override
@@ -2884,26 +2810,28 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncMopPipedUpdateBulk(
           String key, Map<String, T> elements, Transcoder<T> tc) {
 
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException(
+              "The number of piped operations must be larger than 0.");
+    }
+
     for (Map.Entry<String, T> checkMKey : elements.entrySet()) {
       validateMKey(checkMKey.getKey());
     }
-    if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
-      CollectionPipedUpdate<T> collectionPipedUpdate = new MapPipedUpdate<T>(
-              key, elements, tc);
-      return asyncCollectionPipedUpdate(key, collectionPipedUpdate);
+
+    List<CollectionPipedUpdate<T>> updateList = new ArrayList<CollectionPipedUpdate<T>>();
+
+    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
+      updateList.add(new MapPipedUpdate<T>(key, elements, tc));
     } else {
       PartitionedMap<String, T> list = new PartitionedMap<String, T>(
               elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
-      List<CollectionPipedUpdate<T>> collectionPipedUpdateList =
-          new ArrayList<CollectionPipedUpdate<T>>(list.size());
-
-      for (int i = 0; i < list.size(); i++) {
-        collectionPipedUpdateList.add(new MapPipedUpdate<T>(key, list.get(i), tc));
+      for (Map<String, T> elementMap : list) {
+        updateList.add(new MapPipedUpdate<T>(key, elementMap, tc));
       }
-
-      return asyncCollectionPipedUpdate(key, collectionPipedUpdateList);
     }
+    return asyncCollectionPipedUpdate(key, updateList);
   }
 
   @Override
@@ -3695,35 +3623,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(key, op);
     return rv;
-  }
-
-  @Override
-  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
-          String key, List<Element<Object>> elements,
-          CollectionAttributes attributesForCreate) {
-    return asyncBopPipedInsertBulk(key, elements, attributesForCreate, collectionTranscoder);
-  }
-
-  @Override
-  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedInsertBulk(
-          String key, List<Element<T>> elements,
-          CollectionAttributes attributesForCreate, Transcoder<T> tc) {
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      CollectionPipedInsert<T> insert = new ByteArraysBTreePipedInsert<T>(key, elements, attributesForCreate, tc);
-      return asyncCollectionPipedInsert(key, insert);
-    } else {
-      PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
-              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-
-      List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>(
-              list.size());
-
-      for (int i = 0; i < list.size(); i++) {
-        insertList.add(new ByteArraysBTreePipedInsert<T>(key, list.get(i), attributesForCreate, tc));
-      }
-
-      return asyncCollectionPipedInsert(key, insertList);
-    }
   }
 
   @Override
