@@ -953,7 +953,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(updateList.size());
 
     final List<OperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<OperationStatus>(1));
+            .synchronizedList(new ArrayList<OperationStatus>(updateList.size()));
 
     final Map<Integer, CollectionOperationStatus> mergedResult =
         new ConcurrentHashMap<Integer, CollectionOperationStatus>();
@@ -3908,7 +3908,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(insertList.size());
 
     final List<OperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<OperationStatus>(1));
+            .synchronizedList(new ArrayList<OperationStatus>(insertList.size()));
 
     final Map<Integer, CollectionOperationStatus> mergedResult =
         new ConcurrentHashMap<Integer, CollectionOperationStatus>();
