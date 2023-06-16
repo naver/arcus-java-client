@@ -24,27 +24,31 @@ public class GetFuture<T> implements Future<T> {
     this.rv = new OperationFuture<Future<T>>(l, opTimeout);
   }
 
+  public GetFuture(GetFuture<T> parent) {
+    this.rv = parent.getRv();
+  }
+
   public boolean cancel(boolean ign) {
     return rv.cancel(ign);
   }
 
   public T get() throws InterruptedException, ExecutionException {
-    Future<T> v = rv.get();
-    return v == null ? null : v.get();
+    Future<T> decodedTask = rv.get();
+    return decodedTask == null ? null : decodedTask.get();
   }
 
   public T get(long duration, TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
-    Future<T> v = rv.get(duration, units);
-    return v == null ? null : v.get();
+    Future<T> decodedTask = rv.get(duration, units);
+    return decodedTask == null ? null : decodedTask.get();
   }
 
   public OperationStatus getStatus() {
     return rv.getStatus();
   }
 
-  public void set(Future<T> d, OperationStatus s) {
-    rv.set(d, s);
+  public void set(Future<T> decodedTask, OperationStatus status) {
+    rv.set(decodedTask, status);
   }
 
   public void setOperation(Operation to) {
@@ -58,4 +62,9 @@ public class GetFuture<T> implements Future<T> {
   public boolean isDone() {
     return rv.isDone();
   }
+
+  public OperationFuture<Future<T>> getRv() {
+    return rv;
+  }
+
 }

@@ -21,10 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.internal.GetFuture;
-import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.StatusCode;
-
-import net.sf.ehcache.Element;
 
 /**
  * Future returned for GET operations.
@@ -34,51 +30,28 @@ import net.sf.ehcache.Element;
  * @param <T> Type of object returned from the get
  */
 public class FrontCacheGetFuture<T> extends GetFuture<T> {
+  private final LocalCacheManager localCacheManager;
 
-  private static final OperationStatus END =
-          new OperationStatus(true, "END", StatusCode.SUCCESS);
-  private final Element element;
+  private final String key;
 
-
-  public FrontCacheGetFuture(Element element) {
-    super(null, 0);
-    this.element = element;
-  }
-
-  @Override
-  public boolean cancel(boolean mayInterruptIfRunning) {
-    return false;
+  public FrontCacheGetFuture(LocalCacheManager localCacheManager, String key, GetFuture<T> parent) {
+    super(parent);
+    this.localCacheManager = localCacheManager;
+    this.key = key;
   }
 
   @Override
   public T get() throws InterruptedException, ExecutionException {
-    return getValue();
-  }
-
-  @Override
-  public OperationStatus getStatus() {
-    return END;
-  }
-
-  @SuppressWarnings("unchecked")
-  private T getValue() {
-    return (T) this.element.getObjectValue();
+    T t = super.get();
+    localCacheManager.put(key, t);
+    return t;
   }
 
   @Override
   public T get(long timeout, TimeUnit unit) throws InterruptedException,
           ExecutionException, TimeoutException {
-    return getValue();
+    T t = super.get(timeout, unit);
+    localCacheManager.put(key, t);
+    return t;
   }
-
-  @Override
-  public boolean isCancelled() {
-    return false;
-  }
-
-  @Override
-  public boolean isDone() {
-    return true;
-  }
-
 }

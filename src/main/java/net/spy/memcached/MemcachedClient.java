@@ -929,10 +929,6 @@ public class MemcachedClient extends SpyThread
           }
 
           public void complete() {
-            // FIXME weird...
-            if (localCacheManager != null) {
-              localCacheManager.put(key, val, operationTimeout);
-            }
             latch.countDown();
           }
         });
