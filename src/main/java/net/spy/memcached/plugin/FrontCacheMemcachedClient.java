@@ -19,14 +19,19 @@ package net.spy.memcached.plugin;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.ConnectionFactory;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.transcoders.Transcoder;
-
-import net.sf.ehcache.Element;
 
 /**
  * Front cache for some Arcus commands.
@@ -68,6 +73,62 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
   }
 
   /**
+   * Get with a single key and decode using the default transcoder.
+   *
+   * @param key the key to get
+   * @return the result from the cache (null if there is none)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+  public Object get(String key) {
+    return get(key, transcoder);
+  }
+
+  /**
+   * Get with a single key.
+   *
+   * @param <T> Type of object to get.
+   * @param key the key to get
+   * @param tc  the transcoder to serialize and unserialize value
+   * @return the result from the cache (null if there is none)
+   * @throws OperationTimeoutException if the global operation timeout is
+   *                                   exceeded
+   * @throws IllegalStateException     in the rare circumstance where queue
+   *                                   is too full to accept any more requests
+   */
+
+  public <T> T get(String key, Transcoder<T> tc) {
+    Future<T> future = asyncGet(key, tc);
+    try {
+      return future.get(operationTimeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      future.cancel(true);
+      throw new RuntimeException("Interrupted waiting for value", e);
+    } catch (ExecutionException e) {
+      future.cancel(true);
+      throw new RuntimeException("Exception waiting for value", e);
+    } catch (TimeoutException e) {
+      future.cancel(true);
+      throw new OperationTimeoutException(e);
+    }
+  }
+
+  /**
+   * Get the given key asynchronously and decode with the default
+   * transcoder.
+   *
+   * @param key the key to fetch
+   * @return a future that will hold the return value of the fetch
+   * @throws IllegalStateException in the rare circumstance where queue
+   *                               is too full to accept any more requests
+   */
+  public GetFuture<Object> asyncGet(final String key) {
+    return asyncGet(key, transcoder);
+  }
+
+  /**
    * Get the value of the key.
    * Check the local cache first. If the key is not found, send the command to the server.
    *
@@ -77,17 +138,41 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    */
   @Override
   public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
-    Element frontElement = null;
-
-    if (localCacheManager != null) {
-      frontElement = localCacheManager.getElement(key);
-    }
-
-    if (frontElement == null) {
+    if (localCacheManager == null) {
       return super.asyncGet(key, tc);
-    } else {
-      return new FrontCacheGetFuture<T>(frontElement);
     }
+
+    final T t = localCacheManager.get(key, tc);
+    if (t != null) {
+      return new GetFuture<T>(null, 0) {
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+          return false;
+        }
+        @Override
+        public boolean isCancelled() {
+          return false;
+        }
+        @Override
+        public boolean isDone() {
+          return true;
+        }
+        @Override
+        public T get() {
+          return t;
+        }
+        @Override
+        public T get(long timeout, TimeUnit unit) {
+          return t;
+        }
+        @Override
+        public OperationStatus getStatus() {
+          return new OperationStatus(true, "END", StatusCode.SUCCESS);
+        }
+      };
+    }
+    GetFuture<T> parent = super.asyncGet(key, tc);
+    return new FrontCacheGetFuture<T>(localCacheManager, key, parent);
   }
 
   /**
