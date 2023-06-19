@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -68,7 +67,6 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.plugin.LocalCacheManager;
 import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -127,7 +125,6 @@ public class MemcachedClient extends SpyThread
 
   private volatile boolean running = true;
   private volatile boolean shuttingDown = false;
-  protected LocalCacheManager localCacheManager = null;
 
   protected final long operationTimeout;
 
@@ -1104,7 +1101,7 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Iterator<Transcoder<T>> tc_iter) {
-    final Map<String, Future<T>> m = new ConcurrentHashMap<String, Future<T>>();
+    final Map<String, Future<T>> rvMap = new ConcurrentHashMap<String, Future<T>>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
@@ -1114,29 +1111,15 @@ public class MemcachedClient extends SpyThread
     // Break the gets down into groups by key
     final Map<MemcachedNode, List<Collection<String>>> chunks
             = new HashMap<MemcachedNode, List<Collection<String>>>();
-    Iterator<String> key_iter = keys.iterator();
-    while (key_iter.hasNext() && tc_iter.hasNext()) {
-      String key = key_iter.next();
-      Transcoder<T> tc = tc_iter.next();
 
-      // FIXME This should be refactored...
-      // And the original front-cache implementations are really weird :-(
-      if (localCacheManager != null) {
-        final T cachedData = localCacheManager.get(key, tc);
-        if (cachedData != null) {
-          m.put(key, new LocalCacheManager.Task<T>(new Callable<T>() {
-            public T call() throws Exception {
-              return cachedData;
-            }
-          }));
-          continue;
-        }
-      }
+    Iterator<String> keyIter = keys.iterator();
+    while (keyIter.hasNext() && tc_iter.hasNext()) {
+      String key = keyIter.next();
+      Transcoder<T> tc = tc_iter.next();
       tc_map.put(key, tc);
       validateKey(key);
       addKeyToChunk(chunks, key, conn.findNodeByKey(key));
     }
-
     int wholeChunkSize = getWholeChunkSize(chunks);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
     final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
@@ -1151,7 +1134,7 @@ public class MemcachedClient extends SpyThread
 
       public void gotData(String k, int flags, byte[] data) {
         Transcoder<T> tc = tc_map.get(k);
-        m.put(k, tcService.decode(tc,
+        rvMap.put(k, tcService.decode(tc,
                 new CachedData(flags, data, tc.getMaxSize())));
       }
 
@@ -1178,7 +1161,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<T>(m, ops, latch, localCacheManager);
+    return new BulkGetFuture<T>(rvMap, ops, latch);
   }
 
   /**
@@ -2374,14 +2357,4 @@ public class MemcachedClient extends SpyThread
   Collection<MemcachedNode> getAllNodes() {
     return conn.getLocator().getAll();
   }
-
-  /**
-   * get current local cache manager
-   *
-   * @return current local cache manager
-   */
-  public LocalCacheManager getLocalCacheManager() {
-    return localCacheManager;
-  }
-
 }

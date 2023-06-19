@@ -31,7 +31,6 @@ import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
-import net.spy.memcached.plugin.LocalCacheManager;
 
 /**
  * Future for handling results from bulk gets.
@@ -46,9 +45,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private final CountDownLatch latch;
   private boolean timeout = false;
 
-  // FIXME right position?
-  private LocalCacheManager localCacheManager;
-
   public BulkGetFuture(Map<String, Future<T>> m,
                        Collection<Operation> getOps, CountDownLatch l) {
     super();
@@ -57,16 +53,14 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     latch = l;
   }
 
-  public BulkGetFuture(Map<String, Future<T>> m,
-                       Collection<Operation> getOps, CountDownLatch l,
-                       LocalCacheManager lcm) {
+  public BulkGetFuture(BulkGetFuture<T> other) {
     super();
-    rvMap = m;
-    ops = getOps;
-    latch = l;
-    localCacheManager = lcm;
+    rvMap = other.rvMap;
+    ops = other.ops;
+    latch = other.latch;
   }
 
+  @Override
   public boolean cancel(boolean ign) {
     boolean rv = false;
     for (Operation op : ops) {
@@ -76,6 +70,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     return rv;
   }
 
+  @Override
   public Map<String, T> get() throws InterruptedException, ExecutionException {
     try {
       return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -84,6 +79,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     }
   }
 
+  @Override
   public Map<String, T> getSome(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
@@ -103,6 +99,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    *
    * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
+  @Override
   public Map<String, T> get(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException, TimeoutException {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
@@ -112,6 +109,26 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
       throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
     }
     return ret;
+  }
+
+  @Override
+  public boolean isCancelled() {
+    for (Operation op : ops) {
+      if (op.isCancelled()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isDone() {
+    return latch.getCount() == 0;
+  }
+
+  @Override
+  public int getOpCount() {
+    return ops.size();
   }
 
   /**
@@ -143,40 +160,18 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
         throw new ExecutionException(op.getException());
       }
     }
-    Map<String, T> m = new HashMap<String, T>();
+
+    Map<String, T> resultMap = new HashMap<String, T>();
     for (Map.Entry<String, Future<T>> me : rvMap.entrySet()) {
       String key = me.getKey();
       Future<T> future = me.getValue();
       T value = future.get();
 
       // put the key into the result map.
-      m.put(key, value);
-
-      // cache the key locally
-      if (localCacheManager != null) {
-        // iff it is from the remote cache.
-        if (!(future instanceof LocalCacheManager.Task)) {
-          localCacheManager.put(key, value);
-        }
-      }
+      resultMap.put(key, value);
     }
-    return m;
+    return resultMap;
   }
-
-  @Override
-  public boolean isCancelled() {
-    for (Operation op : ops) {
-      if (op.isCancelled()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean isDone() {
-    return latch.getCount() == 0;
-  }
-
   /*
    * set to true if timeout was reached.
    *
