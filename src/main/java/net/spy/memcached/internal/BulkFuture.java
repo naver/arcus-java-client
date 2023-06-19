@@ -42,4 +42,7 @@ public interface BulkFuture<V> extends Future<V> {
   public V getSome(long timeout, TimeUnit unit)
           throws InterruptedException, ExecutionException;
 
+
+  public int getOpCount();
+
 }
