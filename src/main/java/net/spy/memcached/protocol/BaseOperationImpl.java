@@ -45,13 +45,13 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
-  private OperationState state = OperationState.WRITE_QUEUED;
+  protected OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
-  private boolean cancelled = false;
-  private String cancelCause = null;
+  protected boolean cancelled = false;
+  protected String cancelCause = null;
   private OperationException exception = null;
   protected OperationCallback callback = null;
-  private volatile MemcachedNode handlingNode = null;
+  protected volatile MemcachedNode handlingNode = null;
 
   private OperationType opType = OperationType.UNDEFINED;
   private APIType apiType = APIType.UNDEFINED;

@@ -35,19 +35,19 @@ import net.spy.memcached.ops.StatusCode;
  */
 abstract class BaseGetOpImpl extends OperationImpl {
 
-  private static final OperationStatus END =
+  protected static final OperationStatus END =
           new OperationStatus(true, "END", StatusCode.SUCCESS);
-  private static final String RN_STRING = "\r\n";
-  private final String cmd;
-  private final Collection<String> keys;
-  private String currentKey = null;
-  private long casValue = 0;
-  private int currentFlags = 0;
-  private byte[] data = null;
-  private int readOffset = 0;
-  private byte lookingFor = '\0';
+  protected static final String RN_STRING = "\r\n";
+  protected String cmd;
+  protected final Collection<String> keys;
+  protected String currentKey = null;
+  protected long casValue = 0;
+  protected int currentFlags = 0;
+  protected byte[] data = null;
+  protected int readOffset = 0;
+  protected byte lookingFor = '\0';
   /* ENABLE_MIGRATION if */
-  private String notMyKeyLine = null;
+  protected String notMyKeyLine = null;
   /* ENABLE_MIGRATION end */
 
   public BaseGetOpImpl(String c,
@@ -66,7 +66,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   @Override
-  public final void handleLine(String line) {
+  public void handleLine(String line) {
     if (line.equals("END")) {
       getLogger().debug("Get complete!");
       /* ENABLE_MIGRATION if */
@@ -104,7 +104,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   @Override
-  public final void handleRead(ByteBuffer b) {
+  public void handleRead(ByteBuffer b) {
     assert currentKey != null;
     assert data != null;
     // This will be the case, because we'll clear them when it's not.
@@ -223,7 +223,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   @Override
-  protected final void wasCancelled() {
+  protected void wasCancelled() {
     getCallback().receivedStatus(CANCELLED);
   }
 

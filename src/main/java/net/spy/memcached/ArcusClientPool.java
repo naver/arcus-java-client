@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +46,6 @@ import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
-import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
@@ -224,13 +224,18 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public <T> GetFuture<T> asyncGet(String key, Transcoder<T> tc) {
+  public <T> Future<T> asyncGet(String key, Transcoder<T> tc) {
     return this.getClient().asyncGet(key, tc);
   }
 
   @Override
-  public GetFuture<Object> asyncGet(String key) {
+  public Future<Object> asyncGet(String key) {
     return this.getClient().asyncGet(key);
+  }
+
+  @Override
+  public CompletableFuture<Object> reactiveAsyncGet(String key) {
+    return this.getClient().reactiveAsyncGet(key);
   }
 
   @Override

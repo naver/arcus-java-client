@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ConcurrentModificationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -69,8 +70,11 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.LocalCacheManager;
+import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
+
+import static net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl.END;
 
 /**
  * Client to a memcached server.
@@ -892,6 +896,39 @@ public class MemcachedClient extends SpyThread
     return asyncStore(StoreType.replace, key, exp, o, transcoder);
   }
 
+  @Override
+  public <T> GetFuture<T> asyncGet(String key, Transcoder<T> tc) {
+
+    final CountDownLatch latch = new CountDownLatch(1);
+    final GetFuture<T> rv = new GetFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.get(key,
+            new GetOperation.Callback() {
+            private volatile Future<T> val = null;
+
+            public void receivedStatus(OperationStatus status) {
+              rv.set(val, status);
+            }
+
+            public void gotData(String k, int flags, byte[] data) {
+              assert key.equals(k) : "Wrong key returned";
+              val = tcService.decode(tc,
+                      new CachedData(flags, data, tc.getMaxSize()));
+            }
+
+            public void complete() {
+              // FIXME weird...
+              if (localCacheManager != null) {
+                localCacheManager.put(key, val, operationTimeout);
+              }
+              latch.countDown();
+            }
+          });
+    rv.setOperation(op);
+    addOp(key, op);
+    return rv;
+  }
+
   /**
    * Get the given key asynchronously.
    *
@@ -902,14 +939,14 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> ReactiveOperationFuture<T> reactiveAsyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout);
+    final ReactiveOperationFuture<T> rv = new ReactiveOperationFuture<>(latch, operationTimeout);
 
-    Operation op = opFact.get(key,
+    Operation op = opFact.reactiveGet(key,
         new GetOperation.Callback() {
-          private Future<T> val = null;
+          private volatile T val = null;
 
           public void receivedStatus(OperationStatus status) {
             rv.set(val, status);
@@ -917,16 +954,21 @@ public class MemcachedClient extends SpyThread
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            val = tcService.decode(tc,
-                    new CachedData(flags, data, tc.getMaxSize()));
+            tcService.reactiveDecode(tc,
+                    new CachedData(flags, data, tc.getMaxSize())).thenAccept((decodedData) -> {
+                      val = decodedData;
+                      receivedStatus(END);
+                      complete();
+                    });
           }
 
           public void complete() {
             // FIXME weird...
             if (localCacheManager != null) {
-              localCacheManager.put(key, val, operationTimeout);
+              localCacheManager.put(key, val);
             }
             latch.countDown();
+            rv.complete(val);
           }
         });
     rv.setOperation(op);
@@ -943,8 +985,13 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public GetFuture<Object> asyncGet(final String key) {
+  public Future<Object> asyncGet(final String key) {
     return asyncGet(key, transcoder);
+  }
+
+  @Override
+  public CompletableFuture<Object> reactiveAsyncGet(String key) {
+    return reactiveAsyncGet(key, transcoder);
   }
 
   /**

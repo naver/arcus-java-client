@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +77,8 @@ public interface MemcachedClientIF {
   <T> Future<T> asyncGet(String key, Transcoder<T> tc);
 
   Future<Object> asyncGet(String key);
+
+  CompletableFuture<Object> reactiveAsyncGet(String key);
 
   <T> Future<CASValue<T>> asyncGets(String key,
                                     Transcoder<T> tc);
