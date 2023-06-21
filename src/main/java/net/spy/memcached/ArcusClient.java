@@ -952,8 +952,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(updateList.size());
 
-    final List<OperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<OperationStatus>(updateList.size()));
+    final List<CollectionOperationStatus> mergedOperationStatus = Collections
+            .synchronizedList(new ArrayList<CollectionOperationStatus>(updateList.size()));
 
     final Map<Integer, CollectionOperationStatus> mergedResult =
         new ConcurrentHashMap<Integer, CollectionOperationStatus>();
@@ -1058,9 +1058,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public CollectionOperationStatus getOperationStatus() {
-        for (OperationStatus status : mergedOperationStatus) {
+        for (CollectionOperationStatus status : mergedOperationStatus) {
           if (!status.isSuccess()) {
-            return new CollectionOperationStatus(status);
+            return status;
           }
         }
         return new CollectionOperationStatus(true, "END", CollectionResponse.END);
@@ -3907,8 +3907,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(insertList.size());
 
-    final List<OperationStatus> mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<OperationStatus>(insertList.size()));
+    final List<CollectionOperationStatus> mergedOperationStatus = Collections
+            .synchronizedList(new ArrayList<CollectionOperationStatus>(insertList.size()));
 
     final Map<Integer, CollectionOperationStatus> mergedResult =
         new ConcurrentHashMap<Integer, CollectionOperationStatus>();
@@ -4012,9 +4012,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public CollectionOperationStatus getOperationStatus() {
-        for (OperationStatus status : mergedOperationStatus) {
+        for (CollectionOperationStatus status : mergedOperationStatus) {
           if (!status.isSuccess()) {
-            return new CollectionOperationStatus(status);
+            return status;
           }
         }
         return new CollectionOperationStatus(true, "END", CollectionResponse.END);
