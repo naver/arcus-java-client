@@ -21,9 +21,9 @@ jobs:
         cache: 'maven'
     - name: Setup Python
       id: setup_python
-      uses: actions/setup-python@v3
+      uses: MatteoH2O1999/setup-python@v1
       with:
-        python-version: 2.7
+        python-version: '2.7'
     - name: Caching PIP
       id: python_cache
       uses: actions/cache@v3
