@@ -78,6 +78,8 @@ public interface MemcachedClientIF {
 
   Future<Object> asyncGet(String key);
 
+  <T> CompletableFuture<T> reactiveAsyncGet(String key, Transcoder<T> tc);
+
   CompletableFuture<Object> reactiveAsyncGet(String key);
 
   <T> Future<CASValue<T>> asyncGets(String key,

@@ -49,7 +49,7 @@ import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
+import net.spy.memcached.reactive.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**

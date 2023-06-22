@@ -14,7 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached.reactive.internal;
+package net.spy.memcached.reactive;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
@@ -23,12 +30,6 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Managed future for operations.
@@ -40,16 +41,20 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
 
   protected final CountDownLatch latch;
-  protected final AtomicReference<T> objRef;
+  protected final AtomicReference<CompletableFuture<T>> objRef;
   protected OperationStatus status;
   protected final long timeout;
   protected Operation op;
 
+  private final long createdAt = System.currentTimeMillis();
+  private long transcodeCompletedAt = 0;
+
   public ReactiveOperationFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<T>(null), opTimeout);
+    this(l, new AtomicReference<>(null), opTimeout);
   }
 
-  public ReactiveOperationFuture(CountDownLatch l, AtomicReference<T> oref,
+  public ReactiveOperationFuture(CountDownLatch l,
+                                 AtomicReference<CompletableFuture<T>> oref,
                                  long opTimeout) {
     super();
     latch = l;
@@ -75,22 +80,17 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
 
   public T get(long duration, TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
-    if (!latch.await(duration, units)) {
-      // whenever timeout occurs, continuous timeout counter will increase by 1.
-      MemcachedConnection.opTimedOut(op);
-      throw new CheckedOperationTimeoutException(duration, units, op);
-    } else {
-      // continuous timeout counter will be reset
-      MemcachedConnection.opSucceeded(op);
+    Exception exception = createException(
+            !latch.await(duration, units), TimeUnit.MILLISECONDS.convert(duration, units));
+
+    if (exception instanceof TimeoutException) {
+      throw (TimeoutException) exception;
     }
-    if (op != null && op.hasErrored()) {
-      throw new ExecutionException(op.getException());
-    }
-    if (op != null && op.isCancelled()) {
-      throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+    if (exception instanceof ExecutionException) {
+      throw (ExecutionException) exception;
     }
 
-    return objRef.get();
+    return objRef.get().get();
   }
 
   public OperationStatus getStatus() {
@@ -106,13 +106,51 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
     return status;
   }
 
-  public void set(T o, OperationStatus s) {
-    objRef.set(o);
+  public void set(CompletableFuture<T> value, OperationStatus s) {
+    objRef.set(value);
     status = s;
   }
 
   public void setOperation(Operation to) {
     op = to;
+  }
+
+  public Exception createException(long timeoutMillis) {
+    return createException(false, timeoutMillis);
+  }
+
+  private Exception createException(boolean forceTimeout, long timeoutMillis) {
+    Exception timeoutException = createTimeoutException(forceTimeout, timeoutMillis);
+    if (timeoutException != null) {
+      return timeoutException;
+    }
+    return createExecutionException();
+  }
+
+  private TimeoutException createTimeoutException(boolean forceTimeout, long timeoutMillis) {
+    if (forceTimeout || transcodeCompletedAt - createdAt > timeoutMillis) {
+      // whenever timeout occurs, continuous timeout counter will increase by 1.
+      MemcachedConnection.opTimedOut(op);
+      return new CheckedOperationTimeoutException(timeoutMillis, TimeUnit.MILLISECONDS, op);
+    } else {
+      // continuous timeout counter will be reset
+      MemcachedConnection.opSucceeded(op);
+    }
+    return null;
+  }
+
+  public ExecutionException createExecutionException() {
+    if (op != null && op.hasErrored()) {
+      return new ExecutionException(op.getException());
+    }
+    if (op != null && op.isCancelled()) {
+      return new ExecutionException(new RuntimeException(op.getCancelCause()));
+    }
+    return null;
+  }
+
+  public void transcodeCompleted() {
+    transcodeCompletedAt = System.currentTimeMillis();
   }
 
   public boolean isCancelled() {

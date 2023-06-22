@@ -81,7 +81,6 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
-import net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl;
 
 /**
  * Factory for binary operations.
@@ -99,11 +98,6 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   public GetOperation get(String key, Callback callback) {
     return new GetOperationImpl(key, callback);
-  }
-
-  @Override
-  public ReactiveGetOperationImpl reactiveGet(String key, Callback callback) {
-    return null;
   }
 
   public GetOperation get(Collection<String> value, Callback cb) {
