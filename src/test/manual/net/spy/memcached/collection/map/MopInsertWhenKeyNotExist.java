@@ -16,10 +16,10 @@
  */
 package net.spy.memcached.collection.map;
 
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
-
-import java.util.concurrent.TimeUnit;
 
 public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
 

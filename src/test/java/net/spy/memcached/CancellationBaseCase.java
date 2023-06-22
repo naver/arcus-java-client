@@ -1,7 +1,5 @@
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import junit.framework.TestCase;
 
 /**
  * Base class for cancellation tests.

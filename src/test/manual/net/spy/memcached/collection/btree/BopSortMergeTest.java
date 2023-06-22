@@ -16,7 +16,12 @@
  */
 package net.spy.memcached.collection.btree;
 
-import org.junit.Assert;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
@@ -28,11 +33,7 @@ import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
 
 public class BopSortMergeTest extends BaseIntegrationTest {
 

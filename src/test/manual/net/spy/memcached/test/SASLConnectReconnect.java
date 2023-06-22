@@ -9,7 +9,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Assert;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
@@ -17,6 +16,8 @@ import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
+
+import org.junit.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

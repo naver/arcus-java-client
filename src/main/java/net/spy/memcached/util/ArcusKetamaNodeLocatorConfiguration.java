@@ -16,10 +16,10 @@
  */
 package net.spy.memcached.util;
 
+import java.util.Comparator;
+
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedNodeROImpl;
-
-import java.util.Comparator;
 
 public class ArcusKetamaNodeLocatorConfiguration extends
         DefaultKetamaNodeLocatorConfiguration {

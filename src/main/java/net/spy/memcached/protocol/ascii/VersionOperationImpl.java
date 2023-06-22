@@ -27,8 +27,8 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
-import net.spy.memcached.ops.VersionOperation;
 import net.spy.memcached.ops.StatusCode;
+import net.spy.memcached.ops.VersionOperation;
 
 /**
  * Operation to request the version of a memcached server.

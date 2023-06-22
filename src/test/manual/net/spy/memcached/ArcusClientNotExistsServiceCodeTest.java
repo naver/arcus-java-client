@@ -17,9 +17,10 @@
 package net.spy.memcached;
 
 import junit.framework.TestCase;
-import org.junit.Ignore;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
+
+import org.junit.Ignore;
 
 @Ignore
 public class ArcusClientNotExistsServiceCodeTest extends TestCase {

@@ -18,11 +18,12 @@ package net.spy.memcached.collection.attribute;
 
 import java.util.Set;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
+
+import org.junit.Assert;
 
 public class UnReadableSetTest extends BaseIntegrationTest {
 

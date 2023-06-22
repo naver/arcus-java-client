@@ -16,11 +16,11 @@
  */
 package net.spy.memcached;
 
-import net.spy.memcached.ops.Operation;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+
+import net.spy.memcached.ops.Operation;
 
 /**
  * Thrown by {@link MemcachedClient} when any internal operations timeout.

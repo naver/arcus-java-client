@@ -21,10 +21,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
+
+import org.junit.Assert;
 
 public class SopOverflowActionTest extends BaseIntegrationTest {
 

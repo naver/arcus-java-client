@@ -17,11 +17,11 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
-
-import java.util.List;
 
 public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private static final String command = "bop smget";

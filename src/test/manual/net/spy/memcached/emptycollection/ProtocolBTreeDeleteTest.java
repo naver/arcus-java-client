@@ -16,10 +16,12 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
-import net.spy.memcached.collection.ElementFlagFilter;
+
 import net.spy.memcached.collection.BTreeDelete;
+import net.spy.memcached.collection.ElementFlagFilter;
+
+import org.junit.Assert;
 
 public class ProtocolBTreeDeleteTest extends TestCase {
 

@@ -17,11 +17,11 @@
 /* ENABLE_REPLICATION if */
 package net.spy.memcached.util;
 
-import net.spy.memcached.MemcachedNode;
-import net.spy.memcached.ArcusReplNodeAddress;
-import net.spy.memcached.MemcachedReplicaGroup;
-
 import java.util.Comparator;
+
+import net.spy.memcached.ArcusReplNodeAddress;
+import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.MemcachedReplicaGroup;
 
 /**
  * This configuration class is aware that InetSocketAddress is really ArcusReplNodeAddress.

@@ -17,6 +17,7 @@
 package net.spy.memcached;
 
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 
 import org.junit.Ignore;

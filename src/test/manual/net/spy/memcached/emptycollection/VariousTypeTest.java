@@ -22,12 +22,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import net.spy.memcached.collection.Element;
-import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
+
+import org.junit.Assert;
 
 public class VariousTypeTest extends BaseIntegrationTest {
 

@@ -16,8 +16,8 @@
  */
 package net.spy.memcached;
 
-import java.nio.ByteBuffer;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

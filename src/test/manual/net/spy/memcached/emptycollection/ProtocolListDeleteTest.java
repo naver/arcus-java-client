@@ -16,9 +16,11 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.ListDelete;
+
+import org.junit.Assert;
 
 public class ProtocolListDeleteTest extends TestCase {
 

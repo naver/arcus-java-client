@@ -18,11 +18,11 @@
 /* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
-import net.spy.memcached.compat.SpyObject;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import net.spy.memcached.compat.SpyObject;
 
 public abstract class MemcachedReplicaGroup extends SpyObject {
   protected final String group;

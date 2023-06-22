@@ -1,6 +1,11 @@
 package net.spy.memcached.LongKeyTest;
 
-import org.junit.Assert;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -13,11 +18,7 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.transcoders.LongTranscoder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.Map;
+import org.junit.Assert;
 
 public class BaseLongKeyTest extends BaseIntegrationTest {
 

@@ -16,11 +16,6 @@
  */
 package net.spy.memcached.bulkoperation;
 
-import org.junit.Assert;
-import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.StatusCode;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +23,12 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
+
+import org.junit.Assert;
 
 public class BulkDeleteTest extends BaseIntegrationTest {
   public void testNullAndEmptyKeyDelete() {

@@ -16,13 +16,13 @@
  */
 package net.spy.memcached.internal;
 
-import net.spy.memcached.TimedOutMessageFactory;
-import net.spy.memcached.ops.Operation;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.TimedOutMessageFactory;
+import net.spy.memcached.ops.Operation;
 
 /**
  * Timeout exception that tracks the original operation.

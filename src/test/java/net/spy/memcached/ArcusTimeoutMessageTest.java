@@ -16,12 +16,27 @@
  */
 package net.spy.memcached;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -30,31 +45,18 @@ import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
+import net.spy.memcached.ops.StoreType;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ArcusTimeoutMessageTest extends TestCase {

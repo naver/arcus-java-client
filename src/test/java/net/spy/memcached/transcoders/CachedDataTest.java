@@ -1,6 +1,7 @@
 package net.spy.memcached.transcoders;
 
 import junit.framework.TestCase;
+
 import net.spy.memcached.CachedData;
 
 /**

@@ -16,12 +16,14 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.MapDelete;
 
-import java.util.List;
-import java.util.ArrayList;
+import org.junit.Assert;
 
 public class ProtocolMapDeleteTest extends TestCase {
 

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BTreeElement;
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -32,6 +31,8 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
+
+import org.junit.Assert;
 
 public class BopGetBulkTest extends BaseIntegrationTest {
 

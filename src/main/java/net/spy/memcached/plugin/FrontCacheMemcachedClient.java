@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import net.sf.ehcache.Element;
 import net.spy.memcached.ConnectionFactory;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.transcoders.Transcoder;
+
+import net.sf.ehcache.Element;
 
 /**
  * Front cache for some Arcus commands.

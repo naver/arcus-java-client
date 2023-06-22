@@ -19,10 +19,11 @@ package net.spy.memcached;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 
 @Ignore

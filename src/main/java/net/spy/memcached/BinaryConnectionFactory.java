@@ -17,10 +17,10 @@
  */
 package net.spy.memcached;
 
+import java.net.SocketAddress;
+
 import net.spy.memcached.protocol.binary.BinaryMemcachedNodeImpl;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
-
-import java.net.SocketAddress;
 
 /**
  * Default connection factory for binary wire protocol connections.

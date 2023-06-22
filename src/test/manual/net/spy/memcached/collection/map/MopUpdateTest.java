@@ -16,12 +16,13 @@
  */
 package net.spy.memcached.collection.map;
 
-import org.junit.Assert;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
 
 public class MopUpdateTest extends BaseIntegrationTest {
 

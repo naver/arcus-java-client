@@ -22,12 +22,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
+
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionObserver;
-
 import net.spy.memcached.LoggerSetter;
+
 import org.junit.Ignore;
 
 @Ignore

@@ -18,13 +18,14 @@ package net.spy.memcached.emptycollection;
 
 import java.util.Map;
 
-import org.junit.Assert;
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
-import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
+
+import org.junit.Assert;
 
 public class BTreeGetWithFilterTest extends BaseIntegrationTest {
 

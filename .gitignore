@@ -1,9 +1,13 @@
 .settings
 cobertura.ser
-.idea/
 target/
 reports/
 devtools/
 junit*
 *.iml
 *~
+!.idea
+.idea/*
+!.idea/codeStyles
+.idea/codeStyles/*
+!.idea/codeStyles/Project.xml

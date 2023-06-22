@@ -1,9 +1,9 @@
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import junit.framework.TestCase;
 
 public class CancelFailureModeTest extends TestCase {
   private String serverList = "127.0.0.1:11311";

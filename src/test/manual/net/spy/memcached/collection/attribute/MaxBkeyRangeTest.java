@@ -19,12 +19,13 @@ package net.spy.memcached.collection.attribute;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
+
+import org.junit.Assert;
 import org.junit.function.ThrowingRunnable;
 
 import static org.junit.Assert.assertThrows;

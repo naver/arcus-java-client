@@ -1,10 +1,10 @@
 package net.spy.memcached.protocol.ascii;
 
-import net.spy.memcached.ops.APIType;
-import net.spy.memcached.ops.GetOperation;
-
 import java.util.Collection;
 import java.util.HashSet;
+
+import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.GetOperation;
 
 /**
  * Operation for retrieving data.

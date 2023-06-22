@@ -17,12 +17,6 @@
  */
 package net.spy.memcached.protocol;
 
-import junit.framework.TestCase;
-import net.spy.memcached.DefaultConnectionFactory;
-import net.spy.memcached.ops.GetOperation;
-import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.OperationStatus;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
@@ -30,6 +24,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
+
+import junit.framework.TestCase;
+
+import net.spy.memcached.DefaultConnectionFactory;
+import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationStatus;
 
 /**
  * Test the TCPMemcachedNodeImpl

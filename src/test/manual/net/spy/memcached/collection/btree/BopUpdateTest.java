@@ -18,13 +18,14 @@ package net.spy.memcached.collection.btree;
 
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
+import net.spy.memcached.collection.ElementFlagUpdate;
+
+import org.junit.Assert;
 
 public class BopUpdateTest extends BaseIntegrationTest {
 

@@ -1,9 +1,9 @@
 package net.spy.memcached.protocol.binary;
 
+import junit.framework.TestCase;
+
 import static net.spy.memcached.protocol.binary.OperationImpl.decodeInt;
 import static net.spy.memcached.protocol.binary.OperationImpl.decodeUnsignedInt;
-
-import junit.framework.TestCase;
 
 /**
  * Test operation stuff.

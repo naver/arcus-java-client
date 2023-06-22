@@ -23,12 +23,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.ops.CollectionOperationStatus;
+
+import org.junit.Assert;
 
 public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 

@@ -1,20 +1,20 @@
 package net.spy.memcached.internal;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Future;
 
 public class BulkOperationFuture<T> implements Future<Map<String, T>> {
   protected final Map<String, T> failedResult = new HashMap<String, T>();

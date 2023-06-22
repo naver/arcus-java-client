@@ -2,8 +2,8 @@ package net.spy.memcached.protocol.ascii;
 
 import net.spy.memcached.OperationFactory;
 import net.spy.memcached.OperationFactoryTestBase;
-import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.MutatorOperation;
 
 public class OperationFactoryTest extends OperationFactoryTestBase {
 

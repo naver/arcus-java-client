@@ -36,8 +36,8 @@ import net.spy.memcached.compat.SpyThread;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 
 /**
  * A program to use CacheMonitor to start and

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
@@ -30,6 +29,8 @@ import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
+
+import org.junit.Assert;
 
 public class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
 

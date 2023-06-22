@@ -17,8 +17,6 @@
  */
 package net.spy.memcached.protocol.binary;
 
-import static net.spy.memcached.protocol.binary.GetOperationImpl.EXTRA_HDR_LEN;
-
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -31,6 +29,8 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
+
+import static net.spy.memcached.protocol.binary.GetOperationImpl.EXTRA_HDR_LEN;
 
 class MultiGetOperationImpl extends OperationImpl implements GetOperation {
 

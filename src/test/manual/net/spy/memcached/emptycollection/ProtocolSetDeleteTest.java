@@ -16,11 +16,13 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
+
+import org.junit.Assert;
 
 public class ProtocolSetDeleteTest extends TestCase {
   private final Object value = "value";

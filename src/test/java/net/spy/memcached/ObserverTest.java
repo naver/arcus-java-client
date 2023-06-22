@@ -7,11 +7,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SpyObject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 import static org.junit.Assume.assumeTrue;
 
