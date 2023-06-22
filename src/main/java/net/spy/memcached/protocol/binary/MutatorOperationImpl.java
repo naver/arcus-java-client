@@ -20,8 +20,8 @@ package net.spy.memcached.protocol.binary;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;

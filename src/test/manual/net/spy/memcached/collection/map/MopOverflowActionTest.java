@@ -16,16 +16,17 @@
  */
 package net.spy.memcached.collection.map;
 
-import org.junit.Assert;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
 
 public class MopOverflowActionTest extends BaseIntegrationTest {
 

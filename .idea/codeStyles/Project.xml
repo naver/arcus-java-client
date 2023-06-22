@@ -1,0 +1,49 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <JavaCodeStyleSettings>
+      <option name="CLASS_NAMES_IN_JAVADOC" value="2" />
+      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="2147483647" />
+      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="2147483647" />
+      <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+        <value />
+      </option>
+      <option name="IMPORT_LAYOUT_TABLE">
+        <value>
+          <package name="java" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="javax" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="junit" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="net.spy.memcached" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.apache.zookeeper" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.junit" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="java" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="javax" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="junit" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="net.spy.memcached" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.apache.zookeeper" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.junit" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="" withSubpackages="true" static="true" />
+        </value>
+      </option>
+    </JavaCodeStyleSettings>
+    <codeStyleSettings language="JAVA">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>

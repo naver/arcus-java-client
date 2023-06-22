@@ -16,10 +16,12 @@
  */
 package net.spy.memcached.collection;
 
+import junit.framework.TestCase;
+
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
+
 import org.junit.Assert;
-import junit.framework.TestCase;
 
 public class ElementFlagFilterTest extends TestCase {
 

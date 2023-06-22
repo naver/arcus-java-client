@@ -19,14 +19,15 @@ package net.spy.memcached.frontcache;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
+
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.plugin.LocalCacheManager;
 import net.spy.memcached.transcoders.Transcoder;
+
+import org.junit.Ignore;
 
 @Ignore
 public class LocalCacheManagerTest extends TestCase {

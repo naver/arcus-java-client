@@ -16,9 +16,9 @@
  */
 package net.spy.memcached.collection;
 
-import net.spy.memcached.MemcachedNode;
-
 import java.util.List;
+
+import net.spy.memcached.MemcachedNode;
 
 public interface BTreeGetBulk<T> {
 

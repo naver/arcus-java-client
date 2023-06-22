@@ -1,11 +1,11 @@
 package net.spy.memcached;
 
-import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.StoreOperation;
-import net.spy.memcached.ops.DeleteOperation;
-
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+
+import net.spy.memcached.ops.DeleteOperation;
+import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.StoreOperation;
 
 public final class TimedOutMessageFactory {
 

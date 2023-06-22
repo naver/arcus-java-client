@@ -24,10 +24,10 @@ import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeUpdate;
-import net.spy.memcached.collection.MapUpdate;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.ElementFlagUpdate;
+import net.spy.memcached.collection.MapUpdate;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionUpdateOperation;

@@ -16,11 +16,12 @@
  */
 package net.spy.memcached.collection.btree.longbkey;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagUpdate;
+
+import org.junit.Assert;
 
 public class BopUpdateTest extends BaseIntegrationTest {
 

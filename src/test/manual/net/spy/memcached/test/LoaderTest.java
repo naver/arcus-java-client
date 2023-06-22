@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
-import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
+import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.util.CacheLoader;
 

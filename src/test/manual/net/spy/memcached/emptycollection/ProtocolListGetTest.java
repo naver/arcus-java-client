@@ -16,9 +16,11 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
+
 import net.spy.memcached.collection.ListGet;
+
+import org.junit.Assert;
 
 public class ProtocolListGetTest extends TestCase {
 

@@ -18,10 +18,11 @@ package net.spy.memcached.emptycollection;
 
 import java.util.List;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.internal.CollectionFuture;
+
+import org.junit.Assert;
 
 public class GetWithDropListTest extends BaseIntegrationTest {
 

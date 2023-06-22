@@ -3,6 +3,7 @@ package net.spy.memcached.transcoders;
 import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
+
 import net.spy.memcached.CachedData;
 
 /**

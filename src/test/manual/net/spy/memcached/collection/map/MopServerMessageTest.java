@@ -16,14 +16,14 @@
  */
 package net.spy.memcached.collection.map;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.OperationStatus;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class MopServerMessageTest extends BaseIntegrationTest {
 

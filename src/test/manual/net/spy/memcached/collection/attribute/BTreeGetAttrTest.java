@@ -16,12 +16,13 @@
  */
 package net.spy.memcached.collection.attribute;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.util.BTreeUtil;
+
+import org.junit.Assert;
 
 public class BTreeGetAttrTest extends BaseIntegrationTest {
 

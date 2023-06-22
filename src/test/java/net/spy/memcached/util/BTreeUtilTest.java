@@ -19,6 +19,7 @@ package net.spy.memcached.util;
 import java.util.Arrays;
 
 import net.spy.memcached.compat.BaseMockCase;
+
 import org.junit.function.ThrowingRunnable;
 
 import static org.junit.Assert.assertThrows;

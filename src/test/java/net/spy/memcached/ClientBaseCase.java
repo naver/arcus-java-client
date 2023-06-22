@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import junit.framework.TestCase;
+
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;

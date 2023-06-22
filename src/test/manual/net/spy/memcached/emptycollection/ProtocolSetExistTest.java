@@ -17,10 +17,12 @@
 package net.spy.memcached.emptycollection;
 
 import junit.framework.TestCase;
-import org.junit.Assert;
+
 import net.spy.memcached.collection.SetExist;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
+
+import org.junit.Assert;
 
 public class ProtocolSetExistTest extends TestCase {
   private final Object value = "value";

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
@@ -32,6 +31,8 @@ import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
+
+import org.junit.Assert;
 
 public class SMGetErrorTest extends BaseIntegrationTest {
 

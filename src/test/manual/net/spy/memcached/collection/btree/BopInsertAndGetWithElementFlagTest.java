@@ -19,14 +19,15 @@ package net.spy.memcached.collection.btree;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-import net.spy.memcached.collection.Element;
-import net.spy.memcached.collection.ElementFlagFilter;
-import net.spy.memcached.collection.ElementMultiFlagsFilter;
-import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.collection.ElementFlagFilter;
+import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
+import net.spy.memcached.collection.ElementMultiFlagsFilter;
+
+import org.junit.Assert;
 
 public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 

@@ -20,10 +20,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import net.sf.ehcache.Element;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
+
+import net.sf.ehcache.Element;
 
 /**
  * Future returned for GET operations.

@@ -1,6 +1,7 @@
 package net.spy.memcached.collection.btree;
 
 import net.spy.memcached.collection.SMGetElement;
+
 import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 

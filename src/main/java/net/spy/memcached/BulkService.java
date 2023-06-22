@@ -17,13 +17,6 @@
  */
 package net.spy.memcached;
 
-import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.compat.SpyObject;
-import net.spy.memcached.internal.BasicThreadFactory;
-import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.transcoders.Transcoder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +30,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.internal.BasicThreadFactory;
+import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.transcoders.Transcoder;
 
 class BulkService extends SpyObject {
 

@@ -16,7 +16,14 @@
  */
 package net.spy.memcached;
 
-import org.junit.Assert;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCount;
@@ -68,16 +75,10 @@ import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 public class MultibyteKeyTest {
   private static final String MULTIBYTE_KEY = "아커스프리픽스:아커스멀티바이트키스트링";

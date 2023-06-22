@@ -16,14 +16,14 @@
  */
 package net.spy.memcached.collection.map;
 
-import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.transcoders.LongTranscoder;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.transcoders.LongTranscoder;
 
 public class MopDeleteTest extends BaseIntegrationTest {
 

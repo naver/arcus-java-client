@@ -19,12 +19,13 @@ package net.spy.memcached.test;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
+
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.MemcachedClient;
+
+import org.junit.Ignore;
 
 /**
  * Adaptation of http://code.google.com/p/spcached/wiki/benchmarktool

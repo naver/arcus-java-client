@@ -17,16 +17,17 @@
 /* ENABLE_MIGRATION if */
 package net.spy.memcached;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import net.spy.memcached.compat.SpyObject;
+
 import org.apache.zookeeper.AsyncCallback;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * MigrationMonitor monitors the changes of the cloud_stat

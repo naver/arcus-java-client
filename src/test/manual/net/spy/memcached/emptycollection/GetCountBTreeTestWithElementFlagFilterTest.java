@@ -16,13 +16,14 @@
  */
 package net.spy.memcached.emptycollection;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import net.spy.memcached.internal.CollectionFuture;
+
+import org.junit.Assert;
 
 public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationTest {
 

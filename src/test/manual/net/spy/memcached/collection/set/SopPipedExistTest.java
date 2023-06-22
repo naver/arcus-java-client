@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
+
+import org.junit.Assert;
 
 public class SopPipedExistTest extends BaseIntegrationTest {
 

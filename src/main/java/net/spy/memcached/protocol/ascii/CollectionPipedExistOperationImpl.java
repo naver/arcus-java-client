@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedExistOperation;

@@ -16,8 +16,9 @@
  */
 package net.spy.memcached.collection;
 
-import java.util.concurrent.TimeUnit;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 
