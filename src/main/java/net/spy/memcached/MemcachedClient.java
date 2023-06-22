@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -70,11 +71,9 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.LocalCacheManager;
-import net.spy.memcached.reactive.internal.ReactiveOperationFuture;
+import net.spy.memcached.reactive.ReactiveOperationFuture;
 import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
-
-import static net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl.END;
 
 /**
  * Client to a memcached server.
@@ -950,42 +949,69 @@ public class MemcachedClient extends SpyThread
     final CountDownLatch latch = new CountDownLatch(1);
     final ReactiveOperationFuture<T> rv = new ReactiveOperationFuture<>(latch, operationTimeout);
 
-    Operation op = opFact.reactiveGet(key,
-        new GetOperation.Callback() {
-          private volatile T val = null;
-          private volatile boolean readComplete = false;
-          private final AtomicInteger encodeTarget = new AtomicInteger(0);
-          public void receivedStatus(OperationStatus status) {
-            rv.set(val, status);
-          }
+    Operation op = opFact.get(key, new GetOperation.Callback() {
+      private volatile T val = null;
+      private volatile CompletableFuture<T> transcodeFuture = null;
 
-          public void gotData(String k, int flags, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
-            encodeTarget.incrementAndGet();
-            tcService.reactiveDecode(tc,
-                    new CachedData(flags, data, tc.getMaxSize())).thenAccept((decodedData) -> {
-                      val = decodedData;
-                      if (encodeTarget.decrementAndGet() == 0 && readComplete) {
-                        receivedStatus(END);
-                        complete();
-                      }
-                    });
-          }
+      private volatile boolean completed = false;
+      private final AtomicInteger transcoding = new AtomicInteger(0);
 
-          public void readComplete() {
-            readComplete = true;
-          }
+      public void receivedStatus(OperationStatus status) {
+        rv.set(transcodeFuture, status);
+      }
 
-          public void complete() {
-            if (encodeTarget.intValue() == 0) {
-              if (localCacheManager != null) {
-                localCacheManager.put(key, val);
-              }
-              latch.countDown();
-              rv.complete(val);
-            }
-          }
-        });
+      public void gotData(String k, int flags, byte[] data) {
+        assert key.equals(k) : "Wrong key returned";
+        transcoding.incrementAndGet();
+        transcodeFuture = tcService.reactiveDecode(tc, new CachedData(flags, data, tc.getMaxSize()))
+                .whenComplete(this::whenComplete);
+      }
+
+      public void complete() {
+        completed = true;
+        latch.countDown();
+
+        transcodeComplete(val);
+      }
+
+      private void whenComplete(T v, Throwable t) {
+        rv.transcodeCompleted();
+
+        if (t != null) {
+          rv.completeExceptionally(t);
+          return;
+        }
+
+        val = v;
+        transcoding.decrementAndGet();
+        transcodeComplete(v);
+      }
+
+      private void transcodeComplete(T val) {
+        if (transcoding.intValue() == 0 && completed) {
+          completeFuture(val);
+        }
+      }
+
+      private void completeFuture(T val) {
+        Exception exception = null;
+        if (latch.getCount() > 0) {
+          exception = rv.createException(operationTimeout);
+        } else {
+          exception = rv.createExecutionException();
+        }
+
+        if (exception != null) {
+          rv.completeExceptionally(exception);
+          return;
+        }
+
+        if (localCacheManager != null) {
+          localCacheManager.put(key, val);
+        }
+        rv.complete(val);
+      }
+    });
     rv.setOperation(op);
     addOp(key, op);
     return rv;

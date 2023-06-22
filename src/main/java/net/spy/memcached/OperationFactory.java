@@ -83,7 +83,6 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
-import net.spy.memcached.protocol.ascii.ReactiveGetOperationImpl;
 
 /**
  * Factory that builds operations for protocol handlers.
@@ -124,7 +123,7 @@ public interface OperationFactory {
    * @return a new GetOperation
    */
   GetOperation get(String key, GetOperation.Callback callback);
-  ReactiveGetOperationImpl reactiveGet(String key, GetOperation.Callback callback);
+
   /**
    * Create a gets operation.
    *

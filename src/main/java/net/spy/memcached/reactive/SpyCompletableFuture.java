@@ -1,19 +1,12 @@
-package net.spy.memcached.reactive.internal;
+package net.spy.memcached.reactive;
+
+import java.util.concurrent.CompletableFuture;
 
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
-
 public class SpyCompletableFuture<T> extends CompletableFuture<T> {
   private transient Logger logger = null;
-
-  /**
-   * Get an instance of SpyObject.
-   */
-  public SpyCompletableFuture() {
-    super();
-  }
 
   /**
    * Get a Logger instance for this class.
