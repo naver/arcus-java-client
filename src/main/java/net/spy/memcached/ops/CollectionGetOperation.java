@@ -27,6 +27,7 @@ public interface CollectionGetOperation extends KeyedOperation {
 
   interface Callback extends OperationCallback {
     void gotData(String subkey, int flags, byte[] data, byte[] eflag);
+    void addResult();
   }
 
 }
