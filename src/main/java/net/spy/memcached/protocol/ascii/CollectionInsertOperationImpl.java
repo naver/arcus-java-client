@@ -31,6 +31,7 @@ import net.spy.memcached.collection.ListInsert;
 import net.spy.memcached.collection.MapInsert;
 import net.spy.memcached.collection.SetInsert;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -144,6 +145,7 @@ public class CollectionInsertOperationImpl extends OperationImpl
 
   @Override
   protected void wasCancelled() {
+    ((CollectionBulkInsertOperation.Callback) getCallback()).gotStatus(key, STORE_CANCELED);
     getCallback().receivedStatus(STORE_CANCELED);
   }
 
