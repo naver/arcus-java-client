@@ -16,24 +16,38 @@ public final class CachedData {
 
   private final int flags;
   private final byte[] data;
+  private byte[] eFlag;
 
   /**
    * Get a CachedData instance for the given flags and byte array.
    *
-   * @param f        the flags
-   * @param d        the data
-   * @param max_size the maximum allowable size.
+   * @param flags       the flags
+   * @param data        the data
+   * @param max_size    the maximum allowable size.
    */
-  public CachedData(int f, byte[] d, int max_size) {
+  public CachedData(int flags, byte[] data, int max_size) {
     super();
-    if (d.length > max_size) {
+    if (data.length > max_size) {
       throw new IllegalArgumentException(
               "Cannot cache data larger than " + max_size
                       + " bytes (you tried to cache a "
-                      + d.length + " byte object)");
+                      + data.length + " byte object)");
     }
-    flags = f;
-    data = d;
+    this.flags = flags;
+    this.data = data;
+  }
+
+  /**
+   * Get a CachedData instance for the given flags and byte array.
+   *
+   * @param flag        the flags
+   * @param data        the data
+   * @param eFlag       the eFlag
+   * @param max_size    the maximum allowable size.
+   */
+  public CachedData(int flag, byte[] data, byte[] eFlag, int max_size) {
+    this(flag, data, max_size);
+    this.eFlag = eFlag;
   }
 
   /**
@@ -50,9 +64,14 @@ public final class CachedData {
     return flags;
   }
 
+  public byte[] getEFlag() {
+    return eFlag;
+  }
+
   @Override
   public String toString() {
-    return "{CachedData flags=" + flags + " data="
-            + Arrays.toString(data) + "}";
+    return "{CachedData flags=" + flags +
+            " data=" + Arrays.toString(data) +
+            " eFlag=" + Arrays.toString(eFlag) + " }";
   }
 }

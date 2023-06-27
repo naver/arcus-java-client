@@ -127,6 +127,7 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.internal.PipedCollectionFuture;
+import net.spy.memcached.internal.CollectionGetFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -481,12 +482,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                     final CollectionGet collectionGet,
                                                     final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<List<T>> rv = new CollectionFuture<List<T>>(
-            latch, operationTimeout);
+    final CollectionGetFuture<List<T>> rv = new CollectionGetFuture<List<T>>(latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final List<T> list = new ArrayList<T>();
+          private final List<T> result = new ArrayList<T>();
+          private final List<CachedData> cachedDataList = new ArrayList<CachedData>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -497,7 +498,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(list, cstatus);
+              rv.set(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -506,11 +507,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(list, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case OUT_OF_RANGE:
-                rv.set(list, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
                 break;
               case UNREADABLE:
@@ -529,7 +530,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
-            list.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
+            cachedDataList.add(new CachedData(flags, data, tc.getMaxSize()));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataList.isEmpty()) {
+              for (CachedData cachedData : cachedDataList) {
+                result.add(tc.decode(cachedData));
+              }
+            }
           }
         });
     rv.setOperation(op);
@@ -562,12 +572,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                    final CollectionGet collectionGet,
                                                    final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Set<T>> rv = new CollectionFuture<Set<T>>(latch,
-            operationTimeout);
+    final CollectionGetFuture<Set<T>> rv =
+            new CollectionGetFuture<Set<T>>(latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final Set<T> set = new HashSet<T>();
+
+          private final HashSet<T> result = new HashSet<T>();
+          private final HashSet<CachedData> cachedDataSet = new HashSet<CachedData>();
+
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -578,7 +591,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(set, cstatus);
+              rv.set(result, cstatus);
               return;
             }
 
@@ -588,7 +601,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(set, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
@@ -607,7 +620,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
-            set.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
+            cachedDataSet.add(new CachedData(flags, data, tc.getMaxSize()));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataSet.isEmpty()) {
+              for (CachedData cachedData : cachedDataSet) {
+                result.add(tc.decode(cachedData));
+              }
+            }
           }
         });
 
@@ -629,13 +651,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String k, final CollectionGet collectionGet,
           final boolean reverse, final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Long, Element<T>>> rv = new CollectionFuture<Map<Long, Element<T>>>(
-            latch, operationTimeout);
+    final CollectionGetFuture<Map<Long, Element<T>>> rv =
+            new CollectionGetFuture<Map<Long, Element<T>>>(latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final TreeMap<Long, Element<T>> map = new TreeMap<Long, Element<T>>(
-                  (reverse) ? Collections.reverseOrder() : null);
-
+          private final TreeMap<Long, Element<T>> result =
+                  new TreeMap<Long, Element<T>>((reverse) ? Collections.reverseOrder() : null);
+          private final HashMap<Long, CachedData> cachedDataMap = new HashMap<Long, CachedData>();
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -645,7 +667,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(map, cstatus);
+              rv.set(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -654,7 +676,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(map, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
@@ -672,10 +694,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
-            long longBkey = Long.parseLong(bkey);
-            map.put(longBkey, new Element<T>(longBkey,
-                            tc.decode(new CachedData(flags, data, tc.getMaxSize())), eflag));
+          public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
+            cachedDataMap.put(Long.parseLong(bKey), new CachedData(flags, data, eflag, tc.getMaxSize()));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
+              for (Entry<Long, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
+                Long bKey = cachedDataEntry.getKey();
+                CachedData cachedData = cachedDataEntry.getValue();
+                result.put(bKey, new Element<T>(bKey, tc.decode(cachedData), cachedData.getEFlag()));
+              }
+            }
           }
         });
     rv.setOperation(op);
@@ -694,12 +725,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private <T> CollectionFuture<Map<String, T>> asyncMopGet(
           final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<String, T>> rv = new CollectionFuture<Map<String, T>>(
-            latch, operationTimeout);
+    final CollectionGetFuture<Map<String, T>> rv =
+            new CollectionGetFuture<Map<String, T>>(latch, operationTimeout);
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final HashMap<String, T> map = new HashMap<String, T>();
 
+          private final HashMap<String, T> result = new HashMap<String, T>();
+          private final HashMap<String, CachedData> cachedDataMap = new HashMap<String, CachedData>();
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -709,7 +741,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(map, cstatus);
+              rv.set(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -718,7 +750,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(map, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
@@ -737,7 +769,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           public void gotData(String mkey, int flags, byte[] data, byte[] eflag) {
-            map.put(mkey, tc.decode(new CachedData(flags, data, tc.getMaxSize())));
+            cachedDataMap.put(mkey, new CachedData(flags, data, eflag, tc.getMaxSize()));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
+              for (Entry<String, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
+                String mKey = cachedDataEntry.getKey();
+                CachedData cachedData = cachedDataEntry.getValue();
+                result.put(mKey, tc.decode(cachedData));
+              }
+            }
           }
         });
     rv.setOperation(op);
@@ -2920,15 +2963,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<ByteArrayBKey, Element<T>>> rv =
-        new CollectionFuture<Map<ByteArrayBKey, Element<T>>>(latch, operationTimeout);
+    final CollectionGetFuture<Map<ByteArrayBKey, Element<T>>> rv
+            = new CollectionGetFuture<Map<ByteArrayBKey, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final TreeMap<ByteArrayBKey, Element<T>> map
-              = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>(
-                  (reverse) ? Collections.reverseOrder() : null);
-
+          private final TreeMap<ByteArrayBKey, Element<T>> result
+                  = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>((reverse) ? Collections.reverseOrder() : null);
+          private final HashMap<ByteArrayBKey, CachedData> cachedDataMap = new HashMap<ByteArrayBKey, CachedData>();
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -2938,7 +2980,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(map, cstatus);
+              rv.set(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -2947,7 +2989,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(map, cstatus);
+                rv.set(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
@@ -2966,10 +3008,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
-            byte[] byteBkey = BTreeUtil.hexStringToByteArrays(bkey);
-            Element<T> element = new Element<T>(byteBkey,
-                    tc.decode(new CachedData(flags, data, tc.getMaxSize())), eflag);
-            map.put(new ByteArrayBKey(byteBkey), element);
+            cachedDataMap.put(new ByteArrayBKey(BTreeUtil.hexStringToByteArrays(bkey)),
+                    new CachedData(flags, data, eflag, tc.getMaxSize()));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
+              for (Entry<ByteArrayBKey, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
+                ByteArrayBKey bKey = cachedDataEntry.getKey();
+                CachedData cachedData = cachedDataEntry.getValue();
+                result.put(bKey, new Element<T>(bKey.getBytes(), tc.decode(cachedData), cachedData.getEFlag()));
+              }
+            }
           }
         });
     rv.setOperation(op);

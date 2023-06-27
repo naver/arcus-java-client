@@ -176,6 +176,10 @@ public class MultibyteKeyTest {
         @Override
         public void complete() {
         }
+
+        @Override
+        public void addResult() {
+        }
       }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -434,6 +438,10 @@ public class MultibyteKeyTest {
 
             @Override
             public void complete() {
+            }
+
+            @Override
+            public void addResult() {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
