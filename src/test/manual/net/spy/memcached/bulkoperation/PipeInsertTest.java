@@ -147,6 +147,53 @@ public class PipeInsertTest extends BaseIntegrationTest {
     }
   }
 
+  public void testLopPipeInsertIndex() {
+    int elementCount = 3;
+    List<Object> middleElements = new ArrayList<Object>(elementCount);
+    List<Object> headerElements = new ArrayList<Object>(elementCount);
+    List<Object> footerElements = new ArrayList<Object>(elementCount);
+
+    for (int i = 0; i < elementCount; i++) {
+      middleElements.add("middleValue" + i);
+      headerElements.add("headerValue" + i);
+      footerElements.add("footerValue" + i);
+    }
+
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+      mc.asyncLopInsert(KEY, 0, "FirstValue", attr).get(5000L, TimeUnit.MILLISECONDS);
+      mc.asyncLopInsert(KEY, -1, "LastValue", attr).get(5000L, TimeUnit.MILLISECONDS);
+
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future1 =
+              mc.asyncLopPipedInsertBulk(KEY, 1, middleElements, attr);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future2 =
+              mc.asyncLopPipedInsertBulk(KEY, 0, headerElements, attr);
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future3 =
+              mc.asyncLopPipedInsertBulk(KEY, -1, footerElements, attr);
+
+      Map<Integer, CollectionOperationStatus> map1
+              = future1.get(5000L, TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map2
+              = future2.get(5000L, TimeUnit.MILLISECONDS);
+      Map<Integer, CollectionOperationStatus> map3
+              = future3.get(5000L, TimeUnit.MILLISECONDS);
+      Assert.assertEquals(map1.size() + map2.size() + map3.size(), 0);
+
+      List<Object> list = mc.asyncLopGet(KEY, 0, 9999, false, false).get();
+      Assert.assertEquals((elementCount * 3) + 2, list.size());
+
+      int offset = 0;
+      Assert.assertEquals(headerElements, list.subList(offset, offset + elementCount));
+      offset += (elementCount + 1);
+      Assert.assertEquals(middleElements, list.subList(offset, offset + elementCount));
+      offset += (elementCount + 1);
+      Assert.assertEquals(footerElements, list.subList(offset, offset + elementCount));
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
+
   public void testMopPipeInsert() {
     int elementCount = 5000;
 
