@@ -19,6 +19,7 @@ package net.spy.memcached.emptycollection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -29,7 +30,6 @@ import org.junit.Assert;
 public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
-  private final int INDEX = 0;
   private final int EXPIRE_TIME_IN_SEC = 1;
 
   @Override
@@ -61,7 +61,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
-              .asyncLopPipedInsertBulk(KEY, INDEX, valueList, attr).get();
+              .asyncSopPipedInsertBulk(KEY, valueList, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
 
       // check attribute
@@ -72,10 +72,8 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
-      List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
-      for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
-      }
+      Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
+      Assert.assertEquals(valueList.size(), set.size());
 
       // check expire time
       Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
@@ -101,7 +99,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
-              .asyncLopPipedInsertBulk(KEY, INDEX, valueList, attr).get();
+              .asyncSopPipedInsertBulk(KEY, valueList, attr).get();
       Assert.assertTrue(insertResult.isEmpty());
 
       // check attribute
@@ -112,10 +110,8 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
-      List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
-      for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
-      }
+      Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
+      Assert.assertEquals(valueList.size(), set.size());
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -133,7 +129,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
-              .asyncLopPipedInsertBulk(KEY, INDEX, valueList,
+              .asyncSopPipedInsertBulk(KEY, valueList,
                       new CollectionAttributes()).get();
       Assert.assertTrue(insertResult.isEmpty());
 
@@ -145,10 +141,8 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
-      List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
-      for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
-      }
+      Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
+      Assert.assertEquals(valueList.size(), set.size());
     } catch (Exception e) {
       e.printStackTrace();
       Assert.fail(e.getMessage());
@@ -166,7 +160,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       }
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
-              .asyncLopPipedInsertBulk(KEY, INDEX, valueList, null).get();
+              .asyncSopPipedInsertBulk(KEY, valueList, null).get();
       assertEquals(10, insertResult.size());
 
       // check attribute
