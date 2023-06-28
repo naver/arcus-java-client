@@ -56,7 +56,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       attr.setMaxCount(3333);
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++) {
+      for (int i = 1; i <= 10; i++) {
         valueList.add(i);
       }
 
@@ -74,7 +74,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
       for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
+        Assert.assertEquals(i +  1, list2.get(i));
       }
 
       // check expire time
@@ -96,7 +96,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       CollectionAttributes attr = new CollectionAttributes();
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++) {
+      for (int i = 1; i <= 10; i++) {
         valueList.add(i);
       }
 
@@ -114,7 +114,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
       for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
+        Assert.assertEquals(i +  1, list2.get(i));
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -128,7 +128,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
       List<Object> valueList = new ArrayList<Object>();
-      for (int i = 1; i < 11; i++) {
+      for (int i = 1; i <= 10; i++) {
         valueList.add(i);
       }
 
@@ -147,7 +147,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
       // check values
       List<Object> list2 = mc.asyncLopGet(KEY, 0, 10, false, false).get();
       for (int i = 0; i < list2.size(); i++) {
-        Assert.assertEquals(10 - i, list2.get(i));
+        Assert.assertEquals(i +  1, list2.get(i));
       }
     } catch (Exception e) {
       e.printStackTrace();

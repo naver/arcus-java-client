@@ -90,7 +90,11 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (int i = this.nextOpIndex; i < eSize; i++) {
         byte[] each = encodedList.get(i);
-        setArguments(bb, COMMAND, key, index, each.length,
+        int eIndex = index;
+        if (index >= 0) {
+          eIndex += i;
+        }
+        setArguments(bb, COMMAND, key, eIndex, each.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(each);
         bb.put(CRLF);
