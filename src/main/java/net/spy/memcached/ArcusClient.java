@@ -3886,9 +3886,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
+    CachedData insertValue = tc.encode(value);
+
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(
-          entry.getKey(), entry.getValue(), bkey, eFlag, value, attributesForCreate, tc));
+              entry.getKey(), entry.getValue(),
+              String.valueOf(bkey), BTreeUtil.toHex(eFlag),
+              insertValue, attributesForCreate));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -3915,9 +3919,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
+    CachedData insertValue = tc.encode(value);
+
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       insertList.add(new CollectionBulkInsert.BTreeBulkInsert<T>(
-          entry.getKey(), entry.getValue(), bkey, eFlag, value, attributesForCreate, tc));
+              entry.getKey(), entry.getValue(),
+              BTreeUtil.toHex(bkey), BTreeUtil.toHex(eFlag),
+              insertValue, attributesForCreate));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -3945,9 +3953,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
+    CachedData insertValue = tc.encode(value);
+
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      insertList.add(new CollectionBulkInsert.MapBulkInsert<T>(entry.getKey(),
-            entry.getValue(), mkey, value, attributesForCreate, tc));
+      insertList.add(new CollectionBulkInsert.MapBulkInsert<T>(
+              entry.getKey(), entry.getValue(),
+              mkey, insertValue, attributesForCreate));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -3973,9 +3984,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
+    CachedData insertValue = tc.encode(value);
+
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      insertList.add(new CollectionBulkInsert.SetBulkInsert<T>(entry.getKey(),
-            entry.getValue(), value, attributesForCreate, tc));
+      insertList.add(new CollectionBulkInsert.SetBulkInsert<T>(
+              entry.getKey(), entry.getValue(),
+              insertValue, attributesForCreate));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -4001,9 +4015,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionBulkInsert<T>> insertList = new ArrayList<CollectionBulkInsert<T>>(
             arrangedKey.size());
 
+    CachedData insertValue = tc.encode(value);
+
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      insertList.add(new CollectionBulkInsert.ListBulkInsert<T>(entry.getKey(),
-            entry.getValue(), index, value, attributesForCreate, tc));
+      insertList.add(new CollectionBulkInsert.ListBulkInsert<T>(
+              entry.getKey(), entry.getValue(),
+              index, insertValue, attributesForCreate));
     }
 
     return asyncCollectionInsertBulk2(insertList);

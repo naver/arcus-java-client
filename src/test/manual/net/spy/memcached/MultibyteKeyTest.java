@@ -76,6 +76,7 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
+import net.spy.memcached.util.BTreeUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -478,17 +479,18 @@ public class MultibyteKeyTest {
         };
 
     insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(null, keyList,
-        1L, new byte[]{0, 0}, new Random().nextInt(),
-        new CollectionAttributes(), new IntegerTranscoder());
+            String.valueOf(1L), BTreeUtil.toHex(new byte[]{0, 0}),
+            new IntegerTranscoder().encode(new Random().nextInt()),
+            new CollectionAttributes());
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
 
-    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(null, keyList, 0,
-        new Random().nextInt(), new CollectionAttributes(),
-        new IntegerTranscoder());
+    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(null, keyList,
+            0, new IntegerTranscoder().encode(new Random().nextInt()),
+            new CollectionAttributes());
 
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
@@ -497,8 +499,8 @@ public class MultibyteKeyTest {
     }
 
     insert = new CollectionBulkInsert.SetBulkInsert<Integer>(null, keyList,
-        new Random().nextInt(), new CollectionAttributes(),
-        new IntegerTranscoder());
+            new IntegerTranscoder().encode(new Random().nextInt()),
+            new CollectionAttributes());
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
