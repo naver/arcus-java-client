@@ -24,23 +24,21 @@ import java.util.List;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.MemcachedNode;
-import net.spy.memcached.transcoders.Transcoder;
-import net.spy.memcached.util.BTreeUtil;
 
 public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
   protected final MemcachedNode node;
   protected final List<String> keyList;
-  protected final CollectionAttributes attribute;
   protected final CachedData cachedData;
+  protected final CollectionAttributes attribute;
 
   protected CollectionBulkInsert(MemcachedNode node, List<String> keyList,
-                                 CollectionAttributes attribute, CachedData cachedData) {
+                                 CachedData cachedData, CollectionAttributes attribute) {
     super(keyList.size());
     this.node = node;
     this.keyList = keyList;
-    this.attribute = attribute;
     this.cachedData = cachedData;
+    this.attribute = attribute;
   }
 
   public String getKey(int index) {
@@ -68,19 +66,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final String bkey;
     private final String eflag;
 
-    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, Long bkey,
-                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, String.valueOf(bkey), BTreeUtil.toHex(eflag), attr, tc.encode(value));
-    }
-
-    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, byte[] bkey,
-                           byte[] eflag, T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, BTreeUtil.toHex(bkey), BTreeUtil.toHex(eflag), attr, tc.encode(value));
-    }
-
-    protected BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
-                              String eflag, CollectionAttributes attr, CachedData cachedData) {
-      super(node, keyList, attr, cachedData);
+    public BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
+                              String eflag, CachedData cachedData, CollectionAttributes attr) {
+      super(node, keyList, cachedData, attr);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
@@ -125,7 +113,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new BTreeBulkInsert<T>(node, keyList, bkey, eflag, attribute, cachedData);
+      return new BTreeBulkInsert<T>(node, keyList, bkey, eflag, cachedData, attribute);
     }
   }
 
@@ -135,13 +123,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final String mkey;
 
     public MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
-                         T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, mkey, attr, tc.encode(value));
-    }
-
-    protected MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
-                            CollectionAttributes attr, CachedData cachedData) {
-      super(node, keyList, attr, cachedData);
+                         CachedData cachedData, CollectionAttributes attr) {
+      super(node, keyList, cachedData, attr);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
@@ -184,7 +167,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new MapBulkInsert<T>(node, keyList, mkey, attribute, cachedData);
+      return new MapBulkInsert<T>(node, keyList, mkey, cachedData, attribute);
     }
   }
 
@@ -192,14 +175,9 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
     private static final String COMMAND = "sop insert";
 
-    public SetBulkInsert(MemcachedNode node, List<String> keyList, T value,
-                         CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, attr, tc.encode(value));
-    }
-
-    protected SetBulkInsert(MemcachedNode node, List<String> keyList,
-                            CollectionAttributes attr, CachedData cachedData) {
-      super(node, keyList, attr, cachedData);
+    public SetBulkInsert(MemcachedNode node, List<String> keyList,
+                         CachedData cachedData, CollectionAttributes attr) {
+      super(node, keyList, cachedData, attr);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
@@ -239,7 +217,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new SetBulkInsert<T>(node, keyList, attribute, cachedData);
+      return new SetBulkInsert<T>(node, keyList, cachedData, attribute);
     }
   }
 
@@ -249,13 +227,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final int index;
 
     public ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
-                          T value, CollectionAttributes attr, Transcoder<T> tc) {
-      this(node, keyList, index, attr, tc.encode(value));
-    }
-
-    protected ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
-                             CollectionAttributes attr, CachedData cachedData) {
-      super(node, keyList, attr, cachedData);
+                          CachedData cachedData, CollectionAttributes attr) {
+      super(node, keyList, cachedData, attr);
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
@@ -298,7 +271,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new ListBulkInsert<T>(node, keyList, index, attribute, cachedData);
+      return new ListBulkInsert<T>(node, keyList, index, cachedData, attribute);
     }
   }
 }
