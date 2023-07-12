@@ -44,7 +44,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private final Map<String, Future<T>> rvMap;
   private final Collection<Operation> ops;
   private final CountDownLatch latch;
-  private boolean cancelled = false;
   private boolean timeout = false;
 
   // FIXME right position?
@@ -74,10 +73,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
       rv |= op.getState() == OperationState.WRITE_QUEUED;
       op.cancel("by application.");
     }
-    for (Future<T> v : rvMap.values()) {
-      v.cancel(ign);
-    }
-    cancelled = true;
     return rv;
   }
 
@@ -168,8 +163,14 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     return m;
   }
 
+  @Override
   public boolean isCancelled() {
-    return cancelled;
+    for (Operation op : ops) {
+      if (op.isCancelled()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean isDone() {
