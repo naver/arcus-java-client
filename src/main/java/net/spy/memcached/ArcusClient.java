@@ -2142,54 +2142,31 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * All keys in a group belong to the same memcached server.
    *
    * @param keyList   list of keys
-   * @param groupSize max size of the key group (number of keys)
+   * @param maxKeyCountPerGroup max size of the key group (number of keys)
    * @return list of grouped (memcached node + keys) in the group
    */
-  private Collection<Entry<MemcachedNode, List<String>>> groupingKeys(List<String> keyList, int groupSize) {
-    Map<String, Integer> chunkCount = new HashMap<String, Integer>();
-    Map<String, Entry<MemcachedNode, List<String>>> result = new HashMap<String,
-        Entry<MemcachedNode, List<String>>>();
-
+  private Collection<Entry<MemcachedNode, List<String>>> groupingKeys(List<String> keyList, int maxKeyCountPerGroup) {
+    List<Entry<MemcachedNode, List<String>>> resultList = new ArrayList<Entry<MemcachedNode, List<String>>>();
+    Map<MemcachedNode, List<String>> nodeMap = new HashMap<MemcachedNode, List<String>>();
     MemcachedConnection conn = getMemcachedConnection();
 
-    for (String k : keyList) {
-      MemcachedNode qa = conn.findNodeByKey(k);
-      String node;
-      if (qa == null) {
-        node = "fake_node";
-      } else {
-        node = qa.getSocketAddress().toString();
-      }
-      int cc;
-      if (chunkCount.containsKey(node)) {
-        cc = chunkCount.get(node);
-      } else {
-        cc = 0;
-        chunkCount.put(node, 0);
-      }
+    for (String key : keyList) {
+      MemcachedNode qa = conn.findNodeByKey(key);
+      List<String> keyGroup = nodeMap.get(qa);
 
-      String resultKey = node + cc;
-
-      List<String> arrangedKeyList = null;
-
-      if (result.containsKey(resultKey)) {
-        if (result.get(resultKey).getValue().size() >= groupSize) {
-          arrangedKeyList = new ArrayList<String>();
-          cc++;
-          result.put(node + cc, new AbstractMap.SimpleEntry<MemcachedNode,
-              List<String>>(qa, arrangedKeyList));
-          chunkCount.put(node, cc);
-        } else {
-          arrangedKeyList = result.get(resultKey).getValue();
-        }
-      } else {
-        arrangedKeyList = new ArrayList<String>();
-        result.put(resultKey, new AbstractMap.SimpleEntry<MemcachedNode,
-            List<String>>(qa, arrangedKeyList));
+      if (keyGroup == null) {
+        keyGroup = new ArrayList<String>();
+        nodeMap.put(qa, keyGroup);
+      } else if (keyGroup.size() == maxKeyCountPerGroup) {
+        resultList.add(new AbstractMap.SimpleEntry<MemcachedNode, List<String>>(qa, keyGroup));
+        keyGroup = new ArrayList<String>();
+        nodeMap.put(qa, keyGroup);
       }
-      arrangedKeyList.add(k);
+      keyGroup.add(key);
     }
-    return result.values();
+    // Add the Entry instance which is not full(smaller than groupSize) to the result.
+    resultList.addAll(nodeMap.entrySet());
+    return resultList;
   }
 
   /**
