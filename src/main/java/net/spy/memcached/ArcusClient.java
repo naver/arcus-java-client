@@ -2157,7 +2157,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       if (keyGroup == null) {
         keyGroup = new ArrayList<String>();
         nodeMap.put(qa, keyGroup);
-      } else if (keyGroup.size() == maxKeyCountPerGroup) {
+      } else if (keyGroup.size() >= maxKeyCountPerGroup) {
         resultList.add(new AbstractMap.SimpleEntry<MemcachedNode, List<String>>(qa, keyGroup));
         keyGroup = new ArrayList<String>();
         nodeMap.put(qa, keyGroup);
