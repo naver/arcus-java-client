@@ -103,11 +103,15 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
     return failedResult;
   }
 
+  public void addFailedResult(String key, T value) {
+    failedResult.put(key, value);
+  }
+
   public void setOperations(Collection<Operation> ops) {
     this.ops.addAll(ops);
   }
 
-  public void addFailedResult(String key, T value) {
-    failedResult.put(key, value);
+  public void addOperation(Operation op) {
+    ops.add(op);
   }
 }

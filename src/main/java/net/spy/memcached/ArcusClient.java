@@ -3914,12 +3914,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private <T> Future<Map<String, CollectionOperationStatus>> asyncCollectionInsertBulk2(
           List<CollectionBulkInsert<T>> insertList) {
 
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-
-    final Map<String, CollectionOperationStatus> failedResult =
-        new ConcurrentHashMap<String, CollectionOperationStatus>();
-
     final CountDownLatch latch = new CountDownLatch(insertList.size());
+
+    final BulkOperationFuture<CollectionOperationStatus> rv =
+            new BulkOperationFuture<CollectionOperationStatus>(latch, operationTimeout);
 
     for (final CollectionBulkInsert<T> insert : insertList) {
       Operation op = opFact.collectionBulkInsert(
@@ -3935,95 +3933,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 public void gotStatus(String key, OperationStatus status) {
                   if (!status.isSuccess()) {
                     if (status instanceof CollectionOperationStatus) {
-                      failedResult.put(key,
-                              (CollectionOperationStatus) status);
+                      rv.addFailedResult(key, (CollectionOperationStatus) status);
                     } else {
-                      failedResult.put(key,
-                              new CollectionOperationStatus(status));
+                      rv.addFailedResult(key, new CollectionOperationStatus(status));
                     }
                   }
                 }
               });
-      ops.add(op);
+      rv.addOperation(op);
       addOp(insert.getMemcachedNode(), op);
     }
-
-    // return future
-    return new CollectionFuture<Map<String, CollectionOperationStatus>>(
-            latch, operationTimeout) {
-
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          if (op.getState() != OperationState.COMPLETE) {
-            rv = true;
-            op.cancel("by application.");
-          }
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Map<String, CollectionOperationStatus> get(long duration,
-                                                        TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-        if (!latch.await(duration, units)) {
-          Collection<Operation> timedoutOps = new HashSet<Operation>();
-          for (Operation op : ops) {
-            if (op.getState() != OperationState.COMPLETE) {
-              timedoutOps.add(op);
-            } else {
-              MemcachedConnection.opSucceeded(op);
-            }
-          }
-          if (timedoutOps.size() > 0) {
-            MemcachedConnection.opsTimedOut(timedoutOps);
-            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-          }
-        } else {
-          // continuous timeout counter will be reset
-          MemcachedConnection.opsSucceeded(ops);
-        }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-          }
-        }
-
-        return failedResult;
-      }
-
-      @Override
-      public CollectionOperationStatus getOperationStatus() {
-        return null;
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
+    return rv;
   }
 
   public CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> asyncBopGetBulk(
