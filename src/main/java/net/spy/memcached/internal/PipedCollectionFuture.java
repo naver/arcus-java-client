@@ -35,10 +35,7 @@ public class PipedCollectionFuture<K, V>
   public boolean cancel(boolean ign) {
     boolean rv = false;
     for (Operation op : ops) {
-      if (op.getState() != OperationState.COMPLETE) {
-        rv = true;
-        op.cancel("by application.");
-      }
+      rv |= op.cancel("by application.");
     }
     return rv;
   }
