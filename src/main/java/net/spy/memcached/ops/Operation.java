@@ -52,7 +52,7 @@ public interface Operation {
   /**
    * Cancel this operation.
    */
-  void cancel(String cause);
+  boolean cancel(String cause);
 
   /**
    * Get the cause of cancel.

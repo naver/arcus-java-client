@@ -20,6 +20,7 @@ package net.spy.memcached.protocol;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
@@ -45,9 +46,10 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
-  private OperationState state = OperationState.WRITE_QUEUED;
+  private volatile OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
   private boolean cancelled = false;
+  private final AtomicBoolean callbacked = new AtomicBoolean(false);
   private String cancelCause = null;
   private OperationException exception = null;
   protected OperationCallback callback = null;
@@ -90,15 +92,19 @@ public abstract class BaseOperationImpl extends SpyObject {
     return exception;
   }
 
-  public final void cancel(String cause) {
-    cancelled = true;
-    if (handlingNode != null) {
-      cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
-    } else {
-      cancelCause = "Cancelled (" + cause + ")";
+  public final boolean cancel(String cause) {
+    if (callbacked.compareAndSet(false, true)) {
+      cancelled = true;
+      if (handlingNode != null) {
+        cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
+      } else {
+        cancelCause = "Cancelled (" + cause + ")";
+      }
+      wasCancelled();
+      callback.complete();
+      return true;
     }
-    wasCancelled();
-    callback.complete();
+    return false;
   }
 
   public final String getCancelCause() {
@@ -215,7 +221,8 @@ public abstract class BaseOperationImpl extends SpyObject {
         state != OperationState.WRITING) {
       cmd = null;
     }
-    if (state == OperationState.COMPLETE) {
+    if (state == OperationState.COMPLETE &&
+            callbacked.compareAndSet(false, true)) {
       callback.complete();
     }
   }

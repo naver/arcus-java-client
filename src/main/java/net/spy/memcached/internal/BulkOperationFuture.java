@@ -31,10 +31,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
   public boolean cancel(boolean ign) {
     boolean rv = false;
     for (Operation op : ops) {
-      if (op.getState() != OperationState.COMPLETE) {
-        rv = true;
-        op.cancel("by application.");
-      }
+      rv |= op.cancel("by application.");
     }
     return rv;
   }

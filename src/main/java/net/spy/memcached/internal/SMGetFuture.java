@@ -53,10 +53,7 @@ public abstract class SMGetFuture<T> implements Future<T> {
   public boolean cancel(boolean ign) {
     boolean rv = false;
     for (Operation op : ops) {
-      if (op.getState() != OperationState.COMPLETE) {
-        rv = true;
-        op.cancel("by application.");
-      }
+      rv |= op.cancel("by application.");
     }
     return rv;
   }

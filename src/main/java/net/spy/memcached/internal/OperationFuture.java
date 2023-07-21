@@ -60,11 +60,7 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
 
   public boolean cancel(boolean ign) {
     assert op != null : "No operation";
-    if (op.getState() == OperationState.COMPLETE) {
-      return false;
-    }
-    op.cancel("by application.");
-    return true;
+    return op.cancel("by application.");
   }
 
   public T get() throws InterruptedException, ExecutionException {
