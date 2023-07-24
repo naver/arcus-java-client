@@ -831,7 +831,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(updateList.size());
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout, updateList.size());
+            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
     for (int i = 0; i < updateList.size(); i++) {
       final CollectionPipedUpdate<T> update = updateList.get(i);
@@ -868,8 +868,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               }
             }
           });
-      addOp(key, op);
       rv.addOperation(op);
+      addOp(key, op);
     }
     return rv;
   }
@@ -3699,7 +3699,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(insertList.size());
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout, insertList.size());
+            new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
     for (int i = 0; i < insertList.size(); i++) {
       final CollectionPipedInsert<T> insert = insertList.get(i);
@@ -3736,8 +3736,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               }
             }
           });
-      addOp(key, op);
       rv.addOperation(op);
+      addOp(key, op);
     }
     return rv;
   }

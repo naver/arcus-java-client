@@ -21,15 +21,14 @@ import java.util.concurrent.ExecutionException;
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
   private final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-  private final List<CollectionOperationStatus> mergedOperationStatus;
+  private final List<CollectionOperationStatus> mergedOperationStatus
+          = Collections.synchronizedList(new ArrayList<CollectionOperationStatus>());
 
   private final Map<K, V> mergedResult =
           new ConcurrentHashMap<K, V>();
 
-  public PipedCollectionFuture(CountDownLatch l, long opTimeout, int opSize) {
+  public PipedCollectionFuture(CountDownLatch l, long opTimeout) {
     super(l, opTimeout);
-    mergedOperationStatus = Collections
-            .synchronizedList(new ArrayList<CollectionOperationStatus>(opSize));
   }
 
   @Override
