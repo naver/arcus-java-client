@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -128,6 +127,7 @@ import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.internal.PipedCollectionFuture;
 import net.spy.memcached.internal.CollectionGetFuture;
+import net.spy.memcached.internal.BroadcastFuture;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -1952,96 +1952,29 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
-    final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(true);
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
+    Collection<MemcachedNode> nodes = getAllNodes();
+    final BroadcastFuture<Boolean> rv
+            = new BroadcastFuture<Boolean>(operationTimeout, Boolean.TRUE, nodes.size());
 
-    final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
-      public Operation newOp(final MemcachedNode n,
-                             final CountDownLatch latch) {
-        Operation op = opFact.flush(prefix, delay, false,
-            new OperationCallback() {
-              public void receivedStatus(OperationStatus s) {
-                if (!s.isSuccess()) {
-                  flushResult.set(false);
-                }
-              }
-
-              public void complete() {
-                latch.countDown();
-              }
-            });
-        ops.add(op);
-        return op;
-      }
-    });
-
-    return new OperationFuture<Boolean>(blatch, flushResult,
-            operationTimeout) {
-      @Override
-      public boolean cancel(boolean ign) {
-        boolean rv = false;
-        for (Operation op : ops) {
-          rv |= op.cancel("by application.");
-        }
-        return rv;
-      }
-
-      @Override
-      public boolean isCancelled() {
-        for (Operation op : ops) {
-          if (op.isCancelled()) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      @Override
-      public Boolean get(long duration, TimeUnit units)
-          throws InterruptedException, TimeoutException, ExecutionException {
-
-        if (!blatch.await(duration, units)) {
-          // whenever timeout occurs, continuous timeout counter will increase by 1.
-          Collection<Operation> timedoutOps = new HashSet<Operation>();
-          for (Operation op : ops) {
-            if (op.getState() != OperationState.COMPLETE) {
-              MemcachedConnection.opTimedOut(op);
-              timedoutOps.add(op);
-            } else {
-              MemcachedConnection.opSucceeded(op);
-            }
-          }
-          if (timedoutOps.size() > 0) {
-            throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
-          }
-        } else {
-          // continuous timeout counter will be reset
-          MemcachedConnection.opsSucceeded(ops);
-        }
-
-        for (Operation op : ops) {
-          if (op != null && op.hasErrored()) {
-            throw new ExecutionException(op.getException());
-          }
-
-          if (op != null && op.isCancelled()) {
-            throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+    checkState();
+    for (MemcachedNode node : nodes) {
+      Operation op = opFact.flush(prefix, delay, false, new OperationCallback() {
+        @Override
+        public void receivedStatus(OperationStatus status) {
+          if (!status.isSuccess()) {
+            rv.set(Boolean.FALSE, status);
           }
         }
 
-        return flushResult.get();
-      }
-
-      @Override
-      public boolean isDone() {
-        for (Operation op : ops) {
-          if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-            return false;
-          }
+        @Override
+        public void complete() {
+          rv.complete();
         }
-        return true;
-      }
-    };
+      });
+      rv.addOp(op);
+      getMemcachedConnection().addOperation(node, op);
+    }
+    return rv;
   }
 
   @Override
