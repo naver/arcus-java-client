@@ -1,0 +1,94 @@
+package net.spy.memcached.internal;
+
+import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationState;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+public class BroadcastFuture<T> extends OperationFuture<T> {
+  private final List<Operation> ops;
+
+  public BroadcastFuture(long timeout , T result, int latchSize) {
+    super(new CountDownLatch(latchSize), timeout);
+    ops = new ArrayList<Operation>(latchSize);
+    objRef.set(result);
+  }
+
+  @Override
+  public boolean cancel(boolean ign) {
+    boolean rv = false;
+    for (Operation op : ops) {
+      rv |= op.cancel("by application.");
+    }
+    return rv;
+  }
+
+  @Override
+  public boolean isCancelled() {
+    for (Operation op : ops) {
+      if (op.isCancelled()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isDone() {
+    for (Operation op : ops) {
+      if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public T get(long duration, TimeUnit units)
+          throws InterruptedException, TimeoutException, ExecutionException {
+    if (!latch.await(duration, units)) {
+      // whenever timeout occurs, continuous timeout counter will increase by 1.
+      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      for (Operation op : ops) {
+        if (op.getState() != OperationState.COMPLETE) {
+          MemcachedConnection.opTimedOut(op);
+          timedoutOps.add(op);
+        } else {
+          MemcachedConnection.opSucceeded(op);
+        }
+      }
+      if (timedoutOps.size() > 0) {
+        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+      }
+    } else {
+      // continuous timeout counter will be reset
+      MemcachedConnection.opsSucceeded(ops);
+    }
+    for (Operation op : ops) {
+      if (op != null && op.hasErrored()) {
+        throw new ExecutionException(op.getException());
+      }
+
+      if (op != null && op.isCancelled()) {
+        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+      }
+    }
+    return objRef.get();
+  }
+
+  public void addOp(Operation op) {
+    ops.add(op);
+  }
+
+  public void complete() {
+    latch.countDown();
+  }
+}

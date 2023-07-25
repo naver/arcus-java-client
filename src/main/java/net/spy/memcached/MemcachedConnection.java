@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -1490,29 +1489,6 @@ public final class MemcachedConnection extends SpyObject {
     }
     Selector s = selector.wakeup();
     assert s == selector : "Wakeup returned the wrong selector.";
-  }
-
-  /**
-   * Broadcast an operation to all nodes.
-   */
-  public CountDownLatch broadcastOperation(BroadcastOpFactory of) {
-    return broadcastOperation(of, locator.getAll());
-  }
-
-  /**
-   * Broadcast an operation to a specific collection of nodes.
-   */
-  public CountDownLatch broadcastOperation(final BroadcastOpFactory of,
-                                           Collection<MemcachedNode> nodes) {
-    final CountDownLatch latch = new CountDownLatch(nodes.size());
-    for (MemcachedNode node : nodes) {
-      Operation op = of.newOp(node, latch);
-      node.addOpToInputQ(op);
-      addedQueue.offer(node);
-    }
-    Selector s = selector.wakeup();
-    assert s == selector : "Wakeup returned the wrong selector.";
-    return latch;
   }
 
   public void wakeUpSelector() {
