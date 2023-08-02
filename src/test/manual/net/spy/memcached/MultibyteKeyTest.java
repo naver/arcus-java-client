@@ -166,7 +166,7 @@ public class MultibyteKeyTest {
         }
       }, new CollectionGetOperation.Callback() {
         @Override
-        public void gotData(String key, int flags, String subkey, byte[] data) {
+        public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
         }
 
         @Override
@@ -425,7 +425,7 @@ public class MultibyteKeyTest {
           new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
           new CollectionGetOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, String subkey, byte[] data) {
+            public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
             }
 
             @Override

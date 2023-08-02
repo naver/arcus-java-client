@@ -528,8 +528,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, String subkey, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
+          public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
             list.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
@@ -607,8 +606,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, String subkey, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
+          public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
             set.add(tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
@@ -674,12 +672,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, String bkey, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
+          public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
             long longBkey = Long.parseLong(bkey);
             map.put(longBkey, new Element<T>(longBkey,
-                            tc.decode(new CachedData(flags, data, tc.getMaxSize())),
-                            collectionGet.getElementFlag()));
+                            tc.decode(new CachedData(flags, data, tc.getMaxSize())), eflag));
           }
         });
     rv.setOperation(op);
@@ -740,8 +736,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, String mkey, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
+          public void gotData(String mkey, int flags, byte[] data, byte[] eflag) {
             map.put(mkey, tc.decode(new CachedData(flags, data, tc.getMaxSize())));
           }
         });
@@ -2980,12 +2975,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, String bkey, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
+          public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
             byte[] byteBkey = BTreeUtil.hexStringToByteArrays(bkey);
             Element<T> element = new Element<T>(byteBkey,
-                    tc.decode(new CachedData(flags, data, tc.getMaxSize())),
-                    collectionGet.getElementFlag());
+                    tc.decode(new CachedData(flags, data, tc.getMaxSize())), eflag);
             map.put(new ByteArrayBKey(byteBkey), element);
           }
         });
