@@ -46,7 +46,7 @@ public abstract class BaseOperationImpl extends SpyObject {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
-  private volatile OperationState state = OperationState.WRITE_QUEUED;
+  private OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
   private boolean cancelled = false;
   private final AtomicBoolean callbacked = new AtomicBoolean(false);
@@ -96,10 +96,9 @@ public abstract class BaseOperationImpl extends SpyObject {
     if (callbacked.compareAndSet(false, true)) {
       cancelled = true;
       if (handlingNode != null) {
-        cancelCause = "Cancelled (" + cause + " : (" + handlingNode.getNodeName() + ")" + ")";
-      } else {
-        cancelCause = "Cancelled (" + cause + ")";
+        cause += " @ " + handlingNode.getNodeName();
       }
+      cancelCause = "Cancelled (" + cause + ")";
       wasCancelled();
       callback.complete();
       return true;
