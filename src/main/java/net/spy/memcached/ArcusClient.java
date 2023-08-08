@@ -2097,27 +2097,20 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param count        number of elements to get
    * @return list of elements
    */
-  private <T> List<SMGetElement<T>> getSubList(
-          final List<SMGetElement<T>> mergedResult, int offset, int count) {
-    if (mergedResult.size() > count) {
-      int toIndex = (count + offset > mergedResult.size())
-                  ? mergedResult.size() : count + offset;
-      if (offset > toIndex) {
-        return Collections.emptyList();
+  private <T> List<SMGetElement<T>> getSubList(final List<SMGetElement<T>> mergedResult, int offset, int count) {
+    if (offset > 0) {
+      if ((offset + count) < mergedResult.size()) {
+        return mergedResult.subList(offset, (offset + count));
       }
-      return mergedResult.subList(offset, toIndex);
+      if (offset < mergedResult.size()) {
+        return mergedResult.subList(offset, mergedResult.size());
+      }
+      return Collections.emptyList();
     } else {
-      if (offset > 0) {
-        int toIndex = (count + offset > mergedResult.size())
-                    ? mergedResult.size() : count + offset;
-
-        if (offset > toIndex) {
-          return Collections.emptyList();
-        }
-        return mergedResult.subList(offset, toIndex);
-      } else {
-        return mergedResult;
+      if (count < mergedResult.size()) {
+        return mergedResult.subList(0, count);
       }
+      return mergedResult;
     }
   }
 
