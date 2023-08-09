@@ -1,11 +1,11 @@
 package net.spy.memcached.internal;
 
+import net.spy.memcached.ops.CollectionGetOpCallback;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import net.spy.memcached.ops.CollectionGetOperation.Callback;
 
 public class CollectionGetFuture<T> extends CollectionFuture<T> {
 
@@ -19,7 +19,7 @@ public class CollectionGetFuture<T> extends CollectionFuture<T> {
 
     T result = super.get(duration, units);
     if (result != null) {
-      Callback callback = (Callback) op.getCallback();
+      CollectionGetOpCallback callback = (CollectionGetOpCallback) op.getCallback();
       callback.addResult();
     }
     return result;

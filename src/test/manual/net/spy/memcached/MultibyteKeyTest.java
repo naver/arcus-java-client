@@ -553,8 +553,11 @@ public class MultibyteKeyTest {
           new BTreeGetByPosition(BTreeOrder.ASC, 0),
           new BTreeGetByPositionOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, int pos, BKeyObject bkey,
-                                byte[] eflag, byte[] data) {
+            public void addResult() {
+            }
+
+            @Override
+            public void gotData(int pos, int flags, BKeyObject bkey, byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -667,8 +670,7 @@ public class MultibyteKeyTest {
                   new Random().nextInt(), new CollectionAttributes()),
           testData, new BTreeInsertAndGetOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, BKeyObject bkeyObject,
-                                byte[] elementFlag, byte[] data) {
+            public void gotData(int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {
             }
 
             @Override
@@ -677,6 +679,10 @@ public class MultibyteKeyTest {
 
             @Override
             public void complete() {
+            }
+
+            @Override
+            public void addResult() {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {

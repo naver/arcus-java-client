@@ -23,8 +23,8 @@ public interface BTreeInsertAndGetOperation extends KeyedOperation {
 
   BTreeInsertAndGet<?> getGet();
 
-  interface Callback extends OperationCallback {
-    void gotData(String key, int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
+  interface Callback extends CollectionGetOpCallback {
+    void gotData(int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data);
   }
 
 }
