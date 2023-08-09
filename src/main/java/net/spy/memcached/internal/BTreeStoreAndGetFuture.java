@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.collection.Element;
-import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.CollectionGetOpCallback;
 
 /**
  * Future object that contains an b+tree element object
@@ -36,17 +36,13 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
     this(l, new AtomicReference<T>(null), opTimeout);
   }
 
-  public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref,
-                                long opTimeout) {
+  public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref, long opTimeout) {
     super(l, oref, opTimeout);
   }
 
-  public void set(T o, CollectionOperationStatus status) {
-    objRef.set(o);
-    collectionOpStatus = status;
-  }
-
   public Element<E> getElement() {
+    CollectionGetOpCallback callback = (CollectionGetOpCallback) op.getCallback();
+    callback.addResult();
     return element;
   }
 

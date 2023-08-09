@@ -3014,13 +3014,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, Element<T>>> rv =
-        new CollectionFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
+    final CollectionGetFuture<Map<Integer, Element<T>>> rv =
+        new CollectionGetFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.bopGetByPosition(k, get, new BTreeGetByPositionOperation.Callback() {
 
-      private final TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>(
-              (reverse) ? Collections.reverseOrder() : null);
+      private final TreeMap<Integer, Element<T>> result =
+              new TreeMap<Integer, Element<T>>((reverse) ? Collections.reverseOrder() : null);
+      private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap
+              = new HashMap<Integer, Entry<BKeyObject, CachedData>>();
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus;
@@ -3031,7 +3033,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           cstatus = new CollectionOperationStatus(status);
         }
         if (cstatus.isSuccess()) {
-          rv.set(map, cstatus);
+          rv.set(result, cstatus);
           return;
         }
         switch (cstatus.getResponse()) {
@@ -3040,7 +3042,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             getLogger().debug("Key(%s) not found : %s", k, cstatus);
             break;
           case NOT_FOUND_ELEMENT:
-            rv.set(map, cstatus);
+            rv.set(result, cstatus);
             getLogger().debug("Element(%s) not found : %s", k, cstatus);
             break;
           case UNREADABLE:
@@ -3056,17 +3058,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       }
 
+      @Override
       public void complete() {
         latch.countDown();
       }
 
-      public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag,
-                          byte[] data) {
-        assert key.equals(k) : "Wrong key returned";
-        Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
+      @Override
+      public void gotData(int pos, int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+        CachedData cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
+        cachedDataMap.put(pos, new AbstractMap.SimpleEntry<BKeyObject, CachedData>(bkeyObject, cachedData));
+      }
 
-        if (element != null) {
-          map.put(pos, element);
+      @Override
+      public void addResult() {
+        if (result.isEmpty() && !cachedDataMap.isEmpty()) {
+          for (Entry<Integer, Entry<BKeyObject, CachedData>> entry : cachedDataMap.entrySet()) {
+            Entry<BKeyObject, CachedData> cachedDataEntry = entry.getValue();
+            result.put(entry.getKey(), makeBTreeElement(cachedDataEntry.getKey(), cachedDataEntry.getValue(), tc));
+          }
         }
       }
     });
@@ -3213,13 +3222,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Map<Integer, Element<T>>> rv =
-        new CollectionFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
+    final CollectionGetFuture<Map<Integer, Element<T>>> rv
+            = new CollectionGetFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.bopFindPositionWithGet(k, get,
         new BTreeFindPositionWithGetOperation.Callback() {
 
-          private final TreeMap<Integer, Element<T>> map = new TreeMap<Integer, Element<T>>();
+          private final TreeMap<Integer, Element<T>> result
+                  = new TreeMap<Integer, Element<T>>();
+          private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap
+                  = new HashMap<Integer, Entry<BKeyObject, CachedData>>();
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -3230,7 +3242,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(map, cstatus);
+              rv.set(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -3264,12 +3276,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, int pos, BKeyObject bkeyObject, byte[] eflag,
-                              byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
-            Element<T> element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
-            if (element != null) {
-              map.put(pos, element);
+          @Override
+          public void gotData(int pos, int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+            CachedData cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
+            cachedDataMap.put(pos, new AbstractMap.SimpleEntry<BKeyObject, CachedData>(bkeyObject, cachedData));
+          }
+
+          @Override
+          public void addResult() {
+            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
+              for (Map.Entry<Integer, Map.Entry<BKeyObject, CachedData>> entry : cachedDataMap.entrySet()) {
+                Entry<BKeyObject, CachedData> cachedDataEntry = entry.getValue();
+                result.put(entry.getKey(), makeBTreeElement(cachedDataEntry.getKey(), cachedDataEntry.getValue(), tc));
+              }
             }
           }
         }
@@ -3365,12 +3384,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     get.setFlags(co.getFlags());
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final BTreeStoreAndGetFuture<Boolean, E> rv = new BTreeStoreAndGetFuture<Boolean, E>(
-            latch, operationTimeout);
+    final BTreeStoreAndGetFuture<Boolean, E> rv
+            = new BTreeStoreAndGetFuture<Boolean, E>(latch, operationTimeout);
 
     Operation op = opFact.bopInsertAndGet(k, get, co.getData(),
         new BTreeInsertAndGetOperation.Callback() {
           private Element<E> element = null;
+          private CachedData cachedData = null;
+          private BKeyObject bKeyObject = null;
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -3382,7 +3403,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
             if (cstatus.isSuccess()) {
               rv.set(true, cstatus);
-              rv.setElement(element);
               return;
             }
             switch (cstatus.getResponse()) {
@@ -3404,10 +3424,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String key, int flags, BKeyObject bkeyObject,
-                              byte[] eflag, byte[] data) {
-            assert key.equals(k) : "Wrong key returned";
-            element = makeBTreeElement(key, flags, bkeyObject, eflag, data, tc);
+          @Override
+          public void gotData(int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
+            this.bKeyObject = bkeyObject;
+            cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
+          }
+
+          @Override
+          public void addResult() {
+            if (cachedData != null && element == null) {
+              element = makeBTreeElement(bKeyObject, cachedData, tc);
+              rv.setElement(element);
+            }
           }
         });
     rv.setOperation(op);
@@ -3418,32 +3446,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   /**
    * Utility method to create a b+tree element from individual parameters.
    *
-   * @param key   b+tree item's key
-   * @param flags item flags, used when creating the item
    * @param bkey  element key
-   * @param eflag element flags
-   * @param data  element data
+   * @param cachedData element data
    * @param tc    transcoder to serialize and unserialize value
    * @return element object containing all the parameters and transcoded value
    */
-  private <T> Element<T> makeBTreeElement(String key, int flags,
-                                          BKeyObject bkey, byte[] eflag, byte[] data,
-                                          Transcoder<T> tc) {
+  private <T> Element<T> makeBTreeElement(BKeyObject bkey, CachedData cachedData, Transcoder<T> tc) {
     Element<T> element = null;
-    T value = tc.decode(new CachedData(flags, data, tc.getMaxSize()));
+    T value = tc.decode(cachedData);
 
     switch (bkey.getType()) {
       case LONG:
-        element = new Element<T>(bkey.getLongBKey(), value, eflag);
+        element = new Element<T>(bkey.getLongBKey(), value, cachedData.getEFlag());
         break;
       case BYTEARRAY:
-        element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, eflag);
+        element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, cachedData.getEFlag());
         break;
       default:
-        getLogger().error("Unexpected bkey type : (key:" + key + ", bkey:"
-                        + bkey.toString() + ")");
+        getLogger().error("Unexpected bkey type : (bkey:" + bkey.toString() + ")");
     }
-
     return element;
   }
 

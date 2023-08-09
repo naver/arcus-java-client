@@ -201,7 +201,7 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
       // put an element data.
       BTreeFindPositionWithGetOperation.Callback cb =
           (BTreeFindPositionWithGetOperation.Callback) getCallback();
-      cb.gotData(key, flags, pos, get.getBkey(), get.getEflag(), data);
+      cb.gotData(pos, flags, get.getBkey(), get.getEflag(), data);
 
       // next position.
       pos += posDiff;

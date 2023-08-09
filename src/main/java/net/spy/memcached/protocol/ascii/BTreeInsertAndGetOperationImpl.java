@@ -246,7 +246,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     if (lookingFor == '\0' && readOffset == data.length) {
       // put an element data.
       BTreeInsertAndGetOperation.Callback cb = (BTreeInsertAndGetOperation.Callback) getCallback();
-      cb.gotData(key, flags, get.getBkeyObject(), get.getElementFlag(), data);
+      cb.gotData(flags, get.getBkeyObject(), get.getElementFlag(), data);
 
       lookingFor = '\r';
     }
