@@ -20,25 +20,19 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.Map;
 import java.util.Iterator;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import net.spy.memcached.ConnectionFactory;
 import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.BulkGetFuture;
-import net.spy.memcached.internal.SingleElementInfiniteIterator;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -80,62 +74,6 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
       localCacheManager = new LocalCacheManager(cacheName, maxElements,
               timeToLiveSeconds, copyOnRead, copyOnWrite);
     }
-  }
-
-  /**
-   * Get with a single key and decode using the default transcoder.
-   *
-   * @param key the key to get
-   * @return the result from the cache (null if there is none)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-  public Object get(String key) {
-    return get(key, transcoder);
-  }
-
-  /**
-   * Get with a single key.
-   *
-   * @param <T> Type of object to get.
-   * @param key the key to get
-   * @param tc  the transcoder to serialize and unserialize value
-   * @return the result from the cache (null if there is none)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-
-  public <T> T get(String key, Transcoder<T> tc) {
-    Future<T> future = asyncGet(key, tc);
-    try {
-      return future.get(operationTimeout, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      future.cancel(true);
-      throw new RuntimeException("Interrupted waiting for value", e);
-    } catch (ExecutionException e) {
-      future.cancel(true);
-      throw new RuntimeException("Exception waiting for value", e);
-    } catch (TimeoutException e) {
-      future.cancel(true);
-      throw new OperationTimeoutException(e);
-    }
-  }
-
-  /**
-   * Get the given key asynchronously and decode with the default
-   * transcoder.
-   *
-   * @param key the key to fetch
-   * @return a future that will hold the return value of the fetch
-   * @throws IllegalStateException in the rare circumstance where queue
-   *                               is too full to accept any more requests
-   */
-  public GetFuture<Object> asyncGet(final String key) {
-    return asyncGet(key, transcoder);
   }
 
   /**
@@ -183,133 +121,6 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
     }
     GetFuture<T> parent = super.asyncGet(key, tc);
     return new FrontCacheGetFuture<T>(localCacheManager, key, parent);
-  }
-
-  /**
-   * Get the values for multiple keys from the cache.
-   *
-   * @param keys the keys
-   * @return a map of the values (for each value that exists)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-  public Map<String, Object> getBulk(Collection<String> keys) {
-    return getBulk(keys, transcoder);
-  }
-
-  /**
-   * Get the values for multiple keys from the cache.
-   *
-   * @param <T>
-   * @param tc   the transcoder to serialize and unserialize value
-   * @param keys the keys
-   * @return a map of the values (for each value that exists)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-  public <T> Map<String, T> getBulk(Transcoder<T> tc, String... keys) {
-    return getBulk(Arrays.asList(keys), tc);
-  }
-
-  /**
-   * Get the values for multiple keys from the cache.
-   *
-   * @param keys the keys
-   * @return a map of the values (for each value that exists)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-  public Map<String, Object> getBulk(String... keys) {
-    return getBulk(Arrays.asList(keys), transcoder);
-  }
-
-  /**
-   * Get the values for multiple keys from the cache.
-   *
-   * @param <T>
-   * @param keys the keys
-   * @param tc   the transcoder to serialize and unserialize value
-   * @return a map of the values (for each value that exists)
-   * @throws OperationTimeoutException if the global operation timeout is
-   *                                   exceeded
-   * @throws IllegalStateException     in the rare circumstance where queue
-   *                                   is too full to accept any more requests
-   */
-  public <T> Map<String, T> getBulk(Collection<String> keys,
-                                    Transcoder<T> tc) {
-    BulkFuture<Map<String, T>> future = asyncGetBulk(keys, tc);
-    try {
-      return future.get(operationTimeout, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      future.cancel(true);
-      throw new RuntimeException("Interrupted getting bulk values", e);
-    } catch (ExecutionException e) {
-      future.cancel(true);
-      throw new RuntimeException("Failed getting bulk values", e);
-    } catch (TimeoutException e) {
-      future.cancel(true);
-      throw new OperationTimeoutException(e);
-    }
-  }
-
-  /**
-   * Asynchronously get a bunch of objects from the cache.
-   *
-   * @param <T>
-   * @param keys the keys to request
-   * @param tc   the transcoder to serialize and unserialize values
-   * @return a Future result of that fetch
-   * @throws IllegalStateException in the rare circumstance where queue
-   *                               is too full to accept any more requests
-   */
-  public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys, Transcoder<T> tc) {
-    return asyncGetBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
-  }
-
-  /**
-   * Asynchronously get a bunch of objects from the cache and decode them
-   * with the given transcoder.
-   *
-   * @param keys the keys to request
-   * @return a Future result of that fetch
-   * @throws IllegalStateException in the rare circumstance where queue
-   *                               is too full to accept any more requests
-   */
-  public BulkFuture<Map<String, Object>> asyncGetBulk(Collection<String> keys) {
-    return asyncGetBulk(keys, transcoder);
-  }
-
-  /**
-   * Varargs wrapper for asynchronous bulk get.
-   *
-   * @param <T>
-   * @param tc   the transcoder to serialize and unserialize value
-   * @param keys one more keys to get
-   * @return the future values of those keys
-   * @throws IllegalStateException in the rare circumstance where queue
-   *                               is too full to accept any more requests
-   */
-  public <T> BulkFuture<Map<String, T>> asyncGetBulk(Transcoder<T> tc,
-                                                     String... keys) {
-    return asyncGetBulk(Arrays.asList(keys), tc);
-  }
-
-  /**
-   * Varargs wrapper for asynchronous bulk get with the default transcoder.
-   *
-   * @param keys one more keys to get
-   * @return the future values of those keys
-   * @throws IllegalStateException in the rare circumstance where queue
-   *                               is too full to accept any more requests
-   */
-  public BulkFuture<Map<String, Object>> asyncGetBulk(String... keys) {
-    return asyncGetBulk(Arrays.asList(keys), transcoder);
   }
 
   /**
