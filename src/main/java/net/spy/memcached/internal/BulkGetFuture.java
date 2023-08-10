@@ -43,14 +43,16 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private final Map<String, Future<T>> rvMap;
   private final Collection<Operation> ops;
   private final CountDownLatch latch;
-  private boolean timeout = false;
+  private final long timeout;
+  private boolean isTimeout = false;
 
-  public BulkGetFuture(Map<String, Future<T>> m,
-                       Collection<Operation> getOps, CountDownLatch l) {
+  public BulkGetFuture(Map<String, Future<T>> rvMap, Collection<Operation> ops,
+                       CountDownLatch latch, Long timeout) {
     super();
-    rvMap = m;
-    ops = getOps;
-    latch = l;
+    this.rvMap = rvMap;
+    this.ops = ops;
+    this.latch = latch;
+    this.timeout = timeout;
   }
 
   public BulkGetFuture(BulkGetFuture<T> other) {
@@ -58,6 +60,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     rvMap = other.rvMap;
     ops = other.ops;
     latch = other.latch;
+    timeout = other.timeout;
   }
 
   @Override
@@ -72,7 +75,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   @Override
   public Map<String, T> get() throws InterruptedException, ExecutionException {
     try {
-      return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+      return get(timeout, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e);
     }
@@ -84,7 +87,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (timedoutOps.size() > 0) {
-      timeout = true;
+      isTimeout = true;
       LoggerFactory.getLogger(getClass()).warn(
               new CheckedOperationTimeoutException(duration, units, timedoutOps).getMessage());
     }
@@ -104,7 +107,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (timedoutOps.size() > 0) {
-      this.timeout = true;
+      isTimeout = true;
       throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
     }
     return ret;
@@ -177,6 +180,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * @see net.spy.memcached.internal.BulkFuture#isTimeout()
    */
   public boolean isTimeout() {
-    return timeout;
+    return isTimeout;
   }
 }

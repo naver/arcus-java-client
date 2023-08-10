@@ -1161,7 +1161,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<T>(rvMap, ops, latch);
+    return new BulkGetFuture<T>(rvMap, ops, latch, operationTimeout);
   }
 
   /**
@@ -1298,7 +1298,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<CASValue<T>>(m, ops, latch);
+    return new BulkGetFuture<CASValue<T>>(m, ops, latch, operationTimeout);
   }
 
   /**
