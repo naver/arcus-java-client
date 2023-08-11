@@ -2002,7 +2002,7 @@ public class MemcachedClient extends SpyThread
    */
   public Future<Boolean> flush(final int delay) {
     final AtomicReference<Boolean> flushResult =
-            new AtomicReference<Boolean>(null);
+            new AtomicReference<Boolean>(true);
     final ConcurrentLinkedQueue<Operation> ops =
             new ConcurrentLinkedQueue<Operation>();
     final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
@@ -2010,7 +2010,9 @@ public class MemcachedClient extends SpyThread
                              final CountDownLatch latch) {
         Operation op = opFact.flush(delay, new OperationCallback() {
           public void receivedStatus(OperationStatus s) {
-            flushResult.set(s.isSuccess());
+            if (!s.isSuccess()) {
+              flushResult.set(false);
+            }
           }
 
           public void complete() {

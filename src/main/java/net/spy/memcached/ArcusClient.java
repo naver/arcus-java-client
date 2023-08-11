@@ -1952,7 +1952,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
-    final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(null);
+    final AtomicReference<Boolean> flushResult = new AtomicReference<Boolean>(true);
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
 
     final CountDownLatch blatch = broadcastOp(new BroadcastOpFactory() {
@@ -1961,7 +1961,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         Operation op = opFact.flush(prefix, delay, false,
             new OperationCallback() {
               public void receivedStatus(OperationStatus s) {
-                flushResult.set(s.isSuccess());
+                if (!s.isSuccess()) {
+                  flushResult.set(false);
+                }
               }
 
               public void complete() {
