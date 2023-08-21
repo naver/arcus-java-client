@@ -1,12 +1,12 @@
 package net.spy.memcached.plugin;
 
-import net.spy.memcached.OperationTimeoutException;
-import net.spy.memcached.internal.BulkGetFuture;
-
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.OperationTimeoutException;
+import net.spy.memcached.internal.BulkGetFuture;
 
 import static net.spy.memcached.DefaultConnectionFactory.DEFAULT_OPERATION_TIMEOUT;
 

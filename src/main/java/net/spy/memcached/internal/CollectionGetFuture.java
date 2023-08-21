@@ -1,11 +1,11 @@
 package net.spy.memcached.internal;
 
-import net.spy.memcached.ops.CollectionGetOperation.Callback;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.ops.CollectionGetOperation.Callback;
 
 public class CollectionGetFuture<T> extends CollectionFuture<T> {
 
