@@ -1,22 +1,22 @@
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.ExecutionException;
 
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {

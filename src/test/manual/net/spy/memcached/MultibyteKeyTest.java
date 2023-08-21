@@ -75,8 +75,8 @@ import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
-
 import net.spy.memcached.util.BTreeUtil;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
