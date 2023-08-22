@@ -1527,6 +1527,61 @@ public interface ArcusClientIF {
                                                T value, Transcoder<T> tc);
 
   /**
+   * Upsert elements into the b+tree
+   *
+   * @param key      key of a b+tree
+   * @param elements list of b+tree elements
+   * @param attributesForCreate create a b+tree with this attributes,
+   *                            if given key of b+tree is not exists.
+   * @return a future indicating success
+   */
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<Object>> elements, CollectionAttributes attributesForCreate);
+
+
+  /**
+   * Upsert elements into the b+tree
+   *
+   * @param key      key of a b+tree
+   * @param elements map of b+tree elements
+   * @param attributesForCreate create a b+tree with this attributes,
+   *                            if given key of b+tree is not exists.
+   * @return a future indicating success
+   */
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, Object> elements,
+          CollectionAttributes attributesForCreate);
+
+  /**
+   * Upsert elements into the b+tree
+   *
+   * @param key      key of a b+tree
+   * @param elements list of b+tree elements
+   * @param attributesForCreate create a b+tree with this attributes,
+   *                            if given key of b+tree is not exists.
+   * @param tc       a transcoder to encode the value of element
+   * @return a future indicating success
+   */
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<T>> elements,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc);
+
+
+  /**
+   * Upsert elements into the b+tree
+   *
+   * @param key      key of a b+tree
+   * @param elements map of b+tree elements
+   * @param attributesForCreate create a b+tree with this attributes,
+   *                            if given key of b+tree is not exists.
+   * @param tc       a transcoder to encode the value of element
+   * @return a future indicating success
+   */
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, T> elements,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc);
+
+  /**
    * Update elements from the b+tree
    *
    * @param key      key of a b+tree
