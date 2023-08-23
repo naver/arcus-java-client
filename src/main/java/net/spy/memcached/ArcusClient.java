@@ -551,13 +551,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Boolean> asyncSopExist(String key, T value,
                                                      Transcoder<T> tc) {
     SetExist<T> exist = new SetExist<T>(value, tc);
-    return asyncCollectionExist(key, "", exist, tc);
+    return asyncCollectionExist(key, "", exist);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncSopExist(String key, Object value) {
     SetExist<Object> exist = new SetExist<Object>(value, collectionTranscoder);
-    return asyncCollectionExist(key, "", exist, collectionTranscoder);
+    return asyncCollectionExist(key, "", exist);
   }
 
   /**
@@ -961,12 +961,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param key             collection item's key
    * @param subkey          element key (list index, b+tree bkey)
    * @param collectionExist operation parameters (element value and so on)
-   * @param tc              transcoder to serialize and unserialize value
    * @return future holding the success/failure of the operation
    */
-  private <T> CollectionFuture<Boolean> asyncCollectionExist(
-          final String key, final String subkey,
-          final CollectionExist collectionExist, Transcoder<T> tc) {
+  private <T> CollectionFuture<Boolean> asyncCollectionExist(final String key, final String subkey,
+                                                             final CollectionExist collectionExist) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<Boolean>(
             latch, operationTimeout);
@@ -981,8 +979,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            boolean isExist = (CollectionResponse.EXIST == cstatus.getResponse())
-                            ? true : false;
+            boolean isExist = CollectionResponse.EXIST == cstatus.getResponse();
             rv.set(isExist, cstatus);
             if (!cstatus.isSuccess()) {
               getLogger().debug("Exist command to the collection failed : %s (type=%s, key=%s, subkey=%s)",
