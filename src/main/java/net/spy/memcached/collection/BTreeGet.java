@@ -28,7 +28,6 @@ public class BTreeGet extends CollectionGet {
   private boolean isFirstParsing = true;
   private boolean elementFlagExists = false;
 
-
   private BTreeGet(String range,
                    boolean delete, boolean dropIfEmpty,
                    ElementFlagFilter elementFlagFilter) {
@@ -123,7 +122,7 @@ public class BTreeGet extends CollectionGet {
 
   public boolean eachRecordParseCompleted() {
     if (elementFlagExists) {
-      // isFirstParsing true means item header with eFlag was parsed completely
+      // true if item header was parsed completely
       return isFirstParsing;
     } else {
       return true;
@@ -137,7 +136,7 @@ public class BTreeGet extends CollectionGet {
 
   @Override
   public boolean headerReady(int spaceCount) {
-    // non-eFlag header has spaceCount 2 and eFlag header has spaceCount 3
+    // non-eFlag header has 2 spaces and eFlag header has 3 spaces
     return spaceCount == 2 || spaceCount == 3;
   }
 
