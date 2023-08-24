@@ -147,7 +147,7 @@ public class CollectionGetOperationImpl extends OperationImpl
   public final void handleRead(ByteBuffer bb) {
     // Decode a collection data header.
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.hasRemaining()) {
         byte b = bb.get();
 
         // Handle spaces.
@@ -160,15 +160,10 @@ public class CollectionGetOperationImpl extends OperationImpl
               set:   <bytes> <data>\r\n
               map:   <field> <bytes> <data>\r\n
              */
-            collectionGet.decodeItemHeader(new String(byteBuffer.toByteArray()));
+            collectionGet.decodeItemHeader(byteBuffer.toString());
             byteBuffer.reset();
 
-            if (collectionGet.headerReady(spaceCount)
-                    && collectionGet.eachRecordParseCompleted()) {
-//              if (collectionGet.getElementFlag() != null) {
-//                  collectionGet.setHeaderCount(collectionGet
-//                      .getHeaderCount() - 1);
-//               }
+            if (collectionGet.headerReady(spaceCount) && collectionGet.eachRecordParseCompleted()) {
               data = new byte[collectionGet.getDataLength()];
               spaceCount = 0;
               break;

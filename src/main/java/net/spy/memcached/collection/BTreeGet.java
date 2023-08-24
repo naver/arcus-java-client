@@ -21,11 +21,13 @@ import net.spy.memcached.util.BTreeUtil;
 public class BTreeGet extends CollectionGet {
 
   private static final String command = "bop get";
-
   protected int offset = -1;
   protected int count = -1;
-
   protected ElementFlagFilter elementFlagFilter;
+
+  private boolean isFirstParsing = true;
+  private boolean elementFlagExists = false;
+
 
   private BTreeGet(String range,
                    boolean delete, boolean dropIfEmpty,
@@ -69,10 +71,6 @@ public class BTreeGet extends CollectionGet {
                   ElementFlagFilter elementFlagFilter) {
     this(BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
         offset, count, delete, dropIfEmpty, elementFlagFilter);
-  }
-
-  public ElementFlagFilter getElementFlagFilter() {
-    return elementFlagFilter;
   }
 
   public String getRange() {
@@ -123,17 +121,10 @@ public class BTreeGet extends CollectionGet {
     return command;
   }
 
-  public void resetHeaderCount(int count) {
-    this.headerCount = count;
-  }
-
-  private int headerParseStep = 1;
-
-  private boolean elementFlagExists = false;
-
   public boolean eachRecordParseCompleted() {
     if (elementFlagExists) {
-      return headerParseStep == 1;
+      // isFirstParsing true means item header with eFlag was parsed completely
+      return isFirstParsing;
     } else {
       return true;
     }
@@ -146,13 +137,15 @@ public class BTreeGet extends CollectionGet {
 
   @Override
   public boolean headerReady(int spaceCount) {
+    // non-eFlag header has spaceCount 2 and eFlag header has spaceCount 3
     return spaceCount == 2 || spaceCount == 3;
   }
 
+  @Override
   public void decodeItemHeader(String itemHeader) {
     String[] splited = itemHeader.split(" ");
 
-    if (headerParseStep == 1) {
+    if (isFirstParsing) {
       // found bkey
       if (splited[0].startsWith("0x")) {
         this.subkey = splited[0].substring(2);
@@ -164,14 +157,15 @@ public class BTreeGet extends CollectionGet {
       if (splited[1].startsWith("0x")) {
         this.elementFlagExists = true;
         this.elementFlag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-      //this.headerCount++;
-        headerParseStep = 2;
+        // need second parsing because of EFlag field
+        isFirstParsing = false;
       } else {
         this.dataLength = Integer.parseInt(splited[1]);
       }
     } else {
-      this.headerParseStep = 1;
       this.dataLength = Integer.parseInt(splited[1]);
+      // revert true for next B+Tree element parsing
+      this.isFirstParsing = true;
     }
   }
 }
