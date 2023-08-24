@@ -57,14 +57,6 @@ public abstract class CollectionGet {
     return headerCount == spaceCount;
   }
 
-  public void setHeaderCount(int headerCount) {
-    this.headerCount = headerCount;
-  }
-
-  public int getHeaderCount() {
-    return headerCount;
-  }
-
   public boolean eachRecordParseCompleted() {
     return true;
   }
