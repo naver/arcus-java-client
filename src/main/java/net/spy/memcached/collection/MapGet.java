@@ -29,10 +29,11 @@ public class MapGet extends CollectionGet {
   protected byte[] additionalArgs;
 
   public MapGet(List<String> mkeyList, boolean delete, boolean dropIfEmpty) {
-    this.headerCount = 2;
     this.mkeyList = mkeyList;
     this.delete = delete;
     this.dropIfEmpty = dropIfEmpty;
+    this.eHeadCount = 2;
+    this.eFlagIndex = -1;
   }
 
   public void setKeySeparator(String keySeparator) {
@@ -95,9 +96,9 @@ public class MapGet extends CollectionGet {
     return command;
   }
 
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-    this.subkey = splited[0];
-    this.dataLength = Integer.parseInt(splited[1]);
+  @Override
+  public void decodeElemHeader(List<String> tokens) {
+    this.subkey = tokens.get(0);
+    this.dataLength = Integer.parseInt(tokens.get(1));
   }
 }

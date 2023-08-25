@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGet extends CollectionGet {
@@ -25,17 +27,15 @@ public class BTreeGet extends CollectionGet {
   protected int count = -1;
   protected ElementFlagFilter elementFlagFilter;
 
-  private boolean isFirstParsing = true;
-  private boolean elementFlagExists = false;
-
   private BTreeGet(String range,
                    boolean delete, boolean dropIfEmpty,
                    ElementFlagFilter elementFlagFilter) {
-    this.headerCount = 2;
     this.range = range;
     this.delete = delete;
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
+    this.eHeadCount = 2;
+    this.eFlagIndex = 1;
   }
 
   public BTreeGet(long bkey,
@@ -120,51 +120,19 @@ public class BTreeGet extends CollectionGet {
     return command;
   }
 
-  public boolean eachRecordParseCompleted() {
-    if (elementFlagExists) {
-      // true if item header was parsed completely
-      return isFirstParsing;
-    } else {
-      return true;
-    }
-  }
-
   @Override
   public byte[] getAddtionalArgs() {
     return null;
   }
 
   @Override
-  public boolean headerReady(int spaceCount) {
-    // non-eFlag header has 2 spaces and eFlag header has 3 spaces
-    return spaceCount == 2 || spaceCount == 3;
-  }
-
-  @Override
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-
-    if (isFirstParsing) {
-      // found bkey
-      if (splited[0].startsWith("0x")) {
-        this.subkey = splited[0].substring(2);
-      } else {
-        this.subkey = splited[0];
-      }
-
-      // found element flag.
-      if (splited[1].startsWith("0x")) {
-        this.elementFlagExists = true;
-        this.elementFlag = BTreeUtil.hexStringToByteArrays(splited[1].substring(2));
-        // need second parsing because of EFlag field
-        isFirstParsing = false;
-      } else {
-        this.dataLength = Integer.parseInt(splited[1]);
-      }
+  public void decodeElemHeader(List<String> tokens) {
+    subkey = tokens.get(0);
+    if (tokens.size() == 2) {
+      dataLength = Integer.parseInt(tokens.get(1));
     } else {
-      this.dataLength = Integer.parseInt(splited[1]);
-      // revert true for next B+Tree element parsing
-      this.isFirstParsing = true;
+      elementFlag = BTreeUtil.hexStringToByteArrays(tokens.get(1));
+      dataLength = Integer.parseInt(tokens.get(2));
     }
   }
 }

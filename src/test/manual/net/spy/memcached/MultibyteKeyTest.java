@@ -162,7 +162,7 @@ public class MultibyteKeyTest {
         }
 
         @Override
-        public void decodeItemHeader(String itemHeader) {
+        public void decodeElemHeader(List<String> tokens) {
         }
       }, new CollectionGetOperation.Callback() {
         @Override

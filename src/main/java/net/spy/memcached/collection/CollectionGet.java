@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 public abstract class CollectionGet {
 
   protected boolean delete = false;
@@ -23,11 +25,12 @@ public abstract class CollectionGet {
 
   protected String range;
   protected String str;
-  protected int headerCount;
   protected String subkey;
   protected int dataLength;
 
   protected byte[] elementFlag;
+  protected int eHeadCount;
+  protected int eFlagIndex;
 
   public boolean isDelete() {
     return delete;
@@ -53,12 +56,12 @@ public abstract class CollectionGet {
     return elementFlag;
   }
 
-  public boolean headerReady(int spaceCount) {
-    return headerCount == spaceCount;
+  public int getEFlagIndex() {
+    return eFlagIndex;
   }
 
-  public boolean eachRecordParseCompleted() {
-    return true;
+  public int getEHeadCount() {
+    return eHeadCount;
   }
 
   public abstract byte[] getAddtionalArgs();
@@ -67,6 +70,5 @@ public abstract class CollectionGet {
 
   public abstract String getCommand();
 
-  public abstract void decodeItemHeader(String itemHeader);
-
+  public abstract void decodeElemHeader(List<String> tokens);
 }

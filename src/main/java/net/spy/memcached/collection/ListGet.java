@@ -16,15 +16,18 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 public class ListGet extends CollectionGet {
 
   private static final String command = "lop get";
 
   private ListGet(String range, boolean delete, boolean dropIfEmpty) {
-    this.headerCount = 1;
     this.range = range;
     this.delete = delete;
     this.dropIfEmpty = dropIfEmpty;
+    this.eHeadCount = 1;
+    this.eFlagIndex = -1;
   }
 
   public ListGet(int index, boolean delete, boolean dropIfEmpty) {
@@ -70,7 +73,8 @@ public class ListGet extends CollectionGet {
     return command;
   }
 
-  public void decodeItemHeader(String itemHeader) {
-    this.dataLength = Integer.parseInt(itemHeader);
+  @Override
+  public void decodeElemHeader(List<String> tokens) {
+    this.dataLength = Integer.parseInt(tokens.get(0));
   }
 }
