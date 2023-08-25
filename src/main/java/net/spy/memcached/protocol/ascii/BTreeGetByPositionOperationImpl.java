@@ -20,8 +20,10 @@ package net.spy.memcached.protocol.ascii;
 import java.io.ByteArrayOutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGetByPosition;
@@ -63,15 +65,17 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
   protected byte[] data = null;
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
-  protected int spaceCount = 0;
+  protected final List<String> tokens = new ArrayList<String>();
+  protected int eHeadCount;
+  protected int eFlagIndex;
 
-  private Boolean hasEFlag = null;
-
-  public BTreeGetByPositionOperationImpl(String key,
-                                         BTreeGetByPosition get, OperationCallback cb) {
+  public BTreeGetByPositionOperationImpl(String key, BTreeGetByPosition get,
+                                         OperationCallback cb) {
     super(cb);
     this.key = key;
     this.get = get;
+    this.eHeadCount = get.getEHeadCount();
+    this.eFlagIndex = get.getEFlagIndex();
     setAPIType(APIType.BOP_GBP);
     setOperationType(OperationType.READ);
   }
@@ -129,35 +133,27 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
   public void handleRead(ByteBuffer bb) {
     // Decode a data header.
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.hasRemaining()) {
         byte b = bb.get();
         // Handle spaces to parse the header.
         if (b == ' ') {
-          // One-time check to find if this responses have eflags.
-          if (hasEFlag == null && spaceCount == BTreeGetByPosition.HEADER_EFLAG_POSITION) {
-            String[] chunk = new String(byteBuffer.toByteArray())
-                    .split(" ");
-            if (chunk[BTreeGetByPosition.HEADER_EFLAG_POSITION].startsWith("0x")) {
-              hasEFlag = true;
-            } else {
-              hasEFlag = false;
+          // btree: <bkey> [<eflag>] <bytes> <data>\r\n
+          tokens.add(byteBuffer.toString());
+          byteBuffer.reset();
+
+          if (eFlagIndex >= 0) {
+            if (tokens.size() == eFlagIndex + 1 && tokens.get(eFlagIndex).startsWith("0x")) {
+              eHeadCount++;
             }
           }
-
-          spaceCount++;
-
-          // Parse the value header.
-          // FIXME this is not cool... please fix this :-(
-          int spaceReduced = (hasEFlag != null && hasEFlag) ? 1 : 0;
-          if (get.headerReady(spaceCount - spaceReduced)) {
-            // <bkey> [<eflag>] <bytes> <data>\r\n
-            get.decodeItemHeader(new String(byteBuffer.toByteArray()));
+          if (tokens.size() == eHeadCount) {
+            get.decodeElemHeader(tokens);
             data = new byte[get.getDataLength()];
-            byteBuffer.reset();
-            spaceCount = 0;
-            hasEFlag = null;
+            tokens.clear();
+            eHeadCount = get.getEHeadCount();
             break;
           }
+          continue;
         }
 
         // Ready to finish.
@@ -177,7 +173,6 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
           data = null;
           break;
         }
-
         // Write to the result ByteBuffer
         byteBuffer.write(b);
       }
@@ -208,7 +203,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
       // put an element data.
       BTreeGetByPositionOperation.Callback cb =
           (BTreeGetByPositionOperation.Callback) getCallback();
-      cb.gotData(pos, flags, get.getBkey(), get.getEflag(), data);
+      cb.gotData(pos, flags, get.getBkey(), get.getElementFlag(), data);
 
       // next position.
       pos += posDiff;

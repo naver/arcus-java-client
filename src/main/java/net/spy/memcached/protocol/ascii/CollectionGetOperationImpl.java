@@ -20,8 +20,10 @@ package net.spy.memcached.protocol.ascii;
 import java.io.ByteArrayOutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.collection.BTreeGet;
@@ -78,13 +80,17 @@ public class CollectionGetOperationImpl extends OperationImpl
   protected byte[] data = null;
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
-  protected int spaceCount = 0;
+  protected final List<String> tokens = new ArrayList<String>();
+  protected int eHeadCount;
+  protected int eFlagIndex;
 
   public CollectionGetOperationImpl(String key, CollectionGet collectionGet,
                                     OperationCallback cb) {
     super(cb);
     this.key = key;
     this.collectionGet = collectionGet;
+    this.eHeadCount = collectionGet.getEHeadCount();
+    this.eFlagIndex = collectionGet.getEFlagIndex();
     if (this.collectionGet instanceof ListGet) {
       setAPIType(APIType.LOP_GET);
     } else if (this.collectionGet instanceof SetGet) {
@@ -152,23 +158,28 @@ public class CollectionGetOperationImpl extends OperationImpl
 
         // Handle spaces.
         if (b == ' ') {
-          spaceCount++;
-          if (collectionGet.headerReady(spaceCount)) {
-            /*
-              btree: <bkey> [<eflag>] <bytes> <data>\r\n
-              list:  <bytes> <data>\r\n
-              set:   <bytes> <data>\r\n
-              map:   <field> <bytes> <data>\r\n
-             */
-            collectionGet.decodeItemHeader(byteBuffer.toString());
-            byteBuffer.reset();
+           /*
+             btree: <bkey> [<eflag>] <bytes> <data>\r\n
+             list:  <bytes> <data>\r\n
+             set:   <bytes> <data>\r\n
+             map:   <field> <bytes> <data>\r\n
+           */
+          tokens.add(byteBuffer.toString());
+          byteBuffer.reset();
 
-            if (collectionGet.headerReady(spaceCount) && collectionGet.eachRecordParseCompleted()) {
-              data = new byte[collectionGet.getDataLength()];
-              spaceCount = 0;
-              break;
+          if (eFlagIndex >= 0) {
+            if (tokens.size() == eFlagIndex + 1 && tokens.get(eFlagIndex).startsWith("0x")) {
+              eHeadCount++;
             }
           }
+          if (tokens.size() == eHeadCount) {
+            collectionGet.decodeElemHeader(tokens);
+            data = new byte[collectionGet.getDataLength()];
+            tokens.clear();
+            eHeadCount = collectionGet.getEHeadCount();
+            break;
+          }
+          continue;
         }
 
         // Ready to finish.
@@ -189,7 +200,6 @@ public class CollectionGetOperationImpl extends OperationImpl
           data = null;
           break;
         }
-
         byteBuffer.write(b);
       }
       return;

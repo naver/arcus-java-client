@@ -17,6 +17,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 import net.spy.memcached.util.BTreeUtil;
 
 /**
@@ -39,25 +41,24 @@ public class BTreeGetByPosition extends CollectionGet {
   private final String range;
   private final int posFrom;
   private final int posTo;
-
   private BKeyObject bkey;
-  private byte[] eflag;
-  private int bytes;
 
   public BTreeGetByPosition(BTreeOrder order, int pos) {
-    this.headerCount = 2;
     this.order = order;
     this.range = String.valueOf(pos);
     this.posFrom = pos;
     this.posTo = pos;
+    this.eHeadCount = 2;
+    this.eFlagIndex = 1;
   }
 
   public BTreeGetByPosition(BTreeOrder order, int posFrom, int posTo) {
-    this.headerCount = 2;
     this.order = order;
     this.range = String.valueOf(posFrom) + ".." + String.valueOf(posTo);
     this.posFrom = posFrom;
     this.posTo = posTo;
+    this.eHeadCount = 2;
+    this.eFlagIndex = 1;
   }
 
   public BTreeOrder getOrder() {
@@ -86,63 +87,33 @@ public class BTreeGetByPosition extends CollectionGet {
   }
 
   @Override
-  public boolean headerReady(int spaceCount) {
-    return spaceCount == 2;
-  }
-
-  @Override
   public byte[] getAddtionalArgs() {
     return null;
   }
-
-  private static final int BKEY = 0;
-  private static final int EFLAG_OR_BYTES = 1;
-  private static final int BYTES = 2;
 
   /*
    * VALUE <flags> <count>\r\n
    * <bkey> [<eflag>] <bytes> <data>\r\n
    * END\r\n
    */
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-    boolean hasEFlag = false;
-
-    // <bkey>
-    if (splited[BKEY].startsWith("0x")) {
-      this.bkey = new BKeyObject(BTreeUtil.hexStringToByteArrays(splited[0].substring(2)));
+  @Override
+  public void decodeElemHeader(List<String> tokens) {
+    subkey = tokens.get(0);
+    if (subkey.startsWith("0x")) {
+      bkey =  new BKeyObject(BTreeUtil.hexStringToByteArrays(subkey.substring(2)));
     } else {
-      this.bkey = new BKeyObject(Long.parseLong(splited[0]));
+      bkey = new BKeyObject(Long.parseLong(subkey));
     }
-
-    // <eflag> or <bytes>
-    if (splited[EFLAG_OR_BYTES].startsWith("0x")) {
-      // <eflag>
-      hasEFlag = true;
-      this.eflag = BTreeUtil
-              .hexStringToByteArrays(splited[EFLAG_OR_BYTES].substring(2));
+    if (tokens.size() == 2) {
+      dataLength = Integer.parseInt(tokens.get(1));
     } else {
-      this.bytes = Integer.parseInt(splited[EFLAG_OR_BYTES]);
+      elementFlag = BTreeUtil.hexStringToByteArrays(tokens.get(1));
+      dataLength = Integer.parseInt(tokens.get(2));
     }
-
-    // <bytes>
-    if (hasEFlag) {
-      this.bytes = Integer.parseInt(splited[BYTES]);
-    }
-
-    this.dataLength = bytes;
   }
 
   public BKeyObject getBkey() {
     return bkey;
-  }
-
-  public byte[] getEflag() {
-    return eflag;
-  }
-
-  public int getBytes() {
-    return bytes;
   }
 
   public int getPosFrom() {
@@ -156,5 +127,4 @@ public class BTreeGetByPosition extends CollectionGet {
   public boolean isReversed() {
     return posFrom > posTo;
   }
-
 }
