@@ -17,8 +17,12 @@
 package net.spy.memcached.internal;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.ops.CollectionGetOpCallback;
 
@@ -41,6 +45,15 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
   }
 
   public Element<E> getElement() {
+    try {
+      super.get(super.timeout, TimeUnit.MILLISECONDS);
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    } catch (TimeoutException e) {
+      throw new OperationTimeoutException(e);
+    }
     CollectionGetOpCallback callback = (CollectionGetOpCallback) op.getCallback();
     callback.addResult();
     return element;
