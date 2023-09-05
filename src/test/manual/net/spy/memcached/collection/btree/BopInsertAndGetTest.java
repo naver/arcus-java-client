@@ -49,6 +49,23 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     mc.delete(kvKey).get();
   }
 
+  public void testInsertAndGetNotTrimmed() throws Exception {
+    //given
+    CollectionAttributes attrs = new CollectionAttributes();
+    attrs.setMaxCount(longBkeys.length + 1);
+
+    //when
+    for (long each : longBkeys) {
+      mc.asyncBopInsert(key, each, null, "val", attrs).get();
+    }
+
+    //then
+    BTreeStoreAndGetFuture<Boolean, Object> f = mc
+            .asyncBopInsertAndGetTrimmed(key, 2000, null, "val", null);
+    assertTrue(f.get());
+    assertNull(f.getElement());
+  }
+
   public void testInsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
