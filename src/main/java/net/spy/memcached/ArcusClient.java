@@ -3302,8 +3302,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopInsertAndGetTrimmed(
           String key, long bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
-    BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
-            BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<Object> insertAndGet
+            = new BTreeInsertAndGet<Object>(bkey, eFlag, value, false, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
   }
 
@@ -3311,8 +3311,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopInsertAndGetTrimmed(
           String key, long bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
-    BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
-            BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<E> insertAndGet
+            = new BTreeInsertAndGet<E>(bkey, eFlag, value, false, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -3320,8 +3320,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopInsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
-    BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
-            BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<Object> insertAndGet
+            = new BTreeInsertAndGet<Object>(bkey, eFlag, value, false, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
   }
 
@@ -3329,8 +3329,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopInsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
-    BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
-            BTreeInsertAndGet.Command.INSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<E> insertAndGet
+            = new BTreeInsertAndGet<E>(bkey, eFlag, value, false, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -3338,8 +3338,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopUpsertAndGetTrimmed(
           String key, long bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
-    BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
-            BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<Object> insertAndGet
+            = new BTreeInsertAndGet<Object>(bkey, eFlag, value, true, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
   }
 
@@ -3347,8 +3347,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopUpsertAndGetTrimmed(
           String key, long bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
-    BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
-            BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<E> insertAndGet
+            = new BTreeInsertAndGet<E>(bkey, eFlag, value, true, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -3356,8 +3356,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public BTreeStoreAndGetFuture<Boolean, Object> asyncBopUpsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, Object value,
           CollectionAttributes attributesForCreate) {
-    BTreeInsertAndGet<Object> insertAndGet = new BTreeInsertAndGet<Object>(
-            BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<Object> insertAndGet
+            = new BTreeInsertAndGet<Object>(bkey, eFlag, value, true, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, collectionTranscoder);
   }
 
@@ -3365,8 +3365,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopUpsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
-    BTreeInsertAndGet<E> insertAndGet = new BTreeInsertAndGet<E>(
-            BTreeInsertAndGet.Command.UPSERT, bkey, eFlag, value, attributesForCreate);
+    BTreeInsertAndGet<E> insertAndGet
+            = new BTreeInsertAndGet<E>(bkey, eFlag, value, true, attributesForCreate);
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 

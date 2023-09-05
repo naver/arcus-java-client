@@ -99,10 +99,10 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     this.key = key;
     this.get = get;
     this.dataToStore = dataToStore;
-    if (get.getCmd() == BTreeInsertAndGet.Command.INSERT) {
-      setAPIType(APIType.BOP_INSERT);
-    } else if (get.getCmd() == BTreeInsertAndGet.Command.UPSERT) {
+    if (get.isUpdateIfExist()) {
       setAPIType(APIType.BOP_UPSERT);
+    } else {
+      setAPIType(APIType.BOP_INSERT);
     }
     setOperationType(OperationType.WRITE);
   }
@@ -149,15 +149,10 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
       }
     } else {
       OperationStatus status = null;
-      switch (get.getCmd()) {
-        case INSERT:
-          status = matchStatus(line, INSERT_AND_GET_STATUS_ON_LINE);
-          break;
-        case UPSERT:
-          status = matchStatus(line, UPSERT_AND_GET_STATUS_ON_LINE);
-          break;
-        default:
-          status = UNDEFINED_OPERATION;
+      if (get.isUpdateIfExist()) {
+        status = matchStatus(line, UPSERT_AND_GET_STATUS_ON_LINE);
+      } else {
+        status = matchStatus(line, INSERT_AND_GET_STATUS_ON_LINE);
       }
       getLogger().debug(status);
       getCallback().receivedStatus(status);

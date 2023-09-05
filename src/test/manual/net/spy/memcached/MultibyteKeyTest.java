@@ -666,8 +666,8 @@ public class MultibyteKeyTest {
   public void BTreeInsertAndGetOperationImplTest() {
     try {
       opFact.bopInsertAndGet(MULTIBYTE_KEY,
-          new BTreeInsertAndGet<Integer>(BTreeInsertAndGet.Command.INSERT, 1L, new byte[]{0, 0},
-                  new Random().nextInt(), new CollectionAttributes()),
+          new BTreeInsertAndGet<Integer>(1L, new byte[]{0, 0}, new Random().nextInt(),
+                  false,  new CollectionAttributes()),
           testData, new BTreeInsertAndGetOperation.Callback() {
             @Override
             public void gotData(int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {

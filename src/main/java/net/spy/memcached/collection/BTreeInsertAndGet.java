@@ -17,6 +17,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
+
 import net.spy.memcached.util.BTreeUtil;
 
 /**
@@ -31,55 +33,42 @@ import net.spy.memcached.util.BTreeUtil;
  *
  * @param <T> the expected class of the value
  */
-public class BTreeInsertAndGet<T> extends BTreeInsert<T> {
+public class BTreeInsertAndGet<T> extends CollectionGet {
 
-  // FIXME please refactor this :-( subclass-ing needed
-  public enum Command {
-    INSERT("bop insert"),
-    UPSERT("bop upsert");
-
-    private final String command;
-
-    Command(String command) {
-      this.command = command;
-    }
-
-    public String getCommand() {
-      return command;
-    }
-  }
-
-  public static final int HEADER_EFLAG_POSITION = 1; // 0-based
-
-  private Command cmd;
+  private final CollectionInsert<T> collection;
+  private final boolean updateIfExist;
   private BKeyObject bkeyObject;
   private int bytes;
-
-  public BTreeInsertAndGet(Command cmd, long bkey, byte[] eFlag, T value,
-                           CollectionAttributes attributesForCreate) {
-    super(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
-    this.cmd = cmd;
-    this.bkeyObject = new BKeyObject(bkey);
-  }
-
-  public BTreeInsertAndGet(Command cmd, byte[] bkey, byte[] eFlag, T value,
-                           CollectionAttributes attributesForCreate) {
-    super(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
-    this.cmd = cmd;
-    this.bkeyObject = new BKeyObject(bkey);
-  }
-
-  public BKeyObject getBkeyObject() {
-    return bkeyObject;
-  }
-
-  public boolean headerReady(int spaceCount) {
-    return spaceCount == 2;
-  }
 
   private static final int BKEY = 0;
   private static final int EFLAG_OR_BYTES = 1;
   private static final int BYTES = 2;
+
+  public BTreeInsertAndGet(long bkey, byte[] eFlag, T value, boolean updateIfExist,
+                           CollectionAttributes attributesForCreate) {
+    if (updateIfExist) {
+      this.collection = new BTreeUpsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+    } else {
+      this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+    }
+    this.updateIfExist = updateIfExist;
+    this.bkeyObject = new BKeyObject(bkey);
+  }
+
+  public BTreeInsertAndGet(byte[] bkey, byte[] eFlag, T value, boolean updateIfExist,
+                           CollectionAttributes attributesForCreate) {
+    if (updateIfExist) {
+      this.collection = new BTreeUpsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+    } else {
+      this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+    }
+    this.updateIfExist = updateIfExist;
+    this.bkeyObject = new BKeyObject(bkey);
+  }
+
+  @Override
+  public void decodeElemHeader(List<String> tokens) {
+  }
 
   public void decodeItemHeader(String itemHeader) {
     String[] splited = itemHeader.split(" ");
@@ -108,17 +97,44 @@ public class BTreeInsertAndGet<T> extends BTreeInsert<T> {
     }
   }
 
+  public byte[] getAddtionalArgs() {
+    return null;
+  }
+
+  public String stringify() {
+    return collection.stringify();
+  }
+
+  public String getCommand() {
+    return collection.getCommand();
+  }
+
+  public boolean headerReady(int spaceCount) {
+    return spaceCount == 2;
+  }
+
+  public T getValue() {
+    return collection.getValue();
+  }
+
+  public void setFlags(int flags) {
+    collection.setFlags(flags);
+  }
+
+  public String getElementFlagByHex() {
+    return collection.getElementFlagByHex();
+  }
+
   public int getBytes() {
     return bytes;
   }
 
-  public Command getCmd() {
-    return cmd;
+  public boolean isUpdateIfExist() {
+    return updateIfExist;
   }
 
-  @Override
-  public String getCommand() {
-    return cmd.getCommand();
+  public BKeyObject getBkeyObject() {
+    return bkeyObject;
   }
 
 }
