@@ -85,7 +85,7 @@
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.4.14</version>
+            <version>3.5.9</version>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
@@ -135,6 +135,7 @@
                         <arg>-Xlint:all</arg>
                         <arg>-Xlint:-options</arg> <!-- For warning about old java version 6. -->
                         <arg>-Xlint:-processing</arg> <!-- For meaningless warning about annotations -->
+                        <arg>-Xlint:-classfile</arg> <!-- For provided spotbugs in ZK Client -->
                         <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
