@@ -16,10 +16,13 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import net.spy.memcached.CachedData;
 import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.transcoders.Transcoder;
 
 public class BTreeGetResult<K, V> {
 
@@ -40,7 +43,13 @@ public class BTreeGetResult<K, V> {
     return opStatus;
   }
 
-  public void addElement(BTreeElement<K, V> element) {
-    this.elements.put(element.getBkey(), element);
+  public void addElements(List<BTreeElement<K, CachedData>> cachedData, Transcoder<V> tc) {
+    if (elements != null && elements.isEmpty()) {
+      for (BTreeElement<K, CachedData> elem : cachedData) {
+        BTreeElement<K, V> decodedElem =
+                new BTreeElement<K, V>(elem.getBkey(), elem.getEflag(), tc.decode(elem.getValue()));
+        elements.put(decodedElem.getBkey(), decodedElem);
+      }
+    }
   }
 }
