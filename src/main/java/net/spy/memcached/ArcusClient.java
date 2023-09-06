@@ -4025,6 +4025,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
+        private final Map<String, List<BTreeElement<Long, CachedData>>> cachedDataMap =
+                new HashMap<String, List<BTreeElement<Long, CachedData>>>();
+
         @Override
         public void receivedStatus(OperationStatus status) {
           // Nothing to do here because the user MUST search the result Map instance.
@@ -4047,9 +4050,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          result.get(key).addElement(
-                  new BTreeElement<Long, T>((Long) bkey, eflag,
-                          tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+          List<BTreeElement<Long, CachedData>> elements = cachedDataMap.get(key);
+          if (elements == null) {
+            elements = new ArrayList<BTreeElement<Long, CachedData>>();
+            cachedDataMap.put(key, elements);
+          }
+          elements.add(new BTreeElement<Long, CachedData>((Long) bkey, eflag,
+                  new CachedData(flags, data, tc.getMaxSize())));
+        }
+
+        @Override
+        public void addResult() {
+          if (!cachedDataMap.isEmpty()) {
+            for (Entry<String, List<BTreeElement<Long, CachedData>>> entry : cachedDataMap.entrySet()) {
+              result.get(entry.getKey()).addElements(entry.getValue(), tc);
+            }
+            cachedDataMap.clear();
+          }
         }
       });
       ops.add(op);
@@ -4081,6 +4098,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
+        private final Map<String, List<BTreeElement<ByteArrayBKey, CachedData>>> cachedDataMap =
+                new HashMap<String, List<BTreeElement<ByteArrayBKey, CachedData>>>();
+
         @Override
         public void receivedStatus(OperationStatus status) {
         }
@@ -4103,10 +4123,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          result.get(key).addElement(
-                  new BTreeElement<ByteArrayBKey, T>(
-                          new ByteArrayBKey((byte[]) bkey),
-                          eflag, tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+          List<BTreeElement<ByteArrayBKey, CachedData>> elements = cachedDataMap.get(key);
+          if (elements == null) {
+            elements = new ArrayList<BTreeElement<ByteArrayBKey, CachedData>>();
+            cachedDataMap.put(key, elements);
+          }
+          elements.add(new BTreeElement<ByteArrayBKey, CachedData>(
+                  new ByteArrayBKey((byte[]) bkey), eflag,
+                  new CachedData(flags, data, tc.getMaxSize())));
+        }
+
+        @Override
+        public void addResult() {
+          if (!cachedDataMap.isEmpty()) {
+            for (Entry<String, List<BTreeElement<ByteArrayBKey, CachedData>>> entry : cachedDataMap.entrySet()) {
+              result.get(entry.getKey()).addElements(entry.getValue(), tc);
+            }
+            cachedDataMap.clear();
+          }
         }
       });
       ops.add(op);
