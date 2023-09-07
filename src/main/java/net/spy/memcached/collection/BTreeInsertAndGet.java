@@ -37,12 +37,7 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
 
   private final CollectionInsert<T> collection;
   private final boolean updateIfExist;
-  private BKeyObject bkeyObject;
-  private int bytes;
-
-  private static final int BKEY = 0;
-  private static final int EFLAG_OR_BYTES = 1;
-  private static final int BYTES = 2;
+  private BKeyObject bKey;
 
   public BTreeInsertAndGet(long bkey, byte[] eFlag, T value, boolean updateIfExist,
                            CollectionAttributes attributesForCreate) {
@@ -52,7 +47,9 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
       this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     }
     this.updateIfExist = updateIfExist;
-    this.bkeyObject = new BKeyObject(bkey);
+    this.bKey = new BKeyObject(bkey);
+    this.eHeadCount = 2;
+    this.eFlagIndex = 1;
   }
 
   public BTreeInsertAndGet(byte[] bkey, byte[] eFlag, T value, boolean updateIfExist,
@@ -63,78 +60,59 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
       this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     }
     this.updateIfExist = updateIfExist;
-    this.bkeyObject = new BKeyObject(bkey);
+    this.bKey = new BKeyObject(bkey);
+    this.eHeadCount = 2;
+    this.eFlagIndex = 1;
   }
 
   @Override
   public void decodeElemHeader(List<String> tokens) {
-  }
-
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-    boolean hasEFlag = false;
-
-    // <bkey>
-    if (splited[BKEY].startsWith("0x")) {
-      this.bkeyObject = new BKeyObject(BTreeUtil.hexStringToByteArrays(splited[0].substring(2)));
+    subkey = tokens.get(0);
+    if (subkey.startsWith("0x")) {
+      bKey =  new BKeyObject(BTreeUtil.hexStringToByteArrays(subkey.substring(2)));
     } else {
-      this.bkeyObject = new BKeyObject(Long.parseLong(splited[0]));
+      bKey = new BKeyObject(Long.parseLong(subkey));
     }
-
-    // <eflag> or <bytes>
-    if (splited[EFLAG_OR_BYTES].startsWith("0x")) {
-      // <eflag>
-      hasEFlag = true;
-      this.elementFlag = BTreeUtil
-              .hexStringToByteArrays(splited[EFLAG_OR_BYTES].substring(2));
+    if (tokens.size() == 2) {
+      dataLength = Integer.parseInt(tokens.get(1));
     } else {
-      this.bytes = Integer.parseInt(splited[EFLAG_OR_BYTES]);
-    }
-
-    // <bytes>
-    if (hasEFlag) {
-      this.bytes = Integer.parseInt(splited[BYTES]);
+      elementFlag = BTreeUtil.hexStringToByteArrays(tokens.get(1));
+      dataLength = Integer.parseInt(tokens.get(2));
     }
   }
 
+  @Override
   public byte[] getAddtionalArgs() {
     return null;
   }
 
+  @Override
   public String stringify() {
     return collection.stringify();
   }
 
+  @Override
   public String getCommand() {
     return collection.getCommand();
-  }
-
-  public boolean headerReady(int spaceCount) {
-    return spaceCount == 2;
   }
 
   public T getValue() {
     return collection.getValue();
   }
 
-  public void setFlags(int flags) {
-    collection.setFlags(flags);
-  }
-
   public String getElementFlagByHex() {
     return collection.getElementFlagByHex();
   }
 
-  public int getBytes() {
-    return bytes;
+  public BKeyObject getBkeyObject() {
+    return bKey;
+  }
+
+  public void setFlags(int flags) {
+    collection.setFlags(flags);
   }
 
   public boolean isUpdateIfExist() {
     return updateIfExist;
   }
-
-  public BKeyObject getBkeyObject() {
-    return bkeyObject;
-  }
-
 }
