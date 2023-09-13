@@ -153,6 +153,11 @@ public abstract class ClientBaseCase extends TestCase {
         }
 
         @Override
+        public boolean getKeepAlive() {
+          return inner.getKeepAlive();
+        }
+
+        @Override
         public Collection<ConnectionObserver> getInitialObservers() {
           return observers;
         }

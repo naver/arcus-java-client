@@ -318,7 +318,10 @@ public class DefaultConnectionFactory extends SpyObject
   public boolean useNagleAlgorithm() {
     return false;
   }
-
+  @Override
+  public boolean getKeepAlive() {
+    return false;
+  }
   public boolean shouldOptimize() {
     return true;
   }
