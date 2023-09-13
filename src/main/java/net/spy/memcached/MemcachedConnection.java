@@ -630,6 +630,7 @@ public final class MemcachedConnection extends SpyObject {
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
     ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
+    ch.socket().setKeepAlive(connFactory.getKeepAlive());
     ch.socket().setReuseAddress(true);
     /* The codes above can be replaced by the codes below since java 1.7 */
     // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
@@ -1307,6 +1308,7 @@ public final class MemcachedConnection extends SpyObject {
         ch = SocketChannel.open();
         ch.configureBlocking(false);
         ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
+        ch.socket().setKeepAlive(connFactory.getKeepAlive());
         ch.socket().setReuseAddress(true);
         /* The codes above can be replaced by the codes below since java 1.7 */
         // ch.setOption(StandardSocketOptions.TCP_NODELAY, !f.useNagleAlgorithm());
