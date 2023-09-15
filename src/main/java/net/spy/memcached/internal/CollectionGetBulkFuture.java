@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
@@ -39,10 +40,9 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   private final CountDownLatch latch;
   private final T result;
 
-  public CollectionGetBulkFuture(CountDownLatch latch, Collection<Operation> ops, T result,
-                                 long timeout) {
+  public CollectionGetBulkFuture(CountDownLatch latch, T result, long timeout) {
+    this.ops = new ArrayList<Operation>((int) latch.getCount());
     this.latch = latch;
-    this.ops = ops;
     this.result = result;
     this.timeout = timeout;
   }
@@ -128,5 +128,9 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
     }
 
     return new CollectionOperationStatus(new OperationStatus(true, "END"));
+  }
+
+  public void addOperation(Operation operation) {
+    ops.add(operation);
   }
 }

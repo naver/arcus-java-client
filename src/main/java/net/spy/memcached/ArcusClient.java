@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -3653,9 +3652,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
     final Map<String, BTreeGetResult<Long, T>> result =
-        new ConcurrentHashMap<String, BTreeGetResult<Long, T>>();
+        new HashMap<String, BTreeGetResult<Long, T>>();
+    final CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>> rv
+            = new CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>>(latch, result, operationTimeout);
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
@@ -3703,12 +3703,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
       });
-      ops.add(op);
+      rv.addOperation(op);
       addOp(getBulk.getMemcachedNode(), op);
     }
-
-    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, T>>>(
-        latch, ops, result, operationTimeout);
+    return rv;
   }
 
   /**
@@ -3726,9 +3724,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
     final Map<String, BTreeGetResult<ByteArrayBKey, T>> result =
-        new ConcurrentHashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
+        new HashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
+    final CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>> rv =
+            new CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>(latch, result, operationTimeout);
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
@@ -3777,12 +3776,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
       });
-      ops.add(op);
+      rv.addOperation(op);
       addOp(getBulk.getMemcachedNode(), op);
     }
-
-    return new CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, T>>>(
-        latch, ops, result, operationTimeout);
+    return rv;
   }
 
   @Override
