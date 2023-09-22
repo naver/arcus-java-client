@@ -46,33 +46,33 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
       // 0, true).get(1000, TimeUnit.MILLISECONDS);
   }
 
-  public void testBopGet_Maxcount() throws Exception {
-    // Test
-    for (int maxcount = 100; maxcount <= 300; maxcount += 100) {
-      // Create a B+ Tree
-      mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
-
-      // Set maxcount
-      CollectionAttributes attrs = new CollectionAttributes();
-      attrs.setMaxCount(maxcount);
-      assertTrue(mc.asyncSetAttr(key, attrs).get(1000,
-              TimeUnit.MILLISECONDS));
-
-      for (int i = 1; i <= maxcount; i++) {
-        mc.asyncBopInsert(key, i, null, "item" + i,
-                new CollectionAttributes()).get();
-      }
-
-      Map<Long, Element<Object>> result = mc.asyncBopGet(key, 0,
-              maxcount + 1000, ElementFlagFilter.DO_NOT_FILTER, 0,
-              maxcount + 1000).get(10000,
-              TimeUnit.MILLISECONDS);
-      assertEquals(maxcount, result.size());
-      assertTrue(mc.asyncBopDelete(key, 0, 20000,
-              ElementFlagFilter.DO_NOT_FILTER, 0, false).get(1000,
-              TimeUnit.MILLISECONDS));
-    }
-  }
+//  public void testBopGet_Maxcount() throws Exception {
+//    // Test
+//    for (int maxcount = 100; maxcount <= 300; maxcount += 100) {
+//      // Create a B+ Tree
+//      mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes());
+//
+//      // Set maxcount
+//      CollectionAttributes attrs = new CollectionAttributes();
+//      attrs.setMaxCount(maxcount);
+//      assertTrue(mc.asyncSetAttr(key, attrs).get(1000,
+//              TimeUnit.MILLISECONDS));
+//
+//      for (int i = 1; i <= maxcount; i++) {
+//        mc.asyncBopInsert(key, i, null, "item" + i,
+//                new CollectionAttributes()).get();
+//      }
+//
+//      Map<Long, Element<Object>> result = mc.asyncBopGet(key, 0,
+//              maxcount + 1000, ElementFlagFilter.DO_NOT_FILTER, 0,
+//              maxcount + 1000).get(10000,
+//              TimeUnit.MILLISECONDS);
+//      assertEquals(maxcount, result.size());
+//      assertTrue(mc.asyncBopDelete(key, 0, 20000,
+//              ElementFlagFilter.DO_NOT_FILTER, 0, false).get(1000,
+//              TimeUnit.MILLISECONDS));
+//    }
+//  }
 
   public void testBopGet_Overflow() throws Exception {
     // Create a B+ Tree
