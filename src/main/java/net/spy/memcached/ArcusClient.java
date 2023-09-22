@@ -1308,11 +1308,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  @Override
-  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key, long bkey,
-                                                                  ElementFlagFilter eFlagFilter) {
-    return asyncBopGet(key, bkey, eFlagFilter, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key, long bkey,
+//                                                                  ElementFlagFilter eFlagFilter) {
+//    return asyncBopGet(key, bkey, eFlagFilter, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
@@ -1325,13 +1325,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, false, collectionTranscoder);
   }
 
-  @Override
-  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long from, long to,
-                                                                  ElementFlagFilter eFlagFilter,
-                                                                  int offset, int count) {
-    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+//                                                                  long from, long to,
+//                                                                  ElementFlagFilter eFlagFilter,
+//                                                                  int offset, int count) {
+//    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
@@ -1346,13 +1346,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, reverse, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long bkey,
-                                                                 ElementFlagFilter eFlagFilter,
-                                                                 Transcoder<T> tc) {
-    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+//                                                                 long bkey,
+//                                                                 ElementFlagFilter eFlagFilter,
+//                                                                 Transcoder<T> tc) {
+//    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
@@ -1366,14 +1366,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, false, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long from, long to,
-                                                                 ElementFlagFilter eFlagFilter,
-                                                                 int offset, int count,
-                                                                 Transcoder<T> tc) {
-    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+//                                                                 long from, long to,
+//                                                                 ElementFlagFilter eFlagFilter,
+//                                                                 int offset, int count,
+//                                                                 Transcoder<T> tc) {
+//    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
@@ -1389,10 +1389,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopGet(key, get, reverse, tc);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
-    return asyncMopGet(key, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
+//    return asyncMopGet(key, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
@@ -1403,10 +1403,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
-    return asyncMopGet(key, mkey, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
+//    return asyncMopGet(key, mkey, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
@@ -1423,10 +1423,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
-    return asyncMopGet(key, mkeyList, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
+//    return asyncMopGet(key, mkeyList, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
@@ -1443,10 +1443,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
-    return asyncMopGet(key, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
+//    return asyncMopGet(key, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
@@ -1457,10 +1457,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey, Transcoder<T> tc) {
-    return asyncMopGet(key, mkey, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey, Transcoder<T> tc) {
+//    return asyncMopGet(key, mkey, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
@@ -1477,10 +1477,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList, Transcoder<T> tc) {
-    return asyncMopGet(key, mkeyList, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList, Transcoder<T> tc) {
+//    return asyncMopGet(key, mkeyList, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
@@ -1497,10 +1497,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncMopGet(key, get, tc);
   }
 
-  @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
-    return asyncLopGet(key, index, false, false);
-  }
+//  @Override
+//  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
+//    return asyncLopGet(key, index, false, false);
+//  }
 
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
@@ -1509,10 +1509,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
-    return asyncLopGet(key, from, to, false, false);
-  }
+//  @Override
+//  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
+//    return asyncLopGet(key, from, to, false, false);
+//  }
 
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key,
@@ -1522,10 +1522,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
-    return asyncLopGet(key, index, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
+//    return asyncLopGet(key, index, false, false, tc);
+//  }
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
                                                    boolean withDelete, boolean dropIfEmpty,
@@ -1534,10 +1534,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to, Transcoder<T> tc) {
-    return asyncLopGet(key, from, to, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to, Transcoder<T> tc) {
+//    return asyncLopGet(key, from, to, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key,
@@ -1548,10 +1548,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncLopGet(key, get, tc);
   }
 
-  @Override
-  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
-    return asyncSopGet(key, count, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
+//    return asyncSopGet(key, count, false, false);
+//  }
 
   @Override
   public CollectionFuture<Set<Object>> asyncSopGet(String key, int count,
@@ -1560,10 +1560,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncSopGet(key, get, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
-    return asyncSopGet(key, count, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
+//    return asyncSopGet(key, count, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count,
@@ -1613,19 +1613,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionDelete(key, delete);
   }
 
-  @Override
-  public CollectionFuture<Boolean> asyncMopDelete(String key,
-                                                  List<String> mkeyList,
-                                                  boolean dropIfEmpty) {
-    if (mkeyList == null) {
-      throw new IllegalArgumentException("mkeyList is null");
-    }
-    for (int i = 0; i < mkeyList.size(); i++) {
-      validateMKey(mkeyList.get(i));
-    }
-    MapDelete delete = new MapDelete(mkeyList, false, dropIfEmpty);
-    return asyncCollectionDelete(key, delete);
-  }
+//  @Override
+//  public CollectionFuture<Boolean> asyncMopDelete(String key,
+//                                                  List<String> mkeyList,
+//                                                  boolean dropIfEmpty) {
+//    if (mkeyList == null) {
+//      throw new IllegalArgumentException("mkeyList is null");
+//    }
+//    for (int i = 0; i < mkeyList.size(); i++) {
+//      validateMKey(mkeyList.get(i));
+//    }
+//    MapDelete delete = new MapDelete(mkeyList, false, dropIfEmpty);
+//    return asyncCollectionDelete(key, delete);
+//  }
 
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
@@ -2814,11 +2814,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeInsert, tc);
   }
 
-  @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
-    return asyncBopGet(key, bkey, eFlagFilter, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+//          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
+//    return asyncBopGet(key, bkey, eFlagFilter, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
@@ -2829,11 +2829,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, false, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
-    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+//          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
+//    return asyncBopGet(key, bkey, eFlagFilter, false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
@@ -2844,12 +2844,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, false, tc);
   }
 
-  @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int offset, int count) {
-    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
-  }
+//  @Override
+//  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+//          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+//          int offset, int count) {
+//    return asyncBopGet(key, from, to, eFlagFilter, offset, count, false, false);
+//  }
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
@@ -2861,13 +2861,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return asyncBopExtendedGet(key, get, reverse, collectionTranscoder);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
-          int count, Transcoder<T> tc) {
-    return asyncBopGet(key, from, to, eFlagFilter, offset, count,
-            false, false, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+//          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
+//          int count, Transcoder<T> tc) {
+//    return asyncBopGet(key, from, to, eFlagFilter, offset, count,
+//            false, false, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(

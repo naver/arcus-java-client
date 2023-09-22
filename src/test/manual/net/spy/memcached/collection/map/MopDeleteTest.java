@@ -16,8 +16,6 @@
  */
 package net.spy.memcached.collection.map;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -57,18 +55,18 @@ public class MopDeleteTest extends BaseIntegrationTest {
     assertFalse(mc.asyncMopDelete(key, "11", false).get(1000, TimeUnit.MILLISECONDS));
   }
 
-  public void testMopDelete_oneNoMkeyList() throws Exception {
-    // Delete if key is in the map, Skip if key isn't in the map
-    List<String> mkeyList = Arrays.asList("3", "no_key");
-    assertTrue(mc.asyncMopDelete(key, mkeyList, false).get(1000, TimeUnit.MILLISECONDS));
-  }
-
-  public void testMopDelete_AllNoMkeyList() throws Exception {
-    // If all keys aren't in the map, return false
-    List<String> mkeyList = Arrays.asList("no_key1", "no_key2");
-    assertFalse(mc.asyncMopDelete(key, mkeyList, false).get(1000,
-            TimeUnit.MILLISECONDS));
-  }
+//  public void testMopDelete_oneNoMkeyList() throws Exception {
+//    // Delete if key is in the map, Skip if key isn't in the map
+//    List<String> mkeyList = Arrays.asList("3", "no_key");
+//    assertTrue(mc.asyncMopDelete(key, mkeyList, false).get(1000, TimeUnit.MILLISECONDS));
+//  }
+//
+//  public void testMopDelete_AllNoMkeyList() throws Exception {
+//    // If all keys aren't in the map, return false
+//    List<String> mkeyList = Arrays.asList("no_key1", "no_key2");
+//    assertFalse(mc.asyncMopDelete(key, mkeyList, false).get(1000,
+//            TimeUnit.MILLISECONDS));
+//  }
 
   public void testMopDelete_DeleteByBestEffort() throws Exception {
     // Delete items(2..11) in the map

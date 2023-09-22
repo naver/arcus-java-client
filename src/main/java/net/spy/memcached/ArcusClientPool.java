@@ -656,12 +656,12 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncLopCreate(key, type, attributes);
   }
 
-  @Override
-  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long bkey,
-                                                                  ElementFlagFilter eFlagFilter) {
-    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
-  }
+//  @Override
+//  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+//                                                                  long bkey,
+//                                                                  ElementFlagFilter eFlagFilter) {
+//    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
+//  }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
@@ -673,14 +673,14 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
-                                                                  long from, long to,
-                                                                  ElementFlagFilter eFlagFilter,
-                                                                  int offset, int count) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count);
-  }
+//  @Override
+//  public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
+//                                                                  long from, long to,
+//                                                                  ElementFlagFilter eFlagFilter,
+//                                                                  int offset, int count) {
+//    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+//            count);
+//  }
 
   @Override
   public CollectionFuture<Map<Long, Element<Object>>> asyncBopGet(String key,
@@ -693,13 +693,13 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             count, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long bkey,
-                                                                 ElementFlagFilter eFlagFilter,
-                                                                 Transcoder<T> tc) {
-    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+//                                                                 long bkey,
+//                                                                 ElementFlagFilter eFlagFilter,
+//                                                                 Transcoder<T> tc) {
+//    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
@@ -712,15 +712,15 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
-                                                                 long from, long to,
-                                                                 ElementFlagFilter eFlagFilter,
-                                                                 int offset, int count,
-                                                                 Transcoder<T> tc) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
+//                                                                 long from, long to,
+//                                                                 ElementFlagFilter eFlagFilter,
+//                                                                 int offset, int count,
+//                                                                 Transcoder<T> tc) {
+//    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+//            count, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(String key,
@@ -734,10 +734,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             count, withDelete, dropIfEmpty, tc);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
-    return this.getClient().asyncMopGet(key);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key) {
+//    return this.getClient().asyncMopGet(key);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key,
@@ -746,10 +746,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
-    return this.getClient().asyncMopGet(key, mkey);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey) {
+//    return this.getClient().asyncMopGet(key, mkey);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key, String mkey,
@@ -758,10 +758,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
-    return this.getClient().asyncMopGet(key, mkeyList);
-  }
+//  @Override
+//  public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList) {
+//    return this.getClient().asyncMopGet(key, mkeyList);
+//  }
 
   @Override
   public CollectionFuture<Map<String, Object>> asyncMopGet(String key, List<String> mkeyList,
@@ -770,10 +770,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
-    return this.getClient().asyncMopGet(key, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, Transcoder<T> tc) {
+//    return this.getClient().asyncMopGet(key, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key,
@@ -783,11 +783,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, withDelete, dropIfEmpty, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
-                                                          Transcoder<T> tc) {
-    return this.getClient().asyncMopGet(key, mkey, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
+//                                                          Transcoder<T> tc) {
+//    return this.getClient().asyncMopGet(key, mkey, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, String mkey,
@@ -797,11 +797,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, mkey, withDelete, dropIfEmpty, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
-                                                          Transcoder<T> tc) {
-    return this.getClient().asyncMopGet(key, mkeyList, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
+//                                                          Transcoder<T> tc) {
+//    return this.getClient().asyncMopGet(key, mkeyList, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<String, T>> asyncMopGet(String key, List<String> mkeyList,
@@ -811,11 +811,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopGet(key, mkeyList, withDelete, dropIfEmpty, tc);
   }
 
-  @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
-    return this.getClient()
-            .asyncLopGet(key, index);
-  }
+//  @Override
+//  public CollectionFuture<List<Object>> asyncLopGet(String key, int index) {
+//    return this.getClient()
+//            .asyncLopGet(key, index);
+//  }
 
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key, int index,
@@ -825,10 +825,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             .asyncLopGet(key, index, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
-    return this.getClient().asyncLopGet(key, from, to);
-  }
+//  @Override
+//  public CollectionFuture<List<Object>> asyncLopGet(String key, int from, int to) {
+//    return this.getClient().asyncLopGet(key, from, to);
+//  }
 
   @Override
   public CollectionFuture<List<Object>> asyncLopGet(String key,
@@ -839,10 +839,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty);
   }
 
-  @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
-    return this.getClient().asyncLopGet(key, index, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index, Transcoder<T> tc) {
+//    return this.getClient().asyncLopGet(key, index, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key, int index,
@@ -853,10 +853,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to, Transcoder<T> tc) {
-    return this.getClient().asyncLopGet(key, from, to, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<List<T>> asyncLopGet(String key, int from, int to,
+//  Transcoder<T> tc) {
+//    return this.getClient().asyncLopGet(key, from, to, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<List<T>> asyncLopGet(String key,
@@ -868,11 +869,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty, tc);
   }
 
-  @Override
-  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
-    return this.getClient()
-            .asyncSopGet(key, count);
-  }
+//  @Override
+//  public CollectionFuture<Set<Object>> asyncSopGet(String key, int count) {
+//    return this.getClient()
+//            .asyncSopGet(key, count);
+//  }
 
   @Override
   public CollectionFuture<Set<Object>> asyncSopGet(String key,
@@ -883,10 +884,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             .asyncSopGet(key, count, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
-    return this.getClient().asyncSopGet(key, count, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Set<T>> asyncSopGet(String key, int count, Transcoder<T> tc) {
+//    return this.getClient().asyncSopGet(key, count, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Set<T>> asyncSopGet(String key,
@@ -928,11 +929,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncMopDelete(key, mkey, dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<Boolean> asyncMopDelete(String key, List<String> mkeyList,
-                                                  boolean dropIfEmpty) {
-    return this.getClient().asyncMopDelete(key, mkeyList, dropIfEmpty);
-  }
+//  @Override
+//  public CollectionFuture<Boolean> asyncMopDelete(String key, List<String> mkeyList,
+//                                                  boolean dropIfEmpty) {
+//    return this.getClient().asyncMopDelete(key, mkeyList, dropIfEmpty);
+//  }
 
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
@@ -1290,11 +1291,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             attributesForCreate, tc);
   }
 
-  @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
-    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
-  }
+//  @Override
+//  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+//          String key, byte[] bkey, ElementFlagFilter eFlagFilter) {
+//    return this.getClient().asyncBopGet(key, bkey, eFlagFilter);
+//  }
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
@@ -1304,13 +1305,13 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty);
   }
 
-  @Override
-  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int offset, int count) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count);
-  }
+//  @Override
+//  public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
+//          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+//          int offset, int count) {
+//    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+//            count);
+//  }
 
   @Override
   public CollectionFuture<Map<ByteArrayBKey, Element<Object>>> asyncBopGet(
@@ -1320,11 +1321,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             count, withDelete, dropIfEmpty);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
-    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+//          String key, byte[] bkey, ElementFlagFilter eFlagFilter, Transcoder<T> tc) {
+//    return this.getClient().asyncBopGet(key, bkey, eFlagFilter, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
@@ -1334,13 +1335,13 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             dropIfEmpty, tc);
   }
 
-  @Override
-  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
-          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int offset, int count, Transcoder<T> tc) {
-    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
-            count, tc);
-  }
+//  @Override
+//  public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
+//          String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+//          int offset, int count, Transcoder<T> tc) {
+//    return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
+//            count, tc);
+//  }
 
   @Override
   public <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopGet(
