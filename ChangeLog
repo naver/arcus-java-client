@@ -1,3 +1,95 @@
+2022-09-25 [version 1.13.4]
+	* [FEATURE] shutdown client after all of operations are processed
+	* [FEATURE] Prepared the node locator for data migration
+	* [FEATURE] Add TCP connection keep-alive option.
+	* [ENHANCE] add pool and service code information on timeout message
+	* [ENHANCE] Reconnect to ZK when cache_list znode is deleted.
+	* [ENHANCE] Enhance MemcachedNode.toString().
+	* [ENHANCE] Added a JRE version in client_list znode.
+	* [ENHANCE] Optimize groupingKeys() logic
+	* [ENHANCE] change put method logic in LocalCacheManager in aysncGet.
+	* [ENHANCE] Remove repeating encode logic in CollectionBulkInsert.
+	* [ENHANCE] Seperate FrontCacheLogic in asyncGetBulk from MemcachedClient
+	            to FrontCacheMemcachedClient.
+	* [ENHANCE] Modify decoding logic in collection get api.
+	* [ENHANCE] Change decode logic in BTreeGetBulk api.
+	* [FIX] get operation can be bulk operation if having multi key.
+	* [FIX] removed key field in CollectionBulkInsertOperationImpl.
+	* [FIX] Add eflag field in SMGetElement class.
+	* [FIX] Fix BTreeSMGetImpl.decodeItemHeader()
+	* [FIX] Rollback MultiOperationCallback.
+	* [FIX] add pip dependency install
+	* [FIX] Add apt-get update command before apt-get install.
+	* [FIX] adjust checkstyle to mopDelete()
+	* [FIX] Fix buggy code.
+	* [FIX] remove duplicate maven dependency caching
+	* [FIX] Call Future.get() in test setup.
+	* [FIX] Checkstyle violation
+	* [FIX] Call Future.get() for fix CI bug.
+	* [FIX] Remove unused import.
+	* [FIX] Fix operation redirection.
+	* [FIX] Not to cancel operations in node that not in cache list but in
+	        alter list.
+	* [FIX] Fix readQ, writeQ size error.
+	* [FIX] Set handling node to print node information in "inactive node"
+	        cancel message.
+	* [FIX] Fix bug that is occurred when client is attached to Arcus cluster
+	        that is doing migration type=LEAVE.
+	* [FIX] Modified the count value of CountDownLatch in broadcastOperation.
+	* [FIX] Fixed a simple code mistake in processAlterListResult().
+	* [FIX] Checked that the new alter node must not be in allNodes.
+	* [FIX] Checked that new joining node must not be in allNodes.
+	* [FIX] Fixed the logic of locator.getOwnerNode().
+	* [FIX] Fix migration JOIN bug.
+	* [FIX] Fixed the code of moving the hash range of leaving nodes.
+	* [FIX] getVersion method concurrency error.
+	* [FIX] size of mergedOpStatus list in pipedCollectionOperation.
+	* [FIX] getOperationStatus method in asyncCollectionPipedInsert/Update.
+	* [FIX] Element sequence when using asyncLopInsert api.
+	* [FIX] Fix isCancelled,cancel method logic in BulkGetFuture.
+	* [FIX] change cancel method logic in OperationFuture.
+	* [FIX] Change cancel method logic in multi-operation Future.
+	* [FIX] Change keyGroup size comparing logic in groupingkeys method.
+	* [FIX] Change syncronization tool in getVersion().
+	* [FIX] sync problem in BaseOperationImpl cancel and transitionState
+	        method.
+	* [FIX] Incorrect boolean result in asycn flush() method.
+	* [FIX] Infinity waiting with get method in BulkGetFuture.
+	* [FIX] getElement logic in BTreeStoreAndGetFuture.
+	* [CLEANUP] Added a makeMemcachedNode() called from attachMemcachedNode().
+	* [CLEANUP] Added the insertNodeIntoGroup() and removeNodeFromGroup().
+	* [CLEANUP] Logged the address of the newly attached alter node.
+	* [TEST] Set logger to Log4jLogger when running test.
+	* [TEST] Set log level to DEBUG temporarily to dig CI failure issue.
+	* [TEST] change python install script in ci.yml.
+	* [TEST] fix testcase in PipedBulkInsertSetWithAttrTest.
+	* [TEST] Add Socket keepAlive option test.
+	* [DOC] Replace "\t" to " ".
+	* [DOC] Make example codes more readable.
+	* [DOC] fixed the name of async get bulk API in getSome().
+	* [DOC] Fixed how to receive the result value of asyncStoreBulk Future.
+	* [INTERNAL] Fix compile warnings.
+	* [INTERNAL] Prepare BTreeSMGet to clone operations.
+	* [INTERNAL] Clone operations to prepare migration.
+	* [INTERNAL] add asyncMopDelete method - delete by mkeyList
+	* [INTERNAL] add omitted parameter methods - list/set/map
+	* [INTERNAL] separate usage of subkey and bkey/mkey
+	* [INTERNAL] add omitted parameter method - asyncBopGet()
+	* [INTERNAL] Prepare SetPipedExist to redirect in migration.
+	* [INTERNAL] Prepare NodeLocator to redirect in migration.
+	* [INTERNAL] Redirect to prepare migration.
+	* [INTERNAL] Disabled auto join completion and auto leave abort.
+	* [INTERNAL] Enhance compile options.
+	* [INTERNAL] Remove DEBUG level log for #534
+	* [INTERNAL] Prepare to migration.
+	* [INTERNAL] Change CI command to detect Checkstyle violation.
+	* [INTERNAL] Wait a second before reinit CacheMonitor or MigrationMonitor.
+	* [INTERNAL] Reset the continuous timeout if any among piped ops succeeds
+	* [INTERNAL] Use last nodes change.
+	* [INTERNAL] Overriding idDone() in BulkOperationFuture
+	* [INTERNAL] Upgrade ZK Client dependency version from 3.4.14 to 3.5.9
+	* [INTERNAL] Add comment in collection get apis.
+
 2022-04-26 [version 1.13.3]
 	* [FEATURE] print select delay in case of too many empty selected keys.
 	* [FEATURE] shutdown client more gracefully.
