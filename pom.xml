@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.navercorp.arcus</groupId>
+    <groupId>com.jam2in.arcus</groupId>
     <artifactId>arcus-java-client</artifactId>
     <version>1.15.0</version>
     <name>Arcus Java Client</name>
@@ -207,7 +207,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <!-- <source>src/test/java</source> -->
+                                <source>src/test/java</source>
                                 <source>src/test/manual</source>
                             </sources>
                         </configuration>
@@ -220,14 +220,12 @@
                 <version>2.7</version>
                 <executions>
                     <execution>
-                        <id>generate-java-doc</id>
-                        <phase>package</phase>
-                        <!-- Javadocs for the central repo
+                        <!--id>generate-java-doc</id>
+                        <phase>package</phase-->
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        -->
                     </execution>
                 </executions>
                 <configuration>
@@ -290,7 +288,6 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.1</version>
             </plugin>
-            <!-- GPG signing used when deploying to the central repo
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -305,7 +302,17 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://ossrh-staging-api.central.sonatype.com</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -341,16 +348,14 @@
         </extensions>
     </build>
 
-    <!-- Deploy via sonatype
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
-    -->
 </project>
