@@ -21,7 +21,7 @@ jobs:
         cache: 'maven'
     - name: Setup Python
       id: setup_python
-      uses: MatteoH2O1999/setup-python@v1
+      uses: MatteoH2O1999/setup-python@v2
       with:
         python-version: '2.7'
     - name: Caching PIP
