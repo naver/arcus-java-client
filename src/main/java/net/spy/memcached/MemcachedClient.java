@@ -616,6 +616,7 @@ public class MemcachedClient extends SpyThread
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       future.cancel(true);
       throw new RuntimeException("Interrupted waiting for value", e);
     } catch (ExecutionException e) {
@@ -996,6 +997,7 @@ public class MemcachedClient extends SpyThread
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       future.cancel(true);
       throw new RuntimeException("Interrupted waiting for value", e);
     } catch (ExecutionException e) {
@@ -1038,6 +1040,7 @@ public class MemcachedClient extends SpyThread
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       future.cancel(true);
       throw new RuntimeException("Interrupted waiting for value", e);
     } catch (ExecutionException e) {
@@ -1387,6 +1390,7 @@ public class MemcachedClient extends SpyThread
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       future.cancel(true);
       throw new RuntimeException("Interrupted getting bulk values", e);
     } catch (ExecutionException e) {
@@ -1460,6 +1464,7 @@ public class MemcachedClient extends SpyThread
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       future.cancel(true);
       throw new RuntimeException("Interrupted getting bulk values", e);
     } catch (ExecutionException e) {
@@ -1555,6 +1560,7 @@ public class MemcachedClient extends SpyThread
     try {
       rv = future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException("Interrupted waiting for versions", e);
     } catch (ExecutionException e) {
       throw new RuntimeException(e);
@@ -1628,6 +1634,7 @@ public class MemcachedClient extends SpyThread
     try {
       rv = future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException("Interrupted waiting for stats", e);
     } catch (ExecutionException e) {
       throw new RuntimeException(e);
@@ -1658,6 +1665,7 @@ public class MemcachedClient extends SpyThread
         throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, op);
       }
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       op.cancel("by applcation.");
       throw new RuntimeException("Interrupted", e);
     }
@@ -1762,6 +1770,7 @@ public class MemcachedClient extends SpyThread
           assert rv != -1 : "Failed to mutate or init value";
         }
       } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         f.cancel(true);
         throw new RuntimeException("Interrupted waiting for store", e);
       } catch (ExecutionException e) {
@@ -2132,6 +2141,7 @@ public class MemcachedClient extends SpyThread
       // and the check retried.
       return latch.await(timeout, unit);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException("Interrupted waiting for queues", e);
     }
   }
