@@ -1,4 +1,4 @@
-2022-09-25 [version 1.13.4]
+2023-09-25 [version 1.13.4]
 	* [FEATURE] shutdown client after all of operations are processed
 	* [FEATURE] Prepared the node locator for data migration
 	* [FEATURE] Add TCP connection keep-alive option.
