@@ -20,7 +20,7 @@ import net.spy.memcached.CachedData;
 
 public class InspectObjectSizeTranscoder extends SerializingTranscoder {
 
-  public static interface LoggingObjectSize {
+  public interface LoggingObjectSize {
     void histogram(int size);
   }
 

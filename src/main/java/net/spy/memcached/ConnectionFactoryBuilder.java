@@ -684,7 +684,7 @@ public class ConnectionFactoryBuilder {
   /**
    * Type of protocol to use for connections.
    */
-  public static enum Protocol {
+  public enum Protocol {
     /**
      * Use the text (ascii) protocol.
      */
@@ -698,7 +698,7 @@ public class ConnectionFactoryBuilder {
   /**
    * Type of node locator to use.
    */
-  public static enum Locator {
+  public enum Locator {
     /**
      * Array modulus - the classic node location algorithm.
      */

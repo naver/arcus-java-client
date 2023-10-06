@@ -22,33 +22,33 @@ import net.spy.memcached.MemcachedNode;
 
 public interface BTreeSMGet<T> {
 
-  public int headerCount = 4;
+  int headerCount = 4;
 
-  public void setKeySeparator(String keySeparator);
+  void setKeySeparator(String keySeparator);
 
-  public String getSpaceSeparatedKeys();
+  String getSpaceSeparatedKeys();
 
-  public MemcachedNode getMemcachedNode();
+  MemcachedNode getMemcachedNode();
 
-  public List<String> getKeyList();
+  List<String> getKeyList();
 
-  public String stringify();
+  String stringify();
 
-  public String getCommand();
+  String getCommand();
 
-  public boolean headerReady(int spaceCount);
+  boolean headerReady(int spaceCount);
 
-  public String getKey();
+  String getKey();
 
-  public int getFlags();
+  int getFlags();
 
-  public Object getSubkey();
+  Object getSubkey();
 
-  public int getDataLength();
+  int getDataLength();
 
-  public byte[] getEflag();
+  byte[] getEflag();
 
-  public void decodeItemHeader(String itemHeader);
+  void decodeItemHeader(String itemHeader);
 
-  public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList);
+  BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList);
 }

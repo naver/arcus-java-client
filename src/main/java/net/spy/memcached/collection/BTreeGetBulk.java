@@ -22,29 +22,29 @@ import net.spy.memcached.MemcachedNode;
 
 public interface BTreeGetBulk<T> {
 
-  public void setKeySeparator(String keySeparator);
+  void setKeySeparator(String keySeparator);
 
-  public String getSpaceSeparatedKeys();
+  String getSpaceSeparatedKeys();
 
-  public MemcachedNode getMemcachedNode();
+  MemcachedNode getMemcachedNode();
 
-  public List<String> getKeyList();
+  List<String> getKeyList();
 
-  public String stringify();
+  String stringify();
 
-  public String getCommand();
+  String getCommand();
 
-  public boolean elementHeaderReady(int spaceCount);
+  boolean elementHeaderReady(int spaceCount);
 
-  public boolean keyHeaderReady(int spaceCount);
+  boolean keyHeaderReady(int spaceCount);
 
-  public Object getSubkey();
+  Object getSubkey();
 
-  public int getDataLength();
+  int getDataLength();
 
-  public byte[] getEFlag();
+  byte[] getEFlag();
 
-  public void decodeItemHeader(String itemHeader);
+  void decodeItemHeader(String itemHeader);
 
-  public BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList);
+  BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList);
 }
