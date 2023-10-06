@@ -301,7 +301,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
         assert nodeSet != null;
         nodeSet.remove(node);
-        if (nodeSet.size() == 0) {
+        if (nodeSet.isEmpty()) {
           ketamaNodes.remove(k);
         }
       }
@@ -338,7 +338,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedNode> alterSet = ketamaAlterNodes.get(k);
         if (alterSet != null && alterSet.remove(node)) {
-          if (alterSet.size() == 0) {
+          if (alterSet.isEmpty()) {
             ketamaAlterNodes.remove(k);
           }
           SortedSet<MemcachedNode> existSet = ketamaNodes.get(k);

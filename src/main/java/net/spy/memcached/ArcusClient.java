@@ -2305,7 +2305,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public CollectionOperationStatus getOperationStatus() {
-        if (failedOperationStatus.size() > 0) {
+        if (!failedOperationStatus.isEmpty()) {
           return new CollectionOperationStatus(failedOperationStatus.get(0));
         }
         return new CollectionOperationStatus(resultOperationStatus.get(0));
@@ -2564,7 +2564,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       @Override
       public CollectionOperationStatus getOperationStatus() {
-        if (failedOperationStatus.size() > 0) {
+        if (!failedOperationStatus.isEmpty()) {
           return new CollectionOperationStatus(failedOperationStatus.get(0));
         }
         return new CollectionOperationStatus(resultOperationStatus.get(0));

@@ -78,7 +78,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (timedoutOps.size() > 0) {
+      if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opsTimedOut(timedoutOps);
         throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
       }

@@ -67,7 +67,7 @@ public class MapGet extends CollectionGet {
       return str;
     }
 
-    if (mkeyList.size() == 0) {
+    if (mkeyList.isEmpty()) {
       additionalArgs = null;
     } else {
       additionalArgs = getSpaceSeparatedMkeys().getBytes();

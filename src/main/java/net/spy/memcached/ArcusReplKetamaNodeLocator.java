@@ -410,7 +410,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
         nodeSet.remove(group);
-        if (nodeSet.size() == 0) {
+        if (nodeSet.isEmpty()) {
           ketamaGroups.remove(k);
         }
       }
@@ -444,7 +444,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedReplicaGroup> alterSet = ketamaAlterGroups.get(k);
         if (alterSet != null && alterSet.remove(group)) {
-          if (alterSet.size() == 0) {
+          if (alterSet.isEmpty()) {
             ketamaAlterGroups.remove(k);
           }
           SortedSet<MemcachedReplicaGroup> existSet = ketamaGroups.get(k);
