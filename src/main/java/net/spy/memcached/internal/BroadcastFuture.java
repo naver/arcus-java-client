@@ -65,7 +65,7 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (timedoutOps.size() > 0) {
+      if (!timedoutOps.isEmpty()) {
         throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
       }
     } else {

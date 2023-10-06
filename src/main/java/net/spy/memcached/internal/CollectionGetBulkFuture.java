@@ -67,7 +67,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (timedoutOps.size() > 0) {
+      if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opsTimedOut(timedoutOps);
         throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
       }

@@ -66,7 +66,7 @@ public class MapDelete extends CollectionDelete {
       return str;
     }
 
-    if (mkeyList.size() == 0) {
+    if (mkeyList.isEmpty()) {
       additionalArgs = null;
     } else {
       additionalArgs = getSpaceSeparatedMkeys().getBytes();

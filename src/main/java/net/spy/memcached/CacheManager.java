@@ -439,7 +439,7 @@ public class CacheManager extends SpyThread implements Watcher,
    * @param children new children node list
    */
   public void commandCacheListChange(List<String> children) {
-    if (children.size() == 0) {
+    if (children.isEmpty()) {
       getLogger().error("Cannot find any cache nodes for your service code. " +
               "Please contact Arcus support to solve this problem. " +
               "[serviceCode=" + serviceCode + ", adminSessionId=0x" +
@@ -493,7 +493,7 @@ public class CacheManager extends SpyThread implements Watcher,
   @Override
   public boolean commandCloudStatChange(List<String> children) {
     // return true if STATE == PREPARED.
-    if (children.size() == 0) {
+    if (children.isEmpty()) {
       /*
        * case 1 : No child znode in clout_stat znode.
        * case 2 : Starting migration.

@@ -73,7 +73,7 @@ public class PipedCollectionFuture<K, V>
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (timedoutOps.size() > 0) {
+      if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
         throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
       }

@@ -67,7 +67,7 @@ public class ElementMultiFlagsFilter extends ElementFlagFilter {
                       + MAX_EFLAGS);
     }
 
-    if (this.compValue.size() > 0
+    if (!this.compValue.isEmpty()
             && this.compValue.get(0).length != compValue.length) {
       throw new IllegalArgumentException(
               "Length of comparison value must be same with "
