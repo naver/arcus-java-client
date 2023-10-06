@@ -17,7 +17,7 @@ public interface KetamaNodeLocatorConfiguration {
    *                   question (0 is the first repetition)
    * @return The key that represents the specific repetition of the node
    */
-  public String getKeyForNode(MemcachedNode node, int repetition);
+  String getKeyForNode(MemcachedNode node, int repetition);
 
   /**
    * Returns the number of discrete hashes that should be defined for each

@@ -154,7 +154,7 @@ public interface ConnectionFactory {
   /**
    * Get the hash algorithm to be used.
    */
-  public HashAlgorithm getHashAlg();
+  HashAlgorithm getHashAlg();
 
   /**
    * Maximum number of seconds to wait between reconnect attempts.

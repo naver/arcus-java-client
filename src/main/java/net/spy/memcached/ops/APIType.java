@@ -74,7 +74,7 @@ public enum APIType {
 
   private final OperationType apiOpType;
 
-  private APIType(OperationType t) {
+  APIType(OperationType t) {
     this.apiOpType = t;
   }
 

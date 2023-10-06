@@ -24,7 +24,7 @@ public interface BulkFuture<V> extends Future<V> {
   /**
    * @return true if timeout was reached, false otherwise
    */
-  public boolean isTimeout();
+  boolean isTimeout();
 
   /**
    * Wait for the operation to complete and return results.
@@ -39,10 +39,9 @@ public interface BulkFuture<V> extends Future<V> {
    * @throws InterruptedException if the current thread was interrupted while waiting
    * @throws ExecutionException   if the computation threw an exception
    */
-  public V getSome(long timeout, TimeUnit unit)
-          throws InterruptedException, ExecutionException;
+  V getSome(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException;
 
 
-  public int getOpCount();
+  int getOpCount();
 
 }
