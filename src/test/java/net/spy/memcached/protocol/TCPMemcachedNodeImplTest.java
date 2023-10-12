@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,10 +41,6 @@ public class TCPMemcachedNodeImplTest extends TestCase {
       throws Exception {
     Field queueField = TCPMemcachedNodeImpl.class.getDeclaredField(queueFieldName);
     queueField.setAccessible(true);
-
-    Field modifiersField = Field.class.getDeclaredField("modifiers");
-    modifiersField.setAccessible(true);
-    modifiersField.setInt(queueField, queueField.getModifiers() & ~Modifier.FINAL);
 
     return (Queue<Operation>) queueField.get(node);
   }
