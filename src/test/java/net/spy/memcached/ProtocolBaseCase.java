@@ -53,7 +53,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testGetStats() throws Exception {
     Map<SocketAddress, Map<String, String>> stats = client.getStats();
     System.out.println("Stats:  " + stats);
-    assertEquals(1, stats.size());
+    assertEquals(client.getAllNodes().size(), stats.size());
     Map<String, String> oneStat = stats.values().iterator().next();
     assertTrue(oneStat.containsKey("total_items"));
   }
@@ -64,7 +64,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     client.set("slabinitializer", 0, "hi");
     Map<SocketAddress, Map<String, String>> stats = client.getStats("slabs");
     System.out.println("Stats:  " + stats);
-    assertEquals(1, stats.size());
+    assertEquals(client.getAllNodes().size(), stats.size());
     Map<String, String> oneStat = stats.values().iterator().next();
     assertTrue(oneStat.containsKey("0:chunk_size"));
   }
@@ -79,7 +79,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     client.set("sizeinitializer", 0, "hi");
     Map<SocketAddress, Map<String, String>> stats = client.getStats("sizes");
     System.out.println("Stats:  " + stats);
-    assertEquals(1, stats.size());
+    assertEquals(client.getAllNodes().size(), stats.size());
     Map<String, String> oneStat = stats.values().iterator().next();
     assertEquals("1", oneStat.get("96"));
   }
@@ -91,7 +91,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     Map<SocketAddress, Map<String, String>> stats =
             client.getStats("cachedump 0 10000");
     System.out.println("Stats:  " + stats);
-    assertEquals(1, stats.size());
+    assertEquals(client.getAllNodes().size(), stats.size());
     Map<String, String> oneStat = stats.values().iterator().next();
     String val = oneStat.get("dumpinitializer");
     assertTrue(val + "doesn't match", val.matches("\\[acctime=\\d+, exptime=\\d+\\]"));
