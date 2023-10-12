@@ -17,27 +17,75 @@
 package net.spy.memcached.internal;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.SMGetTrimKey;
+import net.spy.memcached.internal.result.SMGetResult;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
-public abstract class SMGetFuture<T> implements Future<T> {
+public final class SMGetFuture<T extends List<?>> implements Future<T> {
 
   private final Collection<Operation> ops;
+  private final SMGetResult<?> result;
+  private final CountDownLatch latch;
   private final long timeout;
 
-  public SMGetFuture(Collection<Operation> ops, long timeout) {
+  public SMGetFuture(Collection<Operation> ops,
+                     SMGetResult<?> result,
+                     CountDownLatch latch,
+                     long timeout) {
+
+    this.latch = latch;
     this.ops = ops;
     this.timeout = timeout;
+    this.result = result;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public T get(long duration, TimeUnit units)
+          throws InterruptedException, TimeoutException, ExecutionException {
+
+    if (!latch.await(duration, units)) {
+      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      for (Operation op : ops) {
+        if (op.getState() != OperationState.COMPLETE) {
+          timedoutOps.add(op);
+        } else {
+          MemcachedConnection.opSucceeded(op);
+        }
+      }
+      if (!timedoutOps.isEmpty()) {
+        MemcachedConnection.opsTimedOut(timedoutOps);
+        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+      }
+    } else {
+      // continuous timeout counter will be reset
+      MemcachedConnection.opsSucceeded(ops);
+    }
+
+    for (Operation op : ops) {
+      if (op != null && op.hasErrored()) {
+        throw new ExecutionException(op.getException());
+      }
+
+      if (op != null && op.isCancelled()) {
+        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+      }
+    }
+
+    return (T) result.getFinalResult();
   }
 
   @Override
@@ -78,11 +126,19 @@ public abstract class SMGetFuture<T> implements Future<T> {
     return true;
   }
 
-  public abstract Map<String, CollectionOperationStatus> getMissedKeys();
+  public List<String> getMissedKeyList() {
+    return result.getMissedKeyList();
+  }
 
-  public abstract List<String> getMissedKeyList();
+  public Map<String, CollectionOperationStatus> getMissedKeys() {
+    return result.getMissedKeyMap();
+  }
 
-  public abstract List<SMGetTrimKey> getTrimmedKeys();
+  public List<SMGetTrimKey> getTrimmedKeys() {
+    return result.getMergedTrimmedKeys();
+  }
 
-  public abstract CollectionOperationStatus getOperationStatus();
+  public CollectionOperationStatus getOperationStatus() {
+    return result.getOperationStatus();
+  }
 }
