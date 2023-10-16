@@ -2098,6 +2098,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param tc        transcoder to serialize and unserialize element value
    * @return future holding the smget result (elements, return codes, and so on)
    */
+  @Deprecated
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
           final List<BTreeSMGet<T>> smGetList, final int offset,
           final int count, final boolean reverse, final Transcoder<T> tc) {
@@ -2323,9 +2324,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             = Collections.synchronizedList(new ArrayList<String>());
     final Map<String, CollectionOperationStatus> missedKeys
             = Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
-    final int totalResultElementCount = count;
 
-    final List<SMGetElement<T>> mergedResult = new ArrayList<SMGetElement<T>>(totalResultElementCount);
+    final List<SMGetElement<T>> mergedResult = new ArrayList<SMGetElement<T>>(count);
     final List<SMGetTrimKey> mergedTrimmedKeys
             = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 
@@ -2334,7 +2334,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final List<OperationStatus> failedOperationStatus
             = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
 
-    final AtomicBoolean stopCollect = new AtomicBoolean(false);
     // if processedSMGetCount is 0, then all smget is done.
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
 
@@ -2349,12 +2348,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           if (!status.isSuccess()) {
             getLogger().warn("SMGetFailed. status=%s", status);
-            if (!stopCollect.get()) {
-              stopCollect.set(true);
-              failedOperationStatus.add(status);
+            if (failedOperationStatus.isEmpty()) {
+              mergedResult.clear();
+              mergedTrimmedKeys.clear();
             }
-            mergedResult.clear();
-            mergedTrimmedKeys.clear();
+            failedOperationStatus.add(status);
             return;
           }
 
@@ -2374,8 +2372,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   break;
                 }
                 if (comp == 0) { // compare key string
-                  comp = result.compareKeyTo(mergedResult.get(pos));
-                  if ((reverse) ? (0 < comp) : (0 > comp)) {
+                  int keyComp = result.compareKeyTo(mergedResult.get(pos));
+                  if ((reverse) ? (0 < keyComp) : (0 > keyComp)) {
                     if (smgetMode == SMGetMode.UNIQUE) {
                       mergedResult.remove(pos); // remove dup bkey
                     }
@@ -2391,7 +2389,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               if (duplicated) { // UNIQUE
                 continue;
               }
-              if (pos >= totalResultElementCount) {
+              if (pos >= count) {
                 // At this point, following conditions are met.
                 //   - mergedResult.size() == totalResultElementCount &&
                 //   - The current <bkey, key> of eachResult is
@@ -2401,17 +2399,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 // So, stop the current sort-merge.
                 break;
               }
-
               mergedResult.add(pos, result);
-              if (mergedResult.size() > totalResultElementCount) {
-                mergedResult.remove(totalResultElementCount);
+              if (mergedResult.size() > count) {
+                // Remove elements that exceed the requested count.
+                mergedResult.remove(count);
               }
               pos += 1;
             }
           }
 
-          if (eachTrimmedResult.size() > 0) {
-            if (mergedTrimmedKeys.size() == 0) {
+          if (!eachTrimmedResult.isEmpty()) {
+            if (mergedTrimmedKeys.isEmpty()) {
               mergedTrimmedKeys.addAll(eachTrimmedResult);
             } else {
               // do sort merge trimmed list
@@ -2430,7 +2428,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           if (processedSMGetCount.get() == 0) {
-            if (mergedTrimmedKeys.size() > 0 && count <= mergedResult.size()) {
+            if (!mergedTrimmedKeys.isEmpty() && count <= mergedResult.size()) {
               // remove trimed keys whose bkeys are behind of the last element.
               SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
               SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
@@ -2471,16 +2469,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
-          if (stopCollect.get()) {
-            return;
-          }
-
-          if (subkey instanceof Long) {
-            eachResult.add(new SMGetElement<T>(key, (Long) subkey, eflag,
-                tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
-          } else if (subkey instanceof byte[]) {
-            eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, eflag,
-                tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+          if (failedOperationStatus.isEmpty()) {
+            if (subkey instanceof Long) {
+              eachResult.add(new SMGetElement<T>(key, (Long) subkey, eflag,
+                      tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            } else {
+              eachResult.add(new SMGetElement<T>(key, (byte[]) subkey, eflag,
+                      tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
+            }
           }
         }
 
@@ -2492,14 +2488,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotTrimmedKey(String key, Object subkey) {
-          if (stopCollect.get()) {
-            return;
-          }
-
-          if (subkey instanceof Long) {
-            eachTrimmedResult.add(new SMGetTrimKey(key, (Long) subkey));
-          } else if (subkey instanceof byte[]) {
-            eachTrimmedResult.add(new SMGetTrimKey(key, (byte[]) subkey));
+          if (failedOperationStatus.isEmpty()) {
+            if (subkey instanceof Long) {
+              eachTrimmedResult.add(new SMGetTrimKey(key, (Long) subkey));
+            } else {
+              eachTrimmedResult.add(new SMGetTrimKey(key, (byte[]) subkey));
+            }
           }
         }
       });
