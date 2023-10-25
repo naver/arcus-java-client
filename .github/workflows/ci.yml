@@ -12,88 +12,31 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: 'maven'
-    - name: Setup Python
-      id: setup_python
-      uses: MatteoH2O1999/setup-python@v2
-      with:
-        python-version: '2.7'
-    - name: Caching PIP
-      id: python_cache
-      uses: actions/cache@v3
-      with:
-        path: venv
-        key: pip-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-    - name: Setup Not Exist PIP
-      if: steps.python_cache.outputs.cache-hit != 'true'
-      run: |
-        # Check if venv exists (restored from secondary keys if any, and delete)
-        # You might not need this line if you only have one primary key for the venv caching
-        # I kept it in my code as a fail-safe
-        if [ -d "venv" ]; then rm -rf venv; fi
-        pip install virtualenv
-        
-        # Re-create the venv
-        virtualenv -p /usr/bin/python2.7 venv
-        
-        source venv/bin/activate
-    - name: Update apt-get
-      run: sudo apt-get update
-    - name: Install ARCUS Dependencies
-      run: sudo apt-get install -qq build-essential autoconf automake libtool libcppunit-dev python-setuptools python-dev ant
-    - name: Cache ARCUS Directory
-      id: arcus-cache
-      uses: actions/cache@v3.0.0
-      with:
-        path: ~/arcus
-        key: ${{runner.os}}-arcus
-    - name: Install ARCUS
-      if: steps.arcus-cache.outputs.cache-hit != 'true'
-      run: |
-        set -e
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Update apt-get
+        run: sudo apt-get update
+      - name: Install Docker
+        run: |
+          sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+          
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          
+          sudo apt install docker-ce docker-ce-cli containerd.io
+      - name: Install ARCUS
+        run: |
+          # clone
+          git clone https://github.com/naver/arcus.git $HOME/arcus
+          
+          # build server
+          cd ~/arcus && docker compose up -d 
 
-        # clone
-        git clone --recursive https://github.com/naver/arcus.git $HOME/arcus
-
-        # build dependencies
-        cd ~/arcus/scripts && ./build.sh
-
-        # build server
-        cd ${HOME}/arcus/server
-        git checkout develop
-        git pull
-        ./configure --prefix=${HOME}/arcus --enable-zk-integration --with-libevent=${HOME}/arcus --with-zookeeper=${HOME}/arcus
-        make
-        make install
-    - name: Run ARCUS Server
-      env:
-        ARCUS_CONF: |
-          {
-            "serviceCode": "test",
-            "servers": [{
-              "hostname": "localhost",
-              "ip": "127.0.0.1",
-              "config": {
-                "port": "11212"
-              }
-            }],
-            "config": {
-              "threads": "6",
-              "memlimit": "1000",
-              "connections": "1000"
-            }
-          }
-      run: |
-        set -e
-        rm -rf ~/arcus/zookeeper/data
-        cd ~/arcus/scripts && echo -e ${ARCUS_CONF} > conf/test.conf && ./arcus.sh quicksetup conf/test.conf
-    - name: Build ARCUS Client
-      run: mvn install -DskipTests
-    - name: Test ARCUS Client
-      run: mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212 && mvn test -DUSE_ZK=true
+      - name: Build ARCUS Client
+        run: mvn install -DskipTests
+      - name: Test ARCUS Client
+        run: mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212 && mvn test -DUSE_ZK=true
