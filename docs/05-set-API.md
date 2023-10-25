@@ -453,12 +453,11 @@ CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(String key, List<O
 수행 결과는 future 객체를 통해 얻는다.
 
 future.get() | future.getOperationStatus().getResponse() | 설명 
------------- | ----------------------------------------- | -------
-not null     | CollectionResponse.EXIST                  | Element가 존재함
-not null     | CollectionResponse.NOT_EXIST              | Element가 존재하지 않음
-null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
-null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
+------------ |-------------------------------------------| -------
+filled map   | CollectionResponse.END                    | 주어진 값들에 대한 존재유무 확인 완료
+empty map    | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+empty map    | CollectionResponse.TYPE_MISMATCH          | 해당 key가 set이 아님
+empty map    | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
 
 결과로 반환된 result(Map\<Object, Boolean\>) 객체에서 다음과 같은 정보를 확인할 수 있다
 
