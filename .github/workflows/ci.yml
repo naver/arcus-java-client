@@ -21,13 +21,6 @@ jobs:
           cache: 'maven'
       - name: Update apt-get
         run: sudo apt-get update
-      - name: Install Docker
-        run: |
-          sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-          
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          
-          sudo apt install docker-ce docker-ce-cli containerd.io
       - name: Install ARCUS
         run: |
           # clone
