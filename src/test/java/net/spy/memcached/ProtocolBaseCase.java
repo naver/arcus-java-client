@@ -713,8 +713,35 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   public void testGracefulShutdownTooSlow() throws Exception {
-    for (int i = 0; i < 10000; i++) {
-      client.set("t" + i, 10, i);
+    final int size = 1000 * 1000;
+    final byte[] data = new byte[size];
+    new Random().nextBytes(data);
+
+    // Used a transcoder without compression to quickly send operations to the server.
+    final Transcoder<byte[]> tc = new Transcoder<byte[]>() {
+      @Override
+      public boolean asyncDecode(CachedData d) {
+        return false;
+      }
+
+      @Override
+      public CachedData encode(byte[] o) {
+        return new CachedData(0, data, size);
+      }
+
+      @Override
+      public byte[] decode(CachedData d) {
+        return d.getData();
+      }
+
+      @Override
+      public int getMaxSize() {
+        return CachedData.MAX_SIZE;
+      }
+    };
+
+    for (int i = 0; i < 100; i++) {
+      client.set("t" + i, 10, data, tc);
     }
     assertFalse("Weird, shut down too fast",
             client.shutdown(700, TimeUnit.MICROSECONDS));
