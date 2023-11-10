@@ -34,6 +34,10 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
     super(CachedData.MAX_SIZE);
   }
 
+  public WhalinV1Transcoder(Compressor compressor) {
+    super(CachedData.MAX_SIZE, compressor);
+  }
+
   public CachedData encode(Object o) {
     byte[] b = null;
     int flags = 0;
@@ -66,27 +70,14 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (b.length > compressionThreshold) {
-      byte[] compressed = compress(b);
-      if (compressed.length < b.length) {
-        getLogger().info("Compressed %s from %d to %d",
-                o.getClass().getName(), b.length, compressed.length);
-        b = compressed;
-        flags |= COMPRESSED;
-      } else {
-        getLogger().info(
-                "Compression increased the size of %s from %d to %d",
-                o.getClass().getName(), b.length, compressed.length);
-      }
-    }
-    return new CachedData(flags, b, getMaxSize());
+    return doCompress(b, flags, o.getClass());
   }
 
   public Object decode(CachedData d) {
     byte[] data = d.getData();
     Object rv = null;
     if ((d.getFlags() & COMPRESSED) != 0) {
-      data = decompress(d.getData());
+      data = doDecompress(d);
     }
     if ((d.getFlags() & SERIALIZED) != 0) {
       rv = deserialize(data);

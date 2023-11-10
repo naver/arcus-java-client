@@ -30,6 +30,11 @@ public class InspectObjectSizeTranscoder extends SerializingTranscoder {
     this.objSizeLogger = objSizeLogger;
   }
 
+  public InspectObjectSizeTranscoder(LoggingObjectSize objSizeLogger, Compressor compressor) {
+    super(compressor);
+    this.objSizeLogger = objSizeLogger;
+  }
+
   @Override
   public CachedData encode(Object o) {
     CachedData encoded = super.encode(o);
