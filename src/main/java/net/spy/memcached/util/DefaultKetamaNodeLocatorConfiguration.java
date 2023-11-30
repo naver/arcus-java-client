@@ -3,6 +3,7 @@ package net.spy.memcached.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedNode;
 
 /**
@@ -36,7 +37,7 @@ public class DefaultKetamaNodeLocatorConfiguration implements
     // all other cases should be as fast as possible.
     String result = socketAddresses.get(node);
     if (result == null) {
-      result = String.valueOf(node.getSocketAddress());
+      result = AddrUtil.getSocketAddressString(node.getSocketAddress());
       result = result.substring(result.indexOf('/') + 1);
       socketAddresses.put(node, result);
     }

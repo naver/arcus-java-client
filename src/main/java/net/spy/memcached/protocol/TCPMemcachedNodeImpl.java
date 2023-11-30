@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
@@ -407,7 +408,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final String getNodeName() {
-    return name + " " + socketAddress;
+    return name + " " + AddrUtil.getSocketAddressString(socketAddress);
   }
 
   public final ByteBuffer getRbuf() {
