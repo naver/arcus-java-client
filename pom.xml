@@ -235,7 +235,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19</version>
                 <configuration>
-                    <!--skipAfterFailureCount>1</skipAfterFailureCount-->
+                    <skipAfterFailureCount>1</skipAfterFailureCount>
                     <excludes>
                         <!-- skip some tests for servers without IPv6 support.  -->
                         <exclude>**/BinaryIPV6ClientTest.java</exclude>
