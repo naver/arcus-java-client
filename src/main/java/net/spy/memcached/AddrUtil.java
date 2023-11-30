@@ -1,6 +1,7 @@
 package net.spy.memcached;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,5 +56,17 @@ public final class AddrUtil {
 
   public static InetSocketAddress getAddress(String s) {
     return getAddresses(s).get(0);
+  }
+
+  public static String getSocketAddressString(SocketAddress addr) {
+    if (addr instanceof InetSocketAddress) {
+      InetSocketAddress temp = (InetSocketAddress) addr;
+
+      if (temp.isUnresolved()) {
+        return temp.getHostName() + ":" + temp.getPort();
+      }
+    }
+
+    return addr.toString();
   }
 }
