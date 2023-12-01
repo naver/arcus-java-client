@@ -31,5 +31,7 @@ jobs:
 
       - name: Build ARCUS Client
         run: mvn install -DskipTests
-      - name: Test ARCUS Client
-        run: mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212 && mvn test -DUSE_ZK=true
+      - name: Test ARCUS Client -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212
+        run: mvn test -DUSE_ZK=false -DARCUS_HOST=127.0.0.1:11212
+      - name: Test ARCUS Client -DUSE_ZK=true
+        run: mvn test -DUSE_ZK=true
