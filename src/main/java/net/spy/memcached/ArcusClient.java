@@ -363,8 +363,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public void shutdown() {
-    super.shutdown(SHUTDOWN_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+  public boolean shutdown(long timeout, TimeUnit unit) {
+    final boolean result = super.shutdown(timeout, unit);
     // Connect to Arcus server directly, cache manager may be null.
     if (cacheManager != null) {
       cacheManager.shutdown();
@@ -373,6 +373,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     // if (bulkService != null) {
     //  bulkService.shutdown();
     // }
+    return result;
+  }
+
+  @Override
+  public void shutdown() {
+    this.shutdown(SHUTDOWN_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
   }
 
   private void validateMKey(String mkey) {
