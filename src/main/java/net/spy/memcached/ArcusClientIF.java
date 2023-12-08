@@ -1403,7 +1403,8 @@ public interface ArcusClientIF {
    * @param to          bkey index to
    * @param eFlagFilter element flag filter
    * @param offset      0-base offset
-   * @param count       number of returning values (0 to all)
+   * @param count       number of returning values. must be larger than 0.
+   *                    {@code offset + count} must not be more than 1000.
    * @return a future that will hold the return value list of the fetch.
    */
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
@@ -1418,7 +1419,7 @@ public interface ArcusClientIF {
    * @param from        bkey index from
    * @param to          bkey index to
    * @param eFlagFilter element flag filter
-   * @param count       number of returning values (0 to all)
+   * @param count       number of returning values. must be larger than 0 and not more than 1000.
    * @param smgetMode   smgetMode
    * @return a future that will hold the return value list of the fetch.
    */
@@ -1913,7 +1914,8 @@ public interface ArcusClientIF {
    * @param to          bkey index to
    * @param eFlagFilter element flag filter
    * @param offset      0-base offset
-   * @param count       number of returning values (0 to all)
+   * @param count       number of returning values. must be larger than 0.
+   *                    {@code offset + count} must not be more than 1000.
    * @return a future that will hold the return value list of the fetch.
    */
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
@@ -1928,7 +1930,7 @@ public interface ArcusClientIF {
    * @param from        bkey index from
    * @param to          bkey index to
    * @param eFlagFilter element flag filter
-   * @param count       number of returning values (0 to all)
+   * @param count       number of returning values. must be larger than 0 and not more than 1000.
    * @param smgetMode   smgetMode
    * @return a future that will hold the return value list of the fetch.
    */
@@ -1971,14 +1973,16 @@ public interface ArcusClientIF {
           byte[] eFlag, T value, CollectionAttributes attributesForCreate, Transcoder<T> tc);
 
   /**
-   * Get elements from each b+tree.
+   * Get elements from multiple b+trees.
    *
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
    * @param eFlagFilter element flag filter
-   * @param offset      0-based offset (max = 50)
-   * @param count       number of returning values (0 to all) (max = 200)
+   * @param offset      0-based offset. must be 0 or positive.
+   * @param count       number of elements to retrieve from each b+tree.
+   *                    must be larger than 0 and not more than 50.
+   *                    total number of returning elements could be 0 to (count * keyList.size()).
    * @return future indicating result of each b+tree
    */
   CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
@@ -1987,15 +1991,17 @@ public interface ArcusClientIF {
           ElementFlagFilter eFlagFilter, int offset, int count);
 
   /**
-   * Get elements from each b+tree.
+   * Get elements from multiple b+trees.
    *
    * @param <T>         the expected class of the value
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
    * @param eFlagFilter element flag filter
-   * @param offset      0-based offset (max = 50)
-   * @param count       number of returning values (0 to all) (max = 200)
+   * @param offset      0-based offset. must be 0 or positive.
+   * @param count       number of elements to retrieve from each b+tree.
+   *                    must be larger than 0 and not more than 50.
+   *                    total number of returning elements could be 0 to (count * keyList.size()).
    * @param tc          transcoder to decode value
    * @return future indicating result of each b+tree
    */
@@ -2005,14 +2011,16 @@ public interface ArcusClientIF {
           Transcoder<T> tc);
 
   /**
-   * Get elements from each b+tree.
+   * Get elements from multiple b+trees.
    *
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
    * @param eFlagFilter element flag filter
-   * @param offset      0-based offset (max = 50)
-   * @param count       number of returning values (0 to all) (max = 200)
+   * @param offset      0-based offset. must be 0 or positive.
+   * @param count       number of elements to retrieve from each b+tree.
+   *                    must be larger than 0 and not more than 50.
+   *                    total number of returning elements could be 0 to (count * keyList.size()).
    * @return future indicating result of each b+tree
    */
   CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> asyncBopGetBulk(
@@ -2020,15 +2028,17 @@ public interface ArcusClientIF {
           ElementFlagFilter eFlagFilter, int offset, int count);
 
   /**
-   * Get elements from each b+tree.
+   * Get elements from multiple b+trees.
    *
    * @param <T>         the expected class of the value
    * @param keyList     key list of b+tree
    * @param from        bkey from
    * @param to          bkey to
    * @param eFlagFilter element flag filter
-   * @param offset      0-based offset (max = 50)
-   * @param count       number of returning values (0 to all) (max = 200)
+   * @param offset      0-based offset. must be 0 or positive.
+   * @param count       number of elements to retrieve from each b+tree.
+   *                    must be larger than 0 and not more than 50.
+   *                    total number of returning elements could be 0 to (count * keyList.size()).
    * @param tc          transcoder to decode value
    * @return future indicating result of each b+tree
    */
