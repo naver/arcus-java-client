@@ -1070,11 +1070,11 @@ asyncBopPipedUpdateBulk(String key, List<Element<Object>> elements)
 
 ## B+Tree Element 일괄 조회
 
-다수의 b+tree들 각각에 대해 from부터 to까지의 bkey를 가진 elements를 탐색하면서,
-eFlagFilter 조건을 만족하는 elements 중 offset 위치부터 count 개수만큼 조회한다.
+다수의 b+tree들 각각에 대해 from ~ to 범위에 속한 bkey를 가지면서 eFlagFilter 조건을 만족하는 elements 중 offset 위치에서 count 개를 조회한다.
+각 b+tree에서 조회한 element는 최대 count개이며, 주어진 b+tree들에서 조회한 element 개수의 총합은 최대 (count * keyList.size())개이다.
 
 ```java
-CollectionGetBulkFuturee<Map<String, BTreeGetResult<Long, Object>>>
+CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>>
 asyncBopGetBulk(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int offset, int count)
 CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>>
 asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset, int count)
@@ -1085,6 +1085,7 @@ asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter 
 - eFlagFilter: eflag에 대한 filter 조건
   - eflag filter 조건을 지정하지 않으려면, ElementFlagFilter.DO_NOT_FILTER를 입력한다.
 - offset, count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 offset과 count 지정
+  - **count 값은 1 이상 50 이하여야 한다.**
 
 
 수행 결과는 future 객체를 통해 Map\<Stirng, BTreeGetResult\<Bkey, Object\>\>을 얻으며,
@@ -1212,9 +1213,8 @@ missed keys에 대한 DB 조회가 offset으로 skip된 element를 가지는 경
 이전의 조회 결과에 이어서 추가로 조회하고자 하는 경우,
 이전에 조회된 bkey 값을 바탕으로 bkey range를 재조정하여 사용할 수 있다.
 
-여러 b+tree들에 대해 sort-merge get을 수행하는 함수는 아래와 같다.
-여러 b+tree들로 부터 from부터 to까지의 bkey를 가지고 있으면서 eflag filter조건을 만족하는 element를 찾아
-sort merge하면서, count개의 element를 조회한다. 
+sort-merge get을 수행하는 함수는 아래와 같다.
+여러 b+tree들에서 from ~ to 범위에 속한 bkey를 가지면서 eFlagFilter 조건을 만족하는 elements들을 sort merge하며 count개를 조회한다.
 
 ```java
 SMGetFuture<List<SMGetElement<Object>>>
@@ -1228,8 +1228,8 @@ asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFi
 - eFlagFilter: eflag에 대한 filter 조건
   - eflag filter 조건을 지정하지 않으려면, ElementFlagFilter.DO_NOT_FILTER를 입력한다.
 - count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 count 지정
-  - **제약 조건으로 1000이하이어야 한다.**
-  - 이는 sort-merge get 연산이 부담이 너무 크지 않은 연산으로 제한하기 위한 것이다.
+  - **count 값은 1 이상 1000이하이어야 한다.**
+  - 이는 sort-merge get 연산을 부담이 너무 크지 않은 연산으로 제한하기 위해서이다.
 - smgetMode: smget에 대해서 mode를 지정하는 flag
   - unique 조회 또는 duplicate 조회를 지정한다.
 
