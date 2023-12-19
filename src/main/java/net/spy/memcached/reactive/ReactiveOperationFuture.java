@@ -16,7 +16,6 @@
  */
 package net.spy.memcached.reactive;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,25 +40,18 @@ import net.spy.memcached.ops.StatusCode;
 public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
 
   protected final CountDownLatch latch;
-  protected final AtomicReference<CompletableFuture<T>> objRef;
+  protected final AtomicReference<T> objRef;
   protected OperationStatus status;
   protected final long timeout;
   protected Operation op;
 
-  private final long createdAt = System.currentTimeMillis();
-  private long transcodeCompletedAt = 0;
+  private Long operationSetAt = null;
+  private Long completedAt = null;
 
   public ReactiveOperationFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<>(null), opTimeout);
-  }
-
-  public ReactiveOperationFuture(CountDownLatch l,
-                                 AtomicReference<CompletableFuture<T>> oref,
-                                 long opTimeout) {
-    super();
-    latch = l;
-    objRef = oref;
-    timeout = opTimeout;
+    this.latch = l;
+    this.timeout = opTimeout;
+    this.objRef = new AtomicReference<>(null);
   }
 
   public boolean cancel(boolean ign) {
@@ -80,6 +72,7 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
 
   public T get(long duration, TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
+
     Exception exception = createException(
             !latch.await(duration, units), TimeUnit.MILLISECONDS.convert(duration, units));
 
@@ -90,7 +83,7 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
       throw (ExecutionException) exception;
     }
 
-    return objRef.get().get();
+    return objRef.get();
   }
 
   public OperationStatus getStatus() {
@@ -106,17 +99,33 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
     return status;
   }
 
-  public void set(CompletableFuture<T> value, OperationStatus s) {
-    objRef.set(value);
+  public void setStatus(OperationStatus s) {
     status = s;
   }
 
   public void setOperation(Operation to) {
+    if (operationSetAt == null) {
+      operationSetAt = System.currentTimeMillis();
+    }
+
     op = to;
   }
 
-  public Exception createException(long timeoutMillis) {
-    return createException(false, timeoutMillis);
+  @Override
+  public boolean complete(T value) {
+    if (completedAt == null) {
+      completedAt = System.currentTimeMillis();
+    }
+
+    objRef.set(value);
+    Exception exception = createException(false, timeout);
+
+    if (exception != null) {
+      this.completeExceptionally(exception);
+      return false;
+    }
+
+    return super.complete(value);
   }
 
   private Exception createException(boolean forceTimeout, long timeoutMillis) {
@@ -128,7 +137,7 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
   }
 
   private TimeoutException createTimeoutException(boolean forceTimeout, long timeoutMillis) {
-    if (forceTimeout || transcodeCompletedAt - createdAt > timeoutMillis) {
+    if (forceTimeout || completedAt - operationSetAt > timeoutMillis) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
       MemcachedConnection.opTimedOut(op);
       return new CheckedOperationTimeoutException(timeoutMillis, TimeUnit.MILLISECONDS, op);
@@ -139,7 +148,7 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
     return null;
   }
 
-  public ExecutionException createExecutionException() {
+  private ExecutionException createExecutionException() {
     if (op != null && op.hasErrored()) {
       return new ExecutionException(op.getException());
     }
@@ -147,10 +156,6 @@ public class ReactiveOperationFuture<T> extends SpyCompletableFuture<T> {
       return new ExecutionException(new RuntimeException(op.getCancelCause()));
     }
     return null;
-  }
-
-  public void transcodeCompleted() {
-    transcodeCompletedAt = System.currentTimeMillis();
   }
 
   public boolean isCancelled() {

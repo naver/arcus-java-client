@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -44,7 +43,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -951,65 +949,19 @@ public class MemcachedClient extends SpyThread
 
     Operation op = opFact.get(key, new GetOperation.Callback() {
       private volatile T val = null;
-      private volatile CompletableFuture<T> transcodeFuture = null;
-
-      private volatile boolean completed = false;
-      private final AtomicInteger transcoding = new AtomicInteger(0);
 
       public void receivedStatus(OperationStatus status) {
-        rv.set(transcodeFuture, status);
+        rv.setStatus(status);
       }
 
       public void gotData(String k, int flags, byte[] data) {
         assert key.equals(k) : "Wrong key returned";
-        transcoding.incrementAndGet();
-        transcodeFuture = tcService.reactiveDecode(tc, new CachedData(flags, data, tc.getMaxSize()))
-                .whenComplete(this::whenComplete);
+        val = tc.decode(new CachedData(flags, data, tc.getMaxSize()));
       }
 
       public void complete() {
-        completed = true;
-        latch.countDown();
-
-        transcodeComplete(val);
-      }
-
-      private void whenComplete(T v, Throwable t) {
-        rv.transcodeCompleted();
-
-        if (t != null) {
-          rv.completeExceptionally(t);
-          return;
-        }
-
-        val = v;
-        transcoding.decrementAndGet();
-        transcodeComplete(v);
-      }
-
-      private void transcodeComplete(T val) {
-        if (transcoding.intValue() == 0 && completed) {
-          completeFuture(val);
-        }
-      }
-
-      private void completeFuture(T val) {
-        Exception exception = null;
-        if (latch.getCount() > 0) {
-          exception = rv.createException(operationTimeout);
-        } else {
-          exception = rv.createExecutionException();
-        }
-
-        if (exception != null) {
-          rv.completeExceptionally(exception);
-          return;
-        }
-
-        if (localCacheManager != null) {
-          localCacheManager.put(key, val);
-        }
         rv.complete(val);
+        latch.countDown();
       }
     });
     rv.setOperation(op);
