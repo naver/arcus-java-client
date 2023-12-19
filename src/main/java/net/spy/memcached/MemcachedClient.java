@@ -51,6 +51,7 @@ import net.spy.memcached.internal.BulkGetFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
+import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -887,29 +888,28 @@ public class MemcachedClient extends SpyThread
   public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout);
+    final GetFuture<T> future = new GetFuture<T>(latch, operationTimeout);
 
     Operation op = opFact.get(key,
         new GetOperation.Callback() {
-          private Future<T> val = null;
+          private final GetResult<T> result = new GetResult<T>(tc);
 
           public void receivedStatus(OperationStatus status) {
-            rv.set(val, status);
+            future.set(result, status);
           }
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            val = tcService.decode(tc,
-                    new CachedData(flags, data, tc.getMaxSize()));
+            result.setCachedData(new CachedData(flags, data, tc.getMaxSize()));
           }
 
           public void complete() {
             latch.countDown();
           }
         });
-    rv.setOperation(op);
+    future.setOperation(op);
     addOp(key, op);
-    return rv;
+    return future;
   }
 
   /**

@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
 
@@ -18,10 +19,10 @@ import net.spy.memcached.ops.OperationStatus;
  */
 public class GetFuture<T> implements Future<T> {
 
-  private final OperationFuture<Future<T>> rv;
+  private final OperationFuture<GetResult<T>> rv;
 
   public GetFuture(CountDownLatch l, long opTimeout) {
-    this.rv = new OperationFuture<Future<T>>(l, opTimeout);
+    this.rv = new OperationFuture<GetResult<T>>(l, opTimeout);
   }
 
   public GetFuture(GetFuture<T> parent) {
@@ -33,22 +34,22 @@ public class GetFuture<T> implements Future<T> {
   }
 
   public T get() throws InterruptedException, ExecutionException {
-    Future<T> decodedTask = rv.get();
-    return decodedTask == null ? null : decodedTask.get();
+    GetResult<T> result = rv.get();
+    return result == null ? null : result.getDecodedValue();
   }
 
   public T get(long duration, TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
-    Future<T> decodedTask = rv.get(duration, units);
-    return decodedTask == null ? null : decodedTask.get();
+    GetResult<T> result = rv.get(duration, units);
+    return result == null ? null : result.getDecodedValue();
   }
 
   public OperationStatus getStatus() {
     return rv.getStatus();
   }
 
-  public void set(Future<T> decodedTask, OperationStatus status) {
-    rv.set(decodedTask, status);
+  public void set(GetResult<T> result, OperationStatus status) {
+    rv.set(result, status);
   }
 
   public void setOperation(Operation to) {
