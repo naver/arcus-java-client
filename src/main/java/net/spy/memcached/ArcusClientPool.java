@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -237,6 +238,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   @Override
   public ReactiveOperationFuture<Object> reactiveAsyncGet(String key) {
     return this.getClient().reactiveAsyncGet(key);
+  }
+
+  @Override
+  public <T> CompletableFuture<T> reactiveAsyncGet(String key, Transcoder<T> tc) {
+    return this.getClient().reactiveAsyncGet(key, tc);
   }
 
   @Override
