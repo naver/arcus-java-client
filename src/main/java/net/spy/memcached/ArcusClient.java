@@ -2032,7 +2032,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       smGetList.add(new BTreeSMGetWithLongTypeBkey<Object>(entry.getKey(),
             entry.getValue(), from, to, eFlagFilter, count, smgetMode));
     }
-    return smget(smGetList, count, (from > to), collectionTranscoder, smgetMode);
+    return smget(smGetList, count, smgetMode == SMGetMode.UNIQUE, (from > to), collectionTranscoder);
   }
 
   /**
@@ -2147,12 +2147,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
-          final List<BTreeSMGet<T>> smGetList, final int count,
-          final boolean reverse, final Transcoder<T> tc, final SMGetMode smgetMode) {
+          final List<BTreeSMGet<T>> smGetList, final int count, final boolean unique,
+          final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-    final SMGetResultImpl<T> result = new SMGetResultImpl<T>(count, smgetMode, reverse);
+    final SMGetResultImpl<T> result = new SMGetResultImpl<T>(count, unique, reverse);
 
     // if processedSMGetCount is 0, then all smget is done.
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
@@ -3297,8 +3297,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             entry.getValue(), from, to, eFlagFilter, count, smgetMode));
     }
 
-    return smget(smGetList, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
-            collectionTranscoder, smgetMode);
+    return smget(smGetList, count, smgetMode == SMGetMode.UNIQUE,
+            (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0), collectionTranscoder);
   }
 
   /**
