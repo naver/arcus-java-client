@@ -125,21 +125,10 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       }
     }
 
-    if (unique) {
-      resultOperationStatus.add(new OperationStatus(true, "END"));
+    if (!unique && hasDuplicatedBKeyResult()) {
+      resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
     } else {
-      boolean isDuplicated = false;
-      for (int i = 1; i < mergedResult.size(); i++) {
-        if (mergedResult.get(i).compareBkeyTo(mergedResult.get(i - 1)) == 0) {
-          isDuplicated = true;
-          break;
-        }
-      }
-      if (isDuplicated) {
-        resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
-      } else {
-        resultOperationStatus.add(new OperationStatus(true, "END"));
-      }
+      resultOperationStatus.add(new OperationStatus(true, "END"));
     }
   }
 }

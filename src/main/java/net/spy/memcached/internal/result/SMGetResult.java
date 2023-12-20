@@ -61,6 +61,15 @@ public abstract class SMGetResult<T>  {
     return new CollectionOperationStatus(resultOperationStatus.get(0));
   }
 
+  protected boolean hasDuplicatedBKeyResult() {
+    for (int i = 1; i < mergedResult.size(); i++) {
+      if (mergedResult.get(i).compareBkeyTo(mergedResult.get(i - 1)) == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public abstract List<SMGetElement<T>> getFinalResult();
   public abstract void makeResultOperationStatus();
 }

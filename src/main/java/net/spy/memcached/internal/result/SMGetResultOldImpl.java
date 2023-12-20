@@ -97,13 +97,8 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
 
   @Override
   public void makeResultOperationStatus() {
-    boolean isDuplicated = false;
-    for (int i = 1; i < mergedResult.size(); i++) {
-      if (mergedResult.get(i).compareBkeyTo(mergedResult.get(i - 1)) == 0) {
-        isDuplicated = true;
-        break;
-      }
-    }
+    boolean isDuplicated = hasDuplicatedBKeyResult();
+
     if (mergedTrim.get()) {
       if (isDuplicated) {
         resultOperationStatus.add(new OperationStatus(true, "DUPLICATED_TRIMMED"));
