@@ -3,19 +3,18 @@ package net.spy.memcached.internal.result;
 import java.util.List;
 
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.OperationStatus;
 
 public final class SMGetResultImpl<T> extends SMGetResult<T> {
   private final int count;
-  private final SMGetMode smGetMode;
+  private final boolean unique;
 
-  public SMGetResultImpl(int count, SMGetMode smGetMode, boolean reverse) {
+  public SMGetResultImpl(int count, boolean unique, boolean reverse) {
     super(count, reverse);
 
     this.count = count;
-    this.smGetMode = smGetMode;
+    this.unique = unique;
   }
 
   @Override
@@ -54,12 +53,12 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
           if (comp == 0) { // compare key string
             int keyComp = result.compareKeyTo(mergedResult.get(pos));
             if ((reverse) ? (0 < keyComp) : (0 > keyComp)) {
-              if (smGetMode == SMGetMode.UNIQUE) {
+              if (unique) {
                 mergedResult.remove(pos); // remove dup bkey
               }
               break;
             } else {
-              if (smGetMode == SMGetMode.UNIQUE) {
+              if (unique) {
                 duplicated = true;
                 break;
               }
@@ -126,7 +125,7 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       }
     }
 
-    if (smGetMode == SMGetMode.UNIQUE) {
+    if (unique) {
       resultOperationStatus.add(new OperationStatus(true, "END"));
     } else {
       boolean isDuplicated = false;
