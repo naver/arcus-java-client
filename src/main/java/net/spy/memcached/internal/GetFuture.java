@@ -25,7 +25,7 @@ public class GetFuture<T> implements Future<T> {
   }
 
   public GetFuture(GetFuture<T> parent) {
-    this.rv = parent.getRv();
+    this.rv = parent.rv;
   }
 
   public boolean cancel(boolean ign) {
@@ -61,10 +61,6 @@ public class GetFuture<T> implements Future<T> {
 
   public boolean isDone() {
     return rv.isDone();
-  }
-
-  public OperationFuture<Future<T>> getRv() {
-    return rv;
   }
 
 }
