@@ -79,7 +79,7 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
         }
         pos += 1;
       }
-      if (isTrimmed && addAll) {
+      if (isTrimmed && addAll && pos > 0) {
         while (pos < mergedResult.size()) {
           if (mergedResult.get(pos).compareBkeyTo(mergedResult.get(pos - 1)) == 0) {
             pos += 1;
