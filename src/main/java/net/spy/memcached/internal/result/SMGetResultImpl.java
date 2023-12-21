@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetTrimKey;
+import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 
 public final class SMGetResultImpl<T> extends SMGetResult<T> {
@@ -22,8 +23,10 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     return mergedResult;
   }
 
-  public void addFailedOperationStatus(OperationStatus status) {
-    failedOperationStatus.add(status);
+  public void setFailedOperationStatus(OperationStatus status) {
+    if (failedOperationStatus == null) {
+      failedOperationStatus = new CollectionOperationStatus(status);
+    }
     mergedResult.clear();
     mergedTrimmedKeys.clear();
   }
@@ -125,10 +128,14 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       }
     }
 
+    final OperationStatus status;
+
     if (!unique && hasDuplicatedBKeyResult()) {
-      resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
+      status = new OperationStatus(true, "DUPLICATED");
     } else {
-      resultOperationStatus.add(new OperationStatus(true, "END"));
+      status = new OperationStatus(true, "END");
     }
+
+    resultOperationStatus = new CollectionOperationStatus(status);
   }
 }

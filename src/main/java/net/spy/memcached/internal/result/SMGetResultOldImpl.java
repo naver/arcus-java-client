@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.spy.memcached.collection.SMGetElement;
+import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 
 public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
@@ -38,8 +39,10 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
     return finalResult;
   }
 
-  public void addFailedOperationStatus(OperationStatus status) {
-    failedOperationStatus.add(status);
+  public void setFailedOperationStatus(OperationStatus status) {
+    if (failedOperationStatus == null) {
+      failedOperationStatus = new CollectionOperationStatus(status);
+    }
     mergedResult.clear();
   }
 
@@ -97,20 +100,23 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
 
   @Override
   public void makeResultOperationStatus() {
-    boolean isDuplicated = hasDuplicatedBKeyResult();
+    final boolean isDuplicated = hasDuplicatedBKeyResult();
+    final OperationStatus status;
 
     if (mergedTrim.get()) {
       if (isDuplicated) {
-        resultOperationStatus.add(new OperationStatus(true, "DUPLICATED_TRIMMED"));
+        status = new OperationStatus(true, "DUPLICATED_TRIMMED");
       } else {
-        resultOperationStatus.add(new OperationStatus(true, "TRIMMED"));
+        status = new OperationStatus(true, "TRIMMED");
       }
     } else {
       if (isDuplicated) {
-        resultOperationStatus.add(new OperationStatus(true, "DUPLICATED"));
+        status = new OperationStatus(true, "DUPLICATED");
       } else {
-        resultOperationStatus.add(new OperationStatus(true, "END"));
+        status = new OperationStatus(true, "END");
       }
     }
+
+    resultOperationStatus = new CollectionOperationStatus(status);
   }
 }
