@@ -9,7 +9,6 @@ import java.util.Map;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.OperationStatus;
 
 public abstract class SMGetResult<T>  {
   protected final int totalResultElementCount;
@@ -20,8 +19,8 @@ public abstract class SMGetResult<T>  {
   protected final List<SMGetTrimKey> mergedTrimmedKeys;
 
   protected final List<SMGetElement<T>> mergedResult;
-  protected final List<OperationStatus> resultOperationStatus;
-  protected final List<OperationStatus> failedOperationStatus;
+  protected volatile CollectionOperationStatus resultOperationStatus = null;
+  protected volatile CollectionOperationStatus failedOperationStatus = null;
 
   public SMGetResult(int totalResultElementCount, boolean reverse) {
     this.totalResultElementCount = totalResultElementCount;
@@ -33,8 +32,6 @@ public abstract class SMGetResult<T>  {
     this.mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
 
     this.mergedResult = new ArrayList<SMGetElement<T>>(totalResultElementCount);
-    this.resultOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
-    this.failedOperationStatus = Collections.synchronizedList(new ArrayList<OperationStatus>(1));
   }
 
   public List<String> getMissedKeyList() {
@@ -55,10 +52,10 @@ public abstract class SMGetResult<T>  {
   }
 
   public CollectionOperationStatus getOperationStatus() {
-    if (!failedOperationStatus.isEmpty()) {
-      return new CollectionOperationStatus(failedOperationStatus.get(0));
+    if (failedOperationStatus != null) {
+      return failedOperationStatus;
     }
-    return new CollectionOperationStatus(resultOperationStatus.get(0));
+    return resultOperationStatus;
   }
 
   protected boolean hasDuplicatedBKeyResult() {

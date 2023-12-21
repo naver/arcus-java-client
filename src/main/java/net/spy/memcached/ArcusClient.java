@@ -2108,7 +2108,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
           } else {
             stopCollect.set(true);
-            result.addFailedOperationStatus(status);
+            result.setFailedOperationStatus(status);
             getLogger().warn("SMGetFailed. status=%s", status);
           }
         }
@@ -2174,7 +2174,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
           } else {
             stopCollect.set(true);
-            result.addFailedOperationStatus(status);
+            result.setFailedOperationStatus(status);
             getLogger().warn("SMGetFailed. status=%s", status);
           }
         }
