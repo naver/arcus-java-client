@@ -9,7 +9,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 
 public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
-  private final AtomicBoolean mergedTrim = new AtomicBoolean(false);
+  private final AtomicBoolean isMergedResultTrimmed = new AtomicBoolean(false);
   private final int offset;
   private final boolean isMultiNode;
 
@@ -47,33 +47,34 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
   }
 
   public void mergeSMGetElements(final List<SMGetElement<T>> eachResult,
-                                 final boolean isTrimmed) {
+                                 final boolean isEachResultTrimmed) {
 
     if (mergedResult.isEmpty()) {
       // merged result is empty, add all.
       mergedResult.addAll(eachResult);
-      mergedTrim.set(isTrimmed);
+      isMergedResultTrimmed.set(isEachResultTrimmed);
 
       while (mergedResult.size() > totalResultElementCount) {
         mergedResult.remove(totalResultElementCount);
       }
     } else {
-      boolean addAll = true;
-      int pos = 0;
+      boolean allAdded = true; // Is all element of eachResult added to mergedResult?
+      int comp = 0, pos = 0;
       for (SMGetElement<T> result : eachResult) {
         for (; pos < mergedResult.size(); pos++) {
-          if ((reverse) ? (0 < result.compareTo(mergedResult.get(pos)))
-                        : (0 > result.compareTo(mergedResult.get(pos)))) {
+          comp = result.compareTo(mergedResult.get(pos));
+          if ((reverse) ? (comp > 0) : (comp < 0)) {
             break;
           }
         }
         if (pos >= totalResultElementCount) {
-          addAll = false;
+          // Can NOT add more than the totalResultElementCount.
+          allAdded = false;
           break;
         }
-        if (pos >= mergedResult.size() && mergedTrim.get() &&
-                result.compareBkeyTo(mergedResult.get(pos - 1)) != 0) {
-          addAll = false;
+        if (pos >= mergedResult.size() && isMergedResultTrimmed.get() && comp != 0) {
+          // Can NOT add to the trimmed area of mergedResult.
+          allAdded = false;
           break;
         }
         mergedResult.add(pos, result);
@@ -82,7 +83,9 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
         }
         pos += 1;
       }
-      if (isTrimmed && addAll && pos > 0) {
+      if (isEachResultTrimmed && allAdded && pos > 0) {
+        // If eachResult is trimmed and all element of it is added,
+        // trim the elements of mergedResult that exist in the trimmed area of eachResult.
         while (pos < mergedResult.size()) {
           if (mergedResult.get(pos).compareBkeyTo(mergedResult.get(pos - 1)) == 0) {
             pos += 1;
@@ -90,10 +93,12 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
             mergedResult.remove(pos);
           }
         }
-        mergedTrim.set(true);
+        isMergedResultTrimmed.set(true);
       }
       if (mergedResult.size() >= totalResultElementCount) {
-        mergedTrim.set(false);
+        // If size of mergedResult is reached to totalResultElementCount,
+        // then mergedResult is NOT trimmed.
+        isMergedResultTrimmed.set(false);
       }
     }
   }
@@ -103,7 +108,7 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
     final boolean isDuplicated = hasDuplicatedBKeyResult();
     final OperationStatus status;
 
-    if (mergedTrim.get()) {
+    if (isMergedResultTrimmed.get()) {
       if (isDuplicated) {
         status = new OperationStatus(true, "DUPLICATED_TRIMMED");
       } else {
