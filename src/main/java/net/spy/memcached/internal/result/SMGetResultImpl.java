@@ -43,32 +43,34 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       }
     } else {
       // do sort merge
-      boolean duplicated;
+      boolean doInsert; // Is current eachResult could be inserted?
       int comp, pos = 0;
       for (SMGetElement<T> result : eachResult) {
-        duplicated = false;
+        doInsert = true;
         for (; pos < mergedResult.size(); pos++) {
-          // compare b+tree key
           comp = result.compareBkeyTo(mergedResult.get(pos));
-          if ((reverse) ? (0 < comp) : (0 > comp)) {
+          if ((reverse) ? (comp > 0) : (comp < 0)) {
             break;
           }
-          if (comp == 0) { // compare key string
+          if (comp == 0) {
+            // Duplicated bkey. Compare the "cache key".
             int keyComp = result.compareKeyTo(mergedResult.get(pos));
-            if ((reverse) ? (0 < keyComp) : (0 > keyComp)) {
+            if ((reverse) ? (keyComp > 0) : (keyComp < 0)) {
               if (unique) {
-                mergedResult.remove(pos); // remove dup bkey
+                // Remove duplicated bkey.
+                mergedResult.remove(pos);
               }
               break;
             } else {
               if (unique) {
-                duplicated = true;
+                // NOT the first cache key with the same bkey. do NOT insert.
+                doInsert = false;
                 break;
               }
             }
           }
         }
-        if (duplicated) { // UNIQUE
+        if (!doInsert) { // UNIQUE
           continue;
         }
         if (pos >= count) {
@@ -83,7 +85,6 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
         }
         mergedResult.add(pos, result);
         if (mergedResult.size() > count) {
-          // Remove elements that exceed the requested count.
           mergedResult.remove(count);
         }
         pos += 1;
@@ -95,11 +96,11 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
         mergedTrimmedKeys.addAll(eachTrimmedResult);
       } else {
         // do sort merge trimmed list
-        int pos = 0;
+        int comp, pos = 0;
         for (SMGetTrimKey result : eachTrimmedResult) {
           for (; pos < mergedTrimmedKeys.size(); pos++) {
-            if ((reverse) ? (0 < result.compareTo(mergedTrimmedKeys.get(pos)))
-                          : (0 > result.compareTo(mergedTrimmedKeys.get(pos)))) {
+            comp = result.compareTo(mergedTrimmedKeys.get(pos));
+            if ((reverse) ? (comp > 0) : (comp < 0)) {
               break;
             }
           }
