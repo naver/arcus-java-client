@@ -57,49 +57,50 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
       while (mergedResult.size() > totalResultElementCount) {
         mergedResult.remove(totalResultElementCount);
       }
-    } else {
-      boolean allAdded = true; // Is all element of eachResult added to mergedResult?
-      int comp = 0, pos = 0;
-      for (SMGetElement<T> result : eachResult) {
-        for (; pos < mergedResult.size(); pos++) {
-          comp = result.compareTo(mergedResult.get(pos));
-          if ((reverse) ? (comp > 0) : (comp < 0)) {
-            break;
-          }
-        }
-        if (pos >= totalResultElementCount) {
-          // Can NOT add more than the totalResultElementCount.
-          allAdded = false;
+      return;
+    }
+
+    boolean allAdded = true; // Is all element of eachResult added to mergedResult?
+    int comp = 0, pos = 0;
+    for (SMGetElement<T> result : eachResult) {
+      for (; pos < mergedResult.size(); pos++) {
+        comp = result.compareTo(mergedResult.get(pos));
+        if ((reverse) ? (comp > 0) : (comp < 0)) {
           break;
         }
-        if (pos >= mergedResult.size() && isMergedResultTrimmed.get() && comp != 0) {
-          // Can NOT add to the trimmed area of mergedResult.
-          allAdded = false;
-          break;
-        }
-        mergedResult.add(pos, result);
-        if (mergedResult.size() > totalResultElementCount) {
-          mergedResult.remove(totalResultElementCount);
-        }
-        pos += 1;
       }
-      if (isEachResultTrimmed && allAdded && pos > 0) {
-        // If eachResult is trimmed and all element of it is added,
-        // trim the elements of mergedResult that exist in the trimmed area of eachResult.
-        while (pos < mergedResult.size()) {
-          if (mergedResult.get(pos).compareBkeyTo(mergedResult.get(pos - 1)) == 0) {
-            pos += 1;
-          } else {
-            mergedResult.remove(pos);
-          }
+      if (pos >= totalResultElementCount) {
+        // Can NOT add more than the totalResultElementCount.
+        allAdded = false;
+        break;
+      }
+      if (pos >= mergedResult.size() && isMergedResultTrimmed.get() && comp != 0) {
+        // Can NOT add to the trimmed area of mergedResult.
+        allAdded = false;
+        break;
+      }
+      mergedResult.add(pos, result);
+      if (mergedResult.size() > totalResultElementCount) {
+        mergedResult.remove(totalResultElementCount);
+      }
+      pos += 1;
+    }
+    if (isEachResultTrimmed && allAdded && pos > 0) {
+      // If eachResult is trimmed and all element of it is added,
+      // trim the elements of mergedResult that exist in the trimmed area of eachResult.
+      while (pos < mergedResult.size()) {
+        if (mergedResult.get(pos).compareBkeyTo(mergedResult.get(pos - 1)) == 0) {
+          pos += 1;
+        } else {
+          mergedResult.remove(pos);
         }
-        isMergedResultTrimmed.set(true);
       }
-      if (mergedResult.size() >= totalResultElementCount) {
-        // If size of mergedResult is reached to totalResultElementCount,
-        // then mergedResult is NOT trimmed.
-        isMergedResultTrimmed.set(false);
-      }
+      isMergedResultTrimmed.set(true);
+    }
+    if (mergedResult.size() >= totalResultElementCount) {
+      // If size of mergedResult is reached to totalResultElementCount,
+      // then mergedResult is NOT trimmed.
+      isMergedResultTrimmed.set(false);
     }
   }
 
