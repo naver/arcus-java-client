@@ -34,6 +34,11 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
   public void mergeSMGetElements(final List<SMGetElement<T>> eachResult,
                                  final List<SMGetTrimKey> eachTrimmedResult) {
 
+    mergeSMGetElements(eachResult);
+    mergeTrimmedKeys(eachTrimmedResult);
+  }
+
+  private void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
     if (mergedResult.isEmpty()) {
       // merged result is empty, add all.
       mergedResult.addAll(eachResult);
@@ -41,73 +46,75 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       while (mergedResult.size() > count) {
         mergedResult.remove(count);
       }
-    } else {
-      // do sort merge
-      boolean doInsert; // Is current eachResult could be inserted?
-      int comp, pos = 0;
-      for (SMGetElement<T> result : eachResult) {
-        doInsert = true;
-        for (; pos < mergedResult.size(); pos++) {
-          comp = result.compareBkeyTo(mergedResult.get(pos));
-          if ((reverse) ? (comp > 0) : (comp < 0)) {
-            break;
-          }
-          if (comp == 0) {
-            // Duplicated bkey. Compare the "cache key".
-            int keyComp = result.compareKeyTo(mergedResult.get(pos));
-            if ((reverse) ? (keyComp > 0) : (keyComp < 0)) {
-              if (unique) {
-                // Remove duplicated bkey.
-                mergedResult.remove(pos);
-              }
-              break;
-            } else {
-              if (unique) {
-                // NOT the first cache key with the same bkey. do NOT insert.
-                doInsert = false;
-                break;
-              }
-            }
-          }
-        }
-        if (!doInsert) { // UNIQUE
-          continue;
-        }
-        if (pos >= count) {
-          // At this point, following conditions are met.
-          //   - mergedResult.size() == totalResultElementCount &&
-          //   - The current <bkey, key> of eachResult is
-          //     behind of the last <bkey, key> of mergedResult.
-          // Then, all the next <bkey, key> elements of eachResult are
-          // definitely behind of the last <bkey, bkey> of mergedResult.
-          // So, stop the current sort-merge.
-          break;
-        }
-        mergedResult.add(pos, result);
-        if (mergedResult.size() > count) {
-          mergedResult.remove(count);
-        }
-        pos += 1;
-      }
+      return;
     }
 
-    if (!eachTrimmedResult.isEmpty()) {
-      if (mergedTrimmedKeys.isEmpty()) {
-        mergedTrimmedKeys.addAll(eachTrimmedResult);
-      } else {
-        // do sort merge trimmed list
-        int comp, pos = 0;
-        for (SMGetTrimKey result : eachTrimmedResult) {
-          for (; pos < mergedTrimmedKeys.size(); pos++) {
-            comp = result.compareTo(mergedTrimmedKeys.get(pos));
-            if ((reverse) ? (comp > 0) : (comp < 0)) {
+    // do sort merge
+    boolean doInsert; // Is current eachResult could be inserted?
+    int comp, pos = 0;
+    for (SMGetElement<T> result : eachResult) {
+      doInsert = true;
+      for (; pos < mergedResult.size(); pos++) {
+        comp = result.compareBkeyTo(mergedResult.get(pos));
+        if ((reverse) ? (comp > 0) : (comp < 0)) {
+          break;
+        }
+        if (comp == 0) {
+          // Duplicated bkey. Compare the "cache key".
+          int keyComp = result.compareKeyTo(mergedResult.get(pos));
+          if ((reverse) ? (keyComp > 0) : (keyComp < 0)) {
+            if (unique) {
+              // Remove duplicated bkey.
+              mergedResult.remove(pos);
+            }
+            break;
+          } else {
+            if (unique) {
+              // NOT the first cache key with the same bkey. do NOT insert.
+              doInsert = false;
               break;
             }
           }
-          mergedTrimmedKeys.add(pos, result);
-          pos += 1;
         }
       }
+      if (!doInsert) { // UNIQUE
+        continue;
+      }
+      if (pos >= count) {
+        // At this point, following conditions are met.
+        //   - mergedResult.size() == totalResultElementCount &&
+        //   - The current <bkey, key> of eachResult is
+        //     behind of the last <bkey, key> of mergedResult.
+        // Then, all the next <bkey, key> elements of eachResult are
+        // definitely behind of the last <bkey, bkey> of mergedResult.
+        // So, stop the current sort-merge.
+        break;
+      }
+      mergedResult.add(pos, result);
+      if (mergedResult.size() > count) {
+        mergedResult.remove(count);
+      }
+      pos += 1;
+    }
+  }
+
+  private void mergeTrimmedKeys(final List<SMGetTrimKey> eachTrimmedResult) {
+    if (mergedTrimmedKeys.isEmpty()) {
+      mergedTrimmedKeys.addAll(eachTrimmedResult);
+      return;
+    }
+
+    // do sort merge trimmed list
+    int comp, pos = 0;
+    for (SMGetTrimKey result : eachTrimmedResult) {
+      for (; pos < mergedTrimmedKeys.size(); pos++) {
+        comp = result.compareTo(mergedTrimmedKeys.get(pos));
+        if ((reverse) ? (comp > 0) : (comp < 0)) {
+          break;
+        }
+      }
+      mergedTrimmedKeys.add(pos, result);
+      pos += 1;
     }
   }
 
