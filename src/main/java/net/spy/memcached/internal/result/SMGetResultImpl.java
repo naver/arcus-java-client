@@ -114,14 +114,15 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
   @Override
   public void makeResultOperationStatus() {
     if (!mergedTrimmedKeys.isEmpty() && count <= mergedResult.size()) {
-      // remove trimed keys whose bkeys are behind of the last element.
+      // Remove trimed keys that bkey is behind of the last element
+      // when result count is reached to query count.
       SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
       SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
               lastElement.getBkeyObject());
+      int comp;
       for (int i = mergedTrimmedKeys.size() - 1; i >= 0; i--) {
-        SMGetTrimKey me = mergedTrimmedKeys.get(i);
-        if ((reverse) ? (0 >= me.compareTo(lastTrimKey))
-                      : (0 <= me.compareTo(lastTrimKey))) {
+        comp = mergedTrimmedKeys.get(i).compareTo(lastTrimKey);
+        if ((reverse) ? (comp <= 0) : (comp >= 0)) {
           mergedTrimmedKeys.remove(i);
         } else {
           break;
