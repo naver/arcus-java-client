@@ -453,8 +453,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     tcs.add(0, decodeTranscoder);
     try {
       client.asyncGetBulk(keys, tcs.listIterator()).get();
-      fail("Expected ExecutionException caused by key mismatch");
-    } catch (java.util.concurrent.ExecutionException e) {
+      fail("Expected AssertionError caused by key mismatch");
+    } catch (AssertionError e) {
       // pass
     }
   }
@@ -552,8 +552,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     tcs.add(0, decodeTranscoder);
     try {
       client.asyncGetsBulk(keys, tcs.listIterator()).get();
-      fail("Expected ExecutionException caused by key mismatch");
-    } catch (java.util.concurrent.ExecutionException e) {
+      fail("Expected AssertionError caused by key mismatch");
+    } catch (AssertionError e) {
       // pass
     }
   }
