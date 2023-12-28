@@ -22,13 +22,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.compat.log.LoggerFactory;
+import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -40,13 +40,13 @@ import net.spy.memcached.ops.OperationState;
  * @param <T> types of objects returned from the GET
  */
 public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
-  private final Map<String, Future<T>> rvMap;
+  private final Map<String, GetResult<T>> rvMap;
   private final Collection<Operation> ops;
   private final CountDownLatch latch;
   private final long timeout;
   private boolean isTimeout = false;
 
-  public BulkGetFuture(Map<String, Future<T>> rvMap, Collection<Operation> ops,
+  public BulkGetFuture(Map<String, GetResult<T>> rvMap, Collection<Operation> ops,
                        CountDownLatch latch, Long timeout) {
     super();
     this.rvMap = rvMap;
@@ -164,10 +164,9 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     }
 
     Map<String, T> resultMap = new HashMap<String, T>();
-    for (Map.Entry<String, Future<T>> me : rvMap.entrySet()) {
+    for (Map.Entry<String, GetResult<T>> me : rvMap.entrySet()) {
       String key = me.getKey();
-      Future<T> future = me.getValue();
-      T value = future.get();
+      T value = me.getValue().getDecodedValue();
 
       // put the key into the result map.
       resultMap.put(key, value);

@@ -51,9 +51,9 @@ import net.spy.memcached.internal.BulkGetFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
-import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.internal.result.GetResultImpl;
+import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -1079,7 +1079,7 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Iterator<Transcoder<T>> tc_iter) {
-    final Map<String, Future<T>> rvMap = new ConcurrentHashMap<String, Future<T>>();
+    final Map<String, GetResult<T>> rvMap = new ConcurrentHashMap<String, GetResult<T>>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
@@ -1112,8 +1112,9 @@ public class MemcachedClient extends SpyThread
 
       public void gotData(String k, int flags, byte[] data) {
         Transcoder<T> tc = tc_map.get(k);
-        rvMap.put(k, tcService.decode(tc,
-                new CachedData(flags, data, tc.getMaxSize())));
+        GetResult<T> result
+                = new GetResultImpl<T>(new CachedData(flags, data, tc.getMaxSize()), tc);
+        rvMap.put(k, result);
       }
 
       public void complete() {
@@ -1213,8 +1214,8 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Iterator<Transcoder<T>> tc_iter) {
-    final Map<String, Future<CASValue<T>>> m
-            = new ConcurrentHashMap<String, Future<CASValue<T>>>();
+    final Map<String, GetResult<CASValue<T>>> rvMap
+            = new ConcurrentHashMap<String, GetResult<CASValue<T>>>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
@@ -1248,9 +1249,9 @@ public class MemcachedClient extends SpyThread
 
       public void gotData(String k, int flags, long cas, byte[] data) {
         Transcoder<T> tc = tc_map.get(k);
-
-        m.put(k, tcService.decode(tc, cas,
-                new CachedData(flags, data, tc.getMaxSize())));
+        GetResult<CASValue<T>> result
+                = new GetsResultImpl<T>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
+        rvMap.put(k, result);
       }
 
       public void complete() {
@@ -1276,7 +1277,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<CASValue<T>>(m, ops, latch, operationTimeout);
+    return new BulkGetFuture<CASValue<T>>(rvMap, ops, latch, operationTimeout);
   }
 
   /**
