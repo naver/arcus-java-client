@@ -234,12 +234,12 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public <T> OperationFuture<CASValue<T>> asyncGets(String key, Transcoder<T> tc) {
+  public <T> GetFuture<CASValue<T>> asyncGets(String key, Transcoder<T> tc) {
     return this.getClient().asyncGets(key, tc);
   }
 
   @Override
-  public OperationFuture<CASValue<Object>> asyncGets(String key) {
+  public GetFuture<CASValue<Object>> asyncGets(String key) {
     return this.getClient().asyncGets(key);
   }
 

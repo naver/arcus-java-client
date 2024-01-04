@@ -51,6 +51,7 @@ import net.spy.memcached.internal.BulkGetFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
+import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.internal.result.GetResultImpl;
 import net.spy.memcached.ops.CASOperationStatus;
@@ -936,16 +937,15 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public <T> OperationFuture<CASValue<T>> asyncGets(final String key,
+  public <T> GetFuture<CASValue<T>> asyncGets(final String key,
                                                     final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<CASValue<T>> rv =
-            new OperationFuture<CASValue<T>>(latch, operationTimeout);
+    final GetFuture<CASValue<T>> rv = new GetFuture<CASValue<T>>(latch, operationTimeout);
 
     Operation op = opFact.gets(key,
         new GetsOperation.Callback() {
-          private CASValue<T> val = null;
+          private GetResult<CASValue<T>> val = null;
 
           public void receivedStatus(OperationStatus status) {
             rv.set(val, status);
@@ -954,8 +954,7 @@ public class MemcachedClient extends SpyThread
           public void gotData(String k, int flags, long cas, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             assert cas > 0 : "CAS was less than zero:  " + cas;
-            val = new CASValue<T>(cas, tc.decode(
-                    new CachedData(flags, data, tc.getMaxSize())));
+            val = new GetsResultImpl<T>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
           }
 
           public void complete() {
@@ -976,7 +975,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public OperationFuture<CASValue<Object>> asyncGets(final String key) {
+  public GetFuture<CASValue<Object>> asyncGets(final String key) {
     return asyncGets(key, transcoder);
   }
 
@@ -993,7 +992,7 @@ public class MemcachedClient extends SpyThread
    *                                   is too full to accept any more requests
    */
   public <T> CASValue<T> gets(String key, Transcoder<T> tc) {
-    OperationFuture<CASValue<T>> future = asyncGets(key, tc);
+    GetFuture<CASValue<T>> future = asyncGets(key, tc);
     try {
       return future.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
