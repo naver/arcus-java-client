@@ -137,8 +137,9 @@ BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys)
 BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys)
 ```
 
-- 다수 key들에 저장된 CASValue를 Map<String, CASValue<Object>> 형태로 반환한다.
+- 다수 key들에 저장된 CASValue를 `Map<String, CASValue<Object>>` 형태로 반환한다.
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
+
 
 ## Key-Value Item 값의 증감
 
