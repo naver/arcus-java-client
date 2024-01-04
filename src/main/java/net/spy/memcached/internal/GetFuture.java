@@ -2,12 +2,10 @@ package net.spy.memcached.internal;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.internal.result.GetResult;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
 
 /**
@@ -17,51 +15,22 @@ import net.spy.memcached.ops.OperationStatus;
  *
  * @param <T> Type of object returned from the get
  */
-public class GetFuture<T> implements Future<T> {
-
-  private final OperationFuture<GetResult<T>> rv;
+public class GetFuture<T> extends OperationFuture<T> {
+  private GetResult<T> result;
 
   public GetFuture(CountDownLatch l, long opTimeout) {
-    this.rv = new OperationFuture<GetResult<T>>(l, opTimeout);
+    super(l, opTimeout);
   }
 
-  public GetFuture(GetFuture<T> parent) {
-    this.rv = parent.rv;
-  }
-
-  public boolean cancel(boolean ign) {
-    return rv.cancel(ign);
-  }
-
-  public T get() throws InterruptedException, ExecutionException {
-    GetResult<T> result = rv.get();
-    return result == null ? null : result.getDecodedValue();
-  }
-
+  @Override
   public T get(long duration, TimeUnit units)
           throws InterruptedException, TimeoutException, ExecutionException {
-    GetResult<T> result = rv.get(duration, units);
+    super.get(duration, units); // for waiting latch.
     return result == null ? null : result.getDecodedValue();
-  }
-
-  public OperationStatus getStatus() {
-    return rv.getStatus();
   }
 
   public void set(GetResult<T> result, OperationStatus status) {
-    rv.set(result, status);
+    super.set(null, status);
+    this.result = result;
   }
-
-  public void setOperation(Operation to) {
-    rv.setOperation(to);
-  }
-
-  public boolean isCancelled() {
-    return rv.isCancelled();
-  }
-
-  public boolean isDone() {
-    return rv.isDone();
-  }
-
 }

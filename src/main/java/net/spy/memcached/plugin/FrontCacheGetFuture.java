@@ -16,11 +16,13 @@
  */
 package net.spy.memcached.plugin;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.ops.OperationStatus;
 
 /**
  * Future returned for GET operations.
@@ -30,28 +32,42 @@ import net.spy.memcached.internal.GetFuture;
  * @param <T> Type of object returned from the get
  */
 public class FrontCacheGetFuture<T> extends GetFuture<T> {
+  private final GetFuture<T> parent;
   private final LocalCacheManager localCacheManager;
-
   private final String key;
 
   public FrontCacheGetFuture(LocalCacheManager localCacheManager, String key, GetFuture<T> parent) {
-    super(parent);
+    super(new CountDownLatch(0), 1);
+    this.parent = parent;
     this.localCacheManager = localCacheManager;
     this.key = key;
   }
 
   @Override
-  public T get() throws InterruptedException, ExecutionException {
-    T t = super.get();
+  public T get(long timeout, TimeUnit unit) throws InterruptedException,
+          ExecutionException, TimeoutException {
+    T t = parent.get(timeout, unit);
     localCacheManager.put(key, t);
     return t;
   }
 
   @Override
-  public T get(long timeout, TimeUnit unit) throws InterruptedException,
-          ExecutionException, TimeoutException {
-    T t = super.get(timeout, unit);
-    localCacheManager.put(key, t);
-    return t;
+  public OperationStatus getStatus() {
+    return parent.getStatus();
+  }
+
+  @Override
+  public boolean cancel(boolean ign) {
+    return parent.cancel(ign);
+  }
+
+  @Override
+  public boolean isDone() {
+    return parent.isDone();
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return parent.isCancelled();
   }
 }
