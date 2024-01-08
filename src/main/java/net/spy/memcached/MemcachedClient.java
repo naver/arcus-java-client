@@ -52,6 +52,7 @@ import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SingleElementInfiniteIterator;
 import net.spy.memcached.internal.result.GetResult;
+import net.spy.memcached.internal.result.GetResultImpl;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -892,7 +893,7 @@ public class MemcachedClient extends SpyThread
 
     Operation op = opFact.get(key,
         new GetOperation.Callback() {
-          private final GetResult<T> result = new GetResult<T>(tc);
+          private GetResult<T> result = null;
 
           public void receivedStatus(OperationStatus status) {
             future.set(result, status);
@@ -900,7 +901,7 @@ public class MemcachedClient extends SpyThread
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            result.setCachedData(new CachedData(flags, data, tc.getMaxSize()));
+            result = new GetResultImpl<T>(new CachedData(flags, data, tc.getMaxSize()), tc);
           }
 
           public void complete() {
