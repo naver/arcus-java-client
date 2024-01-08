@@ -1131,10 +1131,9 @@ public class MemcachedClient extends SpyThread
       for (Collection<String> lk : me.getValue()) {
         Operation op;
         if (node == null) {
-          op = opFact.mget(lk, cb);
+          op = opFact.get(lk, cb);
         } else {
-          op = node.enabledMGetOp() ? opFact.mget(lk, cb)
-                                    : opFact.get(lk, cb);
+          op = node.enabledMGetOp() ? opFact.mget(lk, cb) : opFact.get(lk, cb);
         }
         conn.addOperation(node, op);
         ops.add(op);
@@ -1268,10 +1267,9 @@ public class MemcachedClient extends SpyThread
       for (Collection<String> lk : me.getValue()) {
         Operation op;
         if (node == null) {
-          op = opFact.mgets(lk, cb);
+          op = opFact.gets(lk, cb);
         } else {
-          op = node.enabledMGetsOp() ? opFact.mgets(lk, cb)
-                                     : opFact.gets(lk, cb);
+          op = node.enabledMGetsOp() ? opFact.mgets(lk, cb) : opFact.gets(lk, cb);
         }
         conn.addOperation(node, op);
         ops.add(op);
