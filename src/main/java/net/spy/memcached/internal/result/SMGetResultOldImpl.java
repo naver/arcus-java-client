@@ -1,5 +1,6 @@
 package net.spy.memcached.internal.result;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -102,6 +103,88 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
       // then mergedResult is NOT trimmed.
       isMergedResultTrimmed.set(false);
     }
+  }
+
+  public void mergeSMGetElements2(final List<SMGetElement<T>> eachResult,
+                                  final boolean isEachResultTrimmed) {
+
+    if (mergedResult.isEmpty()) {
+      // merged result is empty, add all.
+      mergedResult.addAll(eachResult);
+      isMergedResultTrimmed.set(isEachResultTrimmed);
+
+      while (mergedResult.size() > totalResultElementCount) {
+        mergedResult.remove(totalResultElementCount);
+      }
+      return;
+    }
+
+    final int eachSize = eachResult.size();
+    final int mergedSize = mergedResult.size();
+    final List<SMGetElement<T>> newMergedResult
+            = new ArrayList<SMGetElement<T>>(totalResultElementCount);
+
+    int eachPos = 0, mergedPos = 0, comp = 0;
+    boolean allAdded = false; // Is all element of eachResult added to mergedResult?
+
+    while (eachPos < eachSize && mergedPos < mergedSize
+            && newMergedResult.size() < totalResultElementCount) {
+
+      final SMGetElement<T> each = eachResult.get(eachPos);
+      final SMGetElement<T> merged = mergedResult.get(mergedPos);
+
+      comp = each.compareTo(merged);
+      if ((reverse) ? (comp > 0) : (comp < 0)) {
+        newMergedResult.add(each);
+        eachPos++;
+
+        if (eachPos >= eachSize) {
+          allAdded = true;
+
+          if (isEachResultTrimmed) {
+            // Can NOT add to the trimmed area of eachResult.
+            isMergedResultTrimmed.set(true);
+            break;
+          }
+        }
+      } else if ((reverse) ? (comp < 0) : (comp > 0)) {
+        newMergedResult.add(merged);
+        mergedPos++;
+      } else {
+        // comp == 0
+        mergedPos++;
+      }
+    }
+
+    do {
+      if (mergedPos >= mergedSize && isMergedResultTrimmed.get() && comp != 0) {
+        // Can NOT add to the trimmed area of mergedResult.
+        break;
+      }
+      while (eachPos < eachSize && newMergedResult.size() < totalResultElementCount) {
+        newMergedResult.add(eachResult.get(eachPos++));
+
+        if (eachPos >= eachSize) {
+          allAdded = true;
+        }
+      }
+      if (isEachResultTrimmed && allAdded) {
+        // Can NOT add to the trimmed area of eachResult.
+        isMergedResultTrimmed.set(true);
+        break;
+      }
+      while (mergedPos < mergedSize && newMergedResult.size() < totalResultElementCount) {
+        newMergedResult.add(mergedResult.get(mergedPos++));
+      }
+    } while (false);
+
+    if (newMergedResult.size() >= totalResultElementCount) {
+      // If size of mergedResult is reached to totalResultElementCount,
+      // then mergedResult is NOT trimmed.
+      isMergedResultTrimmed.set(false);
+    }
+
+    mergedResult = newMergedResult;
   }
 
   @Override
