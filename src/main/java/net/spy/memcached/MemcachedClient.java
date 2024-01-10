@@ -1097,7 +1097,7 @@ public class MemcachedClient extends SpyThread
       Transcoder<T> tc = tc_iter.next();
       tc_map.put(key, tc);
       validateKey(key);
-      addKeyToChunk(chunks, key, conn.findNodeByKey(key));
+      addKeyToChunk(chunks, key);
     }
     int wholeChunkSize = getWholeChunkSize(chunks);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
@@ -1232,7 +1232,7 @@ public class MemcachedClient extends SpyThread
 
       tc_map.put(key, tc);
       validateKey(key);
-      addKeyToChunk(chunks, key, conn.findNodeByKey(key));
+      addKeyToChunk(chunks, key);
     }
 
     int wholeChunkSize = getWholeChunkSize(chunks);
@@ -1281,24 +1281,24 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
-   * add key to chunks
-   * @param chunks collection list that sorted by node
+   * Split the keys into 200 sizes by node.
+   * The max size of each chunk is 200.
+   * @param chunkMap key list that sorted by node
    * @param key the key to request
-   * @param node primary node to request
    */
-  private void addKeyToChunk(Map<MemcachedNode, List<Collection<String>>> chunks,
-                             String key, MemcachedNode node) {
-    List<Collection<String>> lks = chunks.get(node);
-    if (lks == null) {
-      lks = new ArrayList<Collection<String>>();
-      Collection<String> ts = new ArrayList<String>();
-      lks.add(ts);
-      chunks.put(node, lks);
+  private void addKeyToChunk(Map<MemcachedNode, List<Collection<String>>> chunkMap, String key) {
+    MemcachedNode node = conn.findNodeByKey(key);
+    List<Collection<String>> keyChunkList = chunkMap.get(node);
+
+    if (keyChunkList == null) {
+      keyChunkList = new ArrayList<Collection<String>>();
+      keyChunkList.add(new ArrayList<String>());
+      chunkMap.put(node, keyChunkList);
     }
-    if (lks.get(lks.size() - 1).size() >= GET_BULK_CHUNK_SIZE) {
-      lks.add(new ArrayList<String>());
+    if (keyChunkList.get(keyChunkList.size() - 1).size() >= GET_BULK_CHUNK_SIZE) {
+      keyChunkList.add(new ArrayList<String>());
     }
-    lks.get(lks.size() - 1).add(key);
+    keyChunkList.get(keyChunkList.size() - 1).add(key);
   }
 
   /**
