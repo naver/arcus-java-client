@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
@@ -44,7 +45,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private final Collection<Operation> ops;
   private final CountDownLatch latch;
   private final long timeout;
-  private boolean isTimeout = false;
+  private AtomicBoolean isTimeout = new AtomicBoolean(false);
 
   public BulkGetFuture(Map<String, Future<T>> rvMap, Collection<Operation> ops,
                        CountDownLatch latch, Long timeout) {
@@ -61,6 +62,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     ops = other.ops;
     latch = other.latch;
     timeout = other.timeout;
+    isTimeout = other.isTimeout;
   }
 
   @Override
@@ -87,7 +89,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (!timedoutOps.isEmpty()) {
-      isTimeout = true;
+      isTimeout.set(true);
       LoggerFactory.getLogger(getClass()).warn(
               new CheckedOperationTimeoutException(duration, units, timedoutOps).getMessage());
     }
@@ -107,7 +109,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     Collection<Operation> timedoutOps = new HashSet<Operation>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (!timedoutOps.isEmpty()) {
-      isTimeout = true;
+      isTimeout.set(true);
       throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
     }
     return ret;
@@ -180,6 +182,6 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * @see net.spy.memcached.internal.BulkFuture#isTimeout()
    */
   public boolean isTimeout() {
-    return isTimeout;
+    return isTimeout.get();
   }
 }
