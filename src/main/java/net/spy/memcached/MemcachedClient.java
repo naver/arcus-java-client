@@ -66,7 +66,6 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.transcoders.TranscodeService;
 import net.spy.memcached.transcoders.Transcoder;
 
 /**
@@ -131,8 +130,6 @@ public class MemcachedClient extends SpyThread
   protected final OperationFactory opFact;
 
   protected final Transcoder<Object> transcoder;
-
-  private final TranscodeService tcService;
 
   private final AuthDescriptor authDescriptor;
 
@@ -214,7 +211,6 @@ public class MemcachedClient extends SpyThread
       throw new IllegalArgumentException(
               "Operation timeout must be positive.");
     }
-    tcService = new TranscodeService(cf.isDaemon());
     transcoder = cf.getDefaultTranscoder();
     opFact = cf.getOperationFactory();
     assert opFact != null : "Connection factory failed to make op factory";
@@ -2098,7 +2094,6 @@ public class MemcachedClient extends SpyThread
       running = false;
       conn.wakeUpSelector();
       setName(baseName + " - SHUTTING DOWN (informed client)");
-      tcService.shutdown();
     }
     return rv;
   }
