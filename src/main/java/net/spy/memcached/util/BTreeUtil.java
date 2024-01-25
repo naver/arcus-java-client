@@ -18,6 +18,11 @@
 package net.spy.memcached.util;
 
 
+import net.spy.memcached.CachedData;
+import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.transcoders.Transcoder;
+
 public final class BTreeUtil {
 
   private static final String HEXES = "0123456789ABCDEF";
@@ -100,5 +105,22 @@ public final class BTreeUtil {
                 String.format("not supported unsigned long bkey : %s, use byte array bkey", bkey));
       }
     }
+  }
+
+  public static <T> Element<T> makeBTreeElement(BKeyObject bkey,
+                                                CachedData cachedData,
+                                                Transcoder<T> tc) {
+    Element<T> element = null;
+    T value = tc.decode(cachedData);
+
+    switch (bkey.getType()) {
+      case LONG:
+        element = new Element<T>(bkey.getLongBKey(), value, cachedData.getEFlag());
+        break;
+      case BYTEARRAY:
+        element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, cachedData.getEFlag());
+        break;
+    }
+    return element;
   }
 }

@@ -33,10 +33,5 @@ public class MultiBTreeGetBulkOperationCallback extends MultiOperationCallback
   public void gotKey(String key, int elementCount, OperationStatus status) {
     ((BTreeGetBulkOperation.Callback) originalCallback).gotKey(key, elementCount, status);
   }
-
-  @Override
-  public void addResult() {
-    ((BTreeGetBulkOperation.Callback) originalCallback).addResult();
-  }
 }
 

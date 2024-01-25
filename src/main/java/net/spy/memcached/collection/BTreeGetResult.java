@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -25,14 +26,24 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.transcoders.Transcoder;
 
 public class BTreeGetResult<K, V> {
-
-  private final SortedMap<K, BTreeElement<K, V>> elements;
   private final CollectionOperationStatus opStatus;
+  private final SortedMap<K, BTreeElement<K, V>> elements;
 
-  public BTreeGetResult(SortedMap<K, BTreeElement<K, V>> elements,
+  public BTreeGetResult(List<BTreeElement<K, CachedData>> elementList,
+                        boolean reverse, Transcoder<V> transcoder,
                         CollectionOperationStatus opStatus) {
-    this.elements = elements;
     this.opStatus = opStatus;
+
+    if (elementList == null) {
+      this.elements = null;
+      return;
+    }
+    this.elements = new ByteArrayTreeMap<K, BTreeElement<K, V>>(
+            reverse ? Collections.reverseOrder() : null);
+    for (BTreeElement<K, CachedData> elem : elementList) {
+      elements.put(elem.getBkey(), new BTreeElement<K, V>(elem.getBkey(), elem.getEflag(),
+              transcoder.decode(elem.getValue())));
+    }
   }
 
   public Map<K, BTreeElement<K, V>> getElements() {
@@ -41,15 +52,5 @@ public class BTreeGetResult<K, V> {
 
   public CollectionOperationStatus getCollectionResponse() {
     return opStatus;
-  }
-
-  public void addElements(List<BTreeElement<K, CachedData>> cachedData, Transcoder<V> tc) {
-    if (elements != null && elements.isEmpty()) {
-      for (BTreeElement<K, CachedData> elem : cachedData) {
-        BTreeElement<K, V> decodedElem =
-                new BTreeElement<K, V>(elem.getBkey(), elem.getEflag(), tc.decode(elem.getValue()));
-        elements.put(decodedElem.getBkey(), decodedElem);
-      }
-    }
   }
 }
