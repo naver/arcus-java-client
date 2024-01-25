@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.collection.Element;
-import net.spy.memcached.ops.CollectionGetOpCallback;
+import net.spy.memcached.internal.result.GetResult;
 
 /**
  * Future object that contains an b+tree element object
@@ -34,7 +34,7 @@ import net.spy.memcached.ops.CollectionGetOpCallback;
  */
 public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
 
-  private Element<E> element;
+  private GetResult<Element<E>> element;
 
   public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout) {
     this(l, new AtomicReference<T>(null), opTimeout);
@@ -54,13 +54,10 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e);
     }
-    CollectionGetOpCallback callback = (CollectionGetOpCallback) op.getCallback();
-    callback.addResult();
-    return element;
+    return element == null ? null : element.getDecodedValue();
   }
 
-  public void setElement(Element<E> element) {
+  public void setElement(GetResult<Element<E>> element) {
     this.element = element;
   }
-
 }

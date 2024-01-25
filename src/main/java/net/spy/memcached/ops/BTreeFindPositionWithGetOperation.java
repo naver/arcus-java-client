@@ -23,7 +23,7 @@ public interface BTreeFindPositionWithGetOperation extends KeyedOperation {
 
   BTreeFindPositionWithGet getGet();
 
-  interface Callback extends CollectionGetOpCallback {
+  interface Callback extends OperationCallback {
     void gotData(int pos, int flags, BKeyObject bkey, byte[] eflag, byte[] data);
   }
 }

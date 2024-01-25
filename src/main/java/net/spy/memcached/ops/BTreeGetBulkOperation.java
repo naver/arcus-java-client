@@ -21,7 +21,7 @@ import net.spy.memcached.collection.BTreeGetBulk;
 public interface BTreeGetBulkOperation extends KeyedOperation {
   BTreeGetBulk<?> getBulk();
 
-  interface Callback extends CollectionGetOpCallback {
+  interface Callback extends OperationCallback {
     void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data);
 
     void gotKey(String key, int elementCount, OperationStatus status);

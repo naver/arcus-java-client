@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
-import net.spy.memcached.ops.CollectionGetOpCallback;
+import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -37,9 +37,10 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   private final Collection<Operation> ops;
   private final long timeout;
   private final CountDownLatch latch;
-  private final T result;
+  private final GetResult<T> result;
 
-  public CollectionGetBulkFuture(CountDownLatch latch, Collection<Operation> ops, T result,
+  public CollectionGetBulkFuture(CountDownLatch latch, Collection<Operation> ops,
+                                 GetResult<T> result,
                                  long timeout) {
     this.latch = latch;
     this.ops = ops;
@@ -85,12 +86,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
         throw new ExecutionException(new RuntimeException(op.getCancelCause()));
       }
     }
-    for (Operation op : ops) {
-      CollectionGetOpCallback callback = (CollectionGetOpCallback) op.getCallback();
-      callback.addResult();
-    }
-
-    return result;
+    return result == null ? null : result.getDecodedValue();
   }
 
   @Override

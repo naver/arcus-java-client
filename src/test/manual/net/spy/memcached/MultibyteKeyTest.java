@@ -176,10 +176,6 @@ public class MultibyteKeyTest {
         @Override
         public void complete() {
         }
-
-        @Override
-        public void addResult() {
-        }
       }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -439,10 +435,6 @@ public class MultibyteKeyTest {
             @Override
             public void complete() {
             }
-
-            @Override
-            public void addResult() {
-            }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -540,10 +532,6 @@ public class MultibyteKeyTest {
             @Override
             public void complete() {
             }
-
-            @Override
-            public void addResult() {
-            }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -556,9 +544,6 @@ public class MultibyteKeyTest {
       opFact.bopGetByPosition(MULTIBYTE_KEY,
           new BTreeGetByPosition(BTreeOrder.ASC, 0),
           new BTreeGetByPositionOperation.Callback() {
-            @Override
-            public void addResult() {
-            }
 
             @Override
             public void gotData(int pos, int flags, BKeyObject bkey, byte[] eflag, byte[] data) {
@@ -683,10 +668,6 @@ public class MultibyteKeyTest {
 
             @Override
             public void complete() {
-            }
-
-            @Override
-            public void addResult() {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {

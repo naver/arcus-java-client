@@ -25,7 +25,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -70,7 +67,6 @@ import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkeyOld;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.ByteArrayBKey;
-import net.spy.memcached.collection.ByteArrayTreeMap;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionCount;
@@ -123,8 +119,16 @@ import net.spy.memcached.internal.CollectionGetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.PipedCollectionFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.internal.result.BopGetBulkResultImpl;
+import net.spy.memcached.internal.result.BopGetByPositionResultImpl;
+import net.spy.memcached.internal.result.BopGetResultImpl;
+import net.spy.memcached.internal.result.BopStoreAndGetResultImpl;
+import net.spy.memcached.internal.result.GetResult;
+import net.spy.memcached.internal.result.LopGetResultImpl;
+import net.spy.memcached.internal.result.MopGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultOldImpl;
+import net.spy.memcached.internal.result.SopGetResultImpl;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -459,12 +463,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                     final CollectionGet collectionGet,
                                                     final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionGetFuture<List<T>> rv = new CollectionGetFuture<List<T>>(latch, operationTimeout);
+    final CollectionGetFuture<List<T>> rv =
+            new CollectionGetFuture<List<T>>(latch, operationTimeout);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final List<T> result = new ArrayList<T>();
           private final List<CachedData> cachedDataList = new ArrayList<CachedData>();
+          private final GetResult<List<T>> result = new LopGetResultImpl<T>(cachedDataList, tc);
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -475,28 +480,28 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case OUT_OF_RANGE:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 break;
             }
@@ -508,15 +513,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
             cachedDataList.add(new CachedData(flags, data, tc.getMaxSize()));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataList.isEmpty()) {
-              for (CachedData cachedData : cachedDataList) {
-                result.add(tc.decode(cachedData));
-              }
-            }
           }
         });
     rv.setOperation(op);
@@ -554,10 +550,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-
-          private final HashSet<T> result = new HashSet<T>();
           private final HashSet<CachedData> cachedDataSet = new HashSet<CachedData>();
-
+          private final GetResult<Set<T>> result = new SopGetResultImpl<T>(cachedDataSet, tc);
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -568,25 +562,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
 
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               default:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
                 break;
             }
@@ -598,15 +592,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
             cachedDataSet.add(new CachedData(flags, data, tc.getMaxSize()));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataSet.isEmpty()) {
-              for (CachedData cachedData : cachedDataSet) {
-                result.add(tc.decode(cachedData));
-              }
-            }
           }
         });
 
@@ -630,11 +615,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Long, Element<T>>> rv =
             new CollectionGetFuture<Map<Long, Element<T>>>(latch, operationTimeout);
+
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final TreeMap<Long, Element<T>> result =
-                  new TreeMap<Long, Element<T>>((reverse) ? Collections.reverseOrder() : null);
           private final HashMap<Long, CachedData> cachedDataMap = new HashMap<Long, CachedData>();
+          private final GetResult<Map<Long, Element<T>>> result =
+                  new BopGetResultImpl<Long, T>(cachedDataMap, reverse, tc);
+
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -644,24 +631,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
@@ -673,17 +660,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
             cachedDataMap.put(Long.parseLong(bKey), new CachedData(flags, data, eflag, tc.getMaxSize()));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-              for (Entry<Long, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
-                Long bKey = cachedDataEntry.getKey();
-                CachedData cachedData = cachedDataEntry.getValue();
-                result.put(bKey, new Element<T>(bKey, tc.decode(cachedData), cachedData.getEFlag()));
-              }
-            }
           }
         });
     rv.setOperation(op);
@@ -704,11 +680,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<String, T>> rv =
             new CollectionGetFuture<Map<String, T>>(latch, operationTimeout);
+
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-
-          private final HashMap<String, T> result = new HashMap<String, T>();
           private final HashMap<String, CachedData> cachedDataMap = new HashMap<String, CachedData>();
+          private final GetResult<Map<String, T>> result
+                  = new MopGetResultImpl<T>(cachedDataMap, tc);
+
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -718,24 +696,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
                 break;
               default:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
@@ -747,17 +725,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void gotData(String mkey, int flags, byte[] data, byte[] eflag) {
             cachedDataMap.put(mkey, new CachedData(flags, data, eflag, tc.getMaxSize()));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-              for (Entry<String, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
-                String mKey = cachedDataEntry.getKey();
-                CachedData cachedData = cachedDataEntry.getValue();
-                result.put(mKey, tc.decode(cachedData));
-              }
-            }
           }
         });
     rv.setOperation(op);
@@ -2510,9 +2477,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
-          private final TreeMap<ByteArrayBKey, Element<T>> result
-                  = new ByteArrayTreeMap<ByteArrayBKey, Element<T>>((reverse) ? Collections.reverseOrder() : null);
           private final HashMap<ByteArrayBKey, CachedData> cachedDataMap = new HashMap<ByteArrayBKey, CachedData>();
+          private final GetResult<Map<ByteArrayBKey, Element<T>>> result =
+                  new BopGetResultImpl<ByteArrayBKey, T>(cachedDataMap, reverse, tc);
+
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
             if (status instanceof CollectionOperationStatus) {
@@ -2522,24 +2490,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(result, cstatus);
+                rv.setResult(result, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               default:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
                 break;
             }
@@ -2552,17 +2520,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
             cachedDataMap.put(new ByteArrayBKey(BTreeUtil.hexStringToByteArrays(bkey)),
                     new CachedData(flags, data, eflag, tc.getMaxSize()));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-              for (Entry<ByteArrayBKey, CachedData> cachedDataEntry : this.cachedDataMap.entrySet()) {
-                ByteArrayBKey bKey = cachedDataEntry.getKey();
-                CachedData cachedData = cachedDataEntry.getValue();
-                result.put(bKey, new Element<T>(bKey.getBytes(), tc.decode(cachedData), cachedData.getEFlag()));
-              }
-            }
           }
         });
     rv.setOperation(op);
@@ -2628,11 +2585,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new CollectionGetFuture<Map<Integer, Element<T>>>(latch, operationTimeout);
 
     Operation op = opFact.bopGetByPosition(k, get, new BTreeGetByPositionOperation.Callback() {
-
-      private final TreeMap<Integer, Element<T>> result =
-              new TreeMap<Integer, Element<T>>((reverse) ? Collections.reverseOrder() : null);
-      private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap
-              = new HashMap<Integer, Entry<BKeyObject, CachedData>>();
+      private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap =
+              new HashMap<Integer, Entry<BKeyObject, CachedData>>();
+      private final GetResult<Map<Integer, Element<T>>> result =
+              new BopGetByPositionResultImpl<T>(cachedDataMap, reverse, tc);
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus;
@@ -2643,24 +2599,24 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           cstatus = new CollectionOperationStatus(status);
         }
         if (cstatus.isSuccess()) {
-          rv.set(result, cstatus);
+          rv.setResult(result, cstatus);
           return;
         }
         switch (cstatus.getResponse()) {
           case NOT_FOUND:
-            rv.set(null, cstatus);
+            rv.setResult(null, cstatus);
             getLogger().debug("Key(%s) not found : %s", k, cstatus);
             break;
           case NOT_FOUND_ELEMENT:
-            rv.set(result, cstatus);
+            rv.setResult(result, cstatus);
             getLogger().debug("Element(%s) not found : %s", k, cstatus);
             break;
           case UNREADABLE:
-            rv.set(null, cstatus);
+            rv.setResult(null, cstatus);
             getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
             break;
           case TYPE_MISMATCH:
-            rv.set(null, cstatus);
+            rv.setResult(null, cstatus);
             getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
             break;
           default:
@@ -2677,16 +2633,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       public void gotData(int pos, int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
         CachedData cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
         cachedDataMap.put(pos, new AbstractMap.SimpleEntry<BKeyObject, CachedData>(bkeyObject, cachedData));
-      }
-
-      @Override
-      public void addResult() {
-        if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-          for (Entry<Integer, Entry<BKeyObject, CachedData>> entry : cachedDataMap.entrySet()) {
-            Entry<BKeyObject, CachedData> cachedDataEntry = entry.getValue();
-            result.put(entry.getKey(), makeBTreeElement(cachedDataEntry.getKey(), cachedDataEntry.getValue(), tc));
-          }
-        }
       }
     });
     rv.setOperation(op);
@@ -2837,11 +2783,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     Operation op = opFact.bopFindPositionWithGet(k, get,
         new BTreeFindPositionWithGetOperation.Callback() {
-
-          private final TreeMap<Integer, Element<T>> result
-                  = new TreeMap<Integer, Element<T>>();
           private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap
                   = new HashMap<Integer, Entry<BKeyObject, CachedData>>();
+          private final GetResult<Map<Integer, Element<T>>> result
+                  = new BopGetByPositionResultImpl<T>(cachedDataMap, false, tc);
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -2852,29 +2797,29 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
             if (cstatus.isSuccess()) {
-              rv.set(result, cstatus);
+              rv.setResult(result, cstatus);
               return;
             }
             switch (cstatus.getResponse()) {
               case NOT_FOUND:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Key(%s) not found : %s", k, cstatus);
                 break;
               case NOT_FOUND_ELEMENT:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Element(%s) not found : %s", k, cstatus);
                 break;
               case UNREADABLE:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
                 break;
               case BKEY_MISMATCH:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
                     get.getBkeyObject().getType());
                 break;
               case TYPE_MISMATCH:
-                rv.set(null, cstatus);
+                rv.setResult(null, cstatus);
                 getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
                 break;
               default:
@@ -2890,16 +2835,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           public void gotData(int pos, int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
             CachedData cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
             cachedDataMap.put(pos, new AbstractMap.SimpleEntry<BKeyObject, CachedData>(bkeyObject, cachedData));
-          }
-
-          @Override
-          public void addResult() {
-            if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-              for (Map.Entry<Integer, Map.Entry<BKeyObject, CachedData>> entry : cachedDataMap.entrySet()) {
-                Entry<BKeyObject, CachedData> cachedDataEntry = entry.getValue();
-                result.put(entry.getKey(), makeBTreeElement(cachedDataEntry.getKey(), cachedDataEntry.getValue(), tc));
-              }
-            }
           }
         }
     );
@@ -2994,14 +2929,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     get.setFlags(co.getFlags());
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final BTreeStoreAndGetFuture<Boolean, E> rv
-            = new BTreeStoreAndGetFuture<Boolean, E>(latch, operationTimeout);
+    final BTreeStoreAndGetFuture<Boolean, E> rv =
+            new BTreeStoreAndGetFuture<Boolean, E>(latch, operationTimeout);
 
     Operation op = opFact.bopInsertAndGet(k, get, co.getData(),
         new BTreeInsertAndGetOperation.Callback() {
-          private Element<E> element = null;
-          private CachedData cachedData = null;
-          private BKeyObject bKeyObject = null;
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -3036,46 +2968,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           @Override
           public void gotData(int flags, BKeyObject bkeyObject, byte[] eflag, byte[] data) {
-            this.bKeyObject = bkeyObject;
-            cachedData = new CachedData(flags, data, eflag, tc.getMaxSize());
-          }
-
-          @Override
-          public void addResult() {
-            if (cachedData != null && element == null) {
-              element = makeBTreeElement(bKeyObject, cachedData, tc);
-              rv.setElement(element);
-            }
+            rv.setElement(new BopStoreAndGetResultImpl<E>(bkeyObject,
+                    new CachedData(flags, data, eflag, tc.getMaxSize()), tc));
           }
         });
     rv.setOperation(op);
     addOp(k, op);
     return rv;
-  }
-
-  /**
-   * Utility method to create a b+tree element from individual parameters.
-   *
-   * @param bkey  element key
-   * @param cachedData element data
-   * @param tc    transcoder to serialize and unserialize value
-   * @return element object containing all the parameters and transcoded value
-   */
-  private <T> Element<T> makeBTreeElement(BKeyObject bkey, CachedData cachedData, Transcoder<T> tc) {
-    Element<T> element = null;
-    T value = tc.decode(cachedData);
-
-    switch (bkey.getType()) {
-      case LONG:
-        element = new Element<T>(bkey.getLongBKey(), value, cachedData.getEFlag());
-        break;
-      case BYTEARRAY:
-        element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, cachedData.getEFlag());
-        break;
-      default:
-        getLogger().error("Unexpected bkey type : (bkey:" + bkey.toString() + ")");
-    }
-    return element;
   }
 
   @Override
@@ -3636,13 +3535,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-    final Map<String, BTreeGetResult<Long, T>> result =
-        new ConcurrentHashMap<String, BTreeGetResult<Long, T>>();
+    final Map<String, List<BTreeElement<Long, CachedData>>> cachedDataMap =
+            new HashMap<String, List<BTreeElement<Long, CachedData>>>();
+    final Map<String, CollectionOperationStatus> opStatusMap =
+            new HashMap<String, CollectionOperationStatus>();
+    final GetResult<Map<String, BTreeGetResult<Long, T>>> result =
+            new BopGetBulkResultImpl<Long, T>(cachedDataMap, opStatusMap, reverse, tc);
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
-      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
-        private final Map<String, List<BTreeElement<Long, CachedData>>> cachedDataMap =
-                new HashMap<String, List<BTreeElement<Long, CachedData>>>();
+      final Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
 
         @Override
         public void receivedStatus(OperationStatus status) {
@@ -3656,33 +3557,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotKey(String key, int elementCount, OperationStatus status) {
-          TreeMap<Long, BTreeElement<Long, T>> tree = null;
           if (elementCount > 0) {
-            tree = new TreeMap<Long, BTreeElement<Long, T>>(
-                    (reverse) ? Collections.reverseOrder() : null);
+            cachedDataMap.put(key, new ArrayList<BTreeElement<Long, CachedData>>(elementCount));
           }
-          result.put(key, new BTreeGetResult<Long, T>(tree, new CollectionOperationStatus(status)));
+          opStatusMap.put(key, (CollectionOperationStatus) status);
         }
 
         @Override
         public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          List<BTreeElement<Long, CachedData>> elements = cachedDataMap.get(key);
-          if (elements == null) {
-            elements = new ArrayList<BTreeElement<Long, CachedData>>();
-            cachedDataMap.put(key, elements);
-          }
-          elements.add(new BTreeElement<Long, CachedData>((Long) bkey, eflag,
+          List<BTreeElement<Long, CachedData>> elems = cachedDataMap.get(key);
+          assert elems != null : "Element list not prepared in bopGetBulk";
+          elems.add(new BTreeElement<Long, CachedData>((Long) bkey, eflag,
                   new CachedData(flags, data, tc.getMaxSize())));
-        }
-
-        @Override
-        public void addResult() {
-          if (!cachedDataMap.isEmpty()) {
-            for (Entry<String, List<BTreeElement<Long, CachedData>>> entry : cachedDataMap.entrySet()) {
-              result.get(entry.getKey()).addElements(entry.getValue(), tc);
-            }
-            cachedDataMap.clear();
-          }
         }
       });
       ops.add(op);
@@ -3709,14 +3595,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
     final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-    final Map<String, BTreeGetResult<ByteArrayBKey, T>> result =
-        new ConcurrentHashMap<String, BTreeGetResult<ByteArrayBKey, T>>();
+    final Map<String, List<BTreeElement<ByteArrayBKey, CachedData>>> cachedDataMap =
+            new HashMap<String, List<BTreeElement<ByteArrayBKey, CachedData>>>();
+    final Map<String, CollectionOperationStatus> opStatusMap =
+            new HashMap<String, CollectionOperationStatus>();
+    final GetResult<Map<String, BTreeGetResult<ByteArrayBKey, T>>> result =
+            new BopGetBulkResultImpl<ByteArrayBKey, T>(cachedDataMap, opStatusMap, reverse, tc);
 
     for (BTreeGetBulk<T> getBulk : getBulkList) {
       Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
-        private final Map<String, List<BTreeElement<ByteArrayBKey, CachedData>>> cachedDataMap =
-                new HashMap<String, List<BTreeElement<ByteArrayBKey, CachedData>>>();
-
         @Override
         public void receivedStatus(OperationStatus status) {
         }
@@ -3728,35 +3615,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotKey(String key, int elementCount, OperationStatus status) {
-          TreeMap<ByteArrayBKey, BTreeElement<ByteArrayBKey, T>> tree = null;
           if (elementCount > 0) {
-            tree = new ByteArrayTreeMap<ByteArrayBKey, BTreeElement<ByteArrayBKey, T>>(
-                    (reverse) ? Collections.reverseOrder() : null);
+            cachedDataMap.put(key, new ArrayList<BTreeElement<ByteArrayBKey, CachedData>>(elementCount));
           }
-          result.put(key, new BTreeGetResult<ByteArrayBKey, T>(
-              tree, new CollectionOperationStatus(status)));
+          opStatusMap.put(key, (CollectionOperationStatus) status);
         }
 
         @Override
         public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          List<BTreeElement<ByteArrayBKey, CachedData>> elements = cachedDataMap.get(key);
-          if (elements == null) {
-            elements = new ArrayList<BTreeElement<ByteArrayBKey, CachedData>>();
-            cachedDataMap.put(key, elements);
-          }
-          elements.add(new BTreeElement<ByteArrayBKey, CachedData>(
+          List<BTreeElement<ByteArrayBKey, CachedData>> elems = cachedDataMap.get(key);
+          assert elems != null : "Element list not prepared in bopGetBulk";
+          elems.add(new BTreeElement<ByteArrayBKey, CachedData>(
                   new ByteArrayBKey((byte[]) bkey), eflag,
                   new CachedData(flags, data, tc.getMaxSize())));
-        }
-
-        @Override
-        public void addResult() {
-          if (!cachedDataMap.isEmpty()) {
-            for (Entry<String, List<BTreeElement<ByteArrayBKey, CachedData>>> entry : cachedDataMap.entrySet()) {
-              result.get(entry.getKey()).addElements(entry.getValue(), tc);
-            }
-            cachedDataMap.clear();
-          }
         }
       });
       ops.add(op);
