@@ -18,9 +18,9 @@ public abstract class SMGetResult<T>  {
   protected final List<String> missedKeyList;
   protected final Map<String, CollectionOperationStatus> missedKeyMap;
   protected final Map<String, BKeyObject> trimmedKeyMap;
-  protected List<SMGetTrimKey> mergedTrimmedKeys;
+  protected volatile List<SMGetTrimKey> mergedTrimmedKeys;
 
-  protected final List<SMGetElement<T>> mergedResult;
+  protected volatile List<SMGetElement<T>> mergedResult;
   protected volatile CollectionOperationStatus resultOperationStatus = null;
   protected volatile CollectionOperationStatus failedOperationStatus = null;
 
