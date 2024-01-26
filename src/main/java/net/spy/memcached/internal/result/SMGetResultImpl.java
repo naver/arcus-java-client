@@ -1,5 +1,6 @@
 package net.spy.memcached.internal.result;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,64 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       }
       pos += 1;
     }
+  }
+
+  private void mergeSMGetElements2(final List<SMGetElement<T>> eachResult) {
+    if (mergedResult.isEmpty()) {
+      // merged result is empty, add all.
+      mergedResult.addAll(eachResult);
+
+      while (mergedResult.size() > count) {
+        mergedResult.remove(count);
+      }
+      return;
+    }
+
+    final int eachSize = eachResult.size();
+    final int oldMergedSize = mergedResult.size();
+    final List<SMGetElement<T>> newMergedResult = new ArrayList<SMGetElement<T>>(count);
+
+    int eachPos = 0, oldMergedPos = 0, comp;
+    boolean bkeyDuplicated;
+
+    while (eachPos < eachSize && oldMergedPos < oldMergedSize && newMergedResult.size() < count) {
+      final SMGetElement<T> eachElem = eachResult.get(eachPos);
+      final SMGetElement<T> oldMergedElem = mergedResult.get(oldMergedPos);
+
+      comp = eachElem.compareBkeyTo(oldMergedElem);
+      bkeyDuplicated = (comp == 0);
+      if (bkeyDuplicated) {
+        // Duplicated bkey. Compare the "cache key".
+        comp = eachElem.compareKeyTo(oldMergedElem);
+        assert comp != 0 : "Unexpected smget elements. Duplicated cache key : " + eachElem.getKey();
+      }
+      if ((reverse) ? (comp > 0) : (comp < 0)) {
+        newMergedResult.add(eachElem);
+        eachPos++;
+
+        if (unique && bkeyDuplicated) {
+          // NOT the first cache key with the same bkey. do NOT insert.
+          oldMergedPos++;
+        }
+      } else {
+        newMergedResult.add(oldMergedElem);
+        oldMergedPos++;
+
+        if (unique && bkeyDuplicated) {
+          // NOT the first cache key with the same bkey. do NOT insert.
+          eachPos++;
+        }
+      }
+    }
+
+    while (eachPos < eachSize && newMergedResult.size() < count) {
+      newMergedResult.add(eachResult.get(eachPos++));
+    }
+    while (oldMergedPos < oldMergedSize && newMergedResult.size() < count) {
+      newMergedResult.add(mergedResult.get(oldMergedPos++));
+    }
+
+    mergedResult = newMergedResult;
   }
 
   @Override
