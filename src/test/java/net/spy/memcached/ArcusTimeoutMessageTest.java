@@ -49,7 +49,6 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
-import net.spy.memcached.ops.StoreType;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -168,7 +167,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String value = "value";
 
     OperationFuture<Boolean> f
-            = mc.asyncStore(StoreType.add, key, 10, new CachedData(30, value.getBytes(), 300));
+            = mc.add(key, 10, value);
 
     try {
       f.get(1L, TimeUnit.MILLISECONDS);

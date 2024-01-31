@@ -189,7 +189,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static final String DEFAULT_ARCUS_CLIENT_NAME = "ArcusClient";
   private boolean dead;
 
-  // final BulkService bulkService;
   private final Transcoder<Object> collectionTranscoder;
 
   private final int smgetKeyChunkSize;
@@ -315,8 +314,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, name, addrs);
-    // bulkService = new BulkService(cf.getBulkServiceLoopLimit(),
-    //         cf.getBulkServiceThreadCount(), cf.getBulkServiceSingleOpTimeout());
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean();
@@ -368,9 +365,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       cacheManager.shutdown();
     }
     dead = true;
-    // if (bulkService != null) {
-    //  bulkService.shutdown();
-    // }
     return result;
   }
 
@@ -395,25 +389,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 + mkey + "''");
       }
     }
-  }
-
-  OperationFuture<Boolean> asyncStore(StoreType storeType, String key, int exp, CachedData co) {
-    final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
-            operationTimeout);
-    Operation op = opFact.store(storeType, key, co.getFlags(),
-            exp, co.getData(), new OperationCallback() {
-              public void receivedStatus(OperationStatus val) {
-                rv.set(val.isSuccess(), val);
-              }
-
-              public void complete() {
-                latch.countDown();
-              }
-            });
-    rv.setOperation(op);
-    addOp(key, op);
-    return rv;
   }
 
   @Override
