@@ -380,30 +380,6 @@ public class ConnectionFactoryBuilder {
   }
 
   /**
-   * Set bulk service default thread count
-   */
-  @Deprecated
-  public ConnectionFactoryBuilder setBulkServiceThreadCount(int to) {
-    return this;
-  }
-
-  /**
-   * Set bulk service loop limit count
-   */
-  @Deprecated
-  public ConnectionFactoryBuilder setBulkServiceLoopLimit(int to) {
-    return this;
-  }
-
-  /**
-   * Set bulk service each operation timeout
-   */
-  @Deprecated
-  public ConnectionFactoryBuilder setBulkServiceSingleOpTimeout(long to) {
-    return this;
-  }
-
-  /**
    * Set max smget key chunk size
    */
   public ConnectionFactoryBuilder setMaxSMGetKeyChunkSize(int size) {

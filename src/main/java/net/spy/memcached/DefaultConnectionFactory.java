@@ -144,25 +144,6 @@ public class DefaultConnectionFactory extends SpyObject
   public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_WRITE = false;
 
   /**
-   * Default bulk service thread count
-   */
-  public static final int DEFAULT_BULKSERVICE_THREAD_COUNT = 1;
-
-  /**
-   * Default bulk service loop limit
-   */
-  public static final int DEFAULT_BULKSERVICE_LOOP_LIMIT = 1;
-
-  /**
-   * Default bulk service single operation timeout
-   *
-   * operation timeout : 700ms
-   * It avoids the occurence of operation timeout
-   * even if two packet retransmissions exist in linux.
-   */
-  public static final long DEFAULT_BULKSERVICE_SINGLE_OP_TIMEOUT = 700L;
-
-  /**
    * Max smget key chunk size per request
    */
   public static final int DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE = 500;
