@@ -642,8 +642,6 @@ public final class MemcachedConnection extends SpyObject {
     try {
       if (ch.connect(sa)) {
         getLogger().info("new memcached node connected to %s immediately", qa);
-        // FIXME.  Do we ever execute this path?
-        // This method does not call observer.connectionEstablished.
         connected(qa);
       } else {
         getLogger().info("new memcached node added %s to connect queue", qa);
@@ -1500,7 +1498,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /**
-   * Shut down all of the connections.
+   * Shut down all the connections.
    */
   public void shutdown() throws IOException {
     for (MemcachedNode qa : locator.getAll()) {
