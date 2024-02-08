@@ -1,10 +1,7 @@
 package net.spy.memcached.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -12,6 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -21,8 +19,8 @@ import net.spy.memcached.ops.OperationState;
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
   private final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
-  private final List<CollectionOperationStatus> mergedOperationStatus
-          = Collections.synchronizedList(new ArrayList<CollectionOperationStatus>());
+  private final AtomicReference<CollectionOperationStatus> operationStatus
+          = new AtomicReference<CollectionOperationStatus>(null);
 
   private final Map<K, V> mergedResult =
           new ConcurrentHashMap<K, V>();
@@ -97,16 +95,18 @@ public class PipedCollectionFuture<K, V>
 
   @Override
   public CollectionOperationStatus getOperationStatus() {
-    for (CollectionOperationStatus status : mergedOperationStatus) {
-      if (!status.isSuccess()) {
-        return status;
-      }
-    }
-    return mergedOperationStatus.get(0);
+    return operationStatus.get();
   }
 
-  public void addOperationStatus(CollectionOperationStatus status) {
-    mergedOperationStatus.add(status);
+  public void setOperationStatus(CollectionOperationStatus status) {
+    if (operationStatus.get() == null) {
+      operationStatus.set(status);
+      return;
+    }
+
+    if (!status.isSuccess() && operationStatus.get().isSuccess()) {
+      operationStatus.set(status);
+    }
   }
 
   public void addEachResult(K index, V status) {

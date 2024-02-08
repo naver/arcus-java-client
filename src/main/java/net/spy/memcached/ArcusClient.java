@@ -865,7 +865,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().warn("Unhandled state: " + status);
                 cstatus = new CollectionOperationStatus(status);
               }
-              rv.addOperationStatus(cstatus);
+              rv.setOperationStatus(cstatus);
             }
 
             // complete
@@ -3307,7 +3307,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 getLogger().warn("Unhandled state: " + status);
                 cstatus = new CollectionOperationStatus(status);
               }
-              rv.addOperationStatus(cstatus);
+              rv.setOperationStatus(cstatus);
             }
 
             // complete
