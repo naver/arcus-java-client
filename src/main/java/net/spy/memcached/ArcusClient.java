@@ -1005,7 +1005,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           });
       opMap.put(key, op);
     }
-    rv.setOperations(opMap.values());
+    rv.addOperations(opMap.values());
     addOpMap(opMap);
     return rv;
   }
@@ -1053,7 +1053,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             });
       opMap.put(key, op);
     }
-    rv.setOperations(opMap.values());
+    rv.addOperations(opMap.values());
     addOpMap(opMap);
     return rv;
   }
@@ -1093,7 +1093,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             });
       opMap.put(key, op);
     }
-    rv.setOperations(opMap.values());
+    rv.addOperations(opMap.values());
     addOpMap(opMap);
     return rv;
   }
@@ -1140,7 +1140,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           });
       opMap.put(key, op);
     }
-    rv.setOperations(opMap.values());
+    rv.addOperations(opMap.values());
     addOpMap(opMap);
     return rv;
   }
@@ -1174,7 +1174,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       });
       opMap.put(key, op);
     }
-    rv.setOperations(opMap.values());
+    rv.addOperations(opMap.values());
     addOpMap(opMap);
     return rv;
   }
