@@ -22,7 +22,7 @@ public class PipedCollectionFuture<K, V>
   private final AtomicReference<CollectionOperationStatus> operationStatus
           = new AtomicReference<CollectionOperationStatus>(null);
 
-  private final Map<K, V> mergedResult =
+  private final Map<K, V> failedResult =
           new ConcurrentHashMap<K, V>();
 
   public PipedCollectionFuture(CountDownLatch l, long opTimeout) {
@@ -90,7 +90,7 @@ public class PipedCollectionFuture<K, V>
       }
     }
 
-    return mergedResult;
+    return failedResult;
   }
 
   @Override
@@ -110,7 +110,7 @@ public class PipedCollectionFuture<K, V>
   }
 
   public void addEachResult(K index, V status) {
-    mergedResult.put(index, status);
+    failedResult.put(index, status);
   }
 
   public void addOperation(Operation op) {
