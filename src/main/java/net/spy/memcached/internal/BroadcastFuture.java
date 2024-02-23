@@ -84,8 +84,8 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
     return objRef.get();
   }
 
-  public void addOp(Operation op) {
-    ops.add(op);
+  public void addOperations(Collection<Operation> ops) {
+    this.ops.addAll(ops);
   }
 
   public void complete() {

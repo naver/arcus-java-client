@@ -1901,6 +1901,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Collection<MemcachedNode> nodes = getAllNodes();
     final BroadcastFuture<Boolean> rv
             = new BroadcastFuture<Boolean>(operationTimeout, Boolean.TRUE, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -1917,9 +1918,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           rv.complete();
         }
       });
-      rv.addOp(op);
-      getMemcachedConnection().addOperation(node, op);
+      opsMap.put(node, op);
     }
+    rv.addOperations(opsMap.values());
+    getMemcachedConnection().addOperations(opsMap);
     return rv;
   }
 

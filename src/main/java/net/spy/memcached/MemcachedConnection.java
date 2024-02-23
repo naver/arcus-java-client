@@ -1482,13 +1482,8 @@ public final class MemcachedConnection extends SpyObject {
 
   public void addOperations(final Map<MemcachedNode, Operation> ops) {
     for (Map.Entry<MemcachedNode, Operation> me : ops.entrySet()) {
-      final MemcachedNode node = me.getKey();
-      Operation o = me.getValue();
-      node.addOpToInputQ(o);
-      addedQueue.offer(node);
+      addOperation(me.getKey(), me.getValue());
     }
-    Selector s = selector.wakeup();
-    assert s == selector : "Wakeup returned the wrong selector.";
   }
 
   public void wakeUpSelector() {
