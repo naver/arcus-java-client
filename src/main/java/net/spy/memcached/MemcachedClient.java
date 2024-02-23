@@ -1549,6 +1549,7 @@ public class MemcachedClient extends SpyThread
     final BroadcastFuture<Map<SocketAddress, String>> future
             = new BroadcastFuture<Map<SocketAddress, String>>(
                     operationTimeout, result, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -1564,9 +1565,10 @@ public class MemcachedClient extends SpyThread
           future.complete();
         }
       });
-      future.addOp(op);
-      conn.addOperation(node, op);
+      opsMap.put(node, op);
     }
+    future.addOperations(opsMap.values());
+    conn.addOperations(opsMap);
 
     Map<SocketAddress, String> rv = null;
     try {
@@ -1612,6 +1614,7 @@ public class MemcachedClient extends SpyThread
     final BroadcastFuture<Map<SocketAddress, Map<String, String>>> future
             = new BroadcastFuture<Map<SocketAddress, Map<String, String>>>(
                     operationTimeout, resultMap, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -1637,9 +1640,10 @@ public class MemcachedClient extends SpyThread
           future.complete();
         }
       });
-      future.addOp(op);
-      conn.addOperation(node, op);
+      opsMap.put(node, op);
     }
+    future.addOperations(opsMap.values());
+    conn.addOperations(opsMap);
 
     Map<SocketAddress, Map<String, String>> rv = null;
     try {
@@ -1965,6 +1969,7 @@ public class MemcachedClient extends SpyThread
     Collection<MemcachedNode> nodes = getAllNodes();
     final BroadcastFuture<Boolean> rv
             = new BroadcastFuture<Boolean>(operationTimeout, Boolean.TRUE, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -1981,9 +1986,10 @@ public class MemcachedClient extends SpyThread
           rv.complete();
         }
       });
-      rv.addOp(op);
-      conn.addOperation(node, op);
+      opsMap.put(node, op);
     }
+    rv.addOperations(opsMap.values());
+    conn.addOperations(opsMap);
     return rv;
   }
 
@@ -2005,6 +2011,7 @@ public class MemcachedClient extends SpyThread
     final BroadcastFuture<ConcurrentMap<String, String>> future
             = new BroadcastFuture<ConcurrentMap<String, String>>(
                     operationTimeout, resultMap, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -2021,9 +2028,10 @@ public class MemcachedClient extends SpyThread
           future.complete();
         }
       });
-      future.addOp(op);
-      conn.addOperation(node, op);
+      opsMap.put(node, op);
     }
+    future.addOperations(opsMap.values());
+    conn.addOperations(opsMap);
 
     Set<String> rv = null;
     try {
