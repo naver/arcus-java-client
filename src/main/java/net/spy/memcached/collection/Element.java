@@ -35,7 +35,7 @@ public class Element<T> {
    *
    * @param bkey  key of element
    * @param value value of element
-   * @param eflag flag of element (minimun length is 1. maximum length is 31)
+   * @param eflag flag of element (minimum length is 1. maximum length is 31)
    */
   public Element(byte[] bkey, T value, byte[] eflag) {
     this.bKeyObject = new BKeyObject(bkey);

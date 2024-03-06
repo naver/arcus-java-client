@@ -54,7 +54,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
       Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
-      // get value againg
+      // get value again
       Assert.assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, false, false)
               .get().get(INDEX));
     } catch (Exception e) {
@@ -63,7 +63,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
     }
   }
 
-  public void testGetWithtDeleteAndWithoutDrop() {
+  public void testGetWithDeleteAndWithoutDrop() {
     try {
       // check attr
       Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
@@ -90,7 +90,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
     }
   }
 
-  public void testGetWithtDeleteAndWithDrop() {
+  public void testGetWithDeleteAndWithDrop() {
     try {
       // check attr
       Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()

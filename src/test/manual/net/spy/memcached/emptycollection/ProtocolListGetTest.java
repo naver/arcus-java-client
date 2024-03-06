@@ -26,7 +26,7 @@ public class ProtocolListGetTest extends TestCase {
 
   private static final int index = 10;
 
-  public void testStringfy() {
+  public void testStringify() {
     Assert.assertEquals("10 drop",
             (new ListGet(index, true, true)).stringify());
     Assert.assertEquals("10 delete", (new ListGet(index, true,

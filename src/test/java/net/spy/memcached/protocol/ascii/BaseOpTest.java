@@ -80,8 +80,8 @@ public class BaseOpTest extends BaseMockCase {
     op.readFromBuffer(ByteBuffer.wrap("xy".getBytes()));
     byte[] expected = {'x', 'y'};
     assertTrue("Expected " + Arrays.toString(expected) + " but got "
-                    + Arrays.toString(op.getCurentBytes()),
-            Arrays.equals(expected, op.getCurentBytes()));
+                    + Arrays.toString(op.getCurrentBytes()),
+            Arrays.equals(expected, op.getCurrentBytes()));
   }
 
   public void testPartialLine() throws Exception {
@@ -124,7 +124,7 @@ public class BaseOpTest extends BaseMockCase {
       return lines;
     }
 
-    public byte[] getCurentBytes() {
+    public byte[] getCurrentBytes() {
       return currentBytes;
     }
 

@@ -270,7 +270,7 @@ public class MockMemcachedNode implements MemcachedNode {
   }
 
   @Override
-  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempontent) {
+  public int moveOperations(final MemcachedNode toNode, boolean cancelNonIdempotent) {
     // noop
     return 0;
   }

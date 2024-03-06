@@ -8,7 +8,7 @@ public class CASValue<T> {
   private final T value;
 
   /**
-   * Construct a new CASValue with the given identifer and value.
+   * Construct a new CASValue with the given identifier and value.
    *
    * @param c the CAS identifier
    * @param v the value

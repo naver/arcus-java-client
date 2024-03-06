@@ -34,7 +34,7 @@ public final class ArrayModNodeLocator implements NodeLocator {
   private final HashAlgorithm hashAlg;
 
   /**
-   * Construct an ArraymodNodeLocator over the given array of nodes and
+   * Construct an ArrayModNodeLocator over the given array of nodes and
    * using the given hash algorithm.
    *
    * @param n   the array of nodes

@@ -26,13 +26,13 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   private final List<String> keys = new ArrayList<String>();
 
   public BaseLongKeyTest() {
-    int defaultKeyLenght = 4000 - 10; // MAX_KEY_LENGTH - key index string length
+    int defaultKeyLength = 4000 - 10; // MAX_KEY_LENGTH - key index string length
     char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
     for (int i = 0; i < keySize; i++) {
       StringBuilder sb = new StringBuilder();
       Random random = new Random();
-      for (int j = 0; j < defaultKeyLenght; j++) {
+      for (int j = 0; j < defaultKeyLength; j++) {
         char c = chars[random.nextInt(chars.length)];
         sb.append(c);
       }

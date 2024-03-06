@@ -23,10 +23,10 @@ public class AuthDescriptor {
     mechs = m;
     cbh = h;
     authAttempts = 0;
-    String authThreshhold = System.getProperty(
+    String authThreshold = System.getProperty(
             "net.spy.memcached.auth.AuthThreshold");
-    if (authThreshhold != null) {
-      allowedAuthAttempts = Integer.parseInt(authThreshhold);
+    if (authThreshold != null) {
+      allowedAuthAttempts = Integer.parseInt(authThreshold);
     } else {
       allowedAuthAttempts = -1; // auth forever
     }

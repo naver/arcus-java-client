@@ -3,7 +3,7 @@ package net.spy.memcached.ops;
 public enum OperationType {
     /*
      * only Ascii Operation have WRITE or READ, ETC OperationType
-     * Binary Operation has only UNDEFIED OperationType
+     * Binary Operation has only UNDEFINED OperationType
      * because Arcus Client don't use Binary Operation.
      */
 
@@ -15,14 +15,14 @@ public enum OperationType {
    * CASOperationImpl (asyncCAS, cas)
    * CollectionCreateOperationImpl (asyncBopCreate / asyncLopCreate / asyncSopCreate)
    * CollectionInsertOperationImpl (asyncBopInsert / asyncLopInsert / asyncSopInsert / asyncBopUpsert)
-   * CollectionDeleteOperationImpl (asynBopDelete / asyncLopDelete / asyncSopDelete)
+   * CollectionDeleteOperationImpl (asyncBopDelete / asyncLopDelete / asyncSopDelete)
    * CollectionGetOperationImpl (asyncBopGet / asyncLopGet / asyncSopGet) is WRITE, when withDelete is true.
    * CollectionBulkInsertOperationImpl (asyncBopInsertBulk / asyncLopInsertBulk / asyncSopInsertBulk)
    * CollectionPipedInsertOperationImpl (asyncBopPipedInsertBulk / asyncLopPipedInsertBulk / asyncSopPipedInsertBulk)
    * CollectionPipedUpdateOperationImpl (asyncBopPipedUpdateBulk)
    * CollectionUpdateOperationImpl (asyncBopUpdate)
    * CollectionMutateOperationImpl (asyncBopIncr / asyncBopDecr)
-   * BTreeInsertAndGetOperationImpl (asynBopInsertAndGetTrimmed)
+   * BTreeInsertAndGetOperationImpl (asyncBopInsertAndGetTrimmed)
    * FlushOperationImpl / FlushByPrefixOperationImpl (flush)
    * SetAttrOperationImpl (asyncSetAttr)
    */
@@ -61,7 +61,7 @@ public enum OperationType {
 }
 
 /* Operation Hierarchy (only ascii type)
- * ├── BaseOperationImple.java-Abstract
+ * ├── BaseOperationImpl.java-Abstract
    └── Operation.java-Interface
        ├── OperationImpl.java-extends[BaseOperationImpl]-implements[Operation]
        │   ├── BaseGetOpImpl.java-Abstract-extends[OperationImpl]
@@ -73,19 +73,19 @@ public enum OperationType {
        │   ├── BTreeFindPositionOperation.java-Interface-extends[KeyedOperation]
        │   │   └── BTreeFindPositionOperationImpl.java-extends[OperationImpl]-implements[BTreeFindPositionOperation]
        │   ├── BTreeFindPositionWithGetOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── BTreeFindPositionWithGetOperationImpl.java-extends[OperationImpl]-implements[KeyedOpeartion]
+       │   │   └── BTreeFindPositionWithGetOperationImpl.java-extends[OperationImpl]-implements[KeyedOperation]
        │   ├── BTreeGetBulkOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── BTreeGetBulkOperationImpl.java-extends[OpeartionImpl]-implements[KeyedOpeartion]
+       │   │   └── BTreeGetBulkOperationImpl.java-extends[OperationImpl]-implements[KeyedOperation]
        │   ├── BTreeGetByPositionOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── BTreeGetByPositionOperationImpl.java-extends[OperationImpl]-implements[KeyedOpeartion]
-       │   ├── BTreeSortMergeGetOperation.java-Interface-extends[KeyedOpeartion]
+       │   │   └── BTreeGetByPositionOperationImpl.java-extends[OperationImpl]-implements[KeyedOperation]
+       │   ├── BTreeSortMergeGetOperation.java-Interface-extends[KeyedOperation]
        │   │   └── BTreeSortMergeGetOperationImpl.java-extends[OperationImpl]-implements[BTreeSortMergeGetOperation]
        │   ├── BTreeInsertAndGetOperation.java-Interface-extends[KeyedOperation]
        │   │   └── BTreeInsertAndGetOperationImpl.java-extends[OperationImpl]-implements[BTreeInsertAndGetOperation]
        │   ├── CASOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── CASOperationImpl.java-extends[OpeartionImpl]-implements[CASOperation]
+       │   │   └── CASOperationImpl.java-extends[OperationImpl]-implements[CASOperation]
        │   ├── CollectionBulkInsertOperation.java-Interface-extends[KeyedOperation]
-       │   │   └── CollectionBulkInsertOperationImpl.java-extends[OpeartionImpl]-implements[CollectionBulkInsertOperation]
+       │   │   └── CollectionBulkInsertOperationImpl.java-extends[OperationImpl]-implements[CollectionBulkInsertOperation]
        │   ├── CollectionCountOperation.java-Interface-extends[KeyedOperation]
        │   │   └── CollectionCountOperationImpl.java-extends[OperationImpl]-implements[CollectionCountOperation]
        │   ├── CollectionCreateOperation.java-Interface-extends[KeyedOperation]

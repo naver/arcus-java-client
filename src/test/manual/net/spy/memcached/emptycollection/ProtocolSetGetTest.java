@@ -26,7 +26,7 @@ public class ProtocolSetGetTest extends TestCase {
 
   private static final int count = 10;
 
-  public void testStringfy() {
+  public void testStringify() {
     Assert.assertEquals("10 drop",
             (new SetGet(count, true, true)).stringify());
     Assert.assertEquals("10 delete",
