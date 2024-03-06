@@ -143,7 +143,7 @@ public class SASLConnectReconnect {
             assertEquals("me" + i, res);
           }
         } catch (OperationTimeoutException ex) {
-          System.err.println("Operation timeed out, continuing.");
+          System.err.println("Operation timed out, continuing.");
         }
       }
       mc.shutdown(1, TimeUnit.SECONDS);

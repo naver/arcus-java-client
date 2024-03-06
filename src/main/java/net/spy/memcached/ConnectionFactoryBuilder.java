@@ -116,7 +116,7 @@ public class ConnectionFactoryBuilder {
     arcusReplEnabled = b;
   }
 
-  /* @deprecated  This method is no longer needed by applicaitons.
+  /* @deprecated  This method is no longer needed by applications.
    * The replication cluster is internally determined by checking
    * ZK directories for the given service code. The service code
    * must be unique in each ZK ensemble.
@@ -126,7 +126,7 @@ public class ConnectionFactoryBuilder {
     return this;
   }
 
-  /* @deprecated  This method is no longer needed by applicaitons.
+  /* @deprecated  This method is no longer needed by applications.
    * The replication cluster is internally determined by checking
    * ZK directories for the given service code. The service code
    * must be unique in each ZK ensemble.
@@ -397,7 +397,7 @@ public class ConnectionFactoryBuilder {
 
   /* ENABLE_REPLICATION if */
   /**
-   * Set read prioirty for choosing replica node to read data
+   * Set read priority for choosing replica node to read data
    */
   public ConnectionFactoryBuilder setReadPriority(ReadPriority priority) {
     readPriority = priority;
@@ -427,7 +427,7 @@ public class ConnectionFactoryBuilder {
     return this;
   }
 
-  public ConnectionFactoryBuilder clearAPIReadPirority() {
+  public ConnectionFactoryBuilder clearAPIReadPriority() {
     this.apiReadPriorityList.clear();
 
     return this;

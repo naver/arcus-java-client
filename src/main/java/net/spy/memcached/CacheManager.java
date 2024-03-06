@@ -368,7 +368,7 @@ public class CacheManager extends SpyThread implements Watcher,
             retrySleepTime = 5000L; // 5 second
           } catch (Exception e) {
             retrySleepTime = 1000L; // 1 second
-            getLogger().warn("upexpected exception is caught while reconnet to Arcus admin: %s",
+            getLogger().warn("Unexpected exception is caught while reconnect to Arcus admin: %s",
                 e.getMessage());
           }
           /* ENABLE_MIGRATION if */
@@ -408,7 +408,7 @@ public class CacheManager extends SpyThread implements Watcher,
     try {
       wait(retrySleepTime);
     } catch (InterruptedException e) {
-      getLogger().warn("Cache mananger thread is interrupted while wait: %s",
+      getLogger().warn("Cache manager thread is interrupted while wait: %s",
           e.getMessage());
     }
   }

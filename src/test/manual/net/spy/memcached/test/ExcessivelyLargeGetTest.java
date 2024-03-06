@@ -15,7 +15,7 @@ import net.spy.memcached.util.CacheLoader;
 
 /**
  * Test a multiget that's sufficiently large as to get data before the
- * transision to read.
+ * transition to read.
  *
  * Note that this is in manual tests currently because, while it predictably
  * demonstrates the problems, I don't believe it generally demonstrates good

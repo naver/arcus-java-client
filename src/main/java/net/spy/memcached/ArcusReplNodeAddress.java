@@ -87,7 +87,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     return addrs;
   }
 
-  // Similar to AddrUtil.getAddresses.  This version parses replicaton znode names.
+  // Similar to AddrUtil.getAddresses.  This version parses replication znode names.
   // Znode names are group^{M,S}^ip:port-hostname
   static List<InetSocketAddress> getAddresses(String s) {
     List<InetSocketAddress> list = null;

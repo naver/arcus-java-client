@@ -27,7 +27,7 @@ public class ProtocolBTreeGetTest extends TestCase {
 
   private static final long bkey = 10;
 
-  public void testStringfy() {
+  public void testStringify() {
     Assert.assertEquals("10 drop", (new BTreeGet(bkey, true, true,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
     Assert.assertEquals("10 delete", (new BTreeGet(bkey, true,

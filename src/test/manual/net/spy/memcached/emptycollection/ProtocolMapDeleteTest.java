@@ -27,7 +27,7 @@ import org.junit.Assert;
 
 public class ProtocolMapDeleteTest extends TestCase {
 
-  public void testStringfy() {
+  public void testStringify() {
     List<String> mkeyList = new ArrayList<String>();
     mkeyList.add("mkey");
 

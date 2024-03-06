@@ -23,7 +23,7 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
   public MemcachedReplicaGroupImpl(final MemcachedNode node) {
     super(getGroupNameFromNode(node));
 
-    // Cannot make MemcachedReplicaGoup instance without group name and master/slave node
+    // Cannot make MemcachedReplicaGroup instance without group name and master/slave node
     if (node == null) {
       throw new IllegalArgumentException("Memcached Node must not be null");
     }

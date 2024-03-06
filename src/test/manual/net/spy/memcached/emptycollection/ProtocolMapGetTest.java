@@ -29,7 +29,7 @@ public class ProtocolMapGetTest extends TestCase {
 
   private final String MKEY = "mkey";
 
-  public void testStringfy() {
+  public void testStringify() {
     // default setting : dropIfEmpty = true
 
     List<String> mkeyList = new ArrayList<String>();

@@ -92,7 +92,7 @@ public class DefaultConnectionFactory extends SpyObject
    * Default operation timeout in milliseconds.
    *
    * operation timeout : 700ms
-   * It avoids the occurence of operation timeout
+   * It avoids the occurrence of operation timeout
    * even if two packet retransmissions exist in linux.
    */
   public static final long DEFAULT_OPERATION_TIMEOUT = 700L;

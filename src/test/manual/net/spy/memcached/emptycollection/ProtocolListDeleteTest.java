@@ -24,7 +24,7 @@ import org.junit.Assert;
 
 public class ProtocolListDeleteTest extends TestCase {
 
-  public void testStringfy() {
+  public void testStringify() {
     // default setting : dropIfEmpty = true
 
     Assert.assertEquals("10 drop",

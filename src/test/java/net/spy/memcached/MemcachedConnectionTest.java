@@ -120,7 +120,7 @@ public class MemcachedConnectionTest extends TestCase {
     }
   }
 
-  public void testNodesChangeQueue_redundent() throws Exception {
+  public void testNodesChangeQueue_redundant() throws Exception {
     // when
     conn.setCacheNodesChange("0.0.0.0:11211,0.0.0.0:11211");
 

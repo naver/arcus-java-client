@@ -8,7 +8,7 @@ import static net.spy.memcached.protocol.binary.OperationImpl.decodeUnsignedInt;
 /**
  * Test operation stuff.
  */
-public class OperatonTest extends TestCase {
+public class OperationTest extends TestCase {
 
   public void testIntegerDecode() {
     assertEquals(129,

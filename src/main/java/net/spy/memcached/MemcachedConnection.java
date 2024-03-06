@@ -410,7 +410,7 @@ public final class MemcachedConnection extends SpyObject {
      * because the state of the switchover group and the znode state are different.
      *
      * In order to remove the abnormal phenomenon,
-     * we find out the changed groups with the comparision of previous and current znode list,
+     * we find out the changed groups with the comparison of previous and current znode list,
      * and update the state of groups based on them.
      */
     Set<String> changedGroups = findChangedGroups(addrs, locator.getAll());
@@ -441,7 +441,7 @@ public final class MemcachedConnection extends SpyObject {
       }
 
       if (newGroupAddrs == null) {
-        // Old group nodes have disappered. Remove the old group nodes.
+        // Old group nodes have disappeared. Remove the old group nodes.
         removeNodes.add(oldGroup.getMasterNode());
         removeNodes.addAll(oldGroup.getSlaveNodes());
         delayedSwitchoverGroups.remove(oldGroup);
