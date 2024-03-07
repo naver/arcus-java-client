@@ -40,9 +40,9 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
 
   private void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
     if (mergedResult.isEmpty()) {
-      // merged result is empty, add all.
       mergedResult.addAll(eachResult);
 
+      // remove elements that exceed the count
       while (mergedResult.size() > count) {
         mergedResult.remove(count);
       }
@@ -50,10 +50,9 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     }
 
     // do sort merge
-    boolean doInsert; // Is current eachResult could be inserted?
     int comp, pos = 0;
     for (SMGetElement<T> result : eachResult) {
-      doInsert = true;
+      boolean doInsert = true;
       for (; pos < mergedResult.size(); pos++) {
         comp = result.compareBkeyTo(mergedResult.get(pos));
         if ((reverse) ? (comp > 0) : (comp < 0)) {
@@ -81,13 +80,9 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
         continue;
       }
       if (pos >= count) {
-        // At this point, following conditions are met.
-        //   - mergedResult.size() == totalResultElementCount &&
-        //   - The current <bkey, key> of eachResult is
-        //     behind of the last <bkey, key> of mergedResult.
-        // Then, all the next <bkey, key> elements of eachResult are
-        // definitely behind of the last <bkey, bkey> of mergedResult.
-        // So, stop the current sort-merge.
+        // The next element of eachResult must be positioned behind
+        // the elements of the mergedResult whose size is count.
+        // So, stop the current sort-merge task.
         break;
       }
       mergedResult.add(pos, result);
@@ -138,13 +133,11 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     }
 
     final OperationStatus status;
-
     if (!unique && hasDuplicatedBKeyResult()) {
       status = new OperationStatus(true, "DUPLICATED");
     } else {
       status = new OperationStatus(true, "END");
     }
-
     resultOperationStatus = new CollectionOperationStatus(status);
   }
 }

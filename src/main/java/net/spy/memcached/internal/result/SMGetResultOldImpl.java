@@ -50,10 +50,10 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
                                  final boolean isEachResultTrimmed) {
 
     if (mergedResult.isEmpty()) {
-      // merged result is empty, add all.
       mergedResult.addAll(eachResult);
       isMergedResultTrimmed.set(isEachResultTrimmed);
 
+      // remove elements that exceed the totalResultElementCount
       while (mergedResult.size() > totalResultElementCount) {
         mergedResult.remove(totalResultElementCount);
       }
@@ -106,23 +106,20 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
 
   @Override
   public void makeResultOperationStatus() {
-    final boolean isDuplicated = hasDuplicatedBKeyResult();
     final OperationStatus status;
-
     if (isMergedResultTrimmed.get()) {
-      if (isDuplicated) {
+      if (hasDuplicatedBKeyResult()) {
         status = new OperationStatus(true, "DUPLICATED_TRIMMED");
       } else {
         status = new OperationStatus(true, "TRIMMED");
       }
     } else {
-      if (isDuplicated) {
+      if (hasDuplicatedBKeyResult()) {
         status = new OperationStatus(true, "DUPLICATED");
       } else {
         status = new OperationStatus(true, "END");
       }
     }
-
     resultOperationStatus = new CollectionOperationStatus(status);
   }
 }
