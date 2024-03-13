@@ -1,9 +1,11 @@
 package net.spy.memcached.internal.result;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 
@@ -28,17 +30,12 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       failedOperationStatus = new CollectionOperationStatus(status);
     }
     mergedResult.clear();
-    mergedTrimmedKeys.clear();
+    trimmedKeyMap.clear();
+    missedKeyList.clear();
+    missedKeyMap.clear();
   }
 
-  public void mergeSMGetElements(final List<SMGetElement<T>> eachResult,
-                                 final List<SMGetTrimKey> eachTrimmedResult) {
-
-    mergeSMGetElements(eachResult);
-    mergeTrimmedKeys(eachTrimmedResult);
-  }
-
-  private void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
+  public void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
     if (mergedResult.isEmpty()) {
       mergedResult.addAll(eachResult);
 
@@ -93,44 +90,9 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     }
   }
 
-  private void mergeTrimmedKeys(final List<SMGetTrimKey> eachTrimmedResult) {
-    if (mergedTrimmedKeys.isEmpty()) {
-      mergedTrimmedKeys.addAll(eachTrimmedResult);
-      return;
-    }
-
-    // do sort merge trimmed list
-    int comp, pos = 0;
-    for (SMGetTrimKey result : eachTrimmedResult) {
-      for (; pos < mergedTrimmedKeys.size(); pos++) {
-        comp = result.compareTo(mergedTrimmedKeys.get(pos));
-        if ((reverse) ? (comp > 0) : (comp < 0)) {
-          break;
-        }
-      }
-      mergedTrimmedKeys.add(pos, result);
-      pos += 1;
-    }
-  }
-
   @Override
   public void makeResultOperationStatus() {
-    if (!mergedTrimmedKeys.isEmpty() && count <= mergedResult.size()) {
-      // Remove trimmed keys that bkey is behind of the last element
-      // when result count is reached to query count.
-      SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
-      SMGetTrimKey lastTrimKey = new SMGetTrimKey(lastElement.getKey(),
-              lastElement.getBkeyObject());
-      int comp;
-      for (int i = mergedTrimmedKeys.size() - 1; i >= 0; i--) {
-        comp = mergedTrimmedKeys.get(i).compareTo(lastTrimKey);
-        if ((reverse) ? (comp <= 0) : (comp >= 0)) {
-          mergedTrimmedKeys.remove(i);
-        } else {
-          break;
-        }
-      }
-    }
+    refineTrimmedKeys();
 
     final OperationStatus status;
     if (!unique && hasDuplicatedBKeyResult()) {
@@ -139,5 +101,27 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
       status = new OperationStatus(true, "END");
     }
     resultOperationStatus = new CollectionOperationStatus(status);
+  }
+
+  /**
+   * Trimmed keys that are larger/smaller(depends on unique variable) than last element of
+   * {@link SMGetResultImpl#mergedResult} should be removed when result's size reached to the count.
+   * Because the results are sufficient and don't need to retrieve the data further
+   * using trimmed keys.
+   */
+  private void refineTrimmedKeys() {
+    if (!trimmedKeyMap.isEmpty() && count <= mergedResult.size()) {
+      SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
+
+      // FIXME: use removeIf with entrySet() when upgrading java version 8
+      Iterator<Map.Entry<String, BKeyObject>> iterator = trimmedKeyMap.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Map.Entry<String, BKeyObject> entry = iterator.next();
+        int comp = entry.getValue().compareTo(lastElement.getBkeyObject());
+        if ((reverse) ? (comp <= 0) : (comp >= 0)) {
+          iterator.remove();
+        }
+      }
+    }
   }
 }
