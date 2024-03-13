@@ -106,7 +106,6 @@ import net.spy.memcached.collection.MapInsert;
 import net.spy.memcached.collection.MapUpdate;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
-import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -2136,14 +2135,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     for (BTreeSMGet<T> smGet : smGetList) {
       Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperation.Callback() {
         private final List<SMGetElement<T>> eachResult = new ArrayList<SMGetElement<T>>();
-        private final List<SMGetTrimKey> eachTrimmedResult = new ArrayList<SMGetTrimKey>();
 
         @Override
         public void receivedStatus(OperationStatus status) {
           final int processed = processedSMGetCount.decrementAndGet();
 
           if (status.isSuccess()) {
-            result.mergeSMGetElements(eachResult, eachTrimmedResult);
+            result.mergeSMGetElements(eachResult);
             if (processed == 0) {
               result.makeResultOperationStatus();
             }
@@ -2176,6 +2174,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
         @Override
         public void gotMissedKey(String key, OperationStatus cause) {
+          if (stopCollect.get()) {
+            return;
+          }
+
           result.addMissedKey(key, new CollectionOperationStatus(cause));
         }
 
@@ -2186,9 +2188,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           if (subkey instanceof Long) {
-            eachTrimmedResult.add(new SMGetTrimKey(key, (Long) subkey));
+            result.addTrimmedKey(key, new BKeyObject((Long) subkey));
           } else {
-            eachTrimmedResult.add(new SMGetTrimKey(key, (byte[]) subkey));
+            result.addTrimmedKey(key, new BKeyObject((byte[]) subkey));
           }
         }
       });

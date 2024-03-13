@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -16,7 +17,8 @@ public abstract class SMGetResult<T>  {
 
   protected final List<String> missedKeyList;
   protected final Map<String, CollectionOperationStatus> missedKeyMap;
-  protected final List<SMGetTrimKey> mergedTrimmedKeys;
+  protected final Map<String, BKeyObject> trimmedKeyMap;
+  protected List<SMGetTrimKey> mergedTrimmedKeys;
 
   protected final List<SMGetElement<T>> mergedResult;
   protected volatile CollectionOperationStatus resultOperationStatus = null;
@@ -29,7 +31,8 @@ public abstract class SMGetResult<T>  {
     this.missedKeyList = Collections.synchronizedList(new ArrayList<String>());
     this.missedKeyMap
             = Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
-    this.mergedTrimmedKeys = Collections.synchronizedList(new ArrayList<SMGetTrimKey>());
+    this.trimmedKeyMap = Collections.synchronizedMap(new HashMap<String, BKeyObject>());
+    this.mergedTrimmedKeys = new ArrayList<SMGetTrimKey>();
 
     this.mergedResult = new ArrayList<SMGetElement<T>>(totalResultElementCount);
   }
@@ -42,13 +45,33 @@ public abstract class SMGetResult<T>  {
     return missedKeyMap;
   }
 
+  /**
+   * Return trimmed keys to indicate data that existed in the cache server but has been removed.
+   * Trimmed keys are internally managed as Map, but returned as List
+   * due to backward compatibility.
+   * Use resultTrimmedKeys List to reduce conversion from Map to List.
+   *
+   * @return List of Trimmed Keys
+   */
   public List<SMGetTrimKey> getMergedTrimmedKeys() {
+    if (mergedTrimmedKeys.size() != trimmedKeyMap.size()) {
+      List<SMGetTrimKey> result = new ArrayList<SMGetTrimKey>();
+      for (Map.Entry<String, BKeyObject> entry : trimmedKeyMap.entrySet()) {
+        result.add(new SMGetTrimKey(entry.getKey(), entry.getValue()));
+      }
+      Collections.sort(result);
+      mergedTrimmedKeys = result;
+    }
     return mergedTrimmedKeys;
   }
 
   public void addMissedKey(String key, CollectionOperationStatus cstatus) {
     missedKeyList.add(key);
     missedKeyMap.put(key, cstatus);
+  }
+
+  public void addTrimmedKey(String key, BKeyObject bKeyObject) {
+    trimmedKeyMap.put(key, bKeyObject);
   }
 
   public CollectionOperationStatus getOperationStatus() {
