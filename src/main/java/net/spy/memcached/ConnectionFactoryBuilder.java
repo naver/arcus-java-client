@@ -60,6 +60,7 @@ public class ConnectionFactoryBuilder {
   private boolean shouldOptimize = false;
   private boolean useNagle = false;
   private boolean keepAlive = false;
+  private boolean dnsCacheTtlCheck = true;
   //private long maxReconnectDelay =
   //DefaultConnectionFactory.DEFAULT_MAX_RECONNECT_DELAY;
   private long maxReconnectDelay = 1;
@@ -448,6 +449,12 @@ public class ConnectionFactoryBuilder {
     keepAlive = on;
     return this;
   }
+
+  public ConnectionFactoryBuilder setDnsCacheTtlCheck(boolean dnsCacheTtlCheck) {
+    this.dnsCacheTtlCheck = dnsCacheTtlCheck;
+    return this;
+  }
+
   /**
    * Get the ConnectionFactory set up with the provided parameters.
    */
@@ -575,6 +582,11 @@ public class ConnectionFactoryBuilder {
       @Override
       public boolean getKeepAlive() {
         return keepAlive;
+      }
+
+      @Override
+      public boolean getDnsCacheTtlCheck() {
+        return dnsCacheTtlCheck;
       }
 
       @Override

@@ -117,6 +117,11 @@ public interface ConnectionFactory {
   boolean getKeepAlive();
 
   /**
+   * If true, check DNS cache TTL when invoking ArcusClient constructor.
+   */
+  boolean getDnsCacheTtlCheck();
+
+  /**
    * Observers that should be established at the time of connection
    * instantiation.
    *

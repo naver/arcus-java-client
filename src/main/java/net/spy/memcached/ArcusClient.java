@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.security.Security;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,6 +207,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static final int SHUTDOWN_TIMEOUT_MILLISECONDS = 2000;
   private static final AtomicInteger CLIENT_ID = new AtomicInteger(1);
 
+  private static final int MAX_DNS_CACHE_TTL = 300;
+
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -319,6 +322,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, name, addrs);
+
+    if (cf.getDnsCacheTtlCheck() && !validateDnsCacheTtl()) {
+      getLogger().warn("DNS cache TTL must be between 0 and " + MAX_DNS_CACHE_TTL +
+              ". Invoke ConnectionFactoryBuilder.setDnsCacheTtlCheck(false) to avoid this constraint.");
+      throw new IllegalStateException("DNS cache TTL is out of range from 0 to " + MAX_DNS_CACHE_TTL);
+    }
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean();
@@ -334,6 +343,38 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
     this(cf, DEFAULT_ARCUS_CLIENT_NAME + "-" + CLIENT_ID.getAndIncrement(), addrs);
+  }
+
+  @SuppressWarnings("removal")
+  private static boolean validateDnsCacheTtl() {
+    String securityDnsTtl = Security.getProperty("networkaddress.cache.ttl");
+    try {
+      if (securityDnsTtl != null) {
+        return isValidTtl(Integer.valueOf(securityDnsTtl));
+      }
+    } catch (NumberFormatException e) {
+      arcusLogger.warn("Invalid numeric type was set in property.");
+    }
+
+    String systemDnsTtl = System.getProperty("sun.net.inetaddr.ttl");
+    try {
+      if (systemDnsTtl != null) {
+        return isValidTtl(Integer.decode(systemDnsTtl));
+      }
+    } catch (NumberFormatException e) {
+      arcusLogger.warn("Invalid numeric type was set in property.");
+    }
+
+    /**
+     * If SecurityManager was null, dns cache ttl was set positive value.
+     * If is not null, dns cache ttl may be determined by <pre>java.policy</pre> file.
+     * See also {@link InetAddressCachePolicy}.
+     */
+    return System.getSecurityManager() == null;
+  }
+
+  private static boolean isValidTtl(int ttl) {
+    return ttl >= 0 && ttl <= MAX_DNS_CACHE_TTL;
   }
 
   /**
