@@ -94,6 +94,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
     assertFalse(f.shouldOptimize());
     assertFalse(f.useNagleAlgorithm());
     assertFalse(f.getKeepAlive());
+    assertTrue(f.getDnsCacheTtlCheck());
     assertEquals(f.getOpQueueMaxBlockTime(),
             DefaultConnectionFactory.DEFAULT_OP_QUEUE_MAX_BLOCK_TIME);
   }
@@ -132,6 +133,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
             .setTranscoder(new WhalinTranscoder())
             .setUseNagleAlgorithm(true)
             .setKeepAlive(true)
+            .setDnsCacheTtlCheck(false)
             .setLocatorType(Locator.CONSISTENT)
             .setOpQueueMaxBlockTime(19)
             .setAuthDescriptor(anAuthDescriptor)
@@ -152,6 +154,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
     assertFalse(f.shouldOptimize());
     assertTrue(f.useNagleAlgorithm());
     assertTrue(f.getKeepAlive());
+    assertFalse(f.getDnsCacheTtlCheck());
     assertEquals(f.getOpQueueMaxBlockTime(), 19);
     assertSame(anAuthDescriptor, f.getAuthDescriptor());
 
