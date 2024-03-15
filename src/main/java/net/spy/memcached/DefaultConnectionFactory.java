@@ -303,6 +303,12 @@ public class DefaultConnectionFactory extends SpyObject
   public boolean getKeepAlive() {
     return false;
   }
+
+  @Override
+  public boolean getDnsCacheTtlCheck() {
+    return true;
+  }
+
   public boolean shouldOptimize() {
     return false;
   }

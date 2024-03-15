@@ -158,6 +158,11 @@ public abstract class ClientBaseCase extends TestCase {
         }
 
         @Override
+        public boolean getDnsCacheTtlCheck() {
+          return inner.getDnsCacheTtlCheck();
+        }
+
+        @Override
         public Collection<ConnectionObserver> getInitialObservers() {
           return observers;
         }
