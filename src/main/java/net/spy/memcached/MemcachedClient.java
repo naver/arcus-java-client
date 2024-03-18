@@ -1082,9 +1082,8 @@ public class MemcachedClient extends SpyThread
     // used only to read the transcoder for a key.
     final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
 
-    // Break the gets down into groups by key
-    final Map<MemcachedNode, List<Collection<String>>> chunks
-            = new HashMap<MemcachedNode, List<Collection<String>>>();
+    // Grouping keys by memcached node
+    final Map<MemcachedNode, List<String>> keyMap = new HashMap<MemcachedNode, List<String>>();
 
     Iterator<String> keyIter = keys.iterator();
     while (keyIter.hasNext() && tc_iter.hasNext()) {
@@ -1092,9 +1091,9 @@ public class MemcachedClient extends SpyThread
       Transcoder<T> tc = tc_iter.next();
       tc_map.put(key, tc);
       validateKey(key);
-      addKeyToChunk(chunks, key);
+      addKeyToMap(keyMap, key);
     }
-    int wholeChunkSize = getWholeChunkSize(chunks);
+    int wholeChunkSize = getWholeChunkSize(keyMap);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
     final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
 
@@ -1121,10 +1120,12 @@ public class MemcachedClient extends SpyThread
     // Now that we know how many servers it breaks down into, and the latch
     // is all set up, convert all of these strings collections to operations
     checkState();
-    for (Map.Entry<MemcachedNode, List<Collection<String>>> me
-            : chunks.entrySet()) {
-      MemcachedNode node = me.getKey();
-      for (Collection<String> lk : me.getValue()) {
+    for (Map.Entry<MemcachedNode, List<String>> entry : keyMap.entrySet()) {
+      MemcachedNode node = entry.getKey();
+      List<String> keyList = entry.getValue();
+
+      for (int i = 0; i < keyList.size(); i += GET_BULK_CHUNK_SIZE) {
+        List<String> lk = keyList.subList(i, Math.min(keyList.size(), i + GET_BULK_CHUNK_SIZE));
         Operation op;
         if (node == null) {
           op = opFact.mget(lk, cb);
@@ -1218,9 +1219,8 @@ public class MemcachedClient extends SpyThread
     // used only to read the transcoder for a key.
     final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
 
-    // Break the gets down into groups by key
-    final Map<MemcachedNode, List<Collection<String>>> chunks
-            = new HashMap<MemcachedNode, List<Collection<String>>>();
+    // Grouping keys by memcached nodes
+    final Map<MemcachedNode, List<String>> keyMap = new HashMap<MemcachedNode, List<String>>();
     Iterator<String> key_iter = keys.iterator();
     while (key_iter.hasNext() && tc_iter.hasNext()) {
       String key = key_iter.next();
@@ -1228,10 +1228,10 @@ public class MemcachedClient extends SpyThread
 
       tc_map.put(key, tc);
       validateKey(key);
-      addKeyToChunk(chunks, key);
+      addKeyToMap(keyMap, key);
     }
 
-    int wholeChunkSize = getWholeChunkSize(chunks);
+    int wholeChunkSize = getWholeChunkSize(keyMap);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
     final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
 
@@ -1258,10 +1258,12 @@ public class MemcachedClient extends SpyThread
     // Now that we know how many servers it breaks down into, and the latch
     // is all set up, convert all of these strings collections to operations
     checkState();
-    for (Map.Entry<MemcachedNode, List<Collection<String>>> me
-            : chunks.entrySet()) {
-      MemcachedNode node = me.getKey();
-      for (Collection<String> lk : me.getValue()) {
+    for (Map.Entry<MemcachedNode, List<String>> entry : keyMap.entrySet()) {
+      MemcachedNode node = entry.getKey();
+      List<String> keyList = entry.getValue();
+
+      for (int i = 0; i < keyList.size(); i += GET_BULK_CHUNK_SIZE) {
+        List<String> lk = keyList.subList(i, Math.min(keyList.size(), i + GET_BULK_CHUNK_SIZE));
         Operation op;
         if (node == null) {
           op = opFact.mgets(lk, cb);
@@ -1277,36 +1279,30 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
-   * Split the keys into 200 sizes by node.
-   * The max size of each chunk is 200.
-   * @param chunkMap key list that sorted by node
+   * Grouping keys by memcached node.
+   * @param keyMap key list that mapped by node
    * @param key the key to request
    */
-  private void addKeyToChunk(Map<MemcachedNode, List<Collection<String>>> chunkMap, String key) {
+  private void addKeyToMap(Map<MemcachedNode, List<String>> keyMap, String key) {
     MemcachedNode node = conn.findNodeByKey(key);
-    List<Collection<String>> keyChunkList = chunkMap.get(node);
+    List<String> keyList = keyMap.get(node);
 
-    if (keyChunkList == null) {
-      keyChunkList = new ArrayList<Collection<String>>();
-      keyChunkList.add(new ArrayList<String>());
-      chunkMap.put(node, keyChunkList);
+    if (keyList == null) {
+      keyList = new ArrayList<String>();
+      keyMap.put(node, keyList);
     }
-    if (keyChunkList.get(keyChunkList.size() - 1).size() >= GET_BULK_CHUNK_SIZE) {
-      keyChunkList.add(new ArrayList<String>());
-    }
-    keyChunkList.get(keyChunkList.size() - 1).add(key);
+    keyList.add(key);
   }
 
   /**
    * get size of whole chunk by node
-   * @param chunks collection list that sorted by node
+   * @param keyMap collection list that grouped by node
    * @return size of whole chunk
    */
-  private int getWholeChunkSize(Map<MemcachedNode, List<Collection<String>>> chunks) {
+  private int getWholeChunkSize(Map<MemcachedNode, List<String>> keyMap) {
     int wholeChunkSize = 0;
-    for (Map.Entry<MemcachedNode, List<Collection<String>>> counts
-            : chunks.entrySet()) {
-      wholeChunkSize += counts.getValue().size();
+    for (List<String> keys : keyMap.values()) {
+      wholeChunkSize += (((keys.size() - 1) / GET_BULK_CHUNK_SIZE) + 1);
     }
     return wholeChunkSize;
   }
