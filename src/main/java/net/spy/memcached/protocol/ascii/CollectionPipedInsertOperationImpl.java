@@ -122,7 +122,7 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
       if (status.isSuccess()) {
         cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
-        cb.gotStatus(index, status);
+        cb.gotStatus(index, insert.getOpIdx(), status);
         cb.receivedStatus(FAILED_END);
       }
       transitionState(OperationState.COMPLETE);
@@ -161,7 +161,7 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
+        cb.gotStatus(index, insert.getOpIdx(), status);
         successAll = false;
       }
       index++;

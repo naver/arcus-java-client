@@ -815,41 +815,40 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
             new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
-    for (int i = 0; i < updateList.size(); i++) {
-      final CollectionPipedUpdate<T> update = updateList.get(i);
-      final int idx = i;
+    CollectionPipedUpdateOperation.Callback callback = new CollectionPipedUpdateOperation.Callback() {
 
-      Operation op = opFact.collectionPipedUpdate(key, update,
-          new CollectionPipedUpdateOperation.Callback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
 
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
-              rv.setOperationStatus(cstatus);
-            }
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          getLogger().warn("Unhandled state: " + status);
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
+      }
 
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
+      @Override
+      public void complete() {
+        latch.countDown();
+      }
 
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
-              }
-            }
-          });
+      @Override
+      public void gotStatus(Integer index, int opIdx, OperationStatus status) {
+        if (status instanceof CollectionOperationStatus) {
+          rv.addEachResult(index + (opIdx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                  (CollectionOperationStatus) status);
+        } else {
+          rv.addEachResult(index + (opIdx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                  new CollectionOperationStatus(status));
+        }
+      }
+    };
+
+    for (CollectionPipedUpdate<T> pipedUpdate : updateList) {
+      Operation op = opFact.collectionPipedUpdate(key, pipedUpdate, callback);
       rv.addOperation(op);
       addOp(key, op);
     }
@@ -1778,15 +1777,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+    PartitionedMap<Long, T> list = new PartitionedMap<Long, T>(elements,
+            CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new BTreePipedInsert<T>(key, elements, attributesForCreate, tc));
-    } else {
-      PartitionedMap<Long, T> list = new PartitionedMap<Long, T>(
-              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-      for (Map<Long, T> elementMap : list) {
-        insertList.add(new BTreePipedInsert<T>(key, elementMap, attributesForCreate, tc));
-      }
+    for (int i = 0; i < list.size(); i++) {
+      insertList.add(new BTreePipedInsert<T>(key, list.get(i), i, attributesForCreate, tc));
     }
     return asyncCollectionPipedInsert(key, insertList);
   }
@@ -1802,15 +1797,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+    PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(elements,
+            CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new ByteArraysBTreePipedInsert<T>(key, elements, attributesForCreate, tc));
-    } else {
-      PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
-              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-      for (List<Element<T>> elementList : list) {
-        insertList.add(new ByteArraysBTreePipedInsert<T>(key, elementList, attributesForCreate, tc));
-      }
+    for (int i = 0; i < list.size(); i++) {
+      insertList.add(new ByteArraysBTreePipedInsert<T>(key, list.get(i), i, attributesForCreate, tc));
     }
     return asyncCollectionPipedInsert(key, insertList);
   }
@@ -1830,15 +1821,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+    PartitionedMap<String, T> list = new PartitionedMap<String, T>(elements,
+            CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new MapPipedInsert<T>(key, elements, attributesForCreate, tc));
-    } else {
-      PartitionedMap<String, T> list = new PartitionedMap<String, T>(
-              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-      for (Map<String, T> elementMap : list) {
-        insertList.add(new MapPipedInsert<T>(key, elementMap, attributesForCreate, tc));
-      }
+    for (int i = 0 ; i < list.size(); i++) {
+      insertList.add(new MapPipedInsert<T>(key, list.get(i), i, attributesForCreate, tc));
     }
     return asyncCollectionPipedInsert(key, insertList);
   }
@@ -1854,15 +1841,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+    PartitionedList<T> list = new PartitionedList<T>(valueList,
+            CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
-    if (valueList.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new ListPipedInsert<T>(key, index, valueList, attributesForCreate, tc));
-    } else {
-      PartitionedList<T> list = new PartitionedList<T>(valueList,
-              CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-      for (List<T> elementList : list) {
-        insertList.add(new ListPipedInsert<T>(key, index, elementList, attributesForCreate, tc));
-      }
+    for (int i = 0 ; i < list.size(); i++) {
+      insertList.add(new ListPipedInsert<T>(key, index, list.get(i), i, attributesForCreate, tc));
     }
     return asyncCollectionPipedInsert(key, insertList);
   }
@@ -1878,15 +1861,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedInsert<T>> insertList = new ArrayList<CollectionPipedInsert<T>>();
+    PartitionedList<T> list = new PartitionedList<T>(valueList,
+            CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
 
-    if (valueList.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new SetPipedInsert<T>(key, valueList, attributesForCreate, tc));
-    } else {
-      PartitionedList<T> list = new PartitionedList<T>(valueList,
-              CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
-      for (List<T> elementList : list) {
-        insertList.add(new SetPipedInsert<T>(key, elementList, attributesForCreate, tc));
-      }
+    for (int i = 0 ; i < list.size(); i++) {
+      insertList.add(new SetPipedInsert<T>(key, list.get(i), i, attributesForCreate, tc));
     }
     return asyncCollectionPipedInsert(key, insertList);
   }
@@ -2326,15 +2305,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedUpdate<T>> updateList = new ArrayList<CollectionPipedUpdate<T>>();
+    PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(elements,
+            CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
-    if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
-      updateList.add(new BTreePipedUpdate<T>(key, elements, tc));
-    } else {
-      PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
-              elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
-      for (List<Element<T>> elementList : list) {
-        updateList.add(new BTreePipedUpdate<T>(key, elementList, tc));
-      }
+    for (int i = 0; i < list.size(); i++) {
+      updateList.add(new BTreePipedUpdate<T>(key, list.get(i), i, tc));
     }
     return asyncCollectionPipedUpdate(key, updateList);
   }
@@ -2359,16 +2334,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     List<CollectionPipedUpdate<T>> updateList = new ArrayList<CollectionPipedUpdate<T>>();
+    PartitionedMap<String, T> list = new PartitionedMap<String, T>(elements,
+            CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
 
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
-      updateList.add(new MapPipedUpdate<T>(key, elements, tc));
-    } else {
-      PartitionedMap<String, T> list = new PartitionedMap<String, T>(
-              elements, CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT);
-
-      for (Map<String, T> elementMap : list) {
-        updateList.add(new MapPipedUpdate<T>(key, elementMap, tc));
-      }
+    for (int i = 0 ; i < list.size(); i++) {
+      updateList.add(new MapPipedUpdate<T>(key, list.get(i), i, tc));
     }
     return asyncCollectionPipedUpdate(key, updateList);
   }
@@ -3199,41 +3169,40 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
             new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
-    for (int i = 0; i < insertList.size(); i++) {
-      final CollectionPipedInsert<T> insert = insertList.get(i);
-      final int idx = i;
+    CollectionPipedInsertOperation.Callback callback = new CollectionPipedInsertOperation.Callback() {
 
-      Operation op = opFact.collectionPipedInsert(key, insert,
-          new CollectionPipedInsertOperation.Callback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
 
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
-              rv.setOperationStatus(cstatus);
-            }
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          getLogger().warn("Unhandled state: " + status);
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
+      }
 
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
+      @Override
+      public void complete() {
+        latch.countDown();
+      }
 
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
-              }
-            }
-          });
+      @Override
+      public void gotStatus(Integer index, int opIdx, OperationStatus status) {
+        if (status instanceof CollectionOperationStatus) {
+          rv.addEachResult(index + (opIdx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                  (CollectionOperationStatus) status);
+        } else {
+          rv.addEachResult(index + (opIdx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                  new CollectionOperationStatus(status));
+        }
+      }
+    };
+
+    for (CollectionPipedInsert<T> pipedInsert : insertList) {
+      Operation op = opFact.collectionPipedInsert(key, pipedInsert, callback);
       rv.addOperation(op);
       addOp(key, op);
     }

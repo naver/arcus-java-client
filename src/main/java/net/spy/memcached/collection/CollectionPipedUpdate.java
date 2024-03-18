@@ -34,10 +34,17 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
   protected final String key;
   protected final Transcoder<T> tc;
 
-  protected CollectionPipedUpdate(String key, Transcoder<T> tc, int itemCount) {
+  private final int opIdx;
+
+  protected CollectionPipedUpdate(String key, int opIdx, Transcoder<T> tc, int itemCount) {
     super(itemCount);
+    this.opIdx = opIdx;
     this.key = key;
     this.tc = tc;
+  }
+
+  public int getOpIdx() {
+    return opIdx;
   }
 
   public static class BTreePipedUpdate<T> extends CollectionPipedUpdate<T> {
@@ -46,8 +53,8 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
     private final List<Element<T>> elements;
 
     public BTreePipedUpdate(String key, List<Element<T>> elements,
-                            Transcoder<T> tc) {
-      super(key, tc, elements.size());
+                            int opIdx, Transcoder<T> tc) {
+      super(key, opIdx, tc, elements.size());
       this.elements = elements;
     }
 
@@ -140,8 +147,8 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
     private final Map<String, T> elements;
 
     public MapPipedUpdate(String key, Map<String, T> elements,
-                          Transcoder<T> tc) {
-      super(key, tc, elements.size());
+                          int opIdx, Transcoder<T> tc) {
+      super(key, opIdx, tc, elements.size());
       this.elements = elements;
     }
 
