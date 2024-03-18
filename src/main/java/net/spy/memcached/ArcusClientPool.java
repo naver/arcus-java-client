@@ -1586,4 +1586,29 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             value, attributesForCreate, transcoder);
   }
 
+  @Override
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<Object>> elements, CollectionAttributes attributesForCreate) {
+    return this.getClient().asyncBopPipedUpsertBulk(key, elements, attributesForCreate);
+  }
+
+  @Override
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, Object> elements, CollectionAttributes attributesForCreate) {
+    return this.getClient().asyncBopPipedUpsertBulk(key, elements, attributesForCreate);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<T>> elements,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+    return this.getClient().asyncBopPipedUpsertBulk(key, elements, attributesForCreate, tc);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, T> elements,
+          CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+    return this.getClient().asyncBopPipedUpsertBulk(key, elements, attributesForCreate, tc);
+  }
 }
