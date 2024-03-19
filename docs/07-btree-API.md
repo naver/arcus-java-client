@@ -873,19 +873,18 @@ asyncBopGet(String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, i
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.getOperationStatus().getResponse() | 설명 
------------- | ----------------------------------------- | -------
-not null     | CollectionResponse.END                    | Element만 조회, 조회 범위에 b+tree trim 영역 없음
-not null     | CollectionResponse.TRIMMED                | Element만 조회, 조회 범위에 b+tree trim 영역 있음
-not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태
-not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태
-null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT      | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음
-null         | CollectionResponse.OUT_OF_RANGE           | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음
-null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 b+tree가 아님
-null         | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름
-null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)
-
+future.get() | future.getOperationStatus().getResponse() | 설명                                        
+-------------|-------------------------------------------|-------------------------------------------
+not null     | CollectionResponse.END                    | Element만 조회, 조회 범위에 b+tree trim 영역 없음     
+not null     | CollectionResponse.TRIMMED                | Element만 조회, 조회 범위에 b+tree trim 영역 있음     
+not null     | CollectionResponse.DELETED                | Element를 조회하고 삭제한 상태                      
+not null     | CollectionResponse.DELETED_DROPPED        | Element를 조회하고 삭제한 다음 b+tree를 drop한 상태     
+not null     | CollectionResponse.NOT_FOUND_ELEMENT      | 조회된 element가 없음, 조회 범위에 b+tree 영역 없음      
+null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)         
+null         | CollectionResponse.OUT_OF_RANGE           | 조회된 element가 없음, 조회 범위에 b+tree trim 영역 있음 
+null         | CollectionResponse.TYPE_MISMATCH          | 해당 key가 b+tree가 아님                        
+null         | CollectionResponse.BKEY_MISMATCH          | 주어진 bkey 유형이 기존 bkey 유형과 다름               
+null         | CollectionResponse.UNREADABLE             | 해당 key를 읽을 수 없는 상태임. (unreadable item상태)  
 
 결과로 반환된 result(Map\<Long, Element\<Object\>\>) 객체에서 다음과 같은 정보를 확인할 수 있다
 
@@ -1088,7 +1087,7 @@ asyncBopGetBulk(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter 
   - **count 값은 1 이상 50 이하여야 한다.**
 
 
-수행 결과는 future 객체를 통해 Map\<Stirng, BTreeGetResult\<Bkey, Object\>\>을 얻으며,
+수행 결과는 future 객체를 통해 Map\<String, BTreeGetResult\<Bkey, Object\>\>을 얻으며,
 이러한 Map은 개별 b+tree item의 key와 그 b+tree에서 조회한 결과를 담고 있는 BTreeGetResult 객체이다.
 BTreeGetResult 객체를 통해 개별 조회 결과를 아래와 같이 조회할 수 있다.
 
@@ -1397,14 +1396,13 @@ asyncBopGetByPosition(String key, BTreeOrder order, int from, int to)
 
 수행 결과는 future 객체를 통해 얻는다.
 
-future.get() | future.getOperationStatus().getResponse() | 설명 
------------- | ----------------------------------------- | ---------
-not null     | CollectionResponse.END                    | Element를 성공적으로 조회
-null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
-null         | CollectionResponse.NOT_FOUND_ELEMENT      | Element miss
-null         | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님
-null         | CollectionResponse.UNREADABLE             | 해당 key가 unreadable상태임
-
+ future.get() | future.getOperationStatus().getResponse() | 설명                                
+--------------|-------------------------------------------|-----------------------------------
+ not null     | CollectionResponse.END                    | Element를 성공적으로 조회                 
+ not null     | CollectionResponse.NOT_FOUND_ELEMENT      | Element miss                      
+ null         | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음) 
+ null         | CollectionResponse.TYPE_MISMATCH          | 해당 item이 b+tree가 아님               
+ null         | CollectionResponse.UNREADABLE             | 해당 key가 unreadable상태임             
 
 B+tree에서 position 기반의 element 조회 예제이다.
 
