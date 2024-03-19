@@ -128,9 +128,9 @@ public class ArcusTimeoutTest extends TestCase {
           throws InterruptedException, ExecutionException, TimeoutException {
     int keySize = 100000;
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyKey" + i;
+    List<String> keys = new ArrayList<String>(keySize);
+    for (int i = 0; i < keySize; i++) {
+      keys.add("MyKey" + i);
     }
 
     Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);
@@ -142,9 +142,9 @@ public class ArcusTimeoutTest extends TestCase {
           throws InterruptedException, ExecutionException, TimeoutException {
     int keySize = 100000;
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyKey" + i;
+    List<String> keys = new ArrayList<String>(keySize);
+    for (int i = 0; i < keySize; i++) {
+      keys.add("MyKey" + i);
     }
 
     Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);

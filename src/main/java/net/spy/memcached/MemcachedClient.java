@@ -1177,7 +1177,10 @@ public class MemcachedClient extends SpyThread
    * @return the future values of those keys
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#asyncGetBulk(Collection, Transcoder)} instead.
    */
+  @Deprecated
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Transcoder<T> tc,
                                                      String... keys) {
     return asyncGetBulk(Arrays.asList(keys), tc);
@@ -1190,7 +1193,10 @@ public class MemcachedClient extends SpyThread
    * @return the future values of those keys
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#asyncGetBulk(Collection)} instead.
    */
+  @Deprecated
   public BulkFuture<Map<String, Object>> asyncGetBulk(String... keys) {
     return asyncGetBulk(Arrays.asList(keys), transcoder);
   }
@@ -1344,7 +1350,10 @@ public class MemcachedClient extends SpyThread
    * @return the future values of those keys
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#asyncGetsBulk(Collection, Transcoder)} instead.
    */
+  @Deprecated
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
                                                                 String... keys) {
     return asyncGetsBulk(Arrays.asList(keys), tc);
@@ -1357,7 +1366,10 @@ public class MemcachedClient extends SpyThread
    * @return the future values of those keys
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#asyncGetsBulk(Collection)} instead.
    */
+  @Deprecated
   public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys) {
     return asyncGetsBulk(Arrays.asList(keys), transcoder);
   }
@@ -1416,7 +1428,10 @@ public class MemcachedClient extends SpyThread
    *                                   exceeded
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#getBulk(Collection, Transcoder)} instead.
    */
+  @Deprecated
   public <T> Map<String, T> getBulk(Transcoder<T> tc, String... keys) {
     return getBulk(Arrays.asList(keys), tc);
   }
@@ -1430,7 +1445,10 @@ public class MemcachedClient extends SpyThread
    *                                   exceeded
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#getBulk(Collection)} instead.
    */
+  @Deprecated
   public Map<String, Object> getBulk(String... keys) {
     return getBulk(Arrays.asList(keys), transcoder);
   }
@@ -1489,7 +1507,10 @@ public class MemcachedClient extends SpyThread
    *                                   exceeded
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#getsBulk(Collection, Transcoder)} instead.
    */
+  @Deprecated
   public <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys) {
     return getsBulk(Arrays.asList(keys), tc);
   }
@@ -1503,7 +1524,10 @@ public class MemcachedClient extends SpyThread
    *                                   exceeded
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link MemcachedClient#getsBulk(Collection)} instead.
    */
+  @Deprecated
   public Map<String, CASValue<Object>> getsBulk(String... keys) {
     return getsBulk(Arrays.asList(keys), transcoder);
   }
