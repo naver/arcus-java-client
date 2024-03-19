@@ -282,12 +282,14 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncGetBulk(keys);
   }
 
+  @Deprecated
   @Override
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Transcoder<T> tc,
                                                      String... keys) {
     return this.getClient().asyncGetBulk(tc, keys);
   }
 
+  @Deprecated
   @Override
   public BulkFuture<Map<String, Object>> asyncGetBulk(String... keys) {
     return this.getClient().asyncGetBulk(keys);
@@ -310,12 +312,14 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncGetsBulk(keys);
   }
 
+  @Deprecated
   @Override
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Transcoder<T> tc,
                                                                 String... keys) {
     return this.getClient().asyncGetsBulk(tc, keys);
   }
 
+  @Deprecated
   @Override
   public BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys) {
     return this.getClient().asyncGetsBulk(keys);
@@ -333,12 +337,14 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().getBulk(keys);
   }
 
+  @Deprecated
   @Override
   public <T> Map<String, T> getBulk(Transcoder<T> tc, String... keys)
           throws OperationTimeoutException {
     return this.getClient().getBulk(tc, keys);
   }
 
+  @Deprecated
   @Override
   public Map<String, Object> getBulk(String... keys)
           throws OperationTimeoutException {
@@ -357,12 +363,14 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().getsBulk(keys);
   }
 
+  @Deprecated
   @Override
   public <T> Map<String, CASValue<T>> getsBulk(Transcoder<T> tc, String... keys)
           throws OperationTimeoutException {
     return this.getClient().getsBulk(tc, keys);
   }
 
+  @Deprecated
   @Override
   public Map<String, CASValue<Object>> getsBulk(String... keys)
           throws OperationTimeoutException {
@@ -553,6 +561,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncDeleteBulk(key);
   }
 
+  @Deprecated
   @Override
   public Future<Map<String, OperationStatus>> asyncDeleteBulk(
           String... key) {

@@ -238,7 +238,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testInvalidKeyBulk() throws Exception {
     try {
-      Object val = client.getBulk("Key key2");
+      Object val = client.getBulk(Collections.singletonList("Key key2"));
       fail("Expected IllegalArgumentException, got " + val);
     } catch (IllegalArgumentException e) {
       // pass
@@ -268,9 +268,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
           client.set("test" + i, 5, "value" + i);
           assertEquals("value" + i, client.get("test" + i));
         }
-        Map<String, Object> m = client.getBulk("test0", "test1", "test2",
+        Map<String, Object> m = client.getBulk(Arrays.asList("test0", "test1", "test2",
                 "test3", "test4", "test5", "test6", "test7", "test8",
-                "test9", "test10"); // Yes, I intentionally ran over.
+                "test9", "test10")); // Yes, I intentionally ran over.
         for (int i = 0; i < 10; i++) {
           assertEquals("value" + i, m.get("test" + i));
         }
@@ -384,39 +384,6 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     assertEquals("val2", vals.get("test2"));
   }
 
-  public void testGetBulkVararg() throws Exception {
-    assertEquals(0, client.getBulk("test1", "test2", "test3").size());
-    client.set("test1", 5, "val1");
-    client.set("test2", 5, "val2");
-    Map<String, Object> vals = client.getBulk("test1", "test2", "test3");
-    assertEquals(2, vals.size());
-    assertEquals("val1", vals.get("test1"));
-    assertEquals("val2", vals.get("test2"));
-  }
-
-  public void testGetBulkVarargWithTranscoder() throws Exception {
-    Transcoder<String> t = new TestTranscoder();
-    assertEquals(0, client.getBulk(t, "test1", "test2", "test3").size());
-    client.set("test1", 5, "val1", t);
-    client.set("test2", 5, "val2", t);
-    Map<String, String> vals = client.getBulk(t, "test1", "test2", "test3");
-    assertEquals(2, vals.size());
-    assertEquals("val1", vals.get("test1"));
-    assertEquals("val2", vals.get("test2"));
-  }
-
-  public void testAsyncGetBulkVarargWithTranscoder() throws Exception {
-    Transcoder<String> t = new TestTranscoder();
-    assertEquals(0, client.getBulk(t, "test1", "test2", "test3").size());
-    client.set("test1", 5, "val1", t);
-    client.set("test2", 5, "val2", t);
-    Future<Map<String, String>> vals = client.asyncGetBulk(t,
-            "test1", "test2", "test3");
-    assertEquals(2, vals.get().size());
-    assertEquals("val1", vals.get().get("test1"));
-    assertEquals("val2", vals.get().get("test2"));
-  }
-
   public void testAsyncGetBulkWithTranscoderIterator() throws Exception {
     ArrayList<String> keys = new ArrayList<String>();
     keys.add("test1");
@@ -470,46 +437,6 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     assertEquals("val2", vals.get("test2").getValue());
     assertEquals(client.gets("test1").getCas(), vals.get("test1").getCas());
     assertEquals(client.gets("test2").getCas(), vals.get("test2").getCas());
-  }
-
-  public void testGetsBulkVararg() throws Exception {
-    assertEquals(0, client.getsBulk("test1", "test2", "test3").size());
-    client.set("test1", 5, "val1");
-    client.set("test2", 5, "val2");
-    Map<String, CASValue<Object>> vals = client.getsBulk("test1", "test2", "test3");
-    assertEquals(2, vals.size());
-    assertEquals("val1", vals.get("test1").getValue());
-    assertEquals("val2", vals.get("test2").getValue());
-    assertEquals(client.gets("test1").getCas(), vals.get("test1").getCas());
-    assertEquals(client.gets("test2").getCas(), vals.get("test2").getCas());
-  }
-
-  public void testGetsBulkVarargWithTranscoder() throws Exception {
-    Transcoder<String> t = new TestTranscoder();
-    assertEquals(0, client.getsBulk(t, "test1", "test2", "test3").size());
-    client.set("test1", 5, "val1", t);
-    client.set("test2", 5, "val2", t);
-    Map<String, CASValue<String>> vals = client.getsBulk(t,
-            "test1", "test2", "test3");
-    assertEquals(2, vals.size());
-    assertEquals("val1", vals.get("test1").getValue());
-    assertEquals("val2", vals.get("test2").getValue());
-    assertEquals(client.gets("test1", t).getCas(), vals.get("test1").getCas());
-    assertEquals(client.gets("test2", t).getCas(), vals.get("test2").getCas());
-  }
-
-  public void testAsyncGetsBulkVarargWithTranscoder() throws Exception {
-    Transcoder<String> t = new TestTranscoder();
-    assertEquals(0, client.getsBulk(t, "test1", "test2", "test3").size());
-    client.set("test1", 5, "val1", t);
-    client.set("test2", 5, "val2", t);
-    BulkFuture<Map<String, CASValue<String>>> vals = client.asyncGetsBulk(t,
-            "test1", "test2", "test3");
-    assertEquals(2, vals.get().size());
-    assertEquals("val1", vals.get().get("test1").getValue());
-    assertEquals("val2", vals.get().get("test2").getValue());
-    assertEquals(client.gets("test1", t).getCas(), vals.get().get("test1").getCas());
-    assertEquals(client.gets("test2", t).getCas(), vals.get().get("test2").getCas());
   }
 
   public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
@@ -820,7 +747,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testMultiReqAfterShutdown() throws Exception {
     client.shutdown();
     try {
-      Map<String, ?> m = client.getBulk("k1", "k2", "k3");
+      Map<String, ?> m = client.getBulk(Arrays.asList("k1", "k2", "k3"));
       fail("Expected IllegalStateException, got " + m);
     } catch (IllegalStateException e) {
       // OK

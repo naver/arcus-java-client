@@ -1178,6 +1178,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  /**
+   * @deprecated no longer support varargs as collection has the same role.
+   * use {@link ArcusClient#asyncDeleteBulk(List)} instead.
+   */
+  @Deprecated
   @Override
   public Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key) {
     if (key == null) {

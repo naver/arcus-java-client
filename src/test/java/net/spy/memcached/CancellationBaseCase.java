@@ -95,10 +95,6 @@ public abstract class CancellationBaseCase extends TestCase {
     tryTestSequence(client.asyncGetBulk(Arrays.asList("k", "k2")));
   }
 
-  public void testAsyncGetBulkCancellationVararg() throws Exception {
-    tryTestSequence(client.asyncGetBulk("k", "k2"));
-  }
-
   public void testDeleteCancellation() throws Exception {
     tryTestSequence(client.delete("x"));
   }

@@ -2,6 +2,8 @@ package net.spy.memcached;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
+
 public class TimeoutTest extends TestCase {
   private MemcachedClient client = null;
 
@@ -66,7 +68,7 @@ public class TimeoutTest extends TestCase {
   public void testGetBulkTimeout() {
     tryTimeout("getbulk", new Runnable() {
       public void run() {
-        client.getBulk("k", "k2");
+        client.getBulk(Arrays.asList("k", "k2"));
       }
     });
   }

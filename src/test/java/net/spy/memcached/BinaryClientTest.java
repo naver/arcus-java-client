@@ -38,21 +38,6 @@ public class BinaryClientTest extends ProtocolBaseCase {
   }
 
   @Override
-  public void testGetsBulkVararg() throws Exception {
-    assertTrue(true);
-  }
-
-  @Override
-  public void testGetsBulkVarargWithTranscoder() throws Exception {
-    assertTrue(true);
-  }
-
-  @Override
-  public void testAsyncGetsBulkVarargWithTranscoder() throws Exception {
-    assertTrue(true);
-  }
-
-  @Override
   public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
     assertTrue(true);
   }
