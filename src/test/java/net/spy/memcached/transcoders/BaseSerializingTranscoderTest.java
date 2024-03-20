@@ -12,6 +12,7 @@ import net.spy.memcached.CachedData;
 public class BaseSerializingTranscoderTest extends TestCase {
 
   private Exposer ex;
+  private Compressor compressor = new GzipCompressor();
 
   @Override
   protected void setUp() throws Exception {
@@ -33,7 +34,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
 
   public void testCompressNull() {
     try {
-      ex.compress(null);
+      compressor.compress(null);
       fail("Expected an assertion error");
     } catch (NullPointerException e) {
       // pass
@@ -67,7 +68,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
   }
 
   public void testDecompressNull() {
-    assertNull(ex.decompress(null));
+    assertNull(compressor.decompress(null));
   }
 
   public void testUndeserializable() throws Exception {
@@ -118,18 +119,8 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
 
     @Override
-    public byte[] compress(byte[] in) {
-      return super.compress(in);
-    }
-
-    @Override
     public String decodeString(byte[] data) {
       return super.decodeString(data);
-    }
-
-    @Override
-    public byte[] decompress(byte[] in) {
-      return super.decompress(in);
     }
 
     @Override
