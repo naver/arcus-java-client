@@ -398,6 +398,17 @@ public class CacheManager extends SpyThread implements Watcher,
             waitBeforeRetryMonitorCheck(1000L - elapsed);
           }
         }
+
+        // Handling cacheList changes to a MemcachedConnection resulting
+        // from the processing of a CacheMonitor's Watch event.
+        for (ArcusClient ac : getAC()) {
+          try {
+            ac.getMemcachedConnection().handleCacheNodesChange();
+          } catch (IOException e) {
+            getLogger().error("Cache List update error in ArcusClient {}, exception = {}",
+                    ac.getName(), e.getCause());
+          }
+        }
       }
     }
     getLogger().info("Close cache manager.");
@@ -481,6 +492,10 @@ public class CacheManager extends SpyThread implements Watcher,
     for (ArcusClient ac : client) {
       MemcachedConnection conn = ac.getMemcachedConnection();
       conn.setCacheNodesChange(addrs);
+    }
+
+    synchronized (this) {
+      notifyAll(); // awake CacheManager Thread.
     }
   }
 
