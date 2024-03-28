@@ -25,9 +25,9 @@ public class BKeyObject implements Comparable<BKeyObject> {
     LONG, BYTEARRAY
   }
 
-  private BKeyType type;
-  private Long longBKey;
-  private ByteArrayBKey byteArrayBKey;
+  private final BKeyType type;
+  private final Long longBKey;
+  private final ByteArrayBKey byteArrayBKey;
 
   public BKeyObject(long longBKey) {
     BTreeUtil.validateBkey(longBKey);
@@ -37,13 +37,10 @@ public class BKeyObject implements Comparable<BKeyObject> {
   }
 
   public BKeyObject(byte[] byteArrayBKey) {
-    this(new ByteArrayBKey(byteArrayBKey));
-  }
-
-  public BKeyObject(ByteArrayBKey byteArrayBKey) {
+    BTreeUtil.validateBkey(byteArrayBKey);
     this.type = BKeyType.BYTEARRAY;
-    this.byteArrayBKey = byteArrayBKey;
     this.longBKey = null;
+    this.byteArrayBKey = new ByteArrayBKey(byteArrayBKey);
   }
 
   public BKeyType getType() {
@@ -61,16 +58,14 @@ public class BKeyObject implements Comparable<BKeyObject> {
     if (isByteArray()) {
       return byteArrayBKey;
     }
-    throw new IllegalStateException(
-            "This Object has java.lang.Long type bkey.");
+    throw new IllegalStateException("This Object has java.lang.Long type bkey.");
   }
 
   public byte[] getByteArrayBKeyRaw() {
     if (isByteArray()) {
       return byteArrayBKey.getBytes();
     }
-    throw new IllegalStateException(
-            "This Object has java.lang.Long type bkey.");
+    throw new IllegalStateException("This Object has java.lang.Long type bkey.");
   }
 
   public boolean isLong() {
@@ -88,8 +83,7 @@ public class BKeyObject implements Comparable<BKeyObject> {
     } else if (isLong() && another.isLong()) {
       return longBKey.compareTo(another.getLongBKey());
     }
-    throw new IllegalArgumentException(
-            String.format("not supported comparing different type of bkey"));
+    throw new IllegalArgumentException("not supported comparing different type of bkey");
   }
 
   @Override
