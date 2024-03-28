@@ -14,13 +14,19 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    name: JDK ${{ matrix.jdk }}, ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        jdk: [ 8, 11, 17 ]
+        os: [ ubuntu-20.04 ]
+      fail-fast: true
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.jdk }}
+        uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
           cache: 'maven'
       - name: Update apt-get
@@ -33,9 +39,7 @@ jobs:
           # build server
           cd ~/arcus && docker compose up -d 
 
-      - name: Build ARCUS Client
-        run: mvn install -DskipTests
       - name: Test ARCUS Client Without ZK
-        run: mvn test -DUSE_ZK=false -Dtest=ObserverTest
+        run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest
       - name: Test ARCUS Client With ZK
-        run: mvn test -DUSE_ZK=true
+        run: mvn clean verify -DUSE_ZK=true
