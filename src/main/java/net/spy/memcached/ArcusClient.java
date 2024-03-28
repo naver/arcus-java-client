@@ -815,41 +815,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
             new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
-    for (int i = 0; i < updateList.size(); i++) {
-      final CollectionPipedUpdate<T> update = updateList.get(i);
-      final int idx = i;
+    CollectionPipedUpdateOperation.Callback callback = new CollectionPipedUpdateOperation.Callback() {
+      private int opIdx = 0;
 
-      Operation op = opFact.collectionPipedUpdate(key, update,
-          new CollectionPipedUpdateOperation.Callback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
 
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
-              rv.setOperationStatus(cstatus);
-            }
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          getLogger().warn("Unhandled state: " + status);
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
+      }
 
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
+      @Override
+      public void complete() {
+        opIdx += 1;
+        latch.countDown();
+      }
 
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
-              }
-            }
-          });
+      @Override
+      public void gotStatus(Integer index, OperationStatus status) {
+        if (status instanceof CollectionOperationStatus) {
+          rv.addEachResult(index + (opIdx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                  (CollectionOperationStatus) status);
+        } else {
+          rv.addEachResult(index + (opIdx * CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT),
+                  new CollectionOperationStatus(status));
+        }
+      }
+    };
+
+    for (CollectionPipedUpdate<T> pipedUpdate : updateList) {
+      Operation op = opFact.collectionPipedUpdate(key, pipedUpdate, callback);
       rv.addOperation(op);
       addOp(key, op);
     }
@@ -3197,41 +3198,42 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
             new PipedCollectionFuture<Integer, CollectionOperationStatus>(latch, operationTimeout);
 
-    for (int i = 0; i < insertList.size(); i++) {
-      final CollectionPipedInsert<T> insert = insertList.get(i);
-      final int idx = i;
+    CollectionPipedInsertOperation.Callback callback = new CollectionPipedInsertOperation.Callback() {
+      private int opIdx = 0;
 
-      Operation op = opFact.collectionPipedInsert(key, insert,
-          new CollectionPipedInsertOperation.Callback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
 
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
-              rv.setOperationStatus(cstatus);
-            }
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          getLogger().warn("Unhandled state: " + status);
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
+      }
 
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
+      @Override
+      public void complete() {
+        opIdx += 1;
+        latch.countDown();
+      }
 
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
-              }
-            }
-          });
+      @Override
+      public void gotStatus(Integer index, OperationStatus status) {
+        if (status instanceof CollectionOperationStatus) {
+          rv.addEachResult(index + (opIdx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                  (CollectionOperationStatus) status);
+        } else {
+          rv.addEachResult(index + (opIdx * CollectionPipedInsert.MAX_PIPED_ITEM_COUNT),
+                  new CollectionOperationStatus(status));
+        }
+      }
+    };
+
+    for (CollectionPipedInsert<T> pipedInsert : insertList) {
+      Operation op = opFact.collectionPipedInsert(key, pipedInsert, callback);
       rv.addOperation(op);
       addOp(key, op);
     }
