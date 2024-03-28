@@ -248,6 +248,7 @@
                         <exclude>**/RedistributeFailureModeTest.java</exclude>
                         <exclude>**/LoggingTest.java</exclude>
                     </excludes>
+                    <argLine>--illegal-access=permit</argLine>
                 </configuration>
             </plugin>
             <plugin>

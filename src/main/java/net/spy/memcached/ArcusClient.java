@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.security.Security;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -205,6 +206,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   private static final int SHUTDOWN_TIMEOUT_MILLISECONDS = 2000;
 
+  private static final String DNS_CACHE_TTL_PROP = "networkaddress.cache.ttl";
+  private static final String SUN_NET_POLICY_PROP = "sun.net.InetAddressCachePolicy";
+  private static final int MAX_DNS_CACHE_TTL = 300;
+
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -317,6 +322,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, name, addrs);
+
+    if (cf.getDnsCacheTtlCheck() && !isValidDnsCacheTtl()) {
+      getLogger().warn("The minimum value for DNS cache TTL is 0 and the maximum value is " + MAX_DNS_CACHE_TTL +
+              ". Invoke ConnectionFactoryBuilder.setDnsCacheTtlCheck(false) to avoid this validation.");
+      throw new RuntimeException("The value of the DNS cache TTL is less than 0 or greater than " + MAX_DNS_CACHE_TTL);
+    }
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean();
@@ -331,10 +342,55 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    */
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
-    super(cf, DEFAULT_ARCUS_CLIENT_NAME, addrs);
-    collectionTranscoder = new CollectionTranscoder();
-    smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
-    registerMbean();
+    this(cf, DEFAULT_ARCUS_CLIENT_NAME, addrs);
+  }
+
+  private static Integer parseTtl(String target) {
+    try {
+      return Integer.decode(target);
+    } catch (NumberFormatException e) {
+      arcusLogger.warn("None numeric type was set in property.");
+    }
+    try {
+      return Integer.valueOf(target);
+    } catch (NumberFormatException e) {
+      arcusLogger.warn("None numeric type was set in property.");
+    }
+    return null;
+  }
+
+  private static boolean isValidDnsCacheTtl() {
+    Integer ttl = null;
+    try {
+      ttl = (Integer) Class.forName(SUN_NET_POLICY_PROP)
+              .getMethod("get")
+              .invoke(null);
+    } catch (Throwable t) {
+      arcusLogger.error("Can not access to " + SUN_NET_POLICY_PROP);
+    }
+    if (ttl != null && (ttl < 0 || ttl > MAX_DNS_CACHE_TTL)) {
+      return false;
+    }
+
+    // Get DNS cache TTL from System property.
+    String security = Security.getProperty(DNS_CACHE_TTL_PROP);
+    String system = System.getProperty(DNS_CACHE_TTL_PROP);
+
+    if (security != null) {
+      Integer securityTtl = parseTtl(security);
+      if (securityTtl != null &&
+              (securityTtl < 0 || securityTtl > MAX_DNS_CACHE_TTL)) {
+        return false;
+      }
+    }
+    if (system != null) {
+      Integer systemTtl = parseTtl(security);
+      if (systemTtl != null &&
+              (systemTtl < 0 || systemTtl > MAX_DNS_CACHE_TTL)) {
+        return false;
+      }
+    }
+    return System.getSecurityManager() == null;
   }
 
   /**
