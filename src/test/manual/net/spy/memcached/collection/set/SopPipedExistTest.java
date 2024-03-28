@@ -167,6 +167,37 @@ public class SopPipedExistTest extends BaseIntegrationTest {
     }
   }
 
+  public void testMaxOverPipedExist() {
+    int OVER_COUNT = 1000;
+
+    try {
+      List<Object> findValues = new ArrayList<Object>();
+
+      // insert items
+      for (int i = 0; i < OVER_COUNT; i++) {
+        findValues.add("VALUE" + i);
+
+        Assert.assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i, new CollectionAttributes()).get());
+      }
+
+      // exist bulk
+      CollectionFuture<Map<Object, Boolean>> future = mc
+              .asyncSopPipedExistBulk(KEY, findValues);
+
+      Map<Object, Boolean> map = future.get();
+
+      Assert.assertTrue(future.getOperationStatus().isSuccess());
+
+      for (int i = 0; i < OVER_COUNT; i++) {
+        Assert.assertTrue(map.get("VALUE" + i));
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
+  }
+
   public void testPipedExistNotExistsKey() {
     try {
       List<Object> findValues = new ArrayList<Object>();
