@@ -398,6 +398,20 @@ public class CacheManager extends SpyThread implements Watcher,
             waitBeforeRetryMonitorCheck(1000L - elapsed);
           }
         }
+
+        // Only perform cache node list updates when connectivity with ZK is normal.
+        if (!isDead) {
+          // Handling cacheList changes to a MemcachedConnection resulting
+          // from the processing of a CacheMonitor's Watch event.
+          for (ArcusClient ac : getAC()) {
+            try {
+              ac.getMemcachedConnection().handleCacheNodesChange();
+            } catch (IOException e) {
+              getLogger().error("Cache List update error in ArcusClient {}, exception = {}",
+                      ac.getName(), e.getCause());
+            }
+          }
+        }
       }
     }
     getLogger().info("Close cache manager.");
