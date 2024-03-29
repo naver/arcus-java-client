@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.spy.memcached.ArcusClientException.InitializeClientException;
 import net.spy.memcached.compat.SpyThread;
@@ -69,6 +70,7 @@ public class CacheManager extends SpyThread implements Watcher,
   private static final int ZK_SESSION_TIMEOUT = 15000;
 
   private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
+  private static final AtomicInteger POOL_ID = new AtomicInteger(1);
 
   private final String zkConnectString;
 
@@ -661,11 +663,13 @@ public class CacheManager extends SpyThread implements Watcher,
     };
     cfb.setInitialObservers(Collections.singleton(observer));
 
+    int poolId = CacheManager.POOL_ID.getAndIncrement();
     client = new ArcusClient[poolSize];
     int i = 0;
     try {
       for (; i < poolSize; i++) {
-        String clientName = "ArcusClient(" + (i + 1) + "-" + poolSize + ") for " + serviceCode;
+        String clientName = "ArcusClient" + "-" + poolId +
+                "(" + (i + 1) + "-" + poolSize + ") for " + serviceCode;
         client[i] = ArcusClient.getInstance(cfb.build(), clientName, socketList);
         client[i].setName("Memcached IO for " + serviceCode);
         client[i].setCacheManager(this);
