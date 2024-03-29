@@ -52,7 +52,7 @@ public class BopGetResultImpl<K, V> implements GetResult<Map<K, Element<V>>> {
         CachedData cachedData = entry.getValue();
         if (isByteBKey) {
           temp.put(bKey, BTreeUtil.makeBTreeElement(
-                  new BKeyObject((ByteArrayBKey) bKey), cachedData, transcoder));
+                  new BKeyObject(((ByteArrayBKey) bKey).getBytes()), cachedData, transcoder));
         } else {
           temp.put(bKey, BTreeUtil.makeBTreeElement(
                   new BKeyObject((Long) bKey), cachedData, transcoder));
