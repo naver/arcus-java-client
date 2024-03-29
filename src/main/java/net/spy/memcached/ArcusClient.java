@@ -204,6 +204,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static final int MAX_MKEY_LENGTH = 250;
 
   private static final int SHUTDOWN_TIMEOUT_MILLISECONDS = 2000;
+  private static final AtomicInteger CLIENT_ID = new AtomicInteger(1);
 
   private CacheManager cacheManager;
 
@@ -294,6 +295,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   /**
    * Create an Arcus client for the given memcached server addresses.
+   * Only invoked by initArcusClient in CacheManger.
    *
    * @param cf    connection factory to configure connections for this client
    * @param name  client name
@@ -331,10 +333,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    */
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
-    super(cf, DEFAULT_ARCUS_CLIENT_NAME, addrs);
-    collectionTranscoder = new CollectionTranscoder();
-    smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
-    registerMbean();
+    this(cf, DEFAULT_ARCUS_CLIENT_NAME + CLIENT_ID.getAndIncrement(), addrs);
   }
 
   /**
