@@ -36,7 +36,8 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     missedKeyMap.clear();
   }
 
-  public void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
+  @Deprecated
+  private void mergeSMGetElementsOld(final List<SMGetElement<T>> eachResult) {
     if (mergedResult.isEmpty()) {
       mergedResult.addAll(eachResult);
 
@@ -91,7 +92,7 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     }
   }
 
-  private void mergeSMGetElements2(final List<SMGetElement<T>> eachResult) {
+  public void mergeSMGetElements(final List<SMGetElement<T>> eachResult) {
     if (mergedResult.isEmpty()) {
       // merged result is empty, add all.
       mergedResult.addAll(eachResult);
