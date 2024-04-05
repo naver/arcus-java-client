@@ -1541,7 +1541,7 @@ public final class MemcachedConnection extends SpyObject {
         if (node == null) {
           continue;
         }
-
+        // set timeout only once for the same node.
         String key = node.getSocketAddress().toString();
         if (!timedoutNodes.contains(key)) {
           timedoutNodes.add(key);

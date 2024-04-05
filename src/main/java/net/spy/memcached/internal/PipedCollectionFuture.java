@@ -72,6 +72,7 @@ public class PipedCollectionFuture<K, V>
         }
       }
       if (!timedoutOps.isEmpty()) {
+        // set timeout only once for piped ops requested to single node.
         MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
         throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
       }
