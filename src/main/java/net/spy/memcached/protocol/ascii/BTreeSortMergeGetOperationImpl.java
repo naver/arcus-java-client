@@ -164,7 +164,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     }
   }
 
-  private final void readValue(ByteBuffer bb) {
+  private void readValue(ByteBuffer bb) {
     // Decode a collection data header.
     int count = 0;
     if (lookingFor == '\0' && data == null) {
@@ -173,19 +173,20 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
         // Handle spaces.
         if (b == ' ') {
-
-          // Adjust space count if item header has a element flag.
-          String[] chunk = byteBuffer.toString().split(" ");
-          if (chunk.length == BTreeSMGet.headerCount) {
-            if (chunk[3].startsWith("0x")) {
-              spaceCount--;
-            }
-          }
-
           spaceCount++;
           if (smGet.headerReady(spaceCount)) {
+            // Adjust space count if item header has a element flag.
+            String itemHeader = byteBuffer.toString();
+            String[] chunk = itemHeader.split(" ");
+            if (chunk.length == BTreeSMGet.headerCount
+                    && chunk[3].startsWith("0x")) {
+              spaceCount--;
+              byteBuffer.write(b);
+              continue;
+            }
+
             // <key> <flags> <bkey> [<eflag>] <bytes> <data>\r\n
-            smGet.decodeItemHeader(byteBuffer.toString());
+            smGet.decodeItemHeader(itemHeader);
             data = new byte[smGet.getDataLength()];
             byteBuffer.reset();
             spaceCount = 0;
