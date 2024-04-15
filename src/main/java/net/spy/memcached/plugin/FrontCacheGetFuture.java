@@ -24,6 +24,8 @@ import java.util.concurrent.TimeoutException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.OperationStatus;
 
+import static net.spy.memcached.DefaultConnectionFactory.DEFAULT_OPERATION_TIMEOUT;
+
 /**
  * Future returned for GET operations.
  *
@@ -37,7 +39,7 @@ public class FrontCacheGetFuture<T> extends GetFuture<T> {
   private final String key;
 
   public FrontCacheGetFuture(LocalCacheManager localCacheManager, String key, GetFuture<T> parent) {
-    super(new CountDownLatch(0), 1);
+    super(new CountDownLatch(0), DEFAULT_OPERATION_TIMEOUT);
     this.parent = parent;
     this.localCacheManager = localCacheManager;
     this.key = key;
