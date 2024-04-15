@@ -29,9 +29,6 @@ import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.plugin.LocalCacheManager;
 import net.spy.memcached.transcoders.Transcoder;
 
-import org.junit.Ignore;
-
-@Ignore
 public class LocalCacheManagerTest extends TestCase {
 
   private ArcusClient client;
