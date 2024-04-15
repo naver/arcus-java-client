@@ -134,29 +134,30 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   @Override
   public final void handleRead(ByteBuffer bb) {
     if (lookingFor == '\0' && data == null) {
-      for (int i = 0; bb.remaining() > 0; i++) {
+      while (bb.hasRemaining()) {
         byte b = bb.get();
 
         // Handle spaces.
         if (b == ' ') {
           spaceCount++;
 
-          String l = new String(byteBuffer.toByteArray());
-
-          if (l.startsWith("ELEMENT")) {
+          if (getBulk.headerReady(spaceCount)) {
             // ELEMENT <bkey> [<eflag>] <bytes> <data>\r\n
-            if (getBulk.elementHeaderReady(spaceCount)) {
-              if (spaceCount == 3 && l.split(" ")[2].startsWith("0x")) {
-                byteBuffer.write(b);
-                continue;
-              }
+            String itemHeader = byteBuffer.toString();
 
-              getBulk.decodeItemHeader(l);
-              data = new byte[getBulk.getDataLength()];
-              byteBuffer.reset();
-              spaceCount = 0;
-              break;
+            String[] chunk = itemHeader.split(" ");
+            if (chunk.length == BTreeGetBulk.headerCount
+                    && chunk[2].startsWith("0x")) {
+              spaceCount--;
+              byteBuffer.write(b);
+              continue;
             }
+
+            getBulk.decodeItemHeader(chunk);
+            data = new byte[getBulk.getDataLength()];
+            byteBuffer.reset();
+            spaceCount = 0;
+            break;
           }
         }
 

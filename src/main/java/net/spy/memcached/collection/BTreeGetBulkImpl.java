@@ -115,9 +115,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     return str;
   }
 
-  public void decodeItemHeader(String itemHeader) {
-    String[] splited = itemHeader.split(" ");
-
+  public void decodeItemHeader(String[] splited) {
     if (splited.length == 3) {
       // ELEMENT <bkey> <bytes>
       this.subkey = decodeSubkey(splited[1]);
@@ -135,12 +133,8 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     return command;
   }
 
-  public boolean elementHeaderReady(int spaceCount) {
-    return spaceCount == 3 || spaceCount == 4;
-  }
-
-  public boolean keyHeaderReady(int spaceCount) {
-    return spaceCount == 3 || spaceCount == 5;
+  public boolean headerReady(int spaceCount) {
+    return spaceCount == BTreeGetBulk.headerCount;
   }
 
   public int getDataLength() {
