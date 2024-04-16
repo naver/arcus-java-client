@@ -27,7 +27,6 @@ import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.plugin.LocalCacheManager;
-import net.spy.memcached.transcoders.Transcoder;
 
 public class LocalCacheManagerTest extends TestCase {
 
@@ -63,8 +62,7 @@ public class LocalCacheManagerTest extends TestCase {
     Future<Object> f = client.asyncGet(key);
     Object result = f.get();
 
-    Transcoder<Object> tc = null;
-    Object cached = client.getLocalCacheManager().get(key, tc);
+    Object cached = client.getLocalCacheManager().get(key);
 
     assertNotNull(result);
     assertNotNull(cached);
@@ -76,7 +74,7 @@ public class LocalCacheManagerTest extends TestCase {
     f = client.asyncGet(key);
     result = f.get();
 
-    cached = client.getLocalCacheManager().get(key, tc);
+    cached = client.getLocalCacheManager().get(key);
 
     assertNotNull(result);
     assertNotNull(cached);
@@ -88,7 +86,7 @@ public class LocalCacheManagerTest extends TestCase {
     f = client.asyncGet(key);
     result = f.get();
 
-    cached = client.getLocalCacheManager().get(key, tc);
+    cached = client.getLocalCacheManager().get(key);
 
     assertNull(result);
     assertNull(cached);
@@ -105,8 +103,7 @@ public class LocalCacheManagerTest extends TestCase {
     // expecting that the keys are locally cached.
     LocalCacheManager lcm = client.getLocalCacheManager();
     for (String k : keys) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNotNull(got);
     }
 
@@ -123,8 +120,7 @@ public class LocalCacheManagerTest extends TestCase {
     Thread.sleep(3000);
 
     for (String k : keys) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNull(got);
     }
 
@@ -145,8 +141,7 @@ public class LocalCacheManagerTest extends TestCase {
     // expecting that the keys are locally cached.
     LocalCacheManager lcm = client.getLocalCacheManager();
     for (String k : keys) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNotNull(got);
     }
 
@@ -164,8 +159,7 @@ public class LocalCacheManagerTest extends TestCase {
     Thread.sleep(3000);
 
     for (String k : keys) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNull(got);
     }
 
@@ -196,8 +190,7 @@ public class LocalCacheManagerTest extends TestCase {
     // expecting that the keys are locally cached.
     LocalCacheManager lcm = client.getLocalCacheManager();
     for (String k : keySet1) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNotNull(got);
     }
 
@@ -221,8 +214,7 @@ public class LocalCacheManagerTest extends TestCase {
     Thread.sleep(3000);
 
     for (String k : keySet1) {
-      Transcoder<Object> tc = null;
-      Object got = lcm.get(k, tc);
+      Object got = lcm.get(k);
       assertNull(got);
     }
 

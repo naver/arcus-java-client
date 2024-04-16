@@ -90,7 +90,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
       return super.asyncGet(key, tc);
     }
 
-    final T t = localCacheManager.get(key, tc);
+    final T t = localCacheManager.get(key);
     if (t != null) {
       return new GetFuture<T>(null, 0) {
         @Override
@@ -159,7 +159,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
     while (keyIter.hasNext() && tc_iter.hasNext()) {
       String key = keyIter.next();
       Transcoder<T> tc = tc_iter.next();
-      T value = localCacheManager.get(key, tc);
+      T value = localCacheManager.get(key);
       if (value != null) {
         frontCacheHit.put(key, value);
         continue;

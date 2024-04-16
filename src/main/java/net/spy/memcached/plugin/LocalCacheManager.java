@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
-import net.spy.memcached.transcoders.Transcoder;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -44,10 +43,6 @@ public class LocalCacheManager {
 
   protected Cache cache;
   protected String name;
-
-  public LocalCacheManager() {
-    this("DEFAULT_ARCUS_LOCAL_CACHE");
-  }
 
   public LocalCacheManager(String name) {
     this.name = name;
@@ -77,7 +72,7 @@ public class LocalCacheManager {
     }
   }
 
-  public <T> T get(String key, Transcoder<T> tc) {
+  public <T> T get(String key) {
     if (cache == null) {
       return null;
     }
@@ -97,10 +92,10 @@ public class LocalCacheManager {
     return null;
   }
 
-  public <T> Future<T> asyncGet(final String key, final Transcoder<T> tc) {
+  public <T> Future<T> asyncGet(final String key) {
     Task<T> task = new Task<T>(new Callable<T>() {
       public T call() throws Exception {
-        return get(key, tc);
+        return get(key);
       }
     });
     return task;
