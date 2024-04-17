@@ -46,6 +46,13 @@ public class FrontCacheGetFuture<T> extends GetFuture<T> {
   }
 
   @Override
+  public T get() throws InterruptedException, ExecutionException {
+    T t = parent.get();
+    localCacheManager.put(key, t);
+    return t;
+  }
+
+  @Override
   public T get(long timeout, TimeUnit unit) throws InterruptedException,
           ExecutionException, TimeoutException {
     T t = parent.get(timeout, unit);
