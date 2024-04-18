@@ -33,7 +33,12 @@ public class LocalCacheManagerTest extends TestCase {
   private ArcusClient client;
 
   private final List<String> keys =
-      Arrays.asList("key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7", "key8", "key9");
+      Arrays.asList("key0" + System.nanoTime(),
+          "key1" + System.nanoTime(), "key2" + System.nanoTime(),
+          "key3" + System.nanoTime(), "key4" + System.nanoTime(),
+          "key5" + System.nanoTime(), "key6" + System.nanoTime(),
+          "key7" + System.nanoTime(), "key8" + System.nanoTime(),
+          "key9" + System.nanoTime());
 
   @Override
   protected void setUp() throws Exception {
