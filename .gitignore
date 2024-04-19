@@ -9,5 +9,4 @@ junit*
 !.idea
 .idea/*
 !.idea/codeStyles
-.idea/codeStyles/*
-!.idea/codeStyles/Project.xml
+!.idea/codeStyles/**

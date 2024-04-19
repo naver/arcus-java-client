@@ -19,7 +19,6 @@
 
 package net.spy.memcached.protocol.ascii;
 
-
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.StoreOperation;

@@ -37,7 +37,6 @@ import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
-
 public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testAssertions() {

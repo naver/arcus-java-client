@@ -1,9 +1,9 @@
 package net.spy.memcached.test;
 
+import java.util.Arrays;
+
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
-
-import java.util.Arrays;
 
 /**
  * This is an attempt to reproduce a problem where a server fails during a

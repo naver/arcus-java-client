@@ -9,19 +9,55 @@
       </option>
       <option name="IMPORT_LAYOUT_TABLE">
         <value>
+          <package name="com.fasterxml.jackson" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="com.jam2in.arcus" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="com.navercorp.arcus" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="java" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="javax" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="junit" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="net.sf.ehcache" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="net.spy.memcached" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.apache.commons" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.apache.curator" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.apache.ibatis" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.apache.logging" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="org.apache.zookeeper" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="org.aspectj" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.hamcrest" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="org.junit" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="org.jmock" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.mockito" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.mybatis" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.slf4j" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="org.springframework" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="com.fasterxml.jackson" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="com.jam2in.arcus" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="com.navercorp.arcus" withSubpackages="true" static="true" />
           <emptyLine />
           <package name="java" withSubpackages="true" static="true" />
           <emptyLine />
@@ -29,11 +65,35 @@
           <emptyLine />
           <package name="junit" withSubpackages="true" static="true" />
           <emptyLine />
+          <package name="net.sf.ehcache" withSubpackages="true" static="true" />
+          <emptyLine />
           <package name="net.spy.memcached" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.apache.commons" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.apache.curator" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.apache.ibatis" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.apache.logging" withSubpackages="true" static="true" />
           <emptyLine />
           <package name="org.apache.zookeeper" withSubpackages="true" static="true" />
           <emptyLine />
+          <package name="org.aspectj" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.hamcrest" withSubpackages="true" static="true" />
+          <emptyLine />
           <package name="org.junit" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.jmock" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.mockito" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.mybatis" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.slf4j" withSubpackages="true" static="true" />
+          <emptyLine />
+          <package name="org.springframework" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="" withSubpackages="true" static="true" />
         </value>
