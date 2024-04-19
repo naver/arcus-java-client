@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-
 public class RedistributeFailureModeTest extends ClientBaseCase {
 
   private String serverList;

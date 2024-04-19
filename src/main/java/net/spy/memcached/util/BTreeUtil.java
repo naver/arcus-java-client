@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.util;
 
-
 import net.spy.memcached.CachedData;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.Element;

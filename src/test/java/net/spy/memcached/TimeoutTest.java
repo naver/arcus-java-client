@@ -1,8 +1,8 @@
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import java.util.Arrays;
+
+import junit.framework.TestCase;
 
 public class TimeoutTest extends TestCase {
   private MemcachedClient client = null;
