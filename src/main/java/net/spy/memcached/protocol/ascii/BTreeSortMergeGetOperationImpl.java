@@ -145,7 +145,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 
@@ -283,7 +282,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
     }
   }
 
-  private final void readMissedKeys(ByteBuffer bb) {
+  private void readMissedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
@@ -358,11 +357,10 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           byteBuffer.write(b);
         }
       }
-      return;
     }
   }
 
-  private final void readTrimmedKeys(ByteBuffer bb) {
+  private void readTrimmedKeys(ByteBuffer bb) {
     int count = 0;
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
@@ -418,7 +416,6 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
           byteBuffer.write(b);
         }
       }
-      return;
     }
   }
 

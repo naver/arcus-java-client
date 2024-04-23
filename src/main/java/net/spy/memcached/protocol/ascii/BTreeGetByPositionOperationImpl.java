@@ -125,7 +125,6 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 
