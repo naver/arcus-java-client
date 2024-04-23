@@ -104,6 +104,23 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
     bb.put(CRLF);
   }
 
+  protected final byte findLineEndingByte(ByteBuffer buffer, byte initial) {
+    byte current = initial;
+    while (buffer.hasRemaining()) {
+      byte b = buffer.get();
+      assert b == current : "Expecting " + current + ", got " + (char) b;
+
+      if (current == '\r') {
+        current = '\n';
+      } else if (current == '\n') {
+        return '\0';
+      } else {
+        assert false : "Looking for unexpected char: " + (char) current;
+      }
+    }
+    return current;
+  }
+
   private String getLineFromBuffer(ByteBuffer data) throws UnsupportedEncodingException {
     boolean lineFound = false;
     while (data.remaining() > 0) {

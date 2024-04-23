@@ -232,23 +232,7 @@ public class CollectionGetOperationImpl extends OperationImpl
     }
 
     if (lookingFor != '\0' && bb.hasRemaining()) {
-      do {
-        byte tmp = bb.get();
-        assert tmp == lookingFor : "Expecting " + lookingFor + ", got "
-                + (char) tmp;
-
-        switch (lookingFor) {
-          case '\r':
-            lookingFor = '\n';
-            break;
-          case '\n':
-            lookingFor = '\0';
-            break;
-          default:
-            assert false : "Looking for unexpected char: "
-                    + (char) lookingFor;
-        }
-      } while (lookingFor != '\0' && bb.hasRemaining());
+      lookingFor = findLineEndingByte(bb, lookingFor);
 
       if (lookingFor == '\0') {
         data = null;

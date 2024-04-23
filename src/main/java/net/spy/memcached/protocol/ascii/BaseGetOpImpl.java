@@ -110,7 +110,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   @Override
-  public final void handleRead(ByteBuffer b) {
+  public final void handleRead(ByteBuffer bb) {
     assert currentKey != null;
     assert data != null;
     // This will be the case, because we'll clear them when it's not.
@@ -121,10 +121,10 @@ abstract class BaseGetOpImpl extends OperationImpl {
     // If we're not looking for termination, we're still looking for data
     if (lookingFor == '\0') {
       int toRead = data.length - readOffset;
-      int available = b.remaining();
+      int available = bb.remaining();
       toRead = Math.min(toRead, available);
       getLogger().debug("Reading %d bytes", toRead);
-      b.get(data, readOffset, toRead);
+      bb.get(data, readOffset, toRead);
       readOffset += toRead;
     }
     // Transition us into a ``looking for \r\n'' kind of state if we've
@@ -143,22 +143,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
       lookingFor = '\r';
     }
     // If we're looking for an ending byte, let's go find it.
-    if (lookingFor != '\0' && b.hasRemaining()) {
-      do {
-        byte tmp = b.get();
-        assert tmp == lookingFor : "Expecting " + lookingFor + ", got "
-                + (char) tmp;
-        switch (lookingFor) {
-          case '\r':
-            lookingFor = '\n';
-            break;
-          case '\n':
-            lookingFor = '\0';
-            break;
-          default:
-            assert false : "Looking for unexpected char: " + (char) lookingFor;
-        }
-      } while (lookingFor != '\0' && b.hasRemaining());
+    if (lookingFor != '\0' && bb.hasRemaining()) {
+      lookingFor = findLineEndingByte(bb, lookingFor);
+
       // Completed the read, reset stuff.
       if (lookingFor == '\0') {
         currentKey = null;
