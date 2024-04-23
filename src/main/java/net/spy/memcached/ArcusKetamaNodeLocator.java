@@ -42,6 +42,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
 
   private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
   private final Collection<MemcachedNode> allNodes;
+  private final Collection<MemcachedNode> delayedClosingNodes = new HashSet<>();
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedNode>> ketamaAlterNodes;
@@ -238,6 +239,10 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
         removeHash(node);
+        if (node.hasOp() && node.isActive()) {
+          delayedClosingNodes.add(node);
+          continue;
+        }
         try {
           node.closeChannel();
         } catch (IOException e) {
@@ -254,6 +259,14 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
       /* ENABLE_MIGRATION end */
       lock.unlock();
     }
+  }
+
+  public Collection<MemcachedNode> getDelayedClosingNodes() {
+    return Collections.unmodifiableCollection(delayedClosingNodes);
+  }
+
+  public void removeDelayedClosingNodes(Collection<MemcachedNode> closedNodes) {
+    delayedClosingNodes.removeAll(closedNodes);
   }
 
   private Long getKetamaHashPoint(byte[] digest, int h) {
@@ -452,6 +465,10 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
       for (MemcachedNode node : toDelete) {
         alterNodes.remove(node);
         removeHashOfAlter(node);
+        if (node.hasOp() && node.isActive()) {
+          delayedClosingNodes.add(node);
+          continue;
+        }
         try {
           node.closeChannel();
         } catch (IOException e) {

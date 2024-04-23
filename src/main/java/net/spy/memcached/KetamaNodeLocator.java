@@ -20,6 +20,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +143,14 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
     throw new UnsupportedOperationException("update not supported");
+  }
+
+  public Collection<MemcachedNode> getDelayedClosingNodes() {
+    return new HashSet<MemcachedNode>();
+  }
+
+  public void removeDelayedClosingNodes(Collection<MemcachedNode> closedNodes) {
+    // do NOT throw UnsupportedOperationException here for test codes.
   }
 
   public SortedMap<Long, MemcachedNode> getKetamaNodes() {
