@@ -67,6 +67,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
 
   @Override
   public final void handleLine(String line) {
+    /*
+      VALUE <key> <flags> <bytes> [<cas unique>]\r\n
+      <data block>\r\n
+      ...
+      END\r\n
+    */
     if (line.equals("END")) {
       getLogger().debug("Get complete!");
       /* ENABLE_MIGRATION if */
@@ -188,9 +194,9 @@ abstract class BaseGetOpImpl extends OperationImpl {
       int numKeys = keys.size();
       commandBuilder.append(cmd);
       commandBuilder.append(' ');
-      commandBuilder.append(String.valueOf(lenKeys));
+      commandBuilder.append(lenKeys);
       commandBuilder.append(' ');
-      commandBuilder.append(String.valueOf(numKeys));
+      commandBuilder.append(numKeys);
       commandBuilder.append(RN_STRING);
       commandBuilder.append(keysString);
       commandBuilder.append(RN_STRING);

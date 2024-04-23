@@ -145,7 +145,6 @@ public class CollectionGetOperationImpl extends OperationImpl
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 

@@ -94,7 +94,6 @@ public class CollectionCountOperationImpl extends OperationImpl implements
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 

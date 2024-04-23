@@ -69,6 +69,13 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
       return;
     }
     /* ENABLE_MIGRATION end */
+
+    /*
+      ATTR <name>=<value>\r\n
+      ATTR <name>=<value>\r\n
+      ...
+      END\r\n
+    */
     if (line.startsWith("ATTR ")) {
       getLogger().debug("Got line %s", line);
 

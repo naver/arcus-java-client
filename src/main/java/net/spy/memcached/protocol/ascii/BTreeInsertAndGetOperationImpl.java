@@ -151,7 +151,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
         setReadType(OperationReadType.DATA);
       }
     } else {
-      OperationStatus status = null;
+      OperationStatus status;
       if (get.isUpdateIfExist()) {
         status = matchStatus(line, UPSERT_AND_GET_STATUS_ON_LINE);
       } else {
@@ -160,7 +160,6 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);
-      return;
     }
   }
 

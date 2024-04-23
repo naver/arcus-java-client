@@ -73,8 +73,6 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
   public void handleLine(String line) {
     getLogger().debug("Got line %s", line);
 
-    Integer position = null;
-
     /* ENABLE_MIGRATION if */
     if (hasNotMyKey(line)) {
       addRedirectSingleKeyOperation(line, key);
@@ -88,17 +86,12 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
       assert stuff.length == 2;
       assert "POSITION".equals(stuff[0]);
 
-      // FIXME exception-based conversion.
-      try {
-        // POSITION=<position>\r\n
-        position = Integer.parseInt(stuff[1]);
-        BTreeFindPositionOperation.Callback cb =
-            (BTreeFindPositionOperation.Callback) getCallback();
-        cb.gotData(position);
-        getCallback().receivedStatus(POSITION);
-      } catch (Exception e) {
-        // expected : <error_string>
-      }
+      // POSITION=<position>\r\n
+      int position = Integer.parseInt(stuff[1]);
+      BTreeFindPositionOperation.Callback cb =
+              (BTreeFindPositionOperation.Callback) getCallback();
+      cb.gotData(position);
+      getCallback().receivedStatus(POSITION);
     } else {
       OperationStatus status = matchStatus(line, NOT_FOUND, UNREADABLE,
               BKEY_MISMATCH, TYPE_MISMATCH, NOT_FOUND_ELEMENT);
