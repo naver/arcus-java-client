@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -142,7 +143,7 @@ public final class MemcachedConnection extends SpyObject {
     timeoutRatioThreshold = f.getTimeoutRatioThreshold();
     timeoutDurationThreshold = f.getTimeoutDurationThreshold();
     selector = Selector.open();
-    List<MemcachedNode> connections = new ArrayList<MemcachedNode>(a.size());
+    List<MemcachedNode> connections = new CopyOnWriteArrayList<MemcachedNode>();
     for (SocketAddress sa : a) {
       connections.add(makeMemcachedNode(connName, sa));
     }
@@ -303,9 +304,6 @@ public final class MemcachedConnection extends SpyObject {
       handleDelayedSwitchover();
     }
     /* ENABLE_REPLICATION end */
-
-    // Deal with the memcached server group that's been added by CacheManager.
-    handleCacheNodesChange();
 
     if (!reconnectQueue.isEmpty()) {
       attemptReconnects();
