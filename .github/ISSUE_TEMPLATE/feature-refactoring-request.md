@@ -7,6 +7,11 @@ assignees: ''
 
 ---
 
+### 🔗 Related Issue
+
+<!-- Please link related issue. ex) https://github.com/naver/arcus-java-client/issues/{issue_number} -->
+-
+
 ### 🔍 Description
 
 <!--  Please describe the feature you want to see and why it needs. -->
