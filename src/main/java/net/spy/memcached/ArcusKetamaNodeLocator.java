@@ -154,10 +154,6 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     return getNodeForKey(hashAlg.hash(k));
   }
 
-  long getMaxKey() {
-    return ketamaNodes.lastKey();
-  }
-
   MemcachedNode getNodeForKey(long hash) {
     MemcachedNode rv = null;
 
