@@ -89,10 +89,14 @@ public final class MemcachedConnection extends SpyObject {
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   private final ReconnectQueue reconnectQueue;
-  private final AtomicReference<String> cacheNodesChange = new AtomicReference<>(null);
+
+  private final AtomicReference<List<InetSocketAddress>> cacheNodesChange
+          = new AtomicReference<>(null);
   /* ENABLE_MIGRATION if */
-  private final AtomicReference<String> alterNodesChange = new AtomicReference<>(null);
-  private final AtomicReference<String> delayedAlterNodesChange = new AtomicReference<>(null);
+  private final AtomicReference<List<InetSocketAddress>> alterNodesChange
+          = new AtomicReference<>(null);
+  private final AtomicReference<List<InetSocketAddress>> delayedAlterNodesChange
+          = new AtomicReference<>(null);
   /* ENABLE_MIGRATION end */
 
   private final OperationFactory opFactory;
@@ -418,13 +422,6 @@ public final class MemcachedConnection extends SpyObject {
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
             ArcusReplNodeAddress.makeGroupAddrsList(findAddrsOfChangedGroups(addrs, changedGroups));
 
-    // remove invalidated groups in changedGroups
-    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-      if (!ArcusReplNodeAddress.validateGroup(entry)) {
-        changedGroups.remove(entry.getKey());
-      }
-    }
-
     Map<String, MemcachedReplicaGroup> oldAllGroups =
             ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
 
@@ -691,28 +688,28 @@ public final class MemcachedConnection extends SpyObject {
      * and before handleAlterNodesChange(), there MUST be bug because alter_list change
      * will be applied without application of dependent cache_list change.
      */
-    String alterList = alterNodesChange.getAndSet(null);
+    List<InetSocketAddress> alterList = alterNodesChange.getAndSet(null);
     /* ENABLE_MIGRATION end */
-    String cacheList = cacheNodesChange.getAndSet(null);
+    List<InetSocketAddress> cacheList = cacheNodesChange.getAndSet(null);
     if (cacheList != null) {
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
       if (arcusReplEnabled) {
-        updateReplConnections(ArcusReplNodeAddress.getAddresses(cacheList));
+        updateReplConnections(cacheList);
         return;
       }
       /* ENABLE_REPLICATION end */
-      updateConnections(AddrUtil.getAddresses(cacheList));
+      updateConnections(cacheList);
     }
     /* ENABLE_MIGRATION if */
     if (arcusMigrEnabled && alterList != null) {
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
           // prepare connections of alter nodes
-          prepareAlterConnections(convertToSocketAddresses(alterList));
+          prepareAlterConnections(alterList);
         } else {
           // check joining node down
-          updateAlterConnections(convertToSocketAddresses(alterList));
+          updateAlterConnections(alterList);
         }
       }
       if (alterList.isEmpty()) { // end of migration
@@ -724,8 +721,8 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   // Called by CacheManger to add the memcached server group.
-  public void setCacheNodesChange(String addrs) {
-    String old = cacheNodesChange.getAndSet(addrs);
+  public void setCacheNodesChange(List<InetSocketAddress> addrs) {
+    List<InetSocketAddress> old = cacheNodesChange.getAndSet(addrs);
     if (old != null) {
       getLogger().info("Ignored previous cache nodes change.");
     }
@@ -740,29 +737,20 @@ public final class MemcachedConnection extends SpyObject {
 
   /* ENABLE_MIGRATION if */
   /* Called by CacheManger to add the alter memcached server group. */
-  public void setAlterNodesChange(String addrs, boolean readingCacheList) {
+  public void setAlterNodesChange(List<InetSocketAddress> addrs, boolean readingCacheList) {
     if (readingCacheList) {
-      String old = delayedAlterNodesChange.getAndSet(addrs);
+      List<InetSocketAddress> old = delayedAlterNodesChange.getAndSet(addrs);
       if (old != null) {
         getLogger().info("Ignored previous delayed alter nodes change.");
       }
     } else {
-      String old = alterNodesChange.getAndSet(addrs);
+      List<InetSocketAddress> old = alterNodesChange.getAndSet(addrs);
       if (old != null) {
         getLogger().info("Ignored previous alter nodes change.");
       }
       delayedAlterNodesChange.set(null);
       selector.wakeup();
     }
-  }
-
-  private List<InetSocketAddress> convertToSocketAddresses(String s) {
-    /* ENABLE_REPLICATION if */
-    if (arcusReplEnabled) {
-      return ArcusReplNodeAddress.getAddresses(s);
-    }
-    /* ENABLE_REPLICATION end */
-    return AddrUtil.getAddresses(s);
   }
 
   public void prepareAlterConnections(List<InetSocketAddress> addrs) throws IOException {
