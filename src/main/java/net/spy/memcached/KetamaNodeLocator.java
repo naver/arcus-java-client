@@ -104,10 +104,6 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     return rv;
   }
 
-  long getMaxKey() {
-    return ketamaNodes.lastKey();
-  }
-
   MemcachedNode getNodeForKey(long hash) {
     final MemcachedNode rv;
     if (!ketamaNodes.containsKey(hash)) {

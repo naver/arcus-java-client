@@ -76,18 +76,6 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
 
   public void testContinuumWrapping() {
     setupNodes(4);
-    // This is the method by which I found something that would wrap
-    /*
-    String key="a";
-    // maximum key found in the ketama continuum
-    long lastKey=((KetamaNodeLocator)locator).getMaxKey();
-    while(HashAlgorithm.KETAMA_HASH.hash(key) < lastKey) {
-      key=PwGen.getPass(8);
-    }
-    System.out.println("Found a key past the end of the continuum:  "
-        + key);
-    */
-    assertEquals(4294887009L, ((ArcusKetamaNodeLocator) locator).getMaxKey());
 
     assertSame(nodes[3], locator.getPrimary("V5XS8C8N"));
     assertSame(nodes[3], locator.getPrimary("8KR2DKR2"));
