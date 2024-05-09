@@ -118,7 +118,7 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
       if (status.isSuccess()) {
         cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
-        cb.gotStatus(index, status);
+        cb.gotStatus(index, update.getOpIdx(), status);
         cb.receivedStatus(FAILED_END);
       }
       transitionState(OperationState.COMPLETE);
@@ -157,7 +157,7 @@ public class CollectionPipedUpdateOperationImpl extends OperationImpl implements
               BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
+        cb.gotStatus(index, update.getOpIdx(), status);
         successAll = false;
       }
       index++;

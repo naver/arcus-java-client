@@ -36,12 +36,19 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
   protected final CollectionAttributes attribute;
   protected final Transcoder<T> tc;
 
-  protected CollectionPipedInsert(String key, CollectionAttributes attribute,
+  private final int opIdx;
+
+  protected CollectionPipedInsert(String key, int opIdx, CollectionAttributes attribute,
                                   Transcoder<T> tc, int itemCount) {
     super(itemCount);
     this.key = key;
+    this.opIdx = opIdx;
     this.attribute = attribute;
     this.tc = tc;
+  }
+
+  public int getOpIdx() {
+    return opIdx;
   }
 
   /**
@@ -53,9 +60,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
     private final Collection<T> list;
     private final int index;
 
-    public ListPipedInsert(String key, int index, Collection<T> list,
+    public ListPipedInsert(String key, int index, Collection<T> list, int opIdx,
                            CollectionAttributes attr, Transcoder<T> tc) {
-      super(key, attr, tc, list.size());
+      super(key, opIdx, attr, tc, list.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
       }
@@ -115,9 +122,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
     private static final String COMMAND = "sop insert";
     private final Collection<T> set;
 
-    public SetPipedInsert(String key, Collection<T> set,
+    public SetPipedInsert(String key, Collection<T> set, int opIdx,
                           CollectionAttributes attr, Transcoder<T> tc) {
-      super(key, attr, tc, set.size());
+      super(key, opIdx, attr, tc, set.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
       }
@@ -172,9 +179,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
     private static final String COMMAND = "bop insert";
     private final Map<Long, T> map;
 
-    public BTreePipedInsert(String key, Map<Long, T> map,
+    public BTreePipedInsert(String key, Map<Long, T> map, int opIdx,
                             CollectionAttributes attr, Transcoder<T> tc) {
-      super(key, attr, tc, map.size());
+      super(key, opIdx, attr, tc, map.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
@@ -234,9 +241,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
     private static final String COMMAND = "bop insert";
     private final List<Element<T>> elements;
 
-    public ByteArraysBTreePipedInsert(String key, List<Element<T>> elements,
+    public ByteArraysBTreePipedInsert(String key, List<Element<T>> elements, int opIdx,
                                       CollectionAttributes attr, Transcoder<T> tc) {
-      super(key, attr, tc, elements.size());
+      super(key, opIdx, attr, tc, elements.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
       }
@@ -296,9 +303,9 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
     private static final String COMMAND = "mop insert";
     private final Map<String, T> map;
 
-    public MapPipedInsert(String key, Map<String, T> map,
+    public MapPipedInsert(String key, Map<String, T> map, int opIdx,
                           CollectionAttributes attr, Transcoder<T> tc) {
-      super(key, attr, tc, map.size());
+      super(key, opIdx, attr, tc, map.size());
       if (attr != null) { /* item creation option */
         CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
       }
