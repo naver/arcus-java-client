@@ -16,7 +16,7 @@ final class OptimizedGetImpl extends GetOperationImpl {
    * Construct an optimized get starting with the given get operation.
    */
   public OptimizedGetImpl(GetOperation firstGet) {
-    super(new HashSet<String>(), new ProxyCallback());
+    super(new HashSet<>(), new ProxyCallback());
     pcb = (ProxyCallback) getCallback();
     addOperation(firstGet);
   }

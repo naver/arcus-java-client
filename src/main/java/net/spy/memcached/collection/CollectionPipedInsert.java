@@ -67,7 +67,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<byte[]>(list.size());
+      List<byte[]> encodedList = new ArrayList<>(list.size());
       CachedData cd = null;
       for (T each : list) {
         cd = tc.encode(each);
@@ -128,7 +128,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<byte[]>(set.size());
+      List<byte[]> encodedList = new ArrayList<>(set.size());
       CachedData cd = null;
       for (T each : set) {
         cd = tc.encode(each);
@@ -185,7 +185,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<byte[]>(map.size());
+      List<byte[]> encodedList = new ArrayList<>(map.size());
       CachedData cd = null;
       for (T each : map.values()) {
         cd = tc.encode(each);
@@ -206,7 +206,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
       // create ascii operation string
       int keySize = map.keySet().size();
-      List<Long> keyList = new ArrayList<Long>(map.keySet());
+      List<Long> keyList = new ArrayList<>(map.keySet());
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < keySize; i++) {
@@ -247,7 +247,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
+      List<byte[]> encodedList = new ArrayList<>(elements.size());
       CachedData cd = null;
       for (Element<T> each : elements) {
         cd = tc.encode(each.getValue());
@@ -309,7 +309,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<byte[]>(map.size());
+      List<byte[]> encodedList = new ArrayList<>(map.size());
       CachedData cd = null;
       for (T each : map.values()) {
         cd = tc.encode(each);
@@ -330,7 +330,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
       // create ascii operation string
       int mkeySize = map.keySet().size();
-      List<String> keyList = new ArrayList<String>(map.keySet());
+      List<String> keyList = new ArrayList<>(map.keySet());
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
       for (i = this.nextOpIndex; i < mkeySize; i++) {

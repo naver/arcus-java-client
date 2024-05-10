@@ -28,13 +28,13 @@ public abstract class SMGetResult<T>  {
     this.totalResultElementCount = totalResultElementCount;
     this.reverse = reverse;
 
-    this.missedKeyList = Collections.synchronizedList(new ArrayList<String>());
+    this.missedKeyList = Collections.synchronizedList(new ArrayList<>());
     this.missedKeyMap
-            = Collections.synchronizedMap(new HashMap<String, CollectionOperationStatus>());
-    this.trimmedKeyMap = Collections.synchronizedMap(new HashMap<String, BKeyObject>());
-    this.mergedTrimmedKeys = new ArrayList<SMGetTrimKey>();
+            = Collections.synchronizedMap(new HashMap<>());
+    this.trimmedKeyMap = Collections.synchronizedMap(new HashMap<>());
+    this.mergedTrimmedKeys = new ArrayList<>();
 
-    this.mergedResult = new ArrayList<SMGetElement<T>>(totalResultElementCount);
+    this.mergedResult = new ArrayList<>(totalResultElementCount);
   }
 
   public List<String> getMissedKeyList() {
@@ -55,7 +55,7 @@ public abstract class SMGetResult<T>  {
    */
   public List<SMGetTrimKey> getMergedTrimmedKeys() {
     if (mergedTrimmedKeys.size() != trimmedKeyMap.size()) {
-      List<SMGetTrimKey> result = new ArrayList<SMGetTrimKey>();
+      List<SMGetTrimKey> result = new ArrayList<>();
       for (Map.Entry<String, BKeyObject> entry : trimmedKeyMap.entrySet()) {
         result.add(new SMGetTrimKey(entry.getKey(), entry.getValue()));
       }

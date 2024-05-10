@@ -114,10 +114,10 @@ public final class BTreeUtil {
 
     switch (bkey.getType()) {
       case LONG:
-        element = new Element<T>(bkey.getLongBKey(), value, cachedData.getEFlag());
+        element = new Element<>(bkey.getLongBKey(), value, cachedData.getEFlag());
         break;
       case BYTEARRAY:
-        element = new Element<T>(bkey.getByteArrayBKeyRaw(), value, cachedData.getEFlag());
+        element = new Element<>(bkey.getByteArrayBKeyRaw(), value, cachedData.getEFlag());
         break;
     }
     return element;

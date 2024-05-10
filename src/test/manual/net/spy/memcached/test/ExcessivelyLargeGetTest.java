@@ -38,7 +38,7 @@ public class ExcessivelyLargeGetTest extends SpyObject implements Runnable {
     client = new MemcachedClient(new ConnectionFactoryBuilder()
             .setProtocol(Protocol.BINARY).setOpTimeout(15000).build(),
             AddrUtil.getAddresses(ARCUS_HOST));
-    keys = new ArrayList<String>(N);
+    keys = new ArrayList<>(N);
     new Random().nextBytes(value);
   }
 

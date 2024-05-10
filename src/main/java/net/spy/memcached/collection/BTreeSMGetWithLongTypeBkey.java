@@ -48,7 +48,7 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
 
   @Override
   public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList) {
-    return new BTreeSMGetWithLongTypeBkey<T>(node, keyList,
-        range, eFlagFilter, count, smgetMode);
+    return new BTreeSMGetWithLongTypeBkey<>(node, keyList,
+            range, eFlagFilter, count, smgetMode);
   }
 }

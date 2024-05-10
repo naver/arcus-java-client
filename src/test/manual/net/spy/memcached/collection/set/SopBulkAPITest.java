@@ -33,7 +33,7 @@ import org.junit.Assert;
 public class SopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "SopBulkAPITest";
-  private final List<Object> valueList = new ArrayList<Object>();
+  private final List<Object> valueList = new ArrayList<>();
 
   private int getValueCount() {
     return mc.getMaxPipedItemCount();
@@ -104,7 +104,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
       }
 
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-              .asyncSopPipedInsertBulk(key, new ArrayList<Object>(),
+              .asyncSopPipedInsertBulk(key, new ArrayList<>(),
                       new CollectionAttributes());
 
       future.get(10000, TimeUnit.MILLISECONDS);

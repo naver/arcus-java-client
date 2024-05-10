@@ -21,12 +21,12 @@ public class CASMutatorTest extends ClientBaseCase {
         return current + 1;
       }
     };
-    mutator = new CASMutator<Long>(client, new LongTranscoder(), 50);
+    mutator = new CASMutator<>(client, new LongTranscoder(), 50);
   }
 
   public void testDefaultConstructor() {
     // Just validate that this doesn't throw an exception.
-    new CASMutator<Long>(client, new LongTranscoder());
+    new CASMutator<>(client, new LongTranscoder());
   }
 
   public void testConcurrentCAS() throws Throwable {
@@ -64,7 +64,7 @@ public class CASMutatorTest extends ClientBaseCase {
   }
 
   public void testCASValueToString() {
-    CASValue<String> c = new CASValue<String>(717L, "hi");
+    CASValue<String> c = new CASValue<>(717L, "hi");
     assertEquals("{CasValue 717/hi}", c.toString());
   }
 }

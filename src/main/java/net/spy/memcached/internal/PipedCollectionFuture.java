@@ -18,12 +18,12 @@ import net.spy.memcached.ops.OperationState;
 
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
-  private final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
+  private final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
   private final AtomicReference<CollectionOperationStatus> operationStatus
-          = new AtomicReference<CollectionOperationStatus>(null);
+          = new AtomicReference<>(null);
 
   private final Map<K, V> failedResult =
-          new ConcurrentHashMap<K, V>();
+          new ConcurrentHashMap<>();
 
   public PipedCollectionFuture(CountDownLatch l, long opTimeout) {
     super(l, opTimeout);
@@ -63,7 +63,7 @@ public class PipedCollectionFuture<K, V>
           throws InterruptedException, TimeoutException, ExecutionException {
 
     if (!latch.await(duration, units)) {
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedoutOps.add(op);

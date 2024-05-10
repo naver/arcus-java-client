@@ -33,7 +33,7 @@ import org.junit.Assert;
 public class LopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "LopBulkAPITest33";
-  private final List<Object> valueList = new ArrayList<Object>();
+  private final List<Object> valueList = new ArrayList<>();
 
   private int getValueCount() {
     return mc.getMaxPipedItemCount();
@@ -107,7 +107,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
   public void testBulkEmptyList() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-              .asyncLopPipedInsertBulk(key, 0, new ArrayList<Object>(0),
+              .asyncLopPipedInsertBulk(key, 0, new ArrayList<>(0),
                       new CollectionAttributes());
 
       future.get(10000, TimeUnit.MILLISECONDS);

@@ -108,9 +108,9 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
         // none
       }
     };
-    BlockingQueue<Operation> oQueue = new LinkedBlockingQueue<Operation>();
-    BlockingQueue<Operation> rQueue = new LinkedBlockingQueue<Operation>();
-    BlockingQueue<Operation> wQueue = new LinkedBlockingQueue<Operation>();
+    BlockingQueue<Operation> oQueue = new LinkedBlockingQueue<>();
+    BlockingQueue<Operation> rQueue = new LinkedBlockingQueue<>();
+    BlockingQueue<Operation> wQueue = new LinkedBlockingQueue<>();
 
     OperationQueueFactory opQueueFactory = new DirectFactory(oQueue);
     OperationQueueFactory rQueueFactory = new DirectFactory(rQueue);

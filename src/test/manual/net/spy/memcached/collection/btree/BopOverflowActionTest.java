@@ -35,7 +35,7 @@ import org.junit.Assert;
 public class BopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "BopGetBoundaryTest";
-  private List<String> keyList = new ArrayList<String>();
+  private List<String> keyList = new ArrayList<>();
 
   @Override
   protected void setUp() throws Exception {
@@ -275,7 +275,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+      mc.asyncBopPipedInsertBulk(key, new HashMap<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -320,7 +320,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncBopPipedInsertBulk(key, new HashMap<Long, Object>(), attributesForCreate).get();
+      mc.asyncBopPipedInsertBulk(key, new HashMap<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success

@@ -27,7 +27,7 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 public class LopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "LopOverflowActionTest";
-  private List<String> keyList = new ArrayList<String>();
+  private List<String> keyList = new ArrayList<>();
 
   @Override
   protected void setUp() throws Exception {

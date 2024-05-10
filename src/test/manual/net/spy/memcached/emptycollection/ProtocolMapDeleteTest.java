@@ -28,10 +28,10 @@ import org.junit.Assert;
 public class ProtocolMapDeleteTest extends TestCase {
 
   public void testStringify() {
-    List<String> mkeyList = new ArrayList<String>();
+    List<String> mkeyList = new ArrayList<>();
     mkeyList.add("mkey");
 
-    List<String> mkeyList2 = new ArrayList<String>();
+    List<String> mkeyList2 = new ArrayList<>();
     mkeyList2.add("mkey1");
     mkeyList2.add("mkey2");
     // default setting : dropIfEmpty = true

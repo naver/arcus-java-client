@@ -77,11 +77,11 @@ public class SyncThread<T> extends SpyThread {
    */
   public static <T> Collection<SyncThread<T>> getCompletedThreads(
           int num, Callable<T> callable) throws InterruptedException {
-    Collection<SyncThread<T>> rv = new ArrayList<SyncThread<T>>(num);
+    Collection<SyncThread<T>> rv = new ArrayList<>(num);
 
     CyclicBarrier barrier = new CyclicBarrier(num);
     for (int i = 0; i < num; i++) {
-      rv.add(new SyncThread<T>(barrier, callable));
+      rv.add(new SyncThread<>(barrier, callable));
     }
 
     for (SyncThread<T> t : rv) {
@@ -103,7 +103,7 @@ public class SyncThread<T> extends SpyThread {
    */
   public static <T> int getDistinctResultCount(int num, Callable<T> callable)
           throws Throwable {
-    IdentityHashMap<T, Object> found = new IdentityHashMap<T, Object>();
+    IdentityHashMap<T, Object> found = new IdentityHashMap<>();
     Collection<SyncThread<T>> threads = getCompletedThreads(num, callable);
     for (SyncThread<T> s : threads) {
       found.put(s.getResult(), new Object());

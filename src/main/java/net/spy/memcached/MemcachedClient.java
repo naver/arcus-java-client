@@ -239,7 +239,7 @@ public class MemcachedClient extends SpyThread
    * @return point-in-time view of currently available servers
    */
   public Collection<SocketAddress> getAvailableServers() {
-    ArrayList<SocketAddress> rv = new ArrayList<SocketAddress>();
+    ArrayList<SocketAddress> rv = new ArrayList<>();
     for (MemcachedNode node : conn.getLocator().getAll()) {
       if (node.isActive()) {
         rv.add(node.getSocketAddress());
@@ -260,7 +260,7 @@ public class MemcachedClient extends SpyThread
    * @return point-in-time view of currently unavailable servers
    */
   public Collection<SocketAddress> getUnavailableServers() {
-    ArrayList<SocketAddress> rv = new ArrayList<SocketAddress>();
+    ArrayList<SocketAddress> rv = new ArrayList<>();
     for (MemcachedNode node : conn.getLocator().getAll()) {
       if (!node.isActive()) {
         rv.add(node.getSocketAddress());
@@ -369,7 +369,7 @@ public class MemcachedClient extends SpyThread
                                                   int exp, T value, Transcoder<T> tc) {
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
+    final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
             operationTimeout);
     Operation op = opFact.store(storeType, key, co.getFlags(),
             exp, co.getData(), new OperationCallback() {
@@ -396,7 +396,7 @@ public class MemcachedClient extends SpyThread
           T value, Transcoder<T> tc) {
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
+    final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
             operationTimeout);
     Operation op = opFact.cat(catType, cas, key, co.getData(),
         new OperationCallback() {
@@ -522,7 +522,7 @@ public class MemcachedClient extends SpyThread
                                                    Transcoder<T> tc) {
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<CASResponse> rv = new OperationFuture<CASResponse>(
+    final OperationFuture<CASResponse> rv = new OperationFuture<>(
             latch, operationTimeout);
     Operation op = opFact.cas(StoreType.set, key, casId, co.getFlags(), exp,
             co.getData(), new OperationCallback() {
@@ -886,7 +886,7 @@ public class MemcachedClient extends SpyThread
   public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<T> future = new GetFuture<T>(latch, operationTimeout);
+    final GetFuture<T> future = new GetFuture<>(latch, operationTimeout);
 
     Operation op = opFact.get(key,
         new GetOperation.Callback() {
@@ -898,7 +898,7 @@ public class MemcachedClient extends SpyThread
 
           public void gotData(String k, int flags, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
-            result = new GetResultImpl<T>(new CachedData(flags, data, tc.getMaxSize()), tc);
+            result = new GetResultImpl<>(new CachedData(flags, data, tc.getMaxSize()), tc);
           }
 
           public void complete() {
@@ -937,7 +937,7 @@ public class MemcachedClient extends SpyThread
                                                     final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<CASValue<T>> rv = new GetFuture<CASValue<T>>(latch, operationTimeout);
+    final GetFuture<CASValue<T>> rv = new GetFuture<>(latch, operationTimeout);
 
     Operation op = opFact.gets(key,
         new GetsOperation.Callback() {
@@ -950,7 +950,7 @@ public class MemcachedClient extends SpyThread
           public void gotData(String k, int flags, long cas, byte[] data) {
             assert key.equals(k) : "Wrong key returned";
             assert cas > 0 : "CAS was less than zero:  " + cas;
-            val = new GetsResultImpl<T>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
+            val = new GetsResultImpl<>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
           }
 
           public void complete() {
@@ -1075,15 +1075,15 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Iterator<Transcoder<T>> tc_iter) {
-    final Map<String, GetResult<T>> rvMap = new ConcurrentHashMap<String, GetResult<T>>();
+    final Map<String, GetResult<T>> rvMap = new ConcurrentHashMap<>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
     // used only to read the transcoder for a key.
-    final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
+    final Map<String, Transcoder<T>> tc_map = new HashMap<>();
 
     // Grouping keys by memcached node
-    final Map<MemcachedNode, List<String>> keyMap = new HashMap<MemcachedNode, List<String>>();
+    final Map<MemcachedNode, List<String>> keyMap = new HashMap<>();
 
     Iterator<String> keyIter = keys.iterator();
     while (keyIter.hasNext() && tc_iter.hasNext()) {
@@ -1095,7 +1095,7 @@ public class MemcachedClient extends SpyThread
     }
     int wholeChunkSize = getWholeChunkSize(keyMap);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
-    final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
+    final Collection<Operation> ops = new ArrayList<>(wholeChunkSize);
 
     GetOperation.Callback cb = new GetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
@@ -1108,7 +1108,7 @@ public class MemcachedClient extends SpyThread
       public void gotData(String k, int flags, byte[] data) {
         Transcoder<T> tc = tc_map.get(k);
         GetResult<T> result
-                = new GetResultImpl<T>(new CachedData(flags, data, tc.getMaxSize()), tc);
+                = new GetResultImpl<>(new CachedData(flags, data, tc.getMaxSize()), tc);
         rvMap.put(k, result);
       }
 
@@ -1137,7 +1137,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<T>(rvMap, ops, latch, operationTimeout);
+    return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
   }
 
   /**
@@ -1152,7 +1152,7 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
                                                      Transcoder<T> tc) {
-    return asyncGetBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
+    return asyncGetBulk(keys, new SingleElementInfiniteIterator<>(tc));
   }
 
   /**
@@ -1218,15 +1218,15 @@ public class MemcachedClient extends SpyThread
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Iterator<Transcoder<T>> tc_iter) {
     final Map<String, GetResult<CASValue<T>>> rvMap
-            = new ConcurrentHashMap<String, GetResult<CASValue<T>>>();
+            = new ConcurrentHashMap<>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
     // used only to read the transcoder for a key.
-    final Map<String, Transcoder<T>> tc_map = new HashMap<String, Transcoder<T>>();
+    final Map<String, Transcoder<T>> tc_map = new HashMap<>();
 
     // Grouping keys by memcached nodes
-    final Map<MemcachedNode, List<String>> keyMap = new HashMap<MemcachedNode, List<String>>();
+    final Map<MemcachedNode, List<String>> keyMap = new HashMap<>();
     Iterator<String> key_iter = keys.iterator();
     while (key_iter.hasNext() && tc_iter.hasNext()) {
       String key = key_iter.next();
@@ -1239,7 +1239,7 @@ public class MemcachedClient extends SpyThread
 
     int wholeChunkSize = getWholeChunkSize(keyMap);
     final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
-    final Collection<Operation> ops = new ArrayList<Operation>(wholeChunkSize);
+    final Collection<Operation> ops = new ArrayList<>(wholeChunkSize);
 
     GetsOperation.Callback cb = new GetsOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
@@ -1252,7 +1252,7 @@ public class MemcachedClient extends SpyThread
       public void gotData(String k, int flags, long cas, byte[] data) {
         Transcoder<T> tc = tc_map.get(k);
         GetResult<CASValue<T>> result
-                = new GetsResultImpl<T>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
+                = new GetsResultImpl<>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
         rvMap.put(k, result);
       }
 
@@ -1281,7 +1281,7 @@ public class MemcachedClient extends SpyThread
         ops.add(op);
       }
     }
-    return new BulkGetFuture<CASValue<T>>(rvMap, ops, latch, operationTimeout);
+    return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
   }
 
   /**
@@ -1294,7 +1294,7 @@ public class MemcachedClient extends SpyThread
     List<String> keyList = keyMap.get(node);
 
     if (keyList == null) {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       keyMap.put(node, keyList);
     }
     keyList.add(key);
@@ -1325,7 +1325,7 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Transcoder<T> tc) {
-    return asyncGetsBulk(keys, new SingleElementInfiniteIterator<Transcoder<T>>(tc));
+    return asyncGetsBulk(keys, new SingleElementInfiniteIterator<>(tc));
   }
 
   /**
@@ -1545,11 +1545,11 @@ public class MemcachedClient extends SpyThread
   public Map<SocketAddress, String> getVersions() {
     Collection<MemcachedNode> nodes = getAllNodes();
     final Map<SocketAddress, String> result =
-            new ConcurrentHashMap<SocketAddress, String>();
+            new ConcurrentHashMap<>();
     final BroadcastFuture<Map<SocketAddress, String>> future
-            = new BroadcastFuture<Map<SocketAddress, String>>(
-                    operationTimeout, result, nodes.size());
-    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
+            = new BroadcastFuture<>(
+            operationTimeout, result, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -1610,17 +1610,17 @@ public class MemcachedClient extends SpyThread
   public Map<SocketAddress, Map<String, String>> getStats(final String arg) {
     Collection<MemcachedNode> nodes = getAllNodes();
     final Map<SocketAddress, Map<String, String>> resultMap
-            = new HashMap<SocketAddress, Map<String, String>>();
+            = new HashMap<>();
     final BroadcastFuture<Map<SocketAddress, Map<String, String>>> future
-            = new BroadcastFuture<Map<SocketAddress, Map<String, String>>>(
-                    operationTimeout, resultMap, nodes.size());
-    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
+            = new BroadcastFuture<>(
+            operationTimeout, resultMap, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
     for (MemcachedNode node : nodes) {
       final SocketAddress sa = node.getSocketAddress();
       Operation op = opFact.stats(arg, new StatsOperation.Callback() {
-        final private Map<String, String> statMap = new HashMap<String, String>();
+        final private Map<String, String> statMap = new HashMap<>();
 
         @Override
         public void gotStat(String name, String val) {
@@ -1799,7 +1799,7 @@ public class MemcachedClient extends SpyThread
   private OperationFuture<Long> asyncMutate(Mutator m, String key, int by, long def,
                                    int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Long> rv = new OperationFuture<Long>(
+    final OperationFuture<Long> rv = new OperationFuture<>(
             latch, operationTimeout);
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
         new OperationCallback() {
@@ -1940,7 +1940,7 @@ public class MemcachedClient extends SpyThread
    */
   public OperationFuture<Boolean> delete(String key) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Boolean> rv = new OperationFuture<Boolean>(latch,
+    final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
             operationTimeout);
     DeleteOperation op = opFact.delete(key,
         new OperationCallback() {
@@ -1968,8 +1968,8 @@ public class MemcachedClient extends SpyThread
   public Future<Boolean> flush(final int delay) {
     Collection<MemcachedNode> nodes = getAllNodes();
     final BroadcastFuture<Boolean> rv
-            = new BroadcastFuture<Boolean>(operationTimeout, Boolean.TRUE, nodes.size());
-    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
+            = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
     for (MemcachedNode node : nodes) {
@@ -2007,11 +2007,11 @@ public class MemcachedClient extends SpyThread
   public Set<String> listSaslMechanisms() {
     Collection<MemcachedNode> nodes = getAllNodes();
     final ConcurrentMap<String, String> resultMap
-            = new ConcurrentHashMap<String, String>();
+            = new ConcurrentHashMap<>();
     final BroadcastFuture<ConcurrentMap<String, String>> future
-            = new BroadcastFuture<ConcurrentMap<String, String>>(
-                    operationTimeout, resultMap, nodes.size());
-    final Map<MemcachedNode, Operation> opsMap = new HashMap<MemcachedNode, Operation>();
+            = new BroadcastFuture<>(
+            operationTimeout, resultMap, nodes.size());
+    final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
     for (MemcachedNode node : nodes) {

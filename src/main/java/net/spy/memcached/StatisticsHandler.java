@@ -49,7 +49,7 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
   private static final String DELIMETER = "-";
 
   private final MemcachedClient client;
-  private volatile Map<String, MemcachedNode> nodes = new HashMap<String, MemcachedNode>();
+  private volatile Map<String, MemcachedNode> nodes = new HashMap<>();
 
   public StatisticsHandler(final ArcusClient client) {
     this.client = client;
@@ -124,9 +124,9 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
 
   @Override
   public MBeanInfo getMBeanInfo() {
-    List<MBeanAttributeInfo> attributes = new ArrayList<MBeanAttributeInfo>();
+    List<MBeanAttributeInfo> attributes = new ArrayList<>();
 
-    Map<String, MemcachedNode> newNodes = new HashMap<String, MemcachedNode>();
+    Map<String, MemcachedNode> newNodes = new HashMap<>();
 
     for (MemcachedNode node : client.getAllNodes()) {
       newNodes.put(node.getSocketAddress().toString(), node);

@@ -70,7 +70,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   }
 
   private static List<InetSocketAddress> parseNodeNames(String s) {
-    List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+    List<InetSocketAddress> addrs = new ArrayList<>();
 
     for (String node : s.split(",")) {
       String[] temp = node.split("\\^");
@@ -104,7 +104,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     }
 
     if (list == null) {
-      list = new ArrayList<InetSocketAddress>(0);
+      list = new ArrayList<>(0);
     }
     return list;
   }
@@ -113,14 +113,14 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
           List<InetSocketAddress> addrs) {
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            new HashMap<String, List<ArcusReplNodeAddress>>();
+            new HashMap<>();
 
     for (InetSocketAddress addr : addrs) {
       ArcusReplNodeAddress a = (ArcusReplNodeAddress) addr;
       String groupName = a.getGroupName();
       List<ArcusReplNodeAddress> gNodeList = newAllGroups.get(groupName);
       if (gNodeList == null) {
-        gNodeList = new ArrayList<ArcusReplNodeAddress>();
+        gNodeList = new ArrayList<>();
         newAllGroups.put(groupName, gNodeList);
       }
       // Add the master node as the first element of node list.
@@ -186,7 +186,7 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
       return groupNodes.get(0).isSameAddress(groupNodes.get(1));
     }
 
-    Set<String> addrSet = new HashSet<String>();
+    Set<String> addrSet = new HashSet<>();
     for (ArcusReplNodeAddress nodeAddress : groupNodes) {
       addrSet.add(nodeAddress.getIPPort());
     }

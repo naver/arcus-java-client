@@ -40,8 +40,8 @@ public class OptimizedSetImpl extends OperationImpl implements Operation {
 
   private final int terminalOpaque = generateOpaque();
   private final Map<Integer, OperationCallback> callbacks =
-          new HashMap<Integer, OperationCallback>();
-  private final List<CASOperation> ops = new ArrayList<CASOperation>();
+          new HashMap<>();
+  private final List<CASOperation> ops = new ArrayList<>();
 
   // If nothing else, this will be a NOOP.
   private int byteCount = MIN_RECV_PACKET;

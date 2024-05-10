@@ -69,7 +69,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
       Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
       Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
       findValues.add(VALUE4);
       findValues.add(VALUE2);
@@ -113,7 +113,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
       Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
       Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
 
       CollectionFuture<Map<Object, Boolean>> future = mc
@@ -132,7 +132,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
   public void testMaxPipedExist() {
     try {
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
 
       // insert items
       for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
@@ -169,7 +169,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
   public void testPipedExistNotExistsKey() {
     try {
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
       findValues.add(VALUE4);
       findValues.add(VALUE2);
@@ -194,7 +194,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
   public void testPipedExistOneNotExistsKey() {
     try {
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
 
       CollectionFuture<Map<Object, Boolean>> future = mc
@@ -216,7 +216,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
     try {
       Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
 
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
       findValues.add(VALUE2);
       findValues.add(VALUE6);
@@ -242,7 +242,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
     try {
       Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
 
-      List<Object> findValues = new ArrayList<Object>();
+      List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
 
       CollectionFuture<Map<Object, Boolean>> future = mc

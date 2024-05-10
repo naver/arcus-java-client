@@ -47,7 +47,7 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
   protected Operation op;
 
   public OperationFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<T>(null), opTimeout);
+    this(l, new AtomicReference<>(null), opTimeout);
   }
 
   public OperationFuture(CountDownLatch l, AtomicReference<T> oref,

@@ -17,7 +17,7 @@ public class KetamaConnectionFactoryTest extends TestCase {
   public void testCorrectTypes() {
     ConnectionFactory factory = new KetamaConnectionFactory();
 
-    NodeLocator locator = factory.createLocator(new ArrayList<MemcachedNode>());
+    NodeLocator locator = factory.createLocator(new ArrayList<>());
     assertTrue(locator instanceof KetamaNodeLocator);
 
     assertEquals(HashAlgorithm.KETAMA_HASH, factory.getHashAlg());

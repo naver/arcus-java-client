@@ -44,7 +44,7 @@ public class MemcachedConnectionTest extends TestCase {
     super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder().setReadBufferSize(1024);
     ConnectionFactory cf = cfb.build();
-    List<InetSocketAddress> addrs = new ArrayList<InetSocketAddress>();
+    List<InetSocketAddress> addrs = new ArrayList<>();
 
     conn = new MemcachedConnection("connection test", cf, addrs,
         cf.getInitialObservers(), cf.getFailureMode(), cf.getOperationFactory());

@@ -20,14 +20,14 @@ public class BopGetByPositionResultImpl<T> implements GetResult<Map<Integer, Ele
                                     boolean reverse,
                                     Transcoder<T> transcoder) {
     this.cachedDataMap = cachedDataMap;
-    this.result = new TreeMap<Integer, Element<T>>((reverse) ? Collections.reverseOrder() : null);
+    this.result = new TreeMap<>((reverse) ? Collections.reverseOrder() : null);
     this.transcoder = transcoder;
   }
 
   @Override
   public Map<Integer, Element<T>> getDecodedValue() {
     if (result.isEmpty() && !cachedDataMap.isEmpty()) {
-      SortedMap<Integer, Element<T>> temp = new TreeMap<Integer, Element<T>>(result);
+      SortedMap<Integer, Element<T>> temp = new TreeMap<>(result);
       for (Map.Entry<Integer, Map.Entry<BKeyObject, CachedData>> entry : cachedDataMap.entrySet()) {
         Map.Entry<BKeyObject, CachedData> cachedDataEntry = entry.getValue();
         temp.put(entry.getKey(), BTreeUtil.makeBTreeElement(

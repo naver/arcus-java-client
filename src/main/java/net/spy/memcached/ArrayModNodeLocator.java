@@ -78,7 +78,7 @@ public final class ArrayModNodeLocator implements NodeLocator {
 
   /* ENABLE_MIGRATION if */
   public Collection<MemcachedNode> getAlterAll() {
-    return new ArrayList<MemcachedNode>();
+    return new ArrayList<>();
   }
 
   public MemcachedNode getAlterNode(SocketAddress sa) {

@@ -78,7 +78,7 @@ public enum CollectionResponse {
 
   static {
     CollectionResponse[] values = CollectionResponse.values();
-    ENUM_STRINGS = new HashSet<String>(values.length);
+    ENUM_STRINGS = new HashSet<>(values.length);
     for (CollectionResponse e : values) {
       ENUM_STRINGS.add(e.toString());
     }

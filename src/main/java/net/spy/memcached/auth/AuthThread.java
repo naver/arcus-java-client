@@ -37,7 +37,7 @@ public class AuthThread extends SpyThread {
     while (!done.get()) {
       final CountDownLatch latch = new CountDownLatch(1);
       final AtomicReference<OperationStatus> foundStatus =
-              new AtomicReference<OperationStatus>();
+              new AtomicReference<>();
 
       final OperationCallback cb = new OperationCallback() {
         public void receivedStatus(OperationStatus val) {

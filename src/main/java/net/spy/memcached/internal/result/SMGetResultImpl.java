@@ -105,7 +105,7 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
 
     final int eachSize = eachResult.size();
     final int oldMergedSize = mergedResult.size();
-    final List<SMGetElement<T>> newMergedResult = new ArrayList<SMGetElement<T>>(count);
+    final List<SMGetElement<T>> newMergedResult = new ArrayList<>(count);
 
     int eachPos = 0, oldMergedPos = 0, comp;
     boolean bkeyDuplicated;

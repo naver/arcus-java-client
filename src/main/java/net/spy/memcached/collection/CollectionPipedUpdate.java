@@ -55,7 +55,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
+      List<byte[]> encodedList = new ArrayList<>(elements.size());
       CachedData cd = null;
       for (Element<T> each : elements) {
         if (each.getValue() != null) {
@@ -149,7 +149,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<byte[]>(elements.size());
+      List<byte[]> encodedList = new ArrayList<>(elements.size());
       CachedData cd = null;
       for (T each : elements.values()) {
         cd = tc.encode(each);
@@ -173,7 +173,7 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
 
       // create ascii operation string
       int mkeySize = elements.keySet().size();
-      List<String> keyList = new ArrayList<String>(elements.keySet());
+      List<String> keyList = new ArrayList<>(elements.keySet());
       for (i = this.nextOpIndex; i < mkeySize; i++) {
         String mkey = keyList.get(i);
         value = encodedList.get(i);

@@ -38,10 +38,10 @@ public class BTreeGetResult<K, V> {
       this.elements = null;
       return;
     }
-    this.elements = new ByteArrayTreeMap<K, BTreeElement<K, V>>(
+    this.elements = new ByteArrayTreeMap<>(
             reverse ? Collections.reverseOrder() : null);
     for (BTreeElement<K, CachedData> elem : elementList) {
-      elements.put(elem.getBkey(), new BTreeElement<K, V>(elem.getBkey(), elem.getEflag(),
+      elements.put(elem.getBkey(), new BTreeElement<>(elem.getBkey(), elem.getEflag(),
               transcoder.decode(elem.getValue())));
     }
   }

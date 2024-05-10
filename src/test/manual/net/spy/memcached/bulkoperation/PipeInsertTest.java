@@ -51,10 +51,10 @@ public class PipeInsertTest extends BaseIntegrationTest {
   public void testBopPipeInsert() {
     int elementCount = 5000;
 
-    List<Element<Object>> elements = new ArrayList<Element<Object>>();
+    List<Element<Object>> elements = new ArrayList<>();
 
     for (int i = 0; i < elementCount; i++) {
-      elements.add(new Element<Object>(i, "value" + i,
+      elements.add(new Element<>(i, "value" + i,
               new byte[]{(byte) 1}));
     }
 
@@ -82,7 +82,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
   public void testBopPipeInsert2() {
     int elementCount = 5000;
-    Map<Long, Object> elements = new TreeMap<Long, Object>();
+    Map<Long, Object> elements = new TreeMap<>();
     for (long i = 0; i < elementCount; i++) {
       elements.put(i, "value" + i);
     }
@@ -116,7 +116,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   public void testLopPipeInsert() {
     int elementCount = 5000;
 
-    List<Object> elements = new ArrayList<Object>(elementCount);
+    List<Object> elements = new ArrayList<>(elementCount);
 
     for (int i = 0; i < elementCount; i++) {
       elements.add("value" + i);
@@ -149,9 +149,9 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
   public void testLopPipeInsertIndex() {
     int elementCount = 3;
-    List<Object> middleElements = new ArrayList<Object>(elementCount);
-    List<Object> headerElements = new ArrayList<Object>(elementCount);
-    List<Object> footerElements = new ArrayList<Object>(elementCount);
+    List<Object> middleElements = new ArrayList<>(elementCount);
+    List<Object> headerElements = new ArrayList<>(elementCount);
+    List<Object> footerElements = new ArrayList<>(elementCount);
 
     for (int i = 0; i < elementCount; i++) {
       middleElements.add("middleValue" + i);
@@ -197,7 +197,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   public void testMopPipeInsert() {
     int elementCount = 5000;
 
-    Map<String, Object> elements = new TreeMap<String, Object>();
+    Map<String, Object> elements = new TreeMap<>();
 
     for (int i = 0; i < elementCount; i++) {
       elements.put(String.valueOf(i), "value" + i);

@@ -52,7 +52,7 @@ public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
 
     // generate bkey
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 1; i <= maxcount; i++) {
       bkeys.put((long) i, value);
     }

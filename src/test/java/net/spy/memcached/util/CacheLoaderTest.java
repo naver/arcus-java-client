@@ -24,7 +24,7 @@ public class CacheLoaderTest extends BaseMockCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    BlockingQueue<Runnable> wq = new LinkedBlockingQueue<Runnable>();
+    BlockingQueue<Runnable> wq = new LinkedBlockingQueue<>();
     es = new ThreadPoolExecutor(10, 10, 5 * 60, TimeUnit.SECONDS, wq);
   }
 
@@ -50,7 +50,7 @@ public class CacheLoaderTest extends BaseMockCase {
     m.expects(once()).method("set").with(eq("c"), eq(0), eq(3))
             .will(returnValue(new ImmediateFuture(false)));
 
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     map.put("a", 1);
     map.put("b", 2);
     map.put("c", 3);

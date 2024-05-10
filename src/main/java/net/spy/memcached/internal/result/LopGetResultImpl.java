@@ -9,7 +9,7 @@ import net.spy.memcached.transcoders.Transcoder;
 public class LopGetResultImpl<T> implements GetResult<List<T>> {
   private final List<CachedData> cachedDataList;
   private final Transcoder<T> transcoder;
-  private List<T> result = new ArrayList<T>();
+  private List<T> result = new ArrayList<>();
 
   public LopGetResultImpl(List<CachedData> cachedDataList, Transcoder<T> transcoder) {
     this.cachedDataList = cachedDataList;
@@ -19,7 +19,7 @@ public class LopGetResultImpl<T> implements GetResult<List<T>> {
   @Override
   public List<T> getDecodedValue() {
     if (result.isEmpty() && !cachedDataList.isEmpty()) {
-      List<T> temp = new ArrayList<T>();
+      List<T> temp = new ArrayList<>();
       for (CachedData cachedData : cachedDataList) {
         temp.add(transcoder.decode(cachedData));
       }

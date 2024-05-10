@@ -27,7 +27,7 @@ public final class AddrUtil {
       throw new NullPointerException("Null host list");
     }
     ArrayList<InetSocketAddress> addrs =
-            new ArrayList<InetSocketAddress>();
+            new ArrayList<>();
 
     if (s.trim().equals("")) {
       return addrs;

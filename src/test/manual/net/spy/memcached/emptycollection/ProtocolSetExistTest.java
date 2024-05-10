@@ -29,12 +29,12 @@ public class ProtocolSetExistTest extends TestCase {
   private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
   public void testStringify() {
-    SetExist<Object> exist = new SetExist<Object>(value, testTranscoder);
+    SetExist<Object> exist = new SetExist<>(value, testTranscoder);
     Assert.assertEquals("5", exist.stringify());
   }
 
   public void testGetAdditionalArgs() {
-    SetExist<Object> exist = new SetExist<Object>(value, testTranscoder);
+    SetExist<Object> exist = new SetExist<>(value, testTranscoder);
     Assert.assertArrayEquals(new byte[]{'v', 'a', 'l', 'u', 'e'}, exist.getAdditionalArgs());
   }
 }

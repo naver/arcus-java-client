@@ -58,7 +58,7 @@ public final class SMGetFuture<T extends List<?>> implements Future<T> {
           throws InterruptedException, TimeoutException, ExecutionException {
 
     if (!latch.await(duration, units)) {
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedoutOps.add(op);

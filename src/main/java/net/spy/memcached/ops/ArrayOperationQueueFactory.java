@@ -22,7 +22,7 @@ public class ArrayOperationQueueFactory implements OperationQueueFactory {
   }
 
   public BlockingQueue<Operation> create() {
-    return new ArrayBlockingQueue<Operation>(capacity);
+    return new ArrayBlockingQueue<>(capacity);
   }
 
 }

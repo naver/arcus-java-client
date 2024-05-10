@@ -35,9 +35,9 @@ public class PartitionedMap<K, V> extends AbstractList<Map<K, V>> {
     int counter = 0;
     int listIndex = 0;
 
-    mapList = new ArrayList<Map<K, V>>(expectSize);
+    mapList = new ArrayList<>(expectSize);
     for (int i = 0; i < expectSize; i++) {
-      mapList.add(new HashMap<K, V>());
+      mapList.add(new HashMap<>());
     }
 
     for (Map.Entry<K, V> entry : map.entrySet()) {

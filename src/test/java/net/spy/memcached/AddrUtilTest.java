@@ -93,7 +93,7 @@ public class AddrUtilTest extends TestCase {
             AddrUtil.getAddresses("::1:80");
     assertEquals(1, addrs.size());
 
-    Set<String> validLocalhostNames = new HashSet<String>();
+    Set<String> validLocalhostNames = new HashSet<>();
     validLocalhostNames.add("localhost");
     validLocalhostNames.add("ip6-localhost");
     validLocalhostNames.add("localhost6.localdomain6");

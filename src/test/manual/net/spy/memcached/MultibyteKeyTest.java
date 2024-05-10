@@ -101,7 +101,7 @@ public class MultibyteKeyTest {
     };
     testData = new byte[64];
     new Random().nextBytes(testData);
-    keyList = new ArrayList<String>();
+    keyList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       keyList.add(MULTIBYTE_KEY + String.valueOf(i));
     }
@@ -283,8 +283,8 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkey<Object>(null,
-              keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
+              new BTreeSMGetWithLongTypeBkey<>(null,
+                      keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
             public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
@@ -315,8 +315,8 @@ public class MultibyteKeyTest {
   public void BTreeSortMergeGetOperationOldImplTest() {
     try {
       opFact.bopsmget(
-          new BTreeSMGetWithLongTypeBkeyOld<Object>(null,
-              keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
+              new BTreeSMGetWithLongTypeBkeyOld<>(null,
+                      keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
           new BTreeSortMergeGetOperationOld.Callback() {
             @Override
             public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
@@ -356,24 +356,24 @@ public class MultibyteKeyTest {
           }
         };
 
-    List<Element<Integer>> elements = new ArrayList<Element<Integer>>();
+    List<Element<Integer>> elements = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
-      elements.add(new Element<Integer>(Long.valueOf(i), new Random().nextInt(), new byte[]{1, 1}));
+      elements.add(new Element<>(Long.valueOf(i), new Random().nextInt(), new byte[]{1, 1}));
     }
     CollectionPipedInsert<Integer> insert =
-        new CollectionPipedInsert.ByteArraysBTreePipedInsert<Integer>(
-            MULTIBYTE_KEY, elements, new CollectionAttributes(), new IntegerTranscoder());
+            new CollectionPipedInsert.ByteArraysBTreePipedInsert<>(
+                    MULTIBYTE_KEY, elements, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
 
-    Map<Long, Integer> elementsMap = new HashMap<Long, Integer>();
+    Map<Long, Integer> elementsMap = new HashMap<>();
     for (int i = 0; i < 10; i++) {
       elementsMap.put(Long.valueOf(i), new Random().nextInt());
     }
-    insert = new CollectionPipedInsert.BTreePipedInsert<Integer>(
+    insert = new CollectionPipedInsert.BTreePipedInsert<>(
             MULTIBYTE_KEY, elementsMap, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
@@ -381,11 +381,11 @@ public class MultibyteKeyTest {
       Assert.fail();
     }
 
-    List<Integer> elementsList = new ArrayList<Integer>();
+    List<Integer> elementsList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       elementsList.add(new Random().nextInt());
     }
-    insert = new CollectionPipedInsert.ListPipedInsert<Integer>(
+    insert = new CollectionPipedInsert.ListPipedInsert<>(
             MULTIBYTE_KEY, 0, elementsList, new CollectionAttributes(),
             new IntegerTranscoder());
     try {
@@ -394,11 +394,11 @@ public class MultibyteKeyTest {
       Assert.fail();
     }
 
-    Set<Integer> elementsSet = new HashSet<Integer>();
+    Set<Integer> elementsSet = new HashSet<>();
     for (int i = 0; i < 10; i++) {
       elementsSet.add(new Random().nextInt());
     }
-    insert = new CollectionPipedInsert.SetPipedInsert<Integer>(
+    insert = new CollectionPipedInsert.SetPipedInsert<>(
             MULTIBYTE_KEY, elementsSet, new CollectionAttributes(), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
@@ -478,7 +478,7 @@ public class MultibyteKeyTest {
           }
         };
 
-    insert = new CollectionBulkInsert.BTreeBulkInsert<Integer>(null, keyList,
+    insert = new CollectionBulkInsert.BTreeBulkInsert<>(null, keyList,
             String.valueOf(1L), BTreeUtil.toHex(new byte[]{0, 0}),
             new IntegerTranscoder().encode(new Random().nextInt()),
             new CollectionAttributes());
@@ -488,7 +488,7 @@ public class MultibyteKeyTest {
       Assert.fail();
     }
 
-    insert = new CollectionBulkInsert.ListBulkInsert<Integer>(null, keyList,
+    insert = new CollectionBulkInsert.ListBulkInsert<>(null, keyList,
             0, new IntegerTranscoder().encode(new Random().nextInt()),
             new CollectionAttributes());
 
@@ -498,7 +498,7 @@ public class MultibyteKeyTest {
       Assert.fail();
     }
 
-    insert = new CollectionBulkInsert.SetBulkInsert<Integer>(null, keyList,
+    insert = new CollectionBulkInsert.SetBulkInsert<>(null, keyList,
             new IntegerTranscoder().encode(new Random().nextInt()),
             new CollectionAttributes());
     try {
@@ -566,7 +566,7 @@ public class MultibyteKeyTest {
   public void CollectionUpdateOperationImplTest() {
     try {
       opFact.collectionUpdate(MULTIBYTE_KEY, MULTIBYTE_KEY,
-              new BTreeUpdate<Integer>(new Random().nextInt(), ElementFlagUpdate.RESET_FLAG, false),
+              new BTreeUpdate<>(new Random().nextInt(), ElementFlagUpdate.RESET_FLAG, false),
               new byte[]{0, 0}, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
@@ -575,15 +575,15 @@ public class MultibyteKeyTest {
 
   @Test
   public void CollectionPipedUpdateOperationImplTest() {
-    List<Element<Integer>> elementsList = new ArrayList<Element<Integer>>();
+    List<Element<Integer>> elementsList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
-      elementsList.add(new Element<Integer>(
-          Long.valueOf(i), new Random().nextInt(), ElementFlagUpdate.RESET_FLAG));
+      elementsList.add(new Element<>(
+              Long.valueOf(i), new Random().nextInt(), ElementFlagUpdate.RESET_FLAG));
     }
     try {
       opFact.collectionPipedUpdate(MULTIBYTE_KEY,
-          new CollectionPipedUpdate.BTreePipedUpdate<Integer>(
-              MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
+              new CollectionPipedUpdate.BTreePipedUpdate<>(
+                      MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
           new CollectionPipedUpdateOperation.Callback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
@@ -626,13 +626,13 @@ public class MultibyteKeyTest {
 
   @Test
   public void CollectionPipedExistOperationImplTest() {
-    List<Integer> objectList = new ArrayList<Integer>();
+    List<Integer> objectList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       objectList.add(new Random().nextInt());
     }
     try {
       opFact.collectionPipedExist(MULTIBYTE_KEY,
-          new SetPipedExist<Integer>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
+              new SetPipedExist<>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
           new CollectionPipedExistOperation.Callback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
@@ -655,8 +655,8 @@ public class MultibyteKeyTest {
   public void BTreeInsertAndGetOperationImplTest() {
     try {
       opFact.bopInsertAndGet(MULTIBYTE_KEY,
-          new BTreeInsertAndGet<Integer>(1L, new byte[]{0, 0}, new Random().nextInt(),
-                  false,  new CollectionAttributes()),
+              new BTreeInsertAndGet<>(1L, new byte[]{0, 0}, new Random().nextInt(),
+                      false, new CollectionAttributes()),
           testData, new BTreeInsertAndGetOperation.Callback() {
             @Override
             public void gotData(int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {

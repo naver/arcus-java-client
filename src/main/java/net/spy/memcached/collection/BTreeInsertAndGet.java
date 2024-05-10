@@ -42,9 +42,9 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
   public BTreeInsertAndGet(long bkey, byte[] eFlag, T value, boolean updateIfExist,
                            CollectionAttributes attributesForCreate) {
     if (updateIfExist) {
-      this.collection = new BTreeUpsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeUpsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     } else {
-      this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeInsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     }
     this.updateIfExist = updateIfExist;
     this.bKey = new BKeyObject(bkey);
@@ -55,9 +55,9 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
   public BTreeInsertAndGet(byte[] bkey, byte[] eFlag, T value, boolean updateIfExist,
                            CollectionAttributes attributesForCreate) {
     if (updateIfExist) {
-      this.collection = new BTreeUpsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeUpsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     } else {
-      this.collection = new BTreeInsert<T>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeInsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
     }
     this.updateIfExist = updateIfExist;
     this.bKey = new BKeyObject(bkey);

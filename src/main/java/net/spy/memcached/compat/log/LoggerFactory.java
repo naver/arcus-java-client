@@ -56,7 +56,7 @@ public final class LoggerFactory extends Object {
   private LoggerFactory() {
     super();
 
-    instances = new ConcurrentHashMap<String, Logger>();
+    instances = new ConcurrentHashMap<>();
   }
 
   private static void init() {

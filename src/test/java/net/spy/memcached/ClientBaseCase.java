@@ -50,7 +50,7 @@ public abstract class ClientBaseCase extends TestCase {
           "USE_ZK", "false"));
 
   public static Collection<String> stringify(Collection<?> c) {
-    Collection<String> rv = new ArrayList<String>();
+    Collection<String> rv = new ArrayList<>();
     for (Object o : c) {
       rv.add(String.valueOf(o));
     }

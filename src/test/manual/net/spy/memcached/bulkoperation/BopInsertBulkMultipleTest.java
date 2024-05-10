@@ -38,7 +38,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
     String value = "MyValue";
 
     int bkeySize = 500;
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 0; i < bkeySize; i++) {
       bkeys.put((long) i, value);
     }
@@ -102,7 +102,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
     String value = "MyValue";
 
     int bkeySize = 1200;
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 0; i < bkeySize; i++) {
       bkeys.put((long) i, value);
     }

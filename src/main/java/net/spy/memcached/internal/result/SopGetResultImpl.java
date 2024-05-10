@@ -9,7 +9,7 @@ import net.spy.memcached.transcoders.Transcoder;
 public class SopGetResultImpl<T> implements GetResult<Set<T>> {
   private final Set<CachedData> cachedDataSet;
   private final Transcoder<T> transcoder;
-  private Set<T> result = new HashSet<T>();
+  private Set<T> result = new HashSet<>();
 
   public SopGetResultImpl(Set<CachedData> cachedDataSet, Transcoder<T> transcoder) {
     this.cachedDataSet = cachedDataSet;
@@ -19,7 +19,7 @@ public class SopGetResultImpl<T> implements GetResult<Set<T>> {
   @Override
   public Set<T> getDecodedValue() {
     if (result.isEmpty() && !cachedDataSet.isEmpty()) {
-      Set<T> temp = new HashSet<T>();
+      Set<T> temp = new HashSet<>();
       for (CachedData cachedData : cachedDataSet) {
         temp.add(transcoder.decode(cachedData));
       }

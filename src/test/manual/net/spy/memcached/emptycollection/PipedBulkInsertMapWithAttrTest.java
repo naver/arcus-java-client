@@ -54,7 +54,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       attr.setExpireTime(EXPIRE_TIME_IN_SEC);
       attr.setMaxCount(3333);
 
-      Map<String, Object> elements = new HashMap<String, Object>();
+      Map<String, Object> elements = new HashMap<>();
       for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
       }
@@ -87,7 +87,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
 
-      Map<String, Object> elements = new HashMap<String, Object>();
+      Map<String, Object> elements = new HashMap<>();
       for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
       }
@@ -111,7 +111,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-      Map<String, Object> elements = new HashMap<String, Object>();
+      Map<String, Object> elements = new HashMap<>();
       for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
       }
@@ -136,7 +136,7 @@ public class PipedBulkInsertMapWithAttrTest extends BaseIntegrationTest {
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-      Map<String, Object> elements = new HashMap<String, Object>();
+      Map<String, Object> elements = new HashMap<>();
       for (long i = 1; i < 11; i++) {
         elements.put(String.valueOf(i), 1);
       }

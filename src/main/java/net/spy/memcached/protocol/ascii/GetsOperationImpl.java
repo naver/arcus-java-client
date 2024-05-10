@@ -20,7 +20,7 @@ class GetsOperationImpl extends BaseGetOpImpl implements GetsOperation {
   }
 
   public GetsOperationImpl(Collection<String> keys, GetsOperation.Callback cb) {
-    super(CMD, cb, new HashSet<String>(keys));
+    super(CMD, cb, new HashSet<>(keys));
     setAPIType(APIType.GETS);
   }
 

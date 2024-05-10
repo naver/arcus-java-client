@@ -33,7 +33,7 @@ public class CollectionFuture<T> extends OperationFuture<T> {
   protected CollectionOperationStatus collectionOpStatus;
 
   public CollectionFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<T>(null), opTimeout);
+    this(l, new AtomicReference<>(null), opTimeout);
   }
 
   public CollectionFuture(CountDownLatch l, AtomicReference<T> oref,

@@ -120,7 +120,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
       };
     }
     GetFuture<T> parent = super.asyncGet(key, tc);
-    return new FrontCacheGetFuture<T>(localCacheManager, key, parent);
+    return new FrontCacheGetFuture<>(localCacheManager, key, parent);
   }
 
   /**
@@ -151,9 +151,9 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
     * Case 2. local cache is used.
     * 1. Check the local cache first.
     * */
-    final Map<String, T> frontCacheHit = new HashMap<String, T>();
+    final Map<String, T> frontCacheHit = new HashMap<>();
     final Map<String, Transcoder<T>> frontCacheMiss =
-            new HashMap<String, Transcoder<T>>();
+            new HashMap<>();
 
     Iterator<String> keyIter = keys.iterator();
     while (keyIter.hasNext() && tc_iter.hasNext()) {
@@ -172,7 +172,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
     BulkGetFuture<T> parent = (BulkGetFuture<T>) super.asyncGetBulk(
             frontCacheMiss.keySet(), frontCacheMiss.values().iterator());
 
-    return new FrontCacheBulkGetFuture<T>(localCacheManager, parent, frontCacheHit);
+    return new FrontCacheBulkGetFuture<>(localCacheManager, parent, frontCacheHit);
   }
 
   /**

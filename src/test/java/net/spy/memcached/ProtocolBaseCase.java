@@ -353,8 +353,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   // Just to make sure the sequence is being handled correctly
   public void testMixedSetsAndUpdates() throws Exception {
-    Collection<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
-    Collection<String> keys = new ArrayList<String>();
+    Collection<Future<Boolean>> futures = new ArrayList<>();
+    Collection<String> keys = new ArrayList<>();
     for (int i = 0; i < 100; i++) {
       String key = "k" + i;
       futures.add(client.set(key, 10, key));
@@ -384,12 +384,12 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   public void testAsyncGetBulkWithTranscoderIterator() throws Exception {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     keys.add("test1");
     keys.add("test2");
     keys.add("test3");
 
-    ArrayList<Transcoder<String>> tcs = new ArrayList<Transcoder<String>>(keys.size());
+    ArrayList<Transcoder<String>> tcs = new ArrayList<>(keys.size());
     for (String key : keys) {
       tcs.add(new TestWithKeyTranscoder(key));
     }
@@ -439,12 +439,12 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     keys.add("test1");
     keys.add("test2");
     keys.add("test3");
 
-    ArrayList<Transcoder<String>> tcs = new ArrayList<Transcoder<String>>(keys.size());
+    ArrayList<Transcoder<String>> tcs = new ArrayList<>(keys.size());
     for (String key : keys) {
       tcs.add(new TestWithKeyTranscoder(key));
     }
@@ -490,7 +490,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
       return; // We don't know the server address priori
     }
     client.getVersions();
-    assertEquals(new ArrayList<String>(
+    assertEquals(new ArrayList<>(
                     Collections.singleton(getExpectedVersionSource())),
             stringify(client.getAvailableServers()));
   }
@@ -597,7 +597,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
     // Get a new client
     initClient();
-    Collection<String> keys = new ArrayList<String>();
+    Collection<String> keys = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keys.add("t" + i);
     }
@@ -769,7 +769,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testABunchOfCancelledOperations() throws Exception {
     final String k = "bunchOCancel";
-    Collection<Future<?>> futures = new ArrayList<Future<?>>();
+    Collection<Future<?>> futures = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       futures.add(client.set(k, 5, "xval"));
       futures.add(client.asyncGet(k));
@@ -804,7 +804,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testUTF8MultiGet() throws Exception {
     final String value = "Skiing rocks if you can find the time to go!";
-    Collection<String> keys = new ArrayList<String>();
+    Collection<String> keys = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
       final String key = "junit.Здравствуйте."
               + System.currentTimeMillis() + "." + i;

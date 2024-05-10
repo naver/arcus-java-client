@@ -39,7 +39,7 @@ public class ArcusClientPoolShutdownTest extends TestCase {
             BaseIntegrationTest.ZK_SERVICE_ID, cfb, 2);
 
     // This threads must be stopped after client is shutdown.
-    List<String> threadNames = new ArrayList<String>();
+    List<String> threadNames = new ArrayList<>();
     threadNames.add("main-EventThread");
     threadNames.add("main-SendThread(" + BaseIntegrationTest.ZK_HOST + ")");
     threadNames
@@ -47,7 +47,7 @@ public class ArcusClientPoolShutdownTest extends TestCase {
                     "@" + BaseIntegrationTest.ZK_HOST);
 
     // Check exists threads
-    List<String> currentThreads = new ArrayList<String>();
+    List<String> currentThreads = new ArrayList<>();
     for (Thread t : Thread.getAllStackTraces().keySet()) {
       currentThreads.add(t.getName());
     }

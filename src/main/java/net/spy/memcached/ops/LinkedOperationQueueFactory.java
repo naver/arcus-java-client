@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LinkedOperationQueueFactory implements OperationQueueFactory {
 
   public BlockingQueue<Operation> create() {
-    return new LinkedBlockingQueue<Operation>();
+    return new LinkedBlockingQueue<>();
   }
 
 }

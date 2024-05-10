@@ -44,10 +44,10 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
     mc.delete(KEY).get();
     Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-    List<Element<Object>> elements = new ArrayList<Element<Object>>();
+    List<Element<Object>> elements = new ArrayList<>();
 
     for (int i = 0; i < elementCount; i++) {
-      elements.add(new Element<Object>(i, "value" + i, new byte[]{1, 1, 1, 1}));
+      elements.add(new Element<>(i, "value" + i, new byte[]{1, 1, 1, 1}));
     }
 
     // long start = System.currentTimeMillis();
@@ -79,9 +79,9 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
   public void testBopPipeUpdateValue() {
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
-      updateElements.add(new Element<Object>(i, "updated" + i,
+      updateElements.add(new Element<>(i, "updated" + i,
               new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
     }
 
@@ -117,9 +117,9 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     byte[] NEW_BYTE_EFLAG = new byte[]{1, 1};
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
-      updateElements.add(new Element<Object>(i, null,
+      updateElements.add(new Element<>(i, null,
               new ElementFlagUpdate(1, BitWiseOperands.AND,
                       NEW_BYTE_EFLAG)));
     }
@@ -156,9 +156,9 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
   public void testBopPipeUpdateEFlagsReset() {
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
-      updateElements.add(new Element<Object>(i, null,
+      updateElements.add(new Element<>(i, null,
               ElementFlagUpdate.RESET_FLAG));
     }
 
@@ -203,9 +203,9 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
       Assert.fail(e.getMessage());
     }
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
-      updateElements.add(new Element<Object>(i, "updated" + i,
+      updateElements.add(new Element<>(i, "updated" + i,
               new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
     }
 
@@ -243,9 +243,9 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     String key2 = "NEW_BopPipeUpdateTest";
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
-      updateElements.add(new Element<Object>(i, "updated" + i,
+      updateElements.add(new Element<>(i, "updated" + i,
               new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
     }
 

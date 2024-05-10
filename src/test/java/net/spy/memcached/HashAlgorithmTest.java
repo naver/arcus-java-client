@@ -29,7 +29,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   public void testCrc32Hash() {
-    Map<String, Long> exp = new HashMap<String, Long>();
+    Map<String, Long> exp = new HashMap<>();
     exp.put("Test1", 19315L);
     exp.put("Test2", 21114L);
     exp.put("Test3", 9597L);
@@ -42,7 +42,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   public void testFnv1_64() {
-    HashMap<String, Long> exp = new HashMap<String, Long>();
+    HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
     exp.put(" ", 0x8601b7ffL);
     exp.put("hello world!", 0xb97b86bcL);
@@ -59,7 +59,7 @@ public class HashAlgorithmTest extends TestCase {
 
   // Thanks much to pierre@demartines.com for this unit test.
   public void testFnv1a_64() {
-    HashMap<String, Long> exp = new HashMap<String, Long>();
+    HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
     exp.put(" ", 0x8601817fL);
     exp.put("hello world!", 0xcd5a2672L);
@@ -75,7 +75,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   public void testFnv1_32() {
-    HashMap<String, Long> exp = new HashMap<String, Long>();
+    HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
     exp.put(" ", 0x050c5d3fL);
     exp.put("hello world!", 0x8a01b99cL);
@@ -91,7 +91,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   public void testFnv1a_32() {
-    HashMap<String, Long> exp = new HashMap<String, Long>();
+    HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
     exp.put(" ", 0x250c8f7fL);
     exp.put("hello world!", 0xb034fff2L);
@@ -108,7 +108,7 @@ public class HashAlgorithmTest extends TestCase {
 
   // These values came from libketama's test prog.
   public void testKetamaHash() {
-    HashMap<String, Long> exp = new HashMap<String, Long>();
+    HashMap<String, Long> exp = new HashMap<>();
     exp.put("26", 3979113294L);
     exp.put("1404", 2065000984L);
     exp.put("4177", 1125759251L);

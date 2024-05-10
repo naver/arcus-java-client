@@ -46,7 +46,7 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
 
   @Override
   public BTreeGetBulk<T> clone(MemcachedNode node, List<String> keyList) {
-    return new BTreeGetBulkWithLongTypeBkey<T>(node, keyList,
-        range, eFlagFilter, offset, count);
+    return new BTreeGetBulkWithLongTypeBkey<>(node, keyList,
+            range, eFlagFilter, offset, count);
   }
 }

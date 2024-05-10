@@ -46,7 +46,7 @@ public abstract class BaseOperationFactory implements OperationFactory {
     assert !op.isCancelled() : "Attempted to clone a canceled op";
     assert !op.hasErrored() : "Attempted to clone an errored op";
 
-    Collection<Operation> rv = new ArrayList<Operation>(
+    Collection<Operation> rv = new ArrayList<>(
             op.getKeys().size());
     if (op instanceof GetOperation) {
       GetOperation.Callback getCb = new MultiGetOperationCallback(

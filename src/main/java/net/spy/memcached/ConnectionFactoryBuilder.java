@@ -89,7 +89,7 @@ public class ConnectionFactoryBuilder {
   private boolean arcusReplEnabled = false;
 
   private ReadPriority readPriority = ReadPriority.MASTER;
-  private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<APIType, ReadPriority>();
+  private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<>();
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */

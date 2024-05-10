@@ -93,7 +93,7 @@ public class LocalCacheManager {
   }
 
   public <T> Future<T> asyncGet(final String key) {
-    Task<T> task = new Task<T>(new Callable<T>() {
+    Task<T> task = new Task<>(new Callable<T>() {
       public T call() throws Exception {
         return get(key);
       }

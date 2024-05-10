@@ -61,7 +61,7 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   public T get(long duration, TimeUnit units)
       throws InterruptedException, TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedoutOps.add(op);

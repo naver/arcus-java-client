@@ -40,12 +40,12 @@ public class QueueOverflowTest extends ClientBaseCase {
 
       @Override
       public BlockingQueue<Operation> createOperationQueue() {
-        return new ArrayBlockingQueue<Operation>(getOpQueueLen());
+        return new ArrayBlockingQueue<>(getOpQueueLen());
       }
 
       @Override
       public BlockingQueue<Operation> createReadOperationQueue() {
-        return new ArrayBlockingQueue<Operation>(
+        return new ArrayBlockingQueue<>(
                 (int) (getOpQueueLen() * 1.1));
       }
 
@@ -68,7 +68,7 @@ public class QueueOverflowTest extends ClientBaseCase {
   }
 
   private void runOverflowTest(byte b[]) throws Exception {
-    Collection<Future<Boolean>> c = new ArrayList<Future<Boolean>>();
+    Collection<Future<Boolean>> c = new ArrayList<>();
     try {
       for (int i = 0; i < 1000; i++) {
         c.add(client.set("k" + i, 0, b));
@@ -109,7 +109,7 @@ public class QueueOverflowTest extends ClientBaseCase {
     r.nextBytes(b);
     client.set("x", 0, b);
 
-    Collection<Future<Object>> c = new ArrayList<Future<Object>>();
+    Collection<Future<Object>> c = new ArrayList<>();
     try {
       for (int i = 0; i < 1000; i++) {
         c.add(client.asyncGet("x"));

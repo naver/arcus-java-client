@@ -34,7 +34,7 @@ import org.junit.Assert;
 
 public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 
-  private static final List<String> KEY_LIST = new ArrayList<String>();
+  private static final List<String> KEY_LIST = new ArrayList<>();
 
   static {
     String KEY = ByteArrayBKeySMGetErrorTest.class.getSimpleName()

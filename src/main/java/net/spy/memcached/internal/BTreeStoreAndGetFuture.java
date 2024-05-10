@@ -37,7 +37,7 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
   private GetResult<Element<E>> element;
 
   public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<T>(null), opTimeout);
+    this(l, new AtomicReference<>(null), opTimeout);
   }
 
   public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref, long opTimeout) {

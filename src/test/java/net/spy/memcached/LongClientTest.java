@@ -35,7 +35,7 @@ public class LongClientTest extends ClientBaseCase {
     Random r = new Random();
     r.nextBytes(data);
     final int hashcode = Arrays.hashCode(data);
-    final Collection<String> keys = new ArrayList<String>();
+    final Collection<String> keys = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
       client.set("k" + i, 60, data);
       keys.add("k" + i);
