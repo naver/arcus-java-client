@@ -155,25 +155,19 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   MemcachedNode getNodeForKey(long hash) {
-    MemcachedNode rv = null;
-
     lock.lock();
     try {
-      if (!ketamaNodes.isEmpty()) {
-        if (!ketamaNodes.containsKey(hash)) {
-          Long nodeHash = ketamaNodes.ceilingKey(hash);
-          if (nodeHash == null) {
-            hash = ketamaNodes.firstKey();
-          } else {
-            hash = nodeHash;
-          }
-        }
-        rv = ketamaNodes.get(hash).first();
+      if (ketamaNodes.isEmpty()) {
+        return null;
       }
+      Map.Entry<Long, SortedSet<MemcachedNode>> entry = ketamaNodes.ceilingEntry(hash);
+      if (entry == null) {
+        entry = ketamaNodes.firstEntry();
+      }
+      return entry.getValue().first();
     } finally {
       lock.unlock();
     }
-    return rv;
   }
 
   public Iterator<MemcachedNode> getSequence(String k) {

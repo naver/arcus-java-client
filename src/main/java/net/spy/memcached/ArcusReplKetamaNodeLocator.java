@@ -179,28 +179,21 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   private MemcachedNode getNodeForKey(long hash, ReplicaPick pick) {
-    MemcachedReplicaGroup rg;
-    MemcachedNode rv = null;
-
     lock.lock();
     try {
-      if (!ketamaGroups.isEmpty()) {
-        if (!ketamaGroups.containsKey(hash)) {
-          Long nodeHash = ketamaGroups.ceilingKey(hash);
-          if (nodeHash == null) {
-            hash = ketamaGroups.firstKey();
-          } else {
-            hash = nodeHash;
-          }
-        }
-        rg = ketamaGroups.get(hash).first();
-        // return a node (master / slave) for the replica pick request.
-        rv = rg.getNodeByReplicaPick(pick);
+      if (ketamaGroups.isEmpty()) {
+        return null;
       }
+      Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> entry = ketamaGroups.ceilingEntry(hash);
+      if (entry == null) {
+        entry = ketamaGroups.firstEntry();
+      }
+      MemcachedReplicaGroup rg = entry.getValue().first();
+      // return a node (master / slave) for the replica pick request.
+      return rg.getNodeByReplicaPick(pick);
     } finally {
       lock.unlock();
     }
-    return rv;
   }
 
   public Iterator<MemcachedNode> getSequence(String k) {
