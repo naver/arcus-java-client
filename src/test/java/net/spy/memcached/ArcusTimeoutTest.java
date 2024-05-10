@@ -128,7 +128,7 @@ public class ArcusTimeoutTest extends TestCase {
           throws InterruptedException, ExecutionException, TimeoutException {
     int keySize = 100000;
 
-    List<String> keys = new ArrayList<String>(keySize);
+    List<String> keys = new ArrayList<>(keySize);
     for (int i = 0; i < keySize; i++) {
       keys.add("MyKey" + i);
     }
@@ -142,7 +142,7 @@ public class ArcusTimeoutTest extends TestCase {
           throws InterruptedException, ExecutionException, TimeoutException {
     int keySize = 100000;
 
-    List<String> keys = new ArrayList<String>(keySize);
+    List<String> keys = new ArrayList<>(keySize);
     for (int i = 0; i < keySize; i++) {
       keys.add("MyKey" + i);
     }
@@ -217,7 +217,7 @@ public class ArcusTimeoutTest extends TestCase {
     String value = "MyValue";
 
     int bkeySize = mc.getMaxPipedItemCount();
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 0; i < bkeySize; i++) {
       bkeys.put((long) i, value);
     }
@@ -248,7 +248,7 @@ public class ArcusTimeoutTest extends TestCase {
   @Test(expected = TimeoutException.class)
   public void testOldSMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
     }
@@ -261,7 +261,7 @@ public class ArcusTimeoutTest extends TestCase {
   @Test(expected = TimeoutException.class)
   public void testSMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
     }
@@ -277,7 +277,7 @@ public class ArcusTimeoutTest extends TestCase {
   public void testByteArrayBKeyOldSMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
     ArrayList<String> keyList;
-    keyList = new ArrayList<String>();
+    keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
     }
@@ -293,7 +293,7 @@ public class ArcusTimeoutTest extends TestCase {
   @Test(expected = TimeoutException.class)
   public void testByteArrayBKeySMGetTimeout()
           throws InterruptedException, ExecutionException, TimeoutException {
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
     }
@@ -322,7 +322,7 @@ public class ArcusTimeoutTest extends TestCase {
     String value = "MyValue";
 
     int elementSize = mc.getMaxPipedItemCount();
-    Map<String, Object> elements = new TreeMap<String, Object>();
+    Map<String, Object> elements = new TreeMap<>();
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);
     }

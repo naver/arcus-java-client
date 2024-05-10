@@ -50,7 +50,7 @@ public class CacheMapTest extends MockObjectTestCase {
   }
 
   public void testBaseConstructor() throws Exception {
-    BaseCacheMap<Integer> bcm = new BaseCacheMap<Integer>(client,
+    BaseCacheMap<Integer> bcm = new BaseCacheMap<>(client,
             EXP, "base", new IntegerTranscoder());
     Field f = BaseCacheMap.class.getDeclaredField("exp");
     f.setAccessible(true);
@@ -112,7 +112,7 @@ public class CacheMapTest extends MockObjectTestCase {
     clientMock.expects(once()).method("set")
             .with(eq("blahb"), eq(EXP), eq("valb"));
 
-    Map<String, Object> m = new HashMap<String, Object>();
+    Map<String, Object> m = new HashMap<>();
     m.put("a", "vala");
     m.put("b", "valb");
 

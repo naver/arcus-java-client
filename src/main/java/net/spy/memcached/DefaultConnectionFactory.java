@@ -160,7 +160,7 @@ public class DefaultConnectionFactory extends SpyObject
   /* ENABLE_REPLICATION if */
   public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
   private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST =
-      new HashMap<APIType, ReadPriority>();
+          new HashMap<>();
   /* ENABLE_REPLICATION end */
 
   /**
@@ -234,15 +234,15 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   public BlockingQueue<Operation> createOperationQueue() {
-    return new ArrayBlockingQueue<Operation>(getOpQueueLen());
+    return new ArrayBlockingQueue<>(getOpQueueLen());
   }
 
   public BlockingQueue<Operation> createReadOperationQueue() {
-    return new LinkedBlockingQueue<Operation>();
+    return new LinkedBlockingQueue<>();
   }
 
   public BlockingQueue<Operation> createWriteOperationQueue() {
-    return new LinkedBlockingQueue<Operation>();
+    return new LinkedBlockingQueue<>();
   }
 
   public NodeLocator createLocator(List<MemcachedNode> nodes) {

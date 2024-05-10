@@ -17,7 +17,7 @@ public class AuthThreadMonitor extends SpyObject {
   private Map<Object, AuthThread> nodeMap;
 
   public AuthThreadMonitor() {
-    nodeMap = new HashMap<Object, AuthThread>();
+    nodeMap = new HashMap<>();
   }
 
   /**

@@ -27,7 +27,7 @@ import net.spy.memcached.compat.SpyObject;
 public abstract class MemcachedReplicaGroup extends SpyObject {
   protected final String group;
   protected MemcachedNode masterNode;
-  protected List<MemcachedNode> slaveNodes = new ArrayList<MemcachedNode>(MAX_REPL_SLAVE_SIZE);
+  protected List<MemcachedNode> slaveNodes = new ArrayList<>(MAX_REPL_SLAVE_SIZE);
   private int nextSlaveIndex = -1;
   protected MemcachedNode masterCandidate;
   private final StringBuilder sb = new StringBuilder();

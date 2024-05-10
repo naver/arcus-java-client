@@ -40,7 +40,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
   private final Object value = "valvalvalvalvalvalvalvalvalval";
 
   public void testGetAll_1() {
-    ArrayList<String> testKeyList = new ArrayList<String>();
+    ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(key1);
     testKeyList.add(key2);
 

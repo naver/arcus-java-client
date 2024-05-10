@@ -65,7 +65,7 @@ public class BTreeGetByPositionOperationImpl extends OperationImpl implements
   protected byte[] data = null;
   protected int readOffset = 0;
   protected byte lookingFor = '\0';
-  protected final List<String> tokens = new ArrayList<String>();
+  protected final List<String> tokens = new ArrayList<>();
   protected int eHeadCount;
   protected int eFlagIndex;
 

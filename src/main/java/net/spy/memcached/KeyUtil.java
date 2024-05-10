@@ -33,7 +33,7 @@ public final class KeyUtil {
    * @return return a collection of the byte representations of keys
    */
   public static Collection<byte[]> getKeyBytes(Collection<String> keys) {
-    Collection<byte[]> rv = new ArrayList<byte[]>(keys.size());
+    Collection<byte[]> rv = new ArrayList<>(keys.size());
     for (String s : keys) {
       rv.add(getKeyBytes(s));
     }

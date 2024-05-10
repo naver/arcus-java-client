@@ -86,7 +86,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   @Override
   public Map<String, T> getSome(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException {
-    Collection<Operation> timedoutOps = new HashSet<Operation>();
+    Collection<Operation> timedoutOps = new HashSet<>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (!timedoutOps.isEmpty()) {
       isTimeout.set(true);
@@ -106,7 +106,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   @Override
   public Map<String, T> get(long duration, TimeUnit units)
           throws InterruptedException, ExecutionException, TimeoutException {
-    Collection<Operation> timedoutOps = new HashSet<Operation>();
+    Collection<Operation> timedoutOps = new HashSet<>();
     Map<String, T> ret = internalGet(duration, units, timedoutOps);
     if (!timedoutOps.isEmpty()) {
       isTimeout.set(true);
@@ -165,7 +165,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
       }
     }
 
-    Map<String, T> resultMap = new HashMap<String, T>();
+    Map<String, T> resultMap = new HashMap<>();
     for (Map.Entry<String, GetResult<T>> me : rvMap.entrySet()) {
       String key = me.getKey();
       T value = me.getValue().getDecodedValue();

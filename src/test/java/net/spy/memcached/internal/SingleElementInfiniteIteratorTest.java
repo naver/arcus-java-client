@@ -9,7 +9,7 @@ public class SingleElementInfiniteIteratorTest extends TestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    iterator = new SingleElementInfiniteIterator<String>(CONSTANT);
+    iterator = new SingleElementInfiniteIterator<>(CONSTANT);
   }
 
   public void testHasNextAndNext() {

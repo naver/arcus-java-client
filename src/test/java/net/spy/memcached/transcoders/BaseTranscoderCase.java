@@ -25,7 +25,7 @@ public abstract class BaseTranscoderCase extends BaseMockCase {
   }
 
   public void testSomethingBigger() throws Exception {
-    Collection<Date> dates = new ArrayList<Date>();
+    Collection<Date> dates = new ArrayList<>();
     for (int i = 0; i < 1024; i++) {
       dates.add(new Date());
     }

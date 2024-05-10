@@ -32,7 +32,7 @@ public class ProtocolMapGetTest extends TestCase {
   public void testStringify() {
     // default setting : dropIfEmpty = true
 
-    List<String> mkeyList = new ArrayList<String>();
+    List<String> mkeyList = new ArrayList<>();
     mkeyList.add(MKEY);
     Assert.assertEquals("4 1 drop",
             (new MapGet(mkeyList, true, true)).stringify());

@@ -55,7 +55,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       attr.setExpireTime(EXPIRE_TIME_IN_SEC);
       attr.setMaxCount(3333);
 
-      List<Object> valueList = new ArrayList<Object>();
+      List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
         valueList.add(i);
       }
@@ -93,7 +93,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
 
-      List<Object> valueList = new ArrayList<Object>();
+      List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
         valueList.add(i);
       }
@@ -123,7 +123,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-      List<Object> valueList = new ArrayList<Object>();
+      List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
         valueList.add(i);
       }
@@ -154,7 +154,7 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       // check not exists
       Assert.assertNull(mc.asyncGetAttr(KEY).get());
 
-      List<Object> valueList = new ArrayList<Object>();
+      List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
         valueList.add(i);
       }

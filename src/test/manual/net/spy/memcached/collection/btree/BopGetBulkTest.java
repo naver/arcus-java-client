@@ -245,7 +245,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
 
       // empty key list
       try {
-        f = mc.asyncBopGetBulk(new ArrayList<String>(), 0, 10,
+        f = mc.asyncBopGetBulk(new ArrayList<>(), 0, 10,
                 ElementFlagFilter.DO_NOT_FILTER, 0, 10);
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {

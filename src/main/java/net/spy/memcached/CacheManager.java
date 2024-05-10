@@ -621,7 +621,7 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().warn("Invalid cloud_stat znodes.");
       return null;
     }
-    return new AbstractMap.SimpleEntry<MigrationType, MigrationState>(type, state);
+    return new AbstractMap.SimpleEntry<>(type, state);
   }
 
   private boolean isMigrationMonitorDead() {

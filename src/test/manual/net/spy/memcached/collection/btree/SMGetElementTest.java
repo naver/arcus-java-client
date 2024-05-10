@@ -21,7 +21,7 @@ public class SMGetElementTest {
     //given
     long bkey = 1;
 
-    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
+    final SMGetElement<String> element = new SMGetElement<>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(KEY, element.getKey());
@@ -41,7 +41,7 @@ public class SMGetElementTest {
     //given
     byte[] bkey = {0x34};
 
-    final SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
+    final SMGetElement<String> element = new SMGetElement<>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(KEY, element.getKey());
@@ -61,8 +61,8 @@ public class SMGetElementTest {
     //given
     long bkey = 2;
 
-    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
-    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
+    SMGetElement<String> element = new SMGetElement<>(KEY, bkey, EFLAG, VALUE);
+    SMGetElement<String> anotherElement = new SMGetElement<>(KEY, bkey, EFLAG, VALUE);
 
     //when, then
     assertEquals(0, element.compareTo(anotherElement));
@@ -74,8 +74,8 @@ public class SMGetElementTest {
     long bkey = 2;
     long anotherBkey = 1;
 
-    SMGetElement<String> element = new SMGetElement<String>(KEY, bkey, EFLAG, VALUE);
-    SMGetElement<String> anotherElement = new SMGetElement<String>(KEY, anotherBkey, EFLAG, VALUE);
+    SMGetElement<String> element = new SMGetElement<>(KEY, bkey, EFLAG, VALUE);
+    SMGetElement<String> anotherElement = new SMGetElement<>(KEY, anotherBkey, EFLAG, VALUE);
 
     //when, then
     assertTrue(element.compareBkeyTo(anotherElement) > 0);

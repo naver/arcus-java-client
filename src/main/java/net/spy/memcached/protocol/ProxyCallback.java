@@ -17,9 +17,9 @@ import net.spy.memcached.ops.OperationStatus;
 public class ProxyCallback implements GetOperation.Callback {
 
   private final Map<String, Collection<GetOperation.Callback>> callbacks =
-          new HashMap<String, Collection<GetOperation.Callback>>();
+          new HashMap<>();
   private final Collection<GetOperation.Callback> allCallbacks =
-          new ArrayList<GetOperation.Callback>();
+          new ArrayList<>();
 
   public void addCallbacks(GetOperation o) {
     GetOperation.Callback c = new GetCallbackWrapper(o.getKeys().size(),
@@ -28,7 +28,7 @@ public class ProxyCallback implements GetOperation.Callback {
     for (String s : o.getKeys()) {
       Collection<GetOperation.Callback> cbs = callbacks.get(s);
       if (cbs == null) {
-        cbs = new ArrayList<GetOperation.Callback>();
+        cbs = new ArrayList<>();
         callbacks.put(s, cbs);
       }
       cbs.add(c);

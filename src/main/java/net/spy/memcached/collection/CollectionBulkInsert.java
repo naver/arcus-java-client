@@ -113,7 +113,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new BTreeBulkInsert<T>(node, keyList, bkey, eflag, cachedData, attribute);
+      return new BTreeBulkInsert<>(node, keyList, bkey, eflag, cachedData, attribute);
     }
   }
 
@@ -167,7 +167,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new MapBulkInsert<T>(node, keyList, mkey, cachedData, attribute);
+      return new MapBulkInsert<>(node, keyList, mkey, cachedData, attribute);
     }
   }
 
@@ -217,7 +217,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new SetBulkInsert<T>(node, keyList, cachedData, attribute);
+      return new SetBulkInsert<>(node, keyList, cachedData, attribute);
     }
   }
 
@@ -271,7 +271,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new ListBulkInsert<T>(node, keyList, index, cachedData, attribute);
+      return new ListBulkInsert<>(node, keyList, index, cachedData, attribute);
     }
   }
 }

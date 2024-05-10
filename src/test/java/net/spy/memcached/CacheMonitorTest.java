@@ -48,7 +48,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
     listener = mock(CacheMonitorListener.class);
     watcher = mock(Watcher.class);
     zooKeeper = new ZooKeeper("", 15000, (Watcher) watcher.proxy()); // can't mock
-    children = new ArrayList<String>();
+    children = new ArrayList<>();
 
     cacheMonitor = new CacheMonitor(zooKeeper, ARCUS_BASE_CACHE_LIST_ZPATH,
             serviceCode, true, (CacheMonitorListener) listener.proxy());
@@ -74,7 +74,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
   }
 
   public void testProcessResult_emptyChildren() {
-    List<String> fakeChildren = new ArrayList<String>();
+    List<String> fakeChildren = new ArrayList<>();
     fakeChildren.add("0.0.0.0:23456");
 
     // when : empty children

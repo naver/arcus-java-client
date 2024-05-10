@@ -16,7 +16,7 @@ public class BopGetBulkResultImpl<K, V> implements GetResult<Map<String, BTreeGe
   private final boolean reverse;
   private final Transcoder<V> transcoder;
   private Map<String, BTreeGetResult<K, V>> result
-          = new HashMap<String, BTreeGetResult<K, V>>();
+          = new HashMap<>();
 
   public BopGetBulkResultImpl(Map<String, List<BTreeElement<K, CachedData>>> cachedDataMap,
                               Map<String, CollectionOperationStatus> opStatusMap,
@@ -30,10 +30,10 @@ public class BopGetBulkResultImpl<K, V> implements GetResult<Map<String, BTreeGe
   @Override
   public Map<String, BTreeGetResult<K, V>> getDecodedValue() {
     if (result.isEmpty() && !opStatusMap.isEmpty()) {
-      Map<String, BTreeGetResult<K, V>> temp = new HashMap<String, BTreeGetResult<K, V>>(result);
+      Map<String, BTreeGetResult<K, V>> temp = new HashMap<>(result);
       for (Map.Entry<String, CollectionOperationStatus> entry : opStatusMap.entrySet()) {
         String key = entry.getKey();
-        temp.put(key, new BTreeGetResult<K, V>(cachedDataMap.get(key),
+        temp.put(key, new BTreeGetResult<>(cachedDataMap.get(key),
                 reverse, transcoder, entry.getValue()));
       }
       result = temp;

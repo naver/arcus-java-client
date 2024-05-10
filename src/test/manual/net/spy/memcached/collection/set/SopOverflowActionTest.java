@@ -30,7 +30,7 @@ import org.junit.Assert;
 public class SopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "SopOverflowActionTest";
-  private List<String> keyList = new ArrayList<String>();
+  private List<String> keyList = new ArrayList<>();
 
   @Override
   protected void setUp() throws Exception {
@@ -122,7 +122,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -156,7 +156,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -190,7 +190,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -224,7 +224,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -258,7 +258,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success
@@ -292,7 +292,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
 
     // pipe insert
     try {
-      mc.asyncSopPipedInsertBulk(key, new ArrayList<Object>(), attributesForCreate).get();
+      mc.asyncSopPipedInsertBulk(key, new ArrayList<>(), attributesForCreate).get();
       Assert.fail();
     } catch (IllegalArgumentException e) {
       // test success

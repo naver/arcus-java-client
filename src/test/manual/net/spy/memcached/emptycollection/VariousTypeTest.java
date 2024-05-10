@@ -292,7 +292,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
 
   public void testList() {
     try {
-      List<String> value = new ArrayList<String>();
+      List<String> value = new ArrayList<>();
       value.add("Hello");
       value.add("Netspider");
 
@@ -330,7 +330,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
 
     public UserDefinedClass() {
       this.i = 100;
-      this.list = new ArrayList<String>();
+      this.list = new ArrayList<>();
       this.list.add("Hello");
       this.list.add("Netspider");
     }

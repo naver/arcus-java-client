@@ -21,7 +21,7 @@ public class ElementTest {
     long bkey = 1;
     byte[] eflag = {0x34};
 
-    final Element<String> element = new Element<String>(bkey, VALUE, eflag);
+    final Element<String> element = new Element<>(bkey, VALUE, eflag);
 
     //when, then
     assertEquals(bkey, element.getLongBkey());
@@ -44,7 +44,7 @@ public class ElementTest {
     byte[] bkey = {0x3F};
     byte[] eflag = {0x34};
 
-    final Element<String> element = new Element<String>(bkey, VALUE, eflag);
+    final Element<String> element = new Element<>(bkey, VALUE, eflag);
 
     //when, then
     assertEquals(bkey, element.getByteArrayBkey());
@@ -68,7 +68,7 @@ public class ElementTest {
     byte[] eflag = {0x34};
     ElementFlagUpdate elementFlagUpdate = new ElementFlagUpdate(eflag);
 
-    final Element<String> element = new Element<String>(bkey, VALUE, elementFlagUpdate);
+    final Element<String> element = new Element<>(bkey, VALUE, elementFlagUpdate);
 
     //when, then
     assertEquals(bkey, element.getLongBkey());
@@ -91,7 +91,7 @@ public class ElementTest {
     byte[] eflag = {0x34};
     ElementFlagUpdate elementFlagUpdate = new ElementFlagUpdate(eflag);
 
-    final Element<String> element = new Element<String>(bkey, VALUE, elementFlagUpdate);
+    final Element<String> element = new Element<>(bkey, VALUE, elementFlagUpdate);
 
     //when, then
     assertEquals(bkey, element.getByteArrayBkey());

@@ -70,7 +70,7 @@ public abstract class RedirectHandler {
     public static final String UNKNOWN_OWNER = "none";
 
     private final Map<String, List<String>> keysByOwner =
-        new HashMap<String, List<String>>();
+            new HashMap<>();
 
     @Override
     public void addRedirectKey(String response, String key) {
@@ -84,7 +84,7 @@ public abstract class RedirectHandler {
     private void addToKeysByOwnerMap(String key, String owner) {
       List<String> keys = keysByOwner.get(owner);
       if (keys == null) {
-        keys = new ArrayList<String>();
+        keys = new ArrayList<>();
         keysByOwner.put(owner, keys);
       }
       keys.add(key);
@@ -101,7 +101,7 @@ public abstract class RedirectHandler {
           return null;
         }
       } else {
-        keysByNode = new HashMap<MemcachedNode, List<String>>();
+        keysByNode = new HashMap<>();
       }
       for (Map.Entry<String, List<String>> entry : keysByOwner.entrySet()) {
         MemcachedNode node = conn.findNodeByOwner(entry.getKey());

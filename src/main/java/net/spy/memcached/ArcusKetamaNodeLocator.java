@@ -67,7 +67,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
                                 ArcusKetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
-    ketamaNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
+    ketamaNodes = new TreeMap<>();
     config = conf;
 
     int numReps = config.getNodeRepetitions();
@@ -80,9 +80,9 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     assert ketamaNodes.size() <= numReps * nodes.size();
 
     /* ENABLE_MIGRATION if */
-    existNodes = new HashSet<MemcachedNode>();
-    alterNodes = new HashSet<MemcachedNode>();
-    ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
+    existNodes = new HashSet<>();
+    alterNodes = new HashSet<>();
+    ketamaAlterNodes = new TreeMap<>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
@@ -96,9 +96,9 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     config = conf;
 
     /* ENABLE_MIGRATION if */
-    existNodes = new HashSet<MemcachedNode>();
-    alterNodes = new HashSet<MemcachedNode>();
-    ketamaAlterNodes = new TreeMap<Long, SortedSet<MemcachedNode>>();
+    existNodes = new HashSet<>();
+    alterNodes = new HashSet<>();
+    ketamaAlterNodes = new TreeMap<>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
@@ -176,8 +176,8 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   public NodeLocator getReadonlyCopy() {
     TreeMap<Long, SortedSet<MemcachedNode>> smn =
-            new TreeMap<Long, SortedSet<MemcachedNode>>(ketamaNodes);
-    Collection<MemcachedNode> an = new ArrayList<MemcachedNode>(
+            new TreeMap<>(ketamaNodes);
+    Collection<MemcachedNode> an = new ArrayList<>(
             allNodes.size());
 
     lock.lock();
@@ -185,7 +185,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
       // Rewrite the values a copy of the map.
       for (Map.Entry<Long, SortedSet<MemcachedNode>> me : smn.entrySet()) {
         SortedSet<MemcachedNode> nodeROSet =
-                new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+                new TreeSet<>(config.new NodeNameComparator());
         for (MemcachedNode mn : me.getValue()) {
           nodeROSet.add(new MemcachedNodeROImpl(mn));
         }
@@ -262,7 +262,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
         if (nodeSet == null) {
-          nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+          nodeSet = new TreeSet<>(config.new NodeNameComparator());
           ketamaNodes.put(k, nodeSet);
         }
         nodeSet.add(node);
@@ -310,7 +310,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedNode> nodeSet = ketamaAlterNodes.get(k);
         if (nodeSet == null) {
-          nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+          nodeSet = new TreeSet<>(config.new NodeNameComparator());
           ketamaAlterNodes.put(k, nodeSet);
         }
         nodeSet.add(node);
@@ -333,7 +333,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           }
           SortedSet<MemcachedNode> existSet = ketamaNodes.get(k);
           if (existSet == null) {
-            existSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+            existSet = new TreeSet<>(config.new NodeNameComparator());
             ketamaNodes.put(k, existSet);
           }
           existSet.add(node); // joining => joined
@@ -376,11 +376,11 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     NavigableMap<Long, SortedSet<MemcachedNode>> moveRange
         = ketamaAlterNodes.subMap(spoint, sInclusive, epoint, eInclusive);
 
-    List<Long> removeList = new ArrayList<Long>();
+    List<Long> removeList = new ArrayList<>();
     for (Map.Entry<Long, SortedSet<MemcachedNode>> entry : moveRange.entrySet()) {
       SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(entry.getKey());
       if (nodeSet == null) {
-        nodeSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+        nodeSet = new TreeSet<>(config.new NodeNameComparator());
         ketamaNodes.put(entry.getKey(), nodeSet);
       }
       nodeSet.addAll(entry.getValue());
@@ -397,7 +397,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
     NavigableMap<Long, SortedSet<MemcachedNode>> moveRange
         = ketamaNodes.subMap(spoint, sInclusive, epoint, eInclusive);
 
-    List<Long> removeList = new ArrayList<Long>();
+    List<Long> removeList = new ArrayList<>();
     for (Map.Entry<Long, SortedSet<MemcachedNode>> entry : moveRange.entrySet()) {
       Iterator<MemcachedNode> nodeIter = entry.getValue().iterator();
       while (nodeIter.hasNext()) {
@@ -406,7 +406,7 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
           nodeIter.remove(); // leaving => leaved
           SortedSet<MemcachedNode> alterSet = ketamaAlterNodes.get(entry.getKey());
           if (alterSet == null) {
-            alterSet = new TreeSet<MemcachedNode>(config.new NodeNameComparator());
+            alterSet = new TreeSet<>(config.new NodeNameComparator());
             ketamaAlterNodes.put(entry.getKey(), alterSet); // for auto leave abort
           }
           alterSet.add(node);

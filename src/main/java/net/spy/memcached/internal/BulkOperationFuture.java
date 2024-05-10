@@ -17,8 +17,8 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
 public class BulkOperationFuture<T> implements Future<Map<String, T>> {
-  protected final Map<String, T> failedResult = new HashMap<String, T>();
-  protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<Operation>();
+  protected final Map<String, T> failedResult = new HashMap<>();
+  protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
   protected final long timeout;
   protected final CountDownLatch latch;
 
@@ -70,7 +70,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
                             TimeUnit units) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedoutOps.add(op);

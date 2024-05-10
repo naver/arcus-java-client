@@ -14,7 +14,7 @@ public class MGetsOperationImpl extends BaseGetOpImpl implements GetsOperation {
   private static final String CMD = "mgets";
 
   public MGetsOperationImpl(Collection<String> k, Callback c) {
-    super(CMD, c, new HashSet<String>(k));
+    super(CMD, c, new HashSet<>(k));
     setAPIType(APIType.MGETS);
   }
 

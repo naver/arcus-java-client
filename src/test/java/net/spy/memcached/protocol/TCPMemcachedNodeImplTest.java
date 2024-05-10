@@ -73,7 +73,7 @@ public class TCPMemcachedNodeImplTest extends TestCase {
         4096
     );
 
-    List<Operation> fromOperations = new LinkedList<Operation>();
+    List<Operation> fromOperations = new LinkedList<>();
     for (int i = 0; i < fromAllOpCount; i++) {
       Operation op = factory.getOperationFactory().get(
           "cacheKey=" + i,

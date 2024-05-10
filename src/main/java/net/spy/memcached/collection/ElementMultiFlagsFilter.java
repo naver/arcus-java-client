@@ -23,7 +23,7 @@ import net.spy.memcached.util.BTreeUtil;
 public class ElementMultiFlagsFilter extends ElementFlagFilter {
 
   final static int MAX_EFLAGS = 100;
-  private ArrayList<byte[]> compValue = new ArrayList<byte[]>();
+  private ArrayList<byte[]> compValue = new ArrayList<>();
 
   public ElementMultiFlagsFilter() {
   }

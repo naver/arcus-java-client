@@ -56,7 +56,7 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
     super();
     allNodes = nodes;
     hashAlg = alg;
-    ketamaNodes = new TreeMap<Long, MemcachedNode>();
+    ketamaNodes = new TreeMap<>();
     config = conf;
 
     int numReps = config.getNodeRepetitions();
@@ -123,10 +123,10 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public NodeLocator getReadonlyCopy() {
-    TreeMap<Long, MemcachedNode> smn = new TreeMap<Long, MemcachedNode>(
+    TreeMap<Long, MemcachedNode> smn = new TreeMap<>(
             ketamaNodes);
     Collection<MemcachedNode> an =
-            new ArrayList<MemcachedNode>(allNodes.size());
+            new ArrayList<>(allNodes.size());
 
     // Rewrite the values a copy of the map.
     for (Map.Entry<Long, MemcachedNode> me : smn.entrySet()) {
@@ -150,7 +150,7 @@ public final class KetamaNodeLocator extends SpyObject implements NodeLocator {
 
   /* ENABLE_MIGRATION if */
   public Collection<MemcachedNode> getAlterAll() {
-    return new ArrayList<MemcachedNode>();
+    return new ArrayList<>();
   }
 
   public MemcachedNode getAlterNode(SocketAddress sa) {

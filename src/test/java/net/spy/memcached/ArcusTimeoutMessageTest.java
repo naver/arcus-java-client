@@ -186,7 +186,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String key = "KEY";
     int keySize = 100;
 
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     for (int i = 0; i < keySize; i++) {
       map.put(key + i, i);
@@ -212,7 +212,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String key = "KEY";
     int keySize = 1;
 
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
 
     for (int i = 0; i < keySize; i++) {
       map.put(key + i, i);
@@ -406,7 +406,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String value = "MyValue";
 
     int bkeySize = mc.getMaxPipedItemCount();
-    Map<Long, Object> bkeys = new TreeMap<Long, Object>();
+    Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 0; i < bkeySize; i++) {
       bkeys.put((long) i, value);
     }
@@ -429,9 +429,9 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void bopPipedUpdateBulkWithPipeMessage() {
     String key = "MyBopKey";
 
-    List<Element<Object>> updateElements = new ArrayList<Element<Object>>();
+    List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
-      updateElements.add(new Element<Object>(i, "updated" + i,
+      updateElements.add(new Element<>(i, "updated" + i,
               new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
     }
 
@@ -478,7 +478,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
   @Test
   public void oldSMGetWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(key + i);
     }
@@ -500,7 +500,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
   @Test
   public void smGetTimeoutWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(key + i);
     }
@@ -525,7 +525,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void byteArrayBKeyOldSMGetWithBulkMessage() {
     String key = "MyBopKey";
     ArrayList<String> keyList;
-    keyList = new ArrayList<String>();
+    keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(key + i);
     }
@@ -550,7 +550,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
   @Test
   public void byteArrayBKeySMGetWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<String>();
+    List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(key + i);
     }
@@ -580,7 +580,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String value = "MyValue";
 
     int elementSize = mc.getMaxPipedItemCount();
-    Map<String, Object> elements = new TreeMap<String, Object>();
+    Map<String, Object> elements = new TreeMap<>();
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);
     }
@@ -611,7 +611,7 @@ public class ArcusTimeoutMessageTest extends TestCase {
       keys[i] = "MyMopKey" + i;
     }
 
-    Map<String, Object> updated = new HashMap<String, Object>();
+    Map<String, Object> updated = new HashMap<>();
     for (int i = 0; i < keys.length; i++) {
       updated.put(keys[i], value + i);
     }

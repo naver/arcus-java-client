@@ -65,7 +65,7 @@ public class MopGetTest extends BaseIntegrationTest {
 
   public void testMopGet_GetByBestEffort() throws Exception {
     // Retrieve items(2..11) in the list
-    List<String> mkeyList = new ArrayList<String>();
+    List<String> mkeyList = new ArrayList<>();
     for (int i = 2; i < 12; i++) {
       mkeyList.add(String.valueOf(i));
     }
@@ -84,7 +84,7 @@ public class MopGetTest extends BaseIntegrationTest {
   public void testMopGet_GetWithDeletion() throws Exception {
     CollectionAttributes attrs = null;
     Map<String, Object> rmap = null;
-    List<String> mkeyList = new ArrayList<String>();
+    List<String> mkeyList = new ArrayList<>();
 
     // Retrieve items(0..5) in the list with delete option
     for (int i = 0; i < 6; i++) {

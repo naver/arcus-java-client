@@ -32,8 +32,8 @@ import org.junit.Assert;
 public class MopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "MopBulkAPITest33";
-  private final Map<String, Object> elements = new HashMap<String, Object>();
-  private final Map<String, Object> updateMap = new HashMap<String, Object>();
+  private final Map<String, Object> elements = new HashMap<>();
+  private final Map<String, Object> updateMap = new HashMap<>();
 
 
   private int getValueCount() {
@@ -105,7 +105,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   public void testBulkEmptyElements() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
-              .asyncMopPipedInsertBulk(key, new HashMap<String, Object>(),
+              .asyncMopPipedInsertBulk(key, new HashMap<>(),
                       new CollectionAttributes());
 
       future.get(10000, TimeUnit.MILLISECONDS);

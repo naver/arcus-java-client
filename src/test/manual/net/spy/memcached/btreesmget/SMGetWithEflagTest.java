@@ -52,7 +52,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetMissAll() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -92,7 +92,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitAll() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 50; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -148,7 +148,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitAllWithOffsetMoreCount() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 50; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -204,7 +204,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitAllWithOffsetExactCount() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -260,7 +260,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitAllWithOffsetLessThanCount() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 9; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -316,7 +316,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitAllDesc() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -360,7 +360,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitHalf() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -405,7 +405,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testSMGetHitHalfDesc() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -450,7 +450,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   public void testPerformanceGet1000KeysWithoutOffset() {
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < 1000; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);
@@ -507,7 +507,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
     int testSize = 100;
 
     try {
-      keyList = new ArrayList<String>();
+      keyList = new ArrayList<>();
       for (int i = 0; i < testSize; i++) {
         mc.delete(KEY + i).get();
         keyList.add(KEY + i);

@@ -23,7 +23,7 @@ import org.junit.Assert;
 public class BaseLongKeyTest extends BaseIntegrationTest {
 
   private final int keySize = 200;
-  private final List<String> keys = new ArrayList<String>();
+  private final List<String> keys = new ArrayList<>();
 
   public BaseLongKeyTest() {
     int defaultKeyLength = 4000 - 10; // MAX_KEY_LENGTH - key index string length

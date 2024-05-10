@@ -18,7 +18,7 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
 
   public BroadcastFuture(long timeout , T result, int latchSize) {
     super(new CountDownLatch(latchSize), timeout);
-    ops = new ArrayList<Operation>(latchSize);
+    ops = new ArrayList<>(latchSize);
     objRef.set(result);
   }
 
@@ -56,7 +56,7 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
           throws InterruptedException, TimeoutException, ExecutionException {
     if (!latch.await(duration, units)) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
-      Collection<Operation> timedoutOps = new HashSet<Operation>();
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           MemcachedConnection.opTimedOut(op);

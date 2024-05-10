@@ -31,7 +31,7 @@ import org.junit.Assert;
 public class MopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "MopOverflowActionTest";
-  private List<String> keyList = new ArrayList<String>();
+  private List<String> keyList = new ArrayList<>();
 
   @Override
   protected void setUp() throws Exception {
@@ -129,7 +129,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
 
   public void testMopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
-    Map<String, Object> elem = new TreeMap<String, Object>();
+    Map<String, Object> elem = new TreeMap<>();
     elem.put("0", "item0");
 
     // insert

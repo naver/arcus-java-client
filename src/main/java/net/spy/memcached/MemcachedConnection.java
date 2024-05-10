@@ -89,17 +89,17 @@ public final class MemcachedConnection extends SpyObject {
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   private final ReconnectQueue reconnectQueue;
-  private final AtomicReference<String> cacheNodesChange = new AtomicReference<String>(null);
+  private final AtomicReference<String> cacheNodesChange = new AtomicReference<>(null);
   /* ENABLE_MIGRATION if */
-  private final AtomicReference<String> alterNodesChange = new AtomicReference<String>(null);
-  private final AtomicReference<String> delayedAlterNodesChange = new AtomicReference<String>(null);
+  private final AtomicReference<String> alterNodesChange = new AtomicReference<>(null);
+  private final AtomicReference<String> delayedAlterNodesChange = new AtomicReference<>(null);
   /* ENABLE_MIGRATION end */
 
   private final OperationFactory opFactory;
   private final ConnectionFactory connFactory;
   private final Collection<ConnectionObserver> connObservers =
-          new ConcurrentLinkedQueue<ConnectionObserver>();
-  private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<MemcachedNode>();
+          new ConcurrentLinkedQueue<>();
+  private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<>();
 
   /* ENABLE_MIGRATION if */
   private boolean arcusMigrEnabled = false;
@@ -134,7 +134,7 @@ public final class MemcachedConnection extends SpyObject {
     this.connFactory = f;
     connName = name;
     connObservers.addAll(obs);
-    addedQueue = new ConcurrentLinkedQueue<MemcachedNode>();
+    addedQueue = new ConcurrentLinkedQueue<>();
     failureMode = fm;
     optimizeGetOp = f.shouldOptimize();
     opFactory = opfactory;
@@ -142,7 +142,7 @@ public final class MemcachedConnection extends SpyObject {
     timeoutRatioThreshold = f.getTimeoutRatioThreshold();
     timeoutDurationThreshold = f.getTimeoutDurationThreshold();
     selector = Selector.open();
-    List<MemcachedNode> connections = new ArrayList<MemcachedNode>(a.size());
+    List<MemcachedNode> connections = new ArrayList<>(a.size());
     for (SocketAddress sa : a) {
       connections.add(makeMemcachedNode(connName, sa));
     }
@@ -340,8 +340,8 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void updateConnections(List<InetSocketAddress> addrs) throws IOException {
-    List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
-    List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
+    List<MemcachedNode> attachNodes = new ArrayList<>();
+    List<MemcachedNode> removeNodes = new ArrayList<>();
 
     for (MemcachedNode node : locator.getAll()) {
       if (addrs.contains(node.getSocketAddress())) {
@@ -366,12 +366,12 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_REPLICATION if */
   private Set<String> findChangedGroups(List<InetSocketAddress> addrs,
                                         Collection<MemcachedNode> nodes) {
-    Map<String, InetSocketAddress> addrMap = new HashMap<String, InetSocketAddress>();
+    Map<String, InetSocketAddress> addrMap = new HashMap<>();
     for (InetSocketAddress each : addrs) {
       addrMap.put(each.toString(), each);
     }
 
-    Set<String> changedGroupSet = new HashSet<String>();
+    Set<String> changedGroupSet = new HashSet<>();
     for (MemcachedNode node : nodes) {
       String nodeAddr = ((InetSocketAddress) node.getSocketAddress()).toString();
       if (addrMap.remove(nodeAddr) == null) { // removed node
@@ -387,7 +387,7 @@ public final class MemcachedConnection extends SpyObject {
 
   private List<InetSocketAddress> findAddrsOfChangedGroups(List<InetSocketAddress> addrs,
                                                            Set<String> changedGroups) {
-    List<InetSocketAddress> changedGroupAddrs = new ArrayList<InetSocketAddress>();
+    List<InetSocketAddress> changedGroupAddrs = new ArrayList<>();
     for (InetSocketAddress addr : addrs) {
       if (changedGroups.contains(((ArcusReplNodeAddress) addr).getGroupName())) {
         changedGroupAddrs.add(addr);
@@ -397,10 +397,10 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
-    List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
-    List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
-    List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<MemcachedReplicaGroup>();
-    List<Task> taskList = new ArrayList<Task>(); // tasks executed after locator update
+    List<MemcachedNode> attachNodes = new ArrayList<>();
+    List<MemcachedNode> removeNodes = new ArrayList<>();
+    List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<>();
+    List<Task> taskList = new ArrayList<>(); // tasks executed after locator update
 
     /* In replication, after SWITCHOVER or REPL_SLAVE is received from a group
      * and switchover is performed, but before the group's znode is changed,
@@ -561,7 +561,7 @@ public final class MemcachedConnection extends SpyObject {
   private Set<ArcusReplNodeAddress> getAddrsFromNodes(List<MemcachedNode> nodes) {
     Set<ArcusReplNodeAddress> addrs = Collections.emptySet();
     if (!nodes.isEmpty()) {
-      addrs = new HashSet<ArcusReplNodeAddress>((int) (nodes.size() / .75f) + 1);
+      addrs = new HashSet<>((int) (nodes.size() / .75f) + 1);
       for (MemcachedNode node : nodes) {
         addrs.add((ArcusReplNodeAddress) node.getSocketAddress());
       }
@@ -574,7 +574,7 @@ public final class MemcachedConnection extends SpyObject {
     Set<ArcusReplNodeAddress> slaveAddrs = Collections.emptySet();
     int groupSize = groupAddrs.size();
     if (groupSize > 1) {
-      slaveAddrs = new HashSet<ArcusReplNodeAddress>((int) ((groupSize - 1) / .75f) + 1);
+      slaveAddrs = new HashSet<>((int) ((groupSize - 1) / .75f) + 1);
       for (int i = 1; i < groupSize; i++) {
         slaveAddrs.add(groupAddrs.get(i));
       }
@@ -767,7 +767,7 @@ public final class MemcachedConnection extends SpyObject {
 
   public void prepareAlterConnections(List<InetSocketAddress> addrs) throws IOException {
     getLogger().info("Prepare connection of alter nodes. addrs=" + addrs);
-    List<MemcachedNode> alterNodes = new ArrayList<MemcachedNode>();
+    List<MemcachedNode> alterNodes = new ArrayList<>();
     if (mgType == MigrationType.JOIN) {
       for (SocketAddress sa : addrs) {
         alterNodes.add(makeMemcachedNode(connName, sa));
@@ -784,8 +784,8 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void updateAlterConnections(List<InetSocketAddress> addrs) throws IOException {
-    List<MemcachedNode> attachNodes = new ArrayList<MemcachedNode>();
-    List<MemcachedNode> removeNodes = new ArrayList<MemcachedNode>();
+    List<MemcachedNode> attachNodes = new ArrayList<>();
+    List<MemcachedNode> removeNodes = new ArrayList<>();
 
     for (MemcachedNode node : locator.getAlterAll()) {
       if (addrs.contains(node.getSocketAddress())) {
@@ -834,10 +834,10 @@ public final class MemcachedConnection extends SpyObject {
     if (!addedQueue.isEmpty()) {
       getLogger().debug("Handling queue");
       // If there's stuff in the added queue.  Try to process it.
-      Collection<MemcachedNode> toAdd = new HashSet<MemcachedNode>();
+      Collection<MemcachedNode> toAdd = new HashSet<>();
       // Transfer the queue into a hashset.  There are very likely more
       // additions than there are nodes.
-      Collection<MemcachedNode> todo = new HashSet<MemcachedNode>();
+      Collection<MemcachedNode> todo = new HashSet<>();
 
       MemcachedNode node;
       while ((node = addedQueue.poll()) != null) {
@@ -1126,7 +1126,7 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     MemcachedNode node = null;
-    Map<MemcachedNode, Operation> ops = new HashMap<MemcachedNode, Operation>();
+    Map<MemcachedNode, Operation> ops = new HashMap<>();
     MultiOperationCallback mcb = opFactory.createMultiOperationCallback(
         (KeyedOperation) op, keysByNode.size());
 
@@ -1270,7 +1270,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   public Map<MemcachedNode, List<String>> groupKeysByNode(Collection<String> keys) {
-    Map<MemcachedNode, List<String>> keysByNode = new HashMap<MemcachedNode, List<String>>();
+    Map<MemcachedNode, List<String>> keysByNode = new HashMap<>();
     for (String key : keys) {
       MemcachedNode node = findNodeByKey(key);
       if (node == null) {
@@ -1278,7 +1278,7 @@ public final class MemcachedConnection extends SpyObject {
       }
       List<String> k = keysByNode.get(node);
       if (k == null) {
-        k = new ArrayList<String>();
+        k = new ArrayList<>();
         keysByNode.put(node, k);
       }
       k.add(key);
@@ -1288,7 +1288,7 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_MIGRATION end */
 
   private void attemptReconnects() {
-    final List<MemcachedNode> rereQueue = new ArrayList<MemcachedNode>();
+    final List<MemcachedNode> rereQueue = new ArrayList<>();
     final long nanoTime = System.nanoTime();
     SocketChannel ch = null;
     MemcachedNode node = reconnectQueue.popReady(nanoTime);
@@ -1534,7 +1534,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param ops
    */
   public static void opsTimedOut(Collection<Operation> ops) {
-    Collection<String> timedoutNodes = new HashSet<String>();
+    Collection<String> timedoutNodes = new HashSet<>();
     for (Operation op : ops) {
       try {
         MemcachedNode node = op.getHandlingNode();
@@ -1639,9 +1639,9 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     private final Map<MemcachedNode, Long/*reconnect nano time*/> reconMap =
-        new HashMap<MemcachedNode, Long>();
+            new HashMap<>();
     private final NavigableMap<Long/*reconnect nano time*/, MemcachedNode> reconSortedMap =
-        new TreeMap<Long, MemcachedNode>();
+            new TreeMap<>();
 
     private long newReconnectNanoTime(MemcachedNode node, ReconnDelay type) {
       long newReconTime = System.nanoTime();
@@ -1753,7 +1753,7 @@ public final class MemcachedConnection extends SpyObject {
   private class DelayedSwitchoverGroups {
     private final long delayedSwitchoverTimeoutNanos;
     private final SortedMap<Long/*switchover nano time*/, MemcachedReplicaGroup> groups =
-        new TreeMap<Long, MemcachedReplicaGroup>();
+            new TreeMap<>();
 
     public DelayedSwitchoverGroups(long delayedSwitchoverTimeoutMillis) {
       this.delayedSwitchoverTimeoutNanos = TimeUnit.NANOSECONDS.convert(

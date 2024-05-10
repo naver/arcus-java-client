@@ -51,7 +51,7 @@ public class SetPipedExist<T> extends CollectionPipe {
     int capacity = 0;
 
     // encode values
-    List<byte[]> encodedList = new ArrayList<byte[]>(values.size());
+    List<byte[]> encodedList = new ArrayList<>(values.size());
     CachedData cd = null;
     for (T each : values) {
       cd = tc.encode(each);

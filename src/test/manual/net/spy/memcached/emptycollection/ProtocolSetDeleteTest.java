@@ -31,43 +31,43 @@ public class ProtocolSetDeleteTest extends TestCase {
   public void testStringify() {
     // default setting : dropIfEmpty = true
 
-    SetDelete<Object> del = new SetDelete<Object>(value, false, testTranscoder);
+    SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
     Assert.assertEquals("5 drop", del.stringify());
 
-    del = new SetDelete<Object>(value, false, false, testTranscoder);
+    del = new SetDelete<>(value, false, false, testTranscoder);
     Assert.assertEquals("5", del.stringify());
 
-    del = new SetDelete<Object>(value, false, true, testTranscoder);
+    del = new SetDelete<>(value, false, true, testTranscoder);
     Assert.assertEquals("5 drop", del.stringify());
 
-    del = new SetDelete<Object>(value, true, testTranscoder);
+    del = new SetDelete<>(value, true, testTranscoder);
     Assert.assertEquals("5 drop noreply", del.stringify());
 
-    del = new SetDelete<Object>(value, true, false, testTranscoder);
+    del = new SetDelete<>(value, true, false, testTranscoder);
     Assert.assertEquals("5 noreply", del.stringify());
 
-    del = new SetDelete<Object>(value, true, true, testTranscoder);
+    del = new SetDelete<>(value, true, true, testTranscoder);
     Assert.assertEquals("5 drop noreply", del.stringify());
   }
 
   public void testGetAdditionalArgs() {
     byte[] expected = new byte[]{'v', 'a', 'l', 'u', 'e'};
-    SetDelete<Object> del = new SetDelete<Object>(value, false, testTranscoder);
+    SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
 
-    del = new SetDelete<Object>(value, false, false, testTranscoder);
+    del = new SetDelete<>(value, false, false, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
 
-    del = new SetDelete<Object>(value, false, true, testTranscoder);
+    del = new SetDelete<>(value, false, true, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
 
-    del = new SetDelete<Object>(value, true, testTranscoder);
+    del = new SetDelete<>(value, true, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
 
-    del = new SetDelete<Object>(value, true, false, testTranscoder);
+    del = new SetDelete<>(value, true, false, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
 
-    del = new SetDelete<Object>(value, true, true, testTranscoder);
+    del = new SetDelete<>(value, true, true, testTranscoder);
     Assert.assertArrayEquals(expected, del.getAdditionalArgs());
   }
 }

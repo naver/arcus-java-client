@@ -36,7 +36,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
     String value = "MyValue";
 
     int elementSize = 500;
-    Map<String, Object> elements = new TreeMap<String, Object>();
+    Map<String, Object> elements = new TreeMap<>();
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);
     }
@@ -96,7 +96,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
     String value = "MyValue";
 
     int elementSize = 1200;
-    Map<String, Object> elements = new TreeMap<String, Object>();
+    Map<String, Object> elements = new TreeMap<>();
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);
     }

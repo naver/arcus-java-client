@@ -18,7 +18,7 @@ public class DefaultKetamaNodeLocatorConfiguration implements
   // Internal lookup map to try to carry forward the optimisation that was
   // previously in KetamaNodeLocator
   protected Map<MemcachedNode, String> socketAddresses =
-          new HashMap<MemcachedNode, String>();
+          new HashMap<>();
 
   /**
    * Returns the socket address of a given MemcachedNode.

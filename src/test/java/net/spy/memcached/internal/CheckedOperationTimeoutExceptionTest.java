@@ -54,7 +54,7 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
 
 
   public void testMultipleOperation() {
-    Collection<Operation> ops = new ArrayList<Operation>();
+    Collection<Operation> ops = new ArrayList<>();
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));
     assertEquals(CheckedOperationTimeoutException.class.getName()

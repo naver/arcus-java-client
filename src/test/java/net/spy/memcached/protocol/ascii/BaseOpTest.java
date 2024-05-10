@@ -103,7 +103,7 @@ public class BaseOpTest extends BaseMockCase {
 
   private static class SimpleOp extends OperationImpl {
 
-    private final LinkedList<String> lines = new LinkedList<String>();
+    private final LinkedList<String> lines = new LinkedList<>();
     private byte[] currentBytes = null;
     private int bytesToRead = 0;
     private int linesToRead = 1;

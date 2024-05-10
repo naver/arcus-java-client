@@ -45,8 +45,8 @@ public class RedistributeFailureModeTest extends ClientBaseCase {
 
   // Just to make sure the sequence is being handled correctly
   public void testMixedSetsAndUpdates() throws Exception {
-    Collection<Future<Boolean>> futures = new ArrayList<Future<Boolean>>();
-    Collection<String> keys = new ArrayList<String>();
+    Collection<Future<Boolean>> futures = new ArrayList<>();
+    Collection<String> keys = new ArrayList<>();
     Thread.sleep(100);
     for (int i = 0; i < 100; i++) {
       String key = "k" + i;

@@ -149,7 +149,7 @@ public class ArcusKetamaHashingTest extends TestCase {
   }
 
   private List<MemcachedNode> createNodes(List<InetSocketAddress> addresses) {
-    List<MemcachedNode> results = new ArrayList<MemcachedNode>();
+    List<MemcachedNode> results = new ArrayList<>();
 
     for (InetSocketAddress addr : addresses) {
       results.add(new MockMemcachedNode(addr));

@@ -33,8 +33,8 @@ import org.junit.Assert;
 
 public class BopSortMergeOldTest extends BaseIntegrationTest {
 
-  private final List<String> keyList3 = new ArrayList<String>();
-  private final List<String> keyList2 = new ArrayList<String>();
+  private final List<String> keyList3 = new ArrayList<>();
+  private final List<String> keyList2 = new ArrayList<>();
 
   public BopSortMergeOldTest() {
     keyList3.add("key0");

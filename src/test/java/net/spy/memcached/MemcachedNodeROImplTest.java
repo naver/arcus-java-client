@@ -26,7 +26,7 @@ public class MemcachedNodeROImplTest extends MockObjectTestCase {
     assertSame(sa, node.getSocketAddress());
     assertEquals(m.proxy().toString(), node.toString());
 
-    Set<String> acceptable = new HashSet<String>(Arrays.asList(
+    Set<String> acceptable = new HashSet<>(Arrays.asList(
             "toString", "getSocketAddress", "getBytesRemainingToWrite",
             "getReconnectCount", "getSelectionOps", "getNodeName", "hasReadOp",
             "hasWriteOp", "isActive", "isFirstConnecting"));

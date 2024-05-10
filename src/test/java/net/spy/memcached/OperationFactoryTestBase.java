@@ -192,7 +192,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     Collection<Operation> ops = ofact.clone(op);
     assertEquals(3, ops.size());
 
-    Collection<String> mutableKeys = new ArrayList<String>(keys);
+    Collection<String> mutableKeys = new ArrayList<>(keys);
     int i = 3;
     for (Operation o : ops) {
       assertEquals(i, mutableKeys.size()); // Starting size
@@ -240,7 +240,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     Collection<Operation> ops = ofact.clone(op);
     assertEquals(3, ops.size());
 
-    Collection<String> mutableKeys = new ArrayList<String>(keys);
+    Collection<String> mutableKeys = new ArrayList<>(keys);
     int i = 3;
     for (Operation o : ops) {
       assertEquals(i, mutableKeys.size()); // Starting size

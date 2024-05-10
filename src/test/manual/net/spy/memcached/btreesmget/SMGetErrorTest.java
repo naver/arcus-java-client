@@ -36,7 +36,7 @@ import org.junit.Assert;
 
 public class SMGetErrorTest extends BaseIntegrationTest {
 
-  private static final List<String> KEY_LIST = new ArrayList<String>();
+  private static final List<String> KEY_LIST = new ArrayList<>();
 
   static {
     String KEY = SMGetErrorTest.class.getSimpleName()
@@ -399,7 +399,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    ArrayList<String> testKeyList = new ArrayList<String>();
+    ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(KEY_LIST.get(0));
     testKeyList.add(KEY_LIST.get(1));
 
@@ -430,7 +430,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   public void testInvalidArgumentException() {
-    ArrayList<String> testKeyList = new ArrayList<String>();
+    ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(KEY_LIST.get(0));
     testKeyList.add(KEY_LIST.get(1));
 
@@ -464,7 +464,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
     // keylist is empty
     try {
       mc.asyncBopSortMergeGet(
-          new ArrayList<String>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+              new ArrayList<>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is empty.", e.getMessage());

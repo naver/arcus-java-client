@@ -154,7 +154,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void copyInputQueue() {
-    Collection<Operation> tmp = new ArrayList<Operation>();
+    Collection<Operation> tmp = new ArrayList<>();
 
     // don't drain more than we have space to place
     inputQueue.drainTo(tmp, writeQ.remainingCapacity());
@@ -163,13 +163,13 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public Collection<Operation> destroyInputQueue() {
-    Collection<Operation> rv = new ArrayList<Operation>();
+    Collection<Operation> rv = new ArrayList<>();
     inputQueue.drainTo(rv);
     return rv;
   }
 
   private Collection<Operation> destroyQueue(BlockingQueue<Operation> queue, boolean resend) {
-    Collection<Operation> rv = new ArrayList<Operation>();
+    Collection<Operation> rv = new ArrayList<>();
     queue.drainTo(rv);
     if (resend) {
       for (Operation o : rv) {
@@ -384,7 +384,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void insertOp(Operation op) {
     op.setHandlingNode(this);
     op.initialize();
-    ArrayList<Operation> tmp = new ArrayList<Operation>(
+    ArrayList<Operation> tmp = new ArrayList<>(
             inputQueue.size() + 1);
     tmp.add(op);
     inputQueue.drainTo(tmp);
@@ -637,7 +637,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     if (shouldAuth) {
       authLatch = new CountDownLatch(1);
       if (!inputQueue.isEmpty()) {
-        reconnectBlocked = new ArrayList<Operation>(
+        reconnectBlocked = new ArrayList<>(
                 inputQueue.size() + 1);
         inputQueue.drainTo(reconnectBlocked);
       }
@@ -706,7 +706,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   private BlockingQueue<Operation> getAllOperations(boolean cancelNonIdempotent) {
-    BlockingQueue<Operation> allOp = new LinkedBlockingQueue<Operation>();
+    BlockingQueue<Operation> allOp = new LinkedBlockingQueue<>();
 
     while (hasReadOp()) {
       Operation op = removeCurrentReadOp();

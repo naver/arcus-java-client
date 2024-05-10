@@ -23,7 +23,7 @@ public class BopGetResultImpl<K, V> implements GetResult<Map<K, Element<V>>> {
   public BopGetResultImpl(Map<K, CachedData> cachedDataMap,
                           boolean reverse, Transcoder<V> transcoder) {
     this.cachedDataMap = cachedDataMap;
-    this.result = new TreeMap<K, Element<V>>((reverse) ? Collections.reverseOrder() : null);
+    this.result = new TreeMap<>((reverse) ? Collections.reverseOrder() : null);
     this.reverse = reverse;
     this.transcoder = transcoder;
   }
@@ -40,9 +40,9 @@ public class BopGetResultImpl<K, V> implements GetResult<Map<K, Element<V>>> {
       SortedMap<K, Element<V>> temp;
 
       if (isByteBKey) {
-        temp = new ByteArrayTreeMap<K, Element<V>>(reverse ? Collections.<K>reverseOrder() : null);
+        temp = new ByteArrayTreeMap<>(reverse ? Collections.<K>reverseOrder() : null);
       } else if (isLongBKey) {
-        temp = new TreeMap<K, Element<V>>(reverse ? Collections.<K>reverseOrder() : null);
+        temp = new TreeMap<>(reverse ? Collections.<K>reverseOrder() : null);
       } else {
         return result;
       }

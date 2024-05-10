@@ -19,7 +19,7 @@ public class GetsResultImpl<T> implements GetResult<CASValue<T>> {
   @Override
   public CASValue<T> getDecodedValue() {
     if (decodedValue == null) {
-      decodedValue = new CASValue<T>(cas, transcoder.decode(cachedData));
+      decodedValue = new CASValue<>(cas, transcoder.decode(cachedData));
     }
     return decodedValue;
   }

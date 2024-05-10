@@ -50,7 +50,7 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
 
   @Override
   public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList) {
-    return new BTreeSMGetWithByteTypeBkey<T>(node, keyList,
-        range, eFlagFilter, count, smgetMode);
+    return new BTreeSMGetWithByteTypeBkey<>(node, keyList,
+            range, eFlagFilter, count, smgetMode);
   }
 }

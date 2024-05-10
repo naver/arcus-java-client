@@ -39,7 +39,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
   public void testZeroSizedKeys() {
     try {
-      mc.asyncStoreBulk(StoreType.set, new ArrayList<String>(0),
+      mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
               60, "value");
       Assert.fail();
     } catch (IllegalArgumentException e) {
@@ -50,7 +50,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
     }
 
     try {
-      mc.asyncStoreBulk(StoreType.set, new ArrayList<String>(0),
+      mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
               60, new Object(), new CollectionTranscoder());
       Assert.fail();
     } catch (IllegalArgumentException e) {
@@ -74,11 +74,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
 
       // generate key
-      Map<String, Object> o = new HashMap<String, Object>();
+      Map<String, Object> o = new HashMap<>();
       for (int i = 0; i < KEY_SIZE; i++) {
         o.put("MyKey" + i, "MyValue" + i);
       }
-      List<String> keys = new ArrayList<String>(o.keySet());
+      List<String> keys = new ArrayList<>(o.keySet());
 
       // REMOVE
       for (String key : keys) {
@@ -326,12 +326,12 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
     try {
       // generate key
-      Map<String, Object> o = new HashMap<String, Object>();
+      Map<String, Object> o = new HashMap<>();
       for (int i = 0; i < KEY_SIZE; i++) {
         o.put("MyKey" + i, "MyValue" + i);
       }
 
-      List<String> keys = new ArrayList<String>(o.keySet());
+      List<String> keys = new ArrayList<>(o.keySet());
 
       // REMOVE
       for (String key : keys) {
@@ -425,11 +425,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
     try {
       // generate key
-      Map<String, Object> o = new HashMap<String, Object>();
+      Map<String, Object> o = new HashMap<>();
       for (int i = 0; i < KEY_SIZE; i++) {
         o.put("MyKey" + i, "MyValue" + i);
       }
-      List<String> keys = new ArrayList<String>(o.keySet());
+      List<String> keys = new ArrayList<>(o.keySet());
 
       // REMOVE
       for (String key : keys) {
