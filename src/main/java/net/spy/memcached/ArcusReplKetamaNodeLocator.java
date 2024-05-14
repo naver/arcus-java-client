@@ -29,35 +29,40 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
+import static net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator;
+
 public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator {
+
+  private static final HashAlgorithm HASH_ALG = HashAlgorithm.KETAMA_HASH;
 
   private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
   private final HashMap<String, MemcachedReplicaGroup> allGroups;
   private final Collection<MemcachedNode> allNodes;
 
   /* ENABLE_MIGRATION if */
-  private TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaAlterGroups;
-  private HashMap<String, MemcachedReplicaGroup> alterGroups;
-  private HashMap<String, MemcachedReplicaGroup> existGroups;
-  private HashSet<MemcachedNode> alterNodes;
+  private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaAlterGroups = new TreeMap<>();
+  private final HashMap<String, MemcachedReplicaGroup> alterGroups = new HashMap<>();
+  private final HashMap<String, MemcachedReplicaGroup> existGroups = new HashMap<>();
+  private final HashSet<MemcachedNode> alterNodes = new HashSet<>();
 
   private MigrationType migrationType;
-  private Long migrationBasePoint;
+  private Long migrationBasePoint; // FIXME: Remove this field
   private Long migrationLastPoint;
   private boolean migrationInProgress;
   /* ENABLE_MIGRATION end */
 
-  private final Collection<MemcachedReplicaGroup> toDeleteGroups;
-  private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
+  private final Collection<MemcachedReplicaGroup> toDeleteGroups = new HashSet<>();
   private final ArcusReplKetamaNodeLocatorConfiguration config
           = new ArcusReplKetamaNodeLocatorConfiguration();
 
@@ -90,14 +95,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     // ketamaNodes.size() < numReps*nodes.size() : hash collision
     assert ketamaGroups.size() <= (numReps * allGroups.size());
 
-    // prepare toDeleteGroups
-    toDeleteGroups = new HashSet<>();
-
     /* ENABLE_MIGRATION if */
-    alterNodes = new HashSet<>();
-    ketamaAlterGroups = new TreeMap<>();
-    alterGroups = new HashMap<>();
-    existGroups = new HashMap<>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
@@ -109,17 +107,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     ketamaGroups = kg;
     allGroups = ag;
     allNodes = an;
-    toDeleteGroups = new HashSet<>();
 
     /* ENABLE_MIGRATION if */
-    alterNodes = new HashSet<>();
-    ketamaAlterGroups = new TreeMap<>();
-    alterGroups = new HashMap<>();
-    existGroups = new HashMap<>();
     clearMigration();
     /* ENABLE_MIGRATION end */
   }
 
+  @Override
   public Collection<MemcachedNode> getAll() {
     return Collections.unmodifiableCollection(allNodes);
   }
@@ -129,10 +123,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   /* ENABLE_MIGRATION if */
+  @Override
   public Collection<MemcachedNode> getAlterAll() {
     return Collections.unmodifiableCollection(alterNodes);
   }
 
+  @Override
   public MemcachedNode getAlterNode(SocketAddress sa) {
     // The alter node to attach should be found
     for (MemcachedNode node : alterNodes) {
@@ -144,6 +140,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     return null;
   }
 
+  @Override
   public MemcachedNode getOwnerNode(String owner, MigrationType mgType) {
     MemcachedReplicaGroup group;
     if (mgType == MigrationType.JOIN) {
@@ -161,21 +158,13 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
   /* ENABLE_MIGRATION end */
 
-  public Collection<MemcachedNode> getMasterNodes() {
-    List<MemcachedNode> masterNodes = new ArrayList<>(allGroups.size());
-
-    for (MemcachedReplicaGroup g : allGroups.values()) {
-      masterNodes.add(g.getMasterNode());
-    }
-    return masterNodes;
-  }
-
+  @Override
   public MemcachedNode getPrimary(final String k) {
-    return getNodeForKey(hashAlg.hash(k), ReplicaPick.MASTER);
+    return getNodeForKey(HASH_ALG.hash(k), ReplicaPick.MASTER);
   }
 
-  public MemcachedNode getPrimary(final String k, ReplicaPick pick) {
-    return getNodeForKey(hashAlg.hash(k), pick);
+  MemcachedNode getPrimary(final String k, ReplicaPick pick) {
+    return getNodeForKey(HASH_ALG.hash(k), pick);
   }
 
   private MemcachedNode getNodeForKey(long hash, ReplicaPick pick) {
@@ -196,14 +185,16 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
   }
 
+  @Override
   public Iterator<MemcachedNode> getSequence(String k) {
     return new ReplKetamaIterator(k, ReplicaPick.MASTER, allGroups.size());
   }
 
-  public Iterator<MemcachedNode> getSequence(String k, ReplicaPick pick) {
+  Iterator<MemcachedNode> getSequence(String k, ReplicaPick pick) {
     return new ReplKetamaIterator(k, pick, allGroups.size());
   }
 
+  @Override
   public NodeLocator getReadonlyCopy() {
     TreeMap<Long, SortedSet<MemcachedReplicaGroup>> smg =
             new TreeMap<>(ketamaGroups);
@@ -215,8 +206,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     try {
       // Rewrite the values a copy of the map
       for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> mge : smg.entrySet()) {
-        SortedSet<MemcachedReplicaGroup> groupROSet = new TreeSet<>(
-                new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
+        SortedSet<MemcachedReplicaGroup> groupROSet = createGroupSet();
         for (MemcachedReplicaGroup mrg : mge.getValue()) {
           groupROSet.add(new MemcachedReplicaGroupROImpl(mrg));
         }
@@ -237,6 +227,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     return new ArcusReplKetamaNodeLocator(smg, ag, an);
   }
 
+  @Override
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
     update(toAttach, toDelete, new ArrayList<>(0));
   }
@@ -255,11 +246,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
         removeNodeFromGroup(node);
-        try {
-          node.closeChannel();
-        } catch (IOException e) {
-          getLogger().error("Failed to closeChannel the node : " + node);
-        }
+        safeCloseNode(node);
       }
 
       // Change role
@@ -310,12 +297,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         }
         return;
       }
-      // How to handle the new node ? go downward (FIXME)
+      // FIXME: How to handle the new node? go downward
+      getLogger().debug("new node, but NOT in alterNodes: " + node);
     }
     /* ENABLE_MIGRATION end */
 
-    MemcachedReplicaGroup mrg;
-    mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
+    MemcachedReplicaGroup mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
     if (mrg == null) {
       mrg = new MemcachedReplicaGroupImpl(node);
       getLogger().info("new memcached replica group added %s", mrg.getGroupName());
@@ -367,13 +354,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       byte[] digest = HashAlgorithm.computeMd5(config.getKeyForGroup(group, i));
       for (int h = 0; h < 4; h++) {
         Long k = getKetamaHashPoint(digest, h);
-        SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
-        if (nodeSet == null) {
-          nodeSet = new TreeSet<>(
-                  new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-          ketamaGroups.put(k, nodeSet);
-        }
-        nodeSet.add(group);
+        ketamaGroups.computeIfAbsent(k, a -> createGroupSet()).add(group);
       }
     }
   }
@@ -387,7 +368,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         removeHashOfAlter(group);
         return;
       }
-      // An existing or joined group is down. go downward. 
+      // An existing or joined group is down. go downward.
+      getLogger().debug("removed group, but NOT in alterGroups: " + group);
     }
     /* ENABLE_MIGRATION end */
 
@@ -413,13 +395,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       byte[] digest = HashAlgorithm.computeMd5(config.getKeyForGroup(group, i));
       for (int h = 0; h < 4; h++) {
         Long k = getKetamaHashPoint(digest, h);
-        SortedSet<MemcachedReplicaGroup> nodeSet = ketamaAlterGroups.get(k);
-        if (nodeSet == null) {
-          nodeSet = new TreeSet<>(
-                  new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-          ketamaAlterGroups.put(k, nodeSet);
-        }
-        nodeSet.add(group);
+        ketamaGroups.computeIfAbsent(k, a -> createGroupSet()).add(group);
       }
     }
   }
@@ -435,15 +411,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           if (alterSet.isEmpty()) {
             ketamaAlterGroups.remove(k);
           }
-          SortedSet<MemcachedReplicaGroup> existSet = ketamaGroups.get(k);
-          if (existSet == null) {
-            existSet = new TreeSet<>(
-                    new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-            ketamaGroups.put(k, existSet);
-          }
-          existSet.add(group); // joining => joined
+          ketamaGroups.computeIfAbsent(k, a -> createGroupSet()).add(group); // joining => joined
         } else {
-          // The hash point has already been inserted.
+          getLogger().debug("The hash point has already been inserted.");
         }
       }
     }
@@ -461,34 +431,31 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
           if (groupSet.isEmpty()) {
             ketamaAlterGroups.remove(k);
           }
-        } else {
-          groupSet = ketamaGroups.get(k);
-          assert groupSet != null;
-          boolean removed = groupSet.remove(group);
-          if (groupSet.isEmpty()) {
-            ketamaGroups.remove(k);
-          }
-          assert removed;
+          continue;
         }
+
+        groupSet = ketamaGroups.get(k);
+        assert groupSet != null;
+        boolean removed = groupSet.remove(group);
+        if (groupSet.isEmpty()) {
+          ketamaGroups.remove(k);
+        }
+        assert removed;
       }
     }
   }
 
   /* Move the hash range of joining nodes from ketamaAlterNodes to ketamaNodes */
   private void moveHashRangeFromAlterToExist(Long spoint, boolean sInclusive,
-                                             Long epoint, boolean eInclusive) {
+                                             Long epoint) {
+
+    final boolean eInclusive = true; // FIXME: Is this variable really can be false?
     NavigableMap<Long, SortedSet<MemcachedReplicaGroup>> moveRange
         = ketamaAlterGroups.subMap(spoint, sInclusive, epoint, eInclusive);
 
     List<Long> removeList = new ArrayList<>();
     for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> entry : moveRange.entrySet()) {
-      SortedSet<MemcachedReplicaGroup> groupSet = ketamaGroups.get(entry.getKey());
-      if (groupSet == null) {
-        groupSet = new TreeSet<>(
-                new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-        ketamaGroups.put(entry.getKey(), groupSet);
-      }
-      groupSet.addAll(entry.getValue());
+      ketamaGroups.computeIfAbsent(entry.getKey(), a -> createGroupSet()).addAll(entry.getValue());
       removeList.add(entry.getKey());
     }
     for (Long key : removeList) {
@@ -498,7 +465,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
   /* Move the hash range of leaving nodes from ketamaNode to ketamaAlterNodes */
   private void moveHashRangeFromExistToAlter(Long spoint, boolean sInclusive,
-                                             Long epoint, boolean eInclusive) {
+                                             Long epoint) {
+
+    final boolean eInclusive = true; // FIXME: Is this variable really can be false?
     NavigableMap<Long, SortedSet<MemcachedReplicaGroup>> moveRange
         = ketamaGroups.subMap(spoint, sInclusive, epoint, eInclusive);
 
@@ -507,16 +476,12 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       Iterator<MemcachedReplicaGroup> groupIter = entry.getValue().iterator();
       while (groupIter.hasNext()) {
         MemcachedReplicaGroup group = groupIter.next();
-        if (!existGroups.containsKey(group.getGroupName())) {
-          groupIter.remove(); // leaving => leaved
-          SortedSet<MemcachedReplicaGroup> alterSet = ketamaAlterGroups.get(entry.getKey());
-          if (alterSet == null) {
-            alterSet = new TreeSet<>(
-                    new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-            ketamaAlterGroups.put(entry.getKey(), alterSet); // for auto leave abort
-          }
-          alterSet.add(group);
+        if (existGroups.containsKey(group.getGroupName())) {
+          continue;
         }
+        groupIter.remove(); // leaving => leaved
+        // for auto leave abort
+        ketamaAlterGroups.computeIfAbsent(entry.getKey(), a -> createGroupSet()).add(group);
       }
       if (entry.getValue().isEmpty()) {
         removeList.add(entry.getKey());
@@ -527,6 +492,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
   }
 
+  @Override
   public void updateAlter(Collection<MemcachedNode> toAttach,
                           Collection<MemcachedNode> toDelete) {
     lock.lock();
@@ -538,13 +504,10 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         if (mrg == null) {
           mrg = allGroups.get(groupName);
         }
-        if (mrg == null) { // close the unknown alter node (FIXME)
+        if (mrg == null) {
+          // FIXME: close the unknown alter node
           getLogger().warn("Unknown alter node to attach : " + node);
-          try {
-            node.closeChannel();
-          } catch (IOException e) {
-            getLogger().error("Failed to closeChannel the node : " + node);
-          }
+          safeCloseNode(node);
         } else {
           mrg.setMemcachedNode(node);
           alterNodes.add(node);
@@ -561,11 +524,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
             removeHashOfAlter(mrg);
           }
         }
-        try {
-          node.closeChannel();
-        } catch (IOException e) {
-          getLogger().error("Failed to closeChannel the node : " + node);
-        }
+        safeCloseNode(node);
       }
     } finally {
       if (alterNodes.isEmpty()) {
@@ -587,71 +546,64 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     migrationInProgress = false;
   }
 
+  @Override
   public void prepareMigration(Collection<MemcachedNode> toAlter, MigrationType type) {
+    if (type == MigrationType.UNKNOWN) {
+      throw new IllegalArgumentException("MigrationType must NOT be UNKNOWN.");
+    }
     getLogger().info("Prepare ketama info for migration. type=" + type);
-    assert type != MigrationType.UNKNOWN;
 
     clearMigration();
     migrationType = type;
     migrationInProgress = true;
 
-    MemcachedReplicaGroup mrg;
     if (type == MigrationType.JOIN) {
       for (MemcachedNode node : toAlter) {
         alterNodes.add(node);
         String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
-        mrg = alterGroups.get(groupName);
-        if (mrg == null) {
-          mrg = new MemcachedReplicaGroupImpl(node);
-          alterGroups.put(groupName, mrg);
-          prepareHashOfJOIN(mrg);
-        } else {
+        MemcachedReplicaGroup mrg = alterGroups.get(groupName);
+        if (mrg != null) {
           mrg.setMemcachedNode(node);
+          continue;
         }
+
+        mrg = new MemcachedReplicaGroupImpl(node);
+        alterGroups.put(groupName, mrg);
+        prepareHashOfJOIN(mrg);
       }
-      for (String groupName : allGroups.keySet()) {
-        mrg = allGroups.get(groupName);
-        existGroups.put(groupName, mrg);
-      }
-    } else { // MigrationType.LEAVE
-      for (MemcachedNode node : toAlter) {
-        alterNodes.add(node);
-        String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
-        mrg = alterGroups.get(groupName);
-        if (mrg == null) {
-          mrg = allGroups.get(groupName);
-          alterGroups.put(groupName, mrg);
-        }
-      }
-      for (String groupName : allGroups.keySet()) {
-        if (!alterGroups.containsKey(groupName)) {
-          mrg = allGroups.get(groupName);
-          existGroups.put(groupName, mrg);
-        }
-      }
+      existGroups.putAll(allGroups);
+      return;
     }
+
+    // MigrationType.LEAVE
+    for (MemcachedNode node : toAlter) {
+      alterNodes.add(node);
+      String groupName = MemcachedReplicaGroup.getGroupNameFromNode(node);
+      alterGroups.computeIfAbsent(groupName, a -> allGroups.get(groupName));
+    }
+    existGroups.putAll(allGroups.entrySet().stream()
+            .filter(entry -> !alterGroups.containsKey(entry.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
   /* check migrationLastPoint belongs to the (spoint, epoint) range. */
-  private boolean needToMigrateRange(Long spoint, Long epoint) {
-    if (spoint != 0 || epoint != 0) { // Valid migration range
-      if (migrationLastPoint == -1) {
-        return true;
-      }
-      if (spoint == epoint) { // full range
-        return spoint != migrationLastPoint;
-      }
-      if (spoint < epoint) {
-        if (spoint < migrationLastPoint && migrationLastPoint < epoint) {
-          return true;
-        }
-      } else { // spoint > epoint
-        if (spoint < migrationLastPoint || migrationLastPoint < epoint) {
-          return true;
-        }
-      }
+  private boolean needToMigrate(Long spoint, Long epoint) {
+    if (spoint == 0 && epoint == 0) {
+      return true;
     }
-    return false;
+
+    // Valid migration range
+    if (migrationLastPoint == -1) {
+      return true;
+    }
+    if (Objects.equals(spoint, epoint)) { // full range
+      return !Objects.equals(spoint, migrationLastPoint);
+    }
+    if (spoint < epoint) {
+      return spoint < migrationLastPoint && migrationLastPoint < epoint;
+    }
+    // spoint > epoint
+    return spoint < migrationLastPoint || migrationLastPoint < epoint;
   }
 
   private void migrateJoinHashRange(Long spoint, Long epoint) {
@@ -663,10 +615,10 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         spoint = migrationLastPoint;
       }
       if (spoint < epoint) {
-        moveHashRangeFromAlterToExist(spoint, false, epoint, true);
+        moveHashRangeFromAlterToExist(spoint, false, epoint);
       } else {
-        moveHashRangeFromAlterToExist(spoint, false, 0xFFFFFFFFL, true);
-        moveHashRangeFromAlterToExist(0L, true, epoint, true);
+        moveHashRangeFromAlterToExist(spoint, false, 0xFFFFFFFFL);
+        moveHashRangeFromAlterToExist(0L, true, epoint);
       }
       migrationLastPoint = epoint;
     } finally {
@@ -684,10 +636,10 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         epoint = migrationLastPoint;
       }
       if (spoint < epoint) {
-        moveHashRangeFromExistToAlter(spoint, false, epoint, true);
+        moveHashRangeFromExistToAlter(spoint, false, epoint);
       } else {
-        moveHashRangeFromExistToAlter(0L, true, epoint, true);
-        moveHashRangeFromExistToAlter(spoint, false, 0xFFFFFFFFL, true);
+        moveHashRangeFromExistToAlter(0L, true, epoint);
+        moveHashRangeFromExistToAlter(spoint, false, 0xFFFFFFFFL);
       }
       migrationLastPoint = spoint;
     } finally {
@@ -696,8 +648,9 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     getLogger().info("Applied LEAVE range. spoint=" + spoint + ", epoint=" + epoint);
   }
 
+  @Override
   public void updateMigration(Long spoint, Long epoint) {
-    if (migrationInProgress && needToMigrateRange(spoint, epoint)) {
+    if (migrationInProgress && needToMigrate(spoint, epoint)) {
       if (migrationType == MigrationType.JOIN) {
         migrateJoinHashRange(spoint, epoint);
       } else {
@@ -706,6 +659,18 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
   }
   /* ENABLE_MIGRATION end */
+
+  private void safeCloseNode(MemcachedNode node) {
+    try {
+      node.closeChannel();
+    } catch (IOException e) {
+      getLogger().error("Failed to closeChannel the node : " + node);
+    }
+  }
+
+  private static SortedSet<MemcachedReplicaGroup> createGroupSet() {
+    return new TreeSet<>(new MemcachedReplicaGroupComparator());
+  }
 
   private class ReplKetamaIterator implements Iterator<MemcachedNode> {
     private final String key;
@@ -716,24 +681,26 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
 
     public ReplKetamaIterator(final String k, ReplicaPick p, final int t) {
       super();
-      hashVal = hashAlg.hash(k);
+      hashVal = HASH_ALG.hash(k);
       remainingTries = t;
       key = k;
       pick = p;
     }
 
     private void nextHash() {
-      long tmpKey = hashAlg.hash((numTries++) + key);
+      long tmpKey = HASH_ALG.hash((numTries++) + key);
       // This echos the implementation of Long.hashCode()
-      hashVal += (int) (tmpKey ^ (tmpKey >>> 32));
+      hashVal += Long.hashCode(tmpKey);
       hashVal &= 0xffffffffL; // truncate to 32-bits
       remainingTries--;
     }
 
+    @Override
     public boolean hasNext() {
       return remainingTries > 0;
     }
 
+    @Override
     public MemcachedNode next() {
       try {
         return getNodeForKey(hashVal, pick);
@@ -742,6 +709,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       }
     }
 
+    @Override
     public void remove() {
       throw new UnsupportedOperationException("remove not supported");
     }
