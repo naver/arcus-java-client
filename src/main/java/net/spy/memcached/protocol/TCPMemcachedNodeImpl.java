@@ -721,7 +721,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       }
     }
 
-    if (hasWriteOp()) {
+    if (optimizedOp != null) {
+      allOp.add(optimizedOp);
+      optimizedOp = null;
+    }
+
+    if (!writeQ.isEmpty()) {
       writeQ.drainTo(allOp);
     }
 
