@@ -98,6 +98,31 @@ public class DefaultConnectionFactory extends SpyObject
   public static final long DEFAULT_OPERATION_TIMEOUT = 700L;
 
   /**
+   * Default isDaemon : false
+   */
+  public static final boolean DEFAULT_IS_DAEMON = false;
+
+  /**
+   * Default useNagleAlgorithm : false
+   */
+  public static final boolean DEFAULT_USE_NAGLE_ALGORITHM = false;
+
+  /**
+   * Default keepAlive : false
+   */
+  public static final boolean DEFAULT_KEEP_ALIVE = false;
+
+  /**
+   * Default shouldOptimize : false
+   */
+  public static final boolean DEFAULT_SHOULD_OPTIMIZE = false;
+
+  /**
+   * Default dnsCacheTtlCheck : true
+   */
+  public static final boolean DEFAULT_DNS_CACHE_TTL_CHECK = true;
+
+  /**
    * Maximum amount of time (in seconds) to wait between reconnect attempts.
    */
   public static final long DEFAULT_MAX_RECONNECT_DELAY = 30;
@@ -159,8 +184,7 @@ public class DefaultConnectionFactory extends SpyObject
 
   /* ENABLE_REPLICATION if */
   public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
-  private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST =
-          new HashMap<>();
+  private final Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST = new HashMap<>();
   /* ENABLE_REPLICATION end */
 
   /**
@@ -281,7 +305,7 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   public boolean isDaemon() {
-    return false;
+    return DEFAULT_IS_DAEMON;
   }
 
   public Collection<ConnectionObserver> getInitialObservers() {
@@ -297,11 +321,11 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   public boolean useNagleAlgorithm() {
-    return false;
+    return DEFAULT_USE_NAGLE_ALGORITHM;
   }
-  @Override
+
   public boolean getKeepAlive() {
-    return false;
+    return DEFAULT_KEEP_ALIVE;
   }
 
   @Override
@@ -310,7 +334,7 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   public boolean shouldOptimize() {
-    return false;
+    return DEFAULT_SHOULD_OPTIMIZE;
   }
 
   public long getMaxReconnectDelay() {

@@ -35,6 +35,28 @@ import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.Transcoder;
 
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_DELIMITER;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_DNS_CACHE_TTL_CHECK;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_FAILURE_MODE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_FRONT_CACHE_NAME_PREFIX;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_HASH;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_IS_DAEMON;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_KEEP_ALIVE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_RECONNECT_DELAY;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_OPERATION_TIMEOUT;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_OP_QUEUE_MAX_BLOCK_TIME;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_READ_BUFFER_SIZE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_SHOULD_OPTIMIZE;
+import static net.spy.memcached.DefaultArcusConnectionFactory.DEFAULT_USE_NAGLE_ALGORITHM;
+
 /**
  * Builder for more easily configuring a ConnectionFactory.
  */
@@ -46,51 +68,43 @@ public class ConnectionFactoryBuilder {
 
   private Transcoder<Object> transcoder;
   private Transcoder<Object> collectionTranscoder;
-
-  private FailureMode failureMode = FailureMode.Cancel;
-
-  private Collection<ConnectionObserver> initialObservers
-          = Collections.emptyList();
-
   private OperationFactory opFact;
 
+  private Collection<ConnectionObserver> initialObservers = Collections.emptyList();
+  private FailureMode failureMode = DEFAULT_FAILURE_MODE;
+
   private Locator locator = Locator.ARCUSCONSISTENT;
-  private long opTimeout = -1;
-  private boolean isDaemon = true;
-  private boolean shouldOptimize = false;
-  private boolean useNagle = false;
-  private boolean keepAlive = false;
-  private boolean dnsCacheTtlCheck = true;
-  //private long maxReconnectDelay =
-  //DefaultConnectionFactory.DEFAULT_MAX_RECONNECT_DELAY;
-  private long maxReconnectDelay = 1;
+  private long opTimeout = DEFAULT_OPERATION_TIMEOUT;
+  private boolean isDaemon = DEFAULT_IS_DAEMON;
+  private boolean shouldOptimize = DEFAULT_SHOULD_OPTIMIZE;
+  private boolean useNagle = DEFAULT_USE_NAGLE_ALGORITHM;
+  private boolean keepAlive = DEFAULT_KEEP_ALIVE;
+  private boolean dnsCacheTtlCheck = DEFAULT_DNS_CACHE_TTL_CHECK;
+  private long maxReconnectDelay = DEFAULT_MAX_RECONNECT_DELAY;
 
-  private int readBufSize = -1;
-  private HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
+  private int readBufSize = DEFAULT_READ_BUFFER_SIZE;
+  private HashAlgorithm hashAlg = DEFAULT_HASH;
   private AuthDescriptor authDescriptor = null;
-  private long opQueueMaxBlockTime = -1;
+  private long opQueueMaxBlockTime = DEFAULT_OP_QUEUE_MAX_BLOCK_TIME;
 
-  // private int timeoutExceptionThreshold =
-  //     DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
-  private int timeoutExceptionThreshold = 10;
-  private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
-  private int timeoutDurationThreshold = 1000;
+  private int timeoutExceptionThreshold = DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
+  private int timeoutRatioThreshold = DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
+  private int timeoutDurationThreshold = DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD;
 
-  private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
-  private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
-  private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
-  private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
-  private boolean frontCacheCopyOnWrite =
-      DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
+  private final String frontCacheName = DEFAULT_FRONT_CACHE_NAME_PREFIX + this.hashCode();
+  private int maxFrontCacheElements = DEFAULT_MAX_FRONTCACHE_ELEMENTS;
+  private int frontCacheExpireTime = DEFAULT_FRONTCACHE_EXPIRETIME;
+  private boolean frontCacheCopyOnRead = DEFAULT_FRONT_CACHE_COPY_ON_READ;
+  private boolean frontCacheCopyOnWrite = DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
 
-  private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
-  private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
+  private int maxSMGetChunkSize = DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
+  private byte delimiter = DEFAULT_DELIMITER;
 
   /* ENABLE_REPLICATION if */
   private boolean arcusReplEnabled = false;
 
   private ReadPriority readPriority = ReadPriority.MASTER;
-  private Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<>();
+  private final Map<APIType, ReadPriority> apiReadPriorityList = new HashMap<>();
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */
@@ -459,7 +473,7 @@ public class ConnectionFactoryBuilder {
    * Get the ConnectionFactory set up with the provided parameters.
    */
   public ConnectionFactory build() {
-    return new DefaultConnectionFactory() {
+    return new DefaultArcusConnectionFactory(frontCacheName) {
 
       /* ENABLE_REPLICATION if */
       @Override
