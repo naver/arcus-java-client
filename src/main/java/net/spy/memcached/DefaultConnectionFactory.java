@@ -304,7 +304,7 @@ public class DefaultConnectionFactory extends SpyObject
     return false;
   }
   public boolean shouldOptimize() {
-    return true;
+    return false;
   }
 
   public long getMaxReconnectDelay() {
