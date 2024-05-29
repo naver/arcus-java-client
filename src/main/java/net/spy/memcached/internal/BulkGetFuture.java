@@ -134,6 +134,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private Map<String, T> internalGet(long to, TimeUnit unit, boolean throwOnTimeout)
            throws InterruptedException, ExecutionException, TimeoutException {
 
+    long beforeAwait = System.currentTimeMillis();
     if (!latch.await(to, unit)) {
       Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
@@ -147,7 +148,8 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
         MemcachedConnection.opsTimedOut(timedOutOps);
         isTimeout.set(true);
 
-        TimeoutException e = new CheckedOperationTimeoutException(to, unit, timedOutOps);
+        long elapsed = System.currentTimeMillis() - beforeAwait;
+        TimeoutException e = new CheckedOperationTimeoutException(to, unit, elapsed, timedOutOps);
         if (throwOnTimeout) {
           throw e;
         }

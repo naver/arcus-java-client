@@ -62,6 +62,7 @@ public class PipedCollectionFuture<K, V>
   public Map<K, V> get(long duration, TimeUnit unit)
           throws InterruptedException, TimeoutException, ExecutionException {
 
+    long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
       Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
@@ -74,7 +75,9 @@ public class PipedCollectionFuture<K, V>
       if (!timedOutOps.isEmpty()) {
         // set timeout only once for piped ops requested to single node.
         MemcachedConnection.opTimedOut(timedOutOps.iterator().next());
-        throw new CheckedOperationTimeoutException(duration, unit, timedOutOps);
+
+        long elapsed = System.currentTimeMillis() - beforeAwait;
+        throw new CheckedOperationTimeoutException(duration, unit, elapsed, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset only once in pipe

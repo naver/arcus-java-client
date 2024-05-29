@@ -60,18 +60,22 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
   @Override
   public T get(long duration, TimeUnit unit)
       throws InterruptedException, TimeoutException, ExecutionException {
+
+    long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
-      Collection<Operation> timedDutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
-          timedDutOps.add(op);
+          timedOutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (!timedDutOps.isEmpty()) {
-        MemcachedConnection.opsTimedOut(timedDutOps);
-        throw new CheckedOperationTimeoutException(duration, unit, timedDutOps);
+      if (!timedOutOps.isEmpty()) {
+        MemcachedConnection.opsTimedOut(timedOutOps);
+
+        long elapsed = System.currentTimeMillis() - beforeAwait;
+        throw new CheckedOperationTimeoutException(duration, unit, elapsed, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset

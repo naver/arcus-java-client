@@ -34,30 +34,31 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
 
   private final long duration = 1;
   private final TimeUnit unit = TimeUnit.MILLISECONDS;
+  private final long elapsed = 5;
 
   public void testSingleOperation() {
     Operation op = buildOp(11211);
-    Exception e = new CheckedOperationTimeoutException(duration, unit, op);
+    Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
 
     String expected = CheckedOperationTimeoutException.class.getName() +
-            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            ": UNDEFINED operation timed out (5 >= 1 MILLISECONDS)" +
             " - failing node: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]";
     assertEquals(expected, e.toString());
   }
 
   public void testNullNode() {
     Operation op = new TestOperation();
-    Exception e = new CheckedOperationTimeoutException(duration, unit, op);
+    Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
 
     String expected = CheckedOperationTimeoutException.class.getName() +
-            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            ": UNDEFINED operation timed out (5 >= 1 MILLISECONDS)" +
             " - failing node: <unknown> [WRITE_QUEUED]";
     assertEquals(expected, e.toString());
   }
 
   public void testNullOperation() {
     try {
-      Exception e = new CheckedOperationTimeoutException(duration, unit, (Operation) null);
+      Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, (Operation) null);
       fail("NullPointerException is NOT thrown... " + e.getMessage());
     } catch (Exception e) {
       e.printStackTrace();
@@ -69,10 +70,10 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     Collection<Operation> ops = new ArrayList<>();
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));
-    Exception e = new CheckedOperationTimeoutException(duration, unit, ops);
+    Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, ops);
 
     String expected = CheckedOperationTimeoutException.class.getName() +
-            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            ": UNDEFINED operation timed out (5 >= 1 MILLISECONDS)" +
             " - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]," +
             " localhost:64212 [WRITE_QUEUED] [MOCK_STATE]";
     assertEquals(expected, e.toString());

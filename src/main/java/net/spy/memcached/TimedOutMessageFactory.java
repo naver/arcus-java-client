@@ -14,7 +14,9 @@ public final class TimedOutMessageFactory {
 
   public static String createTimedOutMessage(long duration,
                                              TimeUnit unit,
+                                             long elapsed,
                                              Collection<Operation> ops) {
+
     StringBuilder rv = new StringBuilder();
     Operation firstOp = ops.iterator().next();
     if (isBulkOperation(firstOp, ops)) {
@@ -25,7 +27,9 @@ public final class TimedOutMessageFactory {
     }
 
     rv.append(firstOp.getAPIType());
-    rv.append(" operation timed out (>").append(duration);
+    rv.append(" operation timed out (");
+    rv.append(unit.convert(elapsed, TimeUnit.MILLISECONDS));
+    rv.append(" >= ").append(duration);
     rv.append(" ").append(unit).append(") - ");
 
     rv.append("failing node");
