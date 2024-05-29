@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -726,11 +728,18 @@ public class ArcusTimeoutMessageTest extends TestCase {
   }
 
   private String createTimedOutMessage(Operation op) {
-    return TimedOutMessageFactory
-            .createTimedOutMessage(1, TimeUnit.MILLISECONDS, Collections.singletonList(op));
+    Collection<Operation> ops = Collections.singleton(op);
+    return TimedOutMessageFactory.createTimedOutMessage(1, TimeUnit.MILLISECONDS, 0, ops);
   }
 
   private String getTimedOutHeadMessage(String message) {
-    return message.split("-")[0];
+    String[] tokens = message.split("-")[0].split(" >= ");
+    String token = tokens[0];
+
+    token = token.substring(0, token.lastIndexOf('('));
+    String result = (token + "(>= " + tokens[1]).trim();
+
+    assertTrue(Pattern.matches("[A-Z]+ operation timed out \\(>= [0-9]+ [A-Z]+\\)", result));
+    return result;
   }
 }

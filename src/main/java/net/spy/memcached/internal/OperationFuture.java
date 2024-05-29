@@ -73,10 +73,14 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
 
   public T get(long duration, TimeUnit unit)
           throws InterruptedException, TimeoutException, ExecutionException {
+
+    long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
       MemcachedConnection.opTimedOut(op);
-      throw new CheckedOperationTimeoutException(duration, unit, op);
+
+      long elapsed = System.currentTimeMillis() - beforeAwait;
+      throw new CheckedOperationTimeoutException(duration, unit, elapsed, op);
     } else {
       // continuous timeout counter will be reset
       MemcachedConnection.opSucceeded(op);

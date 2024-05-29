@@ -54,6 +54,8 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
   @Override
   public T get(long duration, TimeUnit unit)
           throws InterruptedException, TimeoutException, ExecutionException {
+
+    long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
       Collection<Operation> timedOutOps = new HashSet<>();
@@ -66,7 +68,8 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
         }
       }
       if (!timedOutOps.isEmpty()) {
-        throw new CheckedOperationTimeoutException(duration, unit, timedOutOps);
+        long elapsed = System.currentTimeMillis() - beforeAwait;
+        throw new CheckedOperationTimeoutException(duration, unit, elapsed, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset
