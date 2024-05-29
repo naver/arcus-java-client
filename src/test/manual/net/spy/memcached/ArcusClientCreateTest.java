@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
@@ -46,14 +48,15 @@ public class ArcusClientCreateTest {
 
   @Test
   public void testCreateClientWithDefaultName() throws IOException {
-    int clientId = 1;
     ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), addrs);
 
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
-    MemcachedNode node = nodes.iterator().next();
-
     Assert.assertEquals(nodes.size(), 1);
-    Assert.assertEquals(node.getNodeName(), "ArcusClient" + "-" + clientId + " " + hostName);
+
+    MemcachedNode node = nodes.iterator().next();
+    Pattern compile = Pattern.compile("ArcusClient-\\d+ " + hostName);
+    Matcher matcher = compile.matcher(node.getNodeName());
+    Assert.assertTrue(matcher.matches());
   }
 
   @Test(expected = NullPointerException.class)

@@ -333,7 +333,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    */
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
-    this(cf, DEFAULT_ARCUS_CLIENT_NAME + CLIENT_ID.getAndIncrement(), addrs);
+    this(cf, DEFAULT_ARCUS_CLIENT_NAME + "-" + CLIENT_ID.getAndIncrement(), addrs);
   }
 
   /**

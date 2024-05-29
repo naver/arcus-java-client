@@ -40,6 +40,6 @@ jobs:
           cd ~/arcus && docker compose up -d 
 
       - name: Test ARCUS Client Without ZK
-        run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest
+        run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest,ArcusClientCreateTest
       - name: Test ARCUS Client With ZK
         run: mvn clean verify -DUSE_ZK=true
