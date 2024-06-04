@@ -190,7 +190,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);
   private static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
   private static final String DEFAULT_ARCUS_CLIENT_NAME = "ArcusClient";
-  private boolean dead;
 
   private final Transcoder<Object> collectionTranscoder;
 
@@ -366,7 +365,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     if (cacheManager != null) {
       cacheManager.shutdown();
     }
-    dead = true;
     return result;
   }
 
