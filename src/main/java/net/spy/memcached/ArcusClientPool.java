@@ -60,11 +60,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   private final ArcusClient[] client;
   private final Random rand;
 
-  public ArcusClientPool(int poolSize, ArcusClient[] client) {
-
-    this.poolSize = poolSize;
-    this.client = client;
-    rand = new Random();
+  public ArcusClientPool(CacheManager cacheManager) {
+    this.client = cacheManager.getAC();
+    this.poolSize = client.length;
+    this.rand = new Random();
   }
 
   /**

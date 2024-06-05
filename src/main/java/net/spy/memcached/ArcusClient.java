@@ -288,9 +288,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     if (serviceCode.isEmpty()) {
       throw new IllegalArgumentException("Service code is empty.");
     }
-
-    CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect);
-    return new ArcusClientPool(poolSize, exe.getAC());
+    return new ArcusClientPool(new CacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect));
   }
 
   /**
