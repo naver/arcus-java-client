@@ -41,6 +41,10 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     this(MAX_ELEMENT_BYTES);
   }
 
+  public CollectionTranscoder(Compressor compressor) {
+    super(CachedData.MAX_SIZE, compressor);
+  }
+
   /**
    * Get a serializing transcoder that specifies the max data size.
    */

@@ -59,6 +59,20 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     super(max);
   }
 
+  /**
+   * Get a serializing transcoder customized compressor.
+   */
+  public SerializingTranscoder(Compressor compressor) {
+    super(CachedData.MAX_SIZE, compressor);
+  }
+
+  /**
+   * Get a serializing transcoder that specifies the max data size and customized compressor.
+   */
+  public SerializingTranscoder(int max, Compressor compressor) {
+    super(max, compressor);
+  }
+
   @Override
   public boolean asyncDecode(CachedData d) {
     if ((d.getFlags() & COMPRESSED) != 0
@@ -72,7 +86,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     byte[] data = d.getData();
     Object rv = null;
     if ((d.getFlags() & COMPRESSED) != 0) {
-      data = decompress(d.getData());
+      data = doDecompress(d);
     }
     int flags = d.getFlags() & SPECIAL_MASK;
     if ((d.getFlags() & SERIALIZED) != 0 && data != null) {
@@ -146,20 +160,6 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (b.length > compressionThreshold) {
-      byte[] compressed = compress(b);
-      if (compressed.length < b.length) {
-        getLogger().debug("Compressed %s from %d to %d",
-                o.getClass().getName(), b.length, compressed.length);
-        b = compressed;
-        flags |= COMPRESSED;
-      } else {
-        getLogger().info(
-                "Compression increased the size of %s from %d to %d",
-                o.getClass().getName(), b.length, compressed.length);
-      }
-    }
-    return new CachedData(flags, b, getMaxSize());
+    return doCompress(b, flags, o.getClass());
   }
-
 }

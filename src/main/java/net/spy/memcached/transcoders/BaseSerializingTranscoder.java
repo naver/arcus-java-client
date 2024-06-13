@@ -22,11 +22,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import net.spy.memcached.CachedData;
-import net.spy.memcached.compat.CloseUtil;
 import net.spy.memcached.compat.SpyObject;
 
 /**
@@ -34,24 +31,24 @@ import net.spy.memcached.compat.SpyObject;
  * compressed data.
  */
 public abstract class BaseSerializingTranscoder extends SpyObject {
-
-  /**
-   * Default compression threshold value.
-   */
-  public static final int DEFAULT_COMPRESSION_THRESHOLD = 16384;
-
   private static final String DEFAULT_CHARSET = "UTF-8";
-
-  protected int compressionThreshold = DEFAULT_COMPRESSION_THRESHOLD;
   protected String charset = DEFAULT_CHARSET;
-
+  private final Compressor compressor;
   private final int maxSize;
 
   /**
    * Initialize a serializing transcoder with the given maximum data size.
    */
   public BaseSerializingTranscoder(int max) {
+    this(max, new GzipCompressor());
+  }
+
+  /**
+   * Initialize a serializing transcoder with the given maximum data size and compressor.
+   */
+  public BaseSerializingTranscoder(int max, Compressor compressor) {
     super();
+    this.compressor = compressor;
     maxSize = max;
   }
 
@@ -67,7 +64,9 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * @param to the number of bytes
    */
   public void setCompressionThreshold(int to) {
-    compressionThreshold = to;
+    if (compressor != null) {
+      compressor.setCompressionThreshold(to);
+    }
   }
 
   /**
@@ -81,6 +80,35 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
       throw new RuntimeException(e);
     }
     charset = to;
+  }
+
+  protected CachedData doCompress(byte[] before, int flags, Class<?> type) {
+    if (compressor == null) {
+      return new CachedData(flags, before, getMaxSize());
+    }
+    if (before.length > compressor.getCompressionThreshold()) {
+      byte[] compressed = compressor.compress(before);
+      if (compressed.length < before.length) {
+        getLogger().debug("Compressed %s from %d to %d", type.getName(),
+                before.length, compressed.length);
+        before = compressed;
+        flags |= SerializingTranscoder.COMPRESSED;
+      } else if (compressed.length > before.length) {
+        getLogger().info("Compression increased the size of %s from %d to %d",
+                type.getName(), before.length, compressed.length);
+      } else {
+        getLogger().info("Compression makes same length of %s : %d",
+                type.getName(), before.length);
+      }
+    }
+    return new CachedData(flags, before, getMaxSize());
+  }
+
+  protected byte[] doDecompress(CachedData cachedData) {
+    if (compressor == null) {
+      return cachedData.getData();
+    }
+    return compressor.decompress(cachedData.getData());
   }
 
   /**
@@ -125,56 +153,6 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
               in == null ? 0 : in.length, e);
     }
     return rv;
-  }
-
-  /**
-   * Compress the given array of bytes.
-   */
-  protected byte[] compress(byte[] in) {
-    if (in == null) {
-      throw new NullPointerException("Can't compress null");
-    }
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    GZIPOutputStream gz = null;
-    try {
-      gz = new GZIPOutputStream(bos);
-      gz.write(in);
-    } catch (IOException e) {
-      throw new RuntimeException("IO exception compressing data", e);
-    } finally {
-      CloseUtil.close(gz);
-      CloseUtil.close(bos);
-    }
-    byte[] rv = bos.toByteArray();
-    getLogger().debug("Compressed %d bytes to %d", in.length, rv.length);
-    return rv;
-  }
-
-  /**
-   * Decompress the given array of bytes.
-   *
-   * @return null if the bytes cannot be decompressed
-   */
-  protected byte[] decompress(byte[] in) {
-    ByteArrayOutputStream bos = null;
-    if (in != null) {
-      ByteArrayInputStream bis = new ByteArrayInputStream(in);
-      bos = new ByteArrayOutputStream();
-      GZIPInputStream gis;
-      try {
-        gis = new GZIPInputStream(bis);
-
-        byte[] buf = new byte[8192];
-        int r = -1;
-        while ((r = gis.read(buf)) > 0) {
-          bos.write(buf, 0, r);
-        }
-      } catch (IOException e) {
-        getLogger().warn("Failed to decompress data", e);
-        bos = null;
-      }
-    }
-    return bos == null ? null : bos.toByteArray();
   }
 
   /**
