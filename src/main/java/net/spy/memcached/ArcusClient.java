@@ -330,7 +330,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
     collectionTranscoder = new CollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
-    registerMbean();
+    registerMbean(name);
   }
 
   /**
@@ -380,7 +380,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   /**
    * Register mbean for Arcus client statistics.
    */
-  private void registerMbean() {
+  private void registerMbean(String name) {
     if ("false".equals(System.getProperty("arcus.mbean", "false").toLowerCase())) {
       getLogger().info("Arcus client statistics MBean is NOT registered.");
       return;
@@ -390,9 +390,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       StatisticsHandler mbean = new StatisticsHandler(this);
       ArcusMBeanServer.getInstance().registMBean(
               mbean,
-              mbean.getClass().getPackage().getName() + ":type="
-                      + mbean.getClass().getSimpleName() + "-"
-                      + mbean.hashCode());
+              mbean.getClass().getPackage().getName()
+                      + ":type=" + mbean.getClass().getSimpleName()
+                      + ",name=" + name);
 
       getLogger().info("Arcus client statistics MBean is registered.");
     } catch (Exception e) {
