@@ -134,10 +134,6 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
 
     nodes = newNodes;
 
-    // global input queue
-    attributes.add(new MBeanAttributeInfo(ADDED_Q, "long",
-            "added queue size", true, false, false));
-
     // statistics information on each connection
     for (Entry<String, MemcachedNode> entry : nodes.entrySet()) {
       // reconnect count
@@ -150,7 +146,7 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
               + entry.getValue().getSocketAddress().toString(), "int",
               "continuous timeout count", true, false, false));
 
-      // read queue
+      // input queue
       attributes.add(new MBeanAttributeInfo(INPUT_Q + DELIMETER
               + entry.getValue().getSocketAddress().toString(), "int",
               "input queue count", true, false, false));
@@ -164,11 +160,6 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
       attributes.add(new MBeanAttributeInfo(WRITE_Q + DELIMETER
               + entry.getValue().getSocketAddress().toString(), "int",
               "write queue count", true, false, false));
-
-      // version
-      attributes.add(new MBeanAttributeInfo(VERSION + DELIMETER
-              + entry.getValue().getSocketAddress().toString(), "String",
-              "version", true, false, false));
     }
 
     getLogger().info("retrieve client statistics mbean informations.");
