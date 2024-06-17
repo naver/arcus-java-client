@@ -113,10 +113,10 @@ public class CollectionInsertOperationImpl extends OperationImpl
     }
     /* ENABLE_MIGRATION end */
 
-    getCallback().receivedStatus(
-            matchStatus(line, STORED, REPLACED, CREATED_STORED, NOT_FOUND,
-                    ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-                    TYPE_MISMATCH, BKEY_MISMATCH));
+    OperationStatus status = matchStatus(line, STORED, REPLACED, CREATED_STORED,
+            NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
+            TYPE_MISMATCH, BKEY_MISMATCH);
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

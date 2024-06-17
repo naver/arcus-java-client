@@ -83,9 +83,9 @@ public class CollectionExistOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(
-            matchStatus(line, EXIST, NOT_EXIST, NOT_FOUND, NOT_FOUND,
-                    TYPE_MISMATCH, UNREADABLE));
+    OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
+            NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

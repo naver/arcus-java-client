@@ -85,14 +85,16 @@ final class MutatorOperationImpl extends OperationImpl
     }
     /* ENABLE_MIGRATION end */
 
-    OperationStatus status = null;
-    try {
-      Long.valueOf(line);
-      getCallback().receivedStatus(new OperationStatus(true, line, StatusCode.SUCCESS));
-    } catch (NumberFormatException e) {
+    // <result value>\r\n
+    boolean allDigit = line.chars().allMatch(Character::isDigit);
+    OperationStatus status;
+    if (allDigit) {
+      status = new OperationStatus(true, line, StatusCode.SUCCESS);
+    } else {
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
-      getCallback().receivedStatus(status);
     }
+
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

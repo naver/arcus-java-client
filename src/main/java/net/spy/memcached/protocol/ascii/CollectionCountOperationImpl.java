@@ -76,6 +76,8 @@ public class CollectionCountOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_MIGRATION end */
+
+    OperationStatus status;
     if (line.startsWith("COUNT=")) {
       // COUNT=<count>\r\n
       getLogger().debug("Got line %s", line);
@@ -84,17 +86,15 @@ public class CollectionCountOperationImpl extends OperationImpl implements
       assert "COUNT".equals(stuff[0]);
       count = Integer.parseInt(stuff[1]);
 
-      getCallback().receivedStatus(
-              new CollectionOperationStatus(new OperationStatus(true,
-                      String.valueOf(count))));
-      transitionState(OperationState.COMPLETE);
+      status = new CollectionOperationStatus(new OperationStatus(true,
+              String.valueOf(count)));
     } else {
-      OperationStatus status = matchStatus(
-          line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
+      status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
     }
+
+    getCallback().receivedStatus(status);
+    transitionState(OperationState.COMPLETE);
   }
 
   public void initialize() {
