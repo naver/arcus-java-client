@@ -86,8 +86,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
       cb.gotAttribute(key, stuff[1]);
     } else {
-      OperationStatus status = matchStatus(line, END, NOT_FOUND,
-              ATTR_ERROR_NOT_FOUND);
+      OperationStatus status = matchStatus(line, END, NOT_FOUND, ATTR_ERROR_NOT_FOUND);
       getLogger().debug(status);
       getCallback().receivedStatus(status);
       transitionState(OperationState.COMPLETE);

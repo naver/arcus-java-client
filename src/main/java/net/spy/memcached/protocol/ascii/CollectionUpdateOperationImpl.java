@@ -102,10 +102,10 @@ public class CollectionUpdateOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(
-            matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,
-                    NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
-                    EFLAG_MISMATCH, SERVER_ERROR));
+    OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,
+            NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
+            EFLAG_MISMATCH, SERVER_ERROR);
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

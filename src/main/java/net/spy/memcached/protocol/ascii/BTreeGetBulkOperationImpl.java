@@ -174,8 +174,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
     assert readOffset <= data.length : "readOffset is " + readOffset
             + " data.length is " + data.length;
 
-    getLogger()
-            .debug("readOffset: %d, length: %d", readOffset, data.length);
+    getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 
     if (lookingFor == '\0') {
       int toRead = data.length - readOffset;
@@ -190,8 +189,7 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
 
     if (lookingFor == '\0' && readOffset == data.length) {
       BTreeGetBulkOperation.Callback cb = (BTreeGetBulkOperation.Callback) getCallback();
-      cb.gotElement(
-          key, flags, getBulk.getSubkey(), getBulk.getEFlag(), data);
+      cb.gotElement(key, flags, getBulk.getSubkey(), getBulk.getEFlag(), data);
       lookingFor = '\r';
     }
 

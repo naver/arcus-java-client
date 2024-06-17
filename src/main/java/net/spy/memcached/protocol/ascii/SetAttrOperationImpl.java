@@ -84,9 +84,9 @@ class SetAttrOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(
-            matchStatus(line, OK, NOT_FOUND, ATTR_ERROR_NOT_FOUND,
-                    ATTR_ERROR_BAD_VALUE));
+    OperationStatus status = matchStatus(line, OK, NOT_FOUND,
+            ATTR_ERROR_NOT_FOUND, ATTR_ERROR_BAD_VALUE);
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

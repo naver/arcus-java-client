@@ -93,19 +93,21 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_MIGRATION end */
-    try {
-      // <result value>\r\n
-      Long.valueOf(line);
-      getCallback().receivedStatus(new OperationStatus(true, line));
-    } catch (NumberFormatException e) {
-      OperationStatus status = matchStatus(line, NOT_FOUND, NOT_FOUND_ELEMENT,
+
+    // <result value>\r\n
+    boolean allDigit = line.chars().allMatch(Character::isDigit);
+    OperationStatus status;
+    if (allDigit) {
+      status = new OperationStatus(true, line);
+    } else {
+      status = matchStatus(line, NOT_FOUND, NOT_FOUND_ELEMENT,
               UNREADABLE, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
     }
 
+    getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 
