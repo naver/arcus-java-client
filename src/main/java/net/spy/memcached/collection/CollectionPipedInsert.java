@@ -212,7 +212,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       for (i = this.nextOpIndex; i < keySize; i++) {
         Long bkey = keyList.get(i);
         byte[] value = encodedList.get(i);
-        setArguments(bb, COMMAND, key, bkey, value.length,
+        setArguments(bb, getCommand(), key, bkey, value.length,
             createOption, (i < keySize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
@@ -222,6 +222,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       ((Buffer) bb).flip();
 
       return bb;
+    }
+
+    public String getCommand() {
+      return COMMAND;
     }
   }
 
@@ -274,7 +278,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       for (i = this.nextOpIndex; i < eSize; i++) {
         Element<T> element = elements.get(i);
         byte[] value = encodedList.get(i);
-        setArguments(bb, COMMAND, key,
+        setArguments(bb, getCommand(), key,
                      element.getStringBkey(), element.getStringEFlag(), value.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
@@ -285,6 +289,10 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       ((Buffer) bb).flip();
 
       return bb;
+    }
+
+    public String getCommand() {
+      return COMMAND;
     }
   }
 
