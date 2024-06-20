@@ -112,25 +112,20 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
   static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrsList(
           List<InetSocketAddress> addrs) {
 
-    Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            new HashMap<>();
+    Map<String, List<ArcusReplNodeAddress>> newAllGroups = new HashMap<>();
 
     for (InetSocketAddress addr : addrs) {
-      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addr;
-      String groupName = a.getGroupName();
-      List<ArcusReplNodeAddress> gNodeList = newAllGroups.get(groupName);
-      if (gNodeList == null) {
-        gNodeList = new ArrayList<>();
-        newAllGroups.put(groupName, gNodeList);
-      }
+      ArcusReplNodeAddress replNode = (ArcusReplNodeAddress) addr;
+      List<ArcusReplNodeAddress> gNodeList
+              = newAllGroups.putIfAbsent(replNode.getGroupName(), new ArrayList<>());
+
       // Add the master node as the first element of node list.
-      if (a.master) { // shifts the element currently at that position
-        gNodeList.add(0, a);
+      if (replNode.master) { // shifts the element currently at that position
+        gNodeList.add(0, replNode);
       } else { // Don't care the index, just add it.
-        gNodeList.add(a);
+        gNodeList.add(replNode);
       }
     }
-
     return newAllGroups;
   }
 
