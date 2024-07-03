@@ -205,36 +205,34 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
   }
 
   public NodeLocator getReadonlyCopy() {
-    TreeMap<Long, SortedSet<MemcachedReplicaGroup>> smg =
-            new TreeMap<>(ketamaGroups);
-    HashMap<String, MemcachedReplicaGroup> ag =
-            new HashMap<>(allGroups.size());
-    Collection<MemcachedNode> an = new ArrayList<>(allNodes.size());
-
     lock.lock();
     try {
+      TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaCopy = new TreeMap<>();
+      HashMap<String, MemcachedReplicaGroup> groupsCopy = new HashMap<>(allGroups.size());
+      Collection<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
+
       // Rewrite the values a copy of the map
-      for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> mge : smg.entrySet()) {
+      for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> hashPoint : ketamaGroups.entrySet()) {
         SortedSet<MemcachedReplicaGroup> groupROSet = new TreeSet<>(
                 new ArcusReplKetamaNodeLocatorConfiguration.MemcachedReplicaGroupComparator());
-        for (MemcachedReplicaGroup mrg : mge.getValue()) {
-          groupROSet.add(new MemcachedReplicaGroupROImpl(mrg));
+        for (MemcachedReplicaGroup group : hashPoint.getValue()) {
+          groupROSet.add(new MemcachedReplicaGroupROImpl(group));
         }
-        mge.setValue(groupROSet);
+        ketamaCopy.put(hashPoint.getKey(), groupROSet);
       }
       // copy the allGroups collection.
-      for (Map.Entry<String, MemcachedReplicaGroup> me : allGroups.entrySet()) {
-        ag.put(me.getKey(), new MemcachedReplicaGroupROImpl(me.getValue()));
+      for (Map.Entry<String, MemcachedReplicaGroup> group : allGroups.entrySet()) {
+        groupsCopy.put(group.getKey(), new MemcachedReplicaGroupROImpl(group.getValue()));
       }
       // copy the allNodes collection.
-      for (MemcachedNode n : allNodes) {
-        an.add(new MemcachedNodeROImpl(n));
+      for (MemcachedNode node : allNodes) {
+        nodesCopy.add(new MemcachedNodeROImpl(node));
       }
+
+      return new ArcusReplKetamaNodeLocator(ketamaCopy, groupsCopy, nodesCopy);
     } finally {
       lock.unlock();
     }
-
-    return new ArcusReplKetamaNodeLocator(smg, ag, an);
   }
 
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {

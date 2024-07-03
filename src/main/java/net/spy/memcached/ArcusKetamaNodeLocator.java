@@ -175,31 +175,28 @@ public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
   }
 
   public NodeLocator getReadonlyCopy() {
-    TreeMap<Long, SortedSet<MemcachedNode>> smn =
-            new TreeMap<>(ketamaNodes);
-    Collection<MemcachedNode> an = new ArrayList<>(
-            allNodes.size());
-
     lock.lock();
     try {
+      TreeMap<Long, SortedSet<MemcachedNode>> ketamaCopy = new TreeMap<>();
+      Collection<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
+
       // Rewrite the values a copy of the map.
-      for (Map.Entry<Long, SortedSet<MemcachedNode>> me : smn.entrySet()) {
-        SortedSet<MemcachedNode> nodeROSet =
-                new TreeSet<>(config.new NodeNameComparator());
-        for (MemcachedNode mn : me.getValue()) {
-          nodeROSet.add(new MemcachedNodeROImpl(mn));
+      for (Map.Entry<Long, SortedSet<MemcachedNode>> hashPoint : ketamaNodes.entrySet()) {
+        SortedSet<MemcachedNode> nodeROSet = new TreeSet<>(config.new NodeNameComparator());
+        for (MemcachedNode node : hashPoint.getValue()) {
+          nodeROSet.add(new MemcachedNodeROImpl(node));
         }
-        me.setValue(nodeROSet);
+        ketamaCopy.put(hashPoint.getKey(), nodeROSet);
       }
       // Copy the allNodes collection.
-      for (MemcachedNode n : allNodes) {
-        an.add(new MemcachedNodeROImpl(n));
+      for (MemcachedNode node : allNodes) {
+        nodesCopy.add(new MemcachedNodeROImpl(node));
       }
+
+      return new ArcusKetamaNodeLocator(ketamaCopy, nodesCopy, config);
     } finally {
       lock.unlock();
     }
-
-    return new ArcusKetamaNodeLocator(smn, an, config);
   }
 
   public void update(Collection<MemcachedNode> toAttach,
