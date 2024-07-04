@@ -36,12 +36,12 @@ public class BTreeGetBulkWithLongTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, range, eFlagFilter, offset, count);
   }
 
-  public Long getSubkey() {
-    return (Long) subkey;
+  public Long getBkey() {
+    return (Long) bkey;
   }
 
-  protected Object decodeSubkey(String subkey) {
-    return Long.parseLong(subkey);
+  protected Object decodeBkey(String bkey) {
+    return Long.parseLong(bkey);
   }
 
   @Override

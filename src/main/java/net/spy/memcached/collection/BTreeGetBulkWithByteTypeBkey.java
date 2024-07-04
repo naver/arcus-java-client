@@ -38,12 +38,12 @@ public class BTreeGetBulkWithByteTypeBkey<T> extends BTreeGetBulkImpl<T> {
     super(node, keyList, range, eFlagFilter, offset, count);
   }
 
-  public byte[] getSubkey() {
-    return (byte[]) subkey;
+  public byte[] getBkey() {
+    return (byte[]) bkey;
   }
 
-  protected Object decodeSubkey(String subkey) {
-    return BTreeUtil.hexStringToByteArrays(subkey.substring(2));
+  protected Object decodeBkey(String bkey) {
+    return BTreeUtil.hexStringToByteArrays(bkey.substring(2));
   }
 
   @Override

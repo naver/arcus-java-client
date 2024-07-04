@@ -39,13 +39,13 @@ public class BTreeSMGetWithByteTypeBkey<T> extends BTreeSMGetImpl<T> {
   }
 
   @Override
-  public byte[] getSubkey() {
-    return (byte[]) subkey;
+  public byte[] getBkey() {
+    return (byte[]) bkey;
   }
 
   @Override
-  protected Object decodeSubkey(String subkey) {
-    return BTreeUtil.hexStringToByteArrays(subkey.substring(2));
+  protected Object decodeBkey(String bkey) {
+    return BTreeUtil.hexStringToByteArrays(bkey.substring(2));
   }
 
   @Override

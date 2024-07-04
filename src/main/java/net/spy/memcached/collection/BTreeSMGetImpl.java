@@ -41,7 +41,7 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
 
   private String key;
   private int flags;
-  protected Object subkey;
+  protected Object bkey;
   private int dataLength;
   private byte[] eflag = null;
 
@@ -156,7 +156,7 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
 
     this.key = splited[0];
     this.flags = Integer.parseInt(splited[1]);
-    this.subkey = decodeSubkey(splited[2]);
+    this.bkey = decodeBkey(splited[2]);
 
     if (splited.length == 4) {
       // <key> <flags> <bkey> <bytes>
@@ -169,5 +169,5 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
     }
   }
 
-  protected abstract Object decodeSubkey(String subkey);
+  protected abstract Object decodeBkey(String bkey);
 }

@@ -252,7 +252,7 @@ public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
 
     if (lookingFor == '\0' && readOffset == data.length && count < lineCount) {
       BTreeSortMergeGetOperation.Callback cb = (BTreeSortMergeGetOperation.Callback) getCallback();
-      cb.gotData(smGet.getKey(), smGet.getFlags(), smGet.getSubkey(), smGet.getEflag(), data);
+      cb.gotData(smGet.getKey(), smGet.getFlags(), smGet.getBkey(), smGet.getEflag(), data);
       lookingFor = '\r';
     }
 

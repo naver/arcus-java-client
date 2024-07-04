@@ -25,9 +25,9 @@ public class MultiBTreeSortMergeGetOperationCallback extends MultiOperationCallb
   }
 
   @Override
-  public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+  public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
     ((BTreeSortMergeGetOperation.Callback) originalCallback).gotData(key, flags,
-        subkey, eflag, data);
+            bkey, eflag, data);
   }
 
   @Override
@@ -36,7 +36,7 @@ public class MultiBTreeSortMergeGetOperationCallback extends MultiOperationCallb
   }
 
   @Override
-  public void gotTrimmedKey(String key, Object subkey) {
-    ((BTreeSortMergeGetOperation.Callback) originalCallback).gotTrimmedKey(key, subkey);
+  public void gotTrimmedKey(String key, Object bkey) {
+    ((BTreeSortMergeGetOperation.Callback) originalCallback).gotTrimmedKey(key, bkey);
   }
 }

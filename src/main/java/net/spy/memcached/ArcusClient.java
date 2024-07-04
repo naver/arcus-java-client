@@ -2105,16 +2105,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+        public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
           if (stopCollect.get()) {
             return;
           }
 
-          if (subkey instanceof Long) {
-            eachResult.add(new SMGetElement<>(key, (Long) subkey, eflag,
+          if (bkey instanceof Long) {
+            eachResult.add(new SMGetElement<>(key, (Long) bkey, eflag,
                     tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
-          } else if (subkey instanceof byte[]) {
-            eachResult.add(new SMGetElement<>(key, (byte[]) subkey, eflag,
+          } else if (bkey instanceof byte[]) {
+            eachResult.add(new SMGetElement<>(key, (byte[]) bkey, eflag,
                     tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
           }
         }
@@ -2170,16 +2170,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+        public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
           if (stopCollect.get()) {
             return;
           }
 
-          if (subkey instanceof Long) {
-            eachResult.add(new SMGetElement<>(key, (Long) subkey, eflag,
+          if (bkey instanceof Long) {
+            eachResult.add(new SMGetElement<>(key, (Long) bkey, eflag,
                     tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
           } else {
-            eachResult.add(new SMGetElement<>(key, (byte[]) subkey, eflag,
+            eachResult.add(new SMGetElement<>(key, (byte[]) bkey, eflag,
                     tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
           }
         }
@@ -2194,15 +2194,15 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
 
         @Override
-        public void gotTrimmedKey(String key, Object subkey) {
+        public void gotTrimmedKey(String key, Object bkey) {
           if (stopCollect.get()) {
             return;
           }
 
-          if (subkey instanceof Long) {
-            result.addTrimmedKey(key, new BKeyObject((Long) subkey));
+          if (bkey instanceof Long) {
+            result.addTrimmedKey(key, new BKeyObject((Long) bkey));
           } else {
-            result.addTrimmedKey(key, new BKeyObject((byte[]) subkey));
+            result.addTrimmedKey(key, new BKeyObject((byte[]) bkey));
           }
         }
       });
