@@ -29,6 +29,7 @@ import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ListInsert;
 import net.spy.memcached.collection.MapInsert;
+import net.spy.memcached.collection.MapUpsert;
 import net.spy.memcached.collection.SetInsert;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionInsertOperation;
@@ -87,6 +88,8 @@ public class CollectionInsertOperationImpl extends OperationImpl
       setAPIType(APIType.SOP_INSERT);
     } else if (this.collectionInsert instanceof MapInsert) {
       setAPIType(APIType.MOP_INSERT);
+    } else if (this.collectionInsert instanceof MapUpsert) {
+      setAPIType(APIType.MOP_UPSERT);
     } else if (this.collectionInsert instanceof BTreeInsert) {
       setAPIType(APIType.BOP_INSERT);
     } else if (this.collectionInsert instanceof BTreeUpsert) {

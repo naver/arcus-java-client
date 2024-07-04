@@ -101,6 +101,7 @@ import net.spy.memcached.collection.MapDelete;
 import net.spy.memcached.collection.MapGet;
 import net.spy.memcached.collection.MapInsert;
 import net.spy.memcached.collection.MapUpdate;
+import net.spy.memcached.collection.MapUpsert;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.collection.SetCreate;
@@ -2199,6 +2200,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<>(value, elementFlag, null, attributesForCreate);
 
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeUpsert, tc);
+  }
+
+  @Override
+  public CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, Object value,
+                                                  CollectionAttributes attributesForCreate) {
+    validateMKey(mkey);
+    MapUpsert<Object> mapUpsert = new MapUpsert<>(value, attributesForCreate);
+
+    return asyncCollectionInsert(key, mkey, mapUpsert, collectionTranscoder);
+  }
+
+  @Override
+  public <T> CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
+    validateMKey(mkey);
+    MapUpsert<T> mapUpsert = new MapUpsert<>(value, attributesForCreate);
+
+    return asyncCollectionInsert(key, mkey, mapUpsert, tc);
   }
 
   @Override
