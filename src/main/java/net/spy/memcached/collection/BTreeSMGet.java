@@ -42,7 +42,7 @@ public interface BTreeSMGet<T> {
 
   int getFlags();
 
-  Object getSubkey();
+  Object getBkey();
 
   int getDataLength();
 

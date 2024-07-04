@@ -38,7 +38,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   protected final int offset;
   protected final int count;
 
-  protected Object subkey;
+  protected Object bkey;
   private int dataLength;
   private byte[] eflag = null;
 
@@ -118,12 +118,12 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   public void decodeItemHeader(String[] splited) {
     if (splited.length == 3) {
       // ELEMENT <bkey> <bytes>
-      this.subkey = decodeSubkey(splited[1]);
+      this.bkey = decodeBkey(splited[1]);
       this.dataLength = Integer.parseInt(splited[2]);
       this.eflag = null;
     } else if (splited.length == 4) {
       // ELEMENT <bkey> <eflag> <bytes>
-      this.subkey = decodeSubkey(splited[1]);
+      this.bkey = decodeBkey(splited[1]);
       this.eflag = BTreeUtil.hexStringToByteArrays(splited[2].substring(2));
       this.dataLength = Integer.parseInt(splited[3]);
     }
@@ -145,5 +145,5 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
     return eflag;
   }
 
-  protected abstract Object decodeSubkey(String subkey);
+  protected abstract Object decodeBkey(String bkey);
 }

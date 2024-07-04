@@ -1428,47 +1428,47 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey, int by) {
-    return this.getClient().asyncBopIncr(key, subkey, by);
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey, int by) {
+    return this.getClient().asyncBopIncr(key, bkey, by);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey, int by) {
-    return this.getClient().asyncBopIncr(key, subkey, by);
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey, int by) {
+    return this.getClient().asyncBopIncr(key, bkey, by);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
-    return this.getClient().asyncBopIncr(key, subkey, by, initial, eFlag);
+    return this.getClient().asyncBopIncr(key, bkey, by, initial, eFlag);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopIncr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopIncr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag) {
-    return this.getClient().asyncBopIncr(key, subkey, by, initial, eFlag);
+    return this.getClient().asyncBopIncr(key, bkey, by, initial, eFlag);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey, int by) {
-    return this.getClient().asyncBopDecr(key, subkey, by);
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey, int by) {
+    return this.getClient().asyncBopDecr(key, bkey, by);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey, int by) {
-    return this.getClient().asyncBopDecr(key, subkey, by);
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey, int by) {
+    return this.getClient().asyncBopDecr(key, bkey, by);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, long subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, long bkey,
                                              int by, long initial, byte[] eFlag) {
-    return this.getClient().asyncBopDecr(key, subkey, by, initial, eFlag);
+    return this.getClient().asyncBopDecr(key, bkey, by, initial, eFlag);
   }
 
   @Override
-  public CollectionFuture<Long> asyncBopDecr(String key, byte[] subkey,
+  public CollectionFuture<Long> asyncBopDecr(String key, byte[] bkey,
                                              int by, long initial, byte[] eFlag) {
-    return this.getClient().asyncBopDecr(key, subkey, by, initial, eFlag);
+    return this.getClient().asyncBopDecr(key, bkey, by, initial, eFlag);
   }
 
   @Override

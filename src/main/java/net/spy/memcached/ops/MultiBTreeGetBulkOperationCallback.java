@@ -25,8 +25,8 @@ public class MultiBTreeGetBulkOperationCallback extends MultiOperationCallback
   }
 
   @Override
-  public void gotElement(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
-    ((BTreeGetBulkOperation.Callback) originalCallback).gotElement(key, flags, subkey, eflag, data);
+  public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
+    ((BTreeGetBulkOperation.Callback) originalCallback).gotElement(key, flags, bkey, eflag, data);
   }
 
   @Override

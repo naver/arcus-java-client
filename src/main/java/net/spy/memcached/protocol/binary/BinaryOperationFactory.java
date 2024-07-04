@@ -196,14 +196,6 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
-  public CollectionInsertOperation collectionInsert(String key, byte[] subkey,
-                                                    CollectionInsert<?> collectionInsert,
-                                                    byte[] data,
-                                                    OperationCallback cb) {
-    throw new RuntimeException(
-            "CollectionInsertOperation is not supported in binary protocol yet.");
-  }
-
   public CollectionPipedInsertOperation collectionPipedInsert(String key,
                                                               CollectionPipedInsert<?> insert,
                                                               OperationCallback cb) {

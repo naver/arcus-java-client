@@ -37,13 +37,13 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
   }
 
   @Override
-  public Long getSubkey() {
-    return (Long) subkey;
+  public Long getBkey() {
+    return (Long) bkey;
   }
 
   @Override
-  protected Object decodeSubkey(String subkey) {
-    return Long.parseLong(subkey);
+  protected Object decodeBkey(String bkey) {
+    return Long.parseLong(bkey);
   }
 
   @Override

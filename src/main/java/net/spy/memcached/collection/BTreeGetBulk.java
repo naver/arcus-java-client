@@ -38,7 +38,7 @@ public interface BTreeGetBulk<T> {
 
   boolean headerReady(int spaceCount);
 
-  Object getSubkey();
+  Object getBkey();
 
   int getDataLength();
 

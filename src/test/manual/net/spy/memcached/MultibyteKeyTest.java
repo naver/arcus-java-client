@@ -287,7 +287,7 @@ public class MultibyteKeyTest {
                       keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
-            public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+            public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -295,7 +295,7 @@ public class MultibyteKeyTest {
             }
 
             @Override
-            public void gotTrimmedKey(String key, Object subkey) {
+            public void gotTrimmedKey(String key, Object bkey) {
             }
 
             @Override
@@ -319,7 +319,7 @@ public class MultibyteKeyTest {
                       keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
           new BTreeSortMergeGetOperationOld.Callback() {
             @Override
-            public void gotData(String key, int flags, Object subkey, byte[] eflag, byte[] data) {
+            public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
             }
 
             @Override
@@ -425,7 +425,7 @@ public class MultibyteKeyTest {
           new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
           new CollectionGetOperation.Callback() {
             @Override
-            public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+            public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
             }
 
             @Override
@@ -517,7 +517,7 @@ public class MultibyteKeyTest {
           ),
           new BTreeGetBulkOperation.Callback() {
             @Override
-            public void gotElement(String key, int flags, Object subkey,
+            public void gotElement(String key, int flags, Object bkey,
                                    byte[] eflag, byte[] data) {
             }
 
