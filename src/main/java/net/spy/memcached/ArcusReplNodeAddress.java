@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -132,6 +133,14 @@ public class ArcusReplNodeAddress extends InetSocketAddress {
     }
 
     return newAllGroups;
+  }
+
+  public static List<InetSocketAddress> validateAddress(List<InetSocketAddress> socketList) {
+    return makeGroupAddrsList(socketList).entrySet()
+            .stream()
+            .filter(ArcusReplNodeAddress::validateGroup)
+            .flatMap(e -> e.getValue().stream())
+            .collect(Collectors.toList());
   }
 
   public static boolean validateGroup(Map.Entry<String, List<ArcusReplNodeAddress>> group) {
