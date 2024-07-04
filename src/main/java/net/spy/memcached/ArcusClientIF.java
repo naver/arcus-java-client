@@ -1473,6 +1473,45 @@ public interface ArcusClientIF {
                                                Transcoder<T> tc);
 
   /**
+   * Insert or Update an element.
+   * <p>
+   * If element does not exist in the map, insert the element.
+   * If element exists in the map, the value of element will be updated.
+   * If map does not exist and attributesForCreate argument is not null,
+   * new map will be created by attributes and the element will be inserted.
+   *
+   * @param key                 key of a map
+   * @param mkey                key of a map element
+   * @param value               value of a map element
+   * @param attributesForCreate create a map with attributes, if given key is not exists.
+   * @return a future indicating success, false if there was no key and
+   * attributesForCreate argument is null.
+   */
+  CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, Object value,
+                                           CollectionAttributes attributesForCreate);
+
+  /**
+   * Insert or Update an element.
+   * <p>
+   * If element does not exist in the map, insert the element.
+   * If element exists in the map, the value of element will be updated.
+   * If map does not exist and attributesForCreate argument is not null,
+   * new map will be created by attributes and the element will be inserted.
+   *
+   * @param <T>                 the expected class of the value
+   * @param key                 key of a map
+   * @param mkey                key of a map element
+   * @param value               value of a map element
+   * @param attributesForCreate create a map with attributes, if given key is not exists.
+   * @param tc                  transcoder to encode value
+   * @return a future indicating success, false if there was no key and
+   * attributesForCreate argument is null.
+   */
+  <T> CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, T value,
+                                               CollectionAttributes attributesForCreate,
+                                               Transcoder<T> tc);
+
+  /**
    * Update an element from the b+tree
    *
    * @param key         key of a b+tree

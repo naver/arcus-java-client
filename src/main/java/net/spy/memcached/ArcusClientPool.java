@@ -1149,6 +1149,19 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, Object value,
+                                                  CollectionAttributes attributesForCreate) {
+    return this.getClient().asyncMopUpsert(key, mkey, value, attributesForCreate);
+  }
+
+  @Override
+  public <T> CollectionFuture<Boolean> asyncMopUpsert(String key, String mkey, T value,
+                                                      CollectionAttributes attributesForCreate,
+                                                      Transcoder<T> tc) {
+    return this.getClient().asyncMopUpsert(key, mkey, value, attributesForCreate, tc);
+  }
+
+  @Override
   public CollectionFuture<Boolean> asyncBopInsert(String key, byte[] bkey,
                                                   byte[] eFlag, Object value,
                                                   CollectionAttributes attributesForCreate) {

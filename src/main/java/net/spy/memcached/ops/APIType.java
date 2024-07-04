@@ -43,6 +43,7 @@ public enum APIType {
   // Map API Type
   MOP_CREATE(OperationType.WRITE),
   MOP_INSERT(OperationType.WRITE),
+  MOP_UPSERT(OperationType.WRITE),
   MOP_UPDATE(OperationType.WRITE),
   MOP_DELETE(OperationType.WRITE),
   MOP_GET(OperationType.RW),
