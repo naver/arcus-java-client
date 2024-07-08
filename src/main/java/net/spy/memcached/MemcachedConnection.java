@@ -304,6 +304,9 @@ public final class MemcachedConnection extends SpyObject {
     }
     /* ENABLE_REPLICATION end */
 
+    // Deal with the memcached nodes that removed from ZK but has operation in queue.
+    handleDelayedClosingNodes();
+
     // Deal with the memcached server group that's been added by CacheManager.
     handleCacheNodesChange();
 
@@ -330,12 +333,18 @@ public final class MemcachedConnection extends SpyObject {
       }
       /* ENABLE_MIGRATION end */
 
+      if (node.isActive()) {
+        // if a memcached node is removed from ZK but can still serve operations, do NOT cancel it.
+        // operations that remain in operation queue will be processed until connection is lost.
+        // once all remaining operations are processed, client will close connection.
+        // if connection is lost before remaining operations are processed,
+        // all of them will be canceled after connection is lost.
+        continue;
+      }
+
       // removing node is not related to failure mode.
       // so, cancel operations regardless of failure mode.
-      String cause = "node removed.";
-      cancelOperations(node.destroyReadQueue(false), cause);
-      cancelOperations(node.destroyWriteQueue(false), cause);
-      cancelOperations(node.destroyInputQueue(), cause);
+      cancelAllOperations(node, "node removed.");
     }
   }
 
@@ -678,6 +687,38 @@ public final class MemcachedConnection extends SpyObject {
       }
     });
     addOperation(node, op);
+  }
+
+  // Handle the memcached nodes that removed from ZK but has operation in queue.
+  void handleDelayedClosingNodes() {
+    Collection<MemcachedNode> closingNodes = locator.getDelayedClosingNodes();
+    if (closingNodes.isEmpty()) {
+      return;
+    }
+
+    Collection<MemcachedNode> closedNodes = new HashSet<MemcachedNode>();
+    for (MemcachedNode node : closingNodes) {
+      boolean isActive = node.isActive();
+      boolean hasOp = node.hasOp();
+
+      if (isActive && !hasOp) {
+        try {
+          node.closeChannel();
+        } catch (IOException e) {
+          getLogger().error("Failed to closeChannel the node : " + node);
+        }
+      } else if (!isActive && hasOp) {
+        cancelAllOperations(node, "connection lost after node removed.");
+      } else {
+        continue;
+      }
+
+      closedNodes.add(node);
+    }
+
+    if (!closedNodes.isEmpty()) {
+      locator.updateDelayedClosingNodes(closedNodes);
+    }
   }
 
   // Handle the memcached server group that's been added by CacheManager.
@@ -1223,6 +1264,12 @@ public final class MemcachedConnection extends SpyObject {
     for (Operation op : ops) {
       op.cancel(cause);
     }
+  }
+
+  private void cancelAllOperations(MemcachedNode node, String cause) {
+    cancelOperations(node.destroyReadQueue(false), cause);
+    cancelOperations(node.destroyWriteQueue(false), cause);
+    cancelOperations(node.destroyInputQueue(), cause);
   }
 
   private void redistributeOperations(Collection<Operation> ops, String cause) {

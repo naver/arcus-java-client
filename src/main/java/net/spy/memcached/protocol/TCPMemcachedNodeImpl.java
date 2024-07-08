@@ -343,6 +343,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     return !(optimizedOp == null && writeQ.isEmpty());
   }
 
+  public final boolean hasOp() {
+    return hasReadOp() || hasWriteOp() || !inputQueue.isEmpty();
+  }
+
   public final void addOpToInputQ(Operation op) {
     op.setHandlingNode(this);
     op.initialize();

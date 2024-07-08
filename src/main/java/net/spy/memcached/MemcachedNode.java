@@ -110,6 +110,11 @@ public interface MemcachedNode {
   boolean hasWriteOp();
 
   /**
+   * True if any operation is in operation queue.
+   */
+  boolean hasOp();
+
+  /**
    * Add an operation to the queue.  Authentication operations should
    * never be added to the queue, but this is not checked.
    */

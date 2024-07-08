@@ -58,6 +58,18 @@ public interface NodeLocator {
    */
   void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete);
 
+  /**
+   * Get all memcached nodes that removed from ZK but has operation in queue.
+   * Note that this feature is only available in ArcusKetamaNodeLocator.
+   */
+  Collection<MemcachedNode> getDelayedClosingNodes();
+
+  /**
+   * Update all memcached nodes that removed from ZK but has operation in queue.
+   * Note that this feature is only available in ArcusKetamaNodeLocator.
+   */
+  void updateDelayedClosingNodes(Collection<MemcachedNode> closedNodes);
+
   /* ENABLE_MIGRATION if */
   /**
    * Get all alter memcached nodes.
