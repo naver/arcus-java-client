@@ -94,8 +94,7 @@ public class BaseIntegrationTest extends TestCase {
   }
 
   protected void openFromZK() {
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    mc = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
+    mc = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID);
   }
 
   protected void openDirect() throws Exception {

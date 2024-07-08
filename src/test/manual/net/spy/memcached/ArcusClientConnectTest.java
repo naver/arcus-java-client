@@ -40,9 +40,8 @@ public class ArcusClientConnectTest extends TestCase {
 
   @Test
   public void testOpenAndWait() {
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
+            BaseIntegrationTest.ZK_SERVICE_ID);
     client.shutdown();
   }
 }

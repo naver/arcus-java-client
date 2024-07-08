@@ -30,10 +30,8 @@ public class ArcusClientNotExistsServiceCodeTest extends TestCase {
       return;
     }
 
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     try {
-      ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-              "NOT_EXISTS_SVC_CODE", cfb);
+      ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST, "NOT_EXISTS_SVC_CODE");
     } catch (NotExistsServiceCodeException e) {
       return;
     }

@@ -189,7 +189,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private static String VERSION = null;
   private static final Object VERSION_LOCK = new Object();
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);
-  private static final String ARCUS_CLOUD_ADDR = "127.0.0.1:2181";
+  private static final String ARCUS_ADMIN_ADDR = "127.0.0.1:2181";
   private static final String DEFAULT_ARCUS_CLIENT_NAME = "ArcusClient";
 
   private final Transcoder<Object> collectionTranscoder;
@@ -217,6 +217,17 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   /**
    * @param hostPorts   arcus admin addresses
    * @param serviceCode service code
+   * @return a single ArcusClient
+   */
+  public static ArcusClient createArcusClient(String hostPorts, String serviceCode) {
+
+    return ArcusClient.createArcusClient(hostPorts, serviceCode, new ConnectionFactoryBuilder(), 1, 10000).getClient();
+
+  }
+
+  /**
+   * @param hostPorts   arcus admin addresses
+   * @param serviceCode service code
    * @param cfb         ConnectionFactoryBuilder
    * @return a single ArcusClient
    */
@@ -235,7 +246,19 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public static ArcusClient createArcusClient(String serviceCode,
                                               ConnectionFactoryBuilder cfb) {
 
-    return ArcusClient.createArcusClient(ARCUS_CLOUD_ADDR, serviceCode, cfb, 1, 10000).getClient();
+    return ArcusClient.createArcusClient(ARCUS_ADMIN_ADDR, serviceCode, cfb, 1, 10000).getClient();
+
+  }
+
+  /**
+   * @param hostPorts   arcus admin addresses
+   * @param serviceCode service code
+   * @param poolSize    Arcus client pool size
+   * @return multiple ArcusClient
+   */
+  public static ArcusClientPool createArcusClientPool(String hostPorts, String serviceCode, int poolSize) {
+
+    return ArcusClient.createArcusClient(hostPorts, serviceCode, new ConnectionFactoryBuilder(), poolSize, 0);
 
   }
 
@@ -262,7 +285,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public static ArcusClientPool createArcusClientPool(String serviceCode,
                                                       ConnectionFactoryBuilder cfb, int poolSize) {
 
-    return ArcusClient.createArcusClient(ARCUS_CLOUD_ADDR, serviceCode, cfb, poolSize, 0);
+    return ArcusClient.createArcusClient(ARCUS_ADMIN_ADDR, serviceCode, cfb, poolSize, 0);
 
   }
 

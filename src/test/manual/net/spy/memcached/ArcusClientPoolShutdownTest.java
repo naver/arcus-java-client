@@ -34,9 +34,8 @@ public class ArcusClientPoolShutdownTest extends TestCase {
       return;
     }
 
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, cfb, 2);
+            BaseIntegrationTest.ZK_SERVICE_ID, 2);
 
     // This threads must be stopped after client is shutdown.
     List<String> threadNames = new ArrayList<>();
