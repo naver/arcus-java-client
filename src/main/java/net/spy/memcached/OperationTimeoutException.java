@@ -16,12 +16,6 @@
  */
 package net.spy.memcached;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
-import net.spy.memcached.ops.Operation;
-
 /**
  * Thrown by {@link MemcachedClient} when any internal operations timeout.
  *
@@ -42,19 +36,5 @@ public class OperationTimeoutException extends RuntimeException {
 
   public OperationTimeoutException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public OperationTimeoutException(long duration,
-                                   TimeUnit unit,
-                                   Operation op) {
-    super(TimedOutMessageFactory
-            .createTimedoutMessage(duration, unit, Collections.singleton(op)));
-  }
-
-  public OperationTimeoutException(long duration,
-                                   TimeUnit unit,
-                                   Collection<Operation> ops) {
-    super(TimedOutMessageFactory
-            .createTimedoutMessage(duration, unit, ops));
   }
 }

@@ -23,28 +23,12 @@ public final class TimedOutMessageFactory {
     if (firstOp.isPipeOperation()) {
       rv.append("pipe ");
     }
-    rv.append(firstOp.getAPIType())
-      .append(" operation timed out (>").append(duration)
-      .append(" ").append(unit).append(")");
-    return createMessage(rv.toString(), ops);
-  }
 
-  /**
-   * check bulk operation or not
-   * @param op operation
-   * @param ops number of operation (used in StoreOperationImpl, DeleteOperationImpl)
-   */
-  private static boolean isBulkOperation(Operation op, Collection<Operation> ops) {
-    if (op instanceof StoreOperation || op instanceof DeleteOperation) {
-      return ops.size() > 1;
-    }
-    return op.isBulkOperation();
-  }
+    rv.append(firstOp.getAPIType());
+    rv.append(" operation timed out (>").append(duration);
+    rv.append(" ").append(unit).append(") - ");
 
-  public static String createMessage(String message,
-                                     Collection<Operation> ops) {
-    StringBuilder rv = new StringBuilder(message);
-    rv.append(" - failing node");
+    rv.append("failing node");
     rv.append(ops.size() == 1 ? ": " : "s: ");
     boolean first = true;
     for (Operation op : ops) {
@@ -66,6 +50,18 @@ public final class TimedOutMessageFactory {
       }
     }
     return rv.toString();
+  }
+
+  /**
+   * check bulk operation or not
+   * @param op operation
+   * @param ops number of operation (used in StoreOperationImpl, DeleteOperationImpl)
+   */
+  private static boolean isBulkOperation(Operation op, Collection<Operation> ops) {
+    if (op instanceof StoreOperation || op instanceof DeleteOperation) {
+      return ops.size() > 1;
+    }
+    return op.isBulkOperation();
   }
 
 }
