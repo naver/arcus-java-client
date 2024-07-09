@@ -40,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
@@ -1659,31 +1658,19 @@ public class MemcachedClient extends SpyThread
   }
 
   private long mutate(Mutator m, String key, int by, long def, int exp) {
-    final AtomicLong rv = new AtomicLong();
-    final CountDownLatch latch = new CountDownLatch(1);
-    Operation op = addOp(key, opFact.mutate(m, key, by, def, exp, new OperationCallback() {
-      public void receivedStatus(OperationStatus s) {
-        // XXX:  Potential abstraction leak.
-        // The handling of incr/decr in the binary protocol
-        // Allows us to avoid string processing.
-        rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"));
-      }
-
-      public void complete() {
-        latch.countDown();
-      }
-    }));
+    OperationFuture<Long> rv = asyncMutate(m, key, by, def, exp);
     try {
-      if (!latch.await(operationTimeout, TimeUnit.MILLISECONDS)) {
-        op.cancel("by applcation.");
-        throw new OperationTimeoutException(operationTimeout, TimeUnit.MILLISECONDS, op);
-      }
+      return rv.get(operationTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
-      op.cancel("by applcation.");
-      throw new RuntimeException("Interrupted", e);
+      rv.cancel(true);
+      throw new RuntimeException("Interrupted waiting for value", e);
+    } catch (ExecutionException e) {
+      rv.cancel(true);
+      throw new RuntimeException("Exception waiting for value", e);
+    } catch (TimeoutException e) {
+      rv.cancel(true);
+      throw new OperationTimeoutException(e);
     }
-    getLogger().debug("Mutation returned %s", rv);
-    return rv.get();
   }
 
   /**
