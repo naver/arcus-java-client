@@ -45,16 +45,16 @@ public class OperationTimeoutException extends RuntimeException {
   }
 
   public OperationTimeoutException(long duration,
-                                   TimeUnit units,
+                                   TimeUnit unit,
                                    Operation op) {
     super(TimedOutMessageFactory
-            .createTimedoutMessage(duration, units, Collections.singleton(op)));
+            .createTimedoutMessage(duration, unit, Collections.singleton(op)));
   }
 
   public OperationTimeoutException(long duration,
-                                   TimeUnit units,
+                                   TimeUnit unit,
                                    Collection<Operation> ops) {
     super(TimedOutMessageFactory
-            .createTimedoutMessage(duration, units, ops));
+            .createTimedoutMessage(duration, unit, ops));
   }
 }

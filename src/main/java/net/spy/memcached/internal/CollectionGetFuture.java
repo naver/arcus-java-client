@@ -16,9 +16,9 @@ public class CollectionGetFuture<T> extends CollectionFuture<T> {
   }
 
   @Override
-  public T get(long duration, TimeUnit units)
+  public T get(long duration, TimeUnit unit)
           throws InterruptedException, TimeoutException, ExecutionException {
-    super.get(duration, units); // for waiting latch.
+    super.get(duration, unit); // for waiting latch.
     return result == null ? null : result.getDecodedValue();
   }
 

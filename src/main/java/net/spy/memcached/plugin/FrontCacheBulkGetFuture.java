@@ -35,11 +35,11 @@ public class FrontCacheBulkGetFuture<T> extends BulkGetFuture<T> {
   }
 
   @Override
-  public Map<String, T> get(long duration, TimeUnit units)
+  public Map<String, T> get(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException, TimeoutException {
     if (result == null) {
       try {
-        result = super.get(duration, units);
+        result = super.get(duration, unit);
       } catch (TimeoutException e) {
         throw new OperationTimeoutException(e);
       }
@@ -50,12 +50,12 @@ public class FrontCacheBulkGetFuture<T> extends BulkGetFuture<T> {
   }
 
   @Override
-  public Map<String, T> getSome(long duration, TimeUnit units)
+  public Map<String, T> getSome(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException {
     if (result != null) {
       return result;
     }
-    Map<String, T> getSomeResult = super.getSome(duration, units);
+    Map<String, T> getSomeResult = super.getSome(duration, unit);
     if (getSomeResult.size() == getOpCount()) {
       result = getSomeResult;
     }

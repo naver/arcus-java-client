@@ -84,14 +84,14 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   }
 
   @Override
-  public Map<String, T> getSome(long duration, TimeUnit units)
+  public Map<String, T> getSome(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException {
     Collection<Operation> timedoutOps = new HashSet<>();
-    Map<String, T> ret = internalGet(duration, units, timedoutOps);
+    Map<String, T> ret = internalGet(duration, unit, timedoutOps);
     if (!timedoutOps.isEmpty()) {
       isTimeout.set(true);
       LoggerFactory.getLogger(getClass()).warn(
-              new CheckedOperationTimeoutException(duration, units, timedoutOps).getMessage());
+              new CheckedOperationTimeoutException(duration, unit, timedoutOps).getMessage());
     }
     return ret;
 
@@ -104,13 +104,13 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public Map<String, T> get(long duration, TimeUnit units)
+  public Map<String, T> get(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException, TimeoutException {
     Collection<Operation> timedoutOps = new HashSet<>();
-    Map<String, T> ret = internalGet(duration, units, timedoutOps);
+    Map<String, T> ret = internalGet(duration, unit, timedoutOps);
     if (!timedoutOps.isEmpty()) {
       isTimeout.set(true);
-      throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+      throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
     }
     return ret;
   }

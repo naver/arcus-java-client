@@ -67,9 +67,9 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
 
   @Override
   public Map<String, T> get(long duration,
-                            TimeUnit units) throws InterruptedException,
+                            TimeUnit unit) throws InterruptedException,
           TimeoutException, ExecutionException {
-    if (!latch.await(duration, units)) {
+    if (!latch.await(duration, unit)) {
       Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
@@ -80,7 +80,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
       }
       if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opsTimedOut(timedoutOps);
-        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+        throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
       }
     } else {
       // continuous timeout counter will be reset

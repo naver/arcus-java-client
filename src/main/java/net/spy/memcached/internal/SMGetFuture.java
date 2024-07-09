@@ -54,10 +54,10 @@ public final class SMGetFuture<T extends List<?>> implements Future<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public T get(long duration, TimeUnit units)
+  public T get(long duration, TimeUnit unit)
           throws InterruptedException, TimeoutException, ExecutionException {
 
-    if (!latch.await(duration, units)) {
+    if (!latch.await(duration, unit)) {
       Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
@@ -68,7 +68,7 @@ public final class SMGetFuture<T extends List<?>> implements Future<T> {
       }
       if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opsTimedOut(timedoutOps);
-        throw new CheckedOperationTimeoutException(duration, units, timedoutOps);
+        throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
       }
     } else {
       // continuous timeout counter will be reset
