@@ -86,15 +86,12 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   @Override
   public Map<String, T> getSome(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException {
-    Collection<Operation> timedoutOps = new HashSet<>();
-    Map<String, T> ret = internalGet(duration, unit, timedoutOps);
-    if (!timedoutOps.isEmpty()) {
-      isTimeout.set(true);
-      LoggerFactory.getLogger(getClass()).warn(
-              new CheckedOperationTimeoutException(duration, unit, timedoutOps).getMessage());
-    }
-    return ret;
 
+    try {
+      return internalGet(duration, unit, false);
+    } catch (TimeoutException e) {
+      throw new AssertionError("Something went wrong...", e);
+    }
   }
 
   /*
@@ -106,13 +103,8 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   @Override
   public Map<String, T> get(long duration, TimeUnit unit)
           throws InterruptedException, ExecutionException, TimeoutException {
-    Collection<Operation> timedoutOps = new HashSet<>();
-    Map<String, T> ret = internalGet(duration, unit, timedoutOps);
-    if (!timedoutOps.isEmpty()) {
-      isTimeout.set(true);
-      throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
-    }
-    return ret;
+
+    return internalGet(duration, unit, true);
   }
 
   @Override
@@ -139,10 +131,11 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * refactored code common to both get(long, TimeUnit) and getSome(long,
    * TimeUnit)
    */
-  private Map<String, T> internalGet(long to, TimeUnit unit,
-                                     Collection<Operation> timedoutOps)
-           throws InterruptedException, ExecutionException {
+  private Map<String, T> internalGet(long to, TimeUnit unit, boolean throwOnTimeout)
+           throws InterruptedException, ExecutionException, TimeoutException {
+
     if (!latch.await(to, unit)) {
+      Collection<Operation> timedoutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedoutOps.add(op);
@@ -152,6 +145,13 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
       }
       if (!timedoutOps.isEmpty()) {
         MemcachedConnection.opsTimedOut(timedoutOps);
+        isTimeout.set(true);
+
+        TimeoutException e = new CheckedOperationTimeoutException(to, unit, timedoutOps);
+        if (throwOnTimeout) {
+          throw e;
+        }
+        LoggerFactory.getLogger(getClass()).warn(e.getMessage());
       }
     } else {
       MemcachedConnection.opsSucceeded(ops);
