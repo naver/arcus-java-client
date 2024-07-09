@@ -32,23 +32,6 @@ public class CheckedOperationTimeoutException extends TimeoutException {
   private static final long serialVersionUID = 5187393339735774489L;
   private final Collection<Operation> operations;
 
-  /**
-   * Construct a CheckedOperationTimeoutException with the given message
-   * and operation.
-   *
-   * @param message the message
-   * @param op      the operation that timed out
-   */
-  public CheckedOperationTimeoutException(String message, Operation op) {
-    this(message, Collections.singleton(op));
-  }
-
-  public CheckedOperationTimeoutException(String message,
-                                          Collection<Operation> ops) {
-    super(TimedOutMessageFactory.createMessage(message, ops));
-    operations = ops;
-  }
-
   public CheckedOperationTimeoutException(long duration,
                                           TimeUnit unit,
                                           Operation op) {

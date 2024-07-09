@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -31,36 +32,50 @@ import net.spy.memcached.protocol.BaseOperationImpl;
 
 public class CheckedOperationTimeoutExceptionTest extends TestCase {
 
+  private final long duration = 1;
+  private final TimeUnit unit = TimeUnit.MILLISECONDS;
+
   public void testSingleOperation() {
     Operation op = buildOp(11211);
-    assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing node: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]",
-            new CheckedOperationTimeoutException("test", op).toString());
+    Exception e = new CheckedOperationTimeoutException(duration, unit, op);
+
+    String expected = CheckedOperationTimeoutException.class.getName() +
+            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            " - failing node: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]";
+    assertEquals(expected, e.toString());
   }
 
   public void testNullNode() {
     Operation op = new TestOperation();
-    assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing node: <unknown> [WRITE_QUEUED]",
-            new CheckedOperationTimeoutException("test", op).toString());
+    Exception e = new CheckedOperationTimeoutException(duration, unit, op);
+
+    String expected = CheckedOperationTimeoutException.class.getName() +
+            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            " - failing node: <unknown> [WRITE_QUEUED]";
+    assertEquals(expected, e.toString());
   }
 
   public void testNullOperation() {
-    assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing node: <unknown>",
-            new CheckedOperationTimeoutException("test",
-                    (Operation) null).toString());
+    try {
+      Exception e = new CheckedOperationTimeoutException(duration, unit, (Operation) null);
+      fail("NullPointerException is NOT thrown... " + e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      assertTrue(e instanceof NullPointerException);
+    }
   }
-
 
   public void testMultipleOperation() {
     Collection<Operation> ops = new ArrayList<>();
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));
-    assertEquals(CheckedOperationTimeoutException.class.getName()
-                    + ": test - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE], "
-                    + "localhost:64212 [WRITE_QUEUED] [MOCK_STATE]",
-            new CheckedOperationTimeoutException("test", ops).toString());
+    Exception e = new CheckedOperationTimeoutException(duration, unit, ops);
+
+    String expected = CheckedOperationTimeoutException.class.getName() +
+            ": UNDEFINED operation timed out (>1 MILLISECONDS)" +
+            " - failing nodes: localhost:11211 [WRITE_QUEUED] [MOCK_STATE]," +
+            " localhost:64212 [WRITE_QUEUED] [MOCK_STATE]";
+    assertEquals(expected, e.toString());
   }
 
   private TestOperation buildOp(int portNum) {
