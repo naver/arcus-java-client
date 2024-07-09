@@ -13,7 +13,7 @@ public final class TimedOutMessageFactory {
   }
 
   public static String createTimedoutMessage(long duration,
-                                             TimeUnit units,
+                                             TimeUnit unit,
                                              Collection<Operation> ops) {
     StringBuilder rv = new StringBuilder();
     Operation firstOp = ops.iterator().next();
@@ -25,7 +25,7 @@ public final class TimedOutMessageFactory {
     }
     rv.append(firstOp.getAPIType())
       .append(" operation timed out (>").append(duration)
-      .append(" ").append(units).append(")");
+      .append(" ").append(unit).append(")");
     return createMessage(rv.toString(), ops);
   }
 

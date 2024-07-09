@@ -50,15 +50,15 @@ public class CheckedOperationTimeoutException extends TimeoutException {
   }
 
   public CheckedOperationTimeoutException(long duration,
-                                          TimeUnit units,
+                                          TimeUnit unit,
                                           Operation op) {
-    this(duration, units, Collections.singleton(op));
+    this(duration, unit, Collections.singleton(op));
   }
 
   public CheckedOperationTimeoutException(long duration,
-                                          TimeUnit units,
+                                          TimeUnit unit,
                                           Collection<Operation> ops) {
-    super(TimedOutMessageFactory.createTimedoutMessage(duration, units, ops));
+    super(TimedOutMessageFactory.createTimedoutMessage(duration, unit, ops));
     operations = ops;
   }
 
