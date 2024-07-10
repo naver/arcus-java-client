@@ -34,16 +34,16 @@ public class ArcusClientPoolShutdownTest extends TestCase {
       return;
     }
 
-    ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, 2);
+    ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, 2);
 
     // This threads must be stopped after client is shutdown.
     List<String> threadNames = new ArrayList<>();
     threadNames.add("main-EventThread");
-    threadNames.add("main-SendThread(" + BaseIntegrationTest.ZK_HOST + ")");
+    threadNames.add("main-SendThread(" + BaseIntegrationTest.ZK_ADDRESS + ")");
     threadNames
-            .add("Cache Manager IO for " + BaseIntegrationTest.ZK_SERVICE_ID +
-                    "@" + BaseIntegrationTest.ZK_HOST);
+            .add("Cache Manager IO for " + BaseIntegrationTest.SERVICE_CODE +
+                    "@" + BaseIntegrationTest.ZK_ADDRESS);
 
     // Check exists threads
     List<String> currentThreads = new ArrayList<>();

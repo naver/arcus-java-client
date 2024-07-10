@@ -45,8 +45,8 @@ public class ArcusClientFrontCacheTest extends TestCase {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
+    ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, cfb);
   }
 
   @Test
@@ -55,8 +55,8 @@ public class ArcusClientFrontCacheTest extends TestCase {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, cfb, 4);
+    ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, cfb, 4);
   }
 
   @Test
@@ -65,8 +65,8 @@ public class ArcusClientFrontCacheTest extends TestCase {
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
 
-    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, cfb);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, cfb);
 
     try {
       Assert.assertTrue(client.set("test:key", 100, "value").get());

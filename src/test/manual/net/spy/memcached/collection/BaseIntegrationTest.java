@@ -34,10 +34,10 @@ import org.junit.Ignore;
 @Ignore
 public class BaseIntegrationTest extends TestCase {
 
-  public static final String ZK_HOST = System.getProperty("ZK_HOST",
+  public static final String ZK_ADDRESS = System.getProperty("ZK_ADDRESS",
           "127.0.0.1:2181");
 
-  public static final String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
+  public static final String SERVICE_CODE = System.getProperty("SERVICE_CODE",
           "test");
 
   public static final String ARCUS_HOST = System.getProperty("ARCUS_HOST",
@@ -59,8 +59,8 @@ public class BaseIntegrationTest extends TestCase {
     System.out.println("\tSHUTDOWN_AFTER_EACH_TEST = " + USE_ZK);
 
     if (USE_ZK) {
-      System.out.println("\tZK_HOST = " + ZK_HOST);
-      System.out.println("\tZK_SERVICE_ID = " + ZK_SERVICE_ID);
+      System.out.println("\tZK_ADDRESS = " + ZK_ADDRESS);
+      System.out.println("\tSERVICE_CODE = " + SERVICE_CODE);
     } else {
       System.out.println("\tARCUS_HOST = " + ARCUS_HOST);
     }
@@ -94,7 +94,7 @@ public class BaseIntegrationTest extends TestCase {
   }
 
   protected void openFromZK() {
-    mc = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID);
+    mc = ArcusClient.createArcusClient(ZK_ADDRESS, SERVICE_CODE);
   }
 
   protected void openDirect() throws Exception {

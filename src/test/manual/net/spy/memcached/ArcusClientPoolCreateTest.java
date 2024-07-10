@@ -16,7 +16,6 @@ import static org.junit.Assume.assumeTrue;
 
 public class ArcusClientPoolCreateTest {
 
-  private static final String SERVICE_CODE = "test";
   private static final int POOL_SIZE = 3;
   private static final int CACHE_NODE_SIZE = 3;
 
@@ -29,8 +28,8 @@ public class ArcusClientPoolCreateTest {
   @Test
   public void testCreateClientPool() throws NoSuchFieldException, IllegalAccessException {
     //Create first ArcusClientPool instance.
-    ArcusClientPool clientPool = ArcusClient.createArcusClientPool(SERVICE_CODE,
-            new ConnectionFactoryBuilder(), POOL_SIZE);
+    ArcusClientPool clientPool = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, POOL_SIZE);
 
     ArcusClient[] allClients = clientPool.getAllClients();
 
@@ -51,8 +50,8 @@ public class ArcusClientPoolCreateTest {
     int firstPoolId = getPoolId();
 
     //Create second ArcusClientPool instance.
-    clientPool = ArcusClient.createArcusClientPool(SERVICE_CODE,
-            new ConnectionFactoryBuilder(), POOL_SIZE);
+    clientPool = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, new ConnectionFactoryBuilder(), POOL_SIZE);
 
     allClients = clientPool.getAllClients();
 
