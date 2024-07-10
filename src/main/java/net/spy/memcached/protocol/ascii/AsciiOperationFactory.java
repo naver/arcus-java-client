@@ -119,7 +119,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   public MutatorOperation mutate(Mutator m, String key, int by,
-                                 long def, int exp, OperationCallback cb) {
+                                 long def, int exp, MutatorOperation.Callback cb) {
     return new MutatorOperationImpl(m, key, by, def, exp, cb);
   }
 

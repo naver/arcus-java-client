@@ -71,7 +71,7 @@ public abstract class BaseOperationFactory implements OperationFactory {
       MutatorOperation mo = (MutatorOperation) op;
       rv.add(mutate(mo.getType(), first(op.getKeys()),
               mo.getBy(), mo.getDefault(), mo.getExpiration(),
-              op.getCallback()));
+              (MutatorOperation.Callback) op.getCallback()));
     } else if (op instanceof StoreOperation) {
       StoreOperation so = (StoreOperation) op;
       rv.add(store(so.getStoreType(), first(op.getKeys()), so.getFlags(),

@@ -24,4 +24,13 @@ public interface MutatorOperation extends KeyedOperation {
    * Get the expiration to set in case of a new entry.
    */
   int getExpiration();
+
+  interface Callback extends OperationCallback {
+    /**
+     * Callback for mutate operation.
+     *
+     * @param result the value that was mutated.
+     */
+    void gotMutatedValue(Long result);
+  }
 }

@@ -28,7 +28,6 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
-import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
@@ -52,15 +51,17 @@ final class MutatorOperationImpl extends OperationImpl
   private final int amount;
   private final long def;
   private final int exp;
+  private final MutatorOperation.Callback cb;
 
   public MutatorOperationImpl(Mutator m, String k, int amt, long d, int e,
-                              OperationCallback c) {
-    super(c);
+                              MutatorOperation.Callback cb) {
+    super(cb);
     mutator = m;
     key = k;
     amount = amt;
     def = d;
     exp = e;
+    this.cb = cb;
     if (m == Mutator.incr) {
       setAPIType(APIType.INCR);
     } else if (m == Mutator.decr) {
@@ -88,13 +89,15 @@ final class MutatorOperationImpl extends OperationImpl
     // <result value>\r\n
     boolean allDigit = line.chars().allMatch(Character::isDigit);
     OperationStatus status;
+    long result = -1L;
     if (allDigit) {
       status = new OperationStatus(true, line, StatusCode.SUCCESS);
+      result = Long.parseLong(line);
     } else {
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
     }
-
-    getCallback().receivedStatus(status);
+    cb.gotMutatedValue(result);
+    cb.receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }
 

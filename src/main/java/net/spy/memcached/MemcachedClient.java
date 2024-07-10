@@ -60,6 +60,7 @@ import net.spy.memcached.ops.DeleteOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
@@ -1789,15 +1790,24 @@ public class MemcachedClient extends SpyThread
     final OperationFuture<Long> rv = new OperationFuture<>(
             latch, operationTimeout);
     Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
-        new OperationCallback() {
-          public void receivedStatus(OperationStatus s) {
-            rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"), s);
+        new MutatorOperation.Callback() {
+          private Long value;
+
+          @Override
+          public void receivedStatus(OperationStatus status) {
+            rv.set(value, status);
           }
 
+          @Override
           public void complete() {
             latch.countDown();
           }
-        }));
+
+          @Override
+          public void gotMutatedValue(Long result) {
+            value = result;
+          }
+      }));
     rv.setOperation(op);
     return rv;
   }

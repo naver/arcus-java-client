@@ -32,6 +32,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   public final static String TEST_KEY = "someKey";
   protected OperationFactory ofact = null;
   protected OperationCallback genericCallback;
+  protected MutatorOperation.Callback genericMutationCallback;
   private byte[] testData;
 
   @Override
@@ -45,6 +46,21 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
 
       public void receivedStatus(OperationStatus status) {
         fail("Unexpected status:  " + status);
+      }
+    };
+    genericMutationCallback = new MutatorOperation.Callback() {
+      @Override
+      public void gotMutatedValue(Long result) {
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        fail("Unexpected status:  " + status);
+      }
+
+      @Override
+      public void complete() {
+        fail("Unexpected invocation");
       }
     };
 
@@ -83,7 +99,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     long def = 28775;
     int by = 7735;
     MutatorOperation op = ofact.mutate(Mutator.incr, TEST_KEY, by, def,
-            exp, genericCallback);
+            exp, genericMutationCallback);
 
     MutatorOperation op2 = cloneOne(MutatorOperation.class, op);
     assertKey(op2);
@@ -91,7 +107,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     assertEquals(def, op2.getDefault());
     assertEquals(by, op2.getBy());
     assertSame(Mutator.incr, op2.getType());
-    assertCallback(op2);
+    assertMutationCallback(op2);
   }
 
   public void testMutatorOperationDecrCloning() {
@@ -99,7 +115,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     long def = 28775;
     int by = 7735;
     MutatorOperation op = ofact.mutate(Mutator.decr, TEST_KEY, by, def,
-            exp, genericCallback);
+            exp, genericMutationCallback);
 
     MutatorOperation op2 = cloneOne(MutatorOperation.class, op);
     assertKey(op2);
@@ -107,7 +123,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
     assertEquals(def, op2.getDefault());
     assertEquals(by, op2.getBy());
     assertSame(Mutator.decr, op2.getType());
-    assertCallback(op2);
+    assertMutationCallback(op2);
   }
 
   public void testStoreOperationAddCloning() {
@@ -285,6 +301,10 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
 
   protected void assertCallback(Operation op) {
     assertSame(genericCallback, op.getCallback());
+  }
+
+  protected void assertMutationCallback(Operation op) {
+    assertSame(genericMutationCallback, op.getCallback());
   }
 
   private void assertBytes(byte[] bytes) {

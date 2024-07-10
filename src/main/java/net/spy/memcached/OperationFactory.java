@@ -182,7 +182,7 @@ public interface OperationFactory {
    * @return the new mutator operation
    */
   MutatorOperation mutate(Mutator m, String key, int by,
-                          long def, int exp, OperationCallback cb);
+                          long def, int exp, MutatorOperation.Callback cb);
 
   /**
    * Get a new StatsOperation.

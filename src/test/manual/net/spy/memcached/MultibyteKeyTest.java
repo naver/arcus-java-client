@@ -68,6 +68,7 @@ import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Mutator;
+import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
@@ -273,7 +274,22 @@ public class MultibyteKeyTest {
   @Test
   public void MutatorOperationImplTest() {
     try {
-      opFact.mutate(Mutator.incr, MULTIBYTE_KEY, 1, 1L, 0, genericCallback).initialize();
+      opFact.mutate(Mutator.incr, MULTIBYTE_KEY, 1, 1L, 0, new MutatorOperation.Callback() {
+        @Override
+        public void gotMutatedValue(Long result) {
+
+        }
+
+        @Override
+        public void receivedStatus(OperationStatus status) {
+
+        }
+
+        @Override
+        public void complete() {
+
+        }
+      }).initialize();
     } catch (java.nio.BufferOverflowException e) {
       Assert.fail();
     }
