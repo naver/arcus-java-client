@@ -72,7 +72,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
    *
    * @return ArcusClient
    */
-  public ArcusClient getClient() {
+  ArcusClient getClient() {
     return client[rand.nextInt(poolSize)];
   }
 
@@ -81,7 +81,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
    *
    * @return ArcusClient array
    */
-  public ArcusClient[] getAllClients() {
+  ArcusClient[] getAllClients() {
     return client;
   }
 
