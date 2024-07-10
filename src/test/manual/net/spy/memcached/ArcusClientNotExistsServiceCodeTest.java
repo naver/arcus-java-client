@@ -31,7 +31,7 @@ public class ArcusClientNotExistsServiceCodeTest extends TestCase {
     }
 
     try {
-      ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST, "NOT_EXISTS_SVC_CODE");
+      ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS, "NOT_EXISTS_SVC_CODE");
     } catch (NotExistsServiceCodeException e) {
       return;
     }

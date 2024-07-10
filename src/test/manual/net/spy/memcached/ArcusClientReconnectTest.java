@@ -30,8 +30,8 @@ public class ArcusClientReconnectTest extends TestCase {
       return;
     }
 
-    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE);
 
     try {
       Thread.sleep(120000L);

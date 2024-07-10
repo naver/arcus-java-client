@@ -36,10 +36,10 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class ClientBaseCase extends TestCase {
 
-  public static final String ZK_HOST = System.getProperty("ZK_HOST",
+  public static final String ZK_ADDRESS = System.getProperty("ZK_ADDRESS",
           "127.0.0.1:2181");
 
-  public static final String ZK_SERVICE_ID = System.getProperty("ZK_SERVICE_ID",
+  public static final String SERVICE_CODE = System.getProperty("SERVICE_CODE",
           "test");
 
   public static final String ARCUS_HOST = System
@@ -67,8 +67,8 @@ public abstract class ClientBaseCase extends TestCase {
     System.out.println("USE_ZK=" + USE_ZK);
     System.out.println("SHUTDOWN_AFTER_EACH_TEST=" + USE_ZK);
     if (USE_ZK) {
-      System.out.println("ZK_HOST=" + ZK_HOST + ", ZK_SERVICE_ID="
-              + ZK_SERVICE_ID);
+      System.out.println("ZK_ADDRESS=" + ZK_ADDRESS + ", SERVICE_CODE="
+              + SERVICE_CODE);
     } else {
       System.out.println("ARCUS_HOST=" + ARCUS_HOST);
     }
@@ -303,7 +303,7 @@ public abstract class ClientBaseCase extends TestCase {
   }
 
   protected void openFromZK(ConnectionFactoryBuilder cfb) {
-    client = ArcusClient.createArcusClient(ZK_HOST, ZK_SERVICE_ID, cfb);
+    client = ArcusClient.createArcusClient(ZK_ADDRESS, SERVICE_CODE, cfb);
   }
 
   protected void openDirect(ConnectionFactory cf) throws Exception {

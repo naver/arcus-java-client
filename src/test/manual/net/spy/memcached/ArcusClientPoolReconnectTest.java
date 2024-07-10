@@ -26,8 +26,8 @@ import org.junit.Ignore;
 public class ArcusClientPoolReconnectTest extends TestCase {
 
   public void testOpenAndWait() {
-    ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID, 2);
+    ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE, 2);
 
     try {
       Thread.sleep(120000L);

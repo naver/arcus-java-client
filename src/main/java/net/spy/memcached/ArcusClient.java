@@ -242,7 +242,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param serviceCode service code
    * @param cfb         ConnectionFactoryBuilder
    * @return a single ArcusClient
+   * @deprecated because service code must be along with admin addresses.
+   * Use {@link #createArcusClient(String, String, ConnectionFactoryBuilder)} instead.
    */
+  @Deprecated
   public static ArcusClient createArcusClient(String serviceCode,
                                               ConnectionFactoryBuilder cfb) {
 
@@ -281,7 +284,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param poolSize    Arcus client pool size
    * @param cfb         ConnectionFactoryBuilder
    * @return multiple ArcusClient
+   * @deprecated because service code must be along with admin addresses.
+   * Use {@link #createArcusClientPool(String, String, ConnectionFactoryBuilder, int)} instead.
    */
+  @Deprecated
   public static ArcusClientPool createArcusClientPool(String serviceCode,
                                                       ConnectionFactoryBuilder cfb, int poolSize) {
 

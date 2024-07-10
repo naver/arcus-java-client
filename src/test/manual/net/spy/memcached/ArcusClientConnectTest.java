@@ -40,8 +40,8 @@ public class ArcusClientConnectTest extends TestCase {
 
   @Test
   public void testOpenAndWait() {
-    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_HOST,
-            BaseIntegrationTest.ZK_SERVICE_ID);
+    ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS,
+            BaseIntegrationTest.SERVICE_CODE);
     client.shutdown();
   }
 }
