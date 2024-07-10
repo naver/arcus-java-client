@@ -47,8 +47,9 @@ import org.apache.zookeeper.ZooKeeper;
  * memcached server in the remote machine. It also changes the
  * previous ketama node
  */
-public class CacheManager extends SpyThread implements Watcher,
+public class ElasticCacheManager extends SpyThread implements Watcher, ServerManager,
         CacheMonitor.CacheMonitorListener, MigrationMonitor.MigrationMonitorListener {
+
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 
   private static final String ARCUS_BASE_CLIENT_LIST_ZPATH = "/arcus/client_list/";
@@ -112,8 +113,8 @@ public class CacheManager extends SpyThread implements Watcher,
   private boolean readingCacheList = false;
   /* ENABLE_MIGRATION end */
 
-  public CacheManager(String hostPort, String serviceCode,
-                      ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
+  public ElasticCacheManager(String hostPort, String serviceCode,
+                             ConnectionFactoryBuilder cfb, int poolSize, int waitTimeForConnect) {
     if (cfb.getFailureMode() == FailureMode.Redistribute) {
       throw new InitializeClientException(
           "Redistribute failure mode is not compatible with ArcusClient. " +
@@ -146,7 +147,7 @@ public class CacheManager extends SpyThread implements Watcher,
     setDaemon(true);
     start();
 
-    getLogger().info("CacheManager started. (" + serviceCode + "@" + hostPort + ")");
+    getLogger().info("ElasticCacheManager started. (" + serviceCode + "@" + hostPort + ")");
 
   }
 
@@ -663,7 +664,7 @@ public class CacheManager extends SpyThread implements Watcher,
     };
     cfb.setInitialObservers(Collections.singleton(observer));
 
-    int poolId = CacheManager.POOL_ID.getAndIncrement();
+    int poolId = ElasticCacheManager.POOL_ID.getAndIncrement();
     client = new ArcusClient[poolSize];
     int i = 0;
     try {
@@ -672,7 +673,7 @@ public class CacheManager extends SpyThread implements Watcher,
                 "(" + (i + 1) + "-" + poolSize + ") for " + serviceCode;
         client[i] = ArcusClient.getInstance(cfb.build(), clientName, socketList);
         client[i].setName("Memcached IO for " + serviceCode);
-        client[i].setCacheManager(this);
+        client[i].setServerManager(this);
       }
     } catch (IOException e) {
       getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
@@ -724,7 +725,7 @@ public class CacheManager extends SpyThread implements Watcher,
    *
    * @return current ArcusClient
    */
-  public ArcusClient[] getAC() {
+  public ArcusClient[] getClients() {
     return client;
   }
 

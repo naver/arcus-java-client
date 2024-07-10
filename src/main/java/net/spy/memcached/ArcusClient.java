@@ -208,10 +208,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   private static final int MAX_DNS_CACHE_TTL = 300;
 
-  private CacheManager cacheManager;
+  private ServerManager serverManager;
 
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
+  public void setServerManager(ServerManager serverManager) {
+    this.serverManager = serverManager;
   }
 
   /**
@@ -314,8 +314,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException("Service code is empty.");
     }
 
-    CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect);
-    return new ArcusClientPool(poolSize, exe.getAC());
+    ServerManager manager = new ElasticCacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect);
+    return new ArcusClientPool(poolSize, manager.getClients());
   }
 
   /**
@@ -426,8 +426,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public boolean shutdown(long timeout, TimeUnit unit) {
     final boolean result = super.shutdown(timeout, unit);
     // Connect to Arcus server directly, cache manager may be null.
-    if (cacheManager != null) {
-      cacheManager.shutdown();
+    if (serverManager != null) {
+      serverManager.shutdown();
     }
     return result;
   }

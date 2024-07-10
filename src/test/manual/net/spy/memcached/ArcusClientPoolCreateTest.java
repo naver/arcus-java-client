@@ -75,7 +75,7 @@ public class ArcusClientPoolCreateTest {
   }
 
   private int getPoolId() throws NoSuchFieldException, IllegalAccessException {
-    Class<CacheManager> clazz = CacheManager.class;
+    Class<ElasticCacheManager> clazz = ElasticCacheManager.class;
     Field poolId = clazz.getDeclaredField("POOL_ID");
     poolId.setAccessible(true);
     AtomicInteger atomicInteger = (AtomicInteger) poolId.get(null);

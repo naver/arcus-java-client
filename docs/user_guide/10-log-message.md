@@ -8,7 +8,7 @@ Java client에서 남기는 로그들과 그것들이 의미하는 바는 아래
 ARCUS client가 정상적으로 초기화 되면 다음과 같은 로그를 남긴다.
 
 ```java
-INFO net.spy.memcached.CacheManager: CacheManager started. ([mailto:dev@dev.arcuscloud.nhncorp.com:17288 dev@dev.arcuscloud.nhncorp.com:17288])
+INFO net.spy.memcached.ElasticCacheManager: CacheManager started. ([mailto:dev@dev.arcuscloud.nhncorp.com:17288 dev@dev.arcuscloud.nhncorp.com:17288])
 
 WARN net.spy.memcached.CacheMonitor: Cache list has been changed : From=null, To=[127.0.0.1:11211-hostname, xxx.xxx.xxx.xxx:xxxx-hostname] : [serviceCode=dev]
 
@@ -20,7 +20,7 @@ INFO net.spy.memcached.MemcachedConnection: Connection state changed for sun.nio
 
 INFO net.spy.memcached.MemcachedConnection: Connection state changed for sun.nio.ch.SelectionKeyImpl@2e5bbd6
 
-2011-09-21 10:44:54.055 WARN net.spy.memcached.CacheManager: All arcus connections are established.
+2011-09-21 10:44:54.055 WARN net.spy.memcached.ElasticCacheManager: All arcus connections are established.
 ```
 
 #### ARCUS admin address가 잘못 되었을 때
@@ -28,9 +28,9 @@ INFO net.spy.memcached.MemcachedConnection: Connection state changed for sun.nio
 ARCUS admin address를 잘못 지정했거나 server가 응답이 없을 때 아래와 같은 로그를 남긴다.
 
 ```java
-FATAL net.spy.memcached.CacheManager: Unexpected exception. contact to arcus administrator
+FATAL net.spy.memcached.ElasticCacheManager: Unexpected exception. contact to arcus administrator
 
-INFO net.spy.memcached.CacheManager: Close ZooKeeper client.
+INFO net.spy.memcached.ElasticCacheManager: Close ZooKeeper client.
 ```
 
 #### ARCUS admin과 연결이 단절 되었을 때
@@ -54,9 +54,9 @@ WARN net.spy.memcached.CacheMonitor: Session expired. Trying to reconnect to the
 ```java
 INFO net.spy.memcached.CacheMonitor: Shutting down the CacheMonitor : [serviceCode=dev]
 
-WARN net.spy.memcached.CacheManager: Unexpected disconnection from Arcus admin. Trying to reconnect to Arcus admin.
+WARN net.spy.memcached.ElasticCacheManager: Unexpected disconnection from Arcus admin. Trying to reconnect to Arcus admin.
 
-INFO net.spy.memcached.CacheManager: Close ZooKeeper client.
+INFO net.spy.memcached.ElasticCacheManager: Close ZooKeeper client.
 ```
 
 Reconnect에 성공하면 아래와 같은 로그가 남는다.

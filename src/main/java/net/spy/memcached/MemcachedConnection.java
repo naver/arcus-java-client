@@ -304,7 +304,7 @@ public final class MemcachedConnection extends SpyObject {
     }
     /* ENABLE_REPLICATION end */
 
-    // Deal with the memcached server group that's been added by CacheManager.
+    // Deal with the memcached server group that's been added by ServerManager.
     handleCacheNodesChange();
 
     if (!reconnectQueue.isEmpty()) {
@@ -680,7 +680,7 @@ public final class MemcachedConnection extends SpyObject {
     addOperation(node, op);
   }
 
-  // Handle the memcached server group that's been added by CacheManager.
+  // Handle the memcached server group that's been added by ServerManager.
   void handleCacheNodesChange() throws IOException {
     /* ENABLE_MIGRATION if */
     /*
