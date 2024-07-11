@@ -12,7 +12,7 @@ public final class TimedOutMessageFactory {
   private TimedOutMessageFactory() {
   }
 
-  public static String createTimedoutMessage(long duration,
+  public static String createTimedOutMessage(long duration,
                                              TimeUnit unit,
                                              Collection<Operation> ops) {
     StringBuilder rv = new StringBuilder();

@@ -135,19 +135,19 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
            throws InterruptedException, ExecutionException, TimeoutException {
 
     if (!latch.await(to, unit)) {
-      Collection<Operation> timedoutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
-          timedoutOps.add(op);
+          timedOutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (!timedoutOps.isEmpty()) {
-        MemcachedConnection.opsTimedOut(timedoutOps);
+      if (!timedOutOps.isEmpty()) {
+        MemcachedConnection.opsTimedOut(timedOutOps);
         isTimeout.set(true);
 
-        TimeoutException e = new CheckedOperationTimeoutException(to, unit, timedoutOps);
+        TimeoutException e = new CheckedOperationTimeoutException(to, unit, timedOutOps);
         if (throwOnTimeout) {
           throw e;
         }

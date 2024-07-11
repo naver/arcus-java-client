@@ -70,17 +70,17 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
                             TimeUnit unit) throws InterruptedException,
           TimeoutException, ExecutionException {
     if (!latch.await(duration, unit)) {
-      Collection<Operation> timedoutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
-          timedoutOps.add(op);
+          timedOutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (!timedoutOps.isEmpty()) {
-        MemcachedConnection.opsTimedOut(timedoutOps);
-        throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
+      if (!timedOutOps.isEmpty()) {
+        MemcachedConnection.opsTimedOut(timedOutOps);
+        throw new CheckedOperationTimeoutException(duration, unit, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset

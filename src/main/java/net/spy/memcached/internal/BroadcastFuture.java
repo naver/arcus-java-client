@@ -56,17 +56,17 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
           throws InterruptedException, TimeoutException, ExecutionException {
     if (!latch.await(duration, unit)) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
-      Collection<Operation> timedoutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           MemcachedConnection.opTimedOut(op);
-          timedoutOps.add(op);
+          timedOutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (!timedoutOps.isEmpty()) {
-        throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
+      if (!timedOutOps.isEmpty()) {
+        throw new CheckedOperationTimeoutException(duration, unit, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset

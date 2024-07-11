@@ -63,18 +63,18 @@ public class PipedCollectionFuture<K, V>
           throws InterruptedException, TimeoutException, ExecutionException {
 
     if (!latch.await(duration, unit)) {
-      Collection<Operation> timedoutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new HashSet<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
-          timedoutOps.add(op);
+          timedOutOps.add(op);
         } else {
           MemcachedConnection.opSucceeded(op);
         }
       }
-      if (!timedoutOps.isEmpty()) {
+      if (!timedOutOps.isEmpty()) {
         // set timeout only once for piped ops requested to single node.
-        MemcachedConnection.opTimedOut(timedoutOps.iterator().next());
-        throw new CheckedOperationTimeoutException(duration, unit, timedoutOps);
+        MemcachedConnection.opTimedOut(timedOutOps.iterator().next());
+        throw new CheckedOperationTimeoutException(duration, unit, timedOutOps);
       }
     } else {
       // continuous timeout counter will be reset only once in pipe

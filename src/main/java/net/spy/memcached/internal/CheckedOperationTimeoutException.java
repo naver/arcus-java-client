@@ -41,7 +41,7 @@ public class CheckedOperationTimeoutException extends TimeoutException {
   public CheckedOperationTimeoutException(long duration,
                                           TimeUnit unit,
                                           Collection<Operation> ops) {
-    super(TimedOutMessageFactory.createTimedoutMessage(duration, unit, ops));
+    super(TimedOutMessageFactory.createTimedOutMessage(duration, unit, ops));
     operations = ops;
   }
 
