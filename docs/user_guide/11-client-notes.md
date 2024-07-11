@@ -1,6 +1,6 @@
-## Java Client 사용시 주의사항
+# Java Client 사용시 주의사항
 
-### Counter 사용
+## Counter 사용
 
 ARCUS에서 counter를 사용할 경우 최초에 set 또는 add command를 이용하여 counter key를 등록해야 한다.
 일단 다음과 같이 저장해 보자.
@@ -47,7 +47,7 @@ client.set("my_counter", 10000, "100"); // 반드시 이렇게 사용해야 한�
 그리고, ARCUS client에서 incr/decr command의 입력 값을 primitive 또는 numeric wrapper 값으로 받을 수 있도록 되어 있으나, 내부적으로는 String으로 변환 후 cache server로 전달하도록 되어 있다.
 
 
-### Operation Queue Block Timeout 설정
+## Operation Queue Block Timeout 설정
 
 setOpQueueMaxBlockTime(long t) 함수를 이용하여 queue에 operation을 등록할 때 timeout을 설정한 경우,
 모든 operation은 IllegalStateException을 다음 코드와 같이 catch해 주어야 한다.
@@ -84,7 +84,7 @@ Operation queue block timeout 옵션을 설정하지 않으면, 작업 요청을
 back-end 데이터 저장소로 요청을 보내는 것이 더 좋은 선택이 될 수 있다.
 
 
-### Expiretime 설정
+## Expiretime 설정
 
 Expiretime은 초 단위로 지정된 시간만큼 미래의 시간인 Unix Time으로 변경되어 저장된다.
 그러나, '''expire time이 30일을 초과하면 1970년 기준의 Unix time으로 변경된다.''' 
@@ -119,14 +119,14 @@ Packet retransmission은 제법 흔하게 발생하고 있으므로,
 이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
 따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
 
-### 캐릭터 인코딩
+## 캐릭터 인코딩
 
 ARCUS Client가 지원하는 캐릭터 인코딩은 UTF-8이다. UTF-8 이외의 UTF-16과 같은 다른 인코딩 타입을 지원하지 않아,
 만약 시스템에서 UTF-16과 같은 캐릭터 인코딩을 사용하고 있다면 반드시 UTF-8 타입으로 변경해주어야 한다. 
 리눅스 기준으로 시스템의 기본 캐릭터 인코딩 확인 및 변경 방법은 아래와 같다. 
 리눅스 배포판, 버전마다 다를 수 있으므로 참고로만 활용한다.
 
-#### 시스템 캐릭터 인코딩 확인 (Linux 기준)
+### 시스템 캐릭터 인코딩 확인 (Linux 기준)
 ```bash
 $ echo $LANG
 en_US.UTF-8
@@ -150,14 +150,14 @@ LC_IDENTIFICATION="en_US.UTF-8"
 LC_ALL=
 ```
 
-#### 시스템 캐릭터 인코딩 변경 (Linux 기준)
+### 시스템 캐릭터 인코딩 변경 (Linux 기준)
  
 ```bash
 $ localectl set-locale LANG=en_US.UTF-8
 ```
 
 
-#### JVM 인코딩 변경
+### JVM 인코딩 변경
 
 시스템의 캐릭터 인코딩을 변경하기가 어렵다면, JVM에서 변경해주어도 괜찮다. JVM의 Property(-D) 옵션 중 `file.encoding` 옵션을 사용하여 변경할 수 있다.
 
@@ -165,5 +165,80 @@ $ localectl set-locale LANG=en_US.UTF-8
 -Dfile.encoding=UTF-8
 ```
 
+## JVM의 DNS Cache 만료 시간 설정
 
+ArcusClient 객체 생성 시 ZooKeeper 주소를 도메인 네임으로 설정한 경우, 도메인 네임이 가리키는 IP 주소를 변경하면 ZooKeeper 서버에 연결할 때마다 DNS 조회로 IP 주소를 얻어 연결하므로 응용 프로세스의 재구동 없이도 새로운 IP 주소에 연결할 수 있다.
 
+JVM에는 OS의 DNS Cache와는 별도로 자체적인 DNS Cache 만료 시간을 설정할 수 있다.
+이 값은 아무런 설정을 하지 않았을 때 기본 30초이지만, 보안 관련 요구 사항으로 `SecurityManager`가 설정된 상태이면 기본 -1(무한대)로 설정된다.
+이 값이 무한대이면 ZooKeeper 서버 이전 등으로 IP 주소가 변경되었어도 ArcusClient 객체는 DNS 조회에서 캐싱된 예전 IP 주소를 얻게 되므로 새로운 ZooKeeper 서버에 연결할 수 없다.
+
+이에 따라 arcus-java-client 1.14.0 버전에 현재 Java 프로세스의 DNS Cache 만료 시간을 검증하는 기능이 추가되었다.
+이 기능은 JVM의 DNS Cache 만료 시간이 0초(캐싱하지 않음) 이상, 300초 이하인지 확인하고 범위를 벗어나면 Exception을 발생시켜 ArcusClient 객체의 생성을 불가능하게 한다.
+단, 응용의 성격에 따라 JVM의 DNS Cache 만료 시간이 300초를 초과해야 할 수 있으므로 설정을 통해 검증 기능을 끌 수 있다.
+
+### JVM의 DNS Cache 만료 시간 검증 기능을 끄는 방법
+
+JVM의 DNS Cache 만료 시간을 검증하는 기능은 기본적으로 켜져 있으며, 이를 끄고 싶다면 아래와 같이 설정한다.
+
+```java
+ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+cfb.setDnsCacheTtlCheck(false);
+
+ArcusClient.createArcusClient(ZOOKEEPER_ADDRESS, SERVICE_CODE, cfb);
+```
+
+### JVM의 DNS Cache 만료 시간 설정 방법
+
+JVM의 DNS Cache 만료 시간을 설정하는 방법은 다음과 같다.
+아래의 예시들은 만료 시간을 30초로 설정하는 경우이다.
+
+#### Java 프로세스 실행 시 `-Dnetworkaddress.cache.ttl` 인자를 주어 실행
+
+```bash
+java -jar ... -Dnetworkaddress.cache.ttl=30
+```
+
+#### 소스 코드 상에서 만료 시간 설정
+
+```java
+Security.setProperty("networkaddress.cache.ttl", "30");
+```
+
+```java
+System.setProperty("sun.net.inetaddr.ttl", "30");
+```
+
+#### JDK 설정 (Linux 기준)
+
+- JDK 8+ : `$JAVA_HOME/jre/lib/security/java.security`
+- JDK 11+ : `$JAVA_HOME/conf/security/java.security`
+
+```vim
+#
+# The Java-level namelookup cache policy for successful lookups:
+#
+# any negative value: caching forever
+# any positive value: the number of seconds to cache an address for
+# zero: do not cache
+#
+# default value is forever (FOREVER). For security reasons, this
+# caching is made forever when a security manager is set. When a security
+# manager is not set, the default behavior in this implementation
+# is to cache for 30 seconds.
+#
+# NOTE: setting this to anything other than the default value can have
+#       serious security implications. Do not set it unless
+#       you are sure you are not exposed to DNS spoofing attack.
+#
+networkaddress.cache.ttl=30
+```
+
+### 주의 사항
+
+JVM의 DNS Cache 만료 시간을 별도로 설정하지 않더라도, 아래의 코드를 통해 `SecurityManager`를 설정하게 되면 해당 만료 시간이 -1(무한대)로 설정된다.
+만약 JVM의 DNS Cache 만료 시간을 별도로 설정하지 않았음에도 JVM의 DNS Cache 만료 시간을 검증하는 기능 내에서 Exception이 발생한다면 응용에 아래의 코드가 있는지 확인한다. 
+
+```java
+System.setSecurityManager(...)
+```
