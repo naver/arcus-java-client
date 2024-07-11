@@ -664,10 +664,10 @@ public class ArcusTimeoutMessageTest extends TestCase {
     try {
       mc.getVersions();
     } catch (Exception e) {
-      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
-      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
 
-      assertEquals(exceptionMessage, timedoutMessages);
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -690,10 +690,10 @@ public class ArcusTimeoutMessageTest extends TestCase {
     try {
       mc.getStats();
     } catch (Exception e) {
-      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
-      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
 
-      assertEquals(exceptionMessage, timedoutMessages);
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -705,10 +705,10 @@ public class ArcusTimeoutMessageTest extends TestCase {
     try {
       f.get(1L, TimeUnit.MILLISECONDS);
     } catch (Exception e) {
-      String exceptionMessage = getTimedoutHeadMessage(e.getMessage());
-      String timedoutMessages = getTimedoutHeadMessage(createTimedoutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
 
-      assertEquals(exceptionMessage, timedoutMessages);
+      assertEquals(exceptionMessage, timedOutMessages);
     }
     f.cancel(true);
   }
@@ -725,12 +725,12 @@ public class ArcusTimeoutMessageTest extends TestCase {
     };
   }
 
-  private String createTimedoutMessage(Operation op) {
+  private String createTimedOutMessage(Operation op) {
     return TimedOutMessageFactory
-            .createTimedoutMessage(1, TimeUnit.MILLISECONDS, Collections.singletonList(op));
+            .createTimedOutMessage(1, TimeUnit.MILLISECONDS, Collections.singletonList(op));
   }
 
-  private String getTimedoutHeadMessage(String message) {
+  private String getTimedOutHeadMessage(String message) {
     return message.split("-")[0];
   }
 }

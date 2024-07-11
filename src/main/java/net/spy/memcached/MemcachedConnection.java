@@ -1534,7 +1534,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param ops
    */
   public static void opsTimedOut(Collection<Operation> ops) {
-    Collection<String> timedoutNodes = new HashSet<>();
+    Collection<String> timedOutNodes = new HashSet<>();
     for (Operation op : ops) {
       try {
         MemcachedNode node = op.getHandlingNode();
@@ -1543,8 +1543,8 @@ public final class MemcachedConnection extends SpyObject {
         }
         // set timeout only once for the same node.
         String key = node.getSocketAddress().toString();
-        if (!timedoutNodes.contains(key)) {
-          timedoutNodes.add(key);
+        if (!timedOutNodes.contains(key)) {
+          timedOutNodes.add(key);
           node.setContinuousTimeout(true);
         }
       } catch (Exception e) {
