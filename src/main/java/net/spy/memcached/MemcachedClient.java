@@ -1788,17 +1788,17 @@ public class MemcachedClient extends SpyThread
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Long> rv = new OperationFuture<>(
             latch, operationTimeout);
-    Operation op = addOp(key, opFact.mutate(m, key, by, def, exp,
-        new OperationCallback() {
-          public void receivedStatus(OperationStatus s) {
-            rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"), s);
-          }
+    Operation op = opFact.mutate(m, key, by, def, exp, new OperationCallback() {
+      public void receivedStatus(OperationStatus s) {
+        rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"), s);
+      }
 
-          public void complete() {
-            latch.countDown();
-          }
-        }));
+      public void complete() {
+        latch.countDown();
+      }
+    });
     rv.setOperation(op);
+    addOp(key, op);
     return rv;
   }
 
