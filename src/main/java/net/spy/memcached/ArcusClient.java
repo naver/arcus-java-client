@@ -546,32 +546,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case OUT_OF_RANGE:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found in condition : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                break;
-              default:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
-                break;
-            }
+
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -628,29 +609,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
 
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                break;
-              default:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) unknown status : %s", k, cstatus);
-                break;
-            }
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -697,28 +662,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                break;
-              default:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                break;
-            }
+
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -762,28 +712,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Element(%s) is not readable : %s", k, cstatus);
-                break;
-              default:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                break;
-            }
+
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -2558,28 +2493,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(result, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                break;
-              default:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) Unknown response : %s", k, cstatus);
-                break;
-            }
+
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -2667,30 +2587,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           getLogger().warn("Unhandled state: " + status);
           cstatus = new CollectionOperationStatus(status);
         }
-        if (cstatus.isSuccess()) {
+        if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
           rv.setResult(result, cstatus);
           return;
         }
-        switch (cstatus.getResponse()) {
-          case NOT_FOUND:
-            rv.setResult(null, cstatus);
-            getLogger().debug("Key(%s) not found : %s", k, cstatus);
-            break;
-          case NOT_FOUND_ELEMENT:
-            rv.setResult(result, cstatus);
-            getLogger().debug("Element(%s) not found : %s", k, cstatus);
-            break;
-          case UNREADABLE:
-            rv.setResult(null, cstatus);
-            getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-            break;
-          case TYPE_MISMATCH:
-            rv.setResult(null, cstatus);
-            getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-            break;
-          default:
-            getLogger().warn("Unhandled state: " + status);
-        }
+
+        rv.setResult(null, cstatus);
+        getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
       }
 
       @Override
@@ -2760,30 +2663,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           rv.set(position, cstatus);
           return;
         }
-        switch (cstatus.getResponse()) {
-          case NOT_FOUND:
-            rv.set(null, cstatus);
-            getLogger().debug("Key(%s) not found : %s", k, cstatus);
-            break;
-          case NOT_FOUND_ELEMENT:
-            rv.set(null, cstatus);
-            getLogger().debug("Element(%s) not found : %s", k, cstatus);
-            break;
-          case UNREADABLE:
-            rv.set(null, cstatus);
-            getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-            break;
-          case BKEY_MISMATCH:
-            rv.set(null, cstatus);
-            getLogger().debug("Collection(%s) has wrong bkey : %s", k, cstatus);
-            break;
-          case TYPE_MISMATCH:
-            rv.set(null, cstatus);
-            getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-            break;
-          default:
-            getLogger().warn("Unhandled state: " + status);
-        }
+
+        rv.set(null, cstatus);
+        getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
       }
 
       public void complete() {
@@ -2869,31 +2751,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               rv.setResult(result, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Key(%s) not found : %s", k, cstatus);
-                break;
-              case NOT_FOUND_ELEMENT:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Element(%s) not found : %s", k, cstatus);
-                break;
-              case UNREADABLE:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Collection(%s) is not readable : %s", k, cstatus);
-                break;
-              case BKEY_MISMATCH:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Collection(%s) has wrong bkey : %s(%s)", k, cstatus,
-                    get.getBkeyObject().getType());
-                break;
-              case TYPE_MISMATCH:
-                rv.setResult(null, cstatus);
-                getLogger().debug("Collection(%s) is not a B+Tree : %s", k, cstatus);
-                break;
-              default:
-                getLogger().warn("Unhandled state: " + status);
-            }
+
+            rv.setResult(null, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -3016,19 +2876,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               rv.set(true, cstatus);
               return;
             }
-            switch (cstatus.getResponse()) {
-              case NOT_FOUND:
-              case ELEMENT_EXISTS:
-              case OVERFLOWED:
-              case OUT_OF_RANGE:
-              case TYPE_MISMATCH:
-              case BKEY_MISMATCH:
-                rv.set(false, cstatus);
-                getLogger().debug("Request for %s was not successful : %s", k, cstatus);
-                break;
-              default:
-                getLogger().warn("Unhandled state: " + status);
-            }
+
+            rv.set(false, cstatus);
+            getLogger().debug("Operation failed for key(%s): %s", k, cstatus);
           }
 
           public void complete() {
@@ -3165,23 +3015,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               cstatus = new CollectionOperationStatus(status);
             }
 
-            switch (cstatus.getResponse()) {
-              case EXIST:
-              case NOT_EXIST:
-                result.put(exist.getValues().get(index),
-                        (CollectionResponse.EXIST.equals(cstatus
-                                .getResponse())));
-                break;
-              case UNREADABLE:
-              case TYPE_MISMATCH:
-              case NOT_FOUND:
-                hasAnError = true;
-                rv.set(new HashMap<>(0),
-                        (CollectionOperationStatus) status);
-                break;
-              default:
-                getLogger().warn("Unhandled state: " + status);
+            if (cstatus.isSuccess()) {
+              result.put(exist.getValues().get(index),
+                      (CollectionResponse.EXIST.equals(cstatus
+                              .getResponse())));
+              return;
             }
+
+            hasAnError = true;
+            rv.set(new HashMap<>(0), cstatus);
+            getLogger().debug("Operation failed for key(%s), index(%d): %s", key, index, cstatus);
           }
         });
 
