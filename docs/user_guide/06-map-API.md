@@ -12,6 +12,7 @@ Map item에 대해 수행가능한 기본 연산은 다음과 같다.
 
 - [Map Item 생성](06-map-API.md#map-item-생성)
 - [Map Element 삽입](06-map-API.md#map-element-삽입)
+- [Map Element Upsert](06-map-API.md#map-element-upsert)
 - [Map Element 변경](06-map-API.md#map-element-변경)
 - [Map Element 삭제](06-map-API.md#map-element-삭제)
 - [Map Element 조회](06-map-API.md#map-element-조회)
@@ -160,6 +161,76 @@ try {
    지정한 시간에 insert 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
 3. Insert결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
+
+## Map Element Upsert
+
+Map에 하나의 element를 upsert한다.
+Upsert 연산은 해당 element가 없으면 insert하고, 있으면 update하는 연산이다.
+
+```java
+CollectionFuture<Boolean> 
+asyncMopUpsert(String key, String mkey, Object value, CollectionAttributes attributesForCreate)
+```
+
+- key: upsert 대상 map의 key
+- bkey: upsert할 element의 mkey
+- value: upsert할 element의 value
+- attributesForCreate: 대상 map이 없을 시, 동작을 지정한다.
+    - null: upsert 작업을 수행하지 않는다.
+    - attributes: 주어진 attributes를 가진 empty map item 생성 후에 element 삽입한다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.get() | future.getOperationStatus().getResponse() | 설명 
+------------ | ----------------------------------------- | ---------
+True         | CollectionResponse.STORED                 | Element만 삽입함
+True         | CollectionResponse.CREATED_STORED         | Map collection 생성하고 element를 삽입함
+True         | CollectionResponse.REPLACED               | Element가 교체됨
+False        | CollectionResponse.NOT_FOUND              | Key miss (주어진 key에 해당하는 item이 없음)
+False        | CollectionResponse.TYPE_MISMATCH          | 해당 item이 map이 아님
+False        | CollectionResponse.OVERFLOWED             | 최대 저장가능한 개수만큼 element들이 존재함
+
+Map element를 upsert하는 예제는 아래와 같다.
+
+```java
+String key = "Prefix:MapKey";
+String mkey = "mkey";
+String value = "This is a value.";
+
+CollectionAttributes attributesForCreate = new CollectionAttributes();
+CollectionFuture<Boolean> future = null;
+
+try {
+    future = client.asyncMopUpsert(key, mkey, value, attributesForCreate); // (1)
+} catch (IllegalStateException e) {
+    // handle exception
+}
+
+if (future == null)
+    return;
+
+try {
+    Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+    System.out.println(result);
+    System.out.println(future.getOperationStatus().getResponse()); // (3)
+} catch (TimeoutException e) {
+    future.cancel(true);
+} catch (InterruptedException e) {
+    future.cancel(true);
+} catch (ExecutionException e) {
+    future.cancel(true);
+}
+```
+
+1. attributesForCreate 값이 null이 아니면 map이 존재하지 않을 때
+   attributesForCreate 속성을 가진 map을 새로 생성한 다음 element를 저장한다.
+   만약 key가 존재하지 않는 상황에서 attributesForCreate 값이 null이면 insert에 실패한다.
+   Key가 새로 생성될 때 지정하는 attributesForCreate에 expire time을 지정하지 않으면 기본값인 0으로 설정되며
+   이는 map이 만료되지 않음을 뜻한다.
+2. timeout은 1초로 지정했다. Upsert가 성공하면 future는 true를 반환한다.
+   지정한 시간에 upsert 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
+   TimeoutException이 발생한다.
+3. Upsert 결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
 ## Map Element 변경
 
