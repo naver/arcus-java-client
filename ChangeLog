@@ -1,3 +1,51 @@
+# 2024-07-31 [version 1.14.0]
+## 🐣 New Features
+* Bulk methods using varargs keys are deprecated. Instead, methods using collection keys are still available.
+* ArcusClient factory methods without zookeeper address are deprecated.
+* Provide shutdown(long, TimeUnit) method for ArcusClient.
+* Add auto import setting.
+* Add DNS cache TTL verification.
+* Add ArcusClient factory methods without ConnectionFactoryBuilder.
+* Add async mop upsert method.
+
+## 🔧 Enhancements
+* Add connection information and elapsed time into TimeoutException message.
+* Add all operations at once in broadcast methods.
+* Return GetFuture instead of OperationFuture in asyncGets method.
+* Use GetResult class instead of setting results into future directly in collection get methods.
+* Use List#sublist method instead of using nested collection when split operations in bulk methods.
+* Refactor redundant concurrent data structure and unnecessary modifier.
+* Change the way ArcusClient is named.
+* Change MBean name of ArcusClient to make more readable.
+* Remove Transcoder argument in LocalCacheManager.
+* Remove unused methods/variables and redundant generic type.
+* Remove unused TimeoutException constructors.
+* Remove TranscoderService field in MemcachedClient and BulkService properties in ConnectionFactoryBuilder. Decoding value with transcoder will be done in user thread, such as tomcat thread.
+
+## 🐛 Bug Fixes
+* Make different results from InetSocketAddress.toString() same across JDK versions
+* Throw exception when bop get bulk count is lower than 1.
+* Fix invalid isTimeout value when creating BulkGetFuture with another object.
+* Set default value of shouldOptimize to false in DefaultConnectionFactory.
+* Consider optimizedOp when drain all of operations from the writeQ.
+* Make sure to create readonly copy of locator that has same shape with original one.
+
+## 📝 Documentation
+* Fix wrong information.
+* Add DNS cache TTL information.
+* Add mop upsert API description.
+
+## ✅ Testing
+* Upgrade CI setup python version to 2.7.
+* Use docker compose in CI tests.
+* Fix various test cases which could be failed sometimes.
+* Stop CI test when at least one test fails.
+
+## ⬆️ Dependency Upgrades
+* Upgrade Java version to 8.
+* Upgrade log4j version to 2.23.1.
+* Upgrade slf4j version to 2.0.12.
+
 2023-09-25 [version 1.13.4]
 	* [FEATURE] shutdown client after all of operations are processed
 	* [FEATURE] Prepared the node locator for data migration
