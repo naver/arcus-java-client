@@ -40,18 +40,17 @@ public class CASMutatorTest extends ClientBaseCase {
 
   public void testIncorrectTypeInCAS() throws Throwable {
     // Stick something for this CAS in the cache.
-    client.set("x", 0, "not a long");
+    assertTrue(client.set("x", 0, "not a long").get());
     try {
       Long rv = mutator.cas("x", 1L, 0, mutation);
-      fail("Expected RuntimeException on invalid type mutation, got "
-              + rv);
+      fail("Expected RuntimeException on invalid type mutation, got " + rv);
     } catch (RuntimeException e) {
       assertEquals("Couldn't get a CAS in 50 attempts", e.getMessage());
     }
   }
 
   public void testCASUpdateWithNullInitial() throws Throwable {
-    client.set("x", 0, 1L);
+    assertTrue(client.set("x", 0, 1L).get());
     Long rv = mutator.cas("x", (Long) null, 0, mutation);
     assertEquals(rv, (Long) 2L);
   }

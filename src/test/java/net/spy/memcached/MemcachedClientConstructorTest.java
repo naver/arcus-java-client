@@ -131,6 +131,7 @@ public class MemcachedClientConstructorTest extends TestCase {
           return null;
         }
       }, AddrUtil.getAddresses(ARCUS_HOST));
+      fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make op factory",
               e.getMessage());
@@ -146,6 +147,7 @@ public class MemcachedClientConstructorTest extends TestCase {
           return null;
         }
       }, AddrUtil.getAddresses(ARCUS_HOST));
+      fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make a connection",
               e.getMessage());
