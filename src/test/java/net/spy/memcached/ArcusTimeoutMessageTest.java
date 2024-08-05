@@ -19,48 +19,65 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import junit.framework.TestCase;
 
+import net.spy.memcached.collection.BTreeSMGet;
+import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
+import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkeyOld;
+import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
+import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkeyOld;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
-import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
-import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
+import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
-import net.spy.memcached.ops.APIType;
-import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.BTreeSortMergeGetOperation;
+import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.Operation;
-import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.StatsOperation;
+import net.spy.memcached.ops.StoreType;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
+import static net.spy.memcached.collection.CollectionBulkInsert.BTreeBulkInsert;
+import static net.spy.memcached.collection.CollectionBulkInsert.ListBulkInsert;
+import static net.spy.memcached.collection.CollectionBulkInsert.MapBulkInsert;
+import static net.spy.memcached.collection.CollectionBulkInsert.SetBulkInsert;
+import static net.spy.memcached.collection.CollectionPipedInsert.BTreePipedInsert;
+import static net.spy.memcached.collection.CollectionPipedInsert.ListPipedInsert;
+import static net.spy.memcached.collection.CollectionPipedInsert.MapPipedInsert;
+import static net.spy.memcached.collection.CollectionPipedInsert.SetPipedInsert;
+import static net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
+import static net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
+import static net.spy.memcached.collection.ElementFlagFilter.DO_NOT_FILTER;
+
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ArcusTimeoutMessageTest extends TestCase {
+  private static final int SINGLE = 0x00;
+  private static final int BULK = 0x10;
+  private static final int PIPE = 0x01;
+  private static final int BULK_PIPE = 0x11;
+
   private ArcusClient mc = null;
 
   @Before
@@ -96,22 +113,20 @@ public class ArcusTimeoutMessageTest extends TestCase {
     super.tearDown();
   }
 
-
   @Test
   public void getWithoutBulkMessage() {
     String key = "KEY";
-
-    GetFuture<Object> f = mc.asyncGet(key);
+    GetFuture<?> f = mc.asyncGet(key);
+    Operation op = mc.opFact.get(key, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      Assert.assertEquals(APIType.GET.toString(), messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -119,23 +134,23 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void getBulkWithBulkMessage() {
     String key = "KEY";
     int keySize = 300;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = key + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    BulkFuture<Map<String, Object>> f = mc.asyncGetBulk(Arrays.asList(keys));
+    BulkFuture<?> f = mc.asyncGetBulk(keys);
+    Operation op = mc.opFact.get(keys, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -143,23 +158,23 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void getBulkWithoutBulkMessage() {
     String key = "KEY";
     int keySize = 1;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = key + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    BulkFuture<Map<String, Object>> f = mc.asyncGetBulk(Arrays.asList(keys));
+    BulkFuture<?> f = mc.asyncGetBulk(keys);
+    Operation op = mc.opFact.get(keys, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals(APIType.GET.toString(), messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -168,18 +183,17 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String key = "KEY";
     String value = "value";
 
-    OperationFuture<Boolean> f
-            = mc.add(key, 10, value);
+    OperationFuture<?> f = mc.add(key, 10, value);
+    Operation op = mc.opFact.store(StoreType.add, key, 0, 0, null, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals(APIType.ADD.toString(), messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -187,25 +201,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void setBulkWithBulkMessage() {
     String key = "KEY";
     int keySize = 100;
-
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> values = new HashMap<>(keySize);
 
     for (int i = 0; i < keySize; i++) {
-      map.put(key + i, i);
+      values.put(key + i, i);
     }
 
-    @SuppressWarnings("deprecation")
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncSetBulk(map, 30);
+    Future<?> f = mc.asyncStoreBulk(StoreType.set, values, 30);
+    List<Operation> ops = values.keySet().stream()
+            .map((k) -> mc.opFact.store(StoreType.set, k, 0, 0, null, null))
+            .collect(Collectors.toList());
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(ops), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -213,25 +227,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void setBulkWithoutBulkMessage() {
     String key = "KEY";
     int keySize = 1;
-
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> values = new HashMap<>(keySize);
 
     for (int i = 0; i < keySize; i++) {
-      map.put(key + i, i);
+      values.put(key + i, i);
     }
 
-    @SuppressWarnings("deprecation")
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncSetBulk(map, 30);
+    Future<?> f = mc.asyncStoreBulk(StoreType.set, values, 30);
+    List<Operation> ops = values.keySet().stream()
+            .map((k) -> mc.opFact.store(StoreType.set, k, 0, 0, null, null))
+            .collect(Collectors.toList());
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals(APIType.SET.toString(), messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(ops), SINGLE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -239,23 +253,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void deleteBulkWithBulkMessage() {
     String key = "KEY";
     int keySize = 100;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = key + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    Future<Map<String, OperationStatus>> f = mc.asyncDeleteBulk(Arrays.asList(keys));
+    Future<?> f = mc.asyncDeleteBulk(keys);
+    List<Operation> ops = keys.stream()
+            .map((k) -> mc.opFact.delete(k, null))
+            .collect(Collectors.toList());
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(ops), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -263,23 +279,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void deleteBulkWithoutBulkMessage() {
     String key = "KEY";
     int keySize = 1;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = key + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    Future<Map<String, OperationStatus>> f = mc.asyncDeleteBulk(Arrays.asList(keys));
+    Future<?> f = mc.asyncDeleteBulk(keys);
+    List<Operation> ops = keys.stream()
+            .map((k) -> mc.opFact.delete(k, null))
+            .collect(Collectors.toList());
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals(APIType.DELETE.toString(), messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(ops), SINGLE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -287,23 +305,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void sopPipedInsertBulkWithPipeMessage() {
     String key = "key";
     int valueCount = mc.getMaxPipedItemCount();
-    Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "value" + i;
+    List<Object> values = new ArrayList<>(valueCount);
+
+    for (int i = 0; i < valueCount; i++) {
+      values.add("value" + i);
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> f = mc.asyncSopPipedInsertBulk(
-            key, Arrays.asList(valueList), new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    CollectionFuture<?> f = mc.asyncSopPipedInsertBulk(key, values, attr);
+    SetPipedInsert<?> insert = new SetPipedInsert<>(key, new HashSet<>(), attr, null);
+    Operation op = mc.opFact.collectionPipedInsert(key, insert, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -311,23 +331,24 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void sopPipedExistBulkWithPipeMessage() {
     String key = "key";
     int valueCount = mc.getMaxPipedItemCount();
-    Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "value" + i;
+    List<Object> values = new ArrayList<>(valueCount);
+
+    for (int i = 0; i < valueCount; i++) {
+      values.add("value" + i);
     }
 
-    CollectionFuture<Map<Object, Boolean>> f
-            = mc.asyncSopPipedExistBulk(key, Arrays.asList(valueList));
+    CollectionFuture<?> f = mc.asyncSopPipedExistBulk(key, values);
+    SetPipedExist<?> exist = new SetPipedExist<>(key, values, null);
+    Operation op = mc.opFact.collectionPipedExist(key, exist, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -336,23 +357,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String key = "key";
     String value = "MyValue";
     int keySize = 100;
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = key + i;
+    List<String> keys = new ArrayList<>(keySize);
+
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncSopInsertBulk(
-            Arrays.asList(keys), value, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    Future<?> f = mc.asyncSopInsertBulk(keys, value, attr);
+    SetBulkInsert<?> insert = new SetBulkInsert<>(null, keys, null, attr);
+    Operation op = mc.opFact.collectionBulkInsert(insert, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK_PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK_PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -360,21 +383,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void lopPipedInsertBulkWithPipeMessage() {
     String key = "key";
     int valueCount = 500;
-    Object[] valueList = new Object[valueCount];
-    Arrays.fill(valueList, "MyValue");
+    List<Object> values = new ArrayList<>(valueCount);
 
-    // SET
-    Future<Map<Integer, CollectionOperationStatus>> f = mc.asyncLopPipedInsertBulk(
-            key, 0, Arrays.asList(valueList), new CollectionAttributes());
+    for (int i = 0; i < valueCount; i++) {
+      values.add("MyValue");
+    }
+
+    CollectionAttributes attr = new CollectionAttributes();
+    CollectionFuture<?> f = mc.asyncLopPipedInsertBulk(key, 0, values, attr);
+    ListPipedInsert<?> insert = new ListPipedInsert<>(key, 0, values, attr, null);
+    Operation op = mc.opFact.collectionPipedInsert(key, insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -382,23 +409,25 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void lopInsertBulkWithBulkMessage() {
     String value = "MyValue";
     int keySize = 250000;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyLopKey" + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add("MyLopKey" + i);
     }
 
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncLopInsertBulk(
-            Arrays.asList(keys), 0, value, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    Future<?> f = mc.asyncLopInsertBulk(keys, 0, value, attr);
+    ListBulkInsert<?> insert = new ListBulkInsert<>(null, keys, 0, null, attr);
+    Operation op = mc.opFact.collectionBulkInsert(insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK_PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK_PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -406,48 +435,53 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void bopPipedInsertBulkWithPipeMessage() {
     String key = "MyBopKey";
     String value = "MyValue";
+    int elementSize = mc.getMaxPipedItemCount();
+    Map<Long, Object> elements = new TreeMap<>();
 
-    int bkeySize = mc.getMaxPipedItemCount();
-    Map<Long, Object> bkeys = new TreeMap<>();
-    for (int i = 0; i < bkeySize; i++) {
-      bkeys.put((long) i, value);
+    for (int i = 0; i < elementSize; i++) {
+      elements.put((long) i, value);
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> f = mc.asyncBopPipedInsertBulk(
-            key, bkeys, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    CollectionFuture<?> f = mc.asyncBopPipedInsertBulk(key, elements, attr);
+    BTreePipedInsert<?> insert = new BTreePipedInsert<>(key, elements, attr, null);
+    Operation op = mc.opFact.collectionPipedInsert(key, insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
   @Test
   public void bopPipedUpdateBulkWithPipeMessage() {
     String key = "MyBopKey";
+    String value = "updated";
+    ElementFlagUpdate eflagUpdate = new ElementFlagUpdate(new byte[]{1, 1, 1, 1});
+    int valueCount = mc.getMaxPipedItemCount();
+    List<Element<Object>> updateElements = new ArrayList<>(valueCount);
 
-    List<Element<Object>> updateElements = new ArrayList<>();
-    for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
-      updateElements.add(new Element<>(i, "updated" + i,
-              new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
+    for (int i = 0; i < valueCount; i++) {
+      updateElements.add(new Element<>(i, value + i, eflagUpdate));
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> f
-            = mc.asyncBopPipedUpdateBulk(key, updateElements);
+    CollectionFuture<?> f = mc.asyncBopPipedUpdateBulk(key, updateElements);
+    BTreePipedUpdate<?> update = new BTreePipedUpdate<>(key, updateElements, null);
+    Operation op = mc.opFact.collectionPipedUpdate(key, update, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -455,124 +489,142 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void bopInsertBulkWithBulkMessage() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
-
     int keySize = 10000;
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      String key = "MyBopKey" + i;
-      keys[i] = key;
+    List<String> keys = new ArrayList<>(keySize);
+
+    for (int i = 0; i < keySize; i++) {
+      keys.add("MyBopKey" + i);
     }
 
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncBopInsertBulk(
-            Arrays.asList(keys), bkey, new byte[]{0, 0, 1, 1}, value, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    Future<?> f = mc.asyncBopInsertBulk(keys, bkey, new byte[]{0, 0, 1, 1}, value, attr);
+    BTreeBulkInsert<?> insert = new BTreeBulkInsert<>(null, keys, "", "" , null, attr);
+    Operation op = mc.opFact.collectionBulkInsert(insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK_PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK_PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
   @Test
   public void oldSMGetWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(key + i);
+    int keySize = 1000;
+    int count = keySize / 2;
+    List<String> keys = new ArrayList<>(keySize);
+
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    SMGetFuture<List<SMGetElement<Object>>> f = mc.asyncBopSortMergeGet(
-            keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
+    SMGetFuture<?> f = mc.asyncBopSortMergeGet(keys, 0, keySize, DO_NOT_FILTER, 0, count);
+    BTreeSMGet<?> smGet = new BTreeSMGetWithLongTypeBkeyOld<>(
+            null, keys, 0, keySize, DO_NOT_FILTER, 0, count);
+    Operation op = mc.opFact.bopsmget(smGet, (BTreeSortMergeGetOperationOld.Callback) null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
   @Test
   public void smGetTimeoutWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(key + i);
+    int keySize = 1000;
+    int count = keySize / 2;
+    List<String> keys = new ArrayList<>(keySize);
+
+    for (int i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetMode mode = SMGetMode.UNIQUE;
+    SMGetFuture<?> f = mc.asyncBopSortMergeGet(keys, 0, keySize, DO_NOT_FILTER, count, mode);
+    BTreeSMGet<?> smGet = new BTreeSMGetWithLongTypeBkey<>(
+            null, keys, 0, keySize, DO_NOT_FILTER, count, mode);
+    Operation op = mc.opFact.bopsmget(smGet, (BTreeSortMergeGetOperation.Callback) null);
 
-    SMGetFuture<List<SMGetElement<Object>>> f = mc.asyncBopSortMergeGet(
-            keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
   @Test
   public void byteArrayBKeyOldSMGetWithBulkMessage() {
     String key = "MyBopKey";
-    ArrayList<String> keyList;
-    keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(key + i);
+    byte keySize = Byte.MAX_VALUE;
+    int count = keySize / 2;
+    ArrayList<String> keys = new ArrayList<>(keySize);
+
+    for (byte i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    byte[] from = new byte[]{(byte) 0};
-    byte[] to = new byte[]{(byte) 1000};
+    byte[] from = new byte[]{0};
+    byte[] to = new byte[]{keySize};
 
-    SMGetFuture<List<SMGetElement<Object>>> f = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
+    SMGetFuture<?> f = mc.asyncBopSortMergeGet(keys, from, to, DO_NOT_FILTER, 0, count);
+    BTreeSMGet<?> smGet = new BTreeSMGetWithByteTypeBkeyOld<>(
+            null, keys, from, to, DO_NOT_FILTER, 0, count);
+    Operation op = mc.opFact.bopsmget(smGet, (BTreeSortMergeGetOperationOld.Callback) null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
   @Test
   public void byteArrayBKeySMGetWithBulkMessage() {
     String key = "MyBopKey";
-    List<String> keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(key + i);
+    byte keySize = Byte.MAX_VALUE;
+    int count = keySize / 2;
+    ArrayList<String> keys = new ArrayList<>(keySize);
+
+    for (byte i = 0; i < keySize; i++) {
+      keys.add(key + i);
     }
 
-    byte[] from = new byte[]{(byte) 0};
-    byte[] to = new byte[]{(byte) 1000};
+    byte[] from = new byte[]{0};
+    byte[] to = new byte[]{keySize};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
+    SMGetMode mode = SMGetMode.UNIQUE;
+    SMGetFuture<?> f = mc.asyncBopSortMergeGet(keys, from, to, DO_NOT_FILTER, 500, mode);
+    BTreeSMGet<?> smGet = new BTreeSMGetWithByteTypeBkey<>(
+            null, keys, from, to, DO_NOT_FILTER, count, mode);
+    Operation op = mc.opFact.bopsmget(smGet, (BTreeSortMergeGetOperation.Callback) null);
 
-    SMGetFuture<List<SMGetElement<Object>>> f = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
   }
 
@@ -580,57 +632,53 @@ public class ArcusTimeoutMessageTest extends TestCase {
   public void mopPipedInsertBulkWithPipeMessage() {
     String key = "MyMopKey";
     String value = "MyValue";
-
     int elementSize = mc.getMaxPipedItemCount();
     Map<String, Object> elements = new TreeMap<>();
+
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);
     }
 
-    Future<Map<Integer, CollectionOperationStatus>> f = mc.asyncMopPipedInsertBulk(
-            key, elements, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    CollectionFuture<?> f = mc.asyncMopPipedInsertBulk(key, elements, attr);
+    MapPipedInsert<?> insert = new MapPipedInsert<>(key, elements, attr, null);
+    Operation op = mc.opFact.collectionPipedInsert(key, insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
-    f.cancel(true);
   }
 
   @Test
   public void mopPipedUpdateBulkWithBulkMessage() {
-    String mkey = "MyMopKey";
+    String key = "MyMopKey";
     String value = "MyValue";
-    int keySize = 250000;
+    int elementSize = 250000;
+    Map<String, Object> elements = new HashMap<>(elementSize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyMopKey" + i;
+    for (int i = 0; i < elementSize; i++) {
+      elements.put("MyMopKey" + i, value + i);
     }
 
-    Map<String, Object> updated = new HashMap<>();
-    for (int i = 0; i < keys.length; i++) {
-      updated.put(keys[i], value + i);
-    }
+    CollectionFuture<?> f = mc.asyncMopPipedUpdateBulk(key, elements);
+    MapPipedUpdate<?> update = new MapPipedUpdate<>(key, elements, null);
+    Operation op = mc.opFact.collectionPipedUpdate(key, update, null);
 
-    CollectionFuture<Map<Integer, CollectionOperationStatus>> f =
-            mc.asyncMopPipedUpdateBulk(mkey, updated);
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("pipe", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
-    f.cancel(true);
   }
 
   @Test
@@ -638,36 +686,38 @@ public class ArcusTimeoutMessageTest extends TestCase {
     String mkey = "MyMopKey";
     String value = "MyValue";
     int keySize = 250000;
+    List<String> keys = new ArrayList<>(keySize);
 
-    String[] keys = new String[keySize];
-    for (int i = 0; i < keys.length; i++) {
-      keys[i] = "MyMopKey" + i;
+    for (int i = 0; i < keySize; i++) {
+      keys.add("MyMopKey" + i);
     }
 
-    Future<Map<String, CollectionOperationStatus>> f = mc.asyncMopInsertBulk(
-            Arrays.asList(keys), mkey, value, new CollectionAttributes());
+    CollectionAttributes attr = new CollectionAttributes();
+    Future<?> f = mc.asyncMopInsertBulk(keys, mkey, value, attr);
+    MapBulkInsert<?> insert = new MapBulkInsert<>(null, keys, mkey, null, attr);
+    Operation op = mc.opFact.collectionBulkInsert(insert, null);
+
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (TimeoutException e) {
-      String[] messages = e.getMessage().split(" ");
-      assertEquals("bulk", messages[0]);
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
+    } catch (Exception e) {
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), BULK_PIPE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), BULK_PIPE);
+
+      assertEquals(exceptionMessage, timedOutMessages);
     }
-    f.cancel(true);
   }
 
   @Test
   public void getVersionWithTimeout() {
-    Operation op = mc.opFact.version(getCb());
+    Operation op = mc.opFact.version(null);
 
     try {
-      mc.getVersions();
+      Object v = mc.getVersions();
+      fail("Timeout not occurred with value: " + v);
     } catch (Exception e) {
-      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
-      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
 
       assertEquals(exceptionMessage, timedOutMessages);
     }
@@ -675,25 +725,14 @@ public class ArcusTimeoutMessageTest extends TestCase {
 
   @Test
   public void getStatsWithTimeout() {
-    Operation op = mc.opFact.stats(null, new StatsOperation.Callback() {
-      @Override
-      public void gotStat(String name, String val) {
-      }
-
-      @Override
-      public void receivedStatus(OperationStatus status) {
-      }
-
-      @Override
-      public void complete() {
-      }
-    });
+    Operation op = mc.opFact.stats(null, null);
 
     try {
-      mc.getStats();
+      Object v = mc.getStats();
+      fail("Timeout not occurred with value: " + v);
     } catch (Exception e) {
-      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
-      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
 
       assertEquals(exceptionMessage, timedOutMessages);
     }
@@ -702,44 +741,48 @@ public class ArcusTimeoutMessageTest extends TestCase {
   @Test
   public void flushWithTimeout() {
     Future<Boolean> f = mc.flush();
-    Operation op = mc.opFact.flush(-1, getCb());
+    Operation op = mc.opFact.flush(-1, null);
 
     try {
-      f.get(1L, TimeUnit.MILLISECONDS);
+      Object v = f.get(1L, TimeUnit.MILLISECONDS);
+      fail("Timeout not occurred with value: " + v);
     } catch (Exception e) {
-      String exceptionMessage = getTimedOutHeadMessage(e.getMessage());
-      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op));
+      String exceptionMessage = getTimedOutHeadMessage(e.getMessage(), SINGLE);
+      String timedOutMessages = getTimedOutHeadMessage(createTimedOutMessage(op), SINGLE);
 
       assertEquals(exceptionMessage, timedOutMessages);
     }
-    f.cancel(true);
-  }
-
-  private OperationCallback getCb() {
-    return new OperationCallback() {
-      @Override
-      public void receivedStatus(OperationStatus status) {
-      }
-
-      @Override
-      public void complete() {
-      }
-    };
   }
 
   private String createTimedOutMessage(Operation op) {
-    Collection<Operation> ops = Collections.singleton(op);
+    return createTimedOutMessage(Collections.singleton(op));
+  }
+
+  private String createTimedOutMessage(Collection<Operation> ops) {
     return TimedOutMessageFactory.createTimedOutMessage(1, TimeUnit.MILLISECONDS, 0, ops);
   }
 
-  private String getTimedOutHeadMessage(String message) {
+  private String getTimedOutHeadMessage(String message, int flags) {
     String[] tokens = message.split("-")[0].split(" >= ");
     String token = tokens[0];
 
     token = token.substring(0, token.lastIndexOf('('));
     String result = (token + "(>= " + tokens[1]).trim();
+    String regex = "[A-Z|_]+ operation timed out \\(>= [0-9]+ [A-Z]+\\)";
 
-    assertTrue(Pattern.matches("[A-Z]+ operation timed out \\(>= [0-9]+ [A-Z]+\\)", result));
+    if ((flags & BULK_PIPE) == BULK_PIPE) {
+      regex = "(bulk pipe )" + regex;
+      assertTrue(result, Pattern.matches(regex, result));
+    } else if ((flags & BULK) == BULK) {
+      regex = "(bulk )" + regex;
+      assertTrue(result, Pattern.matches(regex, result));
+    } else if ((flags & PIPE) == PIPE) {
+      regex = "(pipe )" + regex;
+      assertTrue(result, Pattern.matches(regex, result));
+    } else {
+      assertTrue(result, Pattern.matches(regex, result));
+    }
+
     return result;
   }
 }

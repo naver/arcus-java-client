@@ -57,13 +57,13 @@ public abstract class CancellationBaseCase extends TestCase {
     }
   }
 
-  public void testAvailableServers() {
-    client.asyncGet("x");
+  public void testAvailableServers() throws Exception {
+    tryTimeout(client.asyncGet("x"));
     assertEquals(Collections.emptyList(), client.getAvailableServers());
   }
 
-  public void testUnavailableServers() {
-    client.asyncGet("x");
+  public void testUnavailableServers() throws Exception {
+    tryTimeout(client.asyncGet("x"));
     assertEquals(new ArrayList<>(
                     Collections.singleton("/127.0.0.1:64213")),
             ClientBaseCase.stringify(client.getUnavailableServers()));

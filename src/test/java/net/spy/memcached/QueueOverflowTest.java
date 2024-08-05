@@ -107,7 +107,7 @@ public class QueueOverflowTest extends ClientBaseCase {
     byte[] b = new byte[8192];
     Random r = new Random();
     r.nextBytes(b);
-    client.set("x", 0, b);
+    assertTrue(client.set("x", 0, b).get());
 
     Collection<Future<Object>> c = new ArrayList<>();
     try {
