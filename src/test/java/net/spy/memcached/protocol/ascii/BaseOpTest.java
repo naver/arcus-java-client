@@ -27,11 +27,20 @@ import java.util.List;
 
 import net.spy.memcached.compat.BaseMockCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * Test the basic operation buffer handling stuff.
  */
 public class BaseOpTest extends BaseMockCase {
 
+  @Test
   public void testAssertions() {
     try {
       assert false;
@@ -41,6 +50,7 @@ public class BaseOpTest extends BaseMockCase {
     }
   }
 
+  @Test
   public void testDataReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.DATA);
     assertSame(OperationReadType.DATA, op.getReadType());
@@ -55,6 +65,7 @@ public class BaseOpTest extends BaseMockCase {
     op.handleRead(ByteBuffer.wrap("hi".getBytes()));
   }
 
+  @Test
   public void testLineReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
     assertSame(OperationReadType.LINE, op.getReadType());
@@ -68,6 +79,7 @@ public class BaseOpTest extends BaseMockCase {
     op.handleLine("x");
   }
 
+  @Test
   public void testLineParser() throws Exception {
     String input = "This is a multiline string\r\nhere is line two\r\n";
     ByteBuffer b = ByteBuffer.wrap(input.getBytes());
@@ -84,6 +96,7 @@ public class BaseOpTest extends BaseMockCase {
             Arrays.equals(expected, op.getCurrentBytes()));
   }
 
+  @Test
   public void testPartialLine() throws Exception {
     String input1 = "this is a ";
     String input2 = "test\r\n";

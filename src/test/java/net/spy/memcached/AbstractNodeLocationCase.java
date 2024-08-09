@@ -2,14 +2,21 @@ package net.spy.memcached;
 
 import java.util.Iterator;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import junit.framework.TestCase;
 
-public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
+import org.jmock.Mockery;
+
+public abstract class AbstractNodeLocationCase extends TestCase {
 
   protected MemcachedNode[] nodes;
-  protected Mock[] nodeMocks;
   protected NodeLocator locator;
+  protected Mockery context;
+
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    context.assertIsSatisfied();
+  }
 
   private void runSequenceAssertion(NodeLocator l, String k, int... seq) {
     int pos = 0;
@@ -52,11 +59,10 @@ public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
 
   protected void setupNodes(int n) {
     nodes = new MemcachedNode[n];
-    nodeMocks = new Mock[nodes.length];
+    context = new Mockery();
 
-    for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i] = mock(MemcachedNode.class, "node#" + i);
-      nodes[i] = (MemcachedNode) nodeMocks[i].proxy();
+    for (int i = 0; i < n; i++) {
+      nodes[i] = context.mock(MemcachedNode.class, "node#" + i);
     }
   }
 }

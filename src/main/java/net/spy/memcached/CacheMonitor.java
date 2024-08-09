@@ -100,6 +100,11 @@ public class CacheMonitor extends SpyObject implements Watcher,
      * The ZooKeeper session is no longer valid.
      */
     void closing();
+
+    /**
+     *  Declares because of test code in CacheMonitorTest.java
+     */
+    void commandNodeChange(List<String> children);
   }
 
   /**

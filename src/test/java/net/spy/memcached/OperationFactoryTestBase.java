@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
+import junit.framework.TestCase;
+
 import net.spy.memcached.ops.CASOperation;
 import net.spy.memcached.ops.ConcatenationOperation;
 import net.spy.memcached.ops.ConcatenationType;
@@ -21,23 +23,25 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 
 /**
  * Base class for operation factory tests.
  */
-public abstract class OperationFactoryTestBase extends MockObjectTestCase {
+public abstract class OperationFactoryTestBase extends TestCase {
 
   public final static String TEST_KEY = "someKey";
   protected OperationFactory ofact = null;
   protected OperationCallback genericCallback;
   private byte[] testData;
+  private Mockery context;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     ofact = getOperationFactory();
+    context = new Mockery();
     genericCallback = new OperationCallback() {
       public void complete() {
         fail("Unexpected invocation");
@@ -50,6 +54,12 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
 
     testData = new byte[64];
     new Random().nextBytes(testData);
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    context.assertIsSatisfied();
   }
 
   /**
@@ -163,8 +173,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   }
 
   public void testSingleGetOperationCloning() {
-    GetOperation.Callback callback =
-            (GetOperation.Callback) mock(GetOperation.Callback.class).proxy();
+    GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     GetOperation op = ofact.get(TEST_KEY, callback);
 
     GetOperation op2 = cloneOne(GetOperation.class, op);
@@ -173,8 +182,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   }
 
   public void testSingleGetsOperationCloning() {
-    GetsOperation.Callback callback =
-            (GetsOperation.Callback) mock(GetsOperation.Callback.class).proxy();
+    GetsOperation.Callback callback = context.mock(GetsOperation.Callback.class);
     GetsOperation op = ofact.gets(TEST_KEY, callback);
 
     GetsOperation op2 = cloneOne(GetsOperation.class, op);
@@ -185,8 +193,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   // These are harder cases as they fan out.
   public void testMultipleGetOperationCloning() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
-    GetOperation.Callback callback =
-            (GetOperation.Callback) mock(GetOperation.Callback.class).proxy();
+    GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     GetOperation op = ofact.get(keys, callback);
 
     Collection<Operation> ops = ofact.clone(op);
@@ -205,18 +212,19 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
 
   public void testMultipleGetOperationFanout() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
-    Mock m = mock(GetOperation.Callback.class);
+    GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     OperationStatus st = new OperationStatus(true, "blah");
-    m.expects(once()).method("complete");
-    m.expects(once()).method("receivedStatus").with(same(st));
-    m.expects(once()).method("gotData")
-            .with(eq("k1"), eq(1), isA(byte[].class));
-    m.expects(once()).method("gotData")
-            .with(eq("k2"), eq(2), isA(byte[].class));
-    m.expects(once()).method("gotData")
-            .with(eq("k3"), eq(3), isA(byte[].class));
 
-    GetOperation.Callback callback = (GetOperation.Callback) m.proxy();
+    context.checking(
+            new Expectations() {{
+              oneOf(callback).complete();
+              oneOf(callback).receivedStatus(with(same(st)));
+              oneOf(callback).gotData(with("k1"), with(1), with(any(byte[].class)));
+              oneOf(callback).gotData(with("k2"), with(2), with(any(byte[].class)));
+              oneOf(callback).gotData(with("k3"), with(3), with(any(byte[].class)));
+            }}
+    );
+
     GetOperation op = ofact.get(keys, callback);
 
     // Transition each operation callback into the complete state.
@@ -233,8 +241,7 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   // These are harder cases as they fan out.
   public void testMultipleGetsOperationCloning() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
-    GetsOperation.Callback callback =
-            (GetsOperation.Callback) mock(GetsOperation.Callback.class).proxy();
+    GetsOperation.Callback callback = context.mock(GetsOperation.Callback.class);
     GetsOperation op = ofact.gets(keys, callback);
 
     Collection<Operation> ops = ofact.clone(op);
@@ -254,18 +261,19 @@ public abstract class OperationFactoryTestBase extends MockObjectTestCase {
   public void testMultipleGetsOperationFanout() {
     long[] casId = {82757248, 82757249, 82757250};
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
-    Mock m = mock(GetsOperation.Callback.class);
+    GetsOperation.Callback callback = context.mock(GetsOperation.Callback.class);
     OperationStatus st = new OperationStatus(true, "blah");
-    m.expects(once()).method("complete");
-    m.expects(once()).method("receivedStatus").with(same(st));
-    m.expects(once()).method("gotData")
-            .with(eq("k1"), eq(1), eq(casId[0]), isA(byte[].class));
-    m.expects(once()).method("gotData")
-            .with(eq("k2"), eq(2), eq(casId[1]), isA(byte[].class));
-    m.expects(once()).method("gotData")
-            .with(eq("k3"), eq(3), eq(casId[2]), isA(byte[].class));
 
-    GetsOperation.Callback callback = (GetsOperation.Callback) m.proxy();
+    context.checking(
+            new Expectations() {{
+              oneOf(callback).complete();
+              oneOf(callback).receivedStatus(with(same(st)));
+              oneOf(callback).gotData(with("k1"), with(1), with(casId[0]), with(any(byte[].class)));
+              oneOf(callback).gotData(with("k2"), with(2), with(casId[1]), with(any(byte[].class)));
+              oneOf(callback).gotData(with("k3"), with(3), with(casId[2]), with(any(byte[].class)));
+            }}
+    );
+
     GetsOperation op = ofact.gets(keys, callback);
 
     // Transition each operation callback into the complete state.

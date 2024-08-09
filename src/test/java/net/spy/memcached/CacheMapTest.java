@@ -4,20 +4,22 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 
 /**
  * Test the CacheMap.
  */
-public class CacheMapTest extends MockObjectTestCase {
+public class CacheMapTest extends TestCase {
 
   private final static int EXP = 8175;
-  private Mock clientMock;
+  private Mockery context;
   private MemcachedClientIF client;
   private Transcoder<Object> transcoder;
   private CacheMap cacheMap;
@@ -26,22 +28,41 @@ public class CacheMapTest extends MockObjectTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     transcoder = new SerializingTranscoder();
-    clientMock = mock(MemcachedClientIF.class);
-    clientMock.expects(once()).method("getTranscoder")
-            .will(returnValue(transcoder));
-    client = (MemcachedClientIF) clientMock.proxy();
+    context = new Mockery();
+    client = context.mock(MemcachedClientIF.class);
+
+    context.checking(
+            new Expectations() {{
+              oneOf(client).getTranscoder();
+              will(returnValue(transcoder));
+            }}
+    );
+
     cacheMap = new CacheMap(client, EXP, "blah");
   }
 
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    context.assertIsSatisfied();
+  }
+
   private void expectGetAndReturn(String k, Object value) {
-    clientMock.expects(once()).method("get")
-            .with(eq(k), same(transcoder))
-            .will(returnValue(value));
+    context.checking(
+            new Expectations() {{
+              oneOf(client).get(k, transcoder);
+              will(returnValue(value));
+            }}
+    );
   }
 
   public void testNoExpConstructor() throws Exception {
-    clientMock.expects(once()).method("getTranscoder")
-            .will(returnValue(transcoder));
+    context.checking(
+            new Expectations() {{
+              oneOf(client).getTranscoder();
+              will(returnValue(transcoder));
+            }}
+    );
 
     CacheMap cm = new CacheMap(client, "blah");
     Field f = BaseCacheMap.class.getDeclaredField("exp");
@@ -107,10 +128,12 @@ public class CacheMapTest extends MockObjectTestCase {
   }
 
   public void testPutAll() {
-    clientMock.expects(once()).method("set")
-            .with(eq("blaha"), eq(EXP), eq("vala"));
-    clientMock.expects(once()).method("set")
-            .with(eq("blahb"), eq(EXP), eq("valb"));
+    context.checking(
+            new Expectations() {{
+              oneOf(client).set("blaha", EXP, "vala");
+              oneOf(client).set("blahb", EXP, "valb");
+            }}
+    );
 
     Map<String, Object> m = new HashMap<>();
     m.put("a", "vala");
@@ -129,7 +152,11 @@ public class CacheMapTest extends MockObjectTestCase {
 
   public void testRemove() {
     expectGetAndReturn("blaha", "olda");
-    clientMock.expects(once()).method("delete").with(eq("blaha"));
+    context.checking(
+            new Expectations() {{
+              oneOf(client).delete("blaha");
+            }}
+    );
 
     assertEquals("olda", cacheMap.remove("a"));
   }
@@ -140,8 +167,11 @@ public class CacheMapTest extends MockObjectTestCase {
 
   public void testPut() {
     expectGetAndReturn("blaha", "olda");
-    clientMock.expects(once()).method("set")
-            .with(eq("blaha"), eq(EXP), eq("newa"));
+    context.checking(
+            new Expectations() {{
+              oneOf(client).set("blaha", EXP, "newa");
+            }}
+    );
 
     assertEquals("olda", cacheMap.put("a", "newa"));
   }

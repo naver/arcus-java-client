@@ -2,13 +2,24 @@
 
 package net.spy.memcached.compat;
 
-import org.jmock.MockObjectTestCase;
+import org.junit.After;
+import org.junit.Before;
+
+import org.jmock.Mockery;
 
 /**
  * Base test case for mock object tests.
  */
-public abstract class BaseMockCase extends MockObjectTestCase {
+public abstract class BaseMockCase {
+  protected Mockery context;
 
-  // Nothing special needed here.
+  @Before
+  public void setUp() throws Exception {
+    context = new Mockery();
+  }
 
+  @After
+  public void tearDown() throws Exception {
+    context.assertIsSatisfied();
+  }
 }

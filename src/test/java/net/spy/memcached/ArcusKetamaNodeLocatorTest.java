@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jmock.Expectations;
+
 /**
  * Test Arcus ketama node location.
  */
@@ -30,11 +32,15 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
   @Override
   protected void setupNodes(int n) {
     super.setupNodes(n);
-    for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(InetSocketAddress.createUnresolved(
-                      "127.0.0.1", 10000 + i)));
+    for (int i = 0; i < nodes.length; i++) {
+      final int idx = i;
+
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodes[idx]).getSocketAddress();
+                will(returnValue(InetSocketAddress.createUnresolved("127.0.0.1", 10000 + idx)));
+              }}
+      );
     }
 
     locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes));
@@ -119,13 +125,17 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
   private MemcachedNode[] mockNodes(String servers[]) {
     setupNodes(servers.length);
 
-    for (int i = 0; i < nodeMocks.length; i++) {
+    for (int i = 0; i < nodes.length; i++) {
+      final int idx = i;
       List<InetSocketAddress> a = AddrUtil.getAddresses(servers[i]);
 
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(a.iterator().next()));
-
+      nodes[i] = context.mock(MemcachedNode.class, "node##" + i);
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodes[idx]).getSocketAddress();
+                will(returnValue(a.iterator().next()));
+              }}
+      );
     }
     return nodes;
   }
