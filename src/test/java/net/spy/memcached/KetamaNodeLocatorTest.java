@@ -5,6 +5,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
+import org.jmock.Expectations;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test ketama node location.
  */
@@ -12,11 +20,15 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
 
   protected void setupNodes(HashAlgorithm alg, int n) {
     super.setupNodes(n);
-    for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(InetSocketAddress.createUnresolved(
-                      "127.0.0.1", 10000 + i)));
+    for (int i = 0; i < nodes.length; i++) {
+      final int idx = i;
+
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodes[idx]).getSocketAddress();
+                will(returnValue(InetSocketAddress.createUnresolved("127.0.0.1", 10000 + idx)));
+              }}
+      );
     }
 
     locator = new KetamaNodeLocator(Arrays.asList(nodes), alg);
@@ -27,6 +39,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     setupNodes(HashAlgorithm.KETAMA_HASH, n);
   }
 
+  @Test
   public void testAll() throws Exception {
     setupNodes(4);
 
@@ -37,6 +50,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     }
   }
 
+  @Test
   public void testAllClone() throws Exception {
     setupNodes(4);
 
@@ -44,6 +58,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertEquals(4, all.size());
   }
 
+  @Test
   public void testLookups() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
@@ -51,6 +66,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[0], locator.getPrimary("some other key"));
   }
 
+  @Test
   public void testLookupsClone() {
     setupNodes(4);
     assertSame(nodes[0].toString(),
@@ -61,6 +77,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
             locator.getReadonlyCopy().getPrimary("some other key").toString());
   }
 
+  @Test
   public void testContinuumWrapping() {
     setupNodes(4);
 
@@ -69,6 +86,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[3], locator.getPrimary("L9KH6X4X"));
   }
 
+  @Test
   public void testClusterResizing() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
@@ -81,11 +99,13 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[4], locator.getPrimary("some other key"));
   }
 
+  @Test
   public void testSequence1() {
     setupNodes(4);
     assertSequence("dustin", 0, 2, 1, 2);
   }
 
+  @Test
   public void testSequence2() {
     setupNodes(4);
     assertSequence("noelani", 2, 1, 1, 3);
@@ -95,6 +115,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[nid], locator.getPrimary(k));
   }
 
+  @Test
   public void testLibKetamaCompat() {
     setupNodes(5);
     assertPosForKey("36", 2);
@@ -103,6 +124,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertPosForKey("49044", 4);
   }
 
+  @Test
   public void testFNV1A_32() {
     HashAlgorithm alg = HashAlgorithm.FNV1A_32_HASH;
     setupNodes(alg, 5);
@@ -116,17 +138,22 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   private MemcachedNode[] mockNodes(String servers[]) {
     setupNodes(servers.length);
 
-    for (int i = 0; i < nodeMocks.length; i++) {
+    for (int i = 0; i < nodes.length; i++) {
+      final int idx = i;
       List<InetSocketAddress> a = AddrUtil.getAddresses(servers[i]);
 
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(a.iterator().next()));
-
+      nodes[i] = context.mock(MemcachedNode.class, "node##" + i);
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodes[idx]).getSocketAddress();
+                will(returnValue(a.iterator().next()));
+              }}
+      );
     }
     return nodes;
   }
 
+  @Test
   public void testLibKetamaCompatTwo() {
     String servers[] = {
         "10.0.1.1:11211",

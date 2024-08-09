@@ -10,12 +10,13 @@ import java.util.regex.Pattern;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assume.assumeFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 public class ArcusClientCreateTest {
 
@@ -23,14 +24,14 @@ public class ArcusClientCreateTest {
   private static final String hostName = "localhost/127.0.0.1:11211";
   private static final List<InetSocketAddress> addrs = new ArrayList<>();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // This test assumes we does not use ZK
     assumeFalse(BaseIntegrationTest.USE_ZK);
     addrs.add(new InetSocketAddress("localhost", 11211));
   }
 
-  @After
+  @AfterEach
   public void release() {
     addrs.clear();
   }
@@ -42,8 +43,8 @@ public class ArcusClientCreateTest {
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
     MemcachedNode node = nodes.iterator().next();
 
-    Assert.assertEquals(nodes.size(), 1);
-    Assert.assertEquals(node.getNodeName(), clientName + " " + hostName);
+    Assertions.assertEquals(nodes.size(), 1);
+    Assertions.assertEquals(node.getNodeName(), clientName + " " + hostName);
   }
 
   @Test
@@ -51,16 +52,18 @@ public class ArcusClientCreateTest {
     ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), addrs);
 
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
-    Assert.assertEquals(nodes.size(), 1);
+    Assertions.assertEquals(nodes.size(), 1);
 
     MemcachedNode node = nodes.iterator().next();
     Pattern compile = Pattern.compile("ArcusClient-\\d+ " + hostName);
     Matcher matcher = compile.matcher(node.getNodeName());
-    Assert.assertTrue(matcher.matches());
+    Assertions.assertTrue(matcher.matches());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testCreateClientNullName() throws IOException {
-    new ArcusClient(new DefaultConnectionFactory(), null, addrs);
+    assertThrows(NullPointerException.class, () -> {
+      new ArcusClient(new DefaultConnectionFactory(), null, addrs);
+    });
   }
 }

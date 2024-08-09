@@ -25,7 +25,8 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class BopGetIrregularEflagTest extends BaseIntegrationTest {
 
@@ -35,6 +36,7 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
 
   private final Object value = "valvalvalvalvalvalvalvalvalval";
 
+  @Test
   public void testGetAll_1() {
     try {
       mc.delete(key).get();
@@ -50,20 +52,21 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
               100L, TimeUnit.MILLISECONDS);
 
-      Assert.assertNotNull(map);
-      Assert.assertEquals(3, map.size());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(3, map.size());
 
       for (long i = 0; i < map.size(); i++) {
         Element<Object> object = map.get(new byte[]{(byte) i});
-        Assert.assertEquals(value + String.valueOf(i),
+        Assertions.assertEquals(value + String.valueOf(i),
                 object.getValue());
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetAll_2() {
     try {
       mc.delete(key).get();
@@ -79,19 +82,20 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
               100L, TimeUnit.MILLISECONDS);
 
-      Assert.assertNotNull(map);
-      Assert.assertEquals(3, map.size());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(3, map.size());
 
       for (long i = 0; i < map.size(); i++) {
         Element<Object> object = map.get(new byte[]{(byte) i});
-        Assert.assertEquals(value + String.valueOf(i),
+        Assertions.assertEquals(value + String.valueOf(i),
                 object.getValue());
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetAll_3() {
     try {
       mc.delete(key).get();
@@ -107,19 +111,20 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
               100L, TimeUnit.MILLISECONDS);
 
-      Assert.assertNotNull(map);
-      Assert.assertEquals(3, map.size());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(3, map.size());
 
       for (long i = 0; i < map.size(); i++) {
         Element<Object> object = map.get(new byte[]{(byte) i});
-        Assert.assertEquals(value + String.valueOf(i),
+        Assertions.assertEquals(value + String.valueOf(i),
                 object.getValue());
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetAll_4() {
     try {
       mc.delete(key).get();
@@ -135,16 +140,16 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get(
               100L, TimeUnit.MILLISECONDS);
 
-      Assert.assertNotNull(map);
-      Assert.assertEquals(3, map.size());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(3, map.size());
 
       for (long i = 0; i < map.size(); i++) {
         Element<Object> object = map.get(new byte[]{(byte) i});
-        Assert.assertEquals(value + String.valueOf(i),
+        Assertions.assertEquals(value + String.valueOf(i),
                 object.getValue());
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

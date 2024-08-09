@@ -37,6 +37,14 @@ import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.WhalinTranscoder;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test the connection factory builder.
  */
@@ -44,12 +52,14 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
 
   private ConnectionFactoryBuilder b;
 
+  @BeforeEach
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     super.setUp();
     b = new ConnectionFactoryBuilder();
   }
 
+  @Test
   public void testDefaults() throws Exception {
     ConnectionFactory f = b.build();
     assertEquals(DefaultConnectionFactory.DEFAULT_OPERATION_TIMEOUT,
@@ -99,6 +109,7 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
             DefaultConnectionFactory.DEFAULT_OP_QUEUE_MAX_BLOCK_TIME);
   }
 
+  @Test
   public void testModifications() throws Exception {
     ConnectionObserver testObserver = new ConnectionObserver() {
       public void connectionLost(SocketAddress sa) {
@@ -167,12 +178,14 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
             instanceof BinaryMemcachedNodeImpl);
   }
 
+  @Test
   public void testProtocolSetterBinary() {
     assertTrue(
             b.setProtocol(Protocol.BINARY).build().getOperationFactory()
                     instanceof BinaryOperationFactory);
   }
 
+  @Test
   public void testProtocolSetterText() {
     assertTrue(
             b.setProtocol(Protocol.TEXT).build().getOperationFactory()

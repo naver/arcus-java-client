@@ -30,26 +30,35 @@ import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SMGetWithEflagTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private List<String> keyList = null;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testSMGetMissAll() {
     try {
       keyList = new ArrayList<>();
@@ -67,12 +76,12 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertEquals(oldFuture.getMissedKeyList().size(), 10);
+      Assertions.assertTrue(map.isEmpty());
+      Assertions.assertEquals(oldFuture.getMissedKeyList().size(), 10);
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -81,15 +90,16 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertEquals(future.getMissedKeys().size(), 10);
+      Assertions.assertTrue(map.isEmpty());
+      Assertions.assertEquals(future.getMissedKeys().size(), 10);
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitAll() {
     try {
       keyList = new ArrayList<>();
@@ -111,18 +121,18 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(oldFuture.getMissedKeyList().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + i, map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        Assertions.assertEquals(KEY + i, map.get(i).getKey());
+        Assertions.assertEquals(i, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -131,21 +141,22 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(future.getMissedKeys().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + i, map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        Assertions.assertEquals(KEY + i, map.get(i).getKey());
+        Assertions.assertEquals(i, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitAllWithOffsetMoreCount() {
     try {
       keyList = new ArrayList<>();
@@ -167,18 +178,18 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 1, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(oldFuture.getMissedKeyList().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-        Assert.assertEquals(i + 1, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+        Assertions.assertEquals(KEY + (i + 1), map.get(i).getKey());
+        Assertions.assertEquals(i + 1, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
       }
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -187,21 +198,22 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(future.getMissedKeys().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + i, map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        Assertions.assertEquals(KEY + i, map.get(i).getKey());
+        Assertions.assertEquals(i, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitAllWithOffsetExactCount() {
     try {
       keyList = new ArrayList<>();
@@ -223,18 +235,18 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 1, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(9, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      Assertions.assertEquals(9, map.size());
+      Assertions.assertTrue(oldFuture.getMissedKeyList().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-        Assert.assertEquals(i + 1, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+        Assertions.assertEquals(KEY + (i + 1), map.get(i).getKey());
+        Assertions.assertEquals(i + 1, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
       }
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -243,21 +255,22 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(future.getMissedKeys().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + i, map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        Assertions.assertEquals(KEY + i, map.get(i).getKey());
+        Assertions.assertEquals(i, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitAllWithOffsetLessThanCount() {
     try {
       keyList = new ArrayList<>();
@@ -279,18 +292,18 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 1, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(8, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      Assertions.assertEquals(8, map.size());
+      Assertions.assertTrue(oldFuture.getMissedKeyList().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + (i + 1), map.get(i).getKey());
-        Assert.assertEquals(i + 1, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
+        Assertions.assertEquals(KEY + (i + 1), map.get(i).getKey());
+        Assertions.assertEquals(i + 1, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + (i + 1), map.get(i).getValue());
       }
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -299,21 +312,22 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(9, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      Assertions.assertEquals(9, map.size());
+      Assertions.assertTrue(future.getMissedKeys().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(KEY + i, map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        Assertions.assertEquals(KEY + i, map.get(i).getKey());
+        Assertions.assertEquals(i, map.get(i).getBkey());
+        Assertions.assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitAllDesc() {
     try {
       keyList = new ArrayList<>();
@@ -335,12 +349,12 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(oldFuture.getMissedKeyList().isEmpty());
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -349,15 +363,16 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      Assertions.assertEquals(10, map.size());
+      Assertions.assertTrue(future.getMissedKeys().isEmpty());
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitHalf() {
     try {
       keyList = new ArrayList<>();
@@ -380,12 +395,12 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(5, map.size());
-      assertEquals(oldFuture.getMissedKeyList().size(), 5);
+      Assertions.assertEquals(5, map.size());
+      Assertions.assertEquals(oldFuture.getMissedKeyList().size(), 5);
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -394,15 +409,16 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      assertEquals(5, map.size());
-      assertEquals(future.getMissedKeys().size(), 5);
+      Assertions.assertEquals(5, map.size());
+      Assertions.assertEquals(future.getMissedKeys().size(), 5);
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testSMGetHitHalfDesc() {
     try {
       keyList = new ArrayList<>();
@@ -425,12 +441,12 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(5, map.size());
-      assertEquals(oldFuture.getMissedKeyList().size(), 5);
+      Assertions.assertEquals(5, map.size());
+      Assertions.assertEquals(oldFuture.getMissedKeyList().size(), 5);
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -439,15 +455,16 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
-      assertEquals(5, map.size());
-      assertEquals(future.getMissedKeys().size(), 5);
+      Assertions.assertEquals(5, map.size());
+      Assertions.assertEquals(future.getMissedKeys().size(), 5);
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPerformanceGet1000KeysWithoutOffset() {
     try {
       keyList = new ArrayList<>();
@@ -503,6 +520,7 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testSMGetWithMassiveKeys() {
     int testSize = 100;
 
@@ -532,13 +550,13 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
     try {
       List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
       // System.out.println(System.currentTimeMillis() - start + "ms");
-      Assert.assertEquals(50, map.size());
+      Assertions.assertEquals(50, map.size());
       List<String> missed = oldFuture.getMissedKeyList();
-      Assert.assertEquals(testSize / 2, missed.size());
+      Assertions.assertEquals(testSize / 2, missed.size());
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetMode smgetMode = SMGetMode.UNIQUE;
@@ -548,13 +566,13 @@ public class SMGetWithEflagTest extends BaseIntegrationTest {
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       // System.out.println(System.currentTimeMillis() - start + "ms");
-      Assert.assertEquals(50, map.size());
+      Assertions.assertEquals(50, map.size());
       Map<String, CollectionOperationStatus> missed = future.getMissedKeys();
-      Assert.assertEquals(testSize / 2, missed.size());
+      Assertions.assertEquals(testSize / 2, missed.size());
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

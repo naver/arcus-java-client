@@ -21,45 +21,52 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementValueType;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CreateEmptyBTreeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testCreateEmptyWithDefaultAttribute() {
     try {
       // create empty
       CollectionAttributes attribute = new CollectionAttributes();
       Boolean insertResult = mc.asyncBopCreate(KEY,
               ElementValueType.OTHERS, attribute).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      Assertions.assertEquals(Long.valueOf(0), attr.getCount());
+      Assertions.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assertions.assertEquals(Integer.valueOf(0), attr.getExpireTime());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testCreateEmptyWithSpecifiedAttribute() {
     try {
       // create empty
@@ -70,18 +77,18 @@ public class CreateEmptyBTreeTest extends BaseIntegrationTest {
       Boolean insertResult = mc.asyncBopCreate(KEY,
               ElementValueType.OTHERS, attribute).get();
 
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(10000), attr.getMaxCount());
-      Assert.assertEquals(CollectionOverflowAction.error,
+      Assertions.assertEquals(Long.valueOf(0), attr.getCount());
+      Assertions.assertEquals(Long.valueOf(10000), attr.getMaxCount());
+      Assertions.assertEquals(CollectionOverflowAction.error,
               attr.getOverflowAction());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

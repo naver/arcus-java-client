@@ -24,25 +24,31 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class BopGetTest extends BaseIntegrationTest {
 
   private static final String KEY = BopGetTest.class.getSimpleName();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testBopGet() throws Exception {
 
     byte[] bkey = new byte[]{(byte) 1};
@@ -50,19 +56,19 @@ public class BopGetTest extends BaseIntegrationTest {
     Boolean boolean1 = mc.asyncBopInsert(KEY, bkey, null, "value",
             new CollectionAttributes()).get();
 
-    Assert.assertTrue(boolean1);
+    Assertions.assertTrue(boolean1);
 
     Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(KEY, bkey,
             ElementFlagFilter.DO_NOT_FILTER, false, false).get();
 
-    Assert.assertEquals(1, map.size());
+    Assertions.assertEquals(1, map.size());
 
     Element<Object> el = map.get(new ByteArrayBKey(bkey));
 
-    Assert.assertNotNull(el);
+    Assertions.assertNotNull(el);
 
-    Assert.assertEquals("value", el.getValue());
-    Assert.assertEquals("0x01", el.getStringBkey());
-    Assert.assertEquals("", el.getStringEFlag());
+    Assertions.assertEquals("value", el.getValue());
+    Assertions.assertEquals("0x01", el.getStringBkey());
+    Assertions.assertEquals("", el.getStringEFlag());
   }
 }

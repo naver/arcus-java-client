@@ -29,25 +29,31 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PipeInsertTest extends BaseIntegrationTest {
 
   private static final String KEY = PipeInsertTest.class.getSimpleName();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testBopPipeInsert() {
     int elementCount = 5000;
 
@@ -67,19 +73,20 @@ public class PipeInsertTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
 
-      Assert.assertTrue(map.isEmpty());
+      Assertions.assertTrue(map.isEmpty());
 
       Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
 
-      Assert.assertEquals(4000, map3.size());
+      Assertions.assertEquals(4000, map3.size());
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopPipeInsert2() {
     int elementCount = 5000;
     Map<Long, Object> elements = new TreeMap<>();
@@ -100,19 +107,20 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
 
-      Assert.assertTrue(map.isEmpty());
+      Assertions.assertTrue(map.isEmpty());
 
       Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
               ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
 
-      Assert.assertEquals(4000, map3.size());
+      Assertions.assertEquals(4000, map3.size());
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testLopPipeInsert() {
     int elementCount = 5000;
 
@@ -135,18 +143,19 @@ public class PipeInsertTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
 
-      Assert.assertTrue(map.isEmpty());
+      Assertions.assertTrue(map.isEmpty());
 
       List<Object> list = mc.asyncLopGet(KEY, 0, 9999, false, false)
               .get();
 
-      Assert.assertEquals(4000, list.size());
+      Assertions.assertEquals(4000, list.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testLopPipeInsertIndex() {
     int elementCount = 3;
     List<Object> middleElements = new ArrayList<>(elementCount);
@@ -177,23 +186,24 @@ public class PipeInsertTest extends BaseIntegrationTest {
               = future2.get(5000L, TimeUnit.MILLISECONDS);
       Map<Integer, CollectionOperationStatus> map3
               = future3.get(5000L, TimeUnit.MILLISECONDS);
-      Assert.assertEquals(map1.size() + map2.size() + map3.size(), 0);
+      Assertions.assertEquals(map1.size() + map2.size() + map3.size(), 0);
 
       List<Object> list = mc.asyncLopGet(KEY, 0, 9999, false, false).get();
-      Assert.assertEquals((elementCount * 3) + 2, list.size());
+      Assertions.assertEquals((elementCount * 3) + 2, list.size());
 
       int offset = 0;
-      Assert.assertEquals(headerElements, list.subList(offset, offset + elementCount));
+      Assertions.assertEquals(headerElements, list.subList(offset, offset + elementCount));
       offset += (elementCount + 1);
-      Assert.assertEquals(middleElements, list.subList(offset, offset + elementCount));
+      Assertions.assertEquals(middleElements, list.subList(offset, offset + elementCount));
       offset += (elementCount + 1);
-      Assert.assertEquals(footerElements, list.subList(offset, offset + elementCount));
+      Assertions.assertEquals(footerElements, list.subList(offset, offset + elementCount));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testMopPipeInsert() {
     int elementCount = 5000;
 
@@ -212,15 +222,15 @@ public class PipeInsertTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(1000, map.size());
+      Assertions.assertEquals(1000, map.size());
 
       Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
               .get();
 
-      Assert.assertEquals(4000, rmap.size());
+      Assertions.assertEquals(4000, rmap.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

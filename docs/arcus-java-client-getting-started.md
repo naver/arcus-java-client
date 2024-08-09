@@ -109,7 +109,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 // HelloArcusTest.java
 package com.navercorp.arcus;
 
-import org.junit.Assert;
+Assertions.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -125,7 +125,7 @@ public class HelloArcusTest {
     
     @Test
     public void listenHello() {
-        Assert.assertEquals("Hello, Arcus!", helloArcus.listenHello());
+        Assertions.assertEquals("Hello, Arcus!", helloArcus.listenHello());
     }
     
 }

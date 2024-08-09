@@ -27,18 +27,24 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
   private String key = "LopInsertBulkMultipleValueTest";
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(key).get();
     super.tearDown();
   }
 
+  @Test
   public void testInsertAndGet() {
     String value = "MyValue";
 
@@ -59,11 +65,11 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       try {
         Map<Integer, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue(errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty());
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
@@ -76,29 +82,30 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (Exception e) {
         f.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
-      Assert.assertNotNull("List is null.", list);
-      Assert.assertTrue("Cached list is empty.", !list.isEmpty());
-      Assert.assertEquals(valueCount, list.size());
+      Assertions.assertNotNull(list, "List is null.");
+      Assertions.assertTrue(!list.isEmpty(), "Cached list is empty.");
+      assertEquals(valueCount, list.size());
 
       for (Object o : list) {
         if (!value.equals(o)) {
           errorCount++;
         }
       }
-      Assert.assertEquals(valueCount, list.size());
-      Assert.assertEquals(0, errorCount);
+      assertEquals(valueCount, list.size());
+      assertEquals(0, errorCount);
 
       // REMOVE
       mc.asyncLopDelete(key, 0, 4000, true).get();
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testErrorCount() {
     int valueCount = 1200;
     Object[] valueList = new Object[valueCount];
@@ -118,7 +125,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

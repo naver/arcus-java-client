@@ -22,7 +22,10 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MopUpdateTest extends BaseIntegrationTest {
 
@@ -33,48 +36,52 @@ public class MopUpdateTest extends BaseIntegrationTest {
   private final String VALUE = "VALUE";
   private final String NEW_VALUE = "NEWVALUE";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testUpdateNotExistsKey() {
     try {
       // update value
-      Assert.assertFalse(mc.asyncMopUpdate(KEY, mkey, VALUE).get());
+      Assertions.assertFalse(mc.asyncMopUpdate(KEY, mkey, VALUE).get());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testExistsKey() {
     try {
       // insert one
-      Assert.assertTrue(mc.asyncMopInsert(KEY, mkey, VALUE,
+      Assertions.assertTrue(mc.asyncMopInsert(KEY, mkey, VALUE,
               new CollectionAttributes()).get());
 
       // update value only
       Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
               .get(1000, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(VALUE, rmap.get(mkey));
+      Assertions.assertEquals(VALUE, rmap.get(mkey));
 
-      Assert.assertTrue(mc.asyncMopUpdate(KEY, mkey, NEW_VALUE).get());
+      Assertions.assertTrue(mc.asyncMopUpdate(KEY, mkey, NEW_VALUE).get());
 
       Map<String, Object> urmap = mc.asyncMopGet(KEY, false, false)
               .get(1000, TimeUnit.MILLISECONDS);
-      Assert.assertEquals(NEW_VALUE, urmap.get(mkey));
+      Assertions.assertEquals(NEW_VALUE, urmap.get(mkey));
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

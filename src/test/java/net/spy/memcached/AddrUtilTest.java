@@ -21,13 +21,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test the AddrUtils stuff.
  */
-public class AddrUtilTest extends TestCase {
+public class AddrUtilTest {
 
+  @Test
   public void testSingle() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("www.google.com:80");
@@ -36,6 +40,7 @@ public class AddrUtilTest extends TestCase {
     assertEquals(80, addrs.get(0).getPort());
   }
 
+  @Test
   public void testTwo() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("www.google.com:80 www.yahoo.com:81");
@@ -46,6 +51,7 @@ public class AddrUtilTest extends TestCase {
     assertEquals(81, addrs.get(1).getPort());
   }
 
+  @Test
   public void testThree() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses(" ,  www.google.com:80 ,, ,, www.yahoo.com:81 , ,,");
@@ -56,6 +62,7 @@ public class AddrUtilTest extends TestCase {
     assertEquals(81, addrs.get(1).getPort());
   }
 
+  @Test
   public void testBrokenHost() throws Exception {
     String s = "www.google.com:80 www.yahoo.com:81:more";
     try {
@@ -67,6 +74,7 @@ public class AddrUtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testBrokenHost2() throws Exception {
     String s = "www.google.com:80 www.yahoo.com";
     try {
@@ -78,6 +86,7 @@ public class AddrUtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testNullList() throws Exception {
     String s = null;
     try {
@@ -88,6 +97,7 @@ public class AddrUtilTest extends TestCase {
     }
   }
 
+  @Test
   public void testIPv6Host() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("::1:80");

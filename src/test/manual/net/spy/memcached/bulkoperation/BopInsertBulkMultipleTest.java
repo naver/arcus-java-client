@@ -29,10 +29,12 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
+  @Test
   public void testInsertAndGet() {
     String key = "MyBopKey32";
     String value = "MyValue";
@@ -56,8 +58,8 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
         Map<Integer, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -83,7 +85,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
         }
       }
 
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      Assertions.assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (Entry<Long, Object> entry : bkeys.entrySet()) {
@@ -92,11 +94,11 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
-
+  @Test
   public void testErrorCount() {
     String key = "MyBopKeyErrorCount";
     String value = "MyValue";
@@ -117,11 +119,11 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(2000L,
               TimeUnit.MILLISECONDS);
-      assertEquals(bkeySize, map.size());
+      Assertions.assertEquals(bkeySize, map.size());
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

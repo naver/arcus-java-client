@@ -16,35 +16,35 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolBTreeGetTest extends TestCase {
+public class ProtocolBTreeGetTest {
 
   private static final long bkey = 10;
 
+  @Test
   public void testStringify() {
-    Assert.assertEquals("10 drop", (new BTreeGet(bkey, true, true,
+    Assertions.assertEquals("10 drop", (new BTreeGet(bkey, true, true,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    Assert.assertEquals("10 delete", (new BTreeGet(bkey, true,
+    Assertions.assertEquals("10 delete", (new BTreeGet(bkey, true,
             false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    Assert.assertEquals("10", (new BTreeGet(bkey, false, true,
+    Assertions.assertEquals("10", (new BTreeGet(bkey, false, true,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    Assert.assertEquals("10", (new BTreeGet(bkey, false, false,
+    Assertions.assertEquals("10", (new BTreeGet(bkey, false, false,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
 
-    Assert.assertEquals("10..20 1 1 delete", (new BTreeGet(10, 20,
+    Assertions.assertEquals("10..20 1 1 delete", (new BTreeGet(10, 20,
             1, 1, true, false, ElementFlagFilter.DO_NOT_FILTER))
             .stringify());
-    Assert.assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
+    Assertions.assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
             1, true, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
+    Assertions.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
             false, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    Assert.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
+    Assertions.assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
             false, false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
   }
 }

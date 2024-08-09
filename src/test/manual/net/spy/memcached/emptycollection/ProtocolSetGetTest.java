@@ -16,24 +16,24 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.SetGet;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolSetGetTest extends TestCase {
+public class ProtocolSetGetTest {
 
   private static final int count = 10;
 
+  @Test
   public void testStringify() {
-    Assert.assertEquals("10 drop",
+    Assertions.assertEquals("10 drop",
             (new SetGet(count, true, true)).stringify());
-    Assert.assertEquals("10 delete",
+    Assertions.assertEquals("10 delete",
             (new SetGet(count, true, false)).stringify());
-    Assert.assertEquals("10",
+    Assertions.assertEquals("10",
             (new SetGet(count, false, true)).stringify());
-    Assert.assertEquals("10",
+    Assertions.assertEquals("10",
             (new SetGet(count, false, false)).stringify());
   }
 }

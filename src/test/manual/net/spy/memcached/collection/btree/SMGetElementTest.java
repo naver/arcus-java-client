@@ -2,13 +2,12 @@ package net.spy.memcached.collection.btree;
 
 import net.spy.memcached.collection.SMGetElement;
 
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SMGetElementTest {
 
@@ -27,12 +26,7 @@ public class SMGetElementTest {
     assertEquals(KEY, element.getKey());
     assertEquals(bkey, element.getBkey());
     assertArrayEquals(EFLAG, element.getEflag());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getByteBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getByteBkey());
     assertEquals(VALUE, element.getValue());
   }
 
@@ -47,12 +41,7 @@ public class SMGetElementTest {
     assertEquals(KEY, element.getKey());
     assertEquals(bkey, element.getByteBkey());
     assertArrayEquals(EFLAG, element.getEflag());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getBkey());
     assertEquals(VALUE, element.getValue());
   }
 

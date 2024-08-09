@@ -33,7 +33,12 @@ import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BopSortMergeTest extends BaseIntegrationTest {
 
@@ -49,6 +54,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     keyList2.add("key1");
   }
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -60,6 +66,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testBopSortMergeAscDuplicate1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -74,15 +81,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -102,7 +109,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -140,14 +147,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeAscUnique1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -162,15 +170,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -190,7 +198,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -231,14 +239,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescDuplicate1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -252,15 +261,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -295,7 +304,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -394,7 +403,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
@@ -402,10 +411,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3.cancel(true);
       future1.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescUnique1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -419,15 +429,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -462,7 +472,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -563,7 +573,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
@@ -571,10 +581,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3.cancel(true);
       future1.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeAscDuplicate2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -589,15 +600,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -617,7 +628,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -655,14 +666,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeAscUnique2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -677,15 +689,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -705,7 +717,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future);
@@ -746,14 +758,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       assertEquals(CollectionResponse.END, future.getOperationStatus().getResponse());
     } catch (InterruptedException e) {
       future.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescDuplicate2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -767,15 +780,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -810,7 +823,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -909,7 +922,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
@@ -917,10 +930,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3.cancel(true);
       future1.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescUnique2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
@@ -934,15 +948,15 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList3) {
       if (eachString.equals("key0")) {
         for (long i = 1; i <= 5; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 12; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key2")) {
         for (long i = 6; i <= 8; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -977,7 +991,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future1 = mc.asyncBopSortMergeGet(
           keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future10);
@@ -1080,7 +1094,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future5.cancel(true);
       future3.cancel(true);
       future1.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future10.cancel(true);
       future6.cancel(true);
@@ -1088,10 +1102,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future3.cancel(true);
       future1.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescDuplicate3() throws Exception {
     // insert test data
     // key list (maxcount = 10)
@@ -1102,11 +1117,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList2) {
       if (eachString.equals("key0")) {
         for (long i = 19; i <= 29; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 9; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -1125,7 +1140,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future2 = mc.asyncBopSortMergeGet(
           keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future1);
@@ -1177,15 +1192,16 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     } catch (InterruptedException e) {
       future1.cancel(true);
       future2.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future1.cancel(true);
       future2.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopSortMergeDescUnique3() throws Exception {
     // insert test data
     // key list (maxcount = 10)
@@ -1196,11 +1212,11 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     for (String eachString : keyList2) {
       if (eachString.equals("key0")) {
         for (long i = 19; i <= 29; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       } else if (eachString.equals("key1")) {
         for (long i = 1; i <= 9; i++) {
-          Assert.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
+          Assertions.assertTrue(mc.asyncBopInsert(eachString, i, null, "val", attrs).get());
         }
       }
     }
@@ -1219,7 +1235,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
       future2 = mc.asyncBopSortMergeGet(
           keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
     } catch (IllegalStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     assertNotNull(future1);
@@ -1271,12 +1287,12 @@ public class BopSortMergeTest extends BaseIntegrationTest {
     } catch (InterruptedException e) {
       future1.cancel(true);
       future2.cancel(true);
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } catch (ExecutionException e) {
       future1.cancel(true);
       future2.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

@@ -7,6 +7,15 @@ import java.util.Calendar;
 
 import net.spy.memcached.CachedData;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * Test the serializing transcoder.
  */
@@ -15,14 +24,16 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   private WhalinTranscoder tc;
   private TranscoderUtils tu;
 
+  @BeforeEach
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     super.setUp();
     tc = new WhalinTranscoder();
     setTranscoder(tc);
     tu = new TranscoderUtils(false);
   }
 
+  @Test
   public void testNonserializable() throws Exception {
     try {
       tc.encode(new Object());
@@ -32,6 +43,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     }
   }
 
+  @Test
   public void testCompressedStringNotSmaller() throws Exception {
     String s1 = "This is a test simple string that will not be compressed.";
     // Reduce the compression threshold so it'll attempt to compress it.
@@ -43,6 +55,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertEquals(s1, tc.decode(cd));
   }
 
+  @Test
   public void testCompressedString() throws Exception {
     // This one will actually compress
     String s1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -55,6 +68,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertEquals(s1, tc.decode(cd));
   }
 
+  @Test
   public void testObject() throws Exception {
     Calendar c = Calendar.getInstance();
     CachedData cd = tc.encode(c);
@@ -62,6 +76,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertEquals(c, tc.decode(cd));
   }
 
+  @Test
   public void testCompressedObject() throws Exception {
     tc.setCompressionThreshold(8);
     Calendar c = Calendar.getInstance();
@@ -71,6 +86,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertEquals(c, tc.decode(cd));
   }
 
+  @Test
   public void testUnencodeable() throws Exception {
     try {
       CachedData cd = tc.encode(new Object());
@@ -80,6 +96,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     }
   }
 
+  @Test
   public void testUndecodeable() throws Exception {
     CachedData cd = new CachedData(
             Integer.MAX_VALUE &
@@ -89,6 +106,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertNull(tc.decode(cd));
   }
 
+  @Test
   public void testUndecodeableSerialized() throws Exception {
     CachedData cd = new CachedData(WhalinTranscoder.SERIALIZED,
             tu.encodeInt(Integer.MAX_VALUE),
@@ -96,6 +114,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
     assertNull(tc.decode(cd));
   }
 
+  @Test
   public void testUndecodeableCompressed() throws Exception {
     CachedData cd = new CachedData(WhalinTranscoder.COMPRESSED,
             tu.encodeInt(Integer.MAX_VALUE),

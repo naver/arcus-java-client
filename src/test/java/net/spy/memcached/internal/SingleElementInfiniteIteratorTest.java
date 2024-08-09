@@ -1,17 +1,22 @@
 package net.spy.memcached.internal;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SingleElementInfiniteIteratorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class SingleElementInfiniteIteratorTest {
   private static final String CONSTANT = "foo";
   private SingleElementInfiniteIterator<String> iterator;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     iterator = new SingleElementInfiniteIterator<>(CONSTANT);
   }
 
+  @Test
   public void testHasNextAndNext() {
     for (int i = 0; i < 100; ++i) {
       assertTrue(iterator.hasNext());
@@ -19,6 +24,7 @@ public class SingleElementInfiniteIteratorTest extends TestCase {
     }
   }
 
+  @Test
   public void testRemove() {
     try {
       iterator.remove();

@@ -28,7 +28,12 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.LongTranscoder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopInsertWhenKeyExists extends BaseIntegrationTest {
 
@@ -36,6 +41,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.asyncBopDelete(key, 0, 4000, ElementFlagFilter.DO_NOT_FILTER, 0,
@@ -44,6 +50,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
     super.tearDown();
   }
 
+  @Test
   public void testBopInsert_unreadable_largestTrim() throws Exception {
     // insert with unreadable
     CollectionAttributes attr = new CollectionAttributes();
@@ -52,23 +59,24 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
 
     // insert
     Boolean result = mc.asyncBopInsert(key, 0L, null, "value", attr).get();
-    Assert.assertTrue(result);
+    assertTrue(result);
 
     // get attr
     CollectionAttributes attr2 = mc.asyncGetAttr(key).get();
-    Assert.assertFalse(attr2.getReadable());
-    Assert.assertEquals(CollectionOverflowAction.largest_trim,
+    Assertions.assertFalse(attr2.getReadable());
+    assertEquals(CollectionOverflowAction.largest_trim,
             attr2.getOverflowAction());
 
     // get element
     CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
             key, 0L, ElementFlagFilter.DO_NOT_FILTER, false, false);
-    Assert.assertNull(future.get());
+    Assertions.assertNull(future.get());
 
-    Assert.assertEquals(CollectionResponse.UNREADABLE, future
+    assertEquals(CollectionResponse.UNREADABLE, future
             .getOperationStatus().getResponse());
   }
 
+  @Test
   public void testBopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -95,6 +103,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
     assertEquals(10, rattrs.getCount().intValue());
   }
 
+  @Test
   public void testBopInsert_SameItem() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -115,6 +124,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
     assertEquals(10, rmap.size());
   }
 
+  @Test
   public void testBopInsert_SameBkey() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);

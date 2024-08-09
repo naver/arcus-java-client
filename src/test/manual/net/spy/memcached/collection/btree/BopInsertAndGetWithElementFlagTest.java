@@ -27,7 +27,10 @@ import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 import net.spy.memcached.collection.ElementMultiFlagsFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 
@@ -36,95 +39,100 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   private final String VALUE = "VALUE";
   private final byte[] FLAG = "FLAG".getBytes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
-  ;
-
+  @Test
   public void testBopInsertAndGetWithEFlag() throws Exception {
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
 
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
             ElementFlagFilter.DO_NOT_FILTER, false, false).get(
             Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
-    Assert.assertEquals(VALUE, map.get(BKEY).getValue());
+    Assertions.assertEquals(1, map.size());
+    Assertions.assertEquals(VALUE, map.get(BKEY).getValue());
   }
 
+  @Test
   public void testBopInsertAndGetWithoutEFlag() throws Exception {
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
             new CollectionAttributes()).get());
 
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
             ElementFlagFilter.DO_NOT_FILTER, false, false).get(
             Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
-    Assert.assertEquals(VALUE, map.get(BKEY).getValue());
+    Assertions.assertEquals(1, map.size());
+    Assertions.assertEquals(VALUE, map.get(BKEY).getValue());
   }
 
+  @Test
   public void testBopInsertAndRangedGetWithEFlag() throws Exception {
 
     // insert 3 bkeys
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, FLAG, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, FLAG, VALUE,
             new CollectionAttributes()).get());
 
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY, BKEY + 2,
             ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false).get(
             Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(3, map.size());
-    Assert.assertEquals(VALUE, map.get(BKEY).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY + 1).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY + 2).getValue());
+    Assertions.assertEquals(3, map.size());
+    Assertions.assertEquals(VALUE, map.get(BKEY).getValue());
+    Assertions.assertEquals(VALUE, map.get(BKEY + 1).getValue());
+    Assertions.assertEquals(VALUE, map.get(BKEY + 2).getValue());
   }
 
+  @Test
   public void testBopInsertAndRangedGetWithoutEFlag() throws Exception {
 
     // insert 3 bkeys
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, null, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, null, VALUE,
             new CollectionAttributes()).get());
 
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY, BKEY + 2,
             ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false).get(
             Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(3, map.size());
-    Assert.assertEquals(VALUE, map.get(BKEY).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY + 1).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY + 2).getValue());
+    Assertions.assertEquals(3, map.size());
+    Assertions.assertEquals(VALUE, map.get(BKEY).getValue());
+    Assertions.assertEquals(VALUE, map.get(BKEY + 1).getValue());
+    Assertions.assertEquals(VALUE, map.get(BKEY + 2).getValue());
   }
 
+  @Test
   public void testGetAllOfNotFlaggedBkeys() throws Exception {
     // insert 3 bkeys
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, null, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, FLAG, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 3, FLAG, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 3, FLAG, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 4, null, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 4, null, VALUE,
             new CollectionAttributes()).get());
 
     // get not flagged bkeys
@@ -135,20 +143,21 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY, BKEY + 100,
             filter, 0, 100, false, false).get();
 
-    Assert.assertEquals(3, map.size());
+    Assertions.assertEquals(3, map.size());
   }
 
+  @Test
   public void testBopInsertAndRangedGetWithEFlags() throws Exception {
 
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, new byte[]{0}, VALUE,
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY, new byte[]{0}, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, new byte[]{1},
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 1, new byte[]{1},
             VALUE, new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, new byte[]{2},
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 2, new byte[]{2},
             VALUE, new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 3, new byte[]{3},
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 3, new byte[]{3},
             VALUE, new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY + 4, new byte[]{4},
+    Assertions.assertTrue(mc.asyncBopInsert(KEY, BKEY + 4, new byte[]{4},
             VALUE, new CollectionAttributes()).get());
 
     ElementMultiFlagsFilter filter = new ElementMultiFlagsFilter();
@@ -163,7 +172,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
     Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY, BKEY + 100,
             filter, 0, 100, false, false).get();
 
-    Assert.assertEquals(4, map.size());
+    Assertions.assertEquals(4, map.size());
 
     ElementMultiFlagsFilter filter2 = new ElementMultiFlagsFilter();
     filter2.setCompOperand(CompOperands.NotEqual);
@@ -177,6 +186,6 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
     Map<Long, Element<Object>> map2 = mc.asyncBopGet(KEY, BKEY, BKEY + 100,
             filter2, 0, 100, false, false).get();
 
-    Assert.assertEquals(1, map2.size());
+    Assertions.assertEquals(1, map2.size());
   }
 }

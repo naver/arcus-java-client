@@ -28,69 +28,90 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class CacheMonitorTest extends MockObjectTestCase {
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 
-  private Mock watcher;
-  private Mock listener;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class CacheMonitorTest {
+
+  private Watcher watcher;
+  private CacheMonitorListener listener;
   private ZooKeeper zooKeeper;
   private CacheMonitor cacheMonitor;
   private List<String> children;
+  private Mockery context;
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
-
   private static final String serviceCode = "dev";
 
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    listener = mock(CacheMonitorListener.class);
-    watcher = mock(Watcher.class);
-    zooKeeper = new ZooKeeper("", 15000, (Watcher) watcher.proxy()); // can't mock
+  @BeforeEach
+  protected void setUp() throws Exception {
+    listener = context.mock(CacheMonitorListener.class);
+    watcher = context.mock(Watcher.class);
+    zooKeeper = new ZooKeeper("", 15000, watcher); // can't mock
     children = new ArrayList<>();
 
     cacheMonitor = new CacheMonitor(zooKeeper, ARCUS_BASE_CACHE_LIST_ZPATH,
-            serviceCode, true, (CacheMonitorListener) listener.proxy());
+            serviceCode, true, listener);
   }
 
-  @Override
+  @AfterEach
   public void tearDown() throws Exception {
     zooKeeper.close();
-    super.tearDown();
+    context.assertIsSatisfied();
   }
 
+  @Test
   public void testProcessResult() {
     // when
     children.add("0.0.0.0:11211");
-    listener.expects(once()).method("commandNodeChange").with(eq(children));
+    context.checking(
+        new Expectations() {{
+          oneOf(listener).commandNodeChange(children);
+        }}
+    );
 
     // test
     cacheMonitor.processResult(
         Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
 
     // then
-    assertEquals(children, ((CacheMonitorListener) listener).getPrevCacheList());
+    assertEquals(children, listener.getPrevCacheList());
   }
 
+  @Test
   public void testProcessResult_emptyChildren() {
     List<String> fakeChildren = new ArrayList<>();
     fakeChildren.add("0.0.0.0:23456");
 
     // when : empty children
-    listener.expects(once()).method("commandNodeChange").with(eq(fakeChildren));
+    context.checking(
+        new Expectations() {{
+          oneOf(listener).commandNodeChange(fakeChildren);
+        }}
+    );
 
     // test
     cacheMonitor.processResult(
         Code.OK.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
 
     // then
-    assertEquals(fakeChildren, ((CacheMonitorListener) listener).getPrevCacheList());
+    assertEquals(fakeChildren, listener.getPrevCacheList());
   }
 
+  @Test
   public void testProcessResult_otherEvents() {
     children.add("127.0.0.1:11211");
-    listener.expects(never()).method("commandNodeChange");
+    context.checking(
+        new Expectations() {{
+          never(listener).commandNodeChange(children);
+        }}
+    );
 
     Code code;
 
@@ -100,13 +121,21 @@ public class CacheMonitorTest extends MockObjectTestCase {
     // do nothing
 
     code = Code.SESSIONEXPIRED;
-    listener.expects(once()).method("closing");
+    context.checking(
+        new Expectations() {{
+          oneOf(listener).closing();
+        }}
+    );
     cacheMonitor.processResult(
         code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
     assertTrue(cacheMonitor.isDead());
 
     code = Code.NOAUTH;
-    listener.expects(once()).method("closing");
+    context.checking(
+        new Expectations() {{
+          oneOf(listener).closing();
+        }}
+    );
     cacheMonitor.processResult(
         code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
     assertTrue(cacheMonitor.isDead());
@@ -120,6 +149,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
         code.intValue(), ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, null, children);
   }
 
+  @Test
   public void testProcess_syncConnected() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
@@ -132,6 +162,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
     // do nothing
   }
 
+  @Test
   public void testProcess_disconnected() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
@@ -144,11 +175,16 @@ public class CacheMonitorTest extends MockObjectTestCase {
     // do nothing
   }
 
+  @Test
   public void testProcess_expired() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
         EventType.None, KeeperState.Expired, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
-    listener.expects(once()).method("closing");
+    context.checking(
+            new Expectations() {{
+              oneOf(listener).closing();
+            }}
+    );
 
     // test
     cacheMonitor.process(event);
@@ -157,6 +193,7 @@ public class CacheMonitorTest extends MockObjectTestCase {
     assertTrue(cacheMonitor.isDead());
   }
 
+  @Test
   public void testProcess_nodeChildrenChanged() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(

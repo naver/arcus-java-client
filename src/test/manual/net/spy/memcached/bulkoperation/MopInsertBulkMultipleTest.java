@@ -27,10 +27,14 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
+  @Test
   public void testInsertAndGet() {
     String key = "MyMopKey32";
     String value = "MyValue";
@@ -53,12 +57,12 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
         Map<Integer, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
@@ -72,14 +76,14 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
         } catch (Exception e) {
           f.cancel(true);
           e.printStackTrace();
-          Assert.fail(e.getMessage());
+          Assertions.fail(e.getMessage());
         }
         Object value2 = map.entrySet().iterator().next().getValue();
         if (!value.equals(value2)) {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (Entry<String, Object> entry : elements.entrySet()) {
@@ -87,10 +91,11 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testErrorCount() {
     String key = "MyMopKeyErrorCount";
     String value = "MyValue";
@@ -114,7 +119,7 @@ public class MopInsertBulkMultipleTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 

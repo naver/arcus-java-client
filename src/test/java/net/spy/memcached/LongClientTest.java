@@ -2,19 +2,24 @@ package net.spy.memcached;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SyncThread;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Longer running test case.
  */
 public class LongClientTest extends ClientBaseCase {
 
+  @Test
   public void testParallelGet() throws Throwable {
     // Get a connection with the get optimization disabled.
     client.shutdown();
@@ -35,14 +40,11 @@ public class LongClientTest extends ClientBaseCase {
     Random r = new Random();
     r.nextBytes(data);
     final int hashcode = Arrays.hashCode(data);
-    final Collection<String> keys = new ArrayList<>();
+    final List<String> keys = new ArrayList<>(50);
     for (int i = 0; i < 50; i++) {
-      client.set("k" + i, 60, data);
       keys.add("k" + i);
+      assertTrue(client.set(keys.get(i), 3600, data).get());
     }
-
-    // Make sure it got in.
-    client.waitForQueues(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
     int cnt = SyncThread.getDistinctResultCount(25, new Callable<Integer>() {
       public Integer call() throws Exception {

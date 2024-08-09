@@ -26,12 +26,16 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MopInsertBulkTest extends BaseIntegrationTest {
 
   private final String MKEY = "mkey";
 
+  @Test
   public void testInsertAndGet() {
     String value = "MyValue";
     int keySize = 500;
@@ -54,11 +58,11 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
       try {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 100L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
@@ -70,14 +74,14 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
           cachedMap = f.get();
         } catch (Exception e) {
           f.cancel(true);
-          Assert.fail(e.getMessage());
+          Assertions.fail(e.getMessage());
         }
         Object value2 = cachedMap.get(MKEY);
         if (!value.equals(value2)) {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (String key : keys) {
@@ -85,10 +89,11 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testCountError() {
     String value = "MyValue";
 
@@ -112,7 +117,7 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 

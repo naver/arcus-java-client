@@ -26,7 +26,9 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
@@ -39,6 +41,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
   private final Object value = "valvalvalvalvalvalvalvalvalval";
 
+  @Test
   public void testGetAll_1() {
     ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(key1);
@@ -72,7 +75,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
     try {
@@ -103,7 +106,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

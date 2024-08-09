@@ -28,7 +28,12 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class SopBulkAPITest extends BaseIntegrationTest {
 
@@ -39,6 +44,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
     return mc.getMaxPipedItemCount();
   }
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -47,6 +53,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.delete(key).get();
@@ -70,10 +77,11 @@ public class SopBulkAPITest extends BaseIntegrationTest {
       assertEquals(0, map.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkFailed() {
     try {
       for (Object v : valueList) {
@@ -93,10 +101,11 @@ public class SopBulkAPITest extends BaseIntegrationTest {
       assertFalse(future.getOperationStatus().isSuccess());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkEmptySet() {
     try {
       for (Object v : valueList) {
@@ -109,13 +118,13 @@ public class SopBulkAPITest extends BaseIntegrationTest {
 
       future.get(10000, TimeUnit.MILLISECONDS);
 
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       return;
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
-    Assert.fail();
+    Assertions.fail();
   }
 }

@@ -32,7 +32,9 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class BopGetBulkTest extends BaseIntegrationTest {
 
@@ -62,6 +64,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
 
   private final String value = String.valueOf(new Random().nextLong());
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -76,6 +79,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testGetBulkLongBkeyGetAll() {
     try {
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
@@ -87,7 +91,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals(keyList.size(), results.size());
 
       // System.out.println("\n\n\n");
       // for(Entry<String, BTreeGetResult<ByteArrayBKey, Object>> entry :
@@ -111,34 +115,35 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 .get(i));
 
         // check response
-        Assert.assertNotNull(r.getCollectionResponse().getResponse());
-        // Assert.assertEquals(CollectionResponse.OK,
+        Assertions.assertNotNull(r.getCollectionResponse().getResponse());
+        // Assertions.assertEquals(CollectionResponse.OK,
         // r.getCollectionResponse().getResponse());
 
         // check elements
         Map<ByteArrayBKey, BTreeElement<ByteArrayBKey, Object>> elements = r
                 .getElements();
 
-        Assert.assertEquals(3, elements.size());
+        Assertions.assertEquals(3, elements.size());
 
-        Assert.assertTrue(Arrays.equals(eFlag,
+        Assertions.assertTrue(Arrays.equals(eFlag,
                 elements.get(new byte[]{1}).getEflag()));
 
         for (long j = 0; j < elements.size(); j++) {
-          Assert.assertTrue(Arrays.equals(new byte[]{(byte) j},
+          Assertions.assertTrue(Arrays.equals(new byte[]{(byte) j},
                   elements.get(new byte[]{(byte) j}).getBkey()
                           .getBytes()));
-          Assert.assertEquals(value + j,
+          Assertions.assertEquals(value + j,
                   (String) elements.get(new byte[]{(byte) j})
                           .getValue());
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetBulkNotFoundAll() {
     try {
       for (int i = 0; i < keyList.size(); i++) {
@@ -154,7 +159,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals(keyList.size(), results.size());
 
       // System.out.println("\n\n\n");
       // for(Entry<String, BTreeGetResult<ByteArrayBKey, Object>> entry :
@@ -177,16 +182,17 @@ public class BopGetBulkTest extends BaseIntegrationTest {
         BTreeGetResult<ByteArrayBKey, Object> r = results.get(keyList
                 .get(i));
 
-        Assert.assertEquals(CollectionResponse.NOT_FOUND, r
+        Assertions.assertEquals(CollectionResponse.NOT_FOUND, r
                 .getCollectionResponse().getResponse());
-        Assert.assertNull(r.getElements());
+        Assertions.assertNull(r.getElements());
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetBulkNotFoundMixed() {
     try {
       // delete some data.
@@ -205,7 +211,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals(keyList.size(), results.size());
 
       // System.out.println("\n\n\n");
       // for(Entry<String, BTreeGetResult<ByteArrayBKey, Object>> entry :
@@ -230,26 +236,26 @@ public class BopGetBulkTest extends BaseIntegrationTest {
                 .get(i));
 
         if (i % 2 == 0) {
-          Assert.assertEquals(CollectionResponse.NOT_FOUND, r
+          Assertions.assertEquals(CollectionResponse.NOT_FOUND, r
                   .getCollectionResponse().getResponse());
         } else {
-          Assert.assertEquals(CollectionResponse.OK, r
+          Assertions.assertEquals(CollectionResponse.OK, r
                   .getCollectionResponse().getResponse());
 
           Map<ByteArrayBKey, BTreeElement<ByteArrayBKey, Object>> elements = r
                   .getElements();
 
-          Assert.assertEquals(3, elements.size());
+          Assertions.assertEquals(3, elements.size());
 
-          Assert.assertTrue(Arrays.equals(eFlag,
+          Assertions.assertTrue(Arrays.equals(eFlag,
                   elements.get(new byte[]{1}).getEflag()));
 
           for (long j = 0; j < elements.size(); j++) {
-            Assert.assertTrue(Arrays.equals(
+            Assertions.assertTrue(Arrays.equals(
                     new byte[]{(byte) j},
                     elements.get(new byte[]{(byte) j}).getBkey()
                             .getBytes()));
-            Assert.assertEquals(value + j,
+            Assertions.assertEquals(value + j,
                     (String) elements.get(new byte[]{(byte) j})
                             .getValue());
           }
@@ -257,10 +263,11 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testErrorArguments() {
     try {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = null;
@@ -273,7 +280,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
         results = f.get(1000L, TimeUnit.MILLISECONDS);
       } catch (IllegalArgumentException e) {
         // test success
-        Assert.assertEquals("Key list is empty.", e.getMessage());
+        Assertions.assertEquals("Key list is empty.", e.getMessage());
       }
 
       // max key list
@@ -297,10 +304,11 @@ public class BopGetBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testUnreadable() {
     try {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = null;
@@ -316,14 +324,15 @@ public class BopGetBulkTest extends BaseIntegrationTest {
               new byte[]{10}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
       results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
-      Assert.assertEquals("UNREADABLE", results.get(keyList.get(0))
+      Assertions.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals("UNREADABLE", results.get(keyList.get(0))
               .getCollectionResponse().getMessage());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testNotFoundElement() {
     try {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = null;
@@ -341,17 +350,18 @@ public class BopGetBulkTest extends BaseIntegrationTest {
               new byte[]{64}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
       results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals(keyList.size(), results.size());
       for (int i = 0; i < results.size(); i++) {
-        Assert.assertEquals("NOT_FOUND_ELEMENT",
+        Assertions.assertEquals("NOT_FOUND_ELEMENT",
                 results.get(keyList.get(i)).getCollectionResponse()
                         .getMessage());
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testTypeMismatch() {
     try {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = null;
@@ -364,14 +374,15 @@ public class BopGetBulkTest extends BaseIntegrationTest {
               new byte[]{10}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
       results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
-      Assert.assertEquals("TYPE_MISMATCH", results.get(keyList.get(0))
+      Assertions.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals("TYPE_MISMATCH", results.get(keyList.get(0))
               .getCollectionResponse().getMessage());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBKeyMismatch() {
     try {
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = null;
@@ -389,11 +400,11 @@ public class BopGetBulkTest extends BaseIntegrationTest {
               new byte[]{10}, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
       results = f.get(1000L, TimeUnit.MILLISECONDS);
 
-      Assert.assertEquals(keyList.size(), results.size());
-      Assert.assertEquals("BKEY_MISMATCH", results.get(keyList.get(0))
+      Assertions.assertEquals(keyList.size(), results.size());
+      Assertions.assertEquals("BKEY_MISMATCH", results.get(keyList.get(0))
               .getCollectionResponse().getMessage());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

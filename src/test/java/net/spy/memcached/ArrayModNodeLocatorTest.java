@@ -3,6 +3,12 @@ package net.spy.memcached;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test the ArrayModNodeLocator.
  */
@@ -15,6 +21,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
             HashAlgorithm.NATIVE_HASH);
   }
 
+  @Test
   public void testPrimary() throws Exception {
     setupNodes(4);
     assertSame(nodes[3], locator.getPrimary("dustin"));
@@ -22,6 +29,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[1], locator.getPrimary("y"));
   }
 
+  @Test
   public void testPrimaryClone() throws Exception {
     setupNodes(4);
     assertEquals(nodes[3].toString(),
@@ -32,6 +40,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
             locator.getReadonlyCopy().getPrimary("y").toString());
   }
 
+  @Test
   public void testAll() throws Exception {
     setupNodes(4);
     Collection<MemcachedNode> all = locator.getAll();
@@ -42,27 +51,32 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
     assertTrue(all.contains(nodes[3]));
   }
 
+  @Test
   public void testAllClone() throws Exception {
     setupNodes(4);
     Collection<MemcachedNode> all = locator.getReadonlyCopy().getAll();
     assertEquals(4, all.size());
   }
 
+  @Test
   public void testSeq1() {
     setupNodes(4);
     assertSequence("dustin", 0, 1, 2);
   }
 
+  @Test
   public void testSeq2() {
     setupNodes(4);
     assertSequence("noelani", 1, 2, 3);
   }
 
+  @Test
   public void testSeqOnlyOneServer() {
     setupNodes(1);
     assertSequence("noelani");
   }
 
+  @Test
   public void testSeqWithTwoNodes() {
     setupNodes(2);
     assertSequence("dustin", 0);

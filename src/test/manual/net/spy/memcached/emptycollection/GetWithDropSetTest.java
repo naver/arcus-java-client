@@ -21,13 +21,16 @@ import java.util.Set;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GetWithDropSetTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final int VALUE = 1234567890;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -35,75 +38,78 @@ public class GetWithDropSetTest extends BaseIntegrationTest {
 
     boolean insertResult = mc.asyncSopInsert(KEY, VALUE,
             new CollectionAttributes()).get();
-    Assert.assertTrue(insertResult);
+    Assertions.assertTrue(insertResult);
   }
 
+  @Test
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      Assertions.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=true
-      Assert.assertTrue(mc.asyncSopGet(KEY, 10, false, false).get()
+      Assertions.assertTrue(mc.asyncSopGet(KEY, 10, false, false).get()
               .contains(VALUE));
 
       // check exists
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      Assertions.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again
-      Assert.assertTrue(mc.asyncSopGet(KEY, 10, false, false).get()
+      Assertions.assertTrue(mc.asyncSopGet(KEY, 10, false, false).get()
               .contains(VALUE));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      Assertions.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
-      Assert.assertTrue(mc.asyncSopGet(KEY, 10, true, false).get()
+      Assertions.assertTrue(mc.asyncSopGet(KEY, 10, true, false).get()
               .contains(VALUE));
 
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNotNull(attr);
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      Assertions.assertNotNull(attr);
+      Assertions.assertEquals(Long.valueOf(0), attr.getCount());
 
       Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
-      Assert.assertNotNull(set);
-      Assert.assertTrue(set.isEmpty());
+      Assertions.assertNotNull(set);
+      Assertions.assertTrue(set.isEmpty());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      Assertions.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
-      Assert.assertTrue(mc.asyncSopGet(KEY, 10, true, true).get()
+      Assertions.assertTrue(mc.asyncSopGet(KEY, 10, true, true).get()
               .contains(VALUE));
 
       // check exists empty set
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(attr);
+      Assertions.assertNull(attr);
 
       Set<Object> set = mc.asyncSopGet(KEY, 10, false, false).get();
-      Assert.assertNull(set);
+      Assertions.assertNull(set);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

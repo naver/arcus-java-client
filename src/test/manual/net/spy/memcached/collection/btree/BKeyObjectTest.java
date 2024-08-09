@@ -3,13 +3,12 @@ package net.spy.memcached.collection.btree;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.util.BTreeUtil;
 
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BKeyObjectTest {
 
@@ -25,18 +24,8 @@ public class BKeyObjectTest {
     assertEquals(String.valueOf(longBkey), bKeyObject.toString());
     assertEquals(BKeyObject.BKeyType.LONG, bKeyObject.getType());
     assertFalse(bKeyObject.isByteArray());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        bKeyObject.getByteArrayBKeyRaw();
-      }
-    });
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        bKeyObject.getByteArrayBKey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> bKeyObject.getByteArrayBKeyRaw());
+    assertThrows(IllegalStateException.class, () -> bKeyObject.getByteArrayBKey());
   }
 
   @Test
@@ -48,12 +37,7 @@ public class BKeyObjectTest {
     assertEquals(BTreeUtil.toHex(byteArrayBkey), bKeyObject.toString());
     assertEquals(BKeyObject.BKeyType.BYTEARRAY, bKeyObject.getType());
     assertFalse(bKeyObject.isLong());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        bKeyObject.getLongBKey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> bKeyObject.getLongBKey());
   }
 
   @Test
@@ -77,12 +61,8 @@ public class BKeyObjectTest {
     final BKeyObject bKeyObject = new BKeyObject(longBkey);
     final BKeyObject another = new BKeyObject(byteArrayBkey);
 
-    assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        bKeyObject.compareTo(another);
-      }
-    });
+    assertThrows(IllegalArgumentException.class,
+            () -> bKeyObject.compareTo(another));
   }
 
 

@@ -28,7 +28,13 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class LopBulkAPITest extends BaseIntegrationTest {
 
@@ -39,6 +45,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
     return mc.getMaxPipedItemCount();
   }
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -47,11 +54,13 @@ public class LopBulkAPITest extends BaseIntegrationTest {
     }
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
   }
 
+  @Test
   public void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.asyncLopDelete(key, 0, 4000, true).get(1000,
@@ -75,10 +84,11 @@ public class LopBulkAPITest extends BaseIntegrationTest {
       assertEquals(0, map.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkFailed() {
     try {
       mc.asyncLopDelete(key, 0, 4000, true).get(1000,
@@ -100,10 +110,11 @@ public class LopBulkAPITest extends BaseIntegrationTest {
       assertFalse(future.getOperationStatus().isSuccess());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkEmptyList() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -111,14 +122,14 @@ public class LopBulkAPITest extends BaseIntegrationTest {
                       new CollectionAttributes());
 
       future.get(10000, TimeUnit.MILLISECONDS);
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       return;
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
-    Assert.fail();
+    Assertions.fail();
   }
 
 }

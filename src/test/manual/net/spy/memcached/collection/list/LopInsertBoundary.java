@@ -24,12 +24,21 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.transcoders.LongTranscoder;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class LopInsertBoundary extends BaseIntegrationTest {
 
   private String key = "LopInsertBoundary";
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -42,17 +51,20 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteList(key, 1000);
     super.tearDown();
   }
 
+  @Test
   public void testLopInsert_IndexOutOfRange() throws Exception {
     assertFalse(mc.asyncLopInsert(key, 11, 11L, null).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopInsert_PrependTailTrim() throws Exception {
     // Default overflowaction for lists is 'tail_trim'
 
@@ -74,6 +86,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     // prepending
   }
 
+  @Test
   public void testLopInsert_PrependHeadTrim() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
@@ -97,6 +110,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     // prepending
   }
 
+  @Test
   public void testLopInsert_PrependOverflowError() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.error))
@@ -110,6 +124,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopInsert_AppendTailTrim() throws Exception {
     // Default overflowaction for lists is 'tail_trim'
 
@@ -131,6 +146,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     assertEquals(11L, rlist.get(9).longValue());
   }
 
+  @Test
   public void testLopInsert_AppendHeadTrim() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
@@ -154,6 +170,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     assertEquals(11L, rlist.get(9).longValue());
   }
 
+  @Test
   public void testLopInsert_AppendOverflowError() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.error))
@@ -167,6 +184,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopInsert_InsertTailTrim() throws Exception {
     // Default overflowaction for lists is 'tail_trim'
 
@@ -187,6 +205,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     assertEquals(9L, rlist.get(9).longValue()); // tail_trimmed
   }
 
+  @Test
   public void testLopInsert_InsertHeadTrim() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
@@ -209,6 +228,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
     assertEquals(10L, rlist.get(9).longValue());
   }
 
+  @Test
   public void testLopInsert_InsertOverflowError() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.error))
@@ -222,6 +242,7 @@ public class LopInsertBoundary extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopInsert_SetMaxCountUnderCurrentSize() throws Exception {
     assertTrue(mc.asyncSetAttr(key,
             new CollectionAttributes(null, null, CollectionOverflowAction.error))

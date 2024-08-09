@@ -18,7 +18,11 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.transcoders.LongTranscoder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BaseLongKeyTest extends BaseIntegrationTest {
 
@@ -41,6 +45,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testKV_Long() throws Exception {
     // KV Set
     assertTrue(mc.set(keys.get(0), 10, "value1").get());
@@ -52,6 +57,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     assertTrue(mc.delete(keys.get(0)).get());
   }
 
+  @Test
   public void testSet_Long() throws Exception {
     // Set Collection Create & Insert
     assertTrue(mc.asyncSopInsert(keys.get(0), 10L, new CollectionAttributes()).get());
@@ -68,6 +74,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     assertTrue(mc.delete(keys.get(0)).get());
   }
 
+  @Test
   public void testMap_Long() throws Exception {
     // Map Collection Create & Insert
     assertTrue(mc.asyncMopInsert(keys.get(0), "mkey1", 10L, new CollectionAttributes()).get());
@@ -84,6 +91,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     assertTrue(mc.delete(keys.get(0)).get());
   }
 
+  @Test
   public void testList_Long() throws Exception {
     // List Collection Create & Insert
     assertTrue(mc.asyncLopInsert(keys.get(0), 0, 10L, new CollectionAttributes()).get());
@@ -100,6 +108,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     assertTrue(mc.delete(keys.get(0)).get());
   }
 
+  @Test
   public void testBtree_Long() throws Exception {
     // BTree Collection Create & Insert
     assertTrue(mc.asyncBopInsert(keys.get(0), 10, null, 10L,
@@ -118,6 +127,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     assertTrue(mc.delete(keys.get(0)).get());
   }
 
+  @Test
   public void testKV_BulkGet_Long() throws Exception {
     // KV Set
     for (int i = 0; i < keySize; i++) {
@@ -138,6 +148,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testBtree_MGet_Long() throws Exception {
     // BTree Collection Create & Insert
     for (int i = 0; i < keySize; i++) {
@@ -157,6 +168,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testBtree_SMGet_Long() throws Exception {
     // BTree Collection Create & Insert
     for (int i = 0; i < keySize; i++) {
@@ -173,18 +185,18 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
       List<SMGetElement<Object>> map = oldFuture
               .get();
 
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(oldFuture.getMissedKeyList().isEmpty());
+      assertEquals(10, map.size());
+      assertTrue(oldFuture.getMissedKeyList().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(keys.get(i), map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        assertEquals(keys.get(i), map.get(i).getKey());
+        assertEquals(i, map.get(i).getBkey());
+        assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       oldFuture.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc
@@ -194,18 +206,18 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
       List<SMGetElement<Object>> map = future
               .get();
 
-      Assert.assertEquals(10, map.size());
-      Assert.assertTrue(future.getMissedKeys().isEmpty());
+      assertEquals(10, map.size());
+      assertTrue(future.getMissedKeys().isEmpty());
 
       for (int i = 0; i < map.size(); i++) {
-        Assert.assertEquals(keys.get(i), map.get(i).getKey());
-        Assert.assertEquals(i, map.get(i).getBkey());
-        Assert.assertEquals("VALUE" + i, map.get(i).getValue());
+        assertEquals(keys.get(i), map.get(i).getKey());
+        assertEquals(i, map.get(i).getBkey());
+        assertEquals("VALUE" + i, map.get(i).getValue());
       }
     } catch (Exception e) {
       future.cancel(true);
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     // Delete Key

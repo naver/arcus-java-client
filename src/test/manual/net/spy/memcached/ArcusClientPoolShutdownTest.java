@@ -19,16 +19,16 @@ package net.spy.memcached;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
-public class ArcusClientPoolShutdownTest extends TestCase {
+@Disabled
+public class ArcusClientPoolShutdownTest {
 
+  @Test
   public void testOpenAndWait() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;
@@ -51,7 +51,7 @@ public class ArcusClientPoolShutdownTest extends TestCase {
       currentThreads.add(t.getName());
     }
     for (String name : threadNames) {
-      Assert.assertTrue(currentThreads.contains(name));
+      Assertions.assertTrue(currentThreads.contains(name));
     }
 
     // Sleep 1s
@@ -77,8 +77,8 @@ public class ArcusClientPoolShutdownTest extends TestCase {
       currentThreads.add(t.getName());
     }
     for (String name : threadNames) {
-      Assert.assertTrue("Thread '" + name + "' is exists.",
-              !currentThreads.contains(name));
+      Assertions.assertTrue(!currentThreads.contains(name),
+              "Thread '" + name + "' is exists.");
     }
   }
 }

@@ -16,42 +16,47 @@
  */
 package net.spy.memcached.collection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.ElementFlagFilter.BitWiseOperands;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ElementFlagFilterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.fail;
 
+public class ElementFlagFilterTest {
+
+  @Test
   public void testValidate1() {
     try {
       new ElementFlagFilter(null, null);
     } catch (NullPointerException e) {
       return;
     }
-    Assert.fail("Argument validation failed.");
+    fail("Argument validation failed.");
   }
 
+  @Test
   public void testValidate2() {
     try {
       new ElementFlagFilter(null, "".getBytes());
     } catch (NullPointerException e) {
       return;
     }
-    Assert.fail("Argument validation failed.");
+    fail("Argument validation failed.");
   }
 
+  @Test
   public void testValidate3() {
     try {
       new ElementFlagFilter(CompOperands.Equal, null);
     } catch (NullPointerException e) {
       return;
     }
-    Assert.fail("Argument validation failed.");
+    fail("Argument validation failed.");
   }
 
+  @Test
   public void testZeroLengthCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
@@ -66,6 +71,7 @@ public class ElementFlagFilterTest extends TestCase {
     fail("Oops. Something's going wrong.");
   }
 
+  @Test
   public void testZeroLengthBitCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
@@ -82,21 +88,22 @@ public class ElementFlagFilterTest extends TestCase {
     fail("Oops. Something's going wrong.");
   }
 
+  @Test
   public void testConstruct() {
     String src = "ABC";
 
     ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal,
             src.getBytes());
 
-    Assert.assertEquals("0 EQ 0x414243", filter.toString());
+    Assertions.assertEquals("0 EQ 0x414243", filter.toString());
 
     filter.setCompareOffset(2);
 
-    Assert.assertEquals("2 EQ 0x414243", filter.toString());
+    Assertions.assertEquals("2 EQ 0x414243", filter.toString());
 
     filter.setBitOperand(BitWiseOperands.AND, src.getBytes());
 
-    Assert.assertEquals("2 & 0x414243 EQ 0x414243", filter.toString());
+    Assertions.assertEquals("2 & 0x414243 EQ 0x414243", filter.toString());
   }
 
 }

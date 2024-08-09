@@ -20,6 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class FlushByPrefixTest extends BaseIntegrationTest {
 
   private final String PREFIX = "prefix";
@@ -27,6 +34,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE = "value";
 
+  @Test
   public void testFlushByPrefix() {
     try {
       Boolean setResult = mc.set(PREFIX + DELIMITER + KEY, 60, VALUE)
@@ -46,6 +54,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testFlushByPrefix1Depth() {
     try {
       for (int i = 0; i < 10; i++) {
@@ -70,6 +79,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testFlushByMultiPrefix() {
     try {
       for (int i = 0; i < 10; i++) {

@@ -13,7 +13,11 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.ops.Operation;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test queue overflow.
@@ -23,7 +27,7 @@ import org.junit.Ignore;
  * The code has been modified so that no overflow occurs.
  * So this test is no longer necessary.
  */
-@Ignore
+@Disabled
 public class QueueOverflowTest extends ClientBaseCase {
 
   @Override
@@ -88,14 +92,16 @@ public class QueueOverflowTest extends ClientBaseCase {
       // OK, at least we got one back.
     }
     Thread.sleep(500);
-    assertTrue("Was not able to set a key after failure.",
-            client.set("kx", 0, "woo").get(10, TimeUnit.SECONDS));
+    assertTrue(client.set("kx", 0, "woo").get(10, TimeUnit.SECONDS),
+            "Was not able to set a key after failure.");
   }
 
+  @Test
   public void testOverflowingInputQueue() throws Exception {
     runOverflowTest(new byte[]{1});
   }
 
+  @Test
   public void testOverflowingWriteQueue() throws Exception {
     byte[] b = new byte[8192];
     Random r = new Random();
@@ -103,11 +109,12 @@ public class QueueOverflowTest extends ClientBaseCase {
     runOverflowTest(b);
   }
 
+  @Test
   public void testOverflowingReadQueue() throws Exception {
     byte[] b = new byte[8192];
     Random r = new Random();
     r.nextBytes(b);
-    client.set("x", 0, b);
+    assertTrue(client.set("x", 0, b).get());
 
     Collection<Future<Object>> c = new ArrayList<>();
     try {

@@ -16,58 +16,59 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolSetDeleteTest extends TestCase {
+public class ProtocolSetDeleteTest {
   private final Object value = "value";
   private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
+  @Test
   public void testStringify() {
     // default setting : dropIfEmpty = true
 
     SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
-    Assert.assertEquals("5 drop", del.stringify());
+    Assertions.assertEquals("5 drop", del.stringify());
 
     del = new SetDelete<>(value, false, false, testTranscoder);
-    Assert.assertEquals("5", del.stringify());
+    Assertions.assertEquals("5", del.stringify());
 
     del = new SetDelete<>(value, false, true, testTranscoder);
-    Assert.assertEquals("5 drop", del.stringify());
+    Assertions.assertEquals("5 drop", del.stringify());
 
     del = new SetDelete<>(value, true, testTranscoder);
-    Assert.assertEquals("5 drop noreply", del.stringify());
+    Assertions.assertEquals("5 drop noreply", del.stringify());
 
     del = new SetDelete<>(value, true, false, testTranscoder);
-    Assert.assertEquals("5 noreply", del.stringify());
+    Assertions.assertEquals("5 noreply", del.stringify());
 
     del = new SetDelete<>(value, true, true, testTranscoder);
-    Assert.assertEquals("5 drop noreply", del.stringify());
+    Assertions.assertEquals("5 drop noreply", del.stringify());
   }
 
+  @Test
   public void testGetAdditionalArgs() {
     byte[] expected = new byte[]{'v', 'a', 'l', 'u', 'e'};
     SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, false, false, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, false, true, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, true, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, true, false, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, true, true, testTranscoder);
-    Assert.assertArrayEquals(expected, del.getAdditionalArgs());
+    Assertions.assertArrayEquals(expected, del.getAdditionalArgs());
   }
 }

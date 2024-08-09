@@ -33,34 +33,39 @@ import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.WhalinTranscoder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BulkStoreTest extends BaseIntegrationTest {
 
+  @Test
   public void testZeroSizedKeys() {
     try {
       mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
               60, "value");
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // should get here.
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     try {
       mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
               60, new Object(), new CollectionTranscoder());
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // should get here.
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testSetAndGet2() {
     int KEY_SIZE = 10;
 
@@ -92,12 +97,12 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
@@ -106,16 +111,17 @@ public class BulkStoreTest extends BaseIntegrationTest {
         k = key;
         v = (String) mc.asyncGet(k).get();
 
-        Assert.assertEquals(k + " has unexpected value.", o.get(k), v);
+        assertEquals(o.get(k), v, k + " has unexpected value.");
 
         mc.delete(k).get();
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testSetAndGet() {
     String value = "MyValue";
 
@@ -148,18 +154,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : keys) {
         String v = (String) mc.get(key);
-        Assert.assertEquals(key + " has unexpected value.", value, v);
+        assertEquals(value, v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -168,11 +174,12 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
 
+  @Test
   public void testAddAndGet() {
     String value = "MyValue";
 
@@ -197,18 +204,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : keys) {
         String v = (String) mc.get(key);
-        Assert.assertEquals(key + " has unexpected value.", value, v);
+        assertEquals(value, v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -217,11 +224,12 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
 
+  @Test
   public void testReplaceAndGet() {
     String value = "MyValue";
 
@@ -246,18 +254,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : keys) {
         String v = (String) mc.get(key);
-        Assert.assertEquals(key + " has unexpected value.", value, v);
+        assertEquals(value, v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -266,10 +274,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testStoreWithTranscoder() {
     String value = "MyValue";
     Transcoder<Object> transcoder = new WhalinTranscoder();
@@ -295,18 +304,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-            errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        Assert.assertEquals(key + " has unexpected value.", value, v);
+        assertEquals(value, v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -315,10 +324,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testStoreWithTranscoder2() {
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
@@ -345,17 +355,17 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, OperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-            errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        Assert.assertEquals(key + " has unexpected value.", o.get(key), v);
+        assertEquals(o.get(key), v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -364,10 +374,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testSetWithTranscoder() {
     String value = "MyValue";
     Transcoder<Object> transcoder = new WhalinTranscoder();
@@ -394,18 +405,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, CollectionOperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-            errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : keys) {
         String v = (String) mc.get(key, transcoder);
-        Assert.assertEquals(key + " has unexpected value.", value, v);
+        assertEquals(value, v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -414,10 +425,11 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testSetWithTranscoder2() {
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
@@ -444,18 +456,18 @@ public class BulkStoreTest extends BaseIntegrationTest {
       Map<String, CollectionOperationStatus> errorList;
       try {
         errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-            errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
       for (String key : o.keySet()) {
         String v = (String) mc.get(key, transcoder);
-        Assert.assertEquals(key + " has unexpected value.", o.get(key), v);
+        assertEquals(o.get(key), v, key + " has unexpected value.");
       }
 
       // REMOVE
@@ -464,7 +476,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

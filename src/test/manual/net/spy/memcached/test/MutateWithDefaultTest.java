@@ -21,18 +21,24 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MutateWithDefaultTest extends BaseIntegrationTest {
 
   private String key = "MutateWithDefaultTest";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get();
   }
 
+  @Test
   public void testIncr() {
     try {
       long v;
@@ -48,10 +54,11 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testDecr() {
     try {
       long v;
@@ -68,10 +75,11 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testIncrWithDefault() {
     try {
 
@@ -87,10 +95,11 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testDecrWithDefault() {
     try {
 
@@ -106,7 +115,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

@@ -12,7 +12,13 @@ import net.spy.memcached.MemcachedClientIF;
 import net.spy.memcached.compat.BaseMockCase;
 import net.spy.memcached.internal.ImmediateFuture;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import org.jmock.Expectations;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test the cache loader.
@@ -21,34 +27,40 @@ public class CacheLoaderTest extends BaseMockCase {
 
   private ExecutorService es = null;
 
+  @BeforeEach
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     super.setUp();
     BlockingQueue<Runnable> wq = new LinkedBlockingQueue<>();
     es = new ThreadPoolExecutor(10, 10, 5 * 60, TimeUnit.SECONDS, wq);
   }
 
+  @AfterEach
   @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     es.shutdownNow();
     super.tearDown();
   }
 
+  @Test
   public void testSimpleLoading() throws Exception {
-    Mock m = mock(MemcachedClientIF.class);
+    MemcachedClientIF m = context.mock(MemcachedClientIF.class);
 
     LoadCounter sl = new LoadCounter();
-    CacheLoader cl = new CacheLoader((MemcachedClientIF) m.proxy(),
-            es, sl, 0);
+    CacheLoader cl = new CacheLoader(m, es, sl, 0);
 
-    m.expects(once()).method("set").with(eq("a"), eq(0), eq(1))
-            .will(returnValue(new ImmediateFuture(true)));
-    m.expects(once()).method("set").with(eq("a"), eq(0), eq(1))
-            .will(throwException(new IllegalStateException("Full up")));
-    m.expects(once()).method("set").with(eq("b"), eq(0), eq(2))
-            .will(returnValue(new ImmediateFuture(new RuntimeException("blah"))));
-    m.expects(once()).method("set").with(eq("c"), eq(0), eq(3))
-            .will(returnValue(new ImmediateFuture(false)));
+    context.checking(
+            new Expectations() {{
+              oneOf(m).set("a", 0, 1);
+              will(returnValue(new ImmediateFuture(true)));
+
+              oneOf(m).set("b", 0, 2);
+              will(returnValue(new ImmediateFuture(new RuntimeException("blah"))));
+
+              oneOf(m).set("c", 0, 3);
+              will(returnValue(new ImmediateFuture(false)));
+            }}
+    );
 
     Map<String, Object> map = new HashMap<>();
     map.put("a", 1);

@@ -421,6 +421,10 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
+  public void commandNodeChange(List<String> children) {
+    /* TODO */
+  }
+
   private String getAddressListString(List<String> children) {
     StringBuilder addrs = new StringBuilder();
     for (int i = 0; i < children.size(); i++) {

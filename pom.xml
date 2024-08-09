@@ -15,8 +15,9 @@
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.12</slf4j.version>
         <ehcache.version>2.6.0</ehcache.version>
-        <junit.version>4.13.1</junit.version>
-        <jmock.version>1.2.0</jmock.version>
+        <junit.api.version>5.10.2</junit.api.version>
+        <junit.engine.version>5.10.2</junit.engine.version>
+        <jmock.version>2.13.1</jmock.version>
     </properties>
     <licenses>
         <license>
@@ -115,13 +116,19 @@
 
         <!-- TEST -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jmock</groupId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.engine.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
             <artifactId>jmock</artifactId>
             <version>${jmock.version}</version>
             <scope>test</scope>
@@ -245,7 +252,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
+                <version>3.3.1</version>
                 <configuration>
                     <skipAfterFailureCount>1</skipAfterFailureCount>
                     <excludes>

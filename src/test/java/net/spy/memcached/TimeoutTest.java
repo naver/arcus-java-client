@@ -2,14 +2,17 @@ package net.spy.memcached;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TimeoutTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class TimeoutTest {
   private MemcachedClient client = null;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     client = new MemcachedClient(new DefaultConnectionFactory() {
       @Override
       public long getOperationTimeout() {
@@ -24,12 +27,11 @@ public class TimeoutTest extends TestCase {
             AddrUtil.getAddresses("127.0.0.1:64213"));
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     if (client != null) {
       client.shutdown();
     }
-    super.tearDown();
   }
 
   private void tryTimeout(String name, Runnable r) {
@@ -41,6 +43,7 @@ public class TimeoutTest extends TestCase {
     }
   }
 
+  @Test
   public void testCasTimeout() {
     tryTimeout("cas", new Runnable() {
       public void run() {
@@ -49,6 +52,7 @@ public class TimeoutTest extends TestCase {
     });
   }
 
+  @Test
   public void testGetsTimeout() {
     tryTimeout("gets", new Runnable() {
       public void run() {
@@ -57,6 +61,7 @@ public class TimeoutTest extends TestCase {
     });
   }
 
+  @Test
   public void testGetTimeout() {
     tryTimeout("get", new Runnable() {
       public void run() {
@@ -65,6 +70,7 @@ public class TimeoutTest extends TestCase {
     });
   }
 
+  @Test
   public void testGetBulkTimeout() {
     tryTimeout("getbulk", new Runnable() {
       public void run() {
@@ -73,6 +79,7 @@ public class TimeoutTest extends TestCase {
     });
   }
 
+  @Test
   public void testIncrTimeout() {
     tryTimeout("incr", new Runnable() {
       public void run() {
@@ -81,6 +88,7 @@ public class TimeoutTest extends TestCase {
     });
   }
 
+  @Test
   public void testIncrWithDefTimeout() {
     tryTimeout("incrWithDef", new Runnable() {
       public void run() {

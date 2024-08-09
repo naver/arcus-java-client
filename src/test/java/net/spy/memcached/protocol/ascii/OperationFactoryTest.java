@@ -5,6 +5,11 @@ import net.spy.memcached.OperationFactoryTestBase;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 public class OperationFactoryTest extends OperationFactoryTestBase {
 
   @Override
@@ -12,6 +17,7 @@ public class OperationFactoryTest extends OperationFactoryTestBase {
     return new AsciiOperationFactory();
   }
 
+  @Test
   @Override
   public void testMutatorOperationIncrCloning() {
     int exp = 823862;
@@ -29,6 +35,7 @@ public class OperationFactoryTest extends OperationFactoryTestBase {
     assertCallback(op2);
   }
 
+  @Test
   @Override
   public void testMutatorOperationDecrCloning() {
     int exp = 823862;

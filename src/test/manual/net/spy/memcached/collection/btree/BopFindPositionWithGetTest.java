@@ -28,18 +28,27 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BopFindPositionWithGetTest extends BaseIntegrationTest {
 
   private String key = "BopFindPositionWithGetTest";
   private String invalidKey = "InvalidBopFindPositionWithGetTest";
   private String kvKey = "KvBopFindPositionWithGetTest";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testLongBKeyAsc() throws Exception {
     long longBkey, resultBkey;
     int totCount = 100;
@@ -78,15 +87,16 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       }
       resultBkey = position;
       for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-        assertEquals("invalid position", position, each.getKey().intValue());
-        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
-        assertEquals("invalid value", "val", each.getValue().getValue());
+        assertEquals(position, each.getKey().intValue(), "invalid position");
+        assertEquals(resultBkey, each.getValue().getLongBkey(), "invalid bkey");
+        assertEquals("val", each.getValue().getValue(), "invalid value");
         position++;
         resultBkey++;
       }
     }
   }
 
+  @Test
   public void testLongBKeyDesc() throws Exception {
     long longBkey, resultBkey;
     int totCount = 100;
@@ -125,15 +135,16 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       }
       resultBkey = (totCount - 1) - position;
       for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-        assertEquals("invalid position", position, each.getKey().intValue());
-        assertEquals("invalid bkey", resultBkey, each.getValue().getLongBkey());
-        assertEquals("invalid value", "val", each.getValue().getValue());
+        assertEquals(position, each.getKey().intValue(), "invalid position");
+        assertEquals(resultBkey, each.getValue().getLongBkey(), "invalid bkey");
+        assertEquals("val", each.getValue().getValue(), "invalid value");
         position++;
         resultBkey--;
       }
     }
   }
 
+  @Test
   public void testByteArrayBKeyAsc() throws Exception {
     byte[] byteBkey, resultBkey;
     int totCount = 100;
@@ -176,9 +187,9 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       bkey = position;
       resultBkey[0] = (byte) bkey;
       for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-        assertEquals("invalid position", position, each.getKey().intValue());
-        assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
-        assertEquals("invalid value", "val", each.getValue().getValue());
+        assertEquals(position, each.getKey().intValue(), "invalid position");
+        assertTrue(Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()), "invalid bkey");
+        assertEquals("val", each.getValue().getValue(), "invalid value");
         position++;
         bkey++;
         resultBkey[0] = (byte) bkey;
@@ -186,6 +197,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testByteArrayBKeyDesc() throws Exception {
     byte[] byteBkey, resultBkey;
     int totCount = 100;
@@ -228,9 +240,9 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
       bkey = (totCount - 1) - position;
       resultBkey[0] = (byte) bkey;
       for (Entry<Integer, Element<Object>> each : result.entrySet()) {
-        assertEquals("invalid position", position, each.getKey().intValue());
-        assertTrue("invalid bkey", Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()));
-        assertEquals("invalid value", "val", each.getValue().getValue());
+        assertEquals(position, each.getKey().intValue(), "invalid position");
+        assertTrue(Arrays.equals(resultBkey, each.getValue().getByteArrayBkey()), "invalid bkey");
+        assertEquals("val", each.getValue().getValue(), "invalid value");
         position++;
         bkey--;
         resultBkey[0] = (byte) bkey;
@@ -238,6 +250,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testUnsuccessfulResponses() throws Exception {
     mc.delete(invalidKey).get();
     mc.delete(kvKey).get();

@@ -29,12 +29,17 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BopInsertBulkTest extends BaseIntegrationTest {
 
   private static final byte[] EFLAG = new byte[]{0, 0, 1, 1};
 
+  @Test
   public void testInsertAndGet() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
@@ -59,8 +64,8 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -84,7 +89,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (String key : keys) {
@@ -93,10 +98,11 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testInsertAndGetByteArrayBkey() {
     String value = "MyValue";
     byte[] bkey = new byte[]{0, 1, 1, 1};
@@ -121,8 +127,8 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -147,7 +153,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (String key : keys) {
@@ -156,10 +162,11 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testInsertAndGetWithEflag() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
@@ -184,8 +191,8 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -209,7 +216,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0." );
 
       // REMOVE
       for (String key : keys) {
@@ -218,10 +225,11 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testInsertAndGetByteArrayBkeyWithEflag() {
     String value = "MyValue";
     byte[] bkey = new byte[]{0, 1, 1, 1};
@@ -246,8 +254,8 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -272,7 +280,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
           errorCount++;
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (String key : keys) {
@@ -281,10 +289,11 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testKeyAttributes() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
@@ -313,8 +322,8 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -328,10 +337,11 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testErrorCount() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
@@ -361,7 +371,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 }

@@ -8,12 +8,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test the various memcached client constructors.
  */
-public class MemcachedClientConstructorTest extends TestCase {
+public class MemcachedClientConstructorTest {
 
   private MemcachedClient client = null;
 
@@ -24,12 +29,11 @@ public class MemcachedClientConstructorTest extends TestCase {
   protected static boolean USE_ZK = Boolean.valueOf(System.getProperty(
           "USE_ZK", "false"));
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     if (client != null) {
       client.shutdown();
     }
-    super.tearDown();
   }
 
   private void assertWorking() throws Exception {
@@ -43,6 +47,7 @@ public class MemcachedClientConstructorTest extends TestCase {
             e.getMessage());
   }
 
+  @Test
   public void testVarargConstructor() throws Exception {
     if (!USE_ZK) {
       String tokens[] = ARCUS_HOST.split(":");
@@ -54,6 +59,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testEmptyVarargConstructor() throws Exception {
     try {
       client = new MemcachedClient();
@@ -63,6 +69,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testNulListConstructor() throws Exception {
     try {
       List<InetSocketAddress> l = null;
@@ -73,6 +80,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testEmptyListConstructor() throws Exception {
     try {
       client = new MemcachedClient(
@@ -83,6 +91,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testNullFactoryConstructor() throws Exception {
     try {
       client = new MemcachedClient(null,
@@ -93,6 +102,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testNegativeTimeout() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
@@ -108,6 +118,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testZeroTimeout() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
@@ -123,6 +134,7 @@ public class MemcachedClientConstructorTest extends TestCase {
     }
   }
 
+  @Test
   public void testConnFactoryWithoutOpFactory() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
@@ -131,12 +143,14 @@ public class MemcachedClientConstructorTest extends TestCase {
           return null;
         }
       }, AddrUtil.getAddresses(ARCUS_HOST));
+      fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make op factory",
               e.getMessage());
     }
   }
 
+  @Test
   public void testConnFactoryWithoutConns() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
@@ -146,6 +160,7 @@ public class MemcachedClientConstructorTest extends TestCase {
           return null;
         }
       }, AddrUtil.getAddresses(ARCUS_HOST));
+      fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make a connection",
               e.getMessage());
@@ -153,6 +168,7 @@ public class MemcachedClientConstructorTest extends TestCase {
 
   }
 
+  @Test
   public void testArraymodNodeLocatorAccessor() throws Exception {
     client = new MemcachedClient(AddrUtil.getAddresses(ARCUS_HOST));
     assertTrue(client.getNodeLocator() instanceof ArrayModNodeLocator);
@@ -160,6 +176,7 @@ public class MemcachedClientConstructorTest extends TestCase {
             instanceof MemcachedNodeROImpl);
   }
 
+  @Test
   public void testKetamaNodeLocatorAccessor() throws Exception {
     client = new MemcachedClient(new KetamaConnectionFactory(),
             AddrUtil.getAddresses(ARCUS_HOST));

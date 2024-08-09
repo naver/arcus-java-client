@@ -23,17 +23,26 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class SopExistTest extends BaseIntegrationTest {
 
   private final String key = "SopExistTest";
   private final String value = "value";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get();
   }
 
+  @Test
   public void testExist() throws Exception {
     Boolean result = mc.asyncSopInsert(key, value,
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
@@ -45,6 +54,7 @@ public class SopExistTest extends BaseIntegrationTest {
             .getResponse());
   }
 
+  @Test
   public void testNotExist() throws Exception {
     Boolean result = mc.asyncSopInsert(key, value,
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
@@ -56,6 +66,7 @@ public class SopExistTest extends BaseIntegrationTest {
             .getResponse());
   }
 
+  @Test
   public void testNotFound() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
     assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
@@ -63,6 +74,7 @@ public class SopExistTest extends BaseIntegrationTest {
             .getResponse());
   }
 
+  @Test
   public void testUnreadabled() throws Exception {
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setReadable(false);

@@ -19,28 +19,28 @@ package net.spy.memcached.emptycollection;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.MapGet;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolMapGetTest extends TestCase {
+public class ProtocolMapGetTest {
 
   private final String MKEY = "mkey";
 
+  @Test
   public void testStringify() {
     // default setting : dropIfEmpty = true
 
     List<String> mkeyList = new ArrayList<>();
     mkeyList.add(MKEY);
-    Assert.assertEquals("4 1 drop",
+    Assertions.assertEquals("4 1 drop",
             (new MapGet(mkeyList, true, true)).stringify());
-    Assert.assertEquals("4 1 delete",
+    Assertions.assertEquals("4 1 delete",
             (new MapGet(mkeyList, true, false)).stringify());
-    Assert.assertEquals("4 1",
+    Assertions.assertEquals("4 1",
             (new MapGet(mkeyList, false, true)).stringify());
-    Assert.assertEquals("4 1",
+    Assertions.assertEquals("4 1",
             (new MapGet(mkeyList, false, false)).stringify());
   }
 }

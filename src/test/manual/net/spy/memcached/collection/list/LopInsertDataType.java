@@ -24,17 +24,28 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class LopInsertDataType extends BaseIntegrationTest {
 
   private String key = "LopInsertDataType";
   private Random rand = new Random(new Date().getTime());
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteList(key, 1000);
     super.tearDown();
   }
 
+  @Test
   public void testLopInsert_ElementCountLimit() throws Exception {
     byte[] tooBigByte = new byte[1024 * 1024];
     for (int i = 0; i < tooBigByte.length; i++) {
@@ -52,6 +63,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLopInsert_SameDataType() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, 0, "a string",
@@ -72,6 +84,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLopInsert_DifferentDataType() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, -1, "a string",
@@ -97,6 +110,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLopInsert_DifferentDataType_ErrorCase() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, 0, 'a',

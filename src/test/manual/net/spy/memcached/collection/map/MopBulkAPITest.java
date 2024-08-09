@@ -27,7 +27,12 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MopBulkAPITest extends BaseIntegrationTest {
 
@@ -35,11 +40,11 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   private final Map<String, Object> elements = new HashMap<>();
   private final Map<String, Object> updateMap = new HashMap<>();
 
-
   private int getValueCount() {
     return mc.getMaxPipedItemCount();
   }
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -51,6 +56,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.delete(key).get();
@@ -73,10 +79,11 @@ public class MopBulkAPITest extends BaseIntegrationTest {
       assertEquals(0, map.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkFailed() {
     try {
       mc.asyncMopDelete(key, true).get(1000,
@@ -98,10 +105,11 @@ public class MopBulkAPITest extends BaseIntegrationTest {
       assertFalse(future.getOperationStatus().isSuccess());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBulkEmptyElements() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -109,16 +117,17 @@ public class MopBulkAPITest extends BaseIntegrationTest {
                       new CollectionAttributes());
 
       future.get(10000, TimeUnit.MILLISECONDS);
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       return;
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
-    Assert.fail();
+    Assertions.fail();
   }
 
+  @Test
   public void testUpdateBulk() {
     try {
       mc.asyncMopDelete(key, true).get(1000,
@@ -145,7 +154,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
       assertEquals("newvalue1", rmap.get("mkey1"));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

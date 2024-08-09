@@ -23,7 +23,10 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class UnReadableMapTest extends BaseIntegrationTest {
 
@@ -31,19 +34,22 @@ public class UnReadableMapTest extends BaseIntegrationTest {
   private final String MKEY = "MKEY";
   private final String VALUE = "VALUE";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testCreateUnreadableMapTest() {
     try {
       // create unreadable empty
@@ -52,44 +58,45 @@ public class UnReadableMapTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncMopCreate(KEY,
               ElementValueType.STRING, attribute).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
-      Assert.assertFalse(attr.getReadable());
+      Assertions.assertEquals(Long.valueOf(0), attr.getCount());
+      Assertions.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assertions.assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      Assertions.assertFalse(attr.getReadable());
 
       // insert an item
-      Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
+      Assertions.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
               .get());
 
       // get an item
       CollectionFuture<Map<String, Object>> f = mc.asyncMopGet(
               KEY, MKEY, false, false);
-      Assert.assertNull(f.get());
-      Assert.assertEquals("UNREADABLE", f.getOperationStatus()
+      Assertions.assertNull(f.get());
+      Assertions.assertEquals("UNREADABLE", f.getOperationStatus()
               .getMessage());
 
       // set readable
       attribute.setReadable(true);
-      Assert.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
+      Assertions.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
 
       // get an item again
       f = mc.asyncMopGet(KEY, MKEY, false, false);
       Map<String, Object> map = f.get();
 
-      Assert.assertNotNull(map);
-      Assert.assertEquals(VALUE, map.get(MKEY));
-      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(VALUE, map.get(MKEY));
+      Assertions.assertEquals("END", f.getOperationStatus().getMessage());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testCreateReadableMapTest() {
     try {
       // create readable empty
@@ -98,18 +105,18 @@ public class UnReadableMapTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncMopCreate(KEY,
               ElementValueType.STRING, attribute).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
-      Assert.assertTrue(attr.getReadable());
+      Assertions.assertEquals(Long.valueOf(0), attr.getCount());
+      Assertions.assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      Assertions.assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      Assertions.assertTrue(attr.getReadable());
 
       // insert an item
-      Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
+      Assertions.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, null)
               .get());
 
       // get an item
@@ -117,11 +124,11 @@ public class UnReadableMapTest extends BaseIntegrationTest {
               KEY, MKEY, false, false);
 
       Map<String, Object> map = f.get();
-      Assert.assertNotNull(map);
-      Assert.assertEquals(VALUE, map.get(MKEY));
-      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+      Assertions.assertNotNull(map);
+      Assertions.assertEquals(VALUE, map.get(MKEY));
+      Assertions.assertEquals("END", f.getOperationStatus().getMessage());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

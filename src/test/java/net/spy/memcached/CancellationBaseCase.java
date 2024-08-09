@@ -8,27 +8,31 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Base class for cancellation tests.
  */
-public abstract class CancellationBaseCase extends TestCase {
+public abstract class CancellationBaseCase {
   private static final String serverList = "127.0.0.1:64213";
   private MemcachedClient client = null;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     initClient();
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     if (client != null) {
       client.shutdown();
     }
-    super.tearDown();
   }
 
   protected void initClient() throws Exception {
@@ -57,13 +61,15 @@ public abstract class CancellationBaseCase extends TestCase {
     }
   }
 
-  public void testAvailableServers() {
-    client.asyncGet("x");
+  @Test
+  public void testAvailableServers() throws Exception {
+    tryTimeout(client.asyncGet("x"));
     assertEquals(Collections.emptyList(), client.getAvailableServers());
   }
 
-  public void testUnavailableServers() {
-    client.asyncGet("x");
+  @Test
+  public void testUnavailableServers() throws Exception {
+    tryTimeout(client.asyncGet("x"));
     assertEquals(new ArrayList<>(
                     Collections.singleton("/127.0.0.1:64213")),
             ClientBaseCase.stringify(client.getUnavailableServers()));
@@ -83,42 +89,52 @@ public abstract class CancellationBaseCase extends TestCase {
     tryCancellation(f);
   }
 
+  @Test
   public void testAsyncGetCancellation() throws Exception {
     tryTestSequence(client.asyncGet("k"));
   }
 
+  @Test
   public void testAsyncGetsCancellation() throws Exception {
     tryTestSequence(client.asyncGets("k"));
   }
 
+  @Test
   public void testAsyncGetBulkCancellationCollection() throws Exception {
     tryTestSequence(client.asyncGetBulk(Arrays.asList("k", "k2")));
   }
 
+  @Test
   public void testDeleteCancellation() throws Exception {
     tryTestSequence(client.delete("x"));
   }
 
+  @Test
   public void testflushCancellation() throws Exception {
     tryTestSequence(client.flush());
   }
 
+  @Test
   public void testDelayedflushCancellation() throws Exception {
     tryTestSequence(client.flush(3));
   }
 
+  @Test
   public void testReplaceCancellation() throws Exception {
     tryTestSequence(client.replace("x", 3, "y"));
   }
 
+  @Test
   public void testAddCancellation() throws Exception {
     tryTestSequence(client.add("x", 3, "y"));
   }
 
+  @Test
   public void testSetCancellation() throws Exception {
     tryTestSequence(client.set("x", 3, "y"));
   }
 
+  @Test
   public void testCASCancellation() throws Exception {
     tryTestSequence(client.asyncCAS("x", 3, "y"));
   }

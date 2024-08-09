@@ -24,18 +24,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.MockMemcachedNode;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.protocol.BaseOperationImpl;
 
-public class CheckedOperationTimeoutExceptionTest extends TestCase {
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class CheckedOperationTimeoutExceptionTest {
 
   private final long duration = 1;
   private final TimeUnit unit = TimeUnit.MILLISECONDS;
   private final long elapsed = 5;
 
+  @Test
   public void testSingleOperation() {
     Operation op = buildOp(11211);
     Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
@@ -46,6 +51,7 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     assertEquals(expected, e.toString());
   }
 
+  @Test
   public void testNullNode() {
     Operation op = new TestOperation();
     Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
@@ -56,6 +62,7 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     assertEquals(expected, e.toString());
   }
 
+  @Test
   public void testNullOperation() {
     try {
       Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, (Operation) null);
@@ -66,6 +73,7 @@ public class CheckedOperationTimeoutExceptionTest extends TestCase {
     }
   }
 
+  @Test
   public void testMultipleOperation() {
     Collection<Operation> ops = new ArrayList<>();
     ops.add(buildOp(11211));

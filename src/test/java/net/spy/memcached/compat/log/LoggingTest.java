@@ -2,14 +2,22 @@
 
 package net.spy.memcached.compat.log;
 
-import junit.framework.TestCase;
-
 // XXX:  This really needs to get log4j configured first.
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Make sure logging is enabled.
  */
-public class LoggingTest extends TestCase {
+public class LoggingTest {
 
   private Logger logger = null;
 
@@ -17,21 +25,21 @@ public class LoggingTest extends TestCase {
    * Get an instance of LoggingTest.
    */
   public LoggingTest(String name) {
-    super(name);
+    super();
   }
 
   /**
    * Set up logging.
    */
-  @Override
+  @BeforeEach
   public void setUp() throws Exception {
-    super.setUp();
     logger = LoggerFactory.getLogger(getClass());
   }
 
   /**
    * Make sure logging is enabled.
    */
+  @Test
   public void testDebugLogging() {
 //  assertTrue("Debug logging is not enabled", logger.isDebugEnabled());
     logger.debug("debug message");
@@ -40,6 +48,7 @@ public class LoggingTest extends TestCase {
   /**
    * Make sure info is enabled, and test it.
    */
+  @Test
   public void testInfoLogging() {
     assertTrue(logger.isInfoEnabled());
     logger.info("info message");
@@ -48,6 +57,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test other log stuff.
    */
+  @Test
   public void testOtherLogging() {
     logger.warn("warn message");
     logger.warn("test %s", "message");
@@ -62,6 +72,7 @@ public class LoggingTest extends TestCase {
   /**
    * Make sure we're using log4j.
    */
+  @Test
   public void testLog4j() {
 //  Logger l=LoggerFactory.getLogger(getClass());
 //  assertEquals("net.spy.compat.log.Log4JLogger", l.getClass().getName());
@@ -70,6 +81,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test the sun logger.
    */
+  @Test
   public void testSunLogger() {
     Logger l = new SunLogger(getClass().getName());
     assertFalse(l.isDebugEnabled());
@@ -88,6 +100,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test the default logger.
    */
+  @Test
   public void testMyLogger() {
     Logger l = new DefaultLogger(getClass().getName());
     assertFalse(l.isDebugEnabled());
@@ -113,6 +126,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test stringing levels.
    */
+  @Test
   public void testLevelStrings() {
     assertEquals("{LogLevel:  DEBUG}", String.valueOf(Level.DEBUG));
     assertEquals("{LogLevel:  INFO}", String.valueOf(Level.INFO));
@@ -129,6 +143,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test picking up an exception argument.
    */
+  @Test
   public void testExceptionArg() throws Exception {
     Object[] args = new Object[]{"a", 42, new Exception("test")};
     Throwable t = ((AbstractLogger) logger).getThrowable(args);
@@ -139,6 +154,7 @@ public class LoggingTest extends TestCase {
   /**
    * Test when the last argument is not an exception.
    */
+  @Test
   public void testNoExceptionArg() throws Exception {
     Object[] args = new Object[]{"a", 42, new Exception("test"), "x"};
     Throwable t = ((AbstractLogger) logger).getThrowable(args);

@@ -26,19 +26,27 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "MopOverflowActionTest";
   private List<String> keyList = new ArrayList<>();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     keyList.add(key);
   }
 
+  @Test
   public void testMopGet_Maxcount() throws Exception {
     // Test
     for (int maxcount = 100; maxcount <= 200; maxcount += 100) {
@@ -64,6 +72,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testMopGet_Overflow() throws Exception {
     // Create a map
     mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
@@ -94,6 +103,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testMopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
@@ -127,6 +137,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
     mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testMopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
     Map<String, Object> elem = new TreeMap<>();
@@ -136,204 +147,204 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.head_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.tail_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.smallest_silent_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.largest_silent_trim);
       mc.asyncMopInsert(key, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncMopPipedInsertBulk(key, elem, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncMopInsertBulk(keyList, "0", "item0", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

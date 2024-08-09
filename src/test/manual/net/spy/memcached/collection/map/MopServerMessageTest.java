@@ -25,16 +25,27 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.OperationStatus;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MopServerMessageTest extends BaseIntegrationTest {
 
   private final String key = "MopServerMessageTest";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get();
   }
 
+  @Test
   public void testNotFound() throws Exception {
     CollectionFuture<Map<String, Object>> future;
     future = mc.asyncMopGet(key, false, false);
@@ -45,6 +56,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("NOT_FOUND", status.getMessage());
   }
 
+  @Test
   public void testCreatedStored() throws Exception {
     CollectionFuture<Boolean> future;
     future = mc.asyncMopInsert(key, "0", 0, new CollectionAttributes());
@@ -55,6 +67,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("CREATED_STORED", status.getMessage());
   }
 
+  @Test
   public void testStored() throws Exception {
     CollectionFuture<Boolean> future;
     future = mc.asyncMopInsert(key, "0", 0, new CollectionAttributes());
@@ -68,6 +81,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("STORED", status.getMessage());
   }
 
+  @Test
   public void testOverflowed() throws Exception {
     CollectionFuture<Boolean> future;
     future = mc.asyncMopInsert(key, "0", 0, new CollectionAttributes());
@@ -88,6 +102,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("OVERFLOWED", status.getMessage());
   }
 
+  @Test
   public void testDeletedDropped() throws Exception {
     // create
     CollectionFuture<Boolean> future;
@@ -103,6 +118,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("DELETED_DROPPED", status.getMessage());
   }
 
+  @Test
   public void testDeleted() throws Exception {
     // create
     CollectionFuture<Boolean> future;
@@ -122,6 +138,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("DELETED", status.getMessage());
   }
 
+  @Test
   public void testDeletedDroppedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future;
@@ -138,6 +155,7 @@ public class MopServerMessageTest extends BaseIntegrationTest {
     assertEquals("DELETED_DROPPED", status.getMessage());
   }
 
+  @Test
   public void testDeletedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future;

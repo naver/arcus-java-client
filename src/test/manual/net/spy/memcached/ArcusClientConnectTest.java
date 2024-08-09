@@ -16,26 +16,18 @@
  */
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
-import static org.junit.Assume.assumeTrue;
+public class ArcusClientConnectTest {
 
-@RunWith(BlockJUnit4ClassRunner.class)
-public class ArcusClientConnectTest extends TestCase {
-
-  @Before
-  @Override
+  @BeforeEach
   public void setUp() throws Exception {
-    super.setUp();
     // This test assumes we use ZK
-    assumeTrue(BaseIntegrationTest.USE_ZK);
+    Assumptions.assumeTrue(BaseIntegrationTest.USE_ZK);
   }
 
   @Test

@@ -30,13 +30,20 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "BopGetBoundaryTest";
   private List<String> keyList = new ArrayList<>();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -74,6 +81,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 //    }
 //  }
 
+  @Test
   public void testBopGet_Overflow() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
@@ -109,6 +117,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testBopGet_LargestTrim() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
@@ -144,6 +153,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testBopGet_SmallestTrim() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
@@ -179,6 +189,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testBopGet_SmallestTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
@@ -196,6 +207,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             .get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testBopGet_LargestTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
@@ -213,6 +225,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             .get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testBopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
@@ -247,6 +260,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
             1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testBopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
 
@@ -254,90 +268,90 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.head_trim);
       mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncBopPipedInsertBulk(key, new HashMap<>(), attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // create
     try {
       attributesForCreate.setOverflowAction(CollectionOverflowAction.tail_trim);
       mc.asyncBopCreate(key, ElementValueType.STRING, attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // insert
     try {
       mc.asyncBopInsert(key, 1, null, "1", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // pipe insert
     try {
       mc.asyncBopPipedInsertBulk(key, new HashMap<>(), attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
 
     // bulk insert
     try {
       mc.asyncBopInsertBulk(keyList, 1, null, "1", attributesForCreate).get();
-      Assert.fail();
+      Assertions.fail();
     } catch (IllegalArgumentException e) {
       // test success
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

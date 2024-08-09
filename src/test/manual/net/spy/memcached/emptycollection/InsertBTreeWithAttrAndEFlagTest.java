@@ -23,7 +23,10 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
 
@@ -31,23 +34,26 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
   private final long BKEY = 10;
   private final int EXPIRE_TIME_IN_SEC = 1;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testInsertWithAttributeAndWithoutFilter() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -56,50 +62,52 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, "value", attr).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(3333),
+      Assertions.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
       Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertNull(map);
+      Assertions.assertNull(map);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithDefaultAttributeAndWithoutFilter() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
 
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, "value", attr).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(4000),
+      Assertions.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithAttributeAndFilter() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -110,28 +118,29 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY, filter,
               "value", attr).get();
-      Assert.assertTrue(insertResult);
+      Assertions.assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(3333),
+      Assertions.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
       Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertNull(map);
+      Assertions.assertNull(map);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithAttributeAndInvalidFilter() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -146,10 +155,10 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
       } catch (IllegalArgumentException e) {
         return;
       }
-      Assert.fail("Something's going wrong.");
+      Assertions.fail("Something's going wrong.");
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
-    Assert.fail("Something's going wrong.");
+    Assertions.fail("Something's going wrong.");
   }
 }

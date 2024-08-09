@@ -1,8 +1,14 @@
 package net.spy.memcached;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Small test program that does a bunch of sets in a tight loop.
@@ -18,21 +24,26 @@ public final class DoLotsOfSets {
     MemcachedClient client = new MemcachedClient(
             new DefaultConnectionFactory(350000, 32768),
             AddrUtil.getAddresses("localhost:11211"));
+    int count = 300000;
     long start = System.currentTimeMillis();
     byte[] toStore = new byte[26];
     Arrays.fill(toStore, (byte) 'a');
-    for (int i = 0; i < 300000; i++) {
-      client.set("k" + i, 300, toStore);
+    List<Future<Boolean>> futures = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      futures.add(client.set("k" + i, 3600, toStore));
     }
     long added = System.currentTimeMillis();
     System.err.printf("Finished queuing in %sms%n", added - start);
-    client.waitForQueues(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+    for (int i = 0; i < count; i++) {
+      Future<Boolean> future = futures.get(i);
+      assertTrue(future.get(Long.MAX_VALUE, TimeUnit.MILLISECONDS), "k" + i + " is not stored.");
+    }
     long end = System.currentTimeMillis();
     System.err.printf("Completed everything in %sms (%sms to flush)%n",
             end - start, end - added);
     Map<String, Object> m = client.getBulk(Arrays.asList("k1", "k2", "k3", "k4", "k5",
             "k299999", "k299998", "k299997", "k299996"));
-    assert m.size() == 9 : "Expected 9 results, got " + m;
+    assertEquals(m.size(), 9, "Expected 9 results, got " + m);
     client.shutdown();
   }
 }

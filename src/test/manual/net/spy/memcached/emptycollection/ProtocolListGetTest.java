@@ -16,33 +16,33 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.ListGet;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolListGetTest extends TestCase {
+public class ProtocolListGetTest {
 
   private static final int index = 10;
 
+  @Test
   public void testStringify() {
-    Assert.assertEquals("10 drop",
+    Assertions.assertEquals("10 drop",
             (new ListGet(index, true, true)).stringify());
-    Assert.assertEquals("10 delete", (new ListGet(index, true,
+    Assertions.assertEquals("10 delete", (new ListGet(index, true,
             false)).stringify());
-    Assert.assertEquals("10",
+    Assertions.assertEquals("10",
             (new ListGet(index, false, true)).stringify());
-    Assert.assertEquals("10",
+    Assertions.assertEquals("10",
             (new ListGet(index, false, false)).stringify());
 
-    Assert.assertEquals("10..20 delete", (new ListGet(10, 20, true,
+    Assertions.assertEquals("10..20 delete", (new ListGet(10, 20, true,
             false)).stringify());
-    Assert.assertEquals("10..20 drop", (new ListGet(10, 20, true,
+    Assertions.assertEquals("10..20 drop", (new ListGet(10, 20, true,
             true)).stringify());
-    Assert.assertEquals("10..20",
+    Assertions.assertEquals("10..20",
             (new ListGet(10, 20, false, true)).stringify());
-    Assert.assertEquals("10..20",
+    Assertions.assertEquals("10..20",
             (new ListGet(10, 20, false, false)).stringify());
   }
 }

@@ -25,30 +25,36 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final int EXPIRE_TIME_IN_SEC = 1;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    Assertions.assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testInsertWithAttribute() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -62,33 +68,34 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncSopPipedInsertBulk(KEY, valueList, attr).get();
-      Assert.assertTrue(insertResult.isEmpty());
+      Assertions.assertTrue(insertResult.isEmpty());
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(3333),
+      Assertions.assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
+      Assertions.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
-      Assert.assertEquals(valueList.size(), set.size());
+      Assertions.assertEquals(valueList.size(), set.size());
 
       // check expire time
       Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
       List<Object> list = mc.asyncLopGet(KEY, 0, false, false).get();
-      Assert.assertNull(list);
+      Assertions.assertNull(list);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithDefaultAttribute() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -100,28 +107,29 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncSopPipedInsertBulk(KEY, valueList, attr).get();
-      Assert.assertTrue(insertResult.isEmpty());
+      Assertions.assertTrue(insertResult.isEmpty());
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(4000),
+      Assertions.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
+      Assertions.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
-      Assert.assertEquals(valueList.size(), set.size());
+      Assertions.assertEquals(valueList.size(), set.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithoutAttributeCreate() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
@@ -131,28 +139,29 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncSopPipedInsertBulk(KEY, valueList,
                       new CollectionAttributes()).get();
-      Assert.assertTrue(insertResult.isEmpty());
+      Assertions.assertTrue(insertResult.isEmpty());
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(4000),
+      Assertions.assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
-      Assert.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
+      Assertions.assertEquals(Long.valueOf(10), collectionAttributes.getCount());
 
       // check values
       Set<Object> set = mc.asyncSopGet(KEY, 0, false, false).get();
-      Assert.assertEquals(valueList.size(), set.size());
+      Assertions.assertEquals(valueList.size(), set.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithoutAttributeDoNotCreate() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      Assertions.assertNull(mc.asyncGetAttr(KEY).get());
 
       List<Object> valueList = new ArrayList<>();
       for (int i = 1; i < 11; i++) {
@@ -161,15 +170,15 @@ public class PipedBulkInsertSetWithAttrTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> insertResult = mc
               .asyncSopPipedInsertBulk(KEY, valueList, null).get();
-      assertEquals(10, insertResult.size());
+      Assertions.assertEquals(10, insertResult.size());
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      assertNull(collectionAttributes);
+      Assertions.assertNull(collectionAttributes);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 }

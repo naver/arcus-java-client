@@ -27,10 +27,12 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
+  @Test
   public void testInsertAndGet() {
     String key = "testInsertAndGet";
     String prefix = "MyValue";
@@ -54,11 +56,11 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       try {
         Map<Integer, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue(errorList.isEmpty());
+        Assertions.assertTrue(errorList.isEmpty());
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
       // GET
@@ -71,11 +73,11 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       } catch (Exception e) {
         f.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        Assertions.fail(e.getMessage());
       }
 
-      Assert.assertNotNull("Cached list is null.", list);
-      Assert.assertTrue("Cached list is empty.", !list.isEmpty());
+      Assertions.assertNotNull(list, "Cached list is null.");
+      Assertions.assertTrue(!list.isEmpty(), "Cached list is empty.");
 
       for (Object o : list) {
         if (!((String) o).startsWith(prefix)) {
@@ -83,8 +85,8 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
         }
       }
 
-      Assert.assertEquals(valueCount, list.size());
-      Assert.assertEquals(0, errorCount);
+      Assertions.assertEquals(valueCount, list.size());
+      Assertions.assertEquals(0, errorCount);
 
       // REMOVE
       for (Object v : valueList) {
@@ -92,10 +94,11 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
+  @Test
   public void testErrorCount() {
     String key = "testErrorCount";
     int valueCount = 1200;
@@ -114,10 +117,10 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(2000L,
               TimeUnit.MILLISECONDS);
-      assertEquals(valueCount, map.size());
+      Assertions.assertEquals(valueCount, map.size());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      Assertions.fail();
     }
   }
 }

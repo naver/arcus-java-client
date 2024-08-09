@@ -18,8 +18,11 @@ package net.spy.memcached.collection.attribute;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
+import org.junit.jupiter.api.Test;
+
 public class SetAttrTest extends BaseIntegrationTest {
 
+  @Test
   public void testSetAttr() throws Exception {
 
   }

@@ -27,47 +27,46 @@ import java.util.List;
 
 import net.spy.memcached.compat.BaseMockCase;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * Test the basic operation buffer handling stuff.
  */
 public class BaseOpTest extends BaseMockCase {
 
+  @Test
   public void testAssertions() {
-    try {
+    assertThrows(AssertionError.class, () -> {
       assert false;
-      fail("Assertions are not enabled.");
-    } catch (AssertionError e) {
-      // OK
-    }
+    });
   }
 
+  @Test
   public void testDataReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.DATA);
     assertSame(OperationReadType.DATA, op.getReadType());
     // Make sure lines aren't handled
-    try {
-      op.handleLine("x");
-      fail("Handled a line in data mode");
-    } catch (AssertionError e) {
-      // ok
-    }
+    assertThrows(AssertionError.class, () -> op.handleLine("x"));
     op.setBytesToRead(2);
     op.handleRead(ByteBuffer.wrap("hi".getBytes()));
   }
 
+  @Test
   public void testLineReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
     assertSame(OperationReadType.LINE, op.getReadType());
     // Make sure lines aren't handled
-    try {
-      op.handleRead(ByteBuffer.allocate(3));
-      fail("Handled data in line mode");
-    } catch (AssertionError e) {
-      // ok
-    }
+    assertThrows(AssertionError.class, () -> op.handleRead(ByteBuffer.allocate(3)));
     op.handleLine("x");
   }
 
+  @Test
   public void testLineParser() throws Exception {
     String input = "This is a multiline string\r\nhere is line two\r\n";
     ByteBuffer b = ByteBuffer.wrap(input.getBytes());
@@ -79,11 +78,12 @@ public class BaseOpTest extends BaseMockCase {
     op.setBytesToRead(2);
     op.readFromBuffer(ByteBuffer.wrap("xy".getBytes()));
     byte[] expected = {'x', 'y'};
-    assertTrue("Expected " + Arrays.toString(expected) + " but got "
-                    + Arrays.toString(op.getCurrentBytes()),
-            Arrays.equals(expected, op.getCurrentBytes()));
+    assertTrue(Arrays.equals(expected, op.getCurrentBytes()),
+            "Expected " + Arrays.toString(expected) + " but got "
+                    + Arrays.toString(op.getCurrentBytes()));
   }
 
+  @Test
   public void testPartialLine() throws Exception {
     String input1 = "this is a ";
     String input2 = "test\r\n";

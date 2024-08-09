@@ -22,12 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import junit.framework.TestCase;
 
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
@@ -39,22 +36,19 @@ import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-@RunWith(BlockJUnit4ClassRunner.class)
-public class ArcusTimeoutTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class ArcusTimeoutTest {
   private ArcusClient mc = null;
 
   private final String KEY = this.getClass().getSimpleName();
 
-  @Before
-  @Override
+  @BeforeEach
   public void setUp() throws Exception {
-    super.setUp();
     initClient();
   }
 
@@ -72,28 +66,24 @@ public class ArcusTimeoutTest extends TestCase {
     }, AddrUtil.getAddresses("0.0.0.0:23456"));
   }
 
-  @After
-  @Override
+  @AfterEach
   public void tearDown() throws Exception {
     // override teardown to avoid the flush phase
     if (mc != null) {
       mc.shutdown();
     }
-    super.tearDown();
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testCollectionFutureTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testCollectionFutureTimeout() {
     CollectionFuture<Boolean> future;
 
     future = mc.asyncBopInsert(KEY, 0, null, "hello", new CollectionAttributes());
-    future.get(1, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBulkSetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBulkSetTimeout() {
     int keySize = 100000;
 
     String[] keys = new String[keySize];
@@ -104,12 +94,11 @@ public class ArcusTimeoutTest extends TestCase {
     @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, "MyValue");
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBulkSetTimeoutUsingSingleThread()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBulkSetTimeoutUsingSingleThread() {
     int keySize = 100000;
 
     String[] keys = new String[keySize];
@@ -120,12 +109,11 @@ public class ArcusTimeoutTest extends TestCase {
     @SuppressWarnings("deprecation")
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
             Arrays.asList(keys), 60, "MyValue");
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBulkDeleteTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBulkDeleteTimeout() {
     int keySize = 100000;
 
     List<String> keys = new ArrayList<>(keySize);
@@ -134,12 +122,11 @@ public class ArcusTimeoutTest extends TestCase {
     }
 
     Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBulkDeleteTimeoutUsingSingleThread()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBulkDeleteTimeoutUsingSingleThread() {
     int keySize = 100000;
 
     List<String> keys = new ArrayList<>(keySize);
@@ -148,12 +135,11 @@ public class ArcusTimeoutTest extends TestCase {
     }
 
     Future<Map<String, OperationStatus>> future = mc.asyncDeleteBulk(keys);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testSopPipedInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testSopPipedInsertBulkTimeout() {
     String key = "testTimeout";
     int valueCount = mc.getMaxPipedItemCount();
     Object[] valueList = new Object[valueCount];
@@ -163,12 +149,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncSopPipedInsertBulk(
             key, Arrays.asList(valueList), new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testSopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testSopInsertBulkTimeout() {
     String value = "MyValue";
     int keySize = 100000;
     String[] keys = new String[keySize];
@@ -178,12 +163,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncSopInsertBulk(
             Arrays.asList(keys), value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testLopPipedInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testLopPipedInsertBulkTimeout() {
     int valueCount = 500;
     Object[] valueList = new Object[valueCount];
     Arrays.fill(valueList, "MyValue");
@@ -191,12 +175,11 @@ public class ArcusTimeoutTest extends TestCase {
     // SET
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncLopPipedInsertBulk(
             KEY, 0, Arrays.asList(valueList), new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testLopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testLopInsertBulkTimeout() {
     String value = "MyValue";
     int keySize = 250000;
 
@@ -207,12 +190,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncLopInsertBulk(
             Arrays.asList(keys), 0, value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBopPipedInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBopPipedInsertBulkTimeout() {
     String key = "MyBopKey";
     String value = "MyValue";
 
@@ -224,12 +206,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncBopPipedInsertBulk(
             key, bkeys, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testBopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testBopInsertBulkTimeout() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 
@@ -242,12 +223,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncBopInsertBulk(
             Arrays.asList(keys), bkey, new byte[]{0, 0, 1, 1}, value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testOldSMGetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testOldSMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -255,12 +235,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testSMGetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testSMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -270,12 +249,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testByteArrayBKeyOldSMGetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testByteArrayBKeyOldSMGetTimeout() {
     ArrayList<String> keyList;
     keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
@@ -287,12 +265,11 @@ public class ArcusTimeoutTest extends TestCase {
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testByteArrayBKeySMGetTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testByteArrayBKeySMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -305,19 +282,17 @@ public class ArcusTimeoutTest extends TestCase {
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testFlushByPrefixTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testFlushByPrefixTimeout() {
     OperationFuture<Boolean> flushFuture = mc.flush("prefix");
-    flushFuture.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> flushFuture.get(1L, TimeUnit.MILLISECONDS));
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testMopInsertBulkMultipleTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testMopInsertBulkMultipleTimeout() {
     String key = "MyMopKey";
     String value = "MyValue";
 
@@ -329,13 +304,12 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<Integer, CollectionOperationStatus>> future = mc.asyncMopPipedInsertBulk(
             key, elements, new CollectionAttributes());
-    future.get(1L, TimeUnit.NANOSECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.NANOSECONDS));
     future.cancel(true);
   }
 
-  @Test(expected = TimeoutException.class)
-  public void testMopInsertBulkTimeout()
-          throws InterruptedException, ExecutionException, TimeoutException {
+  @Test
+  public void testMopInsertBulkTimeout() {
     String mkey = "MyMopKey";
     String value = "MyValue";
     int keySize = 250000;
@@ -347,7 +321,7 @@ public class ArcusTimeoutTest extends TestCase {
 
     Future<Map<String, CollectionOperationStatus>> future = mc.asyncMopInsertBulk(
             Arrays.asList(keys), mkey, value, new CollectionAttributes());
-    future.get(1L, TimeUnit.MILLISECONDS);
+    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
     future.cancel(true);
   }
 }

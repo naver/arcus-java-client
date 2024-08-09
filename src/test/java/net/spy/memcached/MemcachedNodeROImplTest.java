@@ -8,23 +8,36 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.junit.jupiter.api.Test;
+
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test readonliness of the MemcachedNodeROImpl
  */
-public class MemcachedNodeROImplTest extends MockObjectTestCase {
+public class MemcachedNodeROImplTest {
 
+  @Test
   public void testReadOnliness() throws Exception {
     SocketAddress sa = new InetSocketAddress(11211);
-    Mock m = mock(MemcachedNode.class, "node");
+    Mockery context = new Mockery();
+    MemcachedNode m = context.mock(MemcachedNode.class, "node");
     MemcachedNodeROImpl node =
-            new MemcachedNodeROImpl((MemcachedNode) m.proxy());
-    m.expects(once()).method("getSocketAddress").will(returnValue(sa));
+            new MemcachedNodeROImpl(m);
+    context.checking(
+            new Expectations() {{
+              oneOf(m).getSocketAddress();
+              will(returnValue(sa));
+            }}
+    );
 
     assertSame(sa, node.getSocketAddress());
-    assertEquals(m.proxy().toString(), node.toString());
+    assertEquals(m.toString(), node.toString());
 
     Set<String> acceptable = new HashSet<>(Arrays.asList(
             "toString", "getSocketAddress", "getBytesRemainingToWrite",
@@ -41,12 +54,13 @@ public class MemcachedNodeROImplTest extends MockObjectTestCase {
           meth.invoke(node, args);
           fail("Failed to break on " + meth.getName());
         } catch (InvocationTargetException e) {
-          assertSame("Fail at " + meth.getName(),
-                  UnsupportedOperationException.class,
-                  e.getCause().getClass());
+          assertSame(UnsupportedOperationException.class,
+                  e.getCause().getClass(),
+                  "Fail at " + meth.getName());
         }
       }
     }
+    context.assertIsSatisfied();
   }
 
   private void fillArgs(Class<?>[] parameterTypes, Object[] args) {
