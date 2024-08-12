@@ -653,7 +653,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
       }
     });
 
-    assertTrue(client.set(key, 0, value).get());
+    assertTrue(client.set(key, 0, value).get(1, TimeUnit.SECONDS));
     try {
       for (int i = 0; i < 1000000; i++) {
         client.get(key);
