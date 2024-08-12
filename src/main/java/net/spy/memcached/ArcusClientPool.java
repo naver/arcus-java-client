@@ -462,11 +462,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
-  public boolean waitForQueues(long timeout, TimeUnit unit) {
-    return this.getClient().waitForQueues(timeout, unit);
-  }
-
-  @Override
   public boolean addObserver(ConnectionObserver obs) {
     return this.getClient().addObserver(obs);
   }
