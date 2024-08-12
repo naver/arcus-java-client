@@ -2122,7 +2122,7 @@ public class MemcachedClient extends SpyThread
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
-  public boolean waitForQueues(long timeout, TimeUnit unit) {
+  private boolean waitForQueues(long timeout, TimeUnit unit) {
     Collection<MemcachedNode> nodes = getAllNodes();
     final CountDownLatch latch = new CountDownLatch(nodes.size());
 
