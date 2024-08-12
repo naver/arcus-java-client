@@ -27,44 +27,33 @@ import java.util.List;
 
 import net.spy.memcached.compat.BaseMockCase;
 
+import static org.junit.Assert.assertThrows;
+
 /**
  * Test the basic operation buffer handling stuff.
  */
 public class BaseOpTest extends BaseMockCase {
 
   public void testAssertions() {
-    try {
+    assertThrows(AssertionError.class, () -> {
       assert false;
-      fail("Assertions are not enabled.");
-    } catch (AssertionError e) {
-      // OK
-    }
+    });
   }
 
-  public void testDataReadType() throws Exception {
+  public void testDataReadType() {
     SimpleOp op = new SimpleOp(OperationReadType.DATA);
     assertSame(OperationReadType.DATA, op.getReadType());
     // Make sure lines aren't handled
-    try {
-      op.handleLine("x");
-      fail("Handled a line in data mode");
-    } catch (AssertionError e) {
-      // ok
-    }
+    assertThrows(AssertionError.class, () -> op.handleLine("x"));
     op.setBytesToRead(2);
     op.handleRead(ByteBuffer.wrap("hi".getBytes()));
   }
 
-  public void testLineReadType() throws Exception {
+  public void testLineReadType() {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
     assertSame(OperationReadType.LINE, op.getReadType());
     // Make sure lines aren't handled
-    try {
-      op.handleRead(ByteBuffer.allocate(3));
-      fail("Handled data in line mode");
-    } catch (AssertionError e) {
-      // ok
-    }
+    assertThrows(AssertionError.class, () -> op.handleRead(ByteBuffer.allocate(3)));
     op.handleLine("x");
   }
 
