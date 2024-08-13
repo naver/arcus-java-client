@@ -66,13 +66,8 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
       String cacheName = cf.getFrontCacheName();
       int maxElements = cf.getMaxFrontCacheElements();
       int timeToLiveSeconds = cf.getFrontCacheExpireTime();
-      boolean copyOnRead = cf.getFrontCacheCopyOnRead();
-      boolean copyOnWrite = cf.getFrontCacheCopyOnWrite();
-      // TODO add an additional option
-      // int timeToIdleSeconds = timeToLiveSeconds;
 
-      localCacheManager = new LocalCacheManager(cacheName, maxElements,
-              timeToLiveSeconds, copyOnRead, copyOnWrite);
+      localCacheManager = new LocalCacheManager(cacheName, maxElements, timeToLiveSeconds);
     }
   }
 

@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.plugin;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -24,15 +25,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.PersistenceConfiguration;
-import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
-
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
+
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 
 /**
  * Local cache storage based on ehcache.
@@ -40,36 +42,22 @@ import net.spy.memcached.compat.log.LoggerFactory;
 public class LocalCacheManager {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
-
-  protected Cache cache;
+  private Cache<String, Object> cache;
   protected String name;
 
-  public LocalCacheManager(String name) {
+  public LocalCacheManager(String name, int max, int exptime) {
     this.name = name;
-    // create a undecorated Cache object.
-    this.cache = CacheManager.getInstance().getCache(name);
-  }
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+            .build(true);
+    CacheConfiguration<String, Object> config =
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class,
+                            ResourcePoolsBuilder.heap(max))
+                    .withExpiry(ExpiryPolicyBuilder
+                            .timeToLiveExpiration(Duration.ofSeconds(exptime)))
+                    .build();
+    this.cache = cacheManager.createCache(name, config);
 
-  public LocalCacheManager(String name, int max, int exptime, boolean copyOnRead,
-                           boolean copyOnWrite) {
-    this.cache = CacheManager.getInstance().getCache(name);
-    if (cache == null) {
-      CacheConfiguration config =
-              new CacheConfiguration(name, max)
-                      .copyOnRead(copyOnRead)
-                      .copyOnWrite(copyOnWrite)
-                      .memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
-                      .eternal(false)
-                      .timeToLiveSeconds(exptime)
-                      .timeToIdleSeconds(exptime)
-                      .diskExpiryThreadIntervalSeconds(60)
-                      .persistence(new PersistenceConfiguration().strategy(
-                          PersistenceConfiguration.Strategy.NONE));
-      this.cache = new Cache(config, null, null);
-      CacheManager.getInstance().addCache(cache);
-
-      logger.info("Arcus k/v local cache is enabled : %s", cache.toString());
-    }
+    logger.info("Arcus k/v local cache is enabled : %s", cache.toString());
   }
 
   public <T> T get(String key) {
@@ -78,10 +66,10 @@ public class LocalCacheManager {
     }
 
     try {
-      Element element = cache.get(key);
-      if (null != element) {
+      Object value = cache.get(key);
+      if (null != value) {
         logger.debug("ArcusFrontCache: local cache hit for %s", key);
-        @SuppressWarnings("unchecked") T ret = (T) element.getObjectValue();
+        @SuppressWarnings("unchecked") T ret = (T) value;
         return ret;
       }
     } catch (Exception e) {
@@ -101,21 +89,13 @@ public class LocalCacheManager {
     return task;
   }
 
-  public Element getElement(String key) {
-    Element element = cache.get(key);
-    if (null != element) {
-      logger.debug("ArcusFrontCache: local cache hit for %s", key);
-    }
-    return element;
-  }
-
   public <T> boolean put(String k, T v) {
     if (v == null) {
       return false;
     }
 
     try {
-      cache.put(new Element(k, v));
+      cache.put(k, v);
       return true;
     } catch (Exception e) {
       logger.info("failed to put to the local cache : %s", e.getMessage());

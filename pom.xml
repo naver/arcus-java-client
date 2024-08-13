@@ -14,7 +14,7 @@
         <zookeeper.version>3.5.9</zookeeper.version>
         <log4j.version>2.23.1</log4j.version>
         <slf4j.version>2.0.12</slf4j.version>
-        <ehcache.version>2.6.0</ehcache.version>
+        <ehcache.version>3.10.8</ehcache.version>
         <junit.version>5.10.2</junit.version>
         <jmock.version>2.13.1</jmock.version>
     </properties>
@@ -79,10 +79,16 @@
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
             <exclusions>
+                <!--> org.glassfish.jaxb is blocked in maven 3.8.1 as it comes from http (not https) repository.
+                Also, it is not required in java 8 so we excluded it. See https://github.com/ehcache/ehcache3/issues/2881. </-->
+                <exclusion>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>

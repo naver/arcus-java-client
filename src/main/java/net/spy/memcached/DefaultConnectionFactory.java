@@ -134,13 +134,17 @@ public class DefaultConnectionFactory extends SpyObject
       "ArcusFrontCache" + new Object().hashCode();
 
   /**
+   * copyOnRead is no longer used
    * Default copyOnRead : false
    */
+  @Deprecated
   public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_READ = false;
 
   /**
+   * copyOnWrite is no longer used
    * Default copyOnWrite : false
    */
+  @Deprecated
   public static final boolean DEFAULT_FRONT_CACHE_COPY_ON_WRITE = false;
 
   /**
@@ -347,11 +351,13 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   @Override
+  @Deprecated
   public boolean getFrontCacheCopyOnRead() {
     return DEFAULT_FRONT_CACHE_COPY_ON_READ;
   }
 
   @Override
+  @Deprecated
   public boolean getFrontCacheCopyOnWrite() {
     return DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
   }

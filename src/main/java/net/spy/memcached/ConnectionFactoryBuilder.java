@@ -79,9 +79,6 @@ public class ConnectionFactoryBuilder {
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
   private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
-  private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
-  private boolean frontCacheCopyOnWrite =
-      DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
 
   private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
@@ -347,16 +344,16 @@ public class ConnectionFactoryBuilder {
   /**
    * Set front cache copyOnRead property
    */
+  @Deprecated
   public ConnectionFactoryBuilder setFrontCacheCopyOnRead(boolean copyOnRead) {
-    frontCacheCopyOnRead = copyOnRead;
     return this;
   }
 
   /**
    * Set front cache copyOnWrite property
    */
+  @Deprecated
   public ConnectionFactoryBuilder setFrontCacheCopyOnWrite(boolean copyOnWrite) {
-    frontCacheCopyOnWrite = copyOnWrite;
     return this;
   }
 
@@ -616,13 +613,17 @@ public class ConnectionFactoryBuilder {
       }
 
       @Override
+      @SuppressWarnings("deprecation")
+      @Deprecated
       public boolean getFrontCacheCopyOnRead() {
-        return frontCacheCopyOnRead;
+        return DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
       }
 
       @Override
+      @SuppressWarnings("deprecation")
+      @Deprecated
       public boolean getFrontCacheCopyOnWrite() {
-        return frontCacheCopyOnWrite;
+        return DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
       }
 
       @Override
