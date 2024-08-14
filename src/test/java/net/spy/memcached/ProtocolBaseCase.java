@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -30,8 +30,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import junit.framework.ComparisonFailure;
+
 import net.spy.memcached.compat.SyncThread;
 import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.transcoders.SerializingTranscoder;
@@ -60,7 +63,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testGetStatsSlabs() throws Exception {
     // There needs to at least have been one value set or there may be
     // no slabs to check.
-    client.set("slabinitializer", 0, "hi");
+    assertTrue(client.set("slabinitializer", 0, "hi").get());
     Map<SocketAddress, Map<String, String>> stats = client.getStats("slabs");
     System.out.println("Stats:  " + stats);
     assertEquals(client.getAllNodes().size(), stats.size());
@@ -75,7 +78,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
     // There needs to at least have been one value set or there may be
     // no sizes to check.
-    client.set("sizeinitializer", 0, "hi");
+    assertTrue(client.set("sizeinitializer", 0, "hi").get());
     Map<SocketAddress, Map<String, String>> stats = client.getStats("sizes");
     System.out.println("Stats:  " + stats);
     assertEquals(client.getAllNodes().size(), stats.size());
@@ -86,9 +89,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testGetStatsCacheDump() throws Exception {
     // There needs to at least have been one value set or there
     // won't be anything to dump
-    client.set("dumpinitializer", 0, "hi");
-    Map<SocketAddress, Map<String, String>> stats =
-            client.getStats("cachedump 0 10000");
+    assertTrue(client.set("dumpinitializer", 0, "hi").get());
+    Map<SocketAddress, Map<String, String>> stats = client.getStats("cachedump 0 10000");
     System.out.println("Stats:  " + stats);
     assertEquals(client.getAllNodes().size(), stats.size());
     Map<String, String> oneStat = stats.values().iterator().next();
@@ -98,11 +100,11 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testDelayedFlush() throws Exception {
     assertNull(client.get("test1"));
-    client.set("test1", 5, "test1value");
-    client.set("test2", 5, "test2value");
+    assertTrue(client.set("test1", 5, "test1value").get());
+    assertTrue(client.set("test2", 5, "test2value").get());
     assertEquals("test1value", client.get("test1"));
     assertEquals("test2value", client.get("test2"));
-    client.flush(2);
+    assertTrue(client.flush(2).get());
     Thread.sleep(2100);
     assertNull(client.get("test1"));
     assertNull(client.get("test2"));
@@ -119,13 +121,13 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testSimpleGet() throws Exception {
     assertNull(client.get("test1"));
-    client.set("test1", 5, "test1value");
+    assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.get("test1"));
   }
 
   public void testSimpleCASGets() throws Exception {
     assertNull(client.gets("test1"));
-    client.set("test1", 5, "test1value");
+    assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.gets("test1").getValue());
   }
 
@@ -172,7 +174,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testExtendedUTF8Key() throws Exception {
     String key = "\u2013\u00ba\u2013\u220f\u2014\u00c4";
     assertNull(client.get(key));
-    client.set(key, 5, "test1value");
+    assertTrue(client.set(key, 5, "test1value").get());
     assertEquals("test1value", client.get(key));
   }
 
@@ -247,12 +249,26 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testParallelSetGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
       public Boolean call() throws Exception {
-        for (int i = 0; i < 10; i++) {
-          client.set("test" + i, 5, "value" + i);
-          assertEquals("value" + i, client.get("test" + i));
+        int size = 10;
+        List<String> keys = new ArrayList<>(size);
+        List<String> values = new ArrayList<>(size);
+        List<Future<Boolean>> setFutures = new ArrayList<>(size);
+        List<GetFuture<Object>> getFutures = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+          keys.add("test" + i);
+          values.add("value" + i);
+          setFutures.add(client.set(keys.get(i), 60, values.get(i)));
         }
-        for (int i = 0; i < 10; i++) {
-          assertEquals("value" + i, client.get("test" + i));
+        for (int i = 0; i < size; i++) {
+          assertTrue(setFutures.get(i).get());
+        }
+
+        for (int i = 0; i < size; i++) {
+          getFutures.add(client.asyncGet(keys.get(i)));
+        }
+        for (int i = 0; i < size; i++) {
+          assertEquals(getFutures.get(i).get(), values.get(i));
         }
         return Boolean.TRUE;
       }
@@ -263,10 +279,21 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testParallelSetMultiGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
       public Boolean call() throws Exception {
+        int size = 10;
+        List<String> keys = new ArrayList<>(size);
+        List<String> values = new ArrayList<>(size);
+        List<Future<Boolean>> futures = new ArrayList<>(size);
+
         for (int i = 0; i < 10; i++) {
-          client.set("test" + i, 5, "value" + i);
-          assertEquals("value" + i, client.get("test" + i));
+          keys.add("test" + i);
+          values.add("value" + i);
+          futures.add(client.set(keys.get(i), 60, values.get(i)));
         }
+        for (int i = 0; i < size; i++) {
+          assertTrue(futures.get(i).get());
+          assertEquals(client.get(keys.get(i)), values.get(i));
+        }
+
         Map<String, Object> m = client.getBulk(Arrays.asList("test0", "test1", "test2",
                 "test3", "test4", "test5", "test6", "test7", "test8",
                 "test9", "test10")); // Yes, I intentionally ran over.
@@ -282,9 +309,9 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testParallelSetAutoMultiGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
       public Boolean call() throws Exception {
-        client.set("testparallel", 5, "parallelvalue");
+        assertTrue(client.set("testparallel", 60, "parallelvalue").get());
         for (int i = 0; i < 10; i++) {
-          assertEquals("parallelvalue", client.get("testparallel"));
+          assertEquals(client.get("testparallel"), "parallelvalue");
         }
         return Boolean.TRUE;
       }
@@ -340,43 +367,47 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testUpdate() throws Exception {
     assertNull(client.get("test1"));
-    client.replace("test1", 5, "test1value");
+    assertFalse(client.replace("test1", 5, "test1value").get());
     assertNull(client.get("test1"));
   }
 
   public void testUpdateWithTranscoder() throws Exception {
     Transcoder<String> t = new TestTranscoder();
     assertNull(client.get("test1", t));
-    client.replace("test1", 5, "test1value", t);
+    assertFalse(client.replace("test1", 5, "test1value", t).get());
     assertNull(client.get("test1", t));
   }
 
   // Just to make sure the sequence is being handled correctly
   public void testMixedSetsAndUpdates() throws Exception {
-    Collection<Future<Boolean>> futures = new ArrayList<>();
-    Collection<String> keys = new ArrayList<>();
-    for (int i = 0; i < 100; i++) {
+    int keySize = 100;
+    List<String> keys = new ArrayList<>(keySize);
+    List<Future<Boolean>> setFutures = new ArrayList<>(keySize);
+    List<Future<Boolean>> addFutures = new ArrayList<>(keySize);
+
+    for (int i = 0; i < keySize; i++) {
       String key = "k" + i;
-      futures.add(client.set(key, 10, key));
-      futures.add(client.add(key, 10, "a" + i));
+      setFutures.add(client.set(key, 60, key));
+      addFutures.add(client.add(key, 60, "a" + i));
       keys.add(key);
     }
+    for (int i = 0; i < keySize; i++) {
+      assertTrue(setFutures.get(i).get());
+      assertFalse(addFutures.get(i).get());
+    }
+
     Map<String, Object> m = client.getBulk(keys);
-    assertEquals(100, m.size());
+    assertEquals(keySize, m.size());
     for (Map.Entry<String, Object> me : m.entrySet()) {
       assertEquals(me.getKey(), me.getValue());
-    }
-    for (Iterator<Future<Boolean>> i = futures.iterator(); i.hasNext(); ) {
-      assertTrue(i.next().get());
-      assertFalse(i.next().get());
     }
   }
 
   public void testGetBulk() throws Exception {
     Collection<String> keys = Arrays.asList("test1", "test2", "test3");
     assertEquals(0, client.getBulk(keys).size());
-    client.set("test1", 5, "val1");
-    client.set("test2", 5, "val2");
+    assertTrue(client.set("test1", 5, "val1").get());
+    assertTrue(client.set("test2", 5, "val2").get());
     Map<String, Object> vals = client.getBulk(keys);
     assertEquals(2, vals.size());
     assertEquals("val1", vals.get("test1"));
@@ -402,8 +433,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
     assertEquals(0, client.asyncGetBulk(keys, tcs.listIterator()).get().size());
 
-    client.set(keys.get(0), 5, "val1", tcs.get(0));
-    client.set(keys.get(1), 5, "val2", tcs.get(1));
+    assertTrue(client.set(keys.get(0), 5, "val1", tcs.get(0)).get());
+    assertTrue(client.set(keys.get(1), 5, "val2", tcs.get(1)).get());
     Future<Map<String, String>> vals = client.asyncGetBulk(keys, tcs.listIterator());
     assertEquals(2, vals.get().size());
     assertEquals("val1", vals.get().get(keys.get(0)));
@@ -413,14 +444,14 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     // with another transcoder with the wrong key.
     keys.add(0, "test4");
     Transcoder<String> encodeTranscoder = new TestWithKeyTranscoder(keys.get(0));
-    client.set(keys.get(0), 5, "val4", encodeTranscoder).get();
+    assertTrue(client.set(keys.get(0), 5, "val4", encodeTranscoder).get());
 
     Transcoder<String> decodeTranscoder = new TestWithKeyTranscoder("not " + keys.get(0));
     tcs.add(0, decodeTranscoder);
     try {
       client.asyncGetBulk(keys, tcs.listIterator()).get();
-      fail("Expected AssertionError caused by key mismatch");
-    } catch (AssertionError e) {
+      fail("Expected ComparisonFailure caused by key mismatch");
+    } catch (ComparisonFailure e) {
       // pass
     }
   }
@@ -428,8 +459,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   public void testGetsBulk() throws Exception {
     Collection<String> keys = Arrays.asList("test1", "test2", "test3");
     assertEquals(0, client.getsBulk(keys).size());
-    client.set("test1", 5, "val1");
-    client.set("test2", 5, "val2");
+    assertTrue(client.set("test1", 5, "val1").get());
+    assertTrue(client.set("test2", 5, "val2").get());
     Map<String, CASValue<Object>> vals = client.getsBulk(keys);
     assertEquals(2, vals.size());
     assertEquals("val1", vals.get("test1").getValue());
@@ -457,8 +488,8 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
     assertEquals(0, client.asyncGetBulk(keys, tcs.listIterator()).get().size());
 
-    client.set(keys.get(0), 5, "val1", tcs.get(0));
-    client.set(keys.get(1), 5, "val2", tcs.get(1));
+    assertTrue(client.set(keys.get(0), 5, "val1", tcs.get(0)).get());
+    assertTrue(client.set(keys.get(1), 5, "val2", tcs.get(1)).get());
     BulkFuture<Map<String, CASValue<String>>> vals = client.asyncGetsBulk(keys, tcs.listIterator());
     assertEquals(2, vals.get().size());
     CASValue<String> val1 = vals.get().get(keys.get(0));
@@ -472,14 +503,14 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     // with another transcoder with the wrong key.
     keys.add(0, "test4");
     Transcoder<String> encodeTranscoder = new TestWithKeyTranscoder(keys.get(0));
-    client.set(keys.get(0), 5, "val4", encodeTranscoder).get();
+    assertTrue(client.set(keys.get(0), 5, "val4", encodeTranscoder).get());
 
     Transcoder<String> decodeTranscoder = new TestWithKeyTranscoder("not " + keys.get(0));
     tcs.add(0, decodeTranscoder);
     try {
       client.asyncGetsBulk(keys, tcs.listIterator()).get();
-      fail("Expected AssertionError caused by key mismatch");
-    } catch (AssertionError e) {
+      fail("Expected ComparisonFailure caused by key mismatch");
+    } catch (ComparisonFailure e) {
       // pass
     }
   }
@@ -536,7 +567,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testAsyncIncrement() throws Exception {
     String k = "async-incr";
-    client.set(k, 0, "5");
+    assertTrue(client.set(k, 0, "5").get());
     Future<Long> f = client.asyncIncr(k, 1);
     assertEquals(6, (long) f.get());
   }
@@ -549,7 +580,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testAsyncDecrement() throws Exception {
     String k = "async-decr";
-    client.set(k, 0, "5");
+    assertTrue(client.set(k, 0, "5").get());
     Future<Long> f = client.asyncDecr(k, 1);
     assertEquals(4, (long) f.get());
   }
@@ -571,16 +602,16 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   public void testImmediateDelete() throws Exception {
     assertNull(client.get("test1"));
-    client.set("test1", 5, "test1value");
+    assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.get("test1"));
-    client.delete("test1");
+    assertTrue(client.delete("test1").get());
     assertNull(client.get("test1"));
   }
 
   public void testFlush() throws Exception {
     assertNull(client.get("test1"));
-    client.set("test1", 5, "test1value");
-    client.set("test2", 5, "test2value");
+    assertTrue(client.set("test1", 5, "test1value").get());
+    assertTrue(client.set("test2", 5, "test2value").get());
     assertEquals("test1value", client.get("test1"));
     assertEquals("test2value", client.get("test2"));
     assertTrue(client.flush().get());
@@ -622,7 +653,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
       }
     });
 
-    client.set(key, 0, value);
+    assertTrue(client.set(key, 0, value).get(1, TimeUnit.SECONDS));
     try {
       for (int i = 0; i < 1000000; i++) {
         client.get(key);
@@ -704,7 +735,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
 
     // But I should still be able to do something.
-    client.set("k", 5, "Blah");
+    assertTrue(client.set("k", 5, "Blah").get());
     assertEquals("Blah", client.get("k"));
   }
 
@@ -727,7 +758,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
 
     // But I should still be able to do something.
-    client.set("k", 5, "Blah");
+    assertTrue(client.set("k", 5, "Blah").get());
     assertEquals("Blah", client.get("k"));
   }
 

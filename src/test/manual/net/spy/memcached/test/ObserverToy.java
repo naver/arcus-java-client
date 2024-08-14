@@ -19,7 +19,7 @@ public final class ObserverToy {
   private ObserverToy() {
   }
 
-  public static void main(String args[]) throws Exception {
+  public static void main(String[] args) throws Exception {
     final ConnectionObserver obs = new ConnectionObserver() {
       public void connectionEstablished(SocketAddress sa,
                                         int reconnectCount) {
@@ -33,7 +33,7 @@ public final class ObserverToy {
 
     };
 
-    MemcachedClient c = new MemcachedClient(new DefaultConnectionFactory() {
+    MemcachedClient client = new MemcachedClient(new DefaultConnectionFactory() {
 
       @Override
       public Collection<ConnectionObserver> getInitialObservers() {
@@ -48,8 +48,12 @@ public final class ObserverToy {
     }, AddrUtil.getAddresses("localhost:11212"));
 
     while (true) {
-      c.waitForQueues(1, TimeUnit.SECONDS);
-      Thread.sleep(1000);
+      try {
+        client.asyncGet("ObserverToy").get(1, TimeUnit.SECONDS);
+        Thread.sleep(1000);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
