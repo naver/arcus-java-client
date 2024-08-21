@@ -12,11 +12,7 @@ import net.spy.memcached.MemcachedClientIF;
 import net.spy.memcached.compat.BaseMockCase;
 import net.spy.memcached.internal.ImmediateFuture;
 
-import org.junit.Test;
-
 import org.jmock.Expectations;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test the cache loader.
@@ -26,19 +22,18 @@ public class CacheLoaderTest extends BaseMockCase {
   private ExecutorService es = null;
 
   @Override
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     super.setUp();
     BlockingQueue<Runnable> wq = new LinkedBlockingQueue<>();
     es = new ThreadPoolExecutor(10, 10, 5 * 60, TimeUnit.SECONDS, wq);
   }
 
   @Override
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     es.shutdownNow();
     super.tearDown();
   }
 
-  @Test
   public void testSimpleLoading() throws Exception {
     MemcachedClientIF m = context.mock(MemcachedClientIF.class);
 

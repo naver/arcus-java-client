@@ -4,13 +4,10 @@ import java.util.Arrays;
 
 import net.spy.memcached.CachedData;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class WhalinV1TranscoderTest extends BaseTranscoderCase {
 
   @Override
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     super.setUp();
     setTranscoder(new WhalinV1Transcoder());
   }

@@ -45,8 +45,9 @@ public class CacheMonitorTest extends TestCase {
   private static final String serviceCode = "dev";
 
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     super.setUp();
+    context = new Mockery();
     listener = context.mock(CacheMonitorListener.class);
     watcher = context.mock(Watcher.class);
     zooKeeper = new ZooKeeper("", 15000, watcher); // can't mock
