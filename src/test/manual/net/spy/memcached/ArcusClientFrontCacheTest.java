@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class ArcusClientFrontCacheTest {
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     // This test assumes we use ZK
     assumeTrue(BaseIntegrationTest.USE_ZK);
   }

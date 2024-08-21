@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 public class ArcusClientConnectTest {
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     // This test assumes we use ZK
     Assumptions.assumeTrue(BaseIntegrationTest.USE_ZK);
   }

@@ -14,12 +14,12 @@ public abstract class BaseMockCase {
   protected Mockery context;
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     context = new Mockery();
   }
 
   @AfterEach
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     context.assertIsSatisfied();
   }
 }

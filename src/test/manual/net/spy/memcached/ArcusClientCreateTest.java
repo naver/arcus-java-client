@@ -25,7 +25,7 @@ public class ArcusClientCreateTest {
   private static final List<InetSocketAddress> addrs = new ArrayList<>();
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     // This test assumes we does not use ZK
     assumeFalse(BaseIntegrationTest.USE_ZK);
     addrs.add(new InetSocketAddress("localhost", 11211));

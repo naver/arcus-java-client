@@ -26,7 +26,7 @@ public class SerializingTranscoderTest extends BaseTranscoderCase {
 
   @BeforeEach
   @Override
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     super.setUp();
     tc = new SerializingTranscoder();
     setTranscoder(tc);

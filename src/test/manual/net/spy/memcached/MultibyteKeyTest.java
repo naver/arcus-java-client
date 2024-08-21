@@ -89,7 +89,7 @@ public class MultibyteKeyTest {
   private List<String> keyList = null;
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     genericCallback = new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {

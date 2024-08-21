@@ -29,7 +29,7 @@ public class CacheLoaderTest extends BaseMockCase {
 
   @BeforeEach
   @Override
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     super.setUp();
     BlockingQueue<Runnable> wq = new LinkedBlockingQueue<>();
     es = new ThreadPoolExecutor(10, 10, 5 * 60, TimeUnit.SECONDS, wq);
@@ -37,7 +37,7 @@ public class CacheLoaderTest extends BaseMockCase {
 
   @AfterEach
   @Override
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     es.shutdownNow();
     super.tearDown();
   }

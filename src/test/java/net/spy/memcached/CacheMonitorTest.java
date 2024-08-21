@@ -61,7 +61,7 @@ public class CacheMonitorTest {
   }
 
   @AfterEach
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     zooKeeper.close();
     context.assertIsSatisfied();
   }

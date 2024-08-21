@@ -20,7 +20,7 @@ public class ArcusClientPoolCreateTest {
   private static final int CACHE_NODE_SIZE = 3;
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     // This test assumes we use ZK
     assumeTrue(BaseIntegrationTest.USE_ZK);
   }

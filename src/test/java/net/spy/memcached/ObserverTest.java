@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class ObserverTest extends ClientBaseCase {
 
   @BeforeEach
-  public void setup() throws Exception {
+  protected void setUp() throws Exception {
     super.setUp();
   }
 
   @AfterEach
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     super.tearDown();
   }
 

@@ -48,7 +48,7 @@ public class ArcusTimeoutTest {
   private final String KEY = this.getClass().getSimpleName();
 
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     initClient();
   }
 
@@ -67,7 +67,7 @@ public class ArcusTimeoutTest {
   }
 
   @AfterEach
-  public void tearDown() throws Exception {
+  protected void tearDown() throws Exception {
     // override teardown to avoid the flush phase
     if (mc != null) {
       mc.shutdown();

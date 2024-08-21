@@ -32,7 +32,7 @@ public class LoggingTest {
    * Set up logging.
    */
   @BeforeEach
-  public void setUp() throws Exception {
+  protected void setUp() throws Exception {
     logger = LoggerFactory.getLogger(getClass());
   }
 
