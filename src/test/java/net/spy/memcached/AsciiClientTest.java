@@ -23,11 +23,14 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.protocol.ascii.ExtensibleOperationImpl;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This test assumes a client is running on localhost:11211.
  */
 public class AsciiClientTest extends ProtocolBaseCase {
 
+  @Test
   public void testBadOperation() throws Exception {
     client.addOp("x", new ExtensibleOperationImpl(new OperationCallback() {
       public void complete() {

@@ -16,15 +16,15 @@
  */
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
-public class ArcusClientReconnectTest extends TestCase {
+@Disabled
+public class ArcusClientReconnectTest {
 
+  @Test
   public void testOpenAndWait() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;

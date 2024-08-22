@@ -22,15 +22,25 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class CollectionMaxElementSize extends BaseIntegrationTest {
 
   private String key = "CollectionMaxElementSize";
 
+  @AfterEach
+  @Override
   protected void tearDown() throws Exception {
     mc.delete(key).get();
     super.tearDown();
   }
 
+  @Test
   public void testLargeSize() throws Exception {
     int largeSize = 16 * 1024 - 2; //16KB
     StringBuilder sb = new StringBuilder();
@@ -47,6 +57,7 @@ public class CollectionMaxElementSize extends BaseIntegrationTest {
     assertEquals(largeValue, m.get(0L).getValue());
   }
 
+  @Test
   public void testExceed() throws Exception {
     CollectionFuture<Boolean> future;
     future = mc.asyncLopInsert(key, -1, "test", new CollectionAttributes());

@@ -16,15 +16,17 @@
  */
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
-public class ArcusClientNotExistsServiceCodeTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.fail;
 
+@Disabled
+public class ArcusClientNotExistsServiceCodeTest {
+
+  @Test
   public void testNotExistsServiceCode() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;

@@ -23,12 +23,19 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.transcoders.LongTranscoder;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private String key = "MopInsertWhenKeyExists";
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
@@ -36,6 +43,7 @@ public class MopInsertWhenKeyExists extends BaseIntegrationTest {
     super.tearDown();
   }
 
+  @Test
   public void testMopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToMap(key, items9);
@@ -63,6 +71,7 @@ public class MopInsertWhenKeyExists extends BaseIntegrationTest {
     assertEquals(10, rattrs.getCount().intValue());
   }
 
+  @Test
   public void testMopInsert_SameField() throws Exception {
     // Create a list and add it 9 items
     addToMap(key, items9);

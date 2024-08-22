@@ -16,19 +16,20 @@
  */
 package net.spy.memcached.test;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.MemcachedClient;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Adaptation of http://code.google.com/p/spcached/wiki/benchmarktool
  */
-@Ignore
-public class MemcachedThreadBench extends TestCase {
+@Disabled
+public class MemcachedThreadBench {
 
   private static class WorkerStat {
     private int start, runs;
@@ -41,6 +42,7 @@ public class MemcachedThreadBench extends TestCase {
     }
   }
 
+  @Test
   public void testCrap() throws Exception {
     main(new String[]{"10000", "100", "11211", "100"});
   }

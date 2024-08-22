@@ -22,7 +22,14 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.util.BTreeUtil;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BTreeGetAttrTest extends BaseIntegrationTest {
 
@@ -30,160 +37,166 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
   private final String VALUE = "VALUE";
   private final byte[] EFLAG = "eflag".getBytes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testGetTrimmedTest() {
     try {
       // create with default.
       CollectionAttributes attribute = new CollectionAttributes();
       attribute.setMaxCount(3L);
-      Assert.assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               attribute).get());
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 0L, EFLAG, VALUE,
+      assertTrue(mc.asyncBopInsert(KEY, 0L, EFLAG, VALUE,
               attribute).get());
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 1L, EFLAG, VALUE,
+      assertTrue(mc.asyncBopInsert(KEY, 1L, EFLAG, VALUE,
               attribute).get());
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 2L, EFLAG, VALUE,
+      assertTrue(mc.asyncBopInsert(KEY, 2L, EFLAG, VALUE,
               attribute).get());
 
       // get trimmed
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getTrimmed() != null) { // not support
-        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getTrimmed());
+        assertEquals(Long.valueOf(0L), btreeAttrs.getTrimmed());
       }
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 3L, EFLAG, VALUE,
+      assertTrue(mc.asyncBopInsert(KEY, 3L, EFLAG, VALUE,
               attribute).get());
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 4L, EFLAG, VALUE,
+      assertTrue(mc.asyncBopInsert(KEY, 4L, EFLAG, VALUE,
               attribute).get());
 
       // get trimmed
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getTrimmed() != null) { // not support
-        Assert.assertEquals(Long.valueOf(1L), btreeAttrs.getTrimmed());
+        assertEquals(Long.valueOf(1L), btreeAttrs.getTrimmed());
       }
 
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetMinMaxBkeyTest() {
     try {
-      Assert.assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
 
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(btreeAttrs.getMinBkey());
-      Assert.assertNull(btreeAttrs.getMaxBkey());
+      assertNull(btreeAttrs.getMinBkey());
+      assertNull(btreeAttrs.getMaxBkey());
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 0L, EFLAG, VALUE, null)
+      assertTrue(mc.asyncBopInsert(KEY, 0L, EFLAG, VALUE, null)
               .get());
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getMinBkey() != null) { // not support
-        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
-        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMaxBkey());
+        assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
+        assertEquals(Long.valueOf(0L), btreeAttrs.getMaxBkey());
       }
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 1L, EFLAG, VALUE, null)
+      assertTrue(mc.asyncBopInsert(KEY, 1L, EFLAG, VALUE, null)
               .get());
-      Assert.assertTrue(mc.asyncBopInsert(KEY, 2L, EFLAG, VALUE, null)
+      assertTrue(mc.asyncBopInsert(KEY, 2L, EFLAG, VALUE, null)
               .get());
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getMinBkey() != null) { // not support
-        Assert.assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
-        Assert.assertEquals(Long.valueOf(2L), btreeAttrs.getMaxBkey());
+        assertEquals(Long.valueOf(0L), btreeAttrs.getMinBkey());
+        assertEquals(Long.valueOf(2L), btreeAttrs.getMaxBkey());
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetMinMaxBkeyByBytesTest() {
     try {
-      Assert.assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
 
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(btreeAttrs.getMinBkeyByBytes());
-      Assert.assertNull(btreeAttrs.getMaxBkeyByBytes());
+      assertNull(btreeAttrs.getMinBkeyByBytes());
+      assertNull(btreeAttrs.getMaxBkeyByBytes());
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, new byte[]{0, 0, 1},
+      assertTrue(mc.asyncBopInsert(KEY, new byte[]{0, 0, 1},
               EFLAG, VALUE, null).get());
       btreeAttrs = mc.asyncGetAttr(KEY).get();
 
       if (btreeAttrs.getMinBkeyByBytes() != null) { // not support
-        Assert.assertEquals("0x000001",
+        assertEquals("0x000001",
                 BTreeUtil.toHex(btreeAttrs.getMinBkeyByBytes()));
-        Assert.assertEquals("0x000001",
+        assertEquals("0x000001",
                 BTreeUtil.toHex(btreeAttrs.getMaxBkeyByBytes()));
       }
 
-      Assert.assertTrue(mc.asyncBopInsert(KEY, new byte[]{1, 0, 1},
+      assertTrue(mc.asyncBopInsert(KEY, new byte[]{1, 0, 1},
               EFLAG, VALUE, null).get());
-      Assert.assertTrue(mc.asyncBopInsert(KEY, new byte[]{2, 0, 1},
+      assertTrue(mc.asyncBopInsert(KEY, new byte[]{2, 0, 1},
               EFLAG, VALUE, null).get());
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       if (btreeAttrs.getMinBkeyByBytes() != null) { // not support
-        Assert.assertEquals("0x000001",
+        assertEquals("0x000001",
                 BTreeUtil.toHex(btreeAttrs.getMinBkeyByBytes()));
-        Assert.assertEquals("0x020001",
+        assertEquals("0x020001",
                 BTreeUtil.toHex(btreeAttrs.getMaxBkeyByBytes()));
       }
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetOverflowAttrTest() {
     try {
-      Assert.assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
 
       CollectionAttributes btreeAttrs = mc.asyncGetAttr(KEY).get();
       CollectionOverflowAction overflowAction = btreeAttrs
               .getOverflowAction();
-      Assert.assertEquals(CollectionOverflowAction.smallest_trim,
+      assertEquals(CollectionOverflowAction.smallest_trim,
               overflowAction);
 
       // test setattr/getattr smallest_silent_trim
       CollectionAttributes btreeAttrs2 = new CollectionAttributes();
       btreeAttrs2
               .setOverflowAction(CollectionOverflowAction.smallest_silent_trim);
-      Assert.assertTrue(mc.asyncSetAttr(KEY, btreeAttrs2).get());
+      assertTrue(mc.asyncSetAttr(KEY, btreeAttrs2).get());
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       overflowAction = btreeAttrs.getOverflowAction();
-      Assert.assertEquals(CollectionOverflowAction.smallest_silent_trim,
+      assertEquals(CollectionOverflowAction.smallest_silent_trim,
               overflowAction);
 
       // test setattr/getattr largest_silent_trim
       btreeAttrs2 = new CollectionAttributes();
       btreeAttrs2
               .setOverflowAction(CollectionOverflowAction.largest_silent_trim);
-      Assert.assertTrue(mc.asyncSetAttr(KEY, btreeAttrs2).get());
+      assertTrue(mc.asyncSetAttr(KEY, btreeAttrs2).get());
 
       btreeAttrs = mc.asyncGetAttr(KEY).get();
       overflowAction = btreeAttrs.getOverflowAction();
-      Assert.assertEquals(CollectionOverflowAction.largest_silent_trim,
+      assertEquals(CollectionOverflowAction.largest_silent_trim,
               overflowAction);
 
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

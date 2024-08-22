@@ -28,9 +28,14 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BulkDeleteTest extends BaseIntegrationTest {
+  @Test
   public void testNullAndEmptyKeyDelete() {
     // DELETE null key
     try {
@@ -48,6 +53,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testInsertAndDelete() {
     String value = "MyValue";
 
@@ -73,8 +79,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-          Assert.assertTrue("Error list is not empty.",
-                  errorList.isEmpty());
+          assertTrue(errorList.isEmpty(), "Error list is not empty.");
         } catch (TimeoutException e) {
           future.cancel(true);
           e.printStackTrace();
@@ -89,15 +94,16 @@ public class BulkDeleteTest extends BaseIntegrationTest {
           }
         }
 
-        Assert.assertEquals("Error count is greater than 0.", 0,
-                errorCount);
+        assertEquals(0,
+                errorCount, "Error count is greater than 0.");
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testDeleteNotFoundKey() {
     int TEST_COUNT = 64;
 
@@ -124,11 +130,11 @@ public class BulkDeleteTest extends BaseIntegrationTest {
         Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-          Assert.assertEquals("Error count is less than input.",
-                  keys.length / 2, errorList.size());
+          assertEquals(keys.length / 2, errorList.size(),
+                  "Error count is less than input.");
           for (Map.Entry<String, OperationStatus> error :
                   errorList.entrySet()) {
-            Assert.assertEquals(error.getValue().getStatusCode(),
+            assertEquals(error.getValue().getStatusCode(),
                     StatusCode.ERR_NOT_FOUND);
           }
         } catch (TimeoutException e) {
@@ -138,7 +144,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 }

@@ -24,25 +24,35 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopGetTest extends BaseIntegrationTest {
 
   private static final String KEY = BopGetTest.class.getSimpleName();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testBopGet() throws Exception {
 
     byte[] bkey = new byte[]{(byte) 1};
@@ -50,19 +60,19 @@ public class BopGetTest extends BaseIntegrationTest {
     Boolean boolean1 = mc.asyncBopInsert(KEY, bkey, null, "value",
             new CollectionAttributes()).get();
 
-    Assert.assertTrue(boolean1);
+    assertTrue(boolean1);
 
     Map<ByteArrayBKey, Element<Object>> map = mc.asyncBopGet(KEY, bkey,
             ElementFlagFilter.DO_NOT_FILTER, false, false).get();
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
 
     Element<Object> el = map.get(new ByteArrayBKey(bkey));
 
-    Assert.assertNotNull(el);
+    assertNotNull(el);
 
-    Assert.assertEquals("value", el.getValue());
-    Assert.assertEquals("0x01", el.getStringBkey());
-    Assert.assertEquals("", el.getStringEFlag());
+    assertEquals("value", el.getValue());
+    assertEquals("0x01", el.getStringBkey());
+    assertEquals("", el.getStringEFlag());
   }
 }

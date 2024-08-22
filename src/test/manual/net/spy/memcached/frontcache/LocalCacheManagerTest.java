@@ -21,14 +21,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.plugin.LocalCacheManager;
 
-public class LocalCacheManagerTest extends TestCase {
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+public class LocalCacheManagerTest {
 
   private ArcusClient client;
 
@@ -40,23 +47,22 @@ public class LocalCacheManagerTest extends TestCase {
           "key7" + System.nanoTime(), "key8" + System.nanoTime(),
           "key9" + System.nanoTime());
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setFrontCacheExpireTime(5);
     cfb.setMaxFrontCacheElements(10);
     client = ArcusClient.createArcusClient("127.0.0.1:2181", "test", cfb);
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     if (client != null) {
       client.shutdown();
     }
-    super.tearDown();
   }
 
+  @Test
   public void testGet() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
@@ -71,7 +77,7 @@ public class LocalCacheManagerTest extends TestCase {
 
     assertNotNull(result);
     assertNotNull(cached);
-    assertSame("not the same result", result, cached);
+    assertSame(result, cached, "not the same result");
 
     // after 3 seconds : remote expired, locally cached
     Thread.sleep(3000);
@@ -83,7 +89,7 @@ public class LocalCacheManagerTest extends TestCase {
 
     assertNotNull(result);
     assertNotNull(cached);
-    assertEquals("not the same result", result, cached);
+    assertEquals(result, cached, "not the same result");
 
     // after another 3 seconds : both remote and local expired
     Thread.sleep(3000);
@@ -97,6 +103,7 @@ public class LocalCacheManagerTest extends TestCase {
     assertNull(cached);
   }
 
+  @Test
   public void testGetBulk() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
@@ -134,6 +141,7 @@ public class LocalCacheManagerTest extends TestCase {
     assertEquals(0, result.size());
   }
 
+  @Test
   public void testAsyncGetBulk() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
@@ -174,6 +182,7 @@ public class LocalCacheManagerTest extends TestCase {
     assertEquals(0, result.size());
   }
 
+  @Test
   public void testBulkPartial() throws Exception {
     String[] keySet1 = new String[keys.size() / 2];
     String[] keySet2 = new String[keys.size() / 2];

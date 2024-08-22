@@ -22,7 +22,14 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.internal.CollectionFuture;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GetWithDropListTest extends BaseIntegrationTest {
 
@@ -30,6 +37,7 @@ public class GetWithDropListTest extends BaseIntegrationTest {
   private final int INDEX = 0;
   private final int VALUE = 1234567890;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -37,78 +45,81 @@ public class GetWithDropListTest extends BaseIntegrationTest {
 
     boolean insertResult = mc.asyncLopInsert(KEY, INDEX, VALUE,
             new CollectionAttributes()).get();
-    Assert.assertTrue(insertResult);
+    assertTrue(insertResult);
   }
 
+  @Test
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=true
-      Assert.assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, false, false)
+      assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, false, false)
               .get().get(INDEX));
 
       // check exists
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again
-      Assert.assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, false, false)
+      assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, false, false)
               .get().get(INDEX));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
-      Assert.assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, true, false)
+      assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, true, false)
               .get().get(INDEX));
 
       // check exists empty btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNotNull(attr);
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      assertNotNull(attr);
+      assertEquals(Long.valueOf(0), attr.getCount());
 
       // get value again
       CollectionFuture<List<Object>> asyncLopGet = mc.asyncLopGet(KEY,
               INDEX, false, false);
       List<Object> list = asyncLopGet.get();
-      Assert.assertNotNull(list);
-      Assert.assertTrue(list.isEmpty());
+      assertNotNull(list);
+      assertTrue(list.isEmpty());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
-      Assert.assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, true, true)
+      assertEquals(VALUE, mc.asyncLopGet(KEY, INDEX, true, true)
               .get().get(INDEX));
 
       // check btree
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(attr);
+      assertNull(attr);
 
       List<Object> list = mc.asyncLopGet(KEY, INDEX, false, false).get();
-      Assert.assertNull(list);
+      assertNull(list);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

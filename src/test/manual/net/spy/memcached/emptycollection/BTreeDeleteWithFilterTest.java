@@ -21,7 +21,14 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagFilter.CompOperands;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
@@ -31,20 +38,19 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
   private final String FLAG = "flag";
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
-  ;
-
+  @Test
   public void testDeleteWithMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
@@ -52,25 +58,26 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
       boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // delete one bkey
       Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
-      Assert.assertTrue(delete);
+      assertTrue(delete);
 
       // check attr again
-      Assert.assertEquals(Long.valueOf(0), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(0), mc.asyncGetAttr(KEY).get()
               .getCount());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testDeleteWithUnMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
@@ -78,22 +85,22 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
       boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               FLAG.getBytes(), VALUE, new CollectionAttributes()).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // delete one bkey
       Boolean delete = mc.asyncBopDelete(KEY, BKEY, filter, false).get();
-      Assert.assertFalse(delete);
+      assertFalse(delete);
 
       // check attr again
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 

@@ -25,23 +25,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.internal.ReconnDelay;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test stuff that can be tested within a MemcachedConnection separately.
  */
-public class MemcachedConnectionTest extends TestCase {
+public class MemcachedConnectionTest {
 
   private MemcachedConnection conn;
   private ArcusKetamaNodeLocator locator;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder().setReadBufferSize(1024);
     ConnectionFactory cf = cfb.build();
     List<InetSocketAddress> addrs = new ArrayList<>();
@@ -51,12 +55,12 @@ public class MemcachedConnectionTest extends TestCase {
     locator = (ArcusKetamaNodeLocator) conn.getLocator();
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     conn.shutdown();
-    super.tearDown();
   }
 
+  @Test
   public void testDebugBuffer() {
     String input = "this is a test _";
     ByteBuffer bb = ByteBuffer.wrap(input.getBytes());
@@ -64,6 +68,7 @@ public class MemcachedConnectionTest extends TestCase {
     assertEquals("this is a test \\x5f", s);
   }
 
+  @Test
   public void testNodesChangeQueue() throws Exception {
     // when
     conn.setCacheNodesChange("0.0.0.0:11211");
@@ -93,6 +98,7 @@ public class MemcachedConnectionTest extends TestCase {
     assertTrue(1 == locator.getAll().size());
   }
 
+  @Test
   public void testNodesChangeQueue_empty() throws Exception {
     // when
     // on servers in the queue
@@ -104,6 +110,7 @@ public class MemcachedConnectionTest extends TestCase {
     assertTrue(0 == locator.getAll().size());
   }
 
+  @Test
   public void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
@@ -120,6 +127,7 @@ public class MemcachedConnectionTest extends TestCase {
     }
   }
 
+  @Test
   public void testNodesChangeQueue_redundant() throws Exception {
     // when
     conn.setCacheNodesChange("0.0.0.0:11211,0.0.0.0:11211");
@@ -131,6 +139,7 @@ public class MemcachedConnectionTest extends TestCase {
     assertTrue(2 == locator.getAll().size());
   }
 
+  @Test
   public void testNodesChangeQueue_twice() throws Exception {
     // when
     conn.setCacheNodesChange("0.0.0.0:11211");
@@ -143,10 +152,12 @@ public class MemcachedConnectionTest extends TestCase {
     assertTrue(1 == locator.getAll().size());
   }
 
+  @Test
   public void testAddOperations() throws Exception {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testReconnectQueue_delayReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
@@ -168,24 +179,24 @@ public class MemcachedConnectionTest extends TestCase {
     long firstReconnectTime;
     reconnectQueue.add(node, ReconnDelay.DEFAULT);
     firstReconnectTime = reconMap.get(node);
-    Assert.assertTrue(firstReconnectTime > System.nanoTime());
-    Assert.assertEquals(reconMap.size(), 1);
-    Assert.assertEquals(reconSortedMap.get(firstReconnectTime), node);
-    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
-    Assert.assertEquals(reconSortedMap.size(), 1);
-    Assert.assertFalse(reconnectQueue.isEmpty());
-    Assert.assertTrue(reconnectQueue.contains(node));
+    assertTrue(firstReconnectTime > System.nanoTime());
+    assertEquals(reconMap.size(), 1);
+    assertEquals(reconSortedMap.get(firstReconnectTime), node);
+    assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    assertEquals(reconSortedMap.size(), 1);
+    assertFalse(reconnectQueue.isEmpty());
+    assertTrue(reconnectQueue.contains(node));
 
     // replace test with same node
     long secondReconnectTime;
     reconnectQueue.replace(node, ReconnDelay.DEFAULT);
     secondReconnectTime = reconMap.get(node);
-    Assert.assertEquals(secondReconnectTime, firstReconnectTime);
-    Assert.assertEquals(reconMap.size(), 1);
-    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
-    Assert.assertEquals(reconSortedMap.size(), 1);
-    Assert.assertFalse(reconnectQueue.isEmpty());
-    Assert.assertTrue(reconnectQueue.contains(node));
+    assertEquals(secondReconnectTime, firstReconnectTime);
+    assertEquals(reconMap.size(), 1);
+    assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    assertEquals(reconSortedMap.size(), 1);
+    assertFalse(reconnectQueue.isEmpty());
+    assertTrue(reconnectQueue.contains(node));
 
     // add test with another node
     MemcachedNode anotherNode = new MockMemcachedNode(
@@ -193,34 +204,35 @@ public class MemcachedConnectionTest extends TestCase {
     long anotherReconnectTime;
     reconnectQueue.add(anotherNode, ReconnDelay.DEFAULT);
     anotherReconnectTime = reconMap.get(anotherNode);
-    Assert.assertTrue(anotherReconnectTime > System.nanoTime());
-    Assert.assertEquals(reconMap.size(), 2);
-    Assert.assertEquals(reconSortedMap.get(anotherReconnectTime), anotherNode);
-    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
-    Assert.assertEquals(reconSortedMap.size(), 2);
-    Assert.assertFalse(reconnectQueue.isEmpty());
-    Assert.assertTrue(reconnectQueue.contains(anotherNode));
+    assertTrue(anotherReconnectTime > System.nanoTime());
+    assertEquals(reconMap.size(), 2);
+    assertEquals(reconSortedMap.get(anotherReconnectTime), anotherNode);
+    assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    assertEquals(reconSortedMap.size(), 2);
+    assertFalse(reconnectQueue.isEmpty());
+    assertTrue(reconnectQueue.contains(anotherNode));
 
     // pop test
-    Assert.assertNull(reconnectQueue.popReady(System.nanoTime()));
+    assertNull(reconnectQueue.popReady(System.nanoTime()));
     Thread.sleep(reconnectQueue.getMinDelayMillis() + 10);
-    Assert.assertEquals(reconnectQueue.popReady(System.nanoTime()), node);
+    assertEquals(reconnectQueue.popReady(System.nanoTime()), node);
     Thread.sleep(reconnectQueue.getMinDelayMillis() + 10);
-    Assert.assertEquals(reconnectQueue.popReady(System.nanoTime()), anotherNode);
-    Assert.assertNull(reconnectQueue.popReady(System.nanoTime()));
+    assertEquals(reconnectQueue.popReady(System.nanoTime()), anotherNode);
+    assertNull(reconnectQueue.popReady(System.nanoTime()));
 
     // remove test
     reconnectQueue.add(node, ReconnDelay.DEFAULT);
     reconnectQueue.remove(node);
-    Assert.assertFalse(reconMap.containsKey(node));
-    Assert.assertEquals(reconMap.size(), 0);
-    Assert.assertFalse(reconSortedMap.containsKey(firstReconnectTime));
-    Assert.assertEquals(reconSortedMap.size(), 0);
-    Assert.assertTrue(reconnectQueue.isEmpty());
-    Assert.assertFalse(reconnectQueue.contains(node));
+    assertFalse(reconMap.containsKey(node));
+    assertEquals(reconMap.size(), 0);
+    assertFalse(reconSortedMap.containsKey(firstReconnectTime));
+    assertEquals(reconSortedMap.size(), 0);
+    assertTrue(reconnectQueue.isEmpty());
+    assertFalse(reconnectQueue.contains(node));
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testReconnectQueue_immediateReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
@@ -242,27 +254,27 @@ public class MemcachedConnectionTest extends TestCase {
     long firstReconnectTime;
     reconnectQueue.add(node, ReconnDelay.DEFAULT);
     firstReconnectTime = reconMap.get(node);
-    Assert.assertTrue(firstReconnectTime > System.nanoTime());
-    Assert.assertEquals(reconMap.size(), 1);
-    Assert.assertEquals(reconSortedMap.get(firstReconnectTime), node);
-    Assert.assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
-    Assert.assertEquals(reconSortedMap.size(), 1);
-    Assert.assertFalse(reconnectQueue.isEmpty());
-    Assert.assertTrue(reconnectQueue.contains(node));
-    Assert.assertNull(reconnectQueue.popReady(System.nanoTime()));
+    assertTrue(firstReconnectTime > System.nanoTime());
+    assertEquals(reconMap.size(), 1);
+    assertEquals(reconSortedMap.get(firstReconnectTime), node);
+    assertEquals(reconSortedMap.firstKey(), (Long) firstReconnectTime);
+    assertEquals(reconSortedMap.size(), 1);
+    assertFalse(reconnectQueue.isEmpty());
+    assertTrue(reconnectQueue.contains(node));
+    assertNull(reconnectQueue.popReady(System.nanoTime()));
 
     // second put test with immediate reconnect and same node
     long secondReconnectTime;
     reconnectQueue.replace(node, ReconnDelay.IMMEDIATE);
     secondReconnectTime = reconMap.get(node);
-    Assert.assertTrue(secondReconnectTime < firstReconnectTime);
-    Assert.assertEquals(reconMap.size(), 1);
-    Assert.assertFalse(reconSortedMap.containsKey(firstReconnectTime));
-    Assert.assertEquals(reconSortedMap.firstKey(), (Long) secondReconnectTime);
-    Assert.assertEquals(reconSortedMap.size(), 1);
-    Assert.assertFalse(reconnectQueue.isEmpty());
-    Assert.assertTrue(reconnectQueue.contains(node));
+    assertTrue(secondReconnectTime < firstReconnectTime);
+    assertEquals(reconMap.size(), 1);
+    assertFalse(reconSortedMap.containsKey(firstReconnectTime));
+    assertEquals(reconSortedMap.firstKey(), (Long) secondReconnectTime);
+    assertEquals(reconSortedMap.size(), 1);
+    assertFalse(reconnectQueue.isEmpty());
+    assertTrue(reconnectQueue.contains(node));
     Thread.sleep(10);
-    Assert.assertEquals(reconnectQueue.popReady(System.nanoTime()), node);
+    assertEquals(reconnectQueue.popReady(System.nanoTime()), node);
   }
 }

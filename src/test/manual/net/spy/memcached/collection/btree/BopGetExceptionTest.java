@@ -25,12 +25,20 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.transcoders.LongTranscoder;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BopGetExceptionTest extends BaseIntegrationTest {
 
   private String key = "BopGetExceptionTest";
 
   private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -38,6 +46,7 @@ public class BopGetExceptionTest extends BaseIntegrationTest {
             true).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testBopGet_OutOfBound() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
@@ -56,6 +65,7 @@ public class BopGetExceptionTest extends BaseIntegrationTest {
     assertNotNull(rmap);
   }
 
+  @Test
   public void testBopGet_NoKey() throws Exception {
     // Querying to non-existing collection
     Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,

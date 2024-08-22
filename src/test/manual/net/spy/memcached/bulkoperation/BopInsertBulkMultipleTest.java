@@ -29,10 +29,15 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
+  @Test
   public void testInsertAndGet() {
     String key = "MyBopKey32";
     String value = "MyValue";
@@ -56,8 +61,8 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
         Map<Integer, CollectionOperationStatus> errorList = future.get(
                 20000L, TimeUnit.MILLISECONDS);
 
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
@@ -83,7 +88,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
         }
       }
 
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (Entry<Long, Object> entry : bkeys.entrySet()) {
@@ -92,11 +97,11 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
-
+  @Test
   public void testErrorCount() {
     String key = "MyBopKeyErrorCount";
     String value = "MyValue";
@@ -121,7 +126,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 }

@@ -25,18 +25,27 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.transcoders.LongTranscoder;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BopGetOffsetSupportTest extends BaseIntegrationTest {
 
   private String key = "BopGetOffsetSupportTest";
 
   private Long[] items10 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L};
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteBTree(key, items10);
     super.tearDown();
   }
 
+  @Test
   public void testBopGetOffset_Normal() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
@@ -65,6 +74,7 @@ public class BopGetOffsetSupportTest extends BaseIntegrationTest {
     assertEquals(5, rmap2.size());
   }
 
+  @Test
   public void testBopGetOffset_More() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);

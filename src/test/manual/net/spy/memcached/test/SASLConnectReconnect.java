@@ -17,10 +17,8 @@ import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
 
-import org.junit.Assert;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * A very simple test of using SASL PLAIN auth and ensuring that operations are
@@ -150,7 +148,7 @@ public class SASLConnectReconnect {
     } catch (Exception ex) {
       System.err.println("Bailing out " + ex.toString() + "\n");
       ex.printStackTrace();
-      Assert.fail(ex.getMessage());
+      fail(ex.getMessage());
     }
   }
 }

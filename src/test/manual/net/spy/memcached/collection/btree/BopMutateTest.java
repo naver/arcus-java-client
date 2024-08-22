@@ -25,18 +25,26 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BopMutateTest extends BaseIntegrationTest {
 
   private String key = "BopMutate";
 
   private String[] items9 = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "a"};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get();
   }
 
+  @Test
   public void testBopIncrDecr_Basic() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -59,6 +67,7 @@ public class BopMutateTest extends BaseIntegrationTest {
             .get(1000, TimeUnit.MILLISECONDS).equals(0L));
   }
 
+  @Test
   public void testBopIncrDecr_InitialValue() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -96,6 +105,7 @@ public class BopMutateTest extends BaseIntegrationTest {
     assertEquals(map.get(10L).getValue(), "14");
   }
 
+  @Test
   public void testBopIncrDecr_Minus() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -105,6 +115,7 @@ public class BopMutateTest extends BaseIntegrationTest {
             .get(1000, TimeUnit.MILLISECONDS).equals(0L));
   }
 
+  @Test
   public void testBopIncrDecr_NoKeyError() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
@@ -123,6 +134,7 @@ public class BopMutateTest extends BaseIntegrationTest {
     assertTrue(response2.toString() == "NOT_FOUND_ELEMENT");
   }
 
+  @Test
   public void testBopIncrDecr_StringError() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);

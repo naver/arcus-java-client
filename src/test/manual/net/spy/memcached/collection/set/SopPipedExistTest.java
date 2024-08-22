@@ -26,7 +26,14 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SopPipedExistTest extends BaseIntegrationTest {
 
@@ -38,36 +45,37 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   private final String VALUE5 = "VALUE5";
   private final String VALUE6 = "VALUE6";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
-  ;
-
+  @Test
   public void testPipedExist() {
     try {
-      Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
 
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE1,
               new CollectionAttributes()).get());
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE2,
               new CollectionAttributes()).get());
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE3,
               new CollectionAttributes()).get());
 
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
-      Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
+      assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -82,36 +90,37 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(future.getOperationStatus().isSuccess());
+      assertTrue(future.getOperationStatus().isSuccess());
 
-      Assert.assertTrue(map.get(VALUE1));
-      Assert.assertTrue(map.get(VALUE2));
-      Assert.assertTrue(map.get(VALUE3));
-      Assert.assertFalse(map.get(VALUE4));
-      Assert.assertFalse(map.get(VALUE5));
-      Assert.assertFalse(map.get(VALUE6));
+      assertTrue(map.get(VALUE1));
+      assertTrue(map.get(VALUE2));
+      assertTrue(map.get(VALUE3));
+      assertFalse(map.get(VALUE4));
+      assertFalse(map.get(VALUE5));
+      assertFalse(map.get(VALUE6));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPipedExistWithOneValue() {
     try {
-      Assert.assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
+      assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
 
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE1,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE1,
               new CollectionAttributes()).get());
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE2,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE2,
               new CollectionAttributes()).get());
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE3,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE3,
               new CollectionAttributes()).get());
 
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
-      Assert.assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
-      Assert.assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE1).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE2).get());
+      assertTrue(mc.asyncSopExist(KEY, VALUE3).get());
+      assertFalse(mc.asyncSopExist(KEY, VALUE4).get());
 
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -121,15 +130,16 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(future.getOperationStatus().isSuccess());
+      assertTrue(future.getOperationStatus().isSuccess());
 
-      Assert.assertTrue(map.get(VALUE1));
+      assertTrue(map.get(VALUE1));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testMaxPipedExist() {
     try {
       List<Object> findValues = new ArrayList<>();
@@ -141,7 +151,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
         if (i / 2 == 0) {
           continue;
         }
-        Assert.assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i,
+        assertTrue(mc.asyncSopInsert(KEY, "VALUE" + i,
                 new CollectionAttributes()).get());
       }
 
@@ -151,22 +161,23 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(future.getOperationStatus().isSuccess());
+      assertTrue(future.getOperationStatus().isSuccess());
 
       for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
         if (i / 2 == 0) {
-          Assert.assertFalse(map.get("VALUE" + i));
+          assertFalse(map.get("VALUE" + i));
         } else {
-          Assert.assertTrue(map.get("VALUE" + i));
+          assertTrue(map.get("VALUE" + i));
         }
       }
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPipedExistNotExistsKey() {
     try {
       List<Object> findValues = new ArrayList<>();
@@ -182,16 +193,17 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertFalse(future.getOperationStatus().isSuccess());
-      Assert.assertEquals(CollectionResponse.NOT_FOUND, future
+      assertTrue(map.isEmpty());
+      assertFalse(future.getOperationStatus().isSuccess());
+      assertEquals(CollectionResponse.NOT_FOUND, future
               .getOperationStatus().getResponse());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPipedExistOneNotExistsKey() {
     try {
       List<Object> findValues = new ArrayList<>();
@@ -202,19 +214,20 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertFalse(future.getOperationStatus().isSuccess());
-      Assert.assertEquals(CollectionResponse.NOT_FOUND, future
+      assertTrue(map.isEmpty());
+      assertFalse(future.getOperationStatus().isSuccess());
+      assertEquals(CollectionResponse.NOT_FOUND, future
               .getOperationStatus().getResponse());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPipedExistTypeMismatchedKey() {
     try {
-      Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
+      assertTrue(mc.set(KEY, 10, VALUE1).get());
 
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -228,19 +241,20 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertFalse(future.getOperationStatus().isSuccess());
-      Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
+      assertTrue(map.isEmpty());
+      assertFalse(future.getOperationStatus().isSuccess());
+      assertEquals(CollectionResponse.TYPE_MISMATCH, future
               .getOperationStatus().getResponse());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testPipedExistOneTypeMismatchedKey() {
     try {
-      Assert.assertTrue(mc.set(KEY, 10, VALUE1).get());
+      assertTrue(mc.set(KEY, 10, VALUE1).get());
 
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -250,13 +264,13 @@ public class SopPipedExistTest extends BaseIntegrationTest {
 
       Map<Object, Boolean> map = future.get();
 
-      Assert.assertTrue(map.isEmpty());
-      Assert.assertFalse(future.getOperationStatus().isSuccess());
-      Assert.assertEquals(CollectionResponse.TYPE_MISMATCH, future
+      assertTrue(map.isEmpty());
+      assertFalse(future.getOperationStatus().isSuccess());
+      assertEquals(CollectionResponse.TYPE_MISMATCH, future
               .getOperationStatus().getResponse());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

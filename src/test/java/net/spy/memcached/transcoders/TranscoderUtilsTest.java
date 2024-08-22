@@ -2,22 +2,26 @@ package net.spy.memcached.transcoders;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Some test coverage for transcoder utils.
  */
-public class TranscoderUtilsTest extends TestCase {
+public class TranscoderUtilsTest {
 
   private TranscoderUtils tu;
   private final byte[] oversizeBytes = new byte[16];
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     tu = new TranscoderUtils(true);
   }
 
+  @Test
   public void testBooleanOverflow() {
     try {
       boolean b = tu.decodeBoolean(oversizeBytes);
@@ -27,6 +31,7 @@ public class TranscoderUtilsTest extends TestCase {
     }
   }
 
+  @Test
   public void testByteOverflow() {
     try {
       byte b = tu.decodeByte(oversizeBytes);
@@ -36,6 +41,7 @@ public class TranscoderUtilsTest extends TestCase {
     }
   }
 
+  @Test
   public void testIntOverflow() {
     try {
       int b = tu.decodeInt(oversizeBytes);
@@ -45,6 +51,7 @@ public class TranscoderUtilsTest extends TestCase {
     }
   }
 
+  @Test
   public void testLongOverflow() {
     try {
       long b = tu.decodeLong(oversizeBytes);
@@ -54,10 +61,12 @@ public class TranscoderUtilsTest extends TestCase {
     }
   }
 
+  @Test
   public void testPackedLong() {
     assertEquals("[1]", Arrays.toString(tu.encodeLong(1)));
   }
 
+  @Test
   public void testUnpackedLong() {
     assertEquals("[0, 0, 0, 0, 0, 0, 0, 1]",
             Arrays.toString(new TranscoderUtils(false).encodeLong(1)));

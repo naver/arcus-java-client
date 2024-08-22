@@ -7,21 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Ignore;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This test fails intermittently.
  * Ignore it now and fix it later.
  */
-@Ignore
-public class ConsistentHashingTest extends TestCase {
+@Disabled
+public class ConsistentHashingTest {
 
+  @Test
   public void testSmallSet() {
     runThisManyNodes(3);
   }
 
+  @Test
   public void testLargeSet() {
     runThisManyNodes(100);
   }

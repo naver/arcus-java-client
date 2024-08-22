@@ -24,6 +24,13 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class BopFindPositionTest extends BaseIntegrationTest {
 
   private String key = "BopFindPositionTest";
@@ -40,12 +47,14 @@ public class BopFindPositionTest extends BaseIntegrationTest {
       new byte[]{18}, new byte[]{19}
   };
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(key).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testLongBKeyAsc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
@@ -65,6 +74,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLongBKeyDesc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
@@ -80,11 +90,12 @@ public class BopFindPositionTest extends BaseIntegrationTest {
       assertNotNull(position);
       assertEquals(CollectionResponse.OK, f.getOperationStatus()
               .getResponse());
-      assertEquals("invalid position", longBkeys.length - i - 1,
-              position.intValue());
+      assertEquals(longBkeys.length - i - 1,
+              position.intValue(), "invalid position");
     }
   }
 
+  @Test
   public void testByteArrayBKeyAsc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
@@ -104,6 +115,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testByteArrayBKeyDesc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
@@ -119,11 +131,12 @@ public class BopFindPositionTest extends BaseIntegrationTest {
       assertNotNull(position);
       assertEquals(CollectionResponse.OK, f.getOperationStatus()
               .getResponse());
-      assertEquals("invalid position", longBkeys.length - i - 1,
-              position.intValue());
+      assertEquals(longBkeys.length - i - 1,
+              position.intValue(), "invalid position");
     }
   }
 
+  @Test
   public void testUnsuccessfulResponses() throws Exception {
     mc.delete(invalidKey).get();
     mc.delete(kvKey).get();

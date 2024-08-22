@@ -9,11 +9,17 @@ import java.util.concurrent.Callable;
 
 import net.spy.memcached.compat.SyncThread;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Longer running test case.
  */
 public class LongClientTest extends ClientBaseCase {
 
+  @Test
   public void testParallelGet() throws Throwable {
     // Get a connection with the get optimization disabled.
     client.shutdown();

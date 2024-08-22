@@ -5,6 +5,14 @@ import java.util.concurrent.Callable;
 import net.spy.memcached.compat.SyncThread;
 import net.spy.memcached.transcoders.LongTranscoder;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * Test the CAS mutator.
  */
@@ -13,6 +21,7 @@ public class CASMutatorTest extends ClientBaseCase {
   private CASMutation<Long> mutation;
   private CASMutator<Long> mutator;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -24,11 +33,13 @@ public class CASMutatorTest extends ClientBaseCase {
     mutator = new CASMutator<>(client, new LongTranscoder(), 50);
   }
 
+  @Test
   public void testDefaultConstructor() {
     // Just validate that this doesn't throw an exception.
     new CASMutator<>(client, new LongTranscoder());
   }
 
+  @Test
   public void testConcurrentCAS() throws Throwable {
     int num = SyncThread.getDistinctResultCount(20, new Callable<Long>() {
       public Long call() throws Exception {
@@ -38,6 +49,7 @@ public class CASMutatorTest extends ClientBaseCase {
     assertEquals(20, num);
   }
 
+  @Test
   public void testIncorrectTypeInCAS() throws Throwable {
     // Stick something for this CAS in the cache.
     assertTrue(client.set("x", 0, "not a long").get());
@@ -49,12 +61,14 @@ public class CASMutatorTest extends ClientBaseCase {
     }
   }
 
+  @Test
   public void testCASUpdateWithNullInitial() throws Throwable {
     assertTrue(client.set("x", 0, 1L).get());
     Long rv = mutator.cas("x", (Long) null, 0, mutation);
     assertEquals(rv, (Long) 2L);
   }
 
+  @Test
   public void testCASUpdateWithNullInitialNoExistingVal() throws Throwable {
     assertNull(client.get("x"));
     Long rv = mutator.cas("x", (Long) null, 0, mutation);
@@ -62,6 +76,7 @@ public class CASMutatorTest extends ClientBaseCase {
     assertNull(client.get("x"));
   }
 
+  @Test
   public void testCASValueToString() {
     CASValue<String> c = new CASValue<>(717L, "hi");
     assertEquals("{CasValue 717/hi}", c.toString());

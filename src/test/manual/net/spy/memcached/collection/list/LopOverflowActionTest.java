@@ -24,11 +24,19 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class LopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "LopOverflowActionTest";
   private List<String> keyList = new ArrayList<>();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -36,6 +44,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
     mc.delete(key).get();
   }
 
+  @Test
   public void testLopGet_Maxcount() throws Exception {
     // Test
     for (int maxcount = 100; maxcount <= 200; maxcount += 100) {
@@ -61,6 +70,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLopGet_Overflow() throws Exception {
     // Create a List
     mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
@@ -91,6 +101,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopGet_HeadTrim() throws Exception {
     // Create a List
     mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
@@ -120,6 +131,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopGet_TailTrim() throws Exception {
     // Create a List
     mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();
@@ -149,6 +161,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopGet_HeadTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes()).get();
@@ -165,6 +178,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
     mc.asyncLopDelete(key, 0, 10, false).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testLopGet_TailTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncLopInsert(key, 1, "item1", new CollectionAttributes()).get();
@@ -181,6 +195,7 @@ public class LopOverflowActionTest extends BaseIntegrationTest {
     mc.asyncLopDelete(key, 0, 10, false).get(1000, TimeUnit.MILLISECONDS);
   }
 
+  @Test
   public void testLopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncLopInsert(key, 0, "item0", new CollectionAttributes()).get();

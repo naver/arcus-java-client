@@ -63,12 +63,17 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
     </properties>
 
     <dependencies>
-        <!-- 편의상 JUnit 버전을 4.x로 변경합니다. -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-api</artifactId>
+          <version>5.10.2</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-engine</artifactId>
+          <version>5.10.2</version>
+          <scope>test</scope>
         </dependency>
 
         <!-- ARCUS 클라이언트 의존성을 추가합니다. -->
@@ -109,23 +114,22 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 // HelloArcusTest.java
 package com.navercorp.arcus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HelloArcusTest {
 
     HelloArcus helloArcus = new HelloArcus("127.0.0.1:2181", "test");
     
-    @Before
-    public void sayHello() {
+    @BeforeEach
+    protected void sayHello() {
         helloArcus.sayHello();
     }
     
     @Test
     public void listenHello() {
-        Assert.assertEquals("Hello, Arcus!", helloArcus.listenHello());
+        assertEquals("Hello, Arcus!", helloArcus.listenHello());
     }
     
 }

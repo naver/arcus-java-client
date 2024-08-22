@@ -6,16 +6,26 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class RedistributeFailureModeTest extends ClientBaseCase {
 
   private String serverList;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     serverList = ARCUS_HOST + " 127.0.0.1:11311";
     super.setUp();
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     serverList = ARCUS_HOST;
@@ -43,6 +53,7 @@ public class RedistributeFailureModeTest extends ClientBaseCase {
   }
 
   // Just to make sure the sequence is being handled correctly
+  @Test
   public void testMixedSetsAndUpdates() throws Exception {
     int keySize = 100;
     List<String> keys = new ArrayList<>(keySize);
@@ -66,6 +77,6 @@ public class RedistributeFailureModeTest extends ClientBaseCase {
     for (Map.Entry<String, Object> me : m.entrySet()) {
       assertEquals(me.getKey(), me.getValue());
     }
-    System.err.println(getName() + " complete.");
+    System.err.println("testMixedSetsAndUpdates complete.");
   }
 }

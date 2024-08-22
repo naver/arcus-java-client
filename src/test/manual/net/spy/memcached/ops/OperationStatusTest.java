@@ -3,15 +3,22 @@ package net.spy.memcached.ops;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.internal.OperationFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class OperationStatusTest extends BaseIntegrationTest {
   private static final int EXP = 100;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.flush().get();
   }
 
+  @Test
   public void testStore_success() throws Exception {
     //given
     String value = "value1";
@@ -37,6 +44,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.SUCCESS, appendOperationFuture.getStatus().getStatusCode());
   }
 
+  @Test
   public void testStore_fail() throws Exception {
     //given
     String value = "value1";
@@ -62,6 +70,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.ERR_NOT_STORED, appendOperationFuture.getStatus().getStatusCode());
   }
 
+  @Test
   public void testIncrAndDecr_success() throws Exception {
     //given
     String key = "key";
@@ -78,6 +87,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.SUCCESS, decrOperationFuture.getStatus().getStatusCode());
   }
 
+  @Test
   public void testIncrAndDecr_fail() throws Exception {
     //given
     int value = 1;
@@ -94,6 +104,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.ERR_NOT_FOUND, decrOperationFuture.getStatus().getStatusCode());
   }
 
+  @Test
   public void testDelete_success() throws Exception {
     //given
     String value = "example";
@@ -107,6 +118,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
     assertEquals(StatusCode.SUCCESS, deleteOperationFuture.getStatus().getStatusCode());
   }
 
+  @Test
   public void testDelete_fail() throws Exception {
     //given
     String value = "example";

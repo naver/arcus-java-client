@@ -24,12 +24,22 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MopGetTest extends BaseIntegrationTest {
 
   private String key = "MopGetTest";
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -42,12 +52,14 @@ public class MopGetTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteMap(key);
     super.tearDown();
   }
 
+  @Test
   public void testMopGet_NoKey() throws Exception {
     Map<String, Object> rmap = mc.asyncMopGet("no_key", false, false).get(
             1000, TimeUnit.MILLISECONDS);
@@ -56,6 +68,7 @@ public class MopGetTest extends BaseIntegrationTest {
     assertNull(rmap);
   }
 
+  @Test
   public void testMopGet_NoMkey() throws Exception {
     Map<String, Object> map = mc.asyncMopGet(key, "20", false, false).get(1000,
             TimeUnit.MILLISECONDS);
@@ -63,6 +76,7 @@ public class MopGetTest extends BaseIntegrationTest {
     assertTrue(map.isEmpty());
   }
 
+  @Test
   public void testMopGet_GetByBestEffort() throws Exception {
     // Retrieve items(2..11) in the list
     List<String> mkeyList = new ArrayList<>();
@@ -80,7 +94,7 @@ public class MopGetTest extends BaseIntegrationTest {
     }
   }
 
-
+  @Test
   public void testMopGet_GetWithDeletion() throws Exception {
     CollectionAttributes attrs = null;
     Map<String, Object> rmap = null;

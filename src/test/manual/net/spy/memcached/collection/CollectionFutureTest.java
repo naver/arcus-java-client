@@ -22,16 +22,27 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.OperationStatus;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class CollectionFutureTest extends BaseIntegrationTest {
 
   private String key = "CollectionFutureTest";
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.asyncBopDelete(key, 0, 100, ElementFlagFilter.DO_NOT_FILTER, 0, true).get();
   }
 
+  @Test
   public void testAfterSuccess() throws Exception {
     CollectionFuture<Boolean> future;
     OperationStatus status;
@@ -52,6 +63,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
     assertEquals("CREATED_STORED", status.getMessage());
   }
 
+  @Test
   public void testAfterFailure() throws Exception {
     CollectionFuture<Map<Long, Element<Object>>> future;
     OperationStatus status;

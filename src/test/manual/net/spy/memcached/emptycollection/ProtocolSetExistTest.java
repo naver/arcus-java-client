@@ -16,25 +16,28 @@
  */
 package net.spy.memcached.emptycollection;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.SetExist;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolSetExistTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ProtocolSetExistTest {
   private final Object value = "value";
   private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
+  @Test
   public void testStringify() {
     SetExist<Object> exist = new SetExist<>(value, testTranscoder);
-    Assert.assertEquals("5", exist.stringify());
+    assertEquals("5", exist.stringify());
   }
 
+  @Test
   public void testGetAdditionalArgs() {
     SetExist<Object> exist = new SetExist<>(value, testTranscoder);
-    Assert.assertArrayEquals(new byte[]{'v', 'a', 'l', 'u', 'e'}, exist.getAdditionalArgs());
+    assertArrayEquals(new byte[]{'v', 'a', 'l', 'u', 'e'}, exist.getAdditionalArgs());
   }
 }

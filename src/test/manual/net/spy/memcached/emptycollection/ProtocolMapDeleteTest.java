@@ -19,14 +19,15 @@ package net.spy.memcached.emptycollection;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.MapDelete;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-public class ProtocolMapDeleteTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class ProtocolMapDeleteTest {
+
+  @Test
   public void testStringify() {
     List<String> mkeyList = new ArrayList<>();
     mkeyList.add("mkey");
@@ -39,38 +40,38 @@ public class ProtocolMapDeleteTest extends TestCase {
     MapDelete mapDelete;
     mapDelete = new MapDelete(mkeyList, false);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1 drop", mapDelete.stringify());
+    assertEquals("4 1 drop", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList, false, false);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1", mapDelete.stringify());
+    assertEquals("4 1", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList, false, true);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1 drop", mapDelete.stringify());
+    assertEquals("4 1 drop", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList2, false, false);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("11 2", mapDelete.stringify());
+    assertEquals("11 2", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList2, false, true);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("11 2 drop", mapDelete.stringify());
+    assertEquals("11 2 drop", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList, true);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1 drop noreply", mapDelete.stringify());
+    assertEquals("4 1 drop noreply", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList, true, false);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1 noreply", mapDelete.stringify());
+    assertEquals("4 1 noreply", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList, true, true);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("4 1 drop noreply", mapDelete.stringify());
+    assertEquals("4 1 drop noreply", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList2, true, false);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("11 2 noreply", mapDelete.stringify());
+    assertEquals("11 2 noreply", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList2, true, true);
     mapDelete.setKeySeparator(" ");
-    Assert.assertEquals("11 2 drop noreply", mapDelete.stringify());
+    assertEquals("11 2 drop noreply", mapDelete.stringify());
   }
 }

@@ -24,10 +24,18 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionType;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class GetAttrTest extends BaseIntegrationTest {
 
   private final String[] list = {"hello1", "hello2", "hello3"};
 
+  @Test
   public void testGetAttr_KV() throws Exception {
     String key = "testGetAttr_KV";
 
@@ -41,6 +49,7 @@ public class GetAttrTest extends BaseIntegrationTest {
     assertEquals(CollectionType.kv, rattrs.getType());
   }
 
+  @Test
   public void testGetAttr_ModifiedAttribute() throws Exception {
     String key = "getattr_modified_attribute";
 
@@ -64,6 +73,7 @@ public class GetAttrTest extends BaseIntegrationTest {
     deleteList(key, list.length);
   }
 
+  @Test
   public void testGetAttr_DefaultAttribute() throws Exception {
     String key = "getattr_default_attribute";
 
@@ -84,6 +94,7 @@ public class GetAttrTest extends BaseIntegrationTest {
     deleteList(key, list.length);
   }
 
+  @Test
   public void testGetAttr_KeyNotFound() throws Exception {
     CollectionFuture<CollectionAttributes> future = mc
             .asyncGetAttr("NOT_EXISTS");
