@@ -5,30 +5,38 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.CachedData;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Base tests of the base serializing transcoder stuff.
  */
-public class BaseSerializingTranscoderTest extends TestCase {
+public class BaseSerializingTranscoderTest {
 
   private Exposer ex;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     ex = new Exposer();
   }
 
+  @Test
   public void testValidCharacterSet() {
     ex.setCharset("KOI8");
   }
 
+  @Test
   public void testInvalidCharacterSet() {
     try {
       ex.setCharset("Dustin's Kick Ass Character Set");
@@ -37,6 +45,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testCompressNull() {
     try {
       ex.compress(null);
@@ -46,14 +55,17 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testDecodeStringNull() {
     assertNull(ex.decodeString(null));
   }
 
+  @Test
   public void testDeserializeNull() {
     assertNull(ex.deserialize(null));
   }
 
+  @Test
   public void testEncodeStringNull() {
     try {
       ex.encodeString(null);
@@ -63,6 +75,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testSerializeNull() {
     try {
       ex.serialize(null);
@@ -72,10 +85,12 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testDecompressNull() {
     assertNull(ex.decompress(null));
   }
 
+  @Test
   public void testUndeserializable() throws Exception {
     byte[] data = {
       -84, -19, 0, 5, 115, 114, 0, 4, 84, 101, 115, 116, 2, 61, 102,
@@ -85,11 +100,13 @@ public class BaseSerializingTranscoderTest extends TestCase {
     assertNull(ex.deserialize(data));
   }
 
+  @Test
   public void testDeserializable() throws Exception {
     byte[] data = {-84, -19, 0, 5, 116, 0, 5, 104, 101, 108, 108, 111};
     assertEquals("hello", ex.deserialize(data));
   }
 
+  @Test
   public void testBadCharsetDecode() {
     ex.overrideCharsetSet("Some Crap");
     try {
@@ -101,6 +118,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testBadCharsetEncode() {
     ex.overrideCharsetSet("Some Crap");
     try {
@@ -112,6 +130,7 @@ public class BaseSerializingTranscoderTest extends TestCase {
     }
   }
 
+  @Test
   public void testDifferentClassLoaderMakeDifferentValue() throws Exception {
     // load CustomEntry class with custom class loader.
     CustomClassLoader customClassLoader = new CustomClassLoader();

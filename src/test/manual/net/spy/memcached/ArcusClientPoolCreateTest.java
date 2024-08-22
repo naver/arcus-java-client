@@ -8,19 +8,20 @@ import java.util.regex.Pattern;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class ArcusClientPoolCreateTest {
 
   private static final int POOL_SIZE = 3;
   private static final int CACHE_NODE_SIZE = 3;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeEach
+  protected void setUp() throws Exception {
     // This test assumes we use ZK
     assumeTrue(BaseIntegrationTest.USE_ZK);
   }
@@ -33,9 +34,9 @@ public class ArcusClientPoolCreateTest {
 
     ArcusClient[] allClients = clientPool.getAllClients();
 
-    Assert.assertEquals(allClients.length, POOL_SIZE);
+    assertEquals(allClients.length, POOL_SIZE);
     for (int i = 0 ; i < POOL_SIZE ; i++) {
-      Assert.assertEquals(allClients[i].getMemcachedConnection().getLocator().getAll().size(),
+      assertEquals(allClients[i].getMemcachedConnection().getLocator().getAll().size(),
               CACHE_NODE_SIZE);
       Collection<MemcachedNode> nodes =
               allClients[i].getMemcachedConnection().getLocator().getAll();
@@ -43,7 +44,7 @@ public class ArcusClientPoolCreateTest {
         Pattern compile =
                 Pattern.compile("ArcusClient-(\\d+)\\(" + (i + 1) + "-" + POOL_SIZE + "\\)");
         Matcher matcher = compile.matcher(mc.getNodeName().split(" ")[0]);
-        Assert.assertTrue(matcher.matches());
+        assertTrue(matcher.matches());
       }
     }
 
@@ -55,9 +56,9 @@ public class ArcusClientPoolCreateTest {
 
     allClients = clientPool.getAllClients();
 
-    Assert.assertEquals(allClients.length, POOL_SIZE);
+    assertEquals(allClients.length, POOL_SIZE);
     for (int i = 0 ; i < POOL_SIZE ; i++) {
-      Assert.assertEquals(allClients[i].getMemcachedConnection().getLocator().getAll().size(),
+      assertEquals(allClients[i].getMemcachedConnection().getLocator().getAll().size(),
               CACHE_NODE_SIZE);
       Collection<MemcachedNode> nodes =
               allClients[i].getMemcachedConnection().getLocator().getAll();
@@ -65,12 +66,12 @@ public class ArcusClientPoolCreateTest {
         Pattern compile =
                 Pattern.compile("ArcusClient-(\\d+)\\(" + (i + 1) + "-" + POOL_SIZE + "\\)");
         Matcher matcher = compile.matcher(mc.getNodeName().split(" ")[0]);
-        Assert.assertTrue(matcher.matches());
+        assertTrue(matcher.matches());
       }
     }
 
     int secondPoolId = getPoolId();
-    Assert.assertTrue(secondPoolId > firstPoolId);
+    assertTrue(secondPoolId > firstPoolId);
   }
 
   private int getPoolId() throws NoSuchFieldException, IllegalAccessException {

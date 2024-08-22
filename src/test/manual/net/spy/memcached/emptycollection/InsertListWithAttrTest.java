@@ -21,7 +21,14 @@ import java.util.List;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InsertListWithAttrTest extends BaseIntegrationTest {
 
@@ -29,23 +36,26 @@ public class InsertListWithAttrTest extends BaseIntegrationTest {
   private final int INDEX = 0;
   private final int EXPIRE_TIME_IN_SEC = 1;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testInsertWithAttribute() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
@@ -54,44 +64,45 @@ public class InsertListWithAttrTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncLopInsert(KEY, INDEX, "value", attr)
               .get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(3333),
+      assertEquals(Long.valueOf(3333),
               collectionAttributes.getMaxCount());
 
       // check expire time
       Thread.sleep(EXPIRE_TIME_IN_SEC * 1000L + 1000L);
       List<Object> list = mc.asyncLopGet(KEY, INDEX, false, false).get();
-      Assert.assertNull(list);
+      assertNull(list);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInsertWithDefaultAttribute() {
     try {
       // check not exists
-      Assert.assertNull(mc.asyncGetAttr(KEY).get());
+      assertNull(mc.asyncGetAttr(KEY).get());
 
       // insert with create option
       CollectionAttributes attr = new CollectionAttributes();
 
       Boolean insertResult = mc.asyncLopInsert(KEY, INDEX, "value", attr)
               .get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes collectionAttributes = mc.asyncGetAttr(KEY)
               .get();
-      Assert.assertEquals(Long.valueOf(4000),
+      assertEquals(Long.valueOf(4000),
               collectionAttributes.getMaxCount());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

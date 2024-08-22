@@ -27,12 +27,17 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SopInsertBulkTest extends BaseIntegrationTest {
 
   private String KEY = SopInsertBulkTest.class.getSimpleName();
 
+  @Test
   public void testInsertAndGet() {
     String value = "MyValue";
     int keySize = 500;
@@ -54,12 +59,12 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
       try {
         Map<String, CollectionOperationStatus> errorList = future.get(
                 100L, TimeUnit.MILLISECONDS);
-        Assert.assertTrue("Error list is not empty.",
-                errorList.isEmpty());
+        assertTrue(errorList.isEmpty(),
+                "Error list is not empty.");
       } catch (TimeoutException e) {
         future.cancel(true);
         e.printStackTrace();
-        Assert.fail(e.getMessage());
+        fail(e.getMessage());
       }
 
       // GET
@@ -72,11 +77,11 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
         } catch (Exception e) {
           f.cancel(true);
           e.printStackTrace();
-          Assert.fail(e.getMessage());
+          fail(e.getMessage());
         }
 
-        Assert.assertTrue("Cached list is empty.",
-                !cachedList.isEmpty());
+        assertTrue(!cachedList.isEmpty(),
+                "Cached list is empty.");
 
         for (Object o : cachedList) {
           if (!value.equals(o)) {
@@ -84,7 +89,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
           }
         }
       }
-      Assert.assertEquals("Error count is greater than 0.", 0, errorCount);
+      assertEquals(0, errorCount, "Error count is greater than 0.");
 
       // REMOVE
       for (String key : keys) {
@@ -92,10 +97,11 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 
+  @Test
   public void testErrorCount() {
     String value = "MyValue";
     int keySize = 1200;
@@ -118,7 +124,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail("ERROR");
+      fail("ERROR");
     }
   }
 }

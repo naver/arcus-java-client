@@ -21,10 +21,18 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   private String key = "SopInsertWhenKeyNotExist";
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(key).get();
@@ -37,6 +45,7 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
    *  true  false null
    * </pre>
    */
+  @Test
   public void testSopInsert_nokey_01() throws Exception {
     insertToFail(key, true, false, null);
   }
@@ -47,6 +56,7 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
    *  false true  not null
    * </pre>
    */
+  @Test
   public void testSopInsert_nokey_02() throws Exception {
     assertFalse(insertToSucceed(key, false, true, "some value"));
   }
@@ -57,6 +67,7 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
    *  false  false not null
    * </pre>
    */
+  @Test
   public void testSopInsert_nokey_04() throws Exception {
     assertFalse(insertToSucceed(key, false, false, "some value"));
   }
@@ -67,6 +78,7 @@ public class SopInsertWhenKeyNotExist extends BaseIntegrationTest {
    *  true  true  not null
    * </pre>
    */
+  @Test
   public void testSopInsert_nokey_05() throws Exception {
     assertTrue(insertToSucceed(key, true, true, "some value"));
   }

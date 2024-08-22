@@ -31,18 +31,26 @@ import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BopPipeUpdateTest extends BaseIntegrationTest {
 
   private static final String KEY = BopPipeUpdateTest.class.getSimpleName();
   private static final int elementCount = 1200;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
 
     List<Element<Object>> elements = new ArrayList<>();
 
@@ -63,20 +71,22 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     // System.out.println(System.currentTimeMillis() - start + "ms");
 
-    Assert.assertTrue(map.isEmpty());
+    assertTrue(map.isEmpty());
 
     Map<Long, Element<Object>> map3 = mc.asyncBopGet(KEY, 0, 9999,
             ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false).get();
 
-    Assert.assertEquals(elementCount, map3.size());
+    assertEquals(elementCount, map3.size());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testBopPipeUpdateValue() {
 
     List<Element<Object>> updateElements = new ArrayList<>();
@@ -96,7 +106,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
       // System.out.println(map2.size());
-      Assert.assertTrue(map2.isEmpty());
+      assertTrue(map2.isEmpty());
 
       for (long i = 0; i < elementCount; i++) {
         assertEquals(
@@ -108,11 +118,12 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
   }
 
+  @Test
   public void testBopPipeUpdateEFlags() {
 
     byte[] NEW_BYTE_EFLAG = new byte[]{1, 1};
@@ -135,7 +146,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
       // System.out.println(map2.size());
-      Assert.assertTrue(map2.isEmpty());
+      assertTrue(map2.isEmpty());
 
       for (long i = 0; i < elementCount; i++) {
         Element<Object> element = mc
@@ -150,10 +161,11 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopPipeUpdateEFlagsReset() {
 
     List<Element<Object>> updateElements = new ArrayList<>();
@@ -173,7 +185,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
       // System.out.println(map2.size());
-      Assert.assertTrue(map2.isEmpty());
+      assertTrue(map2.isEmpty());
 
       for (long i = 0; i < elementCount; i++) {
         Element<Object> element = mc
@@ -188,10 +200,11 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBopPipeUpdateNotFoundElement() {
 
     try {
@@ -200,7 +213,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
               TimeUnit.MILLISECONDS));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
     List<Element<Object>> updateElements = new ArrayList<>();
@@ -234,11 +247,12 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
   }
 
+  @Test
   public void testBopPipeUpdateNotFoundKey() {
 
     String key2 = "NEW_BopPipeUpdateTest";
@@ -266,7 +280,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
   }

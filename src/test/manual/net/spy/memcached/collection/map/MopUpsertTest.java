@@ -9,7 +9,14 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class MopUpsertTest extends BaseIntegrationTest {
 
@@ -21,23 +28,26 @@ public class MopUpsertTest extends BaseIntegrationTest {
 
   private final CollectionAttributes collectionAttributes = new CollectionAttributes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testUpsertIfKeyExists() {
     try {
       // given
-      Assert.assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, collectionAttributes).get());
+      assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, collectionAttributes).get());
 
       // when
       CollectionFuture<Boolean> future =
@@ -52,10 +62,11 @@ public class MopUpsertTest extends BaseIntegrationTest {
               .get(1000, TimeUnit.MILLISECONDS);
       assertEquals(NEW_VALUE, map.get(MKEY));
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testUpsertIfKeyDoesNotExist() {
     try {
       // given & when
@@ -65,10 +76,10 @@ public class MopUpsertTest extends BaseIntegrationTest {
       CollectionOperationStatus operationStatus = future.getOperationStatus();
 
       // then
-      Assert.assertTrue("Upsert failed", result);
+      assertTrue(result, "Upsert failed");
       assertEquals(CollectionResponse.CREATED_STORED, operationStatus.getResponse());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

@@ -1,14 +1,17 @@
 package net.spy.memcached.transcoders;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.CachedData;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test a couple aspects of CachedData.
  */
-public class CachedDataTest extends TestCase {
+public class CachedDataTest {
 
+  @Test
   public void testToString() throws Exception {
     String exp = "{CachedData flags=13 data=[84, 104, 105, 115, 32, 105, "
             + "115, 32, 97, 32, 115, 105, 109, 112, 108, 101, 32, 116, 101, "

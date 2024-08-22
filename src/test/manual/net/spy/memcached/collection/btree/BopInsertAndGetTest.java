@@ -27,6 +27,15 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BopInsertAndGetTest extends BaseIntegrationTest {
 
   private String key = "BopStoreAndGetTest";
@@ -41,6 +50,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
       new byte[]{18}, new byte[]{19}
   };
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -49,6 +59,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     mc.delete(kvKey).get();
   }
 
+  @Test
   public void testInsertAndGetNotTrimmed() throws Exception {
     //given
     CollectionAttributes attrs = new CollectionAttributes();
@@ -66,6 +77,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     assertNull(f.getElement());
   }
 
+  @Test
   public void testInsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -104,6 +116,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     assertEquals(12L, posMap.get(0).getLongBkey());
   }
 
+  @Test
   public void testInsertAndGetTrimmedByteArrayBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -147,6 +160,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
             .getByteArrayBkey()));
   }
 
+  @Test
   public void testInsertAndGetTrimmedLongBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -185,6 +199,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     assertEquals(17L, posMap.get(0).getLongBkey());
   }
 
+  @Test
   public void testInsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -228,6 +243,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
             .getByteArrayBkey()));
   }
 
+  @Test
   public void testUpsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -266,6 +282,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     assertEquals(12L, posMap.get(0).getLongBkey());
   }
 
+  @Test
   public void testUpsertAndGetTrimmedByteArrayBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -309,6 +326,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
             .getByteArrayBkey()));
   }
 
+  @Test
   public void testUpsertAndGetTrimmedLongBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -347,6 +365,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
     assertEquals(17L, posMap.get(0).getLongBkey());
   }
 
+  @Test
   public void testUpsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -390,6 +409,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
             .getByteArrayBkey()));
   }
 
+  @Test
   public void testInsertAndGetTrimmedOtherResponses() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
@@ -442,6 +462,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
             .getResponse());
   }
 
+  @Test
   public void testUpsertAndGetTrimmedOtherResponses() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();

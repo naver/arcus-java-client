@@ -27,7 +27,13 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopUpsertTest extends BaseIntegrationTest {
 
@@ -38,23 +44,24 @@ public class BopUpsertTest extends BaseIntegrationTest {
   private final byte[] FLAG = "FLAG".getBytes();
   private final byte[] FLAG2 = "GALF".getBytes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
-  ;
-
+  @Test
   public void testUpsertExistsValueOnly() throws Exception {
     // insert one
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
 
     // get
@@ -62,33 +69,34 @@ public class BopUpsertTest extends BaseIntegrationTest {
             BKEY, ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false)
             .get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
 
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE, i.getValue().getValue());
+      assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // upsert
-    Assert.assertTrue(mc.asyncBopUpsert(KEY, BKEY, null, VALUE2, null)
+    assertTrue(mc.asyncBopUpsert(KEY, BKEY, null, VALUE2, null)
             .get());
 
     // get again
     map = mc.asyncBopGet(KEY, BKEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
             0, 10, false, false).get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertNull(i.getValue().getEFlag());
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE2, i.getValue().getValue());
+      assertNull(i.getValue().getEFlag());
     }
   }
 
+  @Test
   public void testUpsertNotExistsValueOnly() throws Exception {
     // upsert
-    Assert.assertTrue(mc.asyncBopUpsert(KEY, BKEY, null, VALUE2,
+    assertTrue(mc.asyncBopUpsert(KEY, BKEY, null, VALUE2,
             new CollectionAttributes()).get());
 
     // get again
@@ -96,17 +104,17 @@ public class BopUpsertTest extends BaseIntegrationTest {
             BKEY, ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false)
             .get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertNull(i.getValue().getEFlag());
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE2, i.getValue().getValue());
+      assertNull(i.getValue().getEFlag());
     }
   }
-
+  @Test
   public void testUpsertExistsEFlagOnly() throws Exception {
     // insert one
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
 
     // get
@@ -114,27 +122,27 @@ public class BopUpsertTest extends BaseIntegrationTest {
             BKEY, ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false)
             .get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
 
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE, i.getValue().getValue());
+      assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // upsert
-    Assert.assertTrue(mc.asyncBopUpsert(KEY, BKEY, FLAG2, VALUE2, null)
+    assertTrue(mc.asyncBopUpsert(KEY, BKEY, FLAG2, VALUE2, null)
             .get());
 
     // get again
     map = mc.asyncBopGet(KEY, BKEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
             0, 10, false, false).get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE2, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG2, i.getValue().getEFlag()));
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE2, i.getValue().getValue());
+      assertTrue(Arrays.equals(FLAG2, i.getValue().getEFlag()));
     }
   }
 

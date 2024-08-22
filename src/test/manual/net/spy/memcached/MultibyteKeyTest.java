@@ -77,9 +77,10 @@ import net.spy.memcached.transcoders.IntegerTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class MultibyteKeyTest {
   private static final String MULTIBYTE_KEY = "아커스프리픽스:아커스멀티바이트키스트링";
@@ -88,8 +89,8 @@ public class MultibyteKeyTest {
   private OperationCallback genericCallback = null;
   private List<String> keyList = null;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeEach
+  protected void setUp() throws Exception {
     genericCallback = new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
@@ -124,7 +125,7 @@ public class MultibyteKeyTest {
         }
       }).initialize();        // BaseGetOpImpl.initialize()
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -138,7 +139,7 @@ public class MultibyteKeyTest {
         }
       }, testData, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -178,7 +179,7 @@ public class MultibyteKeyTest {
         }
       }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -187,7 +188,7 @@ public class MultibyteKeyTest {
     try {
       opFact.cas(StoreType.add, MULTIBYTE_KEY, 1L, 0, 0, testData, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -198,7 +199,7 @@ public class MultibyteKeyTest {
           .initialize();
       //BaseStoreOperationImpl.initialize()
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -209,7 +210,7 @@ public class MultibyteKeyTest {
           new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
           genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -225,7 +226,7 @@ public class MultibyteKeyTest {
             }
           }, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -245,7 +246,7 @@ public class MultibyteKeyTest {
             }
           }, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -266,7 +267,7 @@ public class MultibyteKeyTest {
         }
       }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -275,7 +276,7 @@ public class MultibyteKeyTest {
     try {
       opFact.mutate(Mutator.incr, MULTIBYTE_KEY, 1, 1L, 0, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -307,7 +308,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -335,7 +336,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -366,7 +367,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
 
     Map<Long, Integer> elementsMap = new HashMap<>();
@@ -378,7 +379,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
 
     List<Integer> elementsList = new ArrayList<>();
@@ -391,7 +392,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
 
     Set<Integer> elementsSet = new HashSet<>();
@@ -403,7 +404,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -412,7 +413,7 @@ public class MultibyteKeyTest {
     try {
       opFact.delete(MULTIBYTE_KEY, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -437,7 +438,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -456,7 +457,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -485,7 +486,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
 
     insert = new CollectionBulkInsert.ListBulkInsert<>(null, keyList,
@@ -495,7 +496,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
 
     insert = new CollectionBulkInsert.SetBulkInsert<>(null, keyList,
@@ -504,7 +505,7 @@ public class MultibyteKeyTest {
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -534,7 +535,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -558,7 +559,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -569,7 +570,7 @@ public class MultibyteKeyTest {
               new BTreeUpdate<>(new Random().nextInt(), ElementFlagUpdate.RESET_FLAG, false),
               new byte[]{0, 0}, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -598,7 +599,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -609,7 +610,7 @@ public class MultibyteKeyTest {
               new BTreeCreate(0, 0, 10000L, CollectionOverflowAction.error, true, false),
               genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -620,7 +621,7 @@ public class MultibyteKeyTest {
               new BTreeCount(0L, 10L, ElementFlagFilter.DO_NOT_FILTER),
               genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -647,7 +648,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -671,7 +672,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -680,7 +681,7 @@ public class MultibyteKeyTest {
     try {
       opFact.setAttr(MULTIBYTE_KEY, new Attributes(), genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 
@@ -703,7 +704,7 @@ public class MultibyteKeyTest {
             }
           }).initialize();
     } catch (java.nio.BufferOverflowException e) {
-      Assert.fail();
+      fail();
     }
   }
 }

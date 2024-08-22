@@ -3,18 +3,20 @@ package net.spy.memcached;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the hash algorithms.
  */
-public class HashAlgorithmTest extends TestCase {
+public class HashAlgorithmTest {
 
   private void assertHash(HashAlgorithm ha, String key, long exp) {
     assertTrue(exp >= 0L);
     // System.out.println(ha + "(" + key + ") = " + exp);
-    assertEquals("Invalid " + ha + " for key ``" + key + "''",
-            exp, ha.hash(key));
+    assertEquals(exp, ha.hash(key), "Invalid " + ha + " for key ``" + key + "''");
   }
 
   // I don't hardcode any values here because they're subject to change
@@ -22,12 +24,14 @@ public class HashAlgorithmTest extends TestCase {
     assertHash(HashAlgorithm.NATIVE_HASH, key, Math.abs(key.hashCode()));
   }
 
+  @Test
   public void testNativeHash() {
     for (String k : new String[]{"Test1", "Test2", "Test3", "Test4"}) {
       assertNativeHash(k);
     }
   }
 
+  @Test
   public void testCrc32Hash() {
     Map<String, Long> exp = new HashMap<>();
     exp.put("Test1", 19315L);
@@ -41,6 +45,7 @@ public class HashAlgorithmTest extends TestCase {
     }
   }
 
+  @Test
   public void testFnv1_64() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
@@ -58,6 +63,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   // Thanks much to pierre@demartines.com for this unit test.
+  @Test
   public void testFnv1a_64() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
@@ -74,6 +80,7 @@ public class HashAlgorithmTest extends TestCase {
     }
   }
 
+  @Test
   public void testFnv1_32() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
@@ -90,6 +97,7 @@ public class HashAlgorithmTest extends TestCase {
     }
   }
 
+  @Test
   public void testFnv1a_32() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
@@ -107,6 +115,7 @@ public class HashAlgorithmTest extends TestCase {
   }
 
   // These values came from libketama's test prog.
+  @Test
   public void testKetamaHash() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("26", 3979113294L);

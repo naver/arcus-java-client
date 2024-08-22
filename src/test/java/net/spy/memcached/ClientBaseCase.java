@@ -27,14 +27,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.transcoders.Transcoder;
 
-public abstract class ClientBaseCase extends TestCase {
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public abstract class ClientBaseCase {
 
   public static final String ZK_ADDRESS = System.getProperty("ZK_ADDRESS",
           "127.0.0.1:2181");
@@ -310,13 +313,12 @@ public abstract class ClientBaseCase extends TestCase {
     client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
   }
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     initClient();
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     // Shut down, start up, flush, and shut down again. Error tests have
     // unpredictable timing issues.
@@ -327,7 +329,6 @@ public abstract class ClientBaseCase extends TestCase {
     assertTrue(client.flush().get());
     client.shutdown();
     client = null;
-    super.tearDown();
   }
 
   protected void flushPause() throws InterruptedException {

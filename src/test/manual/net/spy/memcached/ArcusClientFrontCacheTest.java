@@ -16,25 +16,21 @@
  */
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-@RunWith(BlockJUnit4ClassRunner.class)
-public class ArcusClientFrontCacheTest extends TestCase {
+public class ArcusClientFrontCacheTest {
 
-  @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  @BeforeEach
+  protected void setUp() throws Exception {
     // This test assumes we use ZK
     assumeTrue(BaseIntegrationTest.USE_ZK);
   }
@@ -69,14 +65,14 @@ public class ArcusClientFrontCacheTest extends TestCase {
             BaseIntegrationTest.SERVICE_CODE, cfb);
 
     try {
-      Assert.assertTrue(client.set("test:key", 100, "value").get());
-      Assert.assertEquals("value", client.get("test:key"));
+      assertTrue(client.set("test:key", 100, "value").get());
+      assertEquals("value", client.get("test:key"));
 
-      Assert.assertTrue(client.delete("test:key").get());
+      assertTrue(client.delete("test:key").get());
 
-      Assert.assertNull(client.get("test:key"));
+      assertNull(client.get("test:key"));
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

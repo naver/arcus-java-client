@@ -26,7 +26,11 @@ import java.util.concurrent.TimeoutException;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
@@ -60,6 +64,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testInsertAndGet() {
     Object[] valueList = {1.0, 1000, 1000L, "String",
         new MyBean("beanName")};
@@ -79,21 +84,21 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
         Map<String, CollectionOperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
-          Assert.assertTrue("Error list is not empty.",
-                  errorList.isEmpty());
+          assertTrue(errorList.isEmpty(),
+                  "Error list is not empty.");
         } catch (TimeoutException e) {
           future.cancel(true);
-          Assert.fail(e.toString());
+          fail(e.toString());
         }
 
         // GET
         Object v = mc.get(key[0]);
-        Assert.assertEquals(String.format("K=%s, V=%s", Arrays.toString(key), v),
-                valueList[i], v);
+        assertEquals(valueList[i],
+                v, String.format("K=%s, V=%s", Arrays.toString(key), v));
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail();
+      fail();
     }
   }
 }

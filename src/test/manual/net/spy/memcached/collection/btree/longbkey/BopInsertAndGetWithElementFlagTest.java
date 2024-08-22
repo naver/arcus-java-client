@@ -27,7 +27,12 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 
@@ -40,24 +45,25 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   private final byte[] FLAG2 = "GLAF".getBytes();
   private final byte[] FLAG3 = "FFFF".getBytes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
-  ;
-
+  @Test
   public void testSingleLongBkeyWithEFlag() throws Exception {
 
     // insert one
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
 
     // get
@@ -65,34 +71,35 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
             BKEY, ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false)
             .get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
+    assertEquals(1, map.size());
 
     for (Entry<ByteArrayBKey, Element<Object>> i : map.entrySet()) {
-      Assert.assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
-      Assert.assertEquals(VALUE, i.getValue().getValue());
-      Assert.assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
+      assertTrue(Arrays.equals(BKEY, i.getKey().getBytes()));
+      assertEquals(VALUE, i.getValue().getValue());
+      assertTrue(Arrays.equals(FLAG, i.getValue().getEFlag()));
     }
 
     // delete
-    Assert.assertTrue(mc.asyncBopDelete(KEY, BKEY, BKEY,
+    assertTrue(mc.asyncBopDelete(KEY, BKEY, BKEY,
             ElementFlagFilter.DO_NOT_FILTER, 100, false).get());
 
     // get again
     map = mc.asyncBopGet(KEY, BKEY, BKEY, ElementFlagFilter.DO_NOT_FILTER,
             0, 10, false, false).get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(0, map.size());
+    assertEquals(0, map.size());
 
   }
 
+  @Test
   public void testMultipleLongBkeyWithEFlag() throws Exception {
 
     // insert 3 elements
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY2, FLAG2, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY2, FLAG2, VALUE,
             new CollectionAttributes()).get());
-    Assert.assertTrue(mc.asyncBopInsert(KEY, BKEY3, FLAG3, VALUE,
+    assertTrue(mc.asyncBopInsert(KEY, BKEY3, FLAG3, VALUE,
             new CollectionAttributes()).get());
 
     // get 3 elements
@@ -100,26 +107,26 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
             BKEY3, ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false)
             .get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(3, map.size());
+    assertEquals(3, map.size());
 
-    Assert.assertEquals(VALUE, map.get(BKEY).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY2).getValue());
-    Assert.assertEquals(VALUE, map.get(BKEY3).getValue());
+    assertEquals(VALUE, map.get(BKEY).getValue());
+    assertEquals(VALUE, map.get(BKEY2).getValue());
+    assertEquals(VALUE, map.get(BKEY3).getValue());
 
-    Assert.assertTrue(Arrays.equals(FLAG, map.get(BKEY).getEFlag()));
-    Assert.assertTrue(Arrays.equals(FLAG2, map.get(BKEY2).getEFlag()));
-    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
+    assertTrue(Arrays.equals(FLAG, map.get(BKEY).getEFlag()));
+    assertTrue(Arrays.equals(FLAG2, map.get(BKEY2).getEFlag()));
+    assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
 
     // delete only 2 elements
-    Assert.assertTrue(mc.asyncBopDelete(KEY, BKEY, BKEY2,
+    assertTrue(mc.asyncBopDelete(KEY, BKEY, BKEY2,
             ElementFlagFilter.DO_NOT_FILTER, 100, false).get());
 
     // get all again
     map = mc.asyncBopGet(KEY, BKEY, BKEY3, ElementFlagFilter.DO_NOT_FILTER,
             0, 10, false, false).get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
-    Assert.assertEquals(1, map.size());
-    Assert.assertEquals(VALUE, map.get(BKEY3).getValue());
-    Assert.assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
+    assertEquals(1, map.size());
+    assertEquals(VALUE, map.get(BKEY3).getValue());
+    assertTrue(Arrays.equals(FLAG3, map.get(BKEY3).getEFlag()));
   }
 }

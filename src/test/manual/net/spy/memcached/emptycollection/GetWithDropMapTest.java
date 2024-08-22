@@ -21,7 +21,14 @@ import java.util.Map;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class GetWithDropMapTest extends BaseIntegrationTest {
 
@@ -29,6 +36,7 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
   private final String MKEY = "mkey";
   private final int VALUE = 1234567890;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -36,79 +44,82 @@ public class GetWithDropMapTest extends BaseIntegrationTest {
 
     boolean insertResult = mc.asyncMopInsert(KEY, MKEY, VALUE,
             new CollectionAttributes()).get();
-    Assert.assertTrue(insertResult);
+    assertTrue(insertResult);
   }
 
+  @Test
   public void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=false, drop=false
-      Assert.assertEquals(
+      assertEquals(
               VALUE,
               mc.asyncMopGet(KEY, MKEY, false, false).get().get(MKEY));
 
       // check exists
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value again
-      Assert.assertEquals(
+      assertEquals(
               VALUE,
               mc.asyncMopGet(KEY, MKEY, false, false).get().get(MKEY));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithoutDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=false
-      Assert.assertEquals(
+      assertEquals(
               VALUE,
               mc.asyncMopGet(KEY, MKEY, true, false).get().get(MKEY));
 
       // check exists empty map
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNotNull(attr);
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
+      assertNotNull(attr);
+      assertEquals(Long.valueOf(0), attr.getCount());
 
       Map<String, Object> map = mc.asyncMopGet(KEY, MKEY, false, false).get();
-      Assert.assertNotNull(map);
-      Assert.assertTrue(map.isEmpty());
+      assertNotNull(map);
+      assertTrue(map.isEmpty());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testGetWithDeleteAndWithDrop() {
     try {
       // check attr
-      Assert.assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
+      assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
               .getCount());
 
       // get value delete=true, drop=true
-      Assert.assertEquals(
+      assertEquals(
               VALUE,
               mc.asyncMopGet(KEY, MKEY, true, true).get().get(MKEY));
 
       // check map
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
-      Assert.assertNull(attr);
+      assertNull(attr);
 
       Map<String, Object> map = mc.asyncMopGet(KEY, MKEY, false, false).get();
-      Assert.assertNull(map);
+      assertNull(map);
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

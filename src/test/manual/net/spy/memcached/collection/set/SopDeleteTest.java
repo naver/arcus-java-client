@@ -21,30 +21,40 @@ import java.util.concurrent.ExecutionException;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SopDeleteTest extends BaseIntegrationTest {
 
   private static final String KEY = SopDeleteTest.class.getSimpleName();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testSopDelete0() throws InterruptedException,
           ExecutionException {
     testSopDelete(0);
   }
 
+  @Test
   public void testSopDelete1() throws InterruptedException,
           ExecutionException {
     testSopDelete(1);
@@ -53,16 +63,16 @@ public class SopDeleteTest extends BaseIntegrationTest {
   public void testSopDelete(Object element) throws InterruptedException,
           ExecutionException {
 
-    Assert.assertNull(mc.asyncSopGet(KEY, 100, false, true).get());
+    assertNull(mc.asyncSopGet(KEY, 100, false, true).get());
 
-    Assert.assertTrue(mc.asyncSopInsert(KEY, element,
+    assertTrue(mc.asyncSopInsert(KEY, element,
             new CollectionAttributes()).get());
 
-    Assert.assertNotNull(mc.asyncSopGet(KEY, 100, false, true).get());
+    assertNotNull(mc.asyncSopGet(KEY, 100, false, true).get());
 
-    Assert.assertTrue(mc.asyncSopDelete(KEY, element, true).get());
+    assertTrue(mc.asyncSopDelete(KEY, element, true).get());
 
-    Assert.assertNull(mc.asyncSopGet(KEY, 100, false, true).get());
+    assertNull(mc.asyncSopGet(KEY, 100, false, true).get());
   }
 
 }

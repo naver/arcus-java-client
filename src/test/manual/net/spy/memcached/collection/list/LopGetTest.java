@@ -22,12 +22,22 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class LopGetTest extends BaseIntegrationTest {
 
   private String key = "LopGetTest";
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -40,12 +50,14 @@ public class LopGetTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteList(key, 1000);
     super.tearDown();
   }
 
+  @Test
   public void testLopGet_NoKey() throws Exception {
     List<Object> rlist = mc.asyncLopGet("no_key", 0, false, false).get(
             1000, TimeUnit.MILLISECONDS);
@@ -54,6 +66,7 @@ public class LopGetTest extends BaseIntegrationTest {
     assertNull(rlist);
   }
 
+  @Test
   public void testLopGet_OutOfRange() throws Exception {
     List<Object> list = mc.asyncLopGet(key, 20, false, false).get(1000,
             TimeUnit.MILLISECONDS);
@@ -61,6 +74,7 @@ public class LopGetTest extends BaseIntegrationTest {
     assertTrue(list.isEmpty());
   }
 
+  @Test
   public void testLopGet_GetByBestEffort() throws Exception {
     // Retrieve items(2..11) in the list
     List<Object> rlist = mc.asyncLopGet(key, 2, 11, false, false).get(1000,
@@ -74,6 +88,7 @@ public class LopGetTest extends BaseIntegrationTest {
     }
   }
 
+  @Test
   public void testLopGet_GetWithDeletion() throws Exception {
     CollectionAttributes attrs = null;
     List<Object> rlist = null;

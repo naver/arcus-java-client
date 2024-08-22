@@ -2,11 +2,10 @@ package net.spy.memcached.collection.btree;
 
 import net.spy.memcached.collection.SMGetTrimKey;
 
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SMGetTrimKeyTest {
 
@@ -21,12 +20,7 @@ public class SMGetTrimKeyTest {
     //when, then
     assertEquals(KEY, trimKey.getKey());
     assertEquals(bkey, trimKey.getBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        trimKey.getByteBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> trimKey.getByteBkey());
   }
 
   @Test
@@ -38,12 +32,7 @@ public class SMGetTrimKeyTest {
     //when, then
     assertEquals(KEY, trimKey.getKey());
     assertEquals(bkey, trimKey.getByteBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        trimKey.getBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> trimKey.getBkey());
   }
 
   @Test

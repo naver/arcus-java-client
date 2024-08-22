@@ -8,20 +8,26 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ArcusKetamaHashingTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class ArcusKetamaHashingTest {
+
+  @Test
   public void testSmallSet() {
     String[] stringNodes = generateAddresses(3);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
+  @Test
   public void testLargeSet() {
     String[] stringNodes = generateAddresses(100);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
+  @Test
   public void testHashCollision() {
     StringBuilder sb = new StringBuilder();
     int maxIdx = 103;

@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Small test program that does a bunch of sets in a tight loop.
@@ -36,14 +36,14 @@ public final class DoLotsOfSets {
     System.err.printf("Finished queuing in %sms%n", added - start);
     for (int i = 0; i < count; i++) {
       Future<Boolean> future = futures.get(i);
-      assertTrue("k" + i + " is not stored.", future.get(Long.MAX_VALUE, TimeUnit.MILLISECONDS));
+      assertTrue(future.get(Long.MAX_VALUE, TimeUnit.MILLISECONDS), "k" + i + " is not stored.");
     }
     long end = System.currentTimeMillis();
     System.err.printf("Completed everything in %sms (%sms to flush)%n",
             end - start, end - added);
     Map<String, Object> m = client.getBulk(Arrays.asList("k1", "k2", "k3", "k4", "k5",
             "k299999", "k299998", "k299997", "k299996"));
-    assertEquals("Expected 9 results, got " + m, m.size(), 9);
+    assertEquals(m.size(), 9, "Expected 9 results, got " + m);
     client.shutdown();
   }
 }

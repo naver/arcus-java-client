@@ -16,15 +16,15 @@
  */
 package net.spy.memcached;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.collection.BaseIntegrationTest;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
-public class ArcusClientPoolReconnectTest extends TestCase {
+@Disabled
+public class ArcusClientPoolReconnectTest {
 
+  @Test
   public void testOpenAndWait() {
     ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
             BaseIntegrationTest.SERVICE_CODE, 2);

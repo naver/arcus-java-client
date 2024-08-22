@@ -22,12 +22,22 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class LopDeleteTest extends BaseIntegrationTest {
 
   private String key = "LopDeleteTest";
 
   private Long[] items9 = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -40,22 +50,26 @@ public class LopDeleteTest extends BaseIntegrationTest {
     assertTrue(mc.asyncSetAttr(key, attrs).get(1000, TimeUnit.MILLISECONDS));
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     deleteList(key, 1000);
     super.tearDown();
   }
 
+  @Test
   public void testLopDelete_NoKey() throws Exception {
     assertFalse(mc.asyncLopDelete("no_key", 0, false).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopDelete_OutOfRange() throws Exception {
     assertFalse(mc.asyncLopDelete(key, 11, false).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
+  @Test
   public void testLopDelete_DeleteByBestEffort() throws Exception {
     // Delete items(2..11) in the list
     assertTrue(mc.asyncLopDelete(key, 2, 11, false).get(1000,
@@ -71,6 +85,7 @@ public class LopDeleteTest extends BaseIntegrationTest {
     assertEquals(2L, rlist.get(1));
   }
 
+  @Test
   public void testLopDelete_DeletedDropped() throws Exception {
     // Delete all items in the list
     assertTrue(mc.asyncLopDelete(key, 0, items9.length, true).get(1000,

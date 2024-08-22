@@ -28,7 +28,15 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class VariousTypeTest extends BaseIntegrationTest {
 
@@ -36,19 +44,22 @@ public class VariousTypeTest extends BaseIntegrationTest {
   private final long BKEY = 10;
   private final CollectionAttributes ATTR = new CollectionAttributes();
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testString() {
     try {
       String value = "VALUE";
@@ -56,23 +67,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.STRING, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testLong() {
     try {
       long value = 1234567890L;
@@ -80,23 +92,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.LONG, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testInteger() {
     try {
       int value = 1234567890;
@@ -104,23 +117,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.INTEGER, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testBoolean() {
     try {
       boolean value = false;
@@ -128,23 +142,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.BOOLEAN, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testDate() {
     try {
       Date value = new Date();
@@ -152,23 +167,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.DATE, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testByte() {
     try {
       byte value = 0x00;
@@ -176,23 +192,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.BYTE, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testFloat() {
     try {
       float value = 1234567890;
@@ -200,23 +217,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.FLOAT, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testDouble() {
     try {
       double value = 1234567890;
@@ -224,23 +242,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.DOUBLE, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testByteArray() {
     try {
       byte[] value = "value".getBytes();
@@ -248,24 +267,25 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.BYTEARRAY, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertArrayEquals(value, (byte[]) map.get(BKEY)
+      assertArrayEquals(value, (byte[]) map.get(BKEY)
           .getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testOtherObjects() {
     try {
       UserDefinedClass value = new UserDefinedClass();
@@ -273,23 +293,24 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.OTHERS, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
               ElementFlagFilter.DO_NOT_FILTER, false, false).get();
-      Assert.assertEquals(value, map.get(BKEY).getValue());
+      assertEquals(value, map.get(BKEY).getValue());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testList() {
     try {
       List<String> value = new ArrayList<>();
@@ -299,12 +320,12 @@ public class VariousTypeTest extends BaseIntegrationTest {
       // create empty
       Boolean createResult = mc.asyncBopCreate(KEY,
               ElementValueType.OTHERS, ATTR).get();
-      Assert.assertTrue(createResult);
+      assertTrue(createResult);
 
       // insert value
       Boolean insertResult = mc.asyncBopInsert(KEY, BKEY,
               ElementFlagFilter.EMPTY_ELEMENT_FLAG, value, ATTR).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // get value
       Map<Long, Element<Object>> map = mc.asyncBopGet(KEY, BKEY,
@@ -313,12 +334,12 @@ public class VariousTypeTest extends BaseIntegrationTest {
       @SuppressWarnings("unchecked")
       List<String> r = (List<String>) map.get(BKEY).getValue();
 
-      Assert.assertEquals(2, r.size());
-      Assert.assertEquals("Hello", r.get(0));
-      Assert.assertEquals("Netspider", r.get(1));
+      assertEquals(2, r.size());
+      assertEquals("Hello", r.get(0));
+      assertEquals("Netspider", r.get(1));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 

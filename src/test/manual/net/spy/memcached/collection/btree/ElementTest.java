@@ -4,12 +4,11 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.util.BTreeUtil;
 
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ElementTest {
 
@@ -26,12 +25,7 @@ public class ElementTest {
     //when, then
     assertEquals(bkey, element.getLongBkey());
     assertEquals(String.valueOf(bkey), element.getStringBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getByteArrayBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getByteArrayBkey());
     assertEquals(VALUE, element.getValue());
     assertEquals(eflag, element.getEFlag());
     assertEquals(BTreeUtil.toHex(eflag), element.getStringEFlag());
@@ -49,12 +43,7 @@ public class ElementTest {
     //when, then
     assertEquals(bkey, element.getByteArrayBkey());
     assertEquals(BTreeUtil.toHex(bkey), element.getStringBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getLongBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getLongBkey());
     assertEquals(VALUE, element.getValue());
     assertEquals(eflag, element.getEFlag());
     assertEquals(BTreeUtil.toHex(eflag), element.getStringEFlag());
@@ -72,12 +61,7 @@ public class ElementTest {
 
     //when, then
     assertEquals(bkey, element.getLongBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getByteArrayBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getByteArrayBkey());
     assertEquals(VALUE, element.getValue());
     assertNull(element.getEFlag());
     assertEquals("", element.getStringEFlag());
@@ -95,12 +79,7 @@ public class ElementTest {
 
     //when, then
     assertEquals(bkey, element.getByteArrayBkey());
-    assertThrows(IllegalStateException.class, new ThrowingRunnable() {
-      @Override
-      public void run() throws Throwable {
-        element.getLongBkey();
-      }
-    });
+    assertThrows(IllegalStateException.class, () -> element.getLongBkey());
     assertEquals(VALUE, element.getValue());
     assertNull(element.getEFlag());
     assertEquals("", element.getStringEFlag());

@@ -21,18 +21,20 @@ import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionObserver;
 import net.spy.memcached.LoggerSetter;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 
-@Ignore
-public class BaseIntegrationTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@Disabled
+public class BaseIntegrationTest {
 
   public static final String ZK_ADDRESS = System.getProperty("ZK_ADDRESS",
           "127.0.0.1:2181");
@@ -68,7 +70,7 @@ public class BaseIntegrationTest extends TestCase {
     System.out.println("---------------------------------------------");
   }
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     try {
       System.setProperty("arcus.mbean", "true");
@@ -82,7 +84,7 @@ public class BaseIntegrationTest extends TestCase {
     }
   }
 
-  @Override
+  @AfterEach
   protected void tearDown() throws Exception {
     try {
       if (SHUTDOWN_AFTER_EACH_TEST) {

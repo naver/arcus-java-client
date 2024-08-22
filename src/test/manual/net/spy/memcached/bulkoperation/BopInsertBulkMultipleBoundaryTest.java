@@ -28,10 +28,14 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
 
+  @Test
   public void testBopGet_Overflow() throws Exception {
     String key = "MyBopOverflowtestKey23";
     String value = "MyValue";
@@ -63,7 +67,7 @@ public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
     try {
       Map<Integer, CollectionOperationStatus> errorList = future.get(
               20000L, TimeUnit.MILLISECONDS);
-      Assert.assertEquals("Failed count is not 1.", 1, errorList.size());
+      assertEquals(1, errorList.size(), "Failed count is not 1.");
     } catch (TimeoutException e) {
       future.cancel(true);
       e.printStackTrace();

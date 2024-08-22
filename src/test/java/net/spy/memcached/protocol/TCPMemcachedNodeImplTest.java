@@ -24,17 +24,22 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicLong;
 
-import junit.framework.TestCase;
-
 import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test the TCPMemcachedNodeImpl
  */
-public class TCPMemcachedNodeImplTest extends TestCase {
+public class TCPMemcachedNodeImplTest {
 
   @SuppressWarnings("unchecked")
   private Queue<Operation> getQueue(String queueFieldName, TCPMemcachedNodeImpl node)
@@ -52,6 +57,7 @@ public class TCPMemcachedNodeImplTest extends TestCase {
     return ((AtomicLong) field.get(node)).get();
   }
 
+  @Test
   public void testMoveOperations() throws Exception {
     // given
     final int fromReadOpCount = 5,

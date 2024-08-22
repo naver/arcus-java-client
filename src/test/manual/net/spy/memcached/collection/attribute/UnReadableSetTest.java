@@ -23,7 +23,16 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class UnReadableSetTest extends BaseIntegrationTest {
 
@@ -31,19 +40,22 @@ public class UnReadableSetTest extends BaseIntegrationTest {
   private final String VALUE = "VALUE";
   private final int INDEX = 0;
 
+  @BeforeEach
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     mc.delete(KEY).get();
-    Assert.assertNull(mc.asyncGetAttr(KEY).get());
+    assertNull(mc.asyncGetAttr(KEY).get());
   }
 
+  @AfterEach
   @Override
   protected void tearDown() throws Exception {
     mc.delete(KEY).get();
     super.tearDown();
   }
 
+  @Test
   public void testCreateUnreadableSetTest() {
     try {
       // create unreadable empty
@@ -52,44 +64,45 @@ public class UnReadableSetTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncSopCreate(KEY,
               ElementValueType.STRING, attribute).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
-      Assert.assertFalse(attr.getReadable());
+      assertEquals(Long.valueOf(0), attr.getCount());
+      assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      assertFalse(attr.getReadable());
 
       // insert an item
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE,
               new CollectionAttributes()).get());
 
       // get an item
       CollectionFuture<Set<Object>> f = mc.asyncSopGet(KEY, INDEX, false,
               false);
-      Assert.assertNull(f.get());
-      Assert.assertEquals("UNREADABLE", f.getOperationStatus()
+      assertNull(f.get());
+      assertEquals("UNREADABLE", f.getOperationStatus()
               .getMessage());
 
       // set readable
       attribute.setReadable(true);
-      Assert.assertTrue(mc.asyncSetAttr(KEY, attribute).get());
+      assertTrue(mc.asyncSetAttr(KEY, attribute).get());
 
       // get an item again
       f = mc.asyncSopGet(KEY, INDEX, false, false);
       Set<Object> set = f.get();
 
-      Assert.assertNotNull(set);
-      Assert.assertTrue(set.contains(VALUE));
-      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+      assertNotNull(set);
+      assertTrue(set.contains(VALUE));
+      assertEquals("END", f.getOperationStatus().getMessage());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
+  @Test
   public void testCreateReadableSetTest() {
     try {
       // create readable empty
@@ -98,18 +111,18 @@ public class UnReadableSetTest extends BaseIntegrationTest {
 
       Boolean insertResult = mc.asyncSopCreate(KEY,
               ElementValueType.STRING, attribute).get();
-      Assert.assertTrue(insertResult);
+      assertTrue(insertResult);
 
       // check attribute
       CollectionAttributes attr = mc.asyncGetAttr(KEY).get();
 
-      Assert.assertEquals(Long.valueOf(0), attr.getCount());
-      Assert.assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      Assert.assertEquals(Integer.valueOf(0), attr.getExpireTime());
-      Assert.assertTrue(attr.getReadable());
+      assertEquals(Long.valueOf(0), attr.getCount());
+      assertEquals(Long.valueOf(4000), attr.getMaxCount());
+      assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      assertTrue(attr.getReadable());
 
       // insert an item
-      Assert.assertTrue(mc.asyncSopInsert(KEY, VALUE,
+      assertTrue(mc.asyncSopInsert(KEY, VALUE,
               new CollectionAttributes()).get());
 
       // get an item
@@ -117,11 +130,11 @@ public class UnReadableSetTest extends BaseIntegrationTest {
               false);
 
       Set<Object> set = f.get();
-      Assert.assertNotNull(set);
-      Assert.assertTrue(set.contains(VALUE));
-      Assert.assertEquals("END", f.getOperationStatus().getMessage());
+      assertNotNull(set);
+      assertTrue(set.contains(VALUE));
+      assertEquals("END", f.getOperationStatus().getMessage());
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
