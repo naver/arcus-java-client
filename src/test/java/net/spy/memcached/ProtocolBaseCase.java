@@ -237,7 +237,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
     }
   }
 
-  public void testInvalidKeyBulk() throws Exception {
+  public void testInvalidKeyBulk() {
     try {
       Object val = client.getBulk(Collections.singletonList("Key key2"));
       fail("Expected IllegalArgumentException, got " + val);
