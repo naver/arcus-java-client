@@ -22,6 +22,7 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1060,21 +1061,17 @@ public class MemcachedClient extends SpyThread
     // because it is fully populated when it is used and
     // used only to read the transcoder for a key.
     final Map<String, Transcoder<T>> tcMap = new HashMap<>();
+    for (String key : keys) {
+      if (tcIter.hasNext()) {
+        tcMap.put(key, tcIter.next());
+        validateKey(key);
+      }
+    }
 
     // Grouping keys by memcached node
-    final Map<MemcachedNode, List<String>> keyMap = new HashMap<>();
-
-    Iterator<String> keyIter = keys.iterator();
-    while (keyIter.hasNext() && tcIter.hasNext()) {
-      String key = keyIter.next();
-      Transcoder<T> tc = tcIter.next();
-      tcMap.put(key, tc);
-      validateKey(key);
-      addKeyToMap(keyMap, key);
-    }
-    int wholeChunkSize = getWholeChunkSize(keyMap);
-    final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
-    final Collection<Operation> ops = new ArrayList<>(wholeChunkSize);
+    Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKey
+            = groupingKeys(keys, GET_BULK_CHUNK_SIZE);
+    final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
 
     GetOperation.Callback cb = new GetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
@@ -1096,25 +1093,21 @@ public class MemcachedClient extends SpyThread
       }
     };
 
-    // Now that we know how many servers it breaks down into, and the latch
-    // is all set up, convert all of these strings collections to operations
     checkState();
-    for (Map.Entry<MemcachedNode, List<String>> entry : keyMap.entrySet()) {
+    List<Operation> ops = new ArrayList<>(arrangedKey.size());
+    for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
 
-      for (int i = 0; i < keyList.size(); i += GET_BULK_CHUNK_SIZE) {
-        List<String> lk = keyList.subList(i, Math.min(keyList.size(), i + GET_BULK_CHUNK_SIZE));
-        Operation op;
-        if (node == null) {
-          op = opFact.mget(lk, cb);
-        } else {
-          op = node.enabledMGetOp() ? opFact.mget(lk, cb)
-                                    : opFact.get(lk, cb);
-        }
-        conn.addOperation(node, op);
-        ops.add(op);
+      Operation op;
+      if (node == null) {
+        op = opFact.mget(keyList, cb);
+      } else {
+        op = node.enabledMGetOp() ? opFact.mget(keyList, cb)
+                                  : opFact.get(keyList, cb);
       }
+      conn.addOperation(node, op);
+      ops.add(op);
     }
     return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
   }
@@ -1196,29 +1189,24 @@ public class MemcachedClient extends SpyThread
    */
   public <T> BulkFuture<Map<String, CASValue<T>>> asyncGetsBulk(Collection<String> keys,
                                                                 Iterator<Transcoder<T>> tcIter) {
-    final Map<String, GetResult<CASValue<T>>> rvMap
-            = new ConcurrentHashMap<>();
+    final Map<String, GetResult<CASValue<T>>> rvMap = new ConcurrentHashMap<>();
 
     // This map does not need to be a ConcurrentHashMap
     // because it is fully populated when it is used and
     // used only to read the transcoder for a key.
     final Map<String, Transcoder<T>> tcMap = new HashMap<>();
-
-    // Grouping keys by memcached nodes
-    final Map<MemcachedNode, List<String>> keyMap = new HashMap<>();
-    Iterator<String> keyIter = keys.iterator();
-    while (keyIter.hasNext() && tcIter.hasNext()) {
-      String key = keyIter.next();
-      Transcoder<T> tc = tcIter.next();
-
-      tcMap.put(key, tc);
-      validateKey(key);
-      addKeyToMap(keyMap, key);
+    for (String key : keys) {
+      if (tcIter.hasNext()) {
+        tcMap.put(key, tcIter.next());
+        validateKey(key);
+      }
     }
 
-    int wholeChunkSize = getWholeChunkSize(keyMap);
-    final CountDownLatch latch = new CountDownLatch(wholeChunkSize);
-    final Collection<Operation> ops = new ArrayList<>(wholeChunkSize);
+    // Grouping keys by memcached node
+    Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKey
+            = groupingKeys(keys, GET_BULK_CHUNK_SIZE);
+
+    final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
 
     GetsOperation.Callback cb = new GetsOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
@@ -1243,47 +1231,22 @@ public class MemcachedClient extends SpyThread
     // Now that we know how many servers it breaks down into, and the latch
     // is all set up, convert all of these strings collections to operations
     checkState();
-    for (Map.Entry<MemcachedNode, List<String>> entry : keyMap.entrySet()) {
+    List<Operation> ops = new ArrayList<>(arrangedKey.size());
+    for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
 
-      for (int i = 0; i < keyList.size(); i += GET_BULK_CHUNK_SIZE) {
-        List<String> lk = keyList.subList(i, Math.min(keyList.size(), i + GET_BULK_CHUNK_SIZE));
-        Operation op;
-        if (node == null) {
-          op = opFact.mgets(lk, cb);
-        } else {
-          op = node.enabledMGetsOp() ? opFact.mgets(lk, cb)
-                                     : opFact.gets(lk, cb);
-        }
-        conn.addOperation(node, op);
-        ops.add(op);
+      Operation op;
+      if (node == null) {
+        op = opFact.mgets(keyList, cb);
+      } else {
+        op = node.enabledMGetsOp() ? opFact.mgets(keyList, cb)
+                                   : opFact.gets(keyList, cb);
       }
+      conn.addOperation(node, op);
+      ops.add(op);
     }
     return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
-  }
-
-  /**
-   * Grouping keys by memcached node.
-   * @param keyMap key list that mapped by node
-   * @param key the key to request
-   */
-  private void addKeyToMap(Map<MemcachedNode, List<String>> keyMap, String key) {
-    MemcachedNode node = conn.findNodeByKey(key);
-    keyMap.computeIfAbsent(node, k -> new ArrayList<>()).add(key);
-  }
-
-  /**
-   * get size of whole chunk by node
-   * @param keyMap collection list that grouped by node
-   * @return size of whole chunk
-   */
-  private int getWholeChunkSize(Map<MemcachedNode, List<String>> keyMap) {
-    int wholeChunkSize = 0;
-    for (List<String> keys : keyMap.values()) {
-      wholeChunkSize += (((keys.size() - 1) / GET_BULK_CHUNK_SIZE) + 1);
-    }
-    return wholeChunkSize;
   }
 
   /**
@@ -2182,5 +2145,36 @@ public class MemcachedClient extends SpyThread
    */
   protected Collection<MemcachedNode> getAllNodes() {
     return conn.getLocator().getAll();
+  }
+
+  /**
+   * Turn the list of keys into groups of keys.
+   * All keys in a group belong to the same memcached server.
+   *
+   * @param keyList   list of keys
+   * @param maxKeyCountPerGroup max size of the key group (number of keys)
+   * @return list of grouped (memcached node + keys) in the group
+   */
+  protected Collection<Map.Entry<MemcachedNode, List<String>>> groupingKeys(
+          Collection<String> keyList, int maxKeyCountPerGroup) {
+    List<Map.Entry<MemcachedNode, List<String>>> resultList = new ArrayList<>();
+    Map<MemcachedNode, List<String>> nodeMap = new HashMap<>();
+    for (String key : keyList) {
+      MemcachedNode qa = conn.findNodeByKey(key);
+      List<String> keyGroup = nodeMap.get(qa);
+
+      if (keyGroup == null) {
+        keyGroup = new ArrayList<>();
+        nodeMap.put(qa, keyGroup);
+      } else if (keyGroup.size() >= maxKeyCountPerGroup) {
+        resultList.add(new AbstractMap.SimpleEntry<>(qa, keyGroup));
+        keyGroup = new ArrayList<>();
+        nodeMap.put(qa, keyGroup);
+      }
+      keyGroup.add(key);
+    }
+    // Add the Entry instance which is not full(smaller than groupSize) to the result.
+    resultList.addAll(nodeMap.entrySet());
+    return resultList;
   }
 }

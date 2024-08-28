@@ -1987,38 +1987,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   /**
-   * Turn the list of keys into groups of keys.
-   * All keys in a group belong to the same memcached server.
-   *
-   * @param keyList   list of keys
-   * @param maxKeyCountPerGroup max size of the key group (number of keys)
-   * @return list of grouped (memcached node + keys) in the group
-   */
-  private Collection<Entry<MemcachedNode, List<String>>> groupingKeys(List<String> keyList, int maxKeyCountPerGroup) {
-    List<Entry<MemcachedNode, List<String>>> resultList = new ArrayList<>();
-    Map<MemcachedNode, List<String>> nodeMap = new HashMap<>();
-    MemcachedConnection conn = getMemcachedConnection();
-
-    for (String key : keyList) {
-      MemcachedNode qa = conn.findNodeByKey(key);
-      List<String> keyGroup = nodeMap.get(qa);
-
-      if (keyGroup == null) {
-        keyGroup = new ArrayList<>();
-        nodeMap.put(qa, keyGroup);
-      } else if (keyGroup.size() >= maxKeyCountPerGroup) {
-        resultList.add(new AbstractMap.SimpleEntry<>(qa, keyGroup));
-        keyGroup = new ArrayList<>();
-        nodeMap.put(qa, keyGroup);
-      }
-      keyGroup.add(key);
-    }
-    // Add the Entry instance which is not full(smaller than groupSize) to the result.
-    resultList.addAll(nodeMap.entrySet());
-    return resultList;
-  }
-
-  /**
    * Generic smget operation for b+tree items. Public smget methods call this method.
    *
    * @param smGetList smget parameters (keys, eflags, and so on)
