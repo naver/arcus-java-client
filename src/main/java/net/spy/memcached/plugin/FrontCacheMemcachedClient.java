@@ -81,7 +81,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * Check the local cache first. If the key is not found, send the command to the server.
    *
    * @param key the key to fetch
-   * @param tc  the transcoder to serialize and unserialize value
+   * @param tc  the transcoder to serialize and deserialize value
    * @return a future that will hold the value of the key
    */
   @Override
@@ -128,7 +128,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    * If used with front cache, the front cache is checked first.
    * @param <T>
    * @param keys    the keys to request
-   * @param tc_iter an iterator of transcoders to serialize and
+   * @param tcIter an iterator of transcoders to serialize and
    *                unserialize values; the transcoders are matched with
    *                the keys in the same order.  The minimum of the key
    *                collection length and number of transcoders is used
@@ -139,13 +139,13 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
    */
   @Override
   public <T> BulkFuture<Map<String, T>> asyncGetBulk(Collection<String> keys,
-                                                     Iterator<Transcoder<T>> tc_iter) {
+                                                     Iterator<Transcoder<T>> tcIter) {
     /*
     * Case 1. local cache is not used.
     * All data from Arcus server.
     * */
     if (localCacheManager == null) {
-      return super.asyncGetBulk(keys, tc_iter);
+      return super.asyncGetBulk(keys, tcIter);
     }
     /*
     * Case 2. local cache is used.
@@ -156,9 +156,9 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
             new HashMap<>();
 
     Iterator<String> keyIter = keys.iterator();
-    while (keyIter.hasNext() && tc_iter.hasNext()) {
+    while (keyIter.hasNext() && tcIter.hasNext()) {
       String key = keyIter.next();
-      Transcoder<T> tc = tc_iter.next();
+      Transcoder<T> tc = tcIter.next();
       T value = localCacheManager.get(key);
       if (value != null) {
         frontCacheHit.put(key, value);
