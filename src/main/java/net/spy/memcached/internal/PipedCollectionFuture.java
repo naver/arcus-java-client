@@ -1,10 +1,10 @@
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +18,7 @@ import net.spy.memcached.ops.OperationState;
 
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
-  private final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+  private final Collection<Operation> ops = new ArrayList<>();
   private final AtomicReference<CollectionOperationStatus> operationStatus
           = new AtomicReference<>(null);
 

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -2002,7 +2001,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final int count, final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+    final Collection<Operation> ops = new ArrayList<>(smGetList.size());
     final SMGetResultOldImpl<T> result = new SMGetResultOldImpl<>(offset, count, reverse, smGetList.size() > 1);
 
     // if processedSMGetCount is 0, then all smget is done.
@@ -2070,7 +2069,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+    final Collection<Operation> ops = new ArrayList<>(smGetList.size());
     final SMGetResultImpl<T> result = new SMGetResultImpl<>(count, unique, reverse);
 
     // if processedSMGetCount is 0, then all smget is done.
@@ -3434,7 +3433,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+    final Collection<Operation> ops = new ArrayList<>();
     final Map<String, List<BTreeElement<Long, CachedData>>> cachedDataMap =
             new HashMap<>();
     final Map<String, CollectionOperationStatus> opStatusMap =
@@ -3494,7 +3493,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(getBulkList.size());
-    final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+    final Collection<Operation> ops = new ArrayList<>(getBulkList.size());
     final Map<String, List<BTreeElement<ByteArrayBKey, CachedData>>> cachedDataMap =
             new HashMap<>();
     final Map<String, CollectionOperationStatus> opStatusMap =

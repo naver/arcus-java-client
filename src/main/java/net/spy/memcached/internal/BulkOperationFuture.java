@@ -1,10 +1,10 @@
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,7 +18,7 @@ import net.spy.memcached.ops.OperationState;
 
 public class BulkOperationFuture<T> implements Future<Map<String, T>> {
   protected final Map<String, T> failedResult = new HashMap<>();
-  protected final ConcurrentLinkedQueue<Operation> ops = new ConcurrentLinkedQueue<>();
+  protected final Collection<Operation> ops = new ArrayList<>();
   protected final long timeout;
   protected final CountDownLatch latch;
 

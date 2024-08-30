@@ -3,7 +3,6 @@ package net.spy.memcached.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +13,7 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
 public class BroadcastFuture<T> extends OperationFuture<T> {
-  private final List<Operation> ops;
+  private final Collection<Operation> ops;
 
   public BroadcastFuture(long timeout , T result, int latchSize) {
     super(new CountDownLatch(latchSize), timeout);
