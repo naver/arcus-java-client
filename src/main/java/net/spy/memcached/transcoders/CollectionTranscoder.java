@@ -48,6 +48,10 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     super(max);
   }
 
+  public CollectionTranscoder(int max, ClassLoader cl) {
+    super(max, cl);
+  }
+
   public static int examineFlags(ElementValueType type) {
     int flags = 0;
     if (type == ElementValueType.STRING) {

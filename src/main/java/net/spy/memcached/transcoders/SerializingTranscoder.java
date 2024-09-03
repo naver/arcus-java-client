@@ -49,14 +49,21 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
    * Get a serializing transcoder with the default max data size.
    */
   public SerializingTranscoder() {
-    this(CachedData.MAX_SIZE);
+    this(CachedData.MAX_SIZE, null);
   }
 
   /**
    * Get a serializing transcoder that specifies the max data size.
    */
   public SerializingTranscoder(int max) {
-    super(max);
+    super(max, null);
+  }
+
+  /**
+   * Get a serializing transcoder that specifies the max data size and classloader.
+   */
+  public SerializingTranscoder(int max, ClassLoader cl) {
+    super(max, cl);
   }
 
   @Override
