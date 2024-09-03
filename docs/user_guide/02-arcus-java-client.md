@@ -533,6 +533,11 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
   trans.setCompressionThreshold(4096);
   setTranscoder(trans);
   ```
+  직접 ClassLoader 객체를 지정해 사용할 수 있다. Spring Devtools와 같이 클래스로더를 별도로 두는
+  라이브러리를 사용할 때 캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
+  ```java
+  SerializingTranscoder tc = new SerializingTranscoder(CachedData.MAX_SIZE, this.getClass().getClassLoader());
+  ```
 
 - setShouldOptimize(boolean o)
 

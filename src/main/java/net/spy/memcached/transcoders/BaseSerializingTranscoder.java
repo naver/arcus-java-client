@@ -19,9 +19,12 @@ package net.spy.memcached.transcoders;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Proxy;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -47,12 +50,26 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
 
   private final int maxSize;
 
+  /*
+   * This specifies which class loader to use for deserialization
+   * when there are multiple class loaders.
+   * If this is null, java default classloader will be used.
+   */
+  private final ClassLoader classLoader;
+
   /**
    * Initialize a serializing transcoder with the given maximum data size.
    */
   public BaseSerializingTranscoder(int max) {
     super();
     maxSize = max;
+    classLoader = null;
+  }
+
+  public BaseSerializingTranscoder(int max, ClassLoader cl) {
+    super();
+    maxSize = max;
+    classLoader = cl;
   }
 
   public boolean asyncDecode(CachedData d) {
@@ -112,7 +129,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
     try {
       if (in != null) {
         ByteArrayInputStream bis = new ByteArrayInputStream(in);
-        ObjectInputStream is = new ObjectInputStream(bis);
+        ObjectInputStream is = new ClassLoaderObjectInputStream(bis, this.classLoader);
         rv = is.readObject();
         is.close();
         bis.close();
@@ -209,4 +226,45 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
     return maxSize;
   }
 
+  private static final class ClassLoaderObjectInputStream extends ObjectInputStream {
+    private final ClassLoader classLoader;
+
+    private ClassLoaderObjectInputStream(InputStream in,
+                                         ClassLoader classLoader) throws IOException {
+      super(in);
+      this.classLoader = classLoader;
+    }
+
+    @Override
+    protected Class<?> resolveClass(ObjectStreamClass classDesc)
+            throws IOException, ClassNotFoundException {
+      if (this.classLoader != null) {
+        try {
+          return Class.forName(classDesc.getName(), false, this.classLoader);
+        } catch (ClassNotFoundException e) {
+          return super.resolveClass(classDesc);
+        }
+      } else {
+        return super.resolveClass(classDesc);
+      }
+    }
+
+
+    @Override
+    @SuppressWarnings("deprecation") // for java 17 and above
+    protected Class<?> resolveProxyClass(String[] interfaces)
+            throws IOException, ClassNotFoundException {
+      if (this.classLoader != null) {
+        Class<?>[] resolvedInterfaces = new Class<?>[interfaces.length];
+
+        for (int i = 0; i < interfaces.length; ++i) {
+          resolvedInterfaces[i] = Class.forName(interfaces[i], false, this.classLoader);
+        }
+
+        return Proxy.getProxyClass(this.classLoader, resolvedInterfaces);
+      } else {
+        return super.resolveProxyClass(interfaces);
+      }
+    }
+  }
 }
