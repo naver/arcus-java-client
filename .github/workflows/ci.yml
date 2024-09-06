@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
     - develop
+    types:
+    - opened
+    - synchronize
+    - reopened
+    - ready_for_review
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -21,6 +26,9 @@ jobs:
         jdk: [ 8, 11, 17 ]
         os: [ ubuntu-20.04 ]
       fail-fast: true
+    if: |
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.jdk }}
@@ -35,9 +43,9 @@ jobs:
         run: |
           # clone
           git clone https://github.com/naver/arcus.git $HOME/arcus
-          
+
           # build server
-          cd ~/arcus && docker compose up -d 
+          cd ~/arcus && docker compose up -d
 
       - name: Test ARCUS Client Without ZK
         run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest,ArcusClientCreateTest
