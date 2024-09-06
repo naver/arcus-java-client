@@ -171,7 +171,7 @@ ArcusClientPool pool = ArcusClient.createArcusClientPool(ARCUS_ADMIN, SERVICE_CO
 ARCUS client 객체를 정상적으로 생성하면, 아래의 로그와 같이 cache cloud와 정상 연결됨을 볼 수 있다.
 
 ```
-WARN net.spy.memcached.CacheManager: All arcus connections are established.
+WARN net.spy.memcached.ElasticCacheManager: All arcus connections are established.
 ```
 
 ARCUS cache cloud로 정상 연결되지 않으면, 다음과 같은 로그가 보인다.
@@ -179,7 +179,7 @@ ARCUS cache cloud로 정상 연결되지 않으면, 다음과 같은 로그가 �
 접속 실패한 cache server에 대해서는 ARCUS client가 1초에 한 번씩 자동으로 재연결을 시도한다.
 
 ```
-WARN net.spy.memcached.CacheManager: Some arcus connections are not established.
+WARN net.spy.memcached.ElasticCacheManager: Some arcus connections are not established.
 ```
 
 ### ARCUS Client 소멸
