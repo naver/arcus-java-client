@@ -13,7 +13,7 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 
-public class AuthThread extends SpyThread {
+public final class AuthThread extends SpyThread {
 
   private final MemcachedConnection conn;
   private final AuthDescriptor authDescriptor;

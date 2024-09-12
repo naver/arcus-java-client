@@ -78,7 +78,7 @@ public class ConnectionFactoryBuilder {
 
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
-  private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
+  private String frontCacheName;
   private boolean frontCacheCopyOnRead = DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_READ;
   private boolean frontCacheCopyOnWrite =
       DefaultConnectionFactory.DEFAULT_FRONT_CACHE_COPY_ON_WRITE;
@@ -632,6 +632,9 @@ public class ConnectionFactoryBuilder {
 
       @Override
       public String getFrontCacheName() {
+        if (frontCacheName == null) {
+          frontCacheName = "ArcusFrontCache_" + this.hashCode();
+        }
         return frontCacheName;
       }
 

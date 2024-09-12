@@ -33,7 +33,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public class CollectionBulkInsertOperationImpl extends OperationImpl
+public final class CollectionBulkInsertOperationImpl extends OperationImpl
         implements CollectionBulkInsertOperation {
 
   private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(

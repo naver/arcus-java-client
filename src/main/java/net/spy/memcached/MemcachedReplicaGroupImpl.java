@@ -18,7 +18,7 @@
 /* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
-public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
+public final class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
 
   public MemcachedReplicaGroupImpl(final MemcachedNode node) {
     super(getGroupNameFromNode(node));

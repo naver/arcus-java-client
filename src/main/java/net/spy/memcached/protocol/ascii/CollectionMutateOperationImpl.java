@@ -38,7 +38,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to incr/decr item value from collection in a memcached server.
  */
-public class CollectionMutateOperationImpl extends OperationImpl implements
+public final class CollectionMutateOperationImpl extends OperationImpl implements
         CollectionMutateOperation {
 
   private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(

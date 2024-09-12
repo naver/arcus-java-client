@@ -37,7 +37,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to get exists item count from collection in a memcached server.
  */
-public class CollectionCountOperationImpl extends OperationImpl implements
+public final class CollectionCountOperationImpl extends OperationImpl implements
         CollectionCountOperation {
 
   private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(

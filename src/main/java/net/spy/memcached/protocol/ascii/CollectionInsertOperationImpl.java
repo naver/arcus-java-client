@@ -42,7 +42,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public class CollectionInsertOperationImpl extends OperationImpl
+public final class CollectionInsertOperationImpl extends OperationImpl
         implements CollectionInsertOperation {
 
   private static final int OVERHEAD = 32;

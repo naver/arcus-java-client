@@ -25,7 +25,7 @@ import net.spy.memcached.ops.OperationCallback;
 /**
  * Operation for ascii concatenations.
  */
-public class ConcatenationOperationImpl extends BaseStoreOperationImpl
+public final class ConcatenationOperationImpl extends BaseStoreOperationImpl
         implements ConcatenationOperation {
 
   private final ConcatenationType concatType;

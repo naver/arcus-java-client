@@ -185,7 +185,7 @@ import net.spy.memcached.util.BTreeUtil;
  *
  * }</pre>
  */
-public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
+public final class ArcusClient extends FrontCacheMemcachedClient implements ArcusClientIF {
   private static String VERSION = null;
   private static final Object VERSION_LOCK = new Object();
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusClient.class);

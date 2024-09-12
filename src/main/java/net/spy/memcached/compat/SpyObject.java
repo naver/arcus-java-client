@@ -11,7 +11,7 @@ import net.spy.memcached.compat.log.LoggerFactory;
  */
 public class SpyObject extends Object {
 
-  private transient Logger logger = null;
+  protected transient Logger logger = null;
 
   /**
    * Get an instance of SpyObject.

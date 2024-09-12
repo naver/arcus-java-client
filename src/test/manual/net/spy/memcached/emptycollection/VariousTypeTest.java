@@ -347,7 +347,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
     private static final long serialVersionUID = 8942558579188233740L;
 
     private final int i;
-    private final List<String> list;
+    private final ArrayList<String> list;
 
     public UserDefinedClass() {
       this.i = 100;

@@ -9,7 +9,7 @@ import net.spy.memcached.ops.GetOperation;
 /**
  * Operation for retrieving data.
  */
-public class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
+public final class MGetOperationImpl extends BaseGetOpImpl implements GetOperation {
 
   private static final String CMD = "mget";
 

@@ -40,7 +40,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to create empty collection in a memcached server.
  */
-public class CollectionCreateOperationImpl extends OperationImpl
+public final class CollectionCreateOperationImpl extends OperationImpl
         implements CollectionCreateOperation {
 
   private static final int OVERHEAD = 32;

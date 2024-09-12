@@ -40,6 +40,7 @@ import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -150,6 +151,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
+    logger = LoggerFactory.getLogger(getClass());
     setupForAuth("init authentication");
   }
 
@@ -203,7 +205,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         op.reset();
       } else {
         /* This case cannot happen. */
-        getLogger().warn("No buffer for current write op, removing");
+        logger.warn("No buffer for current write op, removing");
         removeCurrentWriteOp();
       }
     }
@@ -213,14 +215,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     while (hasReadOp()) {
       op = removeCurrentReadOp();
       if (op != getCurrentWriteOp()) {
-        getLogger().warn("Discarding partially completed op: %s", op);
+        logger.warn("Discarding partially completed op: %s", op);
         op.cancel(cause);
       }
     }
 
     while (shouldAuth && hasWriteOp()) {
       op = removeCurrentWriteOp();
-      getLogger().warn("Discarding partially completed op: %s", op);
+      logger.warn("Discarding partially completed op: %s", op);
       op.cancel(cause);
     }
 

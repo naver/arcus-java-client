@@ -30,7 +30,7 @@ import net.spy.memcached.ops.Operation;
 public class CheckedOperationTimeoutException extends TimeoutException {
 
   private static final long serialVersionUID = 5187393339735774489L;
-  private final Collection<Operation> operations;
+  private transient final Collection<Operation> operations;
 
   public CheckedOperationTimeoutException(long duration,
                                           TimeUnit unit,
