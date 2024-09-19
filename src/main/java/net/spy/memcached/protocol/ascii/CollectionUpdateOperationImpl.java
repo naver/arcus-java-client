@@ -39,7 +39,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to update collection data in a memcached server.
  */
-public class CollectionUpdateOperationImpl extends OperationImpl implements
+public final class CollectionUpdateOperationImpl extends OperationImpl implements
         CollectionUpdateOperation {
 
   private static final int OVERHEAD = 32;

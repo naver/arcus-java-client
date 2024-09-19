@@ -78,7 +78,7 @@ public class ConnectionFactoryBuilder {
 
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
-  private String frontCacheName = "ArcusFrontCache_" + this.hashCode();
+  private String frontCacheName;
 
   private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
@@ -609,6 +609,9 @@ public class ConnectionFactoryBuilder {
 
       @Override
       public String getFrontCacheName() {
+        if (frontCacheName == null) {
+          frontCacheName = "ArcusFrontCache_" + this.hashCode();
+        }
         return frontCacheName;
       }
 

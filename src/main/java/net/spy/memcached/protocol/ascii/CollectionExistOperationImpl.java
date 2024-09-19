@@ -37,7 +37,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to check membership of an item in collection in a memcached server.
  */
-public class CollectionExistOperationImpl extends OperationImpl
+public final class CollectionExistOperationImpl extends OperationImpl
         implements CollectionExistOperation {
 
   private static final int OVERHEAD = 32;

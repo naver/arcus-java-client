@@ -33,7 +33,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class BTreeFindPositionOperationImpl extends OperationImpl implements
+public final class BTreeFindPositionOperationImpl extends OperationImpl implements
         BTreeFindPositionOperation {
 
   private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
