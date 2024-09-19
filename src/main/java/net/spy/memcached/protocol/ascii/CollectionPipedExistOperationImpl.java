@@ -31,7 +31,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class CollectionPipedExistOperationImpl extends OperationImpl implements
+public final class CollectionPipedExistOperationImpl extends OperationImpl implements
         CollectionPipedExistOperation {
 
   private static final OperationStatus EXIST_CANCELED = new CollectionOperationStatus(

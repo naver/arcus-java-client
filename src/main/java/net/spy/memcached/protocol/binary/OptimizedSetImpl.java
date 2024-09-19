@@ -34,7 +34,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
 
-public class OptimizedSetImpl extends OperationImpl implements Operation {
+public final class OptimizedSetImpl extends OperationImpl implements Operation {
 
   private static final OperationCallback NOOP_CALLBACK = new NoopCallback();
 

@@ -40,7 +40,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to delete collection data in a memcached server.
  */
-public class CollectionDeleteOperationImpl extends OperationImpl
+public final class CollectionDeleteOperationImpl extends OperationImpl
         implements CollectionDeleteOperation {
 
   private static final OperationStatus DELETE_CANCELED = new CollectionOperationStatus(

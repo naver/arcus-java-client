@@ -43,7 +43,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to retrieve collection data in a memcached server.
  */
-public class CollectionGetOperationImpl extends OperationImpl
+public final class CollectionGetOperationImpl extends OperationImpl
         implements CollectionGetOperation {
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();

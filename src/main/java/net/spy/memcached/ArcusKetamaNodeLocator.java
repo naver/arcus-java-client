@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 
-public class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
+public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
   private final Collection<MemcachedNode> allNodes;

@@ -36,7 +36,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
+public final class BTreeInsertAndGetOperationImpl extends OperationImpl implements
         BTreeInsertAndGetOperation {
 
   private static final int OVERHEAD = 32;

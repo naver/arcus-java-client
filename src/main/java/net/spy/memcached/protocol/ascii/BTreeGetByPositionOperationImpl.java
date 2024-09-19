@@ -36,7 +36,7 @@ import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public class BTreeGetByPositionOperationImpl extends OperationImpl implements
+public final class BTreeGetByPositionOperationImpl extends OperationImpl implements
         BTreeGetByPositionOperation {
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();

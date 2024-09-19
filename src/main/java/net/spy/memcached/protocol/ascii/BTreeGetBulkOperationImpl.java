@@ -36,7 +36,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to retrieve b+tree data with multiple keys
  */
-public class BTreeGetBulkOperationImpl extends OperationImpl implements
+public final class BTreeGetBulkOperationImpl extends OperationImpl implements
         BTreeGetBulkOperation {
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();

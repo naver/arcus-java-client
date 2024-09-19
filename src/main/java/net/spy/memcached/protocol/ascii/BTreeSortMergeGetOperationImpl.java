@@ -39,7 +39,7 @@ import net.spy.memcached.util.BTreeUtil;
 /**
  * Operation to retrieve b+tree data with multiple keys
  */
-public class BTreeSortMergeGetOperationImpl extends OperationImpl implements
+public final class BTreeSortMergeGetOperationImpl extends OperationImpl implements
         BTreeSortMergeGetOperation {
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
