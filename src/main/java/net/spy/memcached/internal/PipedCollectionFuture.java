@@ -2,7 +2,6 @@ package net.spy.memcached.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -64,7 +63,7 @@ public class PipedCollectionFuture<K, V>
 
     long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
-      Collection<Operation> timedOutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new ArrayList<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedOutOps.add(op);

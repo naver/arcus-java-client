@@ -2,7 +2,6 @@ package net.spy.memcached.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +56,7 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
     long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
       // whenever timeout occurs, continuous timeout counter will increase by 1.
-      Collection<Operation> timedOutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new ArrayList<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           MemcachedConnection.opTimedOut(op);

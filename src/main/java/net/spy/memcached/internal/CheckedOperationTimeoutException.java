@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -30,13 +31,13 @@ import net.spy.memcached.ops.Operation;
 public class CheckedOperationTimeoutException extends TimeoutException {
 
   private static final long serialVersionUID = 5187393339735774489L;
-  private final Collection<Operation> operations;
+  private final ArrayList<Operation> operations;
 
   public CheckedOperationTimeoutException(long duration,
                                           TimeUnit unit,
                                           long elapsed,
                                           Operation op) {
-    this(duration, unit, elapsed, Collections.singleton(op));
+    this(duration, unit, elapsed, new ArrayList<>(Collections.singleton(op)));
   }
 
   public CheckedOperationTimeoutException(long duration,
@@ -44,7 +45,7 @@ public class CheckedOperationTimeoutException extends TimeoutException {
                                           long elapsed,
                                           Collection<Operation> ops) {
     super(ExceptionMessageFactory.createTimedOutMessage(duration, unit, elapsed, ops));
-    operations = ops;
+    operations =  new ArrayList<>(ops);
   }
 
   /**
