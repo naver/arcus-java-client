@@ -84,13 +84,12 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   }
 
   @Override
-  public Map<String, T> getSome(long duration, TimeUnit unit)
-          throws InterruptedException, ExecutionException {
-
+  public Map<String, T> getSome(long duration, TimeUnit unit) throws InterruptedException {
     try {
       return internalGet(duration, unit, false);
-    } catch (TimeoutException e) {
-      throw new AssertionError("Something went wrong...", e);
+    } catch (TimeoutException | ExecutionException e) {
+      throw new AssertionError("Unreachable code because internalGet with throwException" +
+              "set to false does not throw exceptions.", e);
     }
   }
 
@@ -131,8 +130,8 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    * refactored code common to both get(long, TimeUnit) and getSome(long,
    * TimeUnit)
    */
-  private Map<String, T> internalGet(long to, TimeUnit unit, boolean throwOnTimeout)
-           throws InterruptedException, ExecutionException, TimeoutException {
+  private Map<String, T> internalGet(long to, TimeUnit unit, boolean throwException)
+          throws InterruptedException, ExecutionException, TimeoutException {
 
     long beforeAwait = System.currentTimeMillis();
     if (!latch.await(to, unit)) {
@@ -150,7 +149,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
 
         long elapsed = System.currentTimeMillis() - beforeAwait;
         TimeoutException e = new CheckedOperationTimeoutException(to, unit, elapsed, timedOutOps);
-        if (throwOnTimeout) {
+        if (throwException) {
           throw e;
         }
         LoggerFactory.getLogger(getClass()).warn(e.getMessage());
@@ -158,12 +157,15 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     } else {
       MemcachedConnection.opsSucceeded(ops);
     }
-    for (Operation op : ops) {
-      if (op.isCancelled()) {
-        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
-      }
-      if (op.hasErrored()) {
-        throw new ExecutionException(op.getException());
+
+    if (throwException) {
+      for (Operation op : ops) {
+        if (op.isCancelled()) {
+          throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+        }
+        if (op.hasErrored()) {
+          throw new ExecutionException(op.getException());
+        }
       }
     }
 
@@ -177,6 +179,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     }
     return resultMap;
   }
+
   /*
    * set to true if timeout was reached.
    *

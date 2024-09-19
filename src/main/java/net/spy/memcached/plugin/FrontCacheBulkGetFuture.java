@@ -50,8 +50,7 @@ public class FrontCacheBulkGetFuture<T> extends BulkGetFuture<T> {
   }
 
   @Override
-  public Map<String, T> getSome(long duration, TimeUnit unit)
-          throws InterruptedException, ExecutionException {
+  public Map<String, T> getSome(long duration, TimeUnit unit) throws InterruptedException {
     if (result != null) {
       return result;
     }

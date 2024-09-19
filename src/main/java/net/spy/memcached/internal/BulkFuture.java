@@ -1,6 +1,5 @@
 package net.spy.memcached.internal;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -29,17 +28,16 @@ public interface BulkFuture<V> extends Future<V> {
   /**
    * Wait for the operation to complete and return results.
    *
-   * If operation could not complete within specified
-   * timeout, partial result is returned. Otherwise, the
-   * behavior is identical to {@link #get(long, TimeUnit)}
+   * If operation could not complete within specified timeout, error, cancellation occurred,
+   * partial result is returned.
+   * Otherwise, the behavior is identical to {@link #get(long, TimeUnit)}
    *
    * @param timeout the maximum time to wait
    * @param unit    the time unit of the timeout argument
    * @return the computed result
    * @throws InterruptedException if the current thread was interrupted while waiting
-   * @throws ExecutionException   if the computation threw an exception
    */
-  V getSome(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException;
+  V getSome(long timeout, TimeUnit unit) throws InterruptedException;
 
 
   int getOpCount();
