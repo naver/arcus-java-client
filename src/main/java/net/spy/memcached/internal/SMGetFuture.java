@@ -16,8 +16,8 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -59,7 +59,7 @@ public final class SMGetFuture<T extends List<?>> implements Future<T> {
 
     long beforeAwait = System.currentTimeMillis();
     if (!latch.await(duration, unit)) {
-      Collection<Operation> timedOutOps = new HashSet<>();
+      Collection<Operation> timedOutOps = new ArrayList<>();
       for (Operation op : ops) {
         if (op.getState() != OperationState.COMPLETE) {
           timedOutOps.add(op);
