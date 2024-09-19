@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SyncThread;
 import net.spy.memcached.internal.BulkFuture;
+import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
@@ -44,6 +45,7 @@ import org.opentest4j.AssertionFailedError;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -557,6 +559,28 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
       fail("Expected ComparisonFailure caused by key mismatch");
     } catch (AssertionFailedError e) {
       // pass
+    }
+  }
+
+  @Test
+  public void getCompositeExceptionFromBulkGetFuture() {
+    List<String> keys = new ArrayList<>();
+    for (int i = 0; i < 210; i++) {
+      keys.add("test" + i);
+    }
+
+    BulkFuture<Map<String, Object>> future = client.asyncGetBulk(keys);
+    future.cancel(true);
+
+    try {
+      future.get();
+    } catch (Exception e) {
+      int count = e.getMessage().split("Cancelled", -1).length - 1;
+      assertTrue(0 < count);
+      assertInstanceOf(CompositeException.class, e);
+      List<Exception> exceptions = ((CompositeException) e).getExceptions();
+      assertFalse(exceptions.isEmpty());
+      assertTrue(exceptions.get(0).getMessage().contains("Cancelled"));
     }
   }
 

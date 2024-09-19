@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import net.spy.memcached.TimedOutMessageFactory;
+import net.spy.memcached.ExceptionMessageFactory;
 import net.spy.memcached.ops.Operation;
 
 /**
@@ -43,7 +43,7 @@ public class CheckedOperationTimeoutException extends TimeoutException {
                                           TimeUnit unit,
                                           long elapsed,
                                           Collection<Operation> ops) {
-    super(TimedOutMessageFactory.createTimedOutMessage(duration, unit, elapsed, ops));
+    super(ExceptionMessageFactory.createTimedOutMessage(duration, unit, elapsed, ops));
     operations = ops;
   }
 

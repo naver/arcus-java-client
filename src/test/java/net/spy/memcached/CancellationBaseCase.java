@@ -8,6 +8,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.internal.CompositeException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +58,13 @@ public abstract class CancellationBaseCase {
       Object o = f.get();
       fail("Expected cancellation, got " + o);
     } catch (ExecutionException e) {
-      assertTrue(e.getCause() instanceof RuntimeException);
-      assertTrue(e.getCause().getMessage().contains("Cancelled"));
+      if (e instanceof CompositeException) {
+        assertTrue(((CompositeException) e).getExceptions()
+                .get(0).getMessage().contains("Cancelled"));
+      } else {
+        assertTrue(e.getCause() instanceof RuntimeException);
+        assertTrue(e.getCause().getMessage().contains("Cancelled"));
+      }
     }
   }
 

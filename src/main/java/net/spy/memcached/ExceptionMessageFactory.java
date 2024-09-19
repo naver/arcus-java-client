@@ -1,15 +1,16 @@
 package net.spy.memcached;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.ops.DeleteOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.StoreOperation;
 
-public final class TimedOutMessageFactory {
+public final class ExceptionMessageFactory {
 
-  private TimedOutMessageFactory() {
+  private ExceptionMessageFactory() {
   }
 
   public static String createTimedOutMessage(long duration,
@@ -68,4 +69,21 @@ public final class TimedOutMessageFactory {
     return op.isBulkOperation();
   }
 
+  public static String createCompositeMessage(List<Exception> exceptions) {
+    StringBuilder rv = new StringBuilder();
+    rv.append("Multiple exceptions (");
+    rv.append(exceptions.size());
+    rv.append(") reported: ");
+    boolean first = true;
+    for (Exception e : exceptions) {
+      if (first) {
+        first = false;
+      } else {
+        rv.append(", ");
+      }
+      rv.append(e.getMessage());
+    }
+    return rv.toString();
+
+  }
 }
