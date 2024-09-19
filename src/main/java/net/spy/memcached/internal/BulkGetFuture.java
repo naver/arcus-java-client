@@ -16,9 +16,11 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -159,13 +161,18 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     }
 
     if (throwException) {
+      List<Exception> exceptions = new ArrayList<>();
       for (Operation op : ops) {
         if (op.isCancelled()) {
-          throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+          exceptions.add(new RuntimeException(op.getCancelCause()));
         }
         if (op.hasErrored()) {
-          throw new ExecutionException(op.getException());
+          exceptions.add(op.getException());
         }
+      }
+
+      if (!exceptions.isEmpty()) {
+        throw new CompositeException(exceptions);
       }
     }
 
