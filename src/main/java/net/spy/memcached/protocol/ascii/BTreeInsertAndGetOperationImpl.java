@@ -136,7 +136,7 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     /*
       VALUE <flags> <count>\r\n
       <bkey> [<eflag>] <bytes> <data>\r\n
-      END\r\n
+      TRIMMED\r\n
     */
     if (line.startsWith("VALUE ")) {
       String[] stuff = line.split(" ");
