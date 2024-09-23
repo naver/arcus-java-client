@@ -32,7 +32,6 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     }
     mergedResult.clear();
     trimmedKeyMap.clear();
-    missedKeyList.clear();
     missedKeyMap.clear();
   }
 
