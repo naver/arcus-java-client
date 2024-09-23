@@ -1,49 +1,46 @@
 package net.spy.memcached.protocol.ascii;
 
+import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test operation exception constructors and accessors and stuff.
  */
-public class OperationExceptionTest {
+class OperationExceptionTest extends BaseIntegrationTest {
 
   @Test
-  public void testEmpty() {
-    OperationException oe = new OperationException();
-    assertSame(OperationErrorType.GENERAL, oe.getType());
-    assertEquals("OperationException: GENERAL", String.valueOf(oe));
-  }
-
-  @Test
-  public void testServer() {
-    OperationException oe = new OperationException(
-            OperationErrorType.SERVER, "SERVER_ERROR figures");
+  void testServer() {
+    OperationException oe = new OperationException(OperationErrorType.SERVER,
+            "SERVER_ERROR figures" + " @ "
+                    + mc.getMemcachedConnection().getPrimaryNode("test").getNodeName());
     assertSame(OperationErrorType.SERVER, oe.getType());
-    assertEquals("OperationException: SERVER: SERVER_ERROR figures",
-            String.valueOf(oe));
+    assertTrue(String.valueOf(oe).startsWith("OperationException: SERVER:" +
+            " SERVER_ERROR figures @ ArcusClient-"));
   }
 
   @Test
-  public void testClient() {
-    OperationException oe = new OperationException(
-            OperationErrorType.CLIENT, "CLIENT_ERROR nope");
+  void testClient() {
+    OperationException oe = new OperationException(OperationErrorType.CLIENT,
+            "CLIENT_ERROR nope" + " @ "
+                    + mc.getMemcachedConnection().getPrimaryNode("test").getNodeName());
     assertSame(OperationErrorType.CLIENT, oe.getType());
-    assertEquals("OperationException: CLIENT: CLIENT_ERROR nope",
-            String.valueOf(oe));
+    assertTrue(String.valueOf(oe).startsWith("OperationException: CLIENT:" +
+            " CLIENT_ERROR nope @ ArcusClient-"));
   }
 
   @Test
-  public void testGeneral() {
-    // General type doesn't have additional info
-    OperationException oe = new OperationException(
-            OperationErrorType.GENERAL, "GENERAL wtf");
+  void testGeneral() {
+    OperationException oe = new OperationException(OperationErrorType.GENERAL,
+            "ERROR no matching command" + " @ "
+                    + mc.getMemcachedConnection().getPrimaryNode("test").getNodeName());
     assertSame(OperationErrorType.GENERAL, oe.getType());
-    assertEquals("OperationException: GENERAL", String.valueOf(oe));
+    assertTrue(String.valueOf(oe).startsWith("OperationException: GENERAL:" +
+            " ERROR no matching command @ ArcusClient-"));
   }
 }

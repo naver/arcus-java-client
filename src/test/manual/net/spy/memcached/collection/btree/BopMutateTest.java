@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopMutateTest extends BaseIntegrationTest {
+class BopMutateTest extends BaseIntegrationTest {
 
   private String key = "BopMutate";
 
@@ -45,7 +45,7 @@ public class BopMutateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopIncrDecr_Basic() throws Exception {
+  void testBopIncrDecr_Basic() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -68,7 +68,7 @@ public class BopMutateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopIncrDecr_InitialValue() throws Exception {
+  void testBopIncrDecr_InitialValue() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -106,7 +106,7 @@ public class BopMutateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopIncrDecr_Minus() throws Exception {
+  void testBopIncrDecr_Minus() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -116,7 +116,7 @@ public class BopMutateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopIncrDecr_NoKeyError() throws Exception {
+  void testBopIncrDecr_NoKeyError() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -135,7 +135,7 @@ public class BopMutateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopIncrDecr_StringError() throws Exception {
+  void testBopIncrDecr_StringError() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -147,9 +147,8 @@ public class BopMutateTest extends BaseIntegrationTest {
               .getResponse();
       System.out.println(response3.toString());
     } catch (Exception e) {
-      assertEquals(
-          "OperationException: CLIENT: "
-              + "CLIENT_ERROR cannot increment or decrement non-numeric value", e.getMessage());
+      assertTrue(e.getMessage().startsWith("OperationException: CLIENT:" +
+              " CLIENT_ERROR cannot increment or decrement non-numeric value @ ArcusClient-"));
     }
   }
 }

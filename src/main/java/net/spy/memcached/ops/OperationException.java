@@ -12,14 +12,6 @@ public final class OperationException extends IOException {
   private final OperationErrorType type;
 
   /**
-   * General exception (no message).
-   */
-  public OperationException() {
-    super();
-    type = OperationErrorType.GENERAL;
-  }
-
-  /**
    * Exception with a message.
    *
    * @param eType the type of error that occurred
@@ -39,12 +31,6 @@ public final class OperationException extends IOException {
 
   @Override
   public String toString() {
-    String rv = null;
-    if (type == OperationErrorType.GENERAL) {
-      rv = "OperationException: " + type;
-    } else {
-      rv = "OperationException: " + type + ": " + getMessage();
-    }
-    return rv;
+    return "OperationException: " + type + ": " + getMessage();
   }
 }
