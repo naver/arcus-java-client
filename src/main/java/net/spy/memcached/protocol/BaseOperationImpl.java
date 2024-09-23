@@ -243,10 +243,8 @@ public abstract class BaseOperationImpl extends SpyObject {
     getLogger().error("Error:  %s by %s", line, this);
     switch (eType) {
       case GENERAL:
-        exception = new OperationException();
-        break;
       case SERVER:
-        exception = new OperationException(eType, line);
+        exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
         break;
       case CLIENT:
         if (line.contains("bad command line format")) {
@@ -257,7 +255,7 @@ public abstract class BaseOperationImpl extends SpyObject {
           String[] cmdLines = new String(bytes).split("\r\n");
           getLogger().error("Bad command: %s", cmdLines[0]);
         }
-        exception = new OperationException(eType, line);
+        exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
         break;
       default:
         assert false;
