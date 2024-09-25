@@ -113,28 +113,8 @@ public class ConnectionFactoryBuilder {
 
   /* ENABLE_REPLICATION if */
   /* Called by cache manager after checking ZK nodes */
-  public void internalArcusReplEnabled(boolean b) {
+  void setArcusReplEnabled(boolean b) {
     arcusReplEnabled = b;
-  }
-
-  /* @deprecated  This method is no longer needed by applications.
-   * The replication cluster is internally determined by checking
-   * ZK directories for the given service code. The service code
-   * must be unique in each ZK ensemble.
-   */
-  @Deprecated
-  public ConnectionFactoryBuilder setArcusReplEnabled(boolean enable) {
-    return this;
-  }
-
-  /* @deprecated  This method is no longer needed by applications.
-   * The replication cluster is internally determined by checking
-   * ZK directories for the given service code. The service code
-   * must be unique in each ZK ensemble.
-   */
-  @Deprecated
-  public boolean getArcusReplEnabled() {
-    return arcusReplEnabled;
   }
   /* ENABLE_REPLICATION end */
 

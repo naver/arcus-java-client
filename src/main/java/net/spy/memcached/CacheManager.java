@@ -211,14 +211,14 @@ public class CacheManager extends SpyThread implements Watcher,
       /* ENABLE_REPLICATION if */
       if (zk.exists(ARCUS_REPL_CACHE_LIST_ZPATH + serviceCode, false) != null) {
         arcusReplEnabled = true;
-        cfb.internalArcusReplEnabled(true);
+        cfb.setArcusReplEnabled(true);
         getLogger().info("Connected to Arcus repl cluster (serviceCode=%s)", serviceCode);
       } else {
       /* ENABLE_REPLICATION end */
         if (zk.exists(ARCUS_BASE_CACHE_LIST_ZPATH + serviceCode, false) != null) {
           /* ENABLE_REPLICATION if */
           arcusReplEnabled = false;
-          cfb.internalArcusReplEnabled(false);
+          cfb.setArcusReplEnabled(false);
           /* ENABLE_REPLICATION end */
           getLogger().info("Connected to Arcus cluster (seriveCode=%s)", serviceCode);
         } else {
