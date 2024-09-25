@@ -71,7 +71,7 @@ public class MemcachedConnectionTest {
   @Test
   public void testNodesChangeQueue() throws Exception {
     // when
-    conn.setCacheNodesChange("0.0.0.0:11211");
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
 
     // 1st test (nodes=1)
     conn.handleCacheNodesChange();
@@ -80,7 +80,7 @@ public class MemcachedConnectionTest {
     assertTrue(1 == locator.getAll().size());
 
     // when
-    conn.setCacheNodesChange("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213");
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213"));
 
     // 2nd test (nodes=3)
     conn.handleCacheNodesChange();
@@ -89,7 +89,7 @@ public class MemcachedConnectionTest {
     assertTrue(3 == locator.getAll().size());
 
     // when
-    conn.setCacheNodesChange("0.0.0.0:11212");
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11212"));
 
     // 3rd test (nodes=1)
     conn.handleCacheNodesChange();
@@ -114,7 +114,7 @@ public class MemcachedConnectionTest {
   public void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
-      conn.setCacheNodesChange("");
+      conn.setCacheNodesChange(AddrUtil.getAddresses(""));
 
       // test
       conn.handleCacheNodesChange();
@@ -130,7 +130,7 @@ public class MemcachedConnectionTest {
   @Test
   public void testNodesChangeQueue_redundant() throws Exception {
     // when
-    conn.setCacheNodesChange("0.0.0.0:11211,0.0.0.0:11211");
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211,0.0.0.0:11211"));
 
     // test
     conn.handleCacheNodesChange();
@@ -142,8 +142,8 @@ public class MemcachedConnectionTest {
   @Test
   public void testNodesChangeQueue_twice() throws Exception {
     // when
-    conn.setCacheNodesChange("0.0.0.0:11211");
-    conn.setCacheNodesChange("0.0.0.0:11211");
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
 
     // test
     conn.handleCacheNodesChange();
