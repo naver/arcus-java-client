@@ -421,7 +421,7 @@ public class CacheManager extends SpyThread implements Watcher,
     }
   }
 
-  private String getAddressListString(List<String> children) {
+  private List<InetSocketAddress> getSocketAddrList(List<String> children) {
     StringBuilder addrs = new StringBuilder();
     for (int i = 0; i < children.size(); i++) {
       String[] temp = children.get(i).split("-");
@@ -431,7 +431,28 @@ public class CacheManager extends SpyThread implements Watcher,
         addrs.append(temp[0]);
       }
     }
-    return addrs.toString();
+    return convertToSocketAddrList(addrs.toString());
+  }
+
+  private List<InetSocketAddress> convertToSocketAddrList(String addrs) {
+    /* ENABLE_REPLICATION if */
+    if (arcusReplEnabled) {
+      List<InetSocketAddress> socketList = ArcusReplNodeAddress.getAddresses(addrs);
+
+      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
+              ArcusReplNodeAddress.makeGroupAddrsList(socketList);
+
+      // recreate socket list
+      socketList.clear();
+      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+        if (ArcusReplNodeAddress.validateGroup(entry)) {
+          socketList.addAll(entry.getValue());
+        }
+      }
+      return socketList;
+    }
+    /* ENABLE_REPLICATION end */
+    return AddrUtil.getAddresses(addrs);
   }
 
   /**
@@ -471,7 +492,7 @@ public class CacheManager extends SpyThread implements Watcher,
     // Znode names are group^{M,S}^ip:port-hostname.  Concat all names separated
     // by commas.  ArcusRepNodeAddress turns these names into ArcusReplNodeAddress.
     /* ENABLE_REPLICATION end */
-    String addrs = getAddressListString(children);
+    List<InetSocketAddress> addrs = getSocketAddrList(children);
 
     if (client == null) {
       if (!addrs.isEmpty()) {
@@ -544,13 +565,12 @@ public class CacheManager extends SpyThread implements Watcher,
   @Override
   public boolean commandAlterListChange(List<String> children) {
     // return false if this method is failed.
-    String addrs = getAddressListString(children);
+    List<InetSocketAddress> addrs = getSocketAddrList(children);
     if (startup) {
       try {
         for (ArcusClient ac : client) {
           MemcachedConnection conn = ac.getMemcachedConnection();
-          conn.prepareAlterConnections(arcusReplEnabled ?
-              ArcusReplNodeAddress.getAddresses(addrs) : AddrUtil.getAddresses(addrs));
+          conn.prepareAlterConnections(addrs);
         }
       } catch (IOException e) {
         getLogger().fatal("Cannot initialize alter_list znode.", e);
@@ -646,10 +666,9 @@ public class CacheManager extends SpyThread implements Watcher,
   /**
    * initialized ArcusClient Pool.
    *
-   * @param addrs current available Memcached Addresses
+   * @param socketList current available Memcached Addresses
    */
-  private void initArcusClient(String addrs) {
-    List<InetSocketAddress> socketList = getSocketAddressList(addrs);
+  private void initArcusClient(List<InetSocketAddress> socketList) {
     int addrCount = socketList.size();
 
     final CountDownLatch latch = new CountDownLatch(addrCount * poolSize);
@@ -696,27 +715,6 @@ public class CacheManager extends SpyThread implements Watcher,
       getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
     }
 
-  }
-
-  private List<InetSocketAddress> getSocketAddressList(String addrs) {
-    /* ENABLE_REPLICATION if */
-    if (arcusReplEnabled) {
-      List<InetSocketAddress> socketList = ArcusReplNodeAddress.getAddresses(addrs);
-
-      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-              ArcusReplNodeAddress.makeGroupAddrsList(socketList);
-
-      // recreate socket list
-      socketList.clear();
-      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (ArcusReplNodeAddress.validateGroup(entry)) {
-          socketList.addAll(entry.getValue());
-        }
-      }
-      return socketList;
-    }
-    /* ENABLE_REPLICATION end */
-    return AddrUtil.getAddresses(addrs);
   }
 
   /**
