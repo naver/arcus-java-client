@@ -17,13 +17,6 @@
 package net.spy.memcached.plugin;
 
 import java.time.Duration;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -41,12 +34,10 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
  */
 public class LocalCacheManager {
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
-  private Cache<String, Object> cache;
-  protected String name;
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Cache<String, Object> cache;
 
   public LocalCacheManager(String name, int max, int exptime) {
-    this.name = name;
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
             .build(true);
     CacheConfiguration<String, Object> config =
@@ -80,15 +71,6 @@ public class LocalCacheManager {
     return null;
   }
 
-  public <T> Future<T> asyncGet(final String key) {
-    Task<T> task = new Task<>(new Callable<T>() {
-      public T call() throws Exception {
-        return get(key);
-      }
-    });
-    return task;
-  }
-
   public <T> boolean put(String k, T v) {
     if (v == null) {
       return false;
@@ -103,53 +85,11 @@ public class LocalCacheManager {
     }
   }
 
-  public <T> boolean put(String k, Future<T> future, long timeout) {
-    if (future == null) {
-      return false;
-    }
-
-    try {
-      T v = future.get(timeout, TimeUnit.MILLISECONDS);
-      return put(k, v);
-    } catch (Exception e) {
-      logger.info("failed to put to the local cache : %s", e.getMessage());
-      return false;
-    }
-  }
-
   public void delete(String k) {
     try {
       cache.remove(k);
     } catch (Exception e) {
       logger.info("failed to remove the locally cached item : %s", e.getMessage());
-    }
-  }
-
-  public static class Task<T> extends FutureTask<T> {
-    private final AtomicBoolean isRunning = new AtomicBoolean(false);
-
-    public Task(Callable<T> callable) {
-      super(callable);
-    }
-
-    @Override
-    public T get() throws InterruptedException, ExecutionException {
-      this.run();
-      return super.get();
-    }
-
-    @Override
-    public T get(long timeout, TimeUnit unit) throws InterruptedException,
-            ExecutionException, TimeoutException {
-      this.run();
-      return super.get(timeout, unit);
-    }
-
-    @Override
-    public void run() {
-      if (this.isRunning.compareAndSet(false, true)) {
-        super.run();
-      }
     }
   }
 
