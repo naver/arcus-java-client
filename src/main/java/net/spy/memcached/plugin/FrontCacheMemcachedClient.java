@@ -188,4 +188,20 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
   public LocalCacheManager getLocalCacheManager() {
     return localCacheManager;
   }
+
+  @Override
+  public boolean shutdown(long timeout, TimeUnit unit) {
+    if (localCacheManager != null) {
+      localCacheManager.close();
+    }
+    return super.shutdown(timeout, unit);
+  }
+
+  @Override
+  public void shutdown() {
+    if (localCacheManager != null) {
+      localCacheManager.close();
+    }
+    super.shutdown();
+  }
 }

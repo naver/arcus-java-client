@@ -35,11 +35,12 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 public class LocalCacheManager {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final CacheManager cacheManager;
   private final Cache<String, Object> cache;
 
   public LocalCacheManager(String name, int max, int exptime) {
-    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-            .build(true);
+    this.cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
+
     CacheConfiguration<String, Object> config =
             CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class,
                             ResourcePoolsBuilder.heap(max))
@@ -91,6 +92,10 @@ public class LocalCacheManager {
     } catch (Exception e) {
       logger.info("failed to remove the locally cached item : %s", e.getMessage());
     }
+  }
+
+  public void close() {
+    cacheManager.close();
   }
 
   @Override
