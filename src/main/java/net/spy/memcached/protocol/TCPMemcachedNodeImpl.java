@@ -150,7 +150,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
-    setupForAuth("init authentication");
+    authLatch = new CountDownLatch(shouldAuth ? 1 : 0);
   }
 
   public final void copyInputQueue() {
