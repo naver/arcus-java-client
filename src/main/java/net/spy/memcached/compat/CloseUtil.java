@@ -16,7 +16,7 @@ import net.spy.memcached.compat.log.LoggerFactory;
  */
 public final class CloseUtil {
 
-  private static Logger logger = LoggerFactory.getLogger(CloseUtil.class);
+  private final static Logger logger = LoggerFactory.getLogger(CloseUtil.class);
 
   private CloseUtil() {
   }
