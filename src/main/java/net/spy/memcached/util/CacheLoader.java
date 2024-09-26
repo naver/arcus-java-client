@@ -112,13 +112,11 @@ public class CacheLoader extends SpyObject {
 
   private void watch(final String key, final Future<Boolean> f) {
     if (executorService != null && storageListener != null) {
-      executorService.execute(new Runnable() {
-        public void run() {
-          try {
-            storageListener.storeResult(key, f.get());
-          } catch (Exception e) {
-            storageListener.errorStoring(key, e);
-          }
+      executorService.execute(() -> {
+        try {
+          storageListener.storeResult(key, f.get());
+        } catch (Exception e) {
+          storageListener.errorStoring(key, e);
         }
       });
     }

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -280,76 +279,70 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   @Test
   public void testParallelSetGet() throws Throwable {
-    int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
-      public Boolean call() throws Exception {
-        int size = 10;
-        List<String> keys = new ArrayList<>(size);
-        List<String> values = new ArrayList<>(size);
-        List<Future<Boolean>> setFutures = new ArrayList<>(size);
-        List<GetFuture<Object>> getFutures = new ArrayList<>(size);
+    int cnt = SyncThread.getDistinctResultCount(10, () -> {
+      int size = 10;
+      List<String> keys = new ArrayList<>(size);
+      List<String> values = new ArrayList<>(size);
+      List<Future<Boolean>> setFutures = new ArrayList<>(size);
+      List<GetFuture<Object>> getFutures = new ArrayList<>(size);
 
-        for (int i = 0; i < size; i++) {
-          keys.add("test" + i);
-          values.add("value" + i);
-          setFutures.add(client.set(keys.get(i), 60, values.get(i)));
-        }
-        for (int i = 0; i < size; i++) {
-          assertTrue(setFutures.get(i).get());
-        }
-
-        for (int i = 0; i < size; i++) {
-          getFutures.add(client.asyncGet(keys.get(i)));
-        }
-        for (int i = 0; i < size; i++) {
-          assertEquals(getFutures.get(i).get(), values.get(i));
-        }
-        return Boolean.TRUE;
+      for (int i = 0; i < size; i++) {
+        keys.add("test" + i);
+        values.add("value" + i);
+        setFutures.add(client.set(keys.get(i), 60, values.get(i)));
       }
+      for (int i = 0; i < size; i++) {
+        assertTrue(setFutures.get(i).get());
+      }
+
+      for (int i = 0; i < size; i++) {
+        getFutures.add(client.asyncGet(keys.get(i)));
+      }
+      for (int i = 0; i < size; i++) {
+        assertEquals(getFutures.get(i).get(), values.get(i));
+      }
+      return Boolean.TRUE;
     });
     assertEquals(1, cnt);
   }
 
   @Test
   public void testParallelSetMultiGet() throws Throwable {
-    int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
-      public Boolean call() throws Exception {
-        int size = 10;
-        List<String> keys = new ArrayList<>(size);
-        List<String> values = new ArrayList<>(size);
-        List<Future<Boolean>> futures = new ArrayList<>(size);
+    int cnt = SyncThread.getDistinctResultCount(10, () -> {
+      int size = 10;
+      List<String> keys = new ArrayList<>(size);
+      List<String> values = new ArrayList<>(size);
+      List<Future<Boolean>> futures = new ArrayList<>(size);
 
-        for (int i = 0; i < 10; i++) {
-          keys.add("test" + i);
-          values.add("value" + i);
-          futures.add(client.set(keys.get(i), 60, values.get(i)));
-        }
-        for (int i = 0; i < size; i++) {
-          assertTrue(futures.get(i).get());
-          assertEquals(client.get(keys.get(i)), values.get(i));
-        }
-
-        Map<String, Object> m = client.getBulk(Arrays.asList("test0", "test1", "test2",
-                "test3", "test4", "test5", "test6", "test7", "test8",
-                "test9", "test10")); // Yes, I intentionally ran over.
-        for (int i = 0; i < 10; i++) {
-          assertEquals("value" + i, m.get("test" + i));
-        }
-        return Boolean.TRUE;
+      for (int i = 0; i < 10; i++) {
+        keys.add("test" + i);
+        values.add("value" + i);
+        futures.add(client.set(keys.get(i), 60, values.get(i)));
       }
+      for (int i = 0; i < size; i++) {
+        assertTrue(futures.get(i).get());
+        assertEquals(client.get(keys.get(i)), values.get(i));
+      }
+
+      Map<String, Object> m = client.getBulk(Arrays.asList("test0", "test1", "test2",
+              "test3", "test4", "test5", "test6", "test7", "test8",
+              "test9", "test10")); // Yes, I intentionally ran over.
+      for (int i = 0; i < 10; i++) {
+        assertEquals("value" + i, m.get("test" + i));
+      }
+      return Boolean.TRUE;
     });
     assertEquals(1, cnt);
   }
 
   @Test
   public void testParallelSetAutoMultiGet() throws Throwable {
-    int cnt = SyncThread.getDistinctResultCount(10, new Callable<Boolean>() {
-      public Boolean call() throws Exception {
-        assertTrue(client.set("testparallel", 60, "parallelvalue").get());
-        for (int i = 0; i < 10; i++) {
-          assertEquals(client.get("testparallel"), "parallelvalue");
-        }
-        return Boolean.TRUE;
+    int cnt = SyncThread.getDistinctResultCount(10, () -> {
+      assertTrue(client.set("testparallel", 60, "parallelvalue").get());
+      for (int i = 0; i < 10; i++) {
+        assertEquals(client.get("testparallel"), "parallelvalue");
       }
+      return Boolean.TRUE;
     });
     assertEquals(1, cnt);
   }
@@ -671,11 +664,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   @Test
   public void testConcurrentMutation() throws Throwable {
-    int num = SyncThread.getDistinctResultCount(10, new Callable<Long>() {
-      public Long call() throws Exception {
-        return client.incr("mtest", 1, 11);
-      }
-    });
+    int num = SyncThread.getDistinctResultCount(10, () -> client.incr("mtest", 1, 11));
     assertEquals(10, num);
   }
 

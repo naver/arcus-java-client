@@ -27,7 +27,6 @@ import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
 
 /**
  * MigrationMonitor monitors the changes of the cloud_stat
@@ -70,18 +69,8 @@ public class MigrationMonitor extends SpyObject implements Watcher {
     this.serviceCode = serviceCode;
     this.listener = listener;
 
-    this.cloudStatCallback = new AsyncCallback.Children2Callback() {
-      @Override
-      public void processResult(int rc, String s, Object o, List<String> list, Stat stat) {
-        processCloudStatResult(rc, list);
-      }
-    };
-    this.alterListCallback = new AsyncCallback.Children2Callback() {
-      @Override
-      public void processResult(int rc, String s, Object o, List<String> list, Stat stat) {
-        processAlterListResult(rc, list);
-      }
-    };
+    this.cloudStatCallback = (rc, s, o, list, stat) -> processCloudStatResult(rc, list);
+    this.alterListCallback = (rc, s, o, list, stat) -> processAlterListResult(rc, list);
 
     getLogger().info("Initializing the MigrationMonitor.");
 

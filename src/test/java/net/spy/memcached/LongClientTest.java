@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import net.spy.memcached.compat.SyncThread;
 
@@ -46,19 +45,17 @@ public class LongClientTest extends ClientBaseCase {
       assertTrue(client.set(keys.get(i), 3600, data).get());
     }
 
-    int cnt = SyncThread.getDistinctResultCount(25, new Callable<Integer>() {
-      public Integer call() throws Exception {
-        for (int i = 0; i < 25; i++) {
-          Map<String, Object> m = client.getBulk(keys);
-          for (String s : keys) {
-            byte b[] = (byte[]) m.get(s);
-            assert Arrays.hashCode(b) == hashcode
-                    : "Expected " + hashcode + " was "
-                    + Arrays.hashCode(b);
-          }
+    int cnt = SyncThread.getDistinctResultCount(25, () -> {
+      for (int i = 0; i < 25; i++) {
+        Map<String, Object> m = client.getBulk(keys);
+        for (String s : keys) {
+          byte b[] = (byte[]) m.get(s);
+          assert Arrays.hashCode(b) == hashcode
+                  : "Expected " + hashcode + " was "
+                  + Arrays.hashCode(b);
         }
-        return hashcode;
       }
+      return hashcode;
     });
     assertEquals(cnt, 25);
   }

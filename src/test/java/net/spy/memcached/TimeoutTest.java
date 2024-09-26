@@ -45,56 +45,32 @@ public class TimeoutTest {
 
   @Test
   public void testCasTimeout() {
-    tryTimeout("cas", new Runnable() {
-      public void run() {
-        client.cas("k", 1, "blah");
-      }
-    });
+    tryTimeout("cas", () -> client.cas("k", 1, "blah"));
   }
 
   @Test
   public void testGetsTimeout() {
-    tryTimeout("gets", new Runnable() {
-      public void run() {
-        client.gets("k");
-      }
-    });
+    tryTimeout("gets", () -> client.gets("k"));
   }
 
   @Test
   public void testGetTimeout() {
-    tryTimeout("get", new Runnable() {
-      public void run() {
-        client.get("k");
-      }
-    });
+    tryTimeout("get", () -> client.get("k"));
   }
 
   @Test
   public void testGetBulkTimeout() {
-    tryTimeout("getbulk", new Runnable() {
-      public void run() {
-        client.getBulk(Arrays.asList("k", "k2"));
-      }
-    });
+    tryTimeout("getbulk", () -> client.getBulk(Arrays.asList("k", "k2")));
   }
 
   @Test
   public void testIncrTimeout() {
-    tryTimeout("incr", new Runnable() {
-      public void run() {
-        client.incr("k", 1);
-      }
-    });
+    tryTimeout("incr", () -> client.incr("k", 1));
   }
 
   @Test
   public void testIncrWithDefTimeout() {
-    tryTimeout("incrWithDef", new Runnable() {
-      public void run() {
-        client.incr("k", 1, 5);
-      }
-    });
+    tryTimeout("incrWithDef", () -> client.incr("k", 1, 5));
   }
 
 }
