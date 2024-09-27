@@ -27,10 +27,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Disabled
-public class ArcusClientPoolShutdownTest {
+class ArcusClientPoolShutdownTest {
 
   @Test
-  public void testOpenAndWait() {
+  void testOpenAndWait() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;
     }

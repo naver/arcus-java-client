@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolSetGetTest {
+class ProtocolSetGetTest {
 
   private static final int count = 10;
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     assertEquals("10 drop",
             (new SetGet(count, true, true)).stringify());
     assertEquals("10 delete",

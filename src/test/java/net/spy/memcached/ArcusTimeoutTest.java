@@ -42,7 +42,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ArcusTimeoutTest {
+class ArcusTimeoutTest {
   private ArcusClient mc = null;
 
   private final String KEY = this.getClass().getSimpleName();
@@ -75,7 +75,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testCollectionFutureTimeout() {
+  void testCollectionFutureTimeout() {
     CollectionFuture<Boolean> future;
 
     future = mc.asyncBopInsert(KEY, 0, null, "hello", new CollectionAttributes());
@@ -83,7 +83,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBulkSetTimeout() {
+  void testBulkSetTimeout() {
     int keySize = 100000;
 
     String[] keys = new String[keySize];
@@ -98,7 +98,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBulkSetTimeoutUsingSingleThread() {
+  void testBulkSetTimeoutUsingSingleThread() {
     int keySize = 100000;
 
     String[] keys = new String[keySize];
@@ -113,7 +113,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBulkDeleteTimeout() {
+  void testBulkDeleteTimeout() {
     int keySize = 100000;
 
     List<String> keys = new ArrayList<>(keySize);
@@ -126,7 +126,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBulkDeleteTimeoutUsingSingleThread() {
+  void testBulkDeleteTimeoutUsingSingleThread() {
     int keySize = 100000;
 
     List<String> keys = new ArrayList<>(keySize);
@@ -139,7 +139,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testSopPipedInsertBulkTimeout() {
+  void testSopPipedInsertBulkTimeout() {
     String key = "testTimeout";
     int valueCount = mc.getMaxPipedItemCount();
     Object[] valueList = new Object[valueCount];
@@ -153,7 +153,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testSopInsertBulkTimeout() {
+  void testSopInsertBulkTimeout() {
     String value = "MyValue";
     int keySize = 100000;
     String[] keys = new String[keySize];
@@ -167,7 +167,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testLopPipedInsertBulkTimeout() {
+  void testLopPipedInsertBulkTimeout() {
     int valueCount = 500;
     Object[] valueList = new Object[valueCount];
     Arrays.fill(valueList, "MyValue");
@@ -179,7 +179,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testLopInsertBulkTimeout() {
+  void testLopInsertBulkTimeout() {
     String value = "MyValue";
     int keySize = 250000;
 
@@ -194,7 +194,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBopPipedInsertBulkTimeout() {
+  void testBopPipedInsertBulkTimeout() {
     String key = "MyBopKey";
     String value = "MyValue";
 
@@ -210,7 +210,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testBopInsertBulkTimeout() {
+  void testBopInsertBulkTimeout() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 
@@ -227,7 +227,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testOldSMGetTimeout() {
+  void testOldSMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -239,7 +239,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testSMGetTimeout() {
+  void testSMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -253,7 +253,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testByteArrayBKeyOldSMGetTimeout() {
+  void testByteArrayBKeyOldSMGetTimeout() {
     ArrayList<String> keyList;
     keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
@@ -269,7 +269,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testByteArrayBKeySMGetTimeout() {
+  void testByteArrayBKeySMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
       keyList.add(KEY + i);
@@ -286,13 +286,13 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testFlushByPrefixTimeout() {
+  void testFlushByPrefixTimeout() {
     OperationFuture<Boolean> flushFuture = mc.flush("prefix");
     assertThrows(TimeoutException.class, () -> flushFuture.get(1L, TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testMopInsertBulkMultipleTimeout() {
+  void testMopInsertBulkMultipleTimeout() {
     String key = "MyMopKey";
     String value = "MyValue";
 
@@ -309,7 +309,7 @@ public class ArcusTimeoutTest {
   }
 
   @Test
-  public void testMopInsertBulkTimeout() {
+  void testMopInsertBulkTimeout() {
     String mkey = "MyMopKey";
     String value = "MyValue";
     int keySize = 250000;

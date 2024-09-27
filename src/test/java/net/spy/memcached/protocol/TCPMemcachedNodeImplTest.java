@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test the TCPMemcachedNodeImpl
  */
-public class TCPMemcachedNodeImplTest {
+class TCPMemcachedNodeImplTest {
 
   @SuppressWarnings("unchecked")
   private Queue<Operation> getQueue(String queueFieldName, TCPMemcachedNodeImpl node)
@@ -58,7 +58,7 @@ public class TCPMemcachedNodeImplTest {
   }
 
   @Test
-  public void testMoveOperations() throws Exception {
+  void testMoveOperations() throws Exception {
     // given
     final int fromReadOpCount = 5,
               fromWriteOpCount = 5,

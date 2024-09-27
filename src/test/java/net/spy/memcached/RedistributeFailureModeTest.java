@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RedistributeFailureModeTest extends ClientBaseCase {
+class RedistributeFailureModeTest extends ClientBaseCase {
 
   private String serverList;
 
@@ -54,7 +54,7 @@ public class RedistributeFailureModeTest extends ClientBaseCase {
 
   // Just to make sure the sequence is being handled correctly
   @Test
-  public void testMixedSetsAndUpdates() throws Exception {
+  void testMixedSetsAndUpdates() throws Exception {
     int keySize = 100;
     List<String> keys = new ArrayList<>(keySize);
     List<Future<Boolean>> setFutures = new ArrayList<>(keySize);

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopGetSortTest extends BaseIntegrationTest {
+class BopGetSortTest extends BaseIntegrationTest {
 
   private String key = "BopGetSortTest";
 
@@ -46,7 +46,7 @@ public class BopGetSortTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_Asc() throws Exception {
+  void testBopGet_Asc() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
 
@@ -82,7 +82,7 @@ public class BopGetSortTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_Desc() throws Exception {
+  void testBopGet_Desc() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
 

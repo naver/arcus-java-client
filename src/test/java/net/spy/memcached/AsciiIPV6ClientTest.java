@@ -3,7 +3,7 @@ package net.spy.memcached;
 /**
  * Test the test protocol over IPv6.
  */
-public class AsciiIPV6ClientTest extends AsciiClientTest {
+class AsciiIPV6ClientTest extends AsciiClientTest {
 
   @Override
   protected void initClient(ConnectionFactory cf) throws Exception {

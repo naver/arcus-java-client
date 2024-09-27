@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SingleElementInfiniteIteratorTest {
+class SingleElementInfiniteIteratorTest {
   private static final String CONSTANT = "foo";
   private SingleElementInfiniteIterator<String> iterator;
 
@@ -17,7 +17,7 @@ public class SingleElementInfiniteIteratorTest {
   }
 
   @Test
-  public void testHasNextAndNext() {
+  void testHasNextAndNext() {
     for (int i = 0; i < 100; ++i) {
       assertTrue(iterator.hasNext());
       assertSame(CONSTANT, iterator.next());
@@ -25,7 +25,7 @@ public class SingleElementInfiniteIteratorTest {
   }
 
   @Test
-  public void testRemove() {
+  void testRemove() {
     try {
       iterator.remove();
       fail("Expected UnsupportedOperationException on a remove.");

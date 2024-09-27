@@ -33,10 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LopInsertBulkTest extends BaseIntegrationTest {
+class LopInsertBulkTest extends BaseIntegrationTest {
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String value = "MyValue";
     int keySize = 500;
 
@@ -94,7 +94,7 @@ public class LopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCountError() {
+  void testCountError() {
     String value = "MyValue";
 
     int keySize = 1200;

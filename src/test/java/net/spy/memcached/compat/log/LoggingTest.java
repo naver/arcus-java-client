@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Make sure logging is enabled.
  */
-public class LoggingTest {
+class LoggingTest {
 
   private Logger logger = null;
 
@@ -33,7 +33,7 @@ public class LoggingTest {
    * Make sure logging is enabled.
    */
   @Test
-  public void testDebugLogging() {
+  void testDebugLogging() {
 //  assertTrue("Debug logging is not enabled", logger.isDebugEnabled());
     logger.debug("debug message");
   }
@@ -42,7 +42,7 @@ public class LoggingTest {
    * Make sure info is enabled, and test it.
    */
   @Test
-  public void testInfoLogging() {
+  void testInfoLogging() {
     assertTrue(logger.isInfoEnabled());
     logger.info("info message");
   }
@@ -51,7 +51,7 @@ public class LoggingTest {
    * Test other log stuff.
    */
   @Test
-  public void testOtherLogging() {
+  void testOtherLogging() {
     logger.warn("warn message");
     logger.warn("test %s", "message");
     logger.error("error message");
@@ -66,7 +66,7 @@ public class LoggingTest {
    * Make sure we're using log4j.
    */
   @Test
-  public void testLog4j() {
+  void testLog4j() {
 //  Logger l=LoggerFactory.getLogger(getClass());
 //  assertEquals("net.spy.compat.log.Log4JLogger", l.getClass().getName());
   }
@@ -75,7 +75,7 @@ public class LoggingTest {
    * Test the sun logger.
    */
   @Test
-  public void testSunLogger() {
+  void testSunLogger() {
     Logger l = new SunLogger(getClass().getName());
     assertFalse(l.isDebugEnabled());
     l.debug("debug message");
@@ -94,7 +94,7 @@ public class LoggingTest {
    * Test the default logger.
    */
   @Test
-  public void testMyLogger() {
+  void testMyLogger() {
     Logger l = new DefaultLogger(getClass().getName());
     assertFalse(l.isDebugEnabled());
     l.debug("debug message");
@@ -120,7 +120,7 @@ public class LoggingTest {
    * Test stringing levels.
    */
   @Test
-  public void testLevelStrings() {
+  void testLevelStrings() {
     assertEquals("{LogLevel:  DEBUG}", String.valueOf(Level.DEBUG));
     assertEquals("{LogLevel:  INFO}", String.valueOf(Level.INFO));
     assertEquals("{LogLevel:  WARN}", String.valueOf(Level.WARN));
@@ -137,7 +137,7 @@ public class LoggingTest {
    * Test picking up an exception argument.
    */
   @Test
-  public void testExceptionArg() throws Exception {
+  void testExceptionArg() throws Exception {
     Object[] args = new Object[]{"a", 42, new Exception("test")};
     Throwable t = ((AbstractLogger) logger).getThrowable(args);
     assertNotNull(t);
@@ -148,7 +148,7 @@ public class LoggingTest {
    * Test when the last argument is not an exception.
    */
   @Test
-  public void testNoExceptionArg() throws Exception {
+  void testNoExceptionArg() throws Exception {
     Object[] args = new Object[]{"a", 42, new Exception("test"), "x"};
     Throwable t = ((AbstractLogger) logger).getThrowable(args);
     assertNull(t);

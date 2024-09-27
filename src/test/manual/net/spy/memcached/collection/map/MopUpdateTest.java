@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopUpdateTest extends BaseIntegrationTest {
+class MopUpdateTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
 
@@ -57,7 +57,7 @@ public class MopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpdateNotExistsKey() {
+  void testUpdateNotExistsKey() {
     try {
       // update value
       assertFalse(mc.asyncMopUpdate(KEY, mkey, VALUE).get());
@@ -68,7 +68,7 @@ public class MopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsKey() {
+  void testExistsKey() {
     try {
       // insert one
       assertTrue(mc.asyncMopInsert(KEY, mkey, VALUE,

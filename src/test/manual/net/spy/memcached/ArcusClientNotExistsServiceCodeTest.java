@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @Disabled
-public class ArcusClientNotExistsServiceCodeTest {
+class ArcusClientNotExistsServiceCodeTest {
 
   @Test
-  public void testNotExistsServiceCode() {
+  void testNotExistsServiceCode() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;
     }

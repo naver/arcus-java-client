@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class OperationStatusTest extends BaseIntegrationTest {
+class OperationStatusTest extends BaseIntegrationTest {
   private static final int EXP = 100;
 
   @BeforeEach
@@ -19,7 +19,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStore_success() throws Exception {
+  void testStore_success() throws Exception {
     //given
     String value = "value1";
     String replaceValue = "value2";
@@ -45,7 +45,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStore_fail() throws Exception {
+  void testStore_fail() throws Exception {
     //given
     String value = "value1";
     String replaceValue = "value2";
@@ -71,7 +71,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testIncrAndDecr_success() throws Exception {
+  void testIncrAndDecr_success() throws Exception {
     //given
     String key = "key";
     String value = "65";
@@ -88,7 +88,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testIncrAndDecr_fail() throws Exception {
+  void testIncrAndDecr_fail() throws Exception {
     //given
     int value = 1;
     int value2 = 2;
@@ -105,7 +105,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDelete_success() throws Exception {
+  void testDelete_success() throws Exception {
     //given
     String value = "example";
 
@@ -119,7 +119,7 @@ public class OperationStatusTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDelete_fail() throws Exception {
+  void testDelete_fail() throws Exception {
     //given
     String value = "example";
 

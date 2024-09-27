@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class AbstractNodeLocationCase {
+abstract class AbstractNodeLocationCase {
 
   protected MemcachedNode[] nodes;
   protected NodeLocator locator;
@@ -39,21 +39,21 @@ public abstract class AbstractNodeLocationCase {
   }
 
   @Test
-  public final void testCloningGetPrimary() {
+  final void testCloningGetPrimary() {
     setupNodes(5);
     assertTrue(locator.getReadonlyCopy().getPrimary("hi")
             instanceof MemcachedNodeROImpl);
   }
 
   @Test
-  public final void testCloningGetAll() {
+  final void testCloningGetAll() {
     setupNodes(5);
     assertTrue(locator.getReadonlyCopy().getAll().iterator().next()
             instanceof MemcachedNodeROImpl);
   }
 
   @Test
-  public final void testCloningGetSequence() {
+  final void testCloningGetSequence() {
     setupNodes(5);
     assertTrue(locator.getReadonlyCopy().getSequence("hi").next()
             instanceof MemcachedNodeROImpl);

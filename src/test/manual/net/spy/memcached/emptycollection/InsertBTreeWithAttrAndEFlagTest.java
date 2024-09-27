@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
+class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10;
@@ -54,7 +54,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttributeAndWithoutFilter() {
+  void testInsertWithAttributeAndWithoutFilter() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -85,7 +85,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithDefaultAttributeAndWithoutFilter() {
+  void testInsertWithDefaultAttributeAndWithoutFilter() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -108,7 +108,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttributeAndFilter() {
+  void testInsertWithAttributeAndFilter() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -141,7 +141,7 @@ public class InsertBTreeWithAttrAndEFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttributeAndInvalidFilter() {
+  void testInsertWithAttributeAndInvalidFilter() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());

@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopUpsertTest extends BaseIntegrationTest {
+class BopUpsertTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final byte[] BKEY = new byte[]{(byte) 1};
@@ -59,7 +59,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertExistsValueOnly() throws Exception {
+  void testUpsertExistsValueOnly() throws Exception {
     // insert one
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
@@ -94,7 +94,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertNotExistsValueOnly() throws Exception {
+  void testUpsertNotExistsValueOnly() throws Exception {
     // upsert
     assertTrue(mc.asyncBopUpsert(KEY, BKEY, null, VALUE2,
             new CollectionAttributes()).get());
@@ -112,7 +112,7 @@ public class BopUpsertTest extends BaseIntegrationTest {
     }
   }
   @Test
-  public void testUpsertExistsEFlagOnly() throws Exception {
+  void testUpsertExistsEFlagOnly() throws Exception {
     // insert one
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());

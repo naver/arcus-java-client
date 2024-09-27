@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
+class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final byte[] BKEY = new byte[]{(byte) 1};
@@ -56,7 +56,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidKey() {
+  void testGetBKeyCountFromInvalidKey() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.GreaterThan, "1".getBytes());
@@ -75,7 +75,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidType() {
+  void testGetBKeyCountFromInvalidType() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -100,7 +100,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty() {
+  void testGetBKeyCountFromNotEmpty() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -136,7 +136,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty2() {
+  void testGetBKeyCountFromNotEmpty2() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -171,7 +171,7 @@ public class BopCountWithElementFlagFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty3() {
+  void testGetBKeyCountFromNotEmpty3() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());

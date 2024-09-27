@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolMapDeleteTest {
+class ProtocolMapDeleteTest {
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     List<String> mkeyList = new ArrayList<>();
     mkeyList.add("mkey");
 

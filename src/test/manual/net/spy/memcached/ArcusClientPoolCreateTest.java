@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public class ArcusClientPoolCreateTest {
+class ArcusClientPoolCreateTest {
 
   private static final int POOL_SIZE = 3;
   private static final int CACHE_NODE_SIZE = 3;
@@ -27,7 +27,7 @@ public class ArcusClientPoolCreateTest {
   }
 
   @Test
-  public void testCreateClientPool() throws NoSuchFieldException, IllegalAccessException {
+  void testCreateClientPool() throws NoSuchFieldException, IllegalAccessException {
     //Create first ArcusClientPool instance.
     ArcusClientPool clientPool = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
             BaseIntegrationTest.SERVICE_CODE, POOL_SIZE);

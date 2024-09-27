@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopSortMergeOldTest extends BaseIntegrationTest {
+class BopSortMergeOldTest extends BaseIntegrationTest {
 
   private final List<String> keyList3 = new ArrayList<>();
   private final List<String> keyList2 = new ArrayList<>();
@@ -65,7 +65,7 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeOldDesc1() throws Exception {
+  void testBopSortMergeOldDesc1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -215,7 +215,7 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeOldDesc2() throws Exception {
+  void testBopSortMergeOldDesc2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -383,7 +383,7 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeOldDesc3() throws Exception {
+  void testBopSortMergeOldDesc3() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -455,7 +455,7 @@ public class BopSortMergeOldTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeOldDesc4() throws Exception {
+  void testBopSortMergeOldDesc4() throws Exception {
 
     // insert test data
     // key list (maxcount = 10)

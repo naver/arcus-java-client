@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CollectionFutureTest extends BaseIntegrationTest {
+class CollectionFutureTest extends BaseIntegrationTest {
 
   private String key = "CollectionFutureTest";
 
@@ -43,7 +43,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testAfterSuccess() throws Exception {
+  void testAfterSuccess() throws Exception {
     CollectionFuture<Boolean> future;
     OperationStatus status;
 
@@ -64,7 +64,7 @@ public class CollectionFutureTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testAfterFailure() throws Exception {
+  void testAfterFailure() throws Exception {
     CollectionFuture<Map<Long, Element<Object>>> future;
     OperationStatus status;
 

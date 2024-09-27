@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  * @author Matt Ingenthron <ingenthr@cep.net>
  */
-public class SASLConnectReconnect {
+class SASLConnectReconnect {
 
   private MemcachedClient mc = null;
 

@@ -33,10 +33,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
+class BopInsertBulkMultipleBoundaryTest extends BaseIntegrationTest {
 
   @Test
-  public void testBopGet_Overflow() throws Exception {
+  void testBopGet_Overflow() throws Exception {
     String key = "MyBopOverflowtestKey23";
     String value = "MyValue";
 

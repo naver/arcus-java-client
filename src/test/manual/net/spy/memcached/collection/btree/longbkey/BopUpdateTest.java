@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopUpdateTest extends BaseIntegrationTest {
+class BopUpdateTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final byte[] BKEY = new byte[]{(byte) 1};
@@ -53,7 +53,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotExistsUpdateWithValue() {
+  void testNotExistsUpdateWithValue() {
     try {
       assertFalse(mc.asyncBopUpdate(KEY, BKEY,
               new ElementFlagUpdate(new byte[]{0}), VALUE).get());
@@ -66,7 +66,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotExistsUpdateWithoutValue() {
+  void testNotExistsUpdateWithoutValue() {
     try {
       assertFalse(mc.asyncBopUpdate(KEY, BKEY,
               new ElementFlagUpdate(new byte[]{0}), null).get());
@@ -79,7 +79,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsUpdateWithValue() {
+  void testExistsUpdateWithValue() {
     try {
       assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
               new CollectionAttributes()).get());
@@ -95,7 +95,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsUpdateWithoutValue() {
+  void testExistsUpdateWithoutValue() {
     try {
       assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
               new CollectionAttributes()).get());
@@ -119,7 +119,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   //
 
   @Test
-  public void testNotExistsUpdateUsingBitOpWithValue() {
+  void testNotExistsUpdateUsingBitOpWithValue() {
     try {
       assertFalse(mc.asyncBopUpdate(
               KEY,
@@ -132,7 +132,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotExistsUpdateUsingBitOpWithoutValue() {
+  void testNotExistsUpdateUsingBitOpWithoutValue() {
     try {
       assertFalse(mc.asyncBopUpdate(
               KEY,
@@ -145,7 +145,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsUpdateUsingBitOpWithValue() {
+  void testExistsUpdateUsingBitOpWithValue() {
     try {
       assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
               VALUE, new CollectionAttributes()).get());
@@ -161,7 +161,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsUpdateUsingBitOpWithoutValue() {
+  void testExistsUpdateUsingBitOpWithoutValue() {
     try {
       assertTrue(mc.asyncBopInsert(KEY, BKEY, EFLAG.getBytes(),
               VALUE, new CollectionAttributes()).get());

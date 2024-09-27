@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SMGetErrorTest extends BaseIntegrationTest {
+class SMGetErrorTest extends BaseIntegrationTest {
 
   private static final List<String> KEY_LIST = new ArrayList<>();
 
@@ -73,7 +73,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDuplicated() {
+  void testDuplicated() {
     // insert test data
     try {
       assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
@@ -120,7 +120,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBkeyMismatch() {
+  void testBkeyMismatch() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -173,7 +173,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testTrimmed() {
+  void testTrimmed() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -262,7 +262,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOutOfRange() {
+  void testOutOfRange() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -351,7 +351,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDuplicated2() {
+  void testDuplicated2() {
     // insert test data
     try {
       assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,
@@ -396,7 +396,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnreadable() {
+  void testUnreadable() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -445,7 +445,7 @@ public class SMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInvalidArgumentException() {
+  void testInvalidArgumentException() {
     ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(KEY_LIST.get(0));
     testKeyList.add(KEY_LIST.get(1));

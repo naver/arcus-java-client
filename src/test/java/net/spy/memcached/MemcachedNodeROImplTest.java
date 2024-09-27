@@ -25,7 +25,7 @@ import static org.jmock.AbstractExpectations.returnValue;
 /**
  * Test readonliness of the MemcachedNodeROImpl
  */
-public class MemcachedNodeROImplTest {
+class MemcachedNodeROImplTest {
 
   private Mockery context;
 
@@ -40,7 +40,7 @@ public class MemcachedNodeROImplTest {
   }
 
   @Test
-  public void testReadOnliness() throws Exception {
+  void testReadOnliness() throws Exception {
     SocketAddress sa = new InetSocketAddress(11211);
     MemcachedNode m = context.mock(MemcachedNode.class, "node");
     MemcachedNodeROImpl node =

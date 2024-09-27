@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolMapGetTest {
+class ProtocolMapGetTest {
 
   private final String MKEY = "mkey";
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     // default setting : dropIfEmpty = true
 
     List<String> mkeyList = new ArrayList<>();

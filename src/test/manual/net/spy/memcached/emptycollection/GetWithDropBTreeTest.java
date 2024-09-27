@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class GetWithDropBTreeTest extends BaseIntegrationTest {
+class GetWithDropBTreeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -50,7 +50,7 @@ public class GetWithDropBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetWithoutDeleteAndDrop() {
+  void testGetWithoutDeleteAndDrop() {
     try {
       // check attr
       assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
@@ -78,7 +78,7 @@ public class GetWithDropBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetWithDeleteAndWithoutDrop() {
+  void testGetWithDeleteAndWithoutDrop() {
     try {
       // check attr
       assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()
@@ -106,7 +106,7 @@ public class GetWithDropBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetWithDeleteAndWithDrop() {
+  void testGetWithDeleteAndWithDrop() {
     try {
       // check attr
       assertEquals(Long.valueOf(1), mc.asyncGetAttr(KEY).get()

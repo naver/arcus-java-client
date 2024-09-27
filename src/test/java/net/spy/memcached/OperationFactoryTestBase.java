@@ -77,7 +77,7 @@ public abstract class OperationFactoryTestBase {
   protected abstract OperationFactory getOperationFactory();
 
   @Test
-  public void testDeleteOperationCloning() {
+  void testDeleteOperationCloning() {
     DeleteOperation op = ofact.delete(TEST_KEY, genericCallback);
 
     DeleteOperation op2 = cloneOne(DeleteOperation.class, op);
@@ -86,7 +86,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testCASOperationCloning() {
+  void testCASOperationCloning() {
     CASOperation op = ofact.cas(StoreType.set,
             "someKey", 727582, 8174, 7175, testData, genericCallback);
 
@@ -134,7 +134,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testStoreOperationAddCloning() {
+  void testStoreOperationAddCloning() {
     int exp = 823862;
     int flags = 7735;
     StoreOperation op = ofact.store(StoreType.add, TEST_KEY,
@@ -149,7 +149,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testStoreOperationSetCloning() {
+  void testStoreOperationSetCloning() {
     int exp = 823862;
     int flags = 7735;
     StoreOperation op = ofact.store(StoreType.set, TEST_KEY,
@@ -164,7 +164,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testConcatenationOperationAppendCloning() {
+  void testConcatenationOperationAppendCloning() {
     long casId = 82757248;
     ConcatenationOperation op = ofact.cat(ConcatenationType.append, casId,
             TEST_KEY, testData, genericCallback);
@@ -177,7 +177,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testConcatenationOperationPrependCloning() {
+  void testConcatenationOperationPrependCloning() {
     long casId = 82757248;
     ConcatenationOperation op = ofact.cat(ConcatenationType.prepend, casId,
             TEST_KEY, testData, genericCallback);
@@ -190,7 +190,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testSingleGetOperationCloning() {
+  void testSingleGetOperationCloning() {
     GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     GetOperation op = ofact.get(TEST_KEY, callback);
 
@@ -200,7 +200,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testSingleGetsOperationCloning() {
+  void testSingleGetsOperationCloning() {
     GetsOperation.Callback callback = context.mock(GetsOperation.Callback.class);
     GetsOperation op = ofact.gets(TEST_KEY, callback);
 
@@ -211,7 +211,7 @@ public abstract class OperationFactoryTestBase {
 
   // These are harder cases as they fan out.
   @Test
-  public void testMultipleGetOperationCloning() {
+  void testMultipleGetOperationCloning() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
     GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     GetOperation op = ofact.get(keys, callback);
@@ -231,7 +231,7 @@ public abstract class OperationFactoryTestBase {
   }
 
   @Test
-  public void testMultipleGetOperationFanout() {
+  void testMultipleGetOperationFanout() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
     GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
     OperationStatus st = new OperationStatus(true, "blah");

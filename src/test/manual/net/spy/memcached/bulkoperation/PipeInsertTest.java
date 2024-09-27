@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class PipeInsertTest extends BaseIntegrationTest {
+class PipeInsertTest extends BaseIntegrationTest {
 
   private static final String KEY = PipeInsertTest.class.getSimpleName();
 
@@ -58,7 +58,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeInsert() {
+  void testBopPipeInsert() {
     int elementCount = 5000;
 
     List<Element<Object>> elements = new ArrayList<>();
@@ -91,7 +91,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeInsert2() {
+  void testBopPipeInsert2() {
     int elementCount = 5000;
     Map<Long, Object> elements = new TreeMap<>();
     for (long i = 0; i < elementCount; i++) {
@@ -125,7 +125,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopPipeInsert() {
+  void testLopPipeInsert() {
     int elementCount = 5000;
 
     List<Object> elements = new ArrayList<>(elementCount);
@@ -160,7 +160,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopPipeInsertIndex() {
+  void testLopPipeInsertIndex() {
     int elementCount = 3;
     List<Object> middleElements = new ArrayList<>(elementCount);
     List<Object> headerElements = new ArrayList<>(elementCount);
@@ -208,7 +208,7 @@ public class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopPipeInsert() {
+  void testMopPipeInsert() {
     int elementCount = 5000;
 
     Map<String, Object> elements = new TreeMap<>();

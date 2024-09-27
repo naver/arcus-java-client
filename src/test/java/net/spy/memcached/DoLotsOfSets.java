@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Small test program that does a bunch of sets in a tight loop.
  */
-public final class DoLotsOfSets {
+final class DoLotsOfSets {
 
   private DoLotsOfSets() {
   }

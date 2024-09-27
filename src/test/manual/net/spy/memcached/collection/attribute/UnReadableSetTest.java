@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class UnReadableSetTest extends BaseIntegrationTest {
+class UnReadableSetTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE = "VALUE";
@@ -56,7 +56,7 @@ public class UnReadableSetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateUnreadableSetTest() {
+  void testCreateUnreadableSetTest() {
     try {
       // create unreadable empty
       CollectionAttributes attribute = new CollectionAttributes();
@@ -103,7 +103,7 @@ public class UnReadableSetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateReadableSetTest() {
+  void testCreateReadableSetTest() {
     try {
       // create readable empty
       CollectionAttributes attribute = new CollectionAttributes();

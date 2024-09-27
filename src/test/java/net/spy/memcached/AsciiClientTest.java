@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
 /**
  * This test assumes a client is running on localhost:11211.
  */
-public class AsciiClientTest extends ProtocolBaseCase {
+class AsciiClientTest extends ProtocolBaseCase {
 
   @Test
-  public void testBadOperation() throws Exception {
+  void testBadOperation() throws Exception {
     client.addOp("x", new ExtensibleOperationImpl(new OperationCallback() {
       public void complete() {
         System.err.println("Complete.");

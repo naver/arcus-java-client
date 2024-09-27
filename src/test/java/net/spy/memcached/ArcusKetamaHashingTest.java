@@ -13,22 +13,22 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ArcusKetamaHashingTest {
+class ArcusKetamaHashingTest {
 
   @Test
-  public void testSmallSet() {
+  void testSmallSet() {
     String[] stringNodes = generateAddresses(3);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
   @Test
-  public void testLargeSet() {
+  void testLargeSet() {
     String[] stringNodes = generateAddresses(100);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
   @Test
-  public void testHashCollision() {
+  void testHashCollision() {
     StringBuilder sb = new StringBuilder();
     int maxIdx = 103;
     for (int i = 0; i <= maxIdx; i++) {

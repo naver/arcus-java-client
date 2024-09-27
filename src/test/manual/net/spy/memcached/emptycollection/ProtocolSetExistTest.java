@@ -25,18 +25,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolSetExistTest {
+class ProtocolSetExistTest {
   private final Object value = "value";
   private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     SetExist<Object> exist = new SetExist<>(value, testTranscoder);
     assertEquals("5", exist.stringify());
   }
 
   @Test
-  public void testGetAdditionalArgs() {
+  void testGetAdditionalArgs() {
     SetExist<Object> exist = new SetExist<>(value, testTranscoder);
     assertArrayEquals(new byte[]{'v', 'a', 'l', 'u', 'e'}, exist.getAdditionalArgs());
   }

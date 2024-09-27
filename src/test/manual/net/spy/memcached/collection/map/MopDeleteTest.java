@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MopDeleteTest extends BaseIntegrationTest {
+class MopDeleteTest extends BaseIntegrationTest {
 
   private String key = "MopDeleteTest";
 
@@ -59,12 +59,12 @@ public class MopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopDelete_NoKey() throws Exception {
+  void testMopDelete_NoKey() throws Exception {
     assertFalse(mc.asyncMopDelete("no_key", false).get(1000, TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testMopDelete_NoMkey() throws Exception {
+  void testMopDelete_NoMkey() throws Exception {
     assertFalse(mc.asyncMopDelete(key, "11", false).get(1000, TimeUnit.MILLISECONDS));
   }
 
@@ -82,7 +82,7 @@ public class MopDeleteTest extends BaseIntegrationTest {
 //  }
 
   @Test
-  public void testMopDelete_DeleteByBestEffort() throws Exception {
+  void testMopDelete_DeleteByBestEffort() throws Exception {
     // Delete items(2..11) in the map
     for (int i = 2; i < 12; i++) {
       mc.asyncMopDelete(key, String.valueOf(i), false).get(1000,
@@ -101,7 +101,7 @@ public class MopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopDelete_DeletedDropped() throws Exception {
+  void testMopDelete_DeletedDropped() throws Exception {
     // Delete all items in the list
     assertTrue(mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS));
 

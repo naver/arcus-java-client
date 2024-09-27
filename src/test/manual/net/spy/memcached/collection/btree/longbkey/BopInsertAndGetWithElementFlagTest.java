@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
+class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final byte[] BKEY = new byte[]{(byte) 1};
@@ -60,7 +60,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSingleLongBkeyWithEFlag() throws Exception {
+  void testSingleLongBkeyWithEFlag() throws Exception {
 
     // insert one
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
@@ -92,7 +92,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMultipleLongBkeyWithEFlag() throws Exception {
+  void testMultipleLongBkeyWithEFlag() throws Exception {
 
     // insert 3 elements
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,

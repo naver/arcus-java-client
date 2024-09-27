@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CollectionMaxElementSize extends BaseIntegrationTest {
+class CollectionMaxElementSize extends BaseIntegrationTest {
 
   private String key = "CollectionMaxElementSize";
 
@@ -41,7 +41,7 @@ public class CollectionMaxElementSize extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLargeSize() throws Exception {
+  void testLargeSize() throws Exception {
     int largeSize = 16 * 1024 - 2; //16KB
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < largeSize; i++) {
@@ -58,7 +58,7 @@ public class CollectionMaxElementSize extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExceed() throws Exception {
+  void testExceed() throws Exception {
     CollectionFuture<Boolean> future;
     future = mc.asyncLopInsert(key, -1, "test", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));

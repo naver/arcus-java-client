@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LopBulkAPITest extends BaseIntegrationTest {
+class LopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "LopBulkAPITest33";
   private final List<Object> valueList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulk() throws Exception {
+  void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.asyncLopDelete(key, 0, 4000, true).get(1000,
               TimeUnit.MILLISECONDS);
@@ -89,7 +89,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkFailed() {
+  void testBulkFailed() {
     try {
       mc.asyncLopDelete(key, 0, 4000, true).get(1000,
               TimeUnit.MILLISECONDS);
@@ -115,7 +115,7 @@ public class LopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkEmptyList() {
+  void testBulkEmptyList() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
               .asyncLopPipedInsertBulk(key, 0, new ArrayList<>(0),

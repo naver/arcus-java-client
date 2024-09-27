@@ -32,12 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopInsertBulkTest extends BaseIntegrationTest {
+class MopInsertBulkTest extends BaseIntegrationTest {
 
   private final String MKEY = "mkey";
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String value = "MyValue";
     int keySize = 500;
 
@@ -95,7 +95,7 @@ public class MopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCountError() {
+  void testCountError() {
     String value = "MyValue";
 
     int keySize = 1200;

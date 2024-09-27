@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class VariousTypeTest extends BaseIntegrationTest {
+class VariousTypeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10;
@@ -60,7 +60,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testString() {
+  void testString() {
     try {
       String value = "VALUE";
 
@@ -85,7 +85,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLong() {
+  void testLong() {
     try {
       long value = 1234567890L;
 
@@ -110,7 +110,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInteger() {
+  void testInteger() {
     try {
       int value = 1234567890;
 
@@ -135,7 +135,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBoolean() {
+  void testBoolean() {
     try {
       boolean value = false;
 
@@ -160,7 +160,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDate() {
+  void testDate() {
     try {
       Date value = new Date();
 
@@ -185,7 +185,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByte() {
+  void testByte() {
     try {
       byte value = 0x00;
 
@@ -210,7 +210,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testFloat() {
+  void testFloat() {
     try {
       float value = 1234567890;
 
@@ -235,7 +235,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDouble() {
+  void testDouble() {
     try {
       double value = 1234567890;
 
@@ -260,7 +260,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArray() {
+  void testByteArray() {
     try {
       byte[] value = "value".getBytes();
 
@@ -286,7 +286,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOtherObjects() {
+  void testOtherObjects() {
     try {
       UserDefinedClass value = new UserDefinedClass();
 
@@ -311,7 +311,7 @@ public class VariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testList() {
+  void testList() {
     try {
       List<String> value = new ArrayList<>();
       value.add("Hello");

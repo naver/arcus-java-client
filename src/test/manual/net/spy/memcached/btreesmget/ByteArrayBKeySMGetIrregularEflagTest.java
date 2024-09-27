@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
+class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
 
   private final String key1 = "ByteArrayBKeySMGetIrregularEflagTest1"
           + (Math.abs(new Random().nextInt(99)) + 100);
@@ -42,7 +42,7 @@ public class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
   private final Object value = "valvalvalvalvalvalvalvalvalval";
 
   @Test
-  public void testGetAll_1() {
+  void testGetAll_1() {
     ArrayList<String> testKeyList = new ArrayList<>();
     testKeyList.add(key1);
     testKeyList.add(key2);

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
+class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   private String key = "MopInsertWhenKeyNotExist";
 
@@ -51,7 +51,7 @@ public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testMopInsert_nokey_01() throws Exception {
+  void testMopInsert_nokey_01() throws Exception {
     insertToFail(key, true, null);
   }
 
@@ -62,7 +62,7 @@ public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testMopInsert_nokey_02() throws Exception {
+  void testMopInsert_nokey_02() throws Exception {
     assertFalse(insertToSucceed(key, false, items9[0]));
   }
 
@@ -73,7 +73,7 @@ public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testMopInsert_nokey_04() throws Exception {
+  void testMopInsert_nokey_04() throws Exception {
     assertFalse(insertToSucceed(key, false, items9[0]));
   }
 
@@ -84,7 +84,7 @@ public class MopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testMopInsert_nokey_05() throws Exception {
+  void testMopInsert_nokey_05() throws Exception {
     assertTrue(insertToSucceed(key, true, items9[0]));
   }
 

@@ -10,12 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ElementTest {
+class ElementTest {
 
   private static final String VALUE = "testValue";
 
   @Test
-  public void createWithLongBkeyAndEFlag() {
+  void createWithLongBkeyAndEFlag() {
     //given
     long bkey = 1;
     byte[] eflag = {0x34};
@@ -33,7 +33,7 @@ public class ElementTest {
   }
 
   @Test
-  public void createWithByteArrayBkeyAndEFlag() {
+  void createWithByteArrayBkeyAndEFlag() {
     //given
     byte[] bkey = {0x3F};
     byte[] eflag = {0x34};
@@ -51,7 +51,7 @@ public class ElementTest {
   }
 
   @Test
-  public void createWithLongBkeyAndElementFlagUpdate() {
+  void createWithLongBkeyAndElementFlagUpdate() {
     //given
     long bkey = 1;
     byte[] eflag = {0x34};
@@ -69,7 +69,7 @@ public class ElementTest {
   }
 
   @Test
-  public void createWithByteArrayBkeyAndElementFlagUpdate() {
+  void createWithByteArrayBkeyAndElementFlagUpdate() {
     //given
     byte[] bkey = {0x3F};
     byte[] eflag = {0x34};

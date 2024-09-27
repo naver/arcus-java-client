@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-public class ArcusClientCreateTest {
+class ArcusClientCreateTest {
 
   private static final String clientName = "TEST";
   private static final String hostName = "localhost/127.0.0.1:11211";
@@ -38,7 +38,7 @@ public class ArcusClientCreateTest {
   }
 
   @Test
-  public void testCreateClientWithCustomName() throws IOException {
+  void testCreateClientWithCustomName() throws IOException {
     ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), clientName, addrs);
 
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
@@ -49,7 +49,7 @@ public class ArcusClientCreateTest {
   }
 
   @Test
-  public void testCreateClientWithDefaultName() throws IOException {
+  void testCreateClientWithDefaultName() throws IOException {
     ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), addrs);
 
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
@@ -62,7 +62,7 @@ public class ArcusClientCreateTest {
   }
 
   @Test
-  public void testCreateClientNullName() throws IOException {
+  void testCreateClientNullName() throws IOException {
     assertThrows(NullPointerException.class, () -> {
       new ArcusClient(new DefaultConnectionFactory(), null, addrs);
     });

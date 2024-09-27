@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MaxBkeyRangeTest extends BaseIntegrationTest {
+class MaxBkeyRangeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 1;
@@ -59,7 +59,7 @@ public class MaxBkeyRangeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMaxBkeyRangeTest() {
+  void testMaxBkeyRangeTest() {
     try {
       // create with default.
       CollectionAttributes attribute = new CollectionAttributes();
@@ -125,7 +125,7 @@ public class MaxBkeyRangeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMaxBkeyRangeByBytesTest() {
+  void testMaxBkeyRangeByBytesTest() {
     try {
       // create with default.
       CollectionAttributes attribute = new CollectionAttributes();

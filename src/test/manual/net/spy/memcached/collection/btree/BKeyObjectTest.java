@@ -16,7 +16,7 @@ public class BKeyObjectTest {
   public final static byte[] byteArrayBkey = {0x35};
 
   @Test
-  public void createLongBkey() {
+  void createLongBkey() {
     final BKeyObject bKeyObject = new BKeyObject(longBkey);
 
     assertEquals(longBkey, (long) bKeyObject.getLongBKey());
@@ -29,7 +29,7 @@ public class BKeyObjectTest {
   }
 
   @Test
-  public void createByteArrayBkey() {
+  void createByteArrayBkey() {
     final BKeyObject bKeyObject = new BKeyObject(byteArrayBkey);
 
     assertEquals(byteArrayBkey, bKeyObject.getByteArrayBKeyRaw());
@@ -41,7 +41,7 @@ public class BKeyObjectTest {
   }
 
   @Test
-  public void compareLongBkeyTest() {
+  void compareLongBkeyTest() {
     BKeyObject bKeyObject = new BKeyObject(longBkey);
     BKeyObject another = new BKeyObject(longBkey);
 
@@ -49,7 +49,7 @@ public class BKeyObjectTest {
   }
 
   @Test
-  public void compareByteArrayBkeyTest() {
+  void compareByteArrayBkeyTest() {
     BKeyObject bKeyObject = new BKeyObject(byteArrayBkey);
     BKeyObject another = new BKeyObject(byteArrayBkey);
 
@@ -57,7 +57,7 @@ public class BKeyObjectTest {
   }
 
   @Test
-  public void compareDifferentTypeTest() {
+  void compareDifferentTypeTest() {
     final BKeyObject bKeyObject = new BKeyObject(longBkey);
     final BKeyObject another = new BKeyObject(byteArrayBkey);
 

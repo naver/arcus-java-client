@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * Test the long transcoder.
  */
-public class LongTranscoderTest {
+class LongTranscoderTest {
 
   private LongTranscoder tc = null;
 
@@ -21,12 +21,12 @@ public class LongTranscoderTest {
   }
 
   @Test
-  public void testLong() throws Exception {
+  void testLong() throws Exception {
     assertEquals(923, tc.decode(tc.encode(923L)).longValue());
   }
 
   @Test
-  public void testBadFlags() throws Exception {
+  void testBadFlags() throws Exception {
     CachedData cd = tc.encode(9284L);
     assertNull(tc.decode(new CachedData(cd.getFlags() + 1, cd.getData(),
             CachedData.MAX_SIZE)));

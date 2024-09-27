@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopGetTest extends BaseIntegrationTest {
+class BopGetTest extends BaseIntegrationTest {
 
   private static final String KEY = BopGetTest.class.getSimpleName();
 
@@ -53,7 +53,7 @@ public class BopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet() throws Exception {
+  void testBopGet() throws Exception {
 
     byte[] bkey = new byte[]{(byte) 1};
 

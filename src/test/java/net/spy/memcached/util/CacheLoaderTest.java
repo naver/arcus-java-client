@@ -26,7 +26,7 @@ import static org.jmock.AbstractExpectations.returnValue;
 /**
  * Test the cache loader.
  */
-public class CacheLoaderTest {
+class CacheLoaderTest {
 
   private ExecutorService es = null;
   private Mockery context;
@@ -45,7 +45,7 @@ public class CacheLoaderTest {
   }
 
   @Test
-  public void testSimpleLoading() throws Exception {
+  void testSimpleLoading() throws Exception {
     MemcachedClientIF m = context.mock(MemcachedClientIF.class);
 
     LoadCounter sl = new LoadCounter();

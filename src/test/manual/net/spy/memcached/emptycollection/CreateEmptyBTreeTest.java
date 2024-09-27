@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CreateEmptyBTreeTest extends BaseIntegrationTest {
+class CreateEmptyBTreeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
 
@@ -50,7 +50,7 @@ public class CreateEmptyBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateEmptyWithDefaultAttribute() {
+  void testCreateEmptyWithDefaultAttribute() {
     try {
       // create empty
       CollectionAttributes attribute = new CollectionAttributes();
@@ -71,7 +71,7 @@ public class CreateEmptyBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateEmptyWithSpecifiedAttribute() {
+  void testCreateEmptyWithSpecifiedAttribute() {
     try {
       // create empty
       CollectionAttributes attribute = new CollectionAttributes();

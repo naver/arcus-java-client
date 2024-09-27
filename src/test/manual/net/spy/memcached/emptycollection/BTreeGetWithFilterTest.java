@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BTreeGetWithFilterTest extends BaseIntegrationTest {
+class BTreeGetWithFilterTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -60,7 +60,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetWithDeleteAndWithoutDropWithFilter() {
+  void testGetWithDeleteAndWithoutDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "flag".getBytes());
@@ -91,7 +91,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetWithDeleteAndWithDropWithFilter() {
+  void testGetWithDeleteAndWithDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "flag".getBytes());
@@ -121,7 +121,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testRangedGetWithtDeleteAndWithoutDropWithFilter() {
+  void testRangedGetWithtDeleteAndWithoutDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "flag".getBytes());
@@ -151,7 +151,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testRangedGetWithtDeleteAndWithDropWithFilter() {
+  void testRangedGetWithtDeleteAndWithDropWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "flag".getBytes());
@@ -180,7 +180,7 @@ public class BTreeGetWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testRangedGetWithtDeleteAndWithDeleteWithFilter() {
+  void testRangedGetWithtDeleteAndWithDeleteWithFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "flag".getBytes());

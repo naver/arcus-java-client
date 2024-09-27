@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class ArcusClientReconnectTest {
+class ArcusClientReconnectTest {
 
   @Test
-  public void testOpenAndWait() {
+  void testOpenAndWait() {
     if (!BaseIntegrationTest.USE_ZK) {
       return;
     }

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test the ArrayModNodeLocator.
  */
-public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
+class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
 
   @Override
   protected void setupNodes(int n) {
@@ -22,7 +22,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testPrimary() throws Exception {
+  void testPrimary() throws Exception {
     setupNodes(4);
     assertSame(nodes[3], locator.getPrimary("dustin"));
     assertSame(nodes[0], locator.getPrimary("x"));
@@ -30,7 +30,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testPrimaryClone() throws Exception {
+  void testPrimaryClone() throws Exception {
     setupNodes(4);
     assertEquals(nodes[3].toString(),
             locator.getReadonlyCopy().getPrimary("dustin").toString());
@@ -41,7 +41,7 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testAll() throws Exception {
+  void testAll() throws Exception {
     setupNodes(4);
     Collection<MemcachedNode> all = locator.getAll();
     assertEquals(4, all.size());
@@ -52,32 +52,32 @@ public class ArrayModNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testAllClone() throws Exception {
+  void testAllClone() throws Exception {
     setupNodes(4);
     Collection<MemcachedNode> all = locator.getReadonlyCopy().getAll();
     assertEquals(4, all.size());
   }
 
   @Test
-  public void testSeq1() {
+  void testSeq1() {
     setupNodes(4);
     assertSequence("dustin", 0, 1, 2);
   }
 
   @Test
-  public void testSeq2() {
+  void testSeq2() {
     setupNodes(4);
     assertSequence("noelani", 1, 2, 3);
   }
 
   @Test
-  public void testSeqOnlyOneServer() {
+  void testSeqOnlyOneServer() {
     setupNodes(1);
     assertSequence("noelani");
   }
 
   @Test
-  public void testSeqWithTwoNodes() {
+  void testSeqWithTwoNodes() {
     setupNodes(2);
     assertSequence("dustin", 0);
   }

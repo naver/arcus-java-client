@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SocketTest {
+class SocketTest {
   private ArcusClient client;
   private final String ZK_STRING = "127.0.0.1:2181";
   private final String SERVICE_CODE = "test";
@@ -21,7 +21,7 @@ public class SocketTest {
   }
 
   @Test
-  public void testSocketKeepAliveTest() throws SocketException {
+  void testSocketKeepAliveTest() throws SocketException {
     Collection<MemcachedNode> allNodes =
             client.getAllNodes();
     for (MemcachedNode node : allNodes) {

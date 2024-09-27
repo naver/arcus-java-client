@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
+class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final int INDEX = 0;
@@ -55,7 +55,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttribute() {
+  void testInsertWithAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -98,7 +98,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithDefaultAttribute() {
+  void testInsertWithDefaultAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -134,7 +134,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithoutAttributeCreate() {
+  void testInsertWithoutAttributeCreate() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -168,7 +168,7 @@ public class PipedBulkInsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithoutAttributeDoNotCreate() {
+  void testInsertWithoutAttributeDoNotCreate() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());

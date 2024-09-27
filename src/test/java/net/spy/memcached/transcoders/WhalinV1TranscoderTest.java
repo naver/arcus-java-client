@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class WhalinV1TranscoderTest extends BaseTranscoderCase {
+class WhalinV1TranscoderTest extends BaseTranscoderCase {
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -17,7 +17,7 @@ public class WhalinV1TranscoderTest extends BaseTranscoderCase {
   }
 
   @Override
-  public void testByteArray() throws Exception {
+  void testByteArray() throws Exception {
     byte[] a = {'a', 'b', 'c'};
 
     CachedData cd = getTranscoder().encode(a);

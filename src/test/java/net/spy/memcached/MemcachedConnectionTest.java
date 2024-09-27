@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test stuff that can be tested within a MemcachedConnection separately.
  */
-public class MemcachedConnectionTest {
+class MemcachedConnectionTest {
 
   private MemcachedConnection conn;
   private ArcusKetamaNodeLocator locator;
@@ -61,7 +61,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testDebugBuffer() {
+  void testDebugBuffer() {
     String input = "this is a test _";
     ByteBuffer bb = ByteBuffer.wrap(input.getBytes());
     String s = MemcachedConnection.dbgBuffer(bb, input.length());
@@ -69,7 +69,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testNodesChangeQueue() throws Exception {
+  void testNodesChangeQueue() throws Exception {
     // when
     conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
 
@@ -99,7 +99,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testNodesChangeQueue_empty() throws Exception {
+  void testNodesChangeQueue_empty() throws Exception {
     // when
     // on servers in the queue
 
@@ -111,7 +111,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testNodesChangeQueue_invalid_addr() {
+  void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
       conn.setCacheNodesChange(AddrUtil.getAddresses(""));
@@ -128,7 +128,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testNodesChangeQueue_redundant() throws Exception {
+  void testNodesChangeQueue_redundant() throws Exception {
     // when
     conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211,0.0.0.0:11211"));
 
@@ -140,7 +140,7 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testNodesChangeQueue_twice() throws Exception {
+  void testNodesChangeQueue_twice() throws Exception {
     // when
     conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
     conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
@@ -153,12 +153,12 @@ public class MemcachedConnectionTest {
   }
 
   @Test
-  public void testAddOperations() throws Exception {
+  void testAddOperations() throws Exception {
   }
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testReconnectQueue_delayReconnect() throws Exception {
+  void testReconnectQueue_delayReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
     Field reconMapField =
@@ -233,7 +233,7 @@ public class MemcachedConnectionTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testReconnectQueue_immediateReconnect() throws Exception {
+  void testReconnectQueue_immediateReconnect() throws Exception {
     MemcachedConnection.ReconnectQueue reconnectQueue = new MemcachedConnection.ReconnectQueue(1);
 
     Field reconMapField =

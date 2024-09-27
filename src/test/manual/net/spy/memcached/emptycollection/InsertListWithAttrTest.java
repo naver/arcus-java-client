@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class InsertListWithAttrTest extends BaseIntegrationTest {
+class InsertListWithAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final int INDEX = 0;
@@ -52,7 +52,7 @@ public class InsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttribute() {
+  void testInsertWithAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -83,7 +83,7 @@ public class InsertListWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithDefaultAttribute() {
+  void testInsertWithDefaultAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());

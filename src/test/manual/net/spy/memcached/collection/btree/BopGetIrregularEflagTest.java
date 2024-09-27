@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopGetIrregularEflagTest extends BaseIntegrationTest {
+class BopGetIrregularEflagTest extends BaseIntegrationTest {
 
   private final String key = "BopGetIrregularEflagTest";
 
@@ -39,7 +39,7 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
   private final Object value = "valvalvalvalvalvalvalvalvalval";
 
   @Test
-  public void testGetAll_1() {
+  void testGetAll_1() {
     try {
       mc.delete(key).get();
       mc.asyncBopInsert(key, 0, eFlag, value + "0",
@@ -66,7 +66,7 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAll_2() {
+  void testGetAll_2() {
     try {
       mc.delete(key).get();
       mc.asyncBopInsert(key, 0, null, value + "0",
@@ -93,7 +93,7 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAll_3() {
+  void testGetAll_3() {
     try {
       mc.delete(key).get();
       mc.asyncBopInsert(key, 0, eFlag, value + "0",
@@ -120,7 +120,7 @@ public class BopGetIrregularEflagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAll_4() {
+  void testGetAll_4() {
     try {
       mc.delete(key).get();
       mc.asyncBopInsert(key, 0, null, value + "0",

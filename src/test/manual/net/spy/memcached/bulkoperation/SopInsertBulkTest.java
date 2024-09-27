@@ -33,12 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SopInsertBulkTest extends BaseIntegrationTest {
+class SopInsertBulkTest extends BaseIntegrationTest {
 
   private String KEY = SopInsertBulkTest.class.getSimpleName();
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String value = "MyValue";
     int keySize = 500;
     String[] keys = new String[keySize];
@@ -102,7 +102,7 @@ public class SopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorCount() {
+  void testErrorCount() {
     String value = "MyValue";
     int keySize = 1200;
 

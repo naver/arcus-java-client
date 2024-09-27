@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test operation stuff.
  */
-public class OperationTest {
+class OperationTest {
 
   @Test
-  public void testIntegerDecode() {
+  void testIntegerDecode() {
     assertEquals(129,
             decodeInt(new byte[]{0, 0, 0, (byte) 0x81}, 0));
     assertEquals(129 * 256,
@@ -25,7 +25,7 @@ public class OperationTest {
   }
 
   @Test
-  public void testUnsignedIntegerDecode() {
+  void testUnsignedIntegerDecode() {
     assertEquals(129,
             decodeUnsignedInt(new byte[]{0, 0, 0, (byte) 0x81}, 0));
     assertEquals(129 * 256,
@@ -37,7 +37,7 @@ public class OperationTest {
   }
 
   @Test
-  public void testOperationStatusString() {
+  void testOperationStatusString() {
     String s = String.valueOf(OperationImpl.STATUS_OK);
     assertEquals("{OperationStatus success=true:  OK}", s);
   }

@@ -37,7 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public abstract class ClientBaseCase {
+abstract class ClientBaseCase {
 
   public static final String ZK_ADDRESS = System.getProperty("ZK_ADDRESS",
           "127.0.0.1:2181");

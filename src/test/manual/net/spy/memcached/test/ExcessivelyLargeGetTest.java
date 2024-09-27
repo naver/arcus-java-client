@@ -21,7 +21,7 @@ import net.spy.memcached.util.CacheLoader;
  * demonstrates the problems, I don't believe it generally demonstrates good
  * behavior for a unit test.
  */
-public class ExcessivelyLargeGetTest extends SpyObject implements Runnable {
+class ExcessivelyLargeGetTest extends SpyObject implements Runnable {
 
   // How many keys to do
   private static final int N = 25000;

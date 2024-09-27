@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Adaptation of http://code.google.com/p/spcached/wiki/benchmarktool
  */
 @Disabled
-public class MemcachedThreadBench {
+class MemcachedThreadBench {
 
   private static class WorkerStat {
     private int start, runs;
@@ -43,7 +43,7 @@ public class MemcachedThreadBench {
   }
 
   @Test
-  public void testCrap() throws Exception {
+  void testCrap() throws Exception {
     main(new String[]{"10000", "100", "11211", "100"});
   }
 

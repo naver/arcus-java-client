@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GetAttrTest extends BaseIntegrationTest {
+class GetAttrTest extends BaseIntegrationTest {
 
   private final String[] list = {"hello1", "hello2", "hello3"};
 
   @Test
-  public void testGetAttr_KV() throws Exception {
+  void testGetAttr_KV() throws Exception {
     String key = "testGetAttr_KV";
 
     mc.set(key, 100, "v").get();
@@ -50,7 +50,7 @@ public class GetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAttr_ModifiedAttribute() throws Exception {
+  void testGetAttr_ModifiedAttribute() throws Exception {
     String key = "getattr_modified_attribute";
 
     addToList(key, list);
@@ -74,7 +74,7 @@ public class GetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAttr_DefaultAttribute() throws Exception {
+  void testGetAttr_DefaultAttribute() throws Exception {
     String key = "getattr_default_attribute";
 
     addToList(key, list);
@@ -95,7 +95,7 @@ public class GetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAttr_KeyNotFound() throws Exception {
+  void testGetAttr_KeyNotFound() throws Exception {
     CollectionFuture<CollectionAttributes> future = mc
             .asyncGetAttr("NOT_EXISTS");
 

@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MopGetTest extends BaseIntegrationTest {
+class MopGetTest extends BaseIntegrationTest {
 
   private String key = "MopGetTest";
 
@@ -60,7 +60,7 @@ public class MopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_NoKey() throws Exception {
+  void testMopGet_NoKey() throws Exception {
     Map<String, Object> rmap = mc.asyncMopGet("no_key", false, false).get(
             1000, TimeUnit.MILLISECONDS);
 
@@ -69,7 +69,7 @@ public class MopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_NoMkey() throws Exception {
+  void testMopGet_NoMkey() throws Exception {
     Map<String, Object> map = mc.asyncMopGet(key, "20", false, false).get(1000,
             TimeUnit.MILLISECONDS);
     assertNotNull(map);
@@ -77,7 +77,7 @@ public class MopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_GetByBestEffort() throws Exception {
+  void testMopGet_GetByBestEffort() throws Exception {
     // Retrieve items(2..11) in the list
     List<String> mkeyList = new ArrayList<>();
     for (int i = 2; i < 12; i++) {
@@ -95,7 +95,7 @@ public class MopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_GetWithDeletion() throws Exception {
+  void testMopGet_GetWithDeletion() throws Exception {
     CollectionAttributes attrs = null;
     Map<String, Object> rmap = null;
     List<String> mkeyList = new ArrayList<>();

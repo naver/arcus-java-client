@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopUpdateTest extends BaseIntegrationTest {
+class BopUpdateTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
 
@@ -70,7 +70,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   //
 
   @Test
-  public void testUpdateZeroLengthEflag() {
+  void testUpdateZeroLengthEflag() {
     byte[] eflag = new byte[]{0, 0, 0, 0};
 
     try {
@@ -91,7 +91,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpdatePaddingRequired() {
+  void testUpdatePaddingRequired() {
     byte[] eflag = new byte[]{1, 0, 0, 0};
 
     try {
@@ -112,7 +112,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpdateExceededLengthEFlag() {
+  void testUpdateExceededLengthEFlag() {
     byte[] eflag = "1234567890123456789012345678901234567890".getBytes();
 
     try {
@@ -132,7 +132,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpdateNotExistsKey() {
+  void testUpdateNotExistsKey() {
     try {
       // update value only
       assertFalse(mc.asyncBopUpdate(KEY, BKEY, null, VALUE).get());
@@ -155,7 +155,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExistsKey() {
+  void testExistsKey() {
     try {
       //
       // insert one
@@ -248,7 +248,7 @@ public class BopUpdateTest extends BaseIntegrationTest {
   // with bitop
   //
   @Test
-  public void testExistsKeyWithBitOp() {
+  void testExistsKeyWithBitOp() {
     try {
       //
       // insert one

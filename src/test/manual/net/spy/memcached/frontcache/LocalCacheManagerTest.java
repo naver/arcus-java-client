@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class LocalCacheManagerTest {
+class LocalCacheManagerTest {
 
   private ArcusClient client;
 
@@ -63,7 +63,7 @@ public class LocalCacheManagerTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  void testGet() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
     }
@@ -104,7 +104,7 @@ public class LocalCacheManagerTest {
   }
 
   @Test
-  public void testGetBulk() throws Exception {
+  void testGetBulk() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
     }
@@ -142,7 +142,7 @@ public class LocalCacheManagerTest {
   }
 
   @Test
-  public void testAsyncGetBulk() throws Exception {
+  void testAsyncGetBulk() throws Exception {
     for (String k : keys) {
       client.set(k, 2, k + "_value").get();
     }
@@ -183,7 +183,7 @@ public class LocalCacheManagerTest {
   }
 
   @Test
-  public void testBulkPartial() throws Exception {
+  void testBulkPartial() throws Exception {
     String[] keySet1 = new String[keys.size() / 2];
     String[] keySet2 = new String[keys.size() / 2];
 

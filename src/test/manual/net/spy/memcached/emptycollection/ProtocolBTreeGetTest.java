@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolBTreeGetTest {
+class ProtocolBTreeGetTest {
 
   private static final long bkey = 10;
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     assertEquals("10 drop", (new BTreeGet(bkey, true, true,
             ElementFlagFilter.DO_NOT_FILTER)).stringify());
     assertEquals("10 delete", (new BTreeGet(bkey, true,

@@ -14,7 +14,7 @@ import net.spy.memcached.MemcachedClient;
  * This expects a server on port 11212 that's somewhat unstable so it can report
  * and what-not.
  */
-public final class ObserverToy {
+final class ObserverToy {
 
   private ObserverToy() {
   }

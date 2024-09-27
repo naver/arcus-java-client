@@ -36,17 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Test the basic operation buffer handling stuff.
  */
-public class BaseOpTest {
+class BaseOpTest {
 
   @Test
-  public void testAssertions() {
+  void testAssertions() {
     assertThrows(AssertionError.class, () -> {
       assert false;
     });
   }
 
   @Test
-  public void testDataReadType() throws Exception {
+  void testDataReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.DATA);
     assertSame(OperationReadType.DATA, op.getReadType());
     // Make sure lines aren't handled
@@ -56,7 +56,7 @@ public class BaseOpTest {
   }
 
   @Test
-  public void testLineReadType() throws Exception {
+  void testLineReadType() throws Exception {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
     assertSame(OperationReadType.LINE, op.getReadType());
     // Make sure lines aren't handled
@@ -65,7 +65,7 @@ public class BaseOpTest {
   }
 
   @Test
-  public void testLineParser() throws Exception {
+  void testLineParser() throws Exception {
     String input = "This is a multiline string\r\nhere is line two\r\n";
     ByteBuffer b = ByteBuffer.wrap(input.getBytes());
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
@@ -82,7 +82,7 @@ public class BaseOpTest {
   }
 
   @Test
-  public void testPartialLine() throws Exception {
+  void testPartialLine() throws Exception {
     String input1 = "this is a ";
     String input2 = "test\r\n";
     ByteBuffer b = ByteBuffer.allocate(20);

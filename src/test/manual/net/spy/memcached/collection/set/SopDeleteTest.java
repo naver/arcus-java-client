@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SopDeleteTest extends BaseIntegrationTest {
+class SopDeleteTest extends BaseIntegrationTest {
 
   private static final String KEY = SopDeleteTest.class.getSimpleName();
 
@@ -49,13 +49,13 @@ public class SopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopDelete0() throws InterruptedException,
+  void testSopDelete0() throws InterruptedException,
           ExecutionException {
     testSopDelete(0);
   }
 
   @Test
-  public void testSopDelete1() throws InterruptedException,
+  void testSopDelete1() throws InterruptedException,
           ExecutionException {
     testSopDelete(1);
   }

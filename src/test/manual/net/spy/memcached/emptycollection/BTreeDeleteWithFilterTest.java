@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
+class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -51,7 +51,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleteWithMatchedFilter() {
+  void testDeleteWithMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, FLAG.getBytes());
@@ -78,7 +78,7 @@ public class BTreeDeleteWithFilterTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleteWithUnMatchedFilter() {
+  void testDeleteWithUnMatchedFilter() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "aa".getBytes());
