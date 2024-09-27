@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopInsertAndGetTest extends BaseIntegrationTest {
+class BopInsertAndGetTest extends BaseIntegrationTest {
 
   private String key = "BopStoreAndGetTest";
   private String invalidKey = "InvalidBopStoreAndGetTest";
@@ -60,7 +60,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetNotTrimmed() throws Exception {
+  void testInsertAndGetNotTrimmed() throws Exception {
     //given
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(longBkeys.length + 1);
@@ -78,7 +78,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetTrimmedLongBKey() throws Exception {
+  void testInsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -117,7 +117,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetTrimmedByteArrayBKey() throws Exception {
+  void testInsertAndGetTrimmedByteArrayBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -161,7 +161,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetTrimmedLongBKeyLargest() throws Exception {
+  void testInsertAndGetTrimmedLongBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -200,7 +200,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
+  void testInsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -244,7 +244,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertAndGetTrimmedLongBKey() throws Exception {
+  void testUpsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -283,7 +283,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertAndGetTrimmedByteArrayBKey() throws Exception {
+  void testUpsertAndGetTrimmedByteArrayBKey() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -327,7 +327,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertAndGetTrimmedLongBKeyLargest() throws Exception {
+  void testUpsertAndGetTrimmedLongBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -366,7 +366,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
+  void testUpsertAndGetTrimmedByteArrayBKeyLargest() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -410,7 +410,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetTrimmedOtherResponses() throws Exception {
+  void testInsertAndGetTrimmedOtherResponses() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);
@@ -463,7 +463,7 @@ public class BopInsertAndGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertAndGetTrimmedOtherResponses() throws Exception {
+  void testUpsertAndGetTrimmedOtherResponses() throws Exception {
     // insert test data
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setMaxCount(10);

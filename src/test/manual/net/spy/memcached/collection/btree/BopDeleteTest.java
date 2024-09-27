@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopDeleteTest extends BaseIntegrationTest {
+class BopDeleteTest extends BaseIntegrationTest {
 
   private String key = "UnReadableBTreeTest";
 
@@ -62,20 +62,20 @@ public class BopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopDelete_NoKey() throws Exception {
+  void testBopDelete_NoKey() throws Exception {
     assertFalse(mc.asyncBopDelete("no_key", 0,
             ElementFlagFilter.DO_NOT_FILTER, false).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testBopDelete_OutOfRange() throws Exception {
+  void testBopDelete_OutOfRange() throws Exception {
     assertFalse(mc.asyncBopDelete(key, 11, ElementFlagFilter.DO_NOT_FILTER,
             false).get(1000, TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testBopDelete_DeleteByBestEffort() throws Exception {
+  void testBopDelete_DeleteByBestEffort() throws Exception {
     // Delete items(2..11) in the list
     assertTrue(mc.asyncBopDelete(key, 2, 11,
             ElementFlagFilter.DO_NOT_FILTER, 0, false).get(1000,
@@ -92,7 +92,7 @@ public class BopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopDelete_DeletedDropped() throws Exception {
+  void testBopDelete_DeletedDropped() throws Exception {
     // Delete all items in the list
     assertTrue(mc.asyncBopDelete(key, 0, items9.length,
             ElementFlagFilter.DO_NOT_FILTER, 0, true).get(1000,
@@ -104,7 +104,7 @@ public class BopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopDeleteWithSingleBkey() throws Exception {
+  void testBopDeleteWithSingleBkey() throws Exception {
     mc.delete(key).get();
 
     byte[] bkey = new byte[]{(byte) 1};

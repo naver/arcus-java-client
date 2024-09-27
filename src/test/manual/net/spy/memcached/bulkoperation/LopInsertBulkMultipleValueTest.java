@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
+class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
   private String key = "LopInsertBulkMultipleValueTest";
 
@@ -47,7 +47,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String value = "MyValue";
 
     int valueCount = 500;
@@ -108,7 +108,7 @@ public class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorCount() {
+  void testErrorCount() {
     int valueCount = 1200;
     Object[] valueList = new Object[valueCount];
     for (int i = 0; i < valueList.length; i++) {

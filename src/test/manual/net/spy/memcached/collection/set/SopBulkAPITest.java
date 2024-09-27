@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SopBulkAPITest extends BaseIntegrationTest {
+class SopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "SopBulkAPITest";
   private final List<Object> valueList = new ArrayList<>();
@@ -54,7 +54,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulk() throws Exception {
+  void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.delete(key).get();
       bulk();
@@ -82,7 +82,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkFailed() {
+  void testBulkFailed() {
     try {
       for (Object v : valueList) {
         mc.asyncSopDelete(key, v, false).get();
@@ -106,7 +106,7 @@ public class SopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkEmptySet() {
+  void testBulkEmptySet() {
     try {
       for (Object v : valueList) {
         mc.asyncSopDelete(key, v, false).get();

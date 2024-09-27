@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ElementFlagFilterTest {
+class ElementFlagFilterTest {
 
   @Test
-  public void testValidate1() {
+  void testValidate1() {
     try {
       new ElementFlagFilter(null, null);
     } catch (NullPointerException e) {
@@ -37,7 +37,7 @@ public class ElementFlagFilterTest {
   }
 
   @Test
-  public void testValidate2() {
+  void testValidate2() {
     try {
       new ElementFlagFilter(null, "".getBytes());
     } catch (NullPointerException e) {
@@ -47,7 +47,7 @@ public class ElementFlagFilterTest {
   }
 
   @Test
-  public void testValidate3() {
+  void testValidate3() {
     try {
       new ElementFlagFilter(CompOperands.Equal, null);
     } catch (NullPointerException e) {
@@ -57,7 +57,7 @@ public class ElementFlagFilterTest {
   }
 
   @Test
-  public void testZeroLengthCompValue() {
+  void testZeroLengthCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "".getBytes());
@@ -72,7 +72,7 @@ public class ElementFlagFilterTest {
   }
 
   @Test
-  public void testZeroLengthBitCompValue() {
+  void testZeroLengthBitCompValue() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "A".getBytes());
@@ -89,7 +89,7 @@ public class ElementFlagFilterTest {
   }
 
   @Test
-  public void testConstruct() {
+  void testConstruct() {
     String src = "ABC";
 
     ElementFlagFilter filter = new ElementFlagFilter(CompOperands.Equal,

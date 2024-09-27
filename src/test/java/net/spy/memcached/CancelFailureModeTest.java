@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CancelFailureModeTest {
+class CancelFailureModeTest {
   private String serverList = "127.0.0.1:11311";
   private MemcachedClient client = null;
 
@@ -32,7 +32,7 @@ public class CancelFailureModeTest {
   }
 
   @Test
-  public void testQueueingToDownServer() throws Exception {
+  void testQueueingToDownServer() throws Exception {
     Future<Boolean> f = client.add("someKey", 0, "some object");
     try {
       boolean b = f.get();

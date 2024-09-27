@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopFindPositionWithGetTest extends BaseIntegrationTest {
+class BopFindPositionWithGetTest extends BaseIntegrationTest {
 
   private String key = "BopFindPositionWithGetTest";
   private String invalidKey = "InvalidBopFindPositionWithGetTest";
@@ -49,7 +49,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyAsc() throws Exception {
+  void testLongBKeyAsc() throws Exception {
     long longBkey, resultBkey;
     int totCount = 100;
     int pwgCount = 10;
@@ -97,7 +97,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyDesc() throws Exception {
+  void testLongBKeyDesc() throws Exception {
     long longBkey, resultBkey;
     int totCount = 100;
     int pwgCount = 10;
@@ -145,7 +145,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyAsc() throws Exception {
+  void testByteArrayBKeyAsc() throws Exception {
     byte[] byteBkey, resultBkey;
     int totCount = 100;
     int pwgCount = 10;
@@ -198,7 +198,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyDesc() throws Exception {
+  void testByteArrayBKeyDesc() throws Exception {
     byte[] byteBkey, resultBkey;
     int totCount = 100;
     int pwgCount = 10;
@@ -251,7 +251,7 @@ public class BopFindPositionWithGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnsuccessfulResponses() throws Exception {
+  void testUnsuccessfulResponses() throws Exception {
     mc.delete(invalidKey).get();
     mc.delete(kvKey).get();
 

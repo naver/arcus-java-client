@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopUpsertTest extends BaseIntegrationTest {
+class MopUpsertTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String MKEY = "upsertTestMkey";
@@ -44,7 +44,7 @@ public class MopUpsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertIfKeyExists() {
+  void testUpsertIfKeyExists() {
     try {
       // given
       assertTrue(mc.asyncMopInsert(KEY, MKEY, VALUE, collectionAttributes).get());
@@ -67,7 +67,7 @@ public class MopUpsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpsertIfKeyDoesNotExist() {
+  void testUpsertIfKeyDoesNotExist() {
     try {
       // given & when
       CollectionFuture<Boolean> future =

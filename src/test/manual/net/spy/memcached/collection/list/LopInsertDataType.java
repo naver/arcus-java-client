@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LopInsertDataType extends BaseIntegrationTest {
+class LopInsertDataType extends BaseIntegrationTest {
 
   private String key = "LopInsertDataType";
   private Random rand = new Random(new Date().getTime());
@@ -46,7 +46,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_ElementCountLimit() throws Exception {
+  void testLopInsert_ElementCountLimit() throws Exception {
     byte[] tooBigByte = new byte[1024 * 1024];
     for (int i = 0; i < tooBigByte.length; i++) {
       tooBigByte[i] = (byte) rand.nextInt(255);
@@ -64,7 +64,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_SameDataType() throws Exception {
+  void testLopInsert_SameDataType() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, 0, "a string",
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
@@ -85,7 +85,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_DifferentDataType() throws Exception {
+  void testLopInsert_DifferentDataType() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, -1, "a string",
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));
@@ -111,7 +111,7 @@ public class LopInsertDataType extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_DifferentDataType_ErrorCase() throws Exception {
+  void testLopInsert_DifferentDataType_ErrorCase() throws Exception {
     // First, create a list and insert one item in it
     assertTrue(mc.asyncLopInsert(key, 0, 'a',
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS));

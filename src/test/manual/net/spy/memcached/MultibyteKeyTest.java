@@ -82,7 +82,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MultibyteKeyTest {
+class MultibyteKeyTest {
   private static final String MULTIBYTE_KEY = "아커스프리픽스:아커스멀티바이트키스트링";
   private final AsciiOperationFactory opFact = new AsciiOperationFactory();
   private byte[] testData;
@@ -109,7 +109,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void getsTest() {
+  void getsTest() {
     try {
       opFact.gets(MULTIBYTE_KEY, new GetsOperation.Callback() {
         @Override
@@ -130,7 +130,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void collectionInsertOperationImplTest() {
+  void collectionInsertOperationImplTest() {
     try {
       opFact.collectionInsert(MULTIBYTE_KEY, MULTIBYTE_KEY, new CollectionInsert<Integer>() {
         @Override
@@ -144,7 +144,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void collectionGetOperationImplTest() {
+  void collectionGetOperationImplTest() {
     try {
       opFact.collectionGet(MULTIBYTE_KEY, new CollectionGet() {
         @Override
@@ -184,7 +184,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CASOperationImplTest() {
+  void CASOperationImplTest() {
     try {
       opFact.cas(StoreType.add, MULTIBYTE_KEY, 1L, 0, 0, testData, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -193,7 +193,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void ConcatenationOperationTest() {
+  void ConcatenationOperationTest() {
     try {
       opFact.cat(ConcatenationType.append, 1L, MULTIBYTE_KEY, testData, genericCallback)
           .initialize();
@@ -204,7 +204,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeFindPositionWithGetOperationImplTest() {
+  void BTreeFindPositionWithGetOperationImplTest() {
     try {
       opFact.bopFindPositionWithGet(MULTIBYTE_KEY,
           new BTreeFindPositionWithGet(1L, BTreeOrder.ASC, 0),
@@ -215,7 +215,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void SetExistOperationImplTest() {
+  void SetExistOperationImplTest() {
     try {
       Transcoder<Object> tc = new CollectionTranscoder();
       opFact.collectionExist(MULTIBYTE_KEY, "",
@@ -231,7 +231,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionMutateOperationImplTest() {
+  void CollectionMutateOperationImplTest() {
     try {
       opFact.collectionMutate(MULTIBYTE_KEY, "",
           new CollectionMutate() {
@@ -251,7 +251,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void getAttrTest() {
+  void getAttrTest() {
     try {
       opFact.getAttr(MULTIBYTE_KEY, new GetAttrOperation.Callback() {
         @Override
@@ -272,7 +272,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void MutatorOperationImplTest() {
+  void MutatorOperationImplTest() {
     try {
       opFact.mutate(Mutator.incr, MULTIBYTE_KEY, 1, 1L, 0, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -281,7 +281,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeSortMergeGetOperationImplTest() {
+  void BTreeSortMergeGetOperationImplTest() {
     try {
       opFact.bopsmget(
               new BTreeSMGetWithLongTypeBkey<>(null,
@@ -313,7 +313,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeSortMergeGetOperationOldImplTest() {
+  void BTreeSortMergeGetOperationOldImplTest() {
     try {
       opFact.bopsmget(
               new BTreeSMGetWithLongTypeBkeyOld<>(null,
@@ -341,7 +341,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionPipedInsertOperationImplTest() {
+  void CollectionPipedInsertOperationImplTest() {
     CollectionPipedInsertOperation.Callback cpsCallback =
         new CollectionPipedInsertOperation.Callback() {
           @Override
@@ -409,7 +409,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void DeleteOperationImplTest() {
+  void DeleteOperationImplTest() {
     try {
       opFact.delete(MULTIBYTE_KEY, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -418,7 +418,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void ExtendedBTreeGetOperationImplTest() {
+  void ExtendedBTreeGetOperationImplTest() {
     byte[] from = new byte[]{0, 0};
     byte[] to = new byte[]{10, 10};
     try {
@@ -443,7 +443,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionDeleteOperationImplTest() {
+  void CollectionDeleteOperationImplTest() {
     try {
       opFact.collectionDelete(MULTIBYTE_KEY,
           new BTreeDelete(1L, false),
@@ -462,7 +462,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionBulkInsertOperationImplTest() {
+  void CollectionBulkInsertOperationImplTest() {
     CollectionBulkInsert<Integer> insert = null;
     CollectionBulkInsertOperation.Callback cbsCallback =
         new CollectionBulkInsertOperation.Callback() {
@@ -510,7 +510,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeGetBulkOperationImplTest() {
+  void BTreeGetBulkOperationImplTest() {
     try {
       opFact.bopGetBulk(
           new BTreeGetBulkWithLongTypeBkey<Integer>(null,
@@ -540,7 +540,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeGetByPositionOperationImplTest() {
+  void BTreeGetByPositionOperationImplTest() {
     try {
       opFact.bopGetByPosition(MULTIBYTE_KEY,
           new BTreeGetByPosition(BTreeOrder.ASC, 0),
@@ -564,7 +564,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionUpdateOperationImplTest() {
+  void CollectionUpdateOperationImplTest() {
     try {
       opFact.collectionUpdate(MULTIBYTE_KEY, MULTIBYTE_KEY,
               new BTreeUpdate<>(new Random().nextInt(), ElementFlagUpdate.RESET_FLAG, false),
@@ -575,7 +575,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionPipedUpdateOperationImplTest() {
+  void CollectionPipedUpdateOperationImplTest() {
     List<Element<Integer>> elementsList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       elementsList.add(new Element<>(
@@ -604,7 +604,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionCreateOperationImplTest() {
+  void CollectionCreateOperationImplTest() {
     try {
       opFact.collectionCreate(MULTIBYTE_KEY,
               new BTreeCreate(0, 0, 10000L, CollectionOverflowAction.error, true, false),
@@ -615,7 +615,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionCountOperationImplTest() {
+  void CollectionCountOperationImplTest() {
     try {
       opFact.collectionCount(MULTIBYTE_KEY,
               new BTreeCount(0L, 10L, ElementFlagFilter.DO_NOT_FILTER),
@@ -626,7 +626,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void CollectionPipedExistOperationImplTest() {
+  void CollectionPipedExistOperationImplTest() {
     List<Integer> objectList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
       objectList.add(new Random().nextInt());
@@ -653,7 +653,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeInsertAndGetOperationImplTest() {
+  void BTreeInsertAndGetOperationImplTest() {
     try {
       opFact.bopInsertAndGet(MULTIBYTE_KEY,
               new BTreeInsertAndGet<>(1L, new byte[]{0, 0}, new Random().nextInt(),
@@ -677,7 +677,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void SetAttrOperationImplTest() {
+  void SetAttrOperationImplTest() {
     try {
       opFact.setAttr(MULTIBYTE_KEY, new Attributes(), genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -686,7 +686,7 @@ public class MultibyteKeyTest {
   }
 
   @Test
-  public void BTreeFindPositionOperationImplTest() {
+  void BTreeFindPositionOperationImplTest() {
     try {
       opFact.bopFindPosition(MULTIBYTE_KEY,
           new BTreeFindPosition(1L, BTreeOrder.ASC),

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LopServerMessageTest extends BaseIntegrationTest {
+class LopServerMessageTest extends BaseIntegrationTest {
 
   private String key = "LopServerMessageTest";
 
@@ -46,7 +46,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFound() throws Exception {
+  void testNotFound() throws Exception {
     CollectionFuture<List<Object>> future = mc.asyncLopGet(key, 0, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -56,7 +56,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreatedStored() throws Exception {
+  void testCreatedStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -66,7 +66,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStored() throws Exception {
+  void testStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -79,7 +79,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOutOfRange() throws Exception {
+  void testOutOfRange() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 1, 1, new CollectionAttributes());
     assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -89,7 +89,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOutOfRange2() throws Exception {
+  void testOutOfRange2() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -106,7 +106,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOverflowed() throws Exception {
+  void testOverflowed() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -126,7 +126,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDropped() throws Exception {
+  void testDeletedDropped() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -141,7 +141,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleted() throws Exception {
+  void testDeleted() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -160,7 +160,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDroppedAfterRetrieval() throws Exception {
+  void testDeletedDroppedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -175,7 +175,7 @@ public class LopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedAfterRetrieval() throws Exception {
+  void testDeletedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncLopInsert(key, 0, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));

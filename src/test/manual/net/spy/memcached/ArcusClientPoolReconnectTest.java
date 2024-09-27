@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class ArcusClientPoolReconnectTest {
+class ArcusClientPoolReconnectTest {
 
   @Test
-  public void testOpenAndWait() {
+  void testOpenAndWait() {
     ArcusClientPool client = ArcusClient.createArcusClientPool(BaseIntegrationTest.ZK_ADDRESS,
             BaseIntegrationTest.SERVICE_CODE, 2);
 

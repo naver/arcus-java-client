@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
+class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE = "VALUE";
@@ -59,7 +59,7 @@ public class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateUnreadableExtendedBTreeTest() {
+  void testCreateUnreadableExtendedBTreeTest() {
     try {
       // create unreadable empty
       CollectionAttributes attribute = new CollectionAttributes();
@@ -110,7 +110,7 @@ public class UnReadableExtendedBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateReadableExtendedBTreeTest() {
+  void testCreateReadableExtendedBTreeTest() {
     try {
       // create readable empty
       CollectionAttributes attribute = new CollectionAttributes();

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BaseLongKeyTest extends BaseIntegrationTest {
+class BaseLongKeyTest extends BaseIntegrationTest {
 
   private final int keySize = 200;
   private final List<String> keys = new ArrayList<>();
@@ -46,7 +46,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testKV_Long() throws Exception {
+  void testKV_Long() throws Exception {
     // KV Set
     assertTrue(mc.set(keys.get(0), 10, "value1").get());
 
@@ -58,7 +58,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSet_Long() throws Exception {
+  void testSet_Long() throws Exception {
     // Set Collection Create & Insert
     assertTrue(mc.asyncSopInsert(keys.get(0), 10L, new CollectionAttributes()).get());
 
@@ -75,7 +75,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMap_Long() throws Exception {
+  void testMap_Long() throws Exception {
     // Map Collection Create & Insert
     assertTrue(mc.asyncMopInsert(keys.get(0), "mkey1", 10L, new CollectionAttributes()).get());
 
@@ -92,7 +92,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testList_Long() throws Exception {
+  void testList_Long() throws Exception {
     // List Collection Create & Insert
     assertTrue(mc.asyncLopInsert(keys.get(0), 0, 10L, new CollectionAttributes()).get());
 
@@ -109,7 +109,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBtree_Long() throws Exception {
+  void testBtree_Long() throws Exception {
     // BTree Collection Create & Insert
     assertTrue(mc.asyncBopInsert(keys.get(0), 10, null, 10L,
             new CollectionAttributes()).get());
@@ -128,7 +128,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testKV_BulkGet_Long() throws Exception {
+  void testKV_BulkGet_Long() throws Exception {
     // KV Set
     for (int i = 0; i < keySize; i++) {
       assertTrue(mc.set(keys.get(i), 60, "value" + i).get());
@@ -149,7 +149,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBtree_MGet_Long() throws Exception {
+  void testBtree_MGet_Long() throws Exception {
     // BTree Collection Create & Insert
     for (int i = 0; i < keySize; i++) {
       assertTrue(mc.asyncBopInsert(keys.get(i), 10, null, 10L,
@@ -169,7 +169,7 @@ public class BaseLongKeyTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBtree_SMGet_Long() throws Exception {
+  void testBtree_SMGet_Long() throws Exception {
     // BTree Collection Create & Insert
     for (int i = 0; i < keySize; i++) {
       assertTrue(mc.asyncBopInsert(keys.get(i), i, null, "VALUE" + i,

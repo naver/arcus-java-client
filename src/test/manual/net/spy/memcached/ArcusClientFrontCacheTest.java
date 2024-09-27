@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-public class ArcusClientFrontCacheTest {
+class ArcusClientFrontCacheTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -36,7 +36,7 @@ public class ArcusClientFrontCacheTest {
   }
 
   @Test
-  public void testCreateSingleClient() {
+  void testCreateSingleClient() {
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
@@ -46,7 +46,7 @@ public class ArcusClientFrontCacheTest {
   }
 
   @Test
-  public void testCreatePool() {
+  void testCreatePool() {
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);
@@ -56,7 +56,7 @@ public class ArcusClientFrontCacheTest {
   }
 
   @Test
-  public void testKV() {
+  void testKV() {
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setFrontCacheExpireTime(10);
     cfb.setMaxFrontCacheElements(10);

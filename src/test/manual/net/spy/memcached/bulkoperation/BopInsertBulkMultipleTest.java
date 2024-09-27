@@ -35,10 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
+class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String key = "MyBopKey32";
     String value = "MyValue";
 
@@ -102,7 +102,7 @@ public class BopInsertBulkMultipleTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorCount() {
+  void testErrorCount() {
     String key = "MyBopKeyErrorCount";
     String value = "MyValue";
 

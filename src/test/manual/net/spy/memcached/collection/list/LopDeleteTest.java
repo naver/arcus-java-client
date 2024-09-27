@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LopDeleteTest extends BaseIntegrationTest {
+class LopDeleteTest extends BaseIntegrationTest {
 
   private String key = "LopDeleteTest";
 
@@ -58,19 +58,19 @@ public class LopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopDelete_NoKey() throws Exception {
+  void testLopDelete_NoKey() throws Exception {
     assertFalse(mc.asyncLopDelete("no_key", 0, false).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testLopDelete_OutOfRange() throws Exception {
+  void testLopDelete_OutOfRange() throws Exception {
     assertFalse(mc.asyncLopDelete(key, 11, false).get(1000,
             TimeUnit.MILLISECONDS));
   }
 
   @Test
-  public void testLopDelete_DeleteByBestEffort() throws Exception {
+  void testLopDelete_DeleteByBestEffort() throws Exception {
     // Delete items(2..11) in the list
     assertTrue(mc.asyncLopDelete(key, 2, 11, false).get(1000,
             TimeUnit.MILLISECONDS));
@@ -86,7 +86,7 @@ public class LopDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopDelete_DeletedDropped() throws Exception {
+  void testLopDelete_DeletedDropped() throws Exception {
     // Delete all items in the list
     assertTrue(mc.asyncLopDelete(key, 0, items9.length, true).get(1000,
             TimeUnit.MILLISECONDS));

@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SopPipedExistTest extends BaseIntegrationTest {
+class SopPipedExistTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE1 = "VALUE1";
@@ -60,7 +60,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExist() {
+  void testPipedExist() {
     try {
       assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
@@ -105,7 +105,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExistWithOneValue() {
+  void testPipedExistWithOneValue() {
     try {
       assertTrue(mc.asyncSopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
@@ -140,7 +140,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMaxPipedExist() {
+  void testMaxPipedExist() {
     try {
       List<Object> findValues = new ArrayList<>();
 
@@ -178,7 +178,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExistNotExistsKey() {
+  void testPipedExistNotExistsKey() {
     try {
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -204,7 +204,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExistOneNotExistsKey() {
+  void testPipedExistOneNotExistsKey() {
     try {
       List<Object> findValues = new ArrayList<>();
       findValues.add(VALUE1);
@@ -225,7 +225,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExistTypeMismatchedKey() {
+  void testPipedExistTypeMismatchedKey() {
     try {
       assertTrue(mc.set(KEY, 10, VALUE1).get());
 
@@ -252,7 +252,7 @@ public class SopPipedExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPipedExistOneTypeMismatchedKey() {
+  void testPipedExistOneTypeMismatchedKey() {
     try {
       assertTrue(mc.set(KEY, 10, VALUE1).get());
 

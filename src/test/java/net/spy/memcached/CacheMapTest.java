@@ -27,7 +27,7 @@ import static org.jmock.AbstractExpectations.returnValue;
 /**
  * Test the CacheMap.
  */
-public class CacheMapTest {
+class CacheMapTest {
 
   private final static int EXP = 8175;
   private Mockery context;
@@ -62,7 +62,7 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testNoExpConstructor() throws Exception {
+  void testNoExpConstructor() throws Exception {
     context.checking(buildExpectations(e -> {
       e.oneOf(client).getTranscoder();
       e.will(returnValue(transcoder));
@@ -75,7 +75,7 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testBaseConstructor() throws Exception {
+  void testBaseConstructor() throws Exception {
     BaseCacheMap<Integer> bcm = new BaseCacheMap<>(client,
             EXP, "base", new IntegerTranscoder());
     Field f = BaseCacheMap.class.getDeclaredField("exp");
@@ -84,7 +84,7 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testClear() {
+  void testClear() {
     try {
       cacheMap.clear();
       fail("Expected unsupported operation exception");
@@ -94,56 +94,56 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testGetPositive() {
+  void testGetPositive() {
     expectGetAndReturn("blaha", "something");
     assertEquals("something", cacheMap.get("a"));
   }
 
   @Test
-  public void testGetNegative() {
+  void testGetNegative() {
     expectGetAndReturn("blaha", null);
     assertNull(cacheMap.get("a"));
   }
 
   @Test
-  public void testGetNotString() {
+  void testGetNotString() {
     assertNull(cacheMap.get(new Object()));
   }
 
   @Test
-  public void testContainsPositive() {
+  void testContainsPositive() {
     expectGetAndReturn("blaha", new Object());
     assertTrue(cacheMap.containsKey("a"));
   }
 
   @Test
-  public void testContainsNegative() {
+  void testContainsNegative() {
     expectGetAndReturn("blaha", null);
     assertFalse(cacheMap.containsKey("a"));
   }
 
   @Test
-  public void testContainsValue() {
+  void testContainsValue() {
     assertFalse(cacheMap.containsValue("anything"));
   }
 
   @Test
-  public void testEntrySet() {
+  void testEntrySet() {
     assertEquals(0, cacheMap.entrySet().size());
   }
 
   @Test
-  public void testKeySet() {
+  void testKeySet() {
     assertEquals(0, cacheMap.keySet().size());
   }
 
   @Test
-  public void testtIsEmpty() {
+  void testtIsEmpty() {
     assertFalse(cacheMap.isEmpty());
   }
 
   @Test
-  public void testPutAll() {
+  void testPutAll() {
     context.checking(buildExpectations(e -> {
       e.oneOf(client).set("blaha", EXP, "vala");
       e.oneOf(client).set("blahb", EXP, "valb");
@@ -157,17 +157,17 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testSize() {
+  void testSize() {
     assertEquals(0, cacheMap.size());
   }
 
   @Test
-  public void testValues() {
+  void testValues() {
     assertEquals(0, cacheMap.values().size());
   }
 
   @Test
-  public void testRemove() {
+  void testRemove() {
     expectGetAndReturn("blaha", "olda");
     context.checking(buildExpectations(e -> {
       e.oneOf(client).delete("blaha");
@@ -177,12 +177,12 @@ public class CacheMapTest {
   }
 
   @Test
-  public void testRemoveNotString() {
+  void testRemoveNotString() {
     assertNull(cacheMap.remove(new Object()));
   }
 
   @Test
-  public void testPut() {
+  void testPut() {
     expectGetAndReturn("blaha", "olda");
     context.checking(buildExpectations(e -> {
       e.oneOf(client).set("blaha", EXP, "newa");

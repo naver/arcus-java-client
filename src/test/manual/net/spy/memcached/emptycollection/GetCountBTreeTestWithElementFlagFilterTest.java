@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationTest {
+class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -55,7 +55,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidKey() {
+  void testGetBKeyCountFromInvalidKey() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.GreaterThan, "1".getBytes());
@@ -74,7 +74,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidType() {
+  void testGetBKeyCountFromInvalidType() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -99,7 +99,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty() {
+  void testGetBKeyCountFromNotEmpty() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -135,7 +135,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty2() {
+  void testGetBKeyCountFromNotEmpty2() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -169,7 +169,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty3() {
+  void testGetBKeyCountFromNotEmpty3() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -205,7 +205,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountByNotExistsBKey() {
+  void testGetBKeyCountByNotExistsBKey() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());
@@ -239,7 +239,7 @@ public class GetCountBTreeTestWithElementFlagFilterTest extends BaseIntegrationT
   }
 
   @Test
-  public void testGetBKeyCountByNotExistsRange() {
+  void testGetBKeyCountByNotExistsRange() {
     try {
       ElementFlagFilter filter = new ElementFlagFilter(
               CompOperands.Equal, "eflag".getBytes());

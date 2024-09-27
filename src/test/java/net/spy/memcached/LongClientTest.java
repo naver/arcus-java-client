@@ -16,10 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Longer running test case.
  */
-public class LongClientTest extends ClientBaseCase {
+class LongClientTest extends ClientBaseCase {
 
   @Test
-  public void testParallelGet() throws Throwable {
+  void testParallelGet() throws Throwable {
     // Get a connection with the get optimization disabled.
     client.shutdown();
     initClient(new DefaultConnectionFactory() {

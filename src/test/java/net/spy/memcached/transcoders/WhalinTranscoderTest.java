@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Test the serializing transcoder.
  */
-public class WhalinTranscoderTest extends BaseTranscoderCase {
+class WhalinTranscoderTest extends BaseTranscoderCase {
 
   private WhalinTranscoder tc;
   private TranscoderUtils tu;
@@ -32,7 +32,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testNonserializable() throws Exception {
+  void testNonserializable() throws Exception {
     try {
       tc.encode(new Object());
       fail("Processed a non-serializable object.");
@@ -42,7 +42,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testCompressedStringNotSmaller() throws Exception {
+  void testCompressedStringNotSmaller() throws Exception {
     String s1 = "This is a test simple string that will not be compressed.";
     // Reduce the compression threshold so it'll attempt to compress it.
     tc.setCompressionThreshold(8);
@@ -54,7 +54,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testCompressedString() throws Exception {
+  void testCompressedString() throws Exception {
     // This one will actually compress
     String s1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     tc.setCompressionThreshold(8);
@@ -67,7 +67,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testObject() throws Exception {
+  void testObject() throws Exception {
     Calendar c = Calendar.getInstance();
     CachedData cd = tc.encode(c);
     assertEquals(WhalinTranscoder.SERIALIZED, cd.getFlags());
@@ -75,7 +75,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testCompressedObject() throws Exception {
+  void testCompressedObject() throws Exception {
     tc.setCompressionThreshold(8);
     Calendar c = Calendar.getInstance();
     CachedData cd = tc.encode(c);
@@ -85,7 +85,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testUnencodeable() throws Exception {
+  void testUnencodeable() throws Exception {
     try {
       CachedData cd = tc.encode(new Object());
       fail("Should fail to serialize, got" + cd);
@@ -95,7 +95,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testUndecodeable() throws Exception {
+  void testUndecodeable() throws Exception {
     CachedData cd = new CachedData(
             Integer.MAX_VALUE &
                     ~(WhalinTranscoder.COMPRESSED | WhalinTranscoder.SERIALIZED),
@@ -105,7 +105,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testUndecodeableSerialized() throws Exception {
+  void testUndecodeableSerialized() throws Exception {
     CachedData cd = new CachedData(WhalinTranscoder.SERIALIZED,
             tu.encodeInt(Integer.MAX_VALUE),
             tc.getMaxSize());
@@ -113,7 +113,7 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
-  public void testUndecodeableCompressed() throws Exception {
+  void testUndecodeableCompressed() throws Exception {
     CachedData cd = new CachedData(WhalinTranscoder.COMPRESSED,
             tu.encodeInt(Integer.MAX_VALUE),
             tc.getMaxSize());

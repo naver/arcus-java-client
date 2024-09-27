@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MopInsertWhenKeyExists extends BaseIntegrationTest {
+class MopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private String key = "MopInsertWhenKeyExists";
 
@@ -44,7 +44,7 @@ public class MopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopInsert_Normal() throws Exception {
+  void testMopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToMap(key, items9);
 
@@ -72,7 +72,7 @@ public class MopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopInsert_SameField() throws Exception {
+  void testMopInsert_SameField() throws Exception {
     // Create a list and add it 9 items
     addToMap(key, items9);
 

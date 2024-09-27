@@ -39,7 +39,7 @@ import static net.spy.memcached.ExpectationsUtil.buildExpectations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CacheMonitorTest {
+class CacheMonitorTest {
 
   private Watcher watcher;
   private CacheMonitorListener listener;
@@ -69,7 +69,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcessResult() {
+  void testProcessResult() {
     // when
     children.add("0.0.0.0:11211");
     context.checking(buildExpectations(e -> {
@@ -85,7 +85,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcessResult_emptyChildren() {
+  void testProcessResult_emptyChildren() {
     List<String> fakeChildren = new ArrayList<>();
     fakeChildren.add("0.0.0.0:23456");
 
@@ -103,7 +103,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcessResult_otherEvents() {
+  void testProcessResult_otherEvents() {
     children.add("127.0.0.1:11211");
     context.checking(buildExpectations(e -> {
       e.never(listener).commandCacheListChange(children);
@@ -142,7 +142,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcess_syncConnected() throws Exception {
+  void testProcess_syncConnected() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
         EventType.None, KeeperState.SyncConnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
@@ -155,7 +155,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcess_disconnected() throws Exception {
+  void testProcess_disconnected() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
         EventType.None, KeeperState.Disconnected, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
@@ -168,7 +168,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcess_expired() throws Exception {
+  void testProcess_expired() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
         EventType.None, KeeperState.Expired, ARCUS_BASE_CACHE_LIST_ZPATH + "/dev");
@@ -184,7 +184,7 @@ public class CacheMonitorTest {
   }
 
   @Test
-  public void testProcess_nodeChildrenChanged() throws Exception {
+  void testProcess_nodeChildrenChanged() throws Exception {
     // when
     WatchedEvent event = new WatchedEvent(
         EventType.NodeChildrenChanged,

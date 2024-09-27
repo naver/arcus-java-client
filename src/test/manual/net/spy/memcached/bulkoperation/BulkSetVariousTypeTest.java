@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BulkSetVariousTypeTest extends BaseIntegrationTest {
+class BulkSetVariousTypeTest extends BaseIntegrationTest {
 
   private static class MyBean implements Serializable {
     private static final long serialVersionUID = -5977830942924286134L;
@@ -65,7 +65,7 @@ public class BulkSetVariousTypeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     Object[] valueList = {1.0, 1000, 1000L, "String",
         new MyBean("beanName")};
     String keyPrefix = "TypeTestKey";

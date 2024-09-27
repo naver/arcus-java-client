@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SopServerMessageTest extends BaseIntegrationTest {
+class SopServerMessageTest extends BaseIntegrationTest {
 
   private String key = "SopServerMessageTest";
 
@@ -47,7 +47,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFound() throws Exception {
+  void testNotFound() throws Exception {
     CollectionFuture<Set<Object>> future = mc.asyncSopGet(key, 1, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -57,7 +57,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreatedStored() throws Exception {
+  void testCreatedStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -67,7 +67,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStored() throws Exception {
+  void testStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -80,7 +80,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOverflowed() throws Exception {
+  void testOverflowed() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -97,7 +97,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testElementExists() throws Exception {
+  void testElementExists() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
@@ -110,7 +110,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDropped() throws Exception {
+  void testDeletedDropped() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -125,7 +125,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleted() throws Exception {
+  void testDeleted() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -144,7 +144,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDroppedAfterRetrieval() throws Exception {
+  void testDeletedDroppedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -159,7 +159,7 @@ public class SopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedAfterRetrieval() throws Exception {
+  void testDeletedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncSopInsert(key, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));

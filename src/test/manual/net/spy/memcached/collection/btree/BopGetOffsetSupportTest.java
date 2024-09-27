@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopGetOffsetSupportTest extends BaseIntegrationTest {
+class BopGetOffsetSupportTest extends BaseIntegrationTest {
 
   private String key = "BopGetOffsetSupportTest";
 
@@ -46,7 +46,7 @@ public class BopGetOffsetSupportTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGetOffset_Normal() throws Exception {
+  void testBopGetOffset_Normal() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
 
@@ -75,7 +75,7 @@ public class BopGetOffsetSupportTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGetOffset_More() throws Exception {
+  void testBopGetOffset_More() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
 

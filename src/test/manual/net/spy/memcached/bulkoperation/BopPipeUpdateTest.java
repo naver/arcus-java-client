@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopPipeUpdateTest extends BaseIntegrationTest {
+class BopPipeUpdateTest extends BaseIntegrationTest {
 
   private static final String KEY = BopPipeUpdateTest.class.getSimpleName();
   private static final int elementCount = 1200;
@@ -87,7 +87,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeUpdateValue() {
+  void testBopPipeUpdateValue() {
 
     List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
@@ -124,7 +124,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeUpdateEFlags() {
+  void testBopPipeUpdateEFlags() {
 
     byte[] NEW_BYTE_EFLAG = new byte[]{1, 1};
 
@@ -166,7 +166,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeUpdateEFlagsReset() {
+  void testBopPipeUpdateEFlagsReset() {
 
     List<Element<Object>> updateElements = new ArrayList<>();
     for (int i = 0; i < elementCount; i++) {
@@ -205,7 +205,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeUpdateNotFoundElement() {
+  void testBopPipeUpdateNotFoundElement() {
 
     try {
       assertTrue(mc.asyncBopDelete(KEY, 0L, 1000L,
@@ -253,7 +253,7 @@ public class BopPipeUpdateTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopPipeUpdateNotFoundKey() {
+  void testBopPipeUpdateNotFoundKey() {
 
     String key2 = "NEW_BopPipeUpdateTest";
 

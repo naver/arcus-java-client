@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SopInsertWhenKeyExists extends BaseIntegrationTest {
+class SopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private String key = "SopInsertWhenKeyExists";
 
@@ -44,7 +44,7 @@ public class SopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopInsert_Normal() throws Exception {
+  void testSopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToSet(key, items9);
 
@@ -70,7 +70,7 @@ public class SopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopInsert_SameItem() throws Exception {
+  void testSopInsert_SameItem() throws Exception {
     // Create a list and add it 9 items
     addToSet(key, items9);
 

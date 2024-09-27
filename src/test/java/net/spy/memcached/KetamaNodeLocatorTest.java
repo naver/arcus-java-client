@@ -18,7 +18,7 @@ import static org.jmock.AbstractExpectations.returnValue;
 /**
  * Test ketama node location.
  */
-public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
+class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
 
   protected void setupNodes(HashAlgorithm alg, int n) {
     super.setupNodes(n);
@@ -40,7 +40,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testAll() throws Exception {
+  void testAll() throws Exception {
     setupNodes(4);
 
     Collection<MemcachedNode> all = locator.getAll();
@@ -51,7 +51,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testAllClone() throws Exception {
+  void testAllClone() throws Exception {
     setupNodes(4);
 
     Collection<MemcachedNode> all = locator.getReadonlyCopy().getAll();
@@ -59,7 +59,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testLookups() {
+  void testLookups() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
     assertSame(nodes[2], locator.getPrimary("noelani"));
@@ -67,7 +67,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testLookupsClone() {
+  void testLookupsClone() {
     setupNodes(4);
     assertSame(nodes[0].toString(),
             locator.getReadonlyCopy().getPrimary("dustin").toString());
@@ -78,7 +78,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testContinuumWrapping() {
+  void testContinuumWrapping() {
     setupNodes(4);
 
     assertSame(nodes[3], locator.getPrimary("V5XS8C8N"));
@@ -87,7 +87,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testClusterResizing() {
+  void testClusterResizing() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
     assertSame(nodes[2], locator.getPrimary("noelani"));
@@ -100,13 +100,13 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testSequence1() {
+  void testSequence1() {
     setupNodes(4);
     assertSequence("dustin", 0, 2, 1, 2);
   }
 
   @Test
-  public void testSequence2() {
+  void testSequence2() {
     setupNodes(4);
     assertSequence("noelani", 2, 1, 1, 3);
   }
@@ -116,7 +116,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testLibKetamaCompat() {
+  void testLibKetamaCompat() {
     setupNodes(5);
     assertPosForKey("36", 2);
     assertPosForKey("10037", 3);
@@ -125,7 +125,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testFNV1A_32() {
+  void testFNV1A_32() {
     HashAlgorithm alg = HashAlgorithm.FNV1A_32_HASH;
     setupNodes(alg, 5);
     assertSequence("noelani", 1, 2, 2, 2, 3);
@@ -152,7 +152,7 @@ public class KetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
-  public void testLibKetamaCompatTwo() {
+  void testLibKetamaCompatTwo() {
     String servers[] = {
         "10.0.1.1:11211",
         "10.0.1.2:11211",

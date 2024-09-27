@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class FlushByPrefixTest extends BaseIntegrationTest {
+class FlushByPrefixTest extends BaseIntegrationTest {
 
   private final String PREFIX = "prefix";
   private final String DELIMITER = ":";
@@ -35,7 +35,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
   private final String VALUE = "value";
 
   @Test
-  public void testFlushByPrefix() {
+  void testFlushByPrefix() {
     try {
       Boolean setResult = mc.set(PREFIX + DELIMITER + KEY, 60, VALUE)
               .get();
@@ -55,7 +55,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testFlushByPrefix1Depth() {
+  void testFlushByPrefix1Depth() {
     try {
       for (int i = 0; i < 10; i++) {
         Boolean setResult = mc.set(PREFIX + DELIMITER + KEY + i, 60,
@@ -80,7 +80,7 @@ public class FlushByPrefixTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testFlushByMultiPrefix() {
+  void testFlushByMultiPrefix() {
     try {
       for (int i = 0; i < 10; i++) {
         for (int prefix2 = 0; prefix2 < 10; prefix2++) {

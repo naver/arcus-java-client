@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
+class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -56,7 +56,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsertAndGetWithEFlag() throws Exception {
+  void testBopInsertAndGetWithEFlag() throws Exception {
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
             new CollectionAttributes()).get());
 
@@ -69,7 +69,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsertAndGetWithoutEFlag() throws Exception {
+  void testBopInsertAndGetWithoutEFlag() throws Exception {
     assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
             new CollectionAttributes()).get());
 
@@ -82,7 +82,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsertAndRangedGetWithEFlag() throws Exception {
+  void testBopInsertAndRangedGetWithEFlag() throws Exception {
 
     // insert 3 bkeys
     assertTrue(mc.asyncBopInsert(KEY, BKEY, FLAG, VALUE,
@@ -103,7 +103,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsertAndRangedGetWithoutEFlag() throws Exception {
+  void testBopInsertAndRangedGetWithoutEFlag() throws Exception {
 
     // insert 3 bkeys
     assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
@@ -124,7 +124,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetAllOfNotFlaggedBkeys() throws Exception {
+  void testGetAllOfNotFlaggedBkeys() throws Exception {
     // insert 3 bkeys
     assertTrue(mc.asyncBopInsert(KEY, BKEY, null, VALUE,
             new CollectionAttributes()).get());
@@ -149,7 +149,7 @@ public class BopInsertAndGetWithElementFlagTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsertAndRangedGetWithEFlags() throws Exception {
+  void testBopInsertAndRangedGetWithEFlags() throws Exception {
 
     assertTrue(mc.asyncBopInsert(KEY, BKEY, new byte[]{0}, VALUE,
             new CollectionAttributes()).get());

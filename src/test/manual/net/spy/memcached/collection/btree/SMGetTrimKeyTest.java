@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SMGetTrimKeyTest {
+class SMGetTrimKeyTest {
 
   private static final String KEY = "test";
 
   @Test
-  public void createWithLongBkey() {
+  void createWithLongBkey() {
     //given
     long bkey = 1;
     final SMGetTrimKey trimKey = new SMGetTrimKey(KEY, bkey);
@@ -24,7 +24,7 @@ public class SMGetTrimKeyTest {
   }
 
   @Test
-  public void createWithByteArrayBkey() {
+  void createWithByteArrayBkey() {
     //given
     byte[] bkey = {0x34};
     final SMGetTrimKey trimKey = new SMGetTrimKey(KEY, bkey);
@@ -36,7 +36,7 @@ public class SMGetTrimKeyTest {
   }
 
   @Test
-  public void compareToTest() {
+  void compareToTest() {
     //given
     long bkey = 2;
 

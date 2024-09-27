@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TimeoutTest {
+class TimeoutTest {
   private MemcachedClient client = null;
 
   @BeforeEach
@@ -44,32 +44,32 @@ public class TimeoutTest {
   }
 
   @Test
-  public void testCasTimeout() {
+  void testCasTimeout() {
     tryTimeout("cas", () -> client.cas("k", 1, "blah"));
   }
 
   @Test
-  public void testGetsTimeout() {
+  void testGetsTimeout() {
     tryTimeout("gets", () -> client.gets("k"));
   }
 
   @Test
-  public void testGetTimeout() {
+  void testGetTimeout() {
     tryTimeout("get", () -> client.get("k"));
   }
 
   @Test
-  public void testGetBulkTimeout() {
+  void testGetBulkTimeout() {
     tryTimeout("getbulk", () -> client.getBulk(Arrays.asList("k", "k2")));
   }
 
   @Test
-  public void testIncrTimeout() {
+  void testIncrTimeout() {
     tryTimeout("incr", () -> client.incr("k", 1));
   }
 
   @Test
-  public void testIncrWithDefTimeout() {
+  void testIncrWithDefTimeout() {
     tryTimeout("incrWithDef", () -> client.incr("k", 1, 5));
   }
 

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SMGetTest extends BaseIntegrationTest {
+class SMGetTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private List<String> keyList = null;
@@ -60,7 +60,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetMissAll() {
+  void testSMGetMissAll() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
@@ -101,7 +101,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitAll() {
+  void testSMGetHitAll() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 50; i++) {
@@ -158,7 +158,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitAllWithOffsetMoreCount() {
+  void testSMGetHitAllWithOffsetMoreCount() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 50; i++) {
@@ -215,7 +215,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitAllWithOffsetExactCount() {
+  void testSMGetHitAllWithOffsetExactCount() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
@@ -272,7 +272,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitAllWithOffsetLessThanCount() {
+  void testSMGetHitAllWithOffsetLessThanCount() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 9; i++) {
@@ -329,7 +329,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitAllDesc() {
+  void testSMGetHitAllDesc() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
@@ -374,7 +374,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitHalf() {
+  void testSMGetHitHalf() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
@@ -421,7 +421,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetHitHalfDesc() {
+  void testSMGetHitHalfDesc() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 10; i++) {
@@ -467,7 +467,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testPerformanceGet1000KeysWithoutOffset() {
+  void testPerformanceGet1000KeysWithoutOffset() {
     try {
       keyList = new ArrayList<>();
       for (int i = 0; i < 1000; i++) {
@@ -523,7 +523,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetWithMassiveKeys() {
+  void testSMGetWithMassiveKeys() {
     int testSize = 2000;
 
     try {
@@ -579,7 +579,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetWithElementMultiFlagsFilter() {
+  void testSMGetWithElementMultiFlagsFilter() {
     int testSize = 2000;
 
     try {
@@ -633,7 +633,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBkeySMGetWithElementMultiFlagsFilter() {
+  void testByteArrayBkeySMGetWithElementMultiFlagsFilter() {
     int testSize = 2000;
 
     try {
@@ -692,7 +692,7 @@ public class SMGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSMGetOverflowMaxCount() {
+  void testSMGetOverflowMaxCount() {
     try {
       mc.asyncBopSortMergeGet(keyList, 0, 1000,
               ElementFlagFilter.DO_NOT_FILTER, 0, 1001);

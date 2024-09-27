@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MutateWithDefaultTest extends BaseIntegrationTest {
+class MutateWithDefaultTest extends BaseIntegrationTest {
 
   private String key = "MutateWithDefaultTest";
 
@@ -39,7 +39,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testIncr() {
+  void testIncr() {
     try {
       long v;
       Future<Long> future = mc.asyncIncr(key, 1);
@@ -59,7 +59,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDecr() {
+  void testDecr() {
     try {
       long v;
 
@@ -80,7 +80,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testIncrWithDefault() {
+  void testIncrWithDefault() {
     try {
 
       Future<Long> future = mc.asyncIncr(key, 1, 100, 10);
@@ -100,7 +100,7 @@ public class MutateWithDefaultTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDecrWithDefault() {
+  void testDecrWithDefault() {
     try {
 
       Future<Long> future = mc.asyncDecr(key, 1, 100, 10);

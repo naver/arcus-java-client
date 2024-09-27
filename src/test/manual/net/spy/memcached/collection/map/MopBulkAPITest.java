@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopBulkAPITest extends BaseIntegrationTest {
+class MopBulkAPITest extends BaseIntegrationTest {
 
   private final String key = "MopBulkAPITest33";
   private final Map<String, Object> elements = new HashMap<>();
@@ -57,7 +57,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulk() throws Exception {
+  void testBulk() throws Exception {
     for (int i = 0; i < 10; i++) {
       mc.delete(key).get();
       bulk();
@@ -84,7 +84,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkFailed() {
+  void testBulkFailed() {
     try {
       mc.asyncMopDelete(key, true).get(1000,
               TimeUnit.MILLISECONDS);
@@ -110,7 +110,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBulkEmptyElements() {
+  void testBulkEmptyElements() {
     try {
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
               .asyncMopPipedInsertBulk(key, new HashMap<>(),
@@ -128,7 +128,7 @@ public class MopBulkAPITest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUpdateBulk() {
+  void testUpdateBulk() {
     try {
       mc.asyncMopDelete(key, true).get(1000,
               TimeUnit.MILLISECONDS);

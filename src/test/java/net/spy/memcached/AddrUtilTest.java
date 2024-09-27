@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Test the AddrUtils stuff.
  */
-public class AddrUtilTest {
+class AddrUtilTest {
 
   @Test
-  public void testSingle() throws Exception {
+  void testSingle() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("www.google.com:80");
     assertEquals(1, addrs.size());
@@ -41,7 +41,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testTwo() throws Exception {
+  void testTwo() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("www.google.com:80 www.yahoo.com:81");
     assertEquals(2, addrs.size());
@@ -52,7 +52,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testThree() throws Exception {
+  void testThree() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses(" ,  www.google.com:80 ,, ,, www.yahoo.com:81 , ,,");
     assertEquals(2, addrs.size());
@@ -63,7 +63,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testBrokenHost() throws Exception {
+  void testBrokenHost() throws Exception {
     String s = "www.google.com:80 www.yahoo.com:81:more";
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
@@ -75,7 +75,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testBrokenHost2() throws Exception {
+  void testBrokenHost2() throws Exception {
     String s = "www.google.com:80 www.yahoo.com";
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
@@ -87,7 +87,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testNullList() throws Exception {
+  void testNullList() throws Exception {
     String s = null;
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
@@ -98,7 +98,7 @@ public class AddrUtilTest {
   }
 
   @Test
-  public void testIPv6Host() throws Exception {
+  void testIPv6Host() throws Exception {
     List<InetSocketAddress> addrs =
             AddrUtil.getAddresses("::1:80");
     assertEquals(1, addrs.size());

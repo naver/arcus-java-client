@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class MopOverflowActionTest extends BaseIntegrationTest {
+class MopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "MopOverflowActionTest";
   private List<String> keyList = new ArrayList<>();
@@ -47,7 +47,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_Maxcount() throws Exception {
+  void testMopGet_Maxcount() throws Exception {
     // Test
     for (int maxcount = 100; maxcount <= 200; maxcount += 100) {
       // Create a map
@@ -73,7 +73,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_Overflow() throws Exception {
+  void testMopGet_Overflow() throws Exception {
     // Create a map
     mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
 
@@ -104,7 +104,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_AvailableOverflowAction() throws Exception {
+  void testMopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncMopInsert(key, "0", "item0", new CollectionAttributes()).get();
 
@@ -138,7 +138,7 @@ public class MopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testMopGet_notAvailableOverflowAction() {
+  void testMopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
     Map<String, Object> elem = new TreeMap<>();
     elem.put("0", "item0");

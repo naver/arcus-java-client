@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
+class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
 
   private String key = "LopInsertWhenKeyNotExist";
 
@@ -49,7 +49,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_01() throws Exception {
+  void testLopInsert_nokey_01() throws Exception {
     insertToFail(key, -1, true, null);
   }
 
@@ -60,7 +60,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_02() throws Exception {
+  void testLopInsert_nokey_02() throws Exception {
     boolean success = insertToSucceed(key, -1, false, "some value");
 
     assertFalse(success);
@@ -73,7 +73,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_03() throws Exception {
+  void testLopInsert_nokey_03() throws Exception {
     assertFalse(insertToSucceed(key, 0, false, "some value"));
   }
 
@@ -84,7 +84,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_04() throws Exception {
+  void testLopInsert_nokey_04() throws Exception {
     assertFalse(insertToSucceed(key, 0, false, "some value"));
   }
 
@@ -95,7 +95,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_05() throws Exception {
+  void testLopInsert_nokey_05() throws Exception {
     assertTrue(insertToSucceed(key, 0, true, "some value"));
   }
 
@@ -106,7 +106,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_06() throws Exception {
+  void testLopInsert_nokey_06() throws Exception {
     assertTrue(insertToSucceed(key, -1, true, "some value"));
   }
 
@@ -117,7 +117,7 @@ public class LopInsertWhenKeyNotExist extends BaseIntegrationTest {
    * </pre>
    */
   @Test
-  public void testLopInsert_nokey_07() throws Exception {
+  void testLopInsert_nokey_07() throws Exception {
     // Prepare 3 items
     String[] items = {"item01", "item02", "item03"};
     for (String item : items) {

@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopInsertWhenKeyExists extends BaseIntegrationTest {
+class BopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private String key = "BopInsertWhenKeyExists";
 
@@ -52,7 +52,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsert_unreadable_largestTrim() throws Exception {
+  void testBopInsert_unreadable_largestTrim() throws Exception {
     // insert with unreadable
     CollectionAttributes attr = new CollectionAttributes();
     attr.setReadable(false);
@@ -78,7 +78,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsert_Normal() throws Exception {
+  void testBopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -105,7 +105,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsert_SameItem() throws Exception {
+  void testBopInsert_SameItem() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 
@@ -126,7 +126,7 @@ public class BopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopInsert_SameBkey() throws Exception {
+  void testBopInsert_SameBkey() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
 

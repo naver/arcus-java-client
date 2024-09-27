@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Some test coverage for transcoder utils.
  */
-public class TranscoderUtilsTest {
+class TranscoderUtilsTest {
 
   private TranscoderUtils tu;
   private final byte[] oversizeBytes = new byte[16];
@@ -22,7 +22,7 @@ public class TranscoderUtilsTest {
   }
 
   @Test
-  public void testBooleanOverflow() {
+  void testBooleanOverflow() {
     try {
       boolean b = tu.decodeBoolean(oversizeBytes);
       fail("Got " + b + " expected assertion.");
@@ -32,7 +32,7 @@ public class TranscoderUtilsTest {
   }
 
   @Test
-  public void testByteOverflow() {
+  void testByteOverflow() {
     try {
       byte b = tu.decodeByte(oversizeBytes);
       fail("Got " + b + " expected assertion.");
@@ -42,7 +42,7 @@ public class TranscoderUtilsTest {
   }
 
   @Test
-  public void testIntOverflow() {
+  void testIntOverflow() {
     try {
       int b = tu.decodeInt(oversizeBytes);
       fail("Got " + b + " expected assertion.");
@@ -52,7 +52,7 @@ public class TranscoderUtilsTest {
   }
 
   @Test
-  public void testLongOverflow() {
+  void testLongOverflow() {
     try {
       long b = tu.decodeLong(oversizeBytes);
       fail("Got " + b + " expected assertion.");
@@ -62,12 +62,12 @@ public class TranscoderUtilsTest {
   }
 
   @Test
-  public void testPackedLong() {
+  void testPackedLong() {
     assertEquals("[1]", Arrays.toString(tu.encodeLong(1)));
   }
 
   @Test
-  public void testUnpackedLong() {
+  void testUnpackedLong() {
     assertEquals("[0, 0, 0, 0, 0, 0, 0, 1]",
             Arrays.toString(new TranscoderUtils(false).encodeLong(1)));
   }

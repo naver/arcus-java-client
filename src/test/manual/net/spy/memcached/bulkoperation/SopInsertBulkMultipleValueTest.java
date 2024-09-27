@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
+class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String key = "testInsertAndGet";
     String prefix = "MyValue";
 
@@ -103,7 +103,7 @@ public class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorCount() {
+  void testErrorCount() {
     String key = "testErrorCount";
     int valueCount = 1200;
     Object[] valueList = new Object[valueCount];

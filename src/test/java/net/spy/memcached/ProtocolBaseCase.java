@@ -51,10 +51,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class ProtocolBaseCase extends ClientBaseCase {
+abstract class ProtocolBaseCase extends ClientBaseCase {
 
   @Test
-  public void testAssertions() {
+  void testAssertions() {
     boolean caught = false;
     try {
       assert false;
@@ -65,7 +65,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetStats() throws Exception {
+  void testGetStats() throws Exception {
     Map<SocketAddress, Map<String, String>> stats = client.getStats();
     System.out.println("Stats:  " + stats);
     assertEquals(client.getAllNodes().size(), stats.size());
@@ -74,7 +74,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetStatsSlabs() throws Exception {
+  void testGetStatsSlabs() throws Exception {
     // There needs to at least have been one value set or there may be
     // no slabs to check.
     assertTrue(client.set("slabinitializer", 0, "hi").get());
@@ -86,7 +86,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetStatsSizes() throws Exception {
+  void testGetStatsSizes() throws Exception {
     // Arcus does not support "stats sizes"
     if (true) {
       return;
@@ -102,7 +102,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetStatsCacheDump() throws Exception {
+  void testGetStatsCacheDump() throws Exception {
     // There needs to at least have been one value set or there
     // won't be anything to dump
     assertTrue(client.set("dumpinitializer", 0, "hi").get());
@@ -115,7 +115,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testDelayedFlush() throws Exception {
+  void testDelayedFlush() throws Exception {
     assertNull(client.get("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertTrue(client.set("test2", 5, "test2value").get());
@@ -128,32 +128,32 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testNoop() {
+  void testNoop() {
     // This runs through the startup/flush cycle
   }
 
   @Test
-  public void testDoubleShutdown() {
+  void testDoubleShutdown() {
     client.shutdown();
     client.shutdown();
   }
 
   @Test
-  public void testSimpleGet() throws Exception {
+  void testSimpleGet() throws Exception {
     assertNull(client.get("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.get("test1"));
   }
 
   @Test
-  public void testSimpleCASGets() throws Exception {
+  void testSimpleCASGets() throws Exception {
     assertNull(client.gets("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.gets("test1").getValue());
   }
 
   @Test
-  public void testCAS() throws Exception {
+  void testCAS() throws Exception {
     final String key = "castestkey";
     // First, make sure it doesn't work for a non-existing value.
     assertSame(CASResponse.NOT_FOUND,
@@ -187,7 +187,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testReallyLongCASId() throws Exception {
+  void testReallyLongCASId() throws Exception {
     String key = "this-is-my-key";
     assertSame(CASResponse.NOT_FOUND,
             client.cas(key, 9223372036854775807L, "bad value"),
@@ -195,7 +195,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testExtendedUTF8Key() throws Exception {
+  void testExtendedUTF8Key() throws Exception {
     String key = "\u2013\u00ba\u2013\u220f\u2014\u00c4";
     assertNull(client.get(key));
     assertTrue(client.set(key, 5, "test1value").get());
@@ -203,7 +203,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKey1() throws Exception {
+  void testInvalidKey1() throws Exception {
     try {
       client.get("key with spaces");
       fail("Expected IllegalArgumentException getting key with spaces");
@@ -213,7 +213,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKey2() throws Exception {
+  void testInvalidKey2() throws Exception {
     try {
       StringBuilder longKey = new StringBuilder();
       // MAX_KEY_LENGTH is 4000.
@@ -228,7 +228,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKey3() throws Exception {
+  void testInvalidKey3() throws Exception {
     try {
       Object val = client.get("Key\n");
       fail("Expected IllegalArgumentException, got " + val);
@@ -238,7 +238,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKey4() throws Exception {
+  void testInvalidKey4() throws Exception {
     try {
       Object val = client.get("Key\r");
       fail("Expected IllegalArgumentException, got " + val);
@@ -248,7 +248,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKey5() throws Exception {
+  void testInvalidKey5() throws Exception {
     try {
       Object val = client.get("Key\0");
       fail("Expected IllegalArgumentException, got " + val);
@@ -258,7 +258,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKeyBlank() throws Exception {
+  void testInvalidKeyBlank() throws Exception {
     try {
       Object val = client.get("");
       fail("Expected IllegalArgumentException, got " + val);
@@ -268,7 +268,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testInvalidKeyBulk() throws Exception {
+  void testInvalidKeyBulk() throws Exception {
     try {
       Object val = client.getBulk(Collections.singletonList("Key key2"));
       fail("Expected IllegalArgumentException, got " + val);
@@ -278,7 +278,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testParallelSetGet() throws Throwable {
+  void testParallelSetGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, () -> {
       int size = 10;
       List<String> keys = new ArrayList<>(size);
@@ -307,7 +307,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testParallelSetMultiGet() throws Throwable {
+  void testParallelSetMultiGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, () -> {
       int size = 10;
       List<String> keys = new ArrayList<>(size);
@@ -336,7 +336,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testParallelSetAutoMultiGet() throws Throwable {
+  void testParallelSetAutoMultiGet() throws Throwable {
     int cnt = SyncThread.getDistinctResultCount(10, () -> {
       assertTrue(client.set("testparallel", 60, "parallelvalue").get());
       for (int i = 0; i < 10; i++) {
@@ -348,7 +348,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAdd() throws Exception {
+  void testAdd() throws Exception {
     assertNull(client.get("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.get("test1"));
@@ -358,7 +358,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAddWithTranscoder() throws Exception {
+  void testAddWithTranscoder() throws Exception {
     Transcoder<String> t = new TestTranscoder();
     assertNull(client.get("test1", t));
     assertTrue(client.set("test1", 5, "test1value", t).get());
@@ -369,7 +369,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAddNotSerializable() throws Exception {
+  void testAddNotSerializable() throws Exception {
     try {
       client.add("t1", 5, new Object());
       fail("expected illegal argument exception");
@@ -379,7 +379,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testSetNotSerializable() throws Exception {
+  void testSetNotSerializable() throws Exception {
     try {
       client.set("t1", 5, new Object());
       fail("expected illegal argument exception");
@@ -389,7 +389,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testReplaceNotSerializable() throws Exception {
+  void testReplaceNotSerializable() throws Exception {
     try {
       client.replace("t1", 5, new Object());
       fail("expected illegal argument exception");
@@ -399,14 +399,14 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUpdate() throws Exception {
+  void testUpdate() throws Exception {
     assertNull(client.get("test1"));
     assertFalse(client.replace("test1", 5, "test1value").get());
     assertNull(client.get("test1"));
   }
 
   @Test
-  public void testUpdateWithTranscoder() throws Exception {
+  void testUpdateWithTranscoder() throws Exception {
     Transcoder<String> t = new TestTranscoder();
     assertNull(client.get("test1", t));
     assertFalse(client.replace("test1", 5, "test1value", t).get());
@@ -415,7 +415,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
 
   // Just to make sure the sequence is being handled correctly
   @Test
-  public void testMixedSetsAndUpdates() throws Exception {
+  void testMixedSetsAndUpdates() throws Exception {
     int keySize = 100;
     List<String> keys = new ArrayList<>(keySize);
     List<Future<Boolean>> setFutures = new ArrayList<>(keySize);
@@ -440,7 +440,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetBulk() throws Exception {
+  void testGetBulk() throws Exception {
     Collection<String> keys = Arrays.asList("test1", "test2", "test3");
     assertEquals(0, client.getBulk(keys).size());
     assertTrue(client.set("test1", 5, "val1").get());
@@ -452,7 +452,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAsyncGetBulkWithTranscoderIterator() throws Exception {
+  void testAsyncGetBulkWithTranscoderIterator() throws Exception {
     ArrayList<String> keys = new ArrayList<>();
     keys.add("test1");
     keys.add("test2");
@@ -495,7 +495,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGetsBulk() throws Exception {
+  void testGetsBulk() throws Exception {
     Collection<String> keys = Arrays.asList("test1", "test2", "test3");
     assertEquals(0, client.getsBulk(keys).size());
     assertTrue(client.set("test1", 5, "val1").get());
@@ -509,7 +509,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
+  void testAsyncGetsBulkWithTranscoderIterator() throws Exception {
     ArrayList<String> keys = new ArrayList<>();
     keys.add("test1");
     keys.add("test2");
@@ -556,7 +556,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void getCompositeExceptionFromBulkGetFuture() {
+  void getCompositeExceptionFromBulkGetFuture() {
     List<String> keys = new ArrayList<>();
     for (int i = 0; i < 210; i++) {
       keys.add("test" + i);
@@ -578,7 +578,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAvailableServers() {
+  void testAvailableServers() {
     if (USE_ZK) {
       return; // We don't know the server address priori
     }
@@ -589,7 +589,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUnavailableServers() {
+  void testUnavailableServers() {
     client.getVersions();
     assertEquals(Collections.emptyList(), client.getUnavailableServers());
   }
@@ -597,7 +597,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   protected abstract String getExpectedVersionSource();
 
   @Test
-  public void testGetVersions() throws Exception {
+  void testGetVersions() throws Exception {
     if (USE_ZK) {
       return; // We don't know the server address priori
     }
@@ -609,13 +609,13 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testNonexistentMutate() throws Exception {
+  void testNonexistentMutate() throws Exception {
     assertEquals(-1, client.incr("nonexistent", 1));
     assertEquals(-1, client.decr("nonexistent", 1));
   }
 
   @Test
-  public void testMutateWithDefault() throws Exception {
+  void testMutateWithDefault() throws Exception {
     assertEquals(3, client.incr("mtest", 1, 3));
     assertEquals(4, client.incr("mtest", 1, 3));
     assertEquals(3, client.decr("mtest", 1, 9));
@@ -623,7 +623,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testMutateWithDefaultAndExp() throws Exception {
+  void testMutateWithDefaultAndExp() throws Exception {
     assertEquals(3, client.incr("mtest", 1, 3, 1));
     assertEquals(4, client.incr("mtest", 1, 3, 1));
     assertEquals(3, client.decr("mtest", 1, 9, 1));
@@ -633,7 +633,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAsyncIncrement() throws Exception {
+  void testAsyncIncrement() throws Exception {
     String k = "async-incr";
     assertTrue(client.set(k, 0, "5").get());
     Future<Long> f = client.asyncIncr(k, 1);
@@ -641,14 +641,14 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAsyncIncrementNonExistent() throws Exception {
+  void testAsyncIncrementNonExistent() throws Exception {
     String k = "async-incr-non-existent";
     Future<Long> f = client.asyncIncr(k, 1);
     assertEquals(-1, (long) f.get());
   }
 
   @Test
-  public void testAsyncDecrement() throws Exception {
+  void testAsyncDecrement() throws Exception {
     String k = "async-decr";
     assertTrue(client.set(k, 0, "5").get());
     Future<Long> f = client.asyncDecr(k, 1);
@@ -656,20 +656,20 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAsyncDecrementNonExistent() throws Exception {
+  void testAsyncDecrementNonExistent() throws Exception {
     String k = "async-decr-non-existent";
     Future<Long> f = client.asyncDecr(k, 1);
     assertEquals(-1, (long) f.get());
   }
 
   @Test
-  public void testConcurrentMutation() throws Throwable {
+  void testConcurrentMutation() throws Throwable {
     int num = SyncThread.getDistinctResultCount(10, () -> client.incr("mtest", 1, 11));
     assertEquals(10, num);
   }
 
   @Test
-  public void testImmediateDelete() throws Exception {
+  void testImmediateDelete() throws Exception {
     assertNull(client.get("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertEquals("test1value", client.get("test1"));
@@ -678,7 +678,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testFlush() throws Exception {
+  void testFlush() throws Exception {
     assertNull(client.get("test1"));
     assertTrue(client.set("test1", 5, "test1value").get());
     assertTrue(client.set("test2", 5, "test2value").get());
@@ -690,7 +690,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGracefulShutdown() throws Exception {
+  void testGracefulShutdown() throws Exception {
     for (int i = 0; i < 1000; i++) {
       client.set("t" + i, 10, i);
     }
@@ -711,7 +711,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testSyncGetTimeouts() throws Exception {
+  void testSyncGetTimeouts() throws Exception {
     final String key = "timeoutTestKey";
     final String value = "timeoutTestValue";
     // Shutting down the default client to get one with a short timeout.
@@ -742,7 +742,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testGracefulShutdownTooSlow() throws Exception {
+  void testGracefulShutdownTooSlow() throws Exception {
     final int size = 1000 * 1000;
     final byte[] data = new byte[size];
     new Random().nextBytes(data);
@@ -788,7 +788,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testStupidlyLargeSetAndSizeOverride() throws Exception {
+  void testStupidlyLargeSetAndSizeOverride() throws Exception {
     Random r = new Random();
     SerializingTranscoder st = new SerializingTranscoder(Integer.MAX_VALUE);
 
@@ -814,7 +814,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testStupidlyLargeSet() throws Exception {
+  void testStupidlyLargeSet() throws Exception {
     Random r = new Random();
     SerializingTranscoder st = new SerializingTranscoder();
     st.setCompressionThreshold(Integer.MAX_VALUE);
@@ -838,7 +838,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testQueueAfterShutdown() throws Exception {
+  void testQueueAfterShutdown() throws Exception {
     client.shutdown();
     try {
       Object o = client.get("k");
@@ -851,7 +851,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testMultiReqAfterShutdown() throws Exception {
+  void testMultiReqAfterShutdown() throws Exception {
     client.shutdown();
     try {
       Map<String, ?> m = client.getBulk(Arrays.asList("k1", "k2", "k3"));
@@ -864,7 +864,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testBroadcastAfterShutdown() throws Exception {
+  void testBroadcastAfterShutdown() throws Exception {
     client.shutdown();
     try {
       Future<?> f = client.flush();
@@ -877,7 +877,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testABunchOfCancelledOperations() throws Exception {
+  void testABunchOfCancelledOperations() throws Exception {
     final String k = "bunchOCancel";
     Collection<Future<?>> futures = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
@@ -894,7 +894,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUTF8Key() throws Exception {
+  void testUTF8Key() throws Exception {
     final String key = "junit.Здравствуйте." + System.currentTimeMillis();
     final String value = "Skiing rocks if you can find the time to go!";
 
@@ -905,7 +905,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUTF8KeyDelete() throws Exception {
+  void testUTF8KeyDelete() throws Exception {
     final String key = "junit.Здравствуйте." + System.currentTimeMillis();
     final String value = "Skiing rocks if you can find the time to go!";
 
@@ -915,7 +915,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUTF8MultiGet() throws Exception {
+  void testUTF8MultiGet() throws Exception {
     final String value = "Skiing rocks if you can find the time to go!";
     Collection<String> keys = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
@@ -934,7 +934,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testUTF8Value() throws Exception {
+  void testUTF8Value() throws Exception {
     final String key = "junit.plaintext." + System.currentTimeMillis();
     final String value = "Здравствуйте Здравствуйте Здравствуйте "
             + "Skiing rocks if you can find the time to go!";
@@ -946,7 +946,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAppend() throws Exception {
+  void testAppend() throws Exception {
     final String key = "append.key";
     assertTrue(client.set(key, 5, "test").get());
     assertTrue(client.append(0, key, "es").get());
@@ -954,7 +954,7 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testPrepend() throws Exception {
+  void testPrepend() throws Exception {
     final String key = "prepend.key";
     assertTrue(client.set(key, 5, "test").get());
     assertTrue(client.prepend(0, key, "es").get());
@@ -962,14 +962,14 @@ public abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
-  public void testAppendNoSuchKey() throws Exception {
+  void testAppendNoSuchKey() throws Exception {
     final String key = "append.missing";
     assertFalse(client.append(0, key, "es").get());
     assertNull(client.get(key));
   }
 
   @Test
-  public void testPrependNoSuchKey() throws Exception {
+  void testPrependNoSuchKey() throws Exception {
     final String key = "prepend.missing";
     assertFalse(client.prepend(0, key, "es").get());
     assertNull(client.get(key));

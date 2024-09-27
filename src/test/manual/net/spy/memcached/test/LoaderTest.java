@@ -13,7 +13,7 @@ import net.spy.memcached.util.CacheLoader;
 /**
  * Loader performance test.
  */
-public class LoaderTest extends SpyObject implements Runnable {
+class LoaderTest extends SpyObject implements Runnable {
 
   private final int count;
   private MemcachedClient client;

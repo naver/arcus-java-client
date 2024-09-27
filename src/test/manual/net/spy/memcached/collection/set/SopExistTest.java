@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SopExistTest extends BaseIntegrationTest {
+class SopExistTest extends BaseIntegrationTest {
 
   private final String key = "SopExistTest";
   private final String value = "value";
@@ -43,7 +43,7 @@ public class SopExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testExist() throws Exception {
+  void testExist() throws Exception {
     Boolean result = mc.asyncSopInsert(key, value,
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
     assertTrue(result);
@@ -55,7 +55,7 @@ public class SopExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotExist() throws Exception {
+  void testNotExist() throws Exception {
     Boolean result = mc.asyncSopInsert(key, value,
             new CollectionAttributes()).get(1000, TimeUnit.MILLISECONDS);
     assertTrue(result);
@@ -67,7 +67,7 @@ public class SopExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFound() throws Exception {
+  void testNotFound() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncSopExist(key, value);
     assertFalse(future.get(1000, TimeUnit.MILLISECONDS));
     assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
@@ -75,7 +75,7 @@ public class SopExistTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnreadabled() throws Exception {
+  void testUnreadabled() throws Exception {
     CollectionAttributes attrs = new CollectionAttributes();
     attrs.setReadable(false);
 

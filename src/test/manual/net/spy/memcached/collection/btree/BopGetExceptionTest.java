@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopGetExceptionTest extends BaseIntegrationTest {
+class BopGetExceptionTest extends BaseIntegrationTest {
 
   private String key = "BopGetExceptionTest";
 
@@ -47,7 +47,7 @@ public class BopGetExceptionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_OutOfBound() throws Exception {
+  void testBopGet_OutOfBound() throws Exception {
     // Create a list and add 10 items in it
     addToBTree(key, items10);
 
@@ -66,7 +66,7 @@ public class BopGetExceptionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_NoKey() throws Exception {
+  void testBopGet_NoKey() throws Exception {
     // Querying to non-existing collection
     Map<Long, Element<Long>> rmap = mc.asyncBopGet(key, 0, 100,
             ElementFlagFilter.DO_NOT_FILTER, 0, 10, false, false,

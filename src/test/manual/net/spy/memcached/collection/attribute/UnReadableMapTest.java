@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class UnReadableMapTest extends BaseIntegrationTest {
+class UnReadableMapTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String MKEY = "MKEY";
@@ -56,7 +56,7 @@ public class UnReadableMapTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateUnreadableMapTest() {
+  void testCreateUnreadableMapTest() {
     try {
       // create unreadable empty
       CollectionAttributes attribute = new CollectionAttributes();
@@ -103,7 +103,7 @@ public class UnReadableMapTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreateReadableMapTest() {
+  void testCreateReadableMapTest() {
     try {
       // create readable empty
       CollectionAttributes attribute = new CollectionAttributes();

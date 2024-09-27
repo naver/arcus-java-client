@@ -18,15 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Ignore it now and fix it later.
  */
 @Disabled
-public class ConsistentHashingTest {
+class ConsistentHashingTest {
 
   @Test
-  public void testSmallSet() {
+  void testSmallSet() {
     runThisManyNodes(3);
   }
 
   @Test
-  public void testLargeSet() {
+  void testLargeSet() {
     runThisManyNodes(100);
   }
 

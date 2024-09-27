@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolBTreeDeleteTest {
+class ProtocolBTreeDeleteTest {
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     // default setting : dropIfEmpty = true
 
     assertEquals("10 drop",

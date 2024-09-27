@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test the connection factory builder.
  */
-public class ConnectionFactoryBuilderTest {
+class ConnectionFactoryBuilderTest {
 
   private ConnectionFactoryBuilder b;
 
@@ -57,7 +57,7 @@ public class ConnectionFactoryBuilderTest {
   }
 
   @Test
-  public void testDefaults() throws Exception {
+  void testDefaults() throws Exception {
     ConnectionFactory f = b.build();
     assertEquals(DefaultConnectionFactory.DEFAULT_OPERATION_TIMEOUT,
             f.getOperationTimeout());
@@ -107,7 +107,7 @@ public class ConnectionFactoryBuilderTest {
   }
 
   @Test
-  public void testModifications() throws Exception {
+  void testModifications() throws Exception {
     ConnectionObserver testObserver = new ConnectionObserver() {
       public void connectionLost(SocketAddress sa) {
         // none
@@ -176,14 +176,14 @@ public class ConnectionFactoryBuilderTest {
   }
 
   @Test
-  public void testProtocolSetterBinary() {
+  void testProtocolSetterBinary() {
     assertTrue(
             b.setProtocol(Protocol.BINARY).build().getOperationFactory()
                     instanceof BinaryOperationFactory);
   }
 
   @Test
-  public void testProtocolSetterText() {
+  void testProtocolSetterText() {
     assertTrue(
             b.setProtocol(Protocol.TEXT).build().getOperationFactory()
                     instanceof AsciiOperationFactory);

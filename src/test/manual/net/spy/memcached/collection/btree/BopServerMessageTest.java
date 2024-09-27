@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BopServerMessageTest extends BaseIntegrationTest {
+class BopServerMessageTest extends BaseIntegrationTest {
 
   private String key = "BopServerMessageTest";
 
@@ -56,7 +56,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFound() throws Exception {
+  void testNotFound() throws Exception {
     CollectionFuture<Map<Long, Element<Object>>> future = mc.asyncBopGet(
             key, 0, ElementFlagFilter.DO_NOT_FILTER, false, false);
     assertNull(future.get(1000, TimeUnit.MILLISECONDS));
@@ -67,7 +67,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFoundElement() throws Exception {
+  void testNotFoundElement() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -82,7 +82,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testCreatedStored() throws Exception {
+  void testCreatedStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -93,7 +93,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStored() throws Exception {
+  void testStored() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -107,7 +107,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOutOfRange() throws Exception {
+  void testOutOfRange() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 1, null, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -125,7 +125,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOverflowed() throws Exception {
+  void testOverflowed() throws Exception {
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
@@ -143,7 +143,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testElementExists() throws Exception {
+  void testElementExists() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());
@@ -159,7 +159,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDropped() throws Exception {
+  void testDeletedDropped() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());
@@ -175,7 +175,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleted() throws Exception {
+  void testDeleted() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());
@@ -195,7 +195,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedDroppedAfterRetrieval() throws Exception {
+  void testDeletedDroppedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());
@@ -212,7 +212,7 @@ public class BopServerMessageTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeletedAfterRetrieval() throws Exception {
+  void testDeletedAfterRetrieval() throws Exception {
     // create
     CollectionFuture<Boolean> future = mc.asyncBopInsert(
         key, 0, null, "aaa", new CollectionAttributes());

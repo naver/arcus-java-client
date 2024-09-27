@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class GetCountBTreeTest extends BaseIntegrationTest {
+class GetCountBTreeTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10L;
@@ -55,7 +55,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidKey() {
+  void testGetBKeyCountFromInvalidKey() {
     try {
       CollectionFuture<Integer> future = mc.asyncBopGetItemCount(
               "INVALIDKEY", BKEY, BKEY, ElementFlagFilter.DO_NOT_FILTER);
@@ -71,7 +71,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidType() {
+  void testGetBKeyCountFromInvalidType() {
     try {
       // insert value into set
       Boolean insertResult = mc.asyncSopInsert(KEY, "value",
@@ -93,7 +93,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountUnreadable() {
+  void testGetBKeyCountUnreadable() {
     try {
       CollectionAttributes attributes = new CollectionAttributes();
       attributes.setReadable(false);
@@ -117,7 +117,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromInvalidBKeyType() {
+  void testGetBKeyCountFromInvalidBKeyType() {
     try {
       // insert an item
       Boolean insertResult = mc.asyncBopInsert(KEY, new byte[]{0},
@@ -139,7 +139,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty() {
+  void testGetBKeyCountFromNotEmpty() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -172,7 +172,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountFromNotEmpty2() {
+  void testGetBKeyCountFromNotEmpty2() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -203,7 +203,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountByNotExistsBKey() {
+  void testGetBKeyCountByNotExistsBKey() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -234,7 +234,7 @@ public class GetCountBTreeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBKeyCountByNotExistsRange() {
+  void testGetBKeyCountByNotExistsRange() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());

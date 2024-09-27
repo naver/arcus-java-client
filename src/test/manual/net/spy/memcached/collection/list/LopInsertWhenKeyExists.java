@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LopInsertWhenKeyExists extends BaseIntegrationTest {
+class LopInsertWhenKeyExists extends BaseIntegrationTest {
 
   private String key = "LopInsertWhenKeyExists";
 
@@ -44,7 +44,7 @@ public class LopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_Normal() throws Exception {
+  void testLopInsert_Normal() throws Exception {
     // Create a list and add it 9 items
     addToList(key, items9);
 
@@ -69,7 +69,7 @@ public class LopInsertWhenKeyExists extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopInsert_SameItem() throws Exception {
+  void testLopInsert_SameItem() throws Exception {
     // Create a list and add it 8 items
     addToList(key, items8);
 

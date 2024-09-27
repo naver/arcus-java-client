@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
+class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final long BKEY = 10;
@@ -60,7 +60,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithAttribute() {
+  void testInsertWithAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -96,7 +96,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithDefaultAttribute() {
+  void testInsertWithDefaultAttribute() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -124,7 +124,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithoutAttributeCreate() {
+  void testInsertWithoutAttributeCreate() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -150,7 +150,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithoutAttributeDoNotCreate() {
+  void testInsertWithoutAttributeDoNotCreate() {
     try {
       // check not exists
       assertNull(mc.asyncGetAttr(KEY).get());
@@ -174,7 +174,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithEflag() {
+  void testInsertWithEflag() {
     try {
       byte[] eflag = new byte[]{0, 1, 0, 1};
       List<Element<Object>> elements = new ArrayList<>();
@@ -204,7 +204,7 @@ public class PipedBulkInsertBTreeWithAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertWithEflagLongBkey() {
+  void testInsertWithEflagLongBkey() {
     try {
       byte[] eflag = new byte[]{0, 1, 0, 1};
 

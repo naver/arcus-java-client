@@ -9,7 +9,7 @@ import net.spy.memcached.MemcachedClient;
  * This is an attempt to reproduce a problem where a server fails during a
  * series of gets.
  */
-public final class MultiNodeFailureTest {
+final class MultiNodeFailureTest {
 
   private MultiNodeFailureTest() {
   }

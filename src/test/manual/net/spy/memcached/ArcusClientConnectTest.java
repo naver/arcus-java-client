@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
-public class ArcusClientConnectTest {
+class ArcusClientConnectTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -31,7 +31,7 @@ public class ArcusClientConnectTest {
   }
 
   @Test
-  public void testOpenAndWait() {
+  void testOpenAndWait() {
     ArcusClient client = ArcusClient.createArcusClient(BaseIntegrationTest.ZK_ADDRESS,
             BaseIntegrationTest.SERVICE_CODE);
     client.shutdown();

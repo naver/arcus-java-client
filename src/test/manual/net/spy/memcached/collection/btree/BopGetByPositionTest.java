@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopGetByPositionTest extends BaseIntegrationTest {
+class BopGetByPositionTest extends BaseIntegrationTest {
 
   private String key = "BopGetByPositionTest";
   private String invalidKey = "InvalidBopGetByPositionTest";
@@ -78,7 +78,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeySingle() throws Exception {
+  void testLongBKeySingle() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -108,7 +108,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeySingleWithoutEflag() throws Exception {
+  void testLongBKeySingleWithoutEflag() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -138,7 +138,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyMultiple() throws Exception {
+  void testLongBKeyMultiple() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -171,7 +171,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyMultipleReversed() throws Exception {
+  void testLongBKeyMultipleReversed() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -204,7 +204,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeySingle() throws Exception {
+  void testByteArrayBKeySingle() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -234,7 +234,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeySingleWithoutEflag() throws Exception {
+  void testByteArrayBKeySingleWithoutEflag() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -264,7 +264,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyMultiple() throws Exception {
+  void testByteArrayBKeyMultiple() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -297,7 +297,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyMultipleReversed() throws Exception {
+  void testByteArrayBKeyMultipleReversed() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -330,7 +330,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnsuccessfulResponses() throws Exception {
+  void testUnsuccessfulResponses() throws Exception {
     mc.delete(invalidKey).get();
     mc.delete(kvKey).get();
 
@@ -388,7 +388,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testAscDesc() throws Exception {
+  void testAscDesc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -478,7 +478,7 @@ public class BopGetByPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInvalidArgumentException() throws Exception {
+  void testInvalidArgumentException() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {

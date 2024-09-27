@@ -15,7 +15,7 @@ import net.spy.memcached.ops.OperationException;
  *
  * memcached -U 11200 -p 11200 -m 32 -M
  */
-public final class MemoryFullTest {
+final class MemoryFullTest {
 
   private MemoryFullTest() {
   }

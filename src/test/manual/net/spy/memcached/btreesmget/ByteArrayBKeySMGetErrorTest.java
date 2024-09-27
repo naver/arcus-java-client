@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
+class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
 
   private static final List<String> KEY_LIST = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDuplicated() {
+  void testDuplicated() {
     // insert test data
     try {
       assertTrue(mc.asyncBopInsert(KEY_LIST.get(0),
@@ -127,7 +127,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBkeyMismatch() {
+  void testBkeyMismatch() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -182,7 +182,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testTrimmed() {
+  void testTrimmed() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -248,7 +248,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testOutOfRange() {
+  void testOutOfRange() {
     // insert test data
     try {
       CollectionAttributes attr = new CollectionAttributes();
@@ -311,7 +311,7 @@ public class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDuplicated2() {
+  void testDuplicated2() {
     // insert test data
     try {
       assertTrue(mc.asyncBopInsert(KEY_LIST.get(0), 1, null,

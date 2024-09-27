@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class SopOverflowActionTest extends BaseIntegrationTest {
+class SopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "SopOverflowActionTest";
   private List<String> keyList = new ArrayList<>();
@@ -46,7 +46,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopGet_Maxcount() throws Exception {
+  void testSopGet_Maxcount() throws Exception {
     // Test
     for (int maxcount = 50000; maxcount <= 10000; maxcount += 1000) {
       // Create a B+ Tree
@@ -81,7 +81,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopGet_AvailableOverflowAction() throws Exception {
+  void testSopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncSopInsert(key, "item0", new CollectionAttributes()).get();
 
@@ -115,7 +115,7 @@ public class SopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSopGet_notAvailableOverflowAction() {
+  void testSopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
 
     // insert

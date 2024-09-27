@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopOverflowActionTest extends BaseIntegrationTest {
+class BopOverflowActionTest extends BaseIntegrationTest {
 
   private String key = "BopGetBoundaryTest";
   private List<String> keyList = new ArrayList<>();
@@ -82,7 +82,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
 //  }
 
   @Test
-  public void testBopGet_Overflow() throws Exception {
+  void testBopGet_Overflow() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
@@ -118,7 +118,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_LargestTrim() throws Exception {
+  void testBopGet_LargestTrim() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
@@ -154,7 +154,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_SmallestTrim() throws Exception {
+  void testBopGet_SmallestTrim() throws Exception {
     // Create a B+ Tree
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
@@ -190,7 +190,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_SmallestTrim_OutOfRange() throws Exception {
+  void testBopGet_SmallestTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
 
@@ -208,7 +208,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_LargestTrim_OutOfRange() throws Exception {
+  void testBopGet_LargestTrim_OutOfRange() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 1, null, "item1", new CollectionAttributes()).get();
 
@@ -226,7 +226,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_AvailableOverflowAction() throws Exception {
+  void testBopGet_AvailableOverflowAction() throws Exception {
     // Create a set
     mc.asyncBopInsert(key, 0, null, "item0", new CollectionAttributes()).get();
 
@@ -261,7 +261,7 @@ public class BopOverflowActionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopGet_notAvailableOverflowAction() {
+  void testBopGet_notAvailableOverflowAction() {
     CollectionAttributes attributesForCreate = new CollectionAttributes();
 
     // create

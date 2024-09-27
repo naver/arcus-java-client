@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BulkDeleteTest extends BaseIntegrationTest {
+class BulkDeleteTest extends BaseIntegrationTest {
   @Test
-  public void testNullAndEmptyKeyDelete() {
+  void testNullAndEmptyKeyDelete() {
     // DELETE null key
     try {
       List<String> keys = null;
@@ -54,7 +54,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndDelete() {
+  void testInsertAndDelete() {
     String value = "MyValue";
 
     int TEST_COUNT = 64;
@@ -104,7 +104,7 @@ public class BulkDeleteTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testDeleteNotFoundKey() {
+  void testDeleteNotFoundKey() {
     int TEST_COUNT = 64;
 
     try {

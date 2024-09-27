@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 /**
  * Test observer hooks.
  */
-public class ObserverTest extends ClientBaseCase {
+class ObserverTest extends ClientBaseCase {
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -32,7 +32,7 @@ public class ObserverTest extends ClientBaseCase {
   }
 
   @Test
-  public void testConnectionObserver() throws Exception {
+  void testConnectionObserver() throws Exception {
     ConnectionObserver obs = new LoggingObserver();
     assertTrue(client.addObserver(obs), "Didn't add observer.");
     assertTrue(client.removeObserver(obs), "Didn't remove observer.");
@@ -40,7 +40,7 @@ public class ObserverTest extends ClientBaseCase {
   }
 
   @Test
-  public void testInitialObservers() throws Exception {
+  void testInitialObservers() throws Exception {
     assumeTrue(!USE_ZK);
     assertTrue(client.shutdown(5, TimeUnit.SECONDS),
             "Couldn't shut down within five seconds");

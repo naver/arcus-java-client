@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LopGetTest extends BaseIntegrationTest {
+class LopGetTest extends BaseIntegrationTest {
 
   private String key = "LopGetTest";
 
@@ -58,7 +58,7 @@ public class LopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopGet_NoKey() throws Exception {
+  void testLopGet_NoKey() throws Exception {
     List<Object> rlist = mc.asyncLopGet("no_key", 0, false, false).get(
             1000, TimeUnit.MILLISECONDS);
 
@@ -67,7 +67,7 @@ public class LopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopGet_OutOfRange() throws Exception {
+  void testLopGet_OutOfRange() throws Exception {
     List<Object> list = mc.asyncLopGet(key, 20, false, false).get(1000,
             TimeUnit.MILLISECONDS);
     assertNotNull(list);
@@ -75,7 +75,7 @@ public class LopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopGet_GetByBestEffort() throws Exception {
+  void testLopGet_GetByBestEffort() throws Exception {
     // Retrieve items(2..11) in the list
     List<Object> rlist = mc.asyncLopGet(key, 2, 11, false, false).get(1000,
             TimeUnit.MILLISECONDS);
@@ -89,7 +89,7 @@ public class LopGetTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLopGet_GetWithDeletion() throws Exception {
+  void testLopGet_GetWithDeletion() throws Exception {
     CollectionAttributes attrs = null;
     List<Object> rlist = null;
 

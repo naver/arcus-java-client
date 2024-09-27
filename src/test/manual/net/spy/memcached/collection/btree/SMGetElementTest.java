@@ -9,14 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SMGetElementTest {
+class SMGetElementTest {
 
   private static final String KEY = "test";
   private static final String VALUE = "testValue";
   private static final byte[] EFLAG = {1, 8, 16, 32, 64};
 
   @Test
-  public void createWithLongBkey() {
+  void createWithLongBkey() {
     //given
     long bkey = 1;
 
@@ -31,7 +31,7 @@ public class SMGetElementTest {
   }
 
   @Test
-  public void createWithByteArrayBkey() {
+  void createWithByteArrayBkey() {
     //given
     byte[] bkey = {0x34};
 
@@ -46,7 +46,7 @@ public class SMGetElementTest {
   }
 
   @Test
-  public void compareToTest() {
+  void compareToTest() {
     //given
     long bkey = 2;
 
@@ -58,7 +58,7 @@ public class SMGetElementTest {
   }
 
   @Test
-  public void compareBkeyToTest() {
+  void compareBkeyToTest() {
     //given
     long bkey = 2;
     long anotherBkey = 1;

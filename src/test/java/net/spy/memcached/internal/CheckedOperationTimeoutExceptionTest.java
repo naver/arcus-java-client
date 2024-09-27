@@ -34,14 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class CheckedOperationTimeoutExceptionTest {
+class CheckedOperationTimeoutExceptionTest {
 
   private final long duration = 1;
   private final TimeUnit unit = TimeUnit.MILLISECONDS;
   private final long elapsed = 5;
 
   @Test
-  public void testSingleOperation() {
+  void testSingleOperation() {
     Operation op = buildOp(11211);
     Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
 
@@ -52,7 +52,7 @@ public class CheckedOperationTimeoutExceptionTest {
   }
 
   @Test
-  public void testNullNode() {
+  void testNullNode() {
     Operation op = new TestOperation();
     Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, op);
 
@@ -63,7 +63,7 @@ public class CheckedOperationTimeoutExceptionTest {
   }
 
   @Test
-  public void testNullOperation() {
+  void testNullOperation() {
     try {
       Exception e = new CheckedOperationTimeoutException(duration, unit, elapsed, (Operation) null);
       fail("NullPointerException is NOT thrown... " + e.getMessage());
@@ -74,7 +74,7 @@ public class CheckedOperationTimeoutExceptionTest {
   }
 
   @Test
-  public void testMultipleOperation() {
+  void testMultipleOperation() {
     Collection<Operation> ops = new ArrayList<>();
     ops.add(buildOp(11211));
     ops.add(buildOp(64212));

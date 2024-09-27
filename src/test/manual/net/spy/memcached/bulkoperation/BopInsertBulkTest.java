@@ -35,12 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopInsertBulkTest extends BaseIntegrationTest {
+class BopInsertBulkTest extends BaseIntegrationTest {
 
   private static final byte[] EFLAG = new byte[]{0, 0, 1, 1};
 
   @Test
-  public void testInsertAndGet() {
+  void testInsertAndGet() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 
@@ -103,7 +103,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetByteArrayBkey() {
+  void testInsertAndGetByteArrayBkey() {
     String value = "MyValue";
     byte[] bkey = new byte[]{0, 1, 1, 1};
 
@@ -167,7 +167,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetWithEflag() {
+  void testInsertAndGetWithEflag() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 
@@ -230,7 +230,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testInsertAndGetByteArrayBkeyWithEflag() {
+  void testInsertAndGetByteArrayBkeyWithEflag() {
     String value = "MyValue";
     byte[] bkey = new byte[]{0, 1, 1, 1};
 
@@ -294,7 +294,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testKeyAttributes() {
+  void testKeyAttributes() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 
@@ -342,7 +342,7 @@ public class BopInsertBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorCount() {
+  void testErrorCount() {
     String value = "MyValue";
     long bkey = Long.MAX_VALUE;
 

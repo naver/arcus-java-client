@@ -24,17 +24,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BTreeUtilTest {
+class BTreeUtilTest {
 
   @Test
-  public void testAA() {
+  void testAA() {
 
     System.out.println(Arrays.toString("".getBytes()));
 
   }
 
   @Test
-  public void testFromByteArraysToHex() throws Exception {
+  void testFromByteArraysToHex() throws Exception {
     byte[] byteArray1 = {0, 'F', 'C', 0, 0};
     assertEquals("0x0046430000", BTreeUtil.toHex(byteArray1));
 
@@ -49,7 +49,7 @@ public class BTreeUtilTest {
   }
 
   @Test
-  public void testFromHexToByteArrays() throws Exception {
+  void testFromHexToByteArrays() throws Exception {
     byte[] byteArray1 = {0, 'F', 'C', 0, 0};
     assertTrue(Arrays.equals(byteArray1,
             BTreeUtil.hexStringToByteArrays("0x0046430000")));
@@ -68,7 +68,7 @@ public class BTreeUtilTest {
   }
 
   @Test
-  public void testCompareSameLengthByteArrays() throws Exception {
+  void testCompareSameLengthByteArrays() throws Exception {
     byte[] array1 = {0, 0, 1, 0};
     byte[] array2 = {0, 0, 0, 0};
     byte[] array3 = {0, 0, 1, 0};
@@ -79,7 +79,7 @@ public class BTreeUtilTest {
   }
 
   @Test
-  public void testCompareDifferentLengthByteArrays() throws Exception {
+  void testCompareDifferentLengthByteArrays() throws Exception {
     byte[] array1 = {0, 0, 1};
     byte[] array2 = {0, 0, 1, 0};
 
@@ -88,14 +88,14 @@ public class BTreeUtilTest {
   }
 
   @Test
-  public void testInValidSizeBkey() {
+  void testInValidSizeBkey() {
     assertThrows(IllegalArgumentException.class, () -> {
       BTreeUtil.validateBkey(new byte[32]);
     });
   }
 
   @Test
-  public void testMinusLongBkey() {
+  void testMinusLongBkey() {
     final long bkey = -1;
     assertThrows(IllegalArgumentException.class, () -> {
       BTreeUtil.validateBkey(bkey);

@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopSortMergeTest extends BaseIntegrationTest {
+class BopSortMergeTest extends BaseIntegrationTest {
 
   private final List<String> keyList3 = new ArrayList<>();
   private final List<String> keyList2 = new ArrayList<>();
@@ -68,7 +68,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeAscDuplicate1() throws Exception {
+  void testBopSortMergeAscDuplicate1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
     int queryCount;
@@ -157,7 +157,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeAscUnique1() throws Exception {
+  void testBopSortMergeAscUnique1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
     int queryCount;
@@ -249,7 +249,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescDuplicate1() throws Exception {
+  void testBopSortMergeDescDuplicate1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -417,7 +417,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescUnique1() throws Exception {
+  void testBopSortMergeDescUnique1() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -587,7 +587,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeAscDuplicate2() throws Exception {
+  void testBopSortMergeAscDuplicate2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
     int queryCount;
@@ -676,7 +676,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeAscUnique2() throws Exception {
+  void testBopSortMergeAscUnique2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
     int queryCount;
@@ -768,7 +768,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescDuplicate2() throws Exception {
+  void testBopSortMergeDescDuplicate2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -936,7 +936,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescUnique2() throws Exception {
+  void testBopSortMergeDescUnique2() throws Exception {
     long bkeyFrom;
     long bkeyTo;
 
@@ -1108,7 +1108,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescDuplicate3() throws Exception {
+  void testBopSortMergeDescDuplicate3() throws Exception {
     // insert test data
     // key list (maxcount = 10)
     CollectionAttributes attrs = new CollectionAttributes();
@@ -1203,7 +1203,7 @@ public class BopSortMergeTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBopSortMergeDescUnique3() throws Exception {
+  void testBopSortMergeDescUnique3() throws Exception {
     // insert test data
     // key list (maxcount = 10)
     CollectionAttributes attrs = new CollectionAttributes();

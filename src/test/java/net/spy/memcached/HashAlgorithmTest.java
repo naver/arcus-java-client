@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Test the hash algorithms.
  */
-public class HashAlgorithmTest {
+class HashAlgorithmTest {
 
   private void assertHash(HashAlgorithm ha, String key, long exp) {
     assertTrue(exp >= 0L);
@@ -25,14 +25,14 @@ public class HashAlgorithmTest {
   }
 
   @Test
-  public void testNativeHash() {
+  void testNativeHash() {
     for (String k : new String[]{"Test1", "Test2", "Test3", "Test4"}) {
       assertNativeHash(k);
     }
   }
 
   @Test
-  public void testCrc32Hash() {
+  void testCrc32Hash() {
     Map<String, Long> exp = new HashMap<>();
     exp.put("Test1", 19315L);
     exp.put("Test2", 21114L);
@@ -46,7 +46,7 @@ public class HashAlgorithmTest {
   }
 
   @Test
-  public void testFnv1_64() {
+  void testFnv1_64() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
     exp.put(" ", 0x8601b7ffL);
@@ -64,7 +64,7 @@ public class HashAlgorithmTest {
 
   // Thanks much to pierre@demartines.com for this unit test.
   @Test
-  public void testFnv1a_64() {
+  void testFnv1a_64() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x84222325L);
     exp.put(" ", 0x8601817fL);
@@ -81,7 +81,7 @@ public class HashAlgorithmTest {
   }
 
   @Test
-  public void testFnv1_32() {
+  void testFnv1_32() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
     exp.put(" ", 0x050c5d3fL);
@@ -98,7 +98,7 @@ public class HashAlgorithmTest {
   }
 
   @Test
-  public void testFnv1a_32() {
+  void testFnv1a_32() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("", 0x811c9dc5L);
     exp.put(" ", 0x250c8f7fL);
@@ -116,7 +116,7 @@ public class HashAlgorithmTest {
 
   // These values came from libketama's test prog.
   @Test
-  public void testKetamaHash() {
+  void testKetamaHash() {
     HashMap<String, Long> exp = new HashMap<>();
     exp.put("26", 3979113294L);
     exp.put("1404", 2065000984L);

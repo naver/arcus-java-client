@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BopGetBulkTest extends BaseIntegrationTest {
+class BopGetBulkTest extends BaseIntegrationTest {
 
   private final List<String> keyList = new ArrayList<String>() {
     private static final long serialVersionUID = -4044682425313432602L;
@@ -74,7 +74,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBulkLongBkeyGetAll() {
+  void testGetBulkLongBkeyGetAll() {
     try {
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
@@ -133,7 +133,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBulkNotFoundAll() {
+  void testGetBulkNotFoundAll() {
     try {
       for (int i = 0; i < keyList.size(); i++) {
         mc.delete(keyList.get(i)).get();
@@ -180,7 +180,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetBulkNotFoundMixed() {
+  void testGetBulkNotFoundMixed() {
     try {
       // delete some data.
       for (int i = 0; i < keyList.size(); i++) {
@@ -250,7 +250,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testErrorArguments() {
+  void testErrorArguments() {
     try {
       Map<String, BTreeGetResult<Long, Object>> results = null;
       CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
@@ -280,7 +280,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnreadable() {
+  void testUnreadable() {
     try {
       Map<String, BTreeGetResult<Long, Object>> results = null;
       CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
@@ -304,7 +304,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testNotFoundElement() {
+  void testNotFoundElement() {
     try {
       Map<String, BTreeGetResult<Long, Object>> results = null;
       CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
@@ -333,7 +333,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testTypeMismatch() {
+  void testTypeMismatch() {
     try {
       Map<String, BTreeGetResult<Long, Object>> results = null;
       CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;
@@ -354,7 +354,7 @@ public class BopGetBulkTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testBKeyMismatch() {
+  void testBKeyMismatch() {
     try {
       Map<String, BTreeGetResult<Long, Object>> results = null;
       CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> f = null;

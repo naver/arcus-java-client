@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Basic behavior validation for all transcoders that work with objects.
  */
-public abstract class BaseTranscoderCase {
+abstract class BaseTranscoderCase {
 
   private Transcoder<Object> tc;
 
@@ -31,7 +31,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testSomethingBigger() throws Exception {
+  void testSomethingBigger() throws Exception {
     Collection<Date> dates = new ArrayList<>();
     for (int i = 0; i < 1024; i++) {
       dates.add(new Date());
@@ -41,52 +41,52 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testDate() throws Exception {
+  void testDate() throws Exception {
     Date d = new Date();
     CachedData cd = tc.encode(d);
     assertEquals(d, tc.decode(cd));
   }
 
   @Test
-  public void testLong() throws Exception {
+  void testLong() throws Exception {
     assertEquals(923L, tc.decode(tc.encode(923L)));
   }
 
   @Test
-  public void testInt() throws Exception {
+  void testInt() throws Exception {
     assertEquals(923, tc.decode(tc.encode(923)));
   }
 
   @Test
-  public void testShort() throws Exception {
+  void testShort() throws Exception {
     assertEquals((short) 923, tc.decode(tc.encode((short) 923)));
   }
 
   @Test
-  public void testChar() throws Exception {
+  void testChar() throws Exception {
     assertEquals('c', tc.decode(tc.encode('c')));
   }
 
   @Test
-  public void testBoolean() throws Exception {
+  void testBoolean() throws Exception {
     assertSame(Boolean.TRUE, tc.decode(tc.encode(true)));
     assertSame(Boolean.FALSE, tc.decode(tc.encode(false)));
   }
 
   @Test
-  public void testByte() throws Exception {
+  void testByte() throws Exception {
     assertEquals((byte) -127, tc.decode(tc.encode((byte) -127)));
   }
 
   @Test
-  public void testStringBuilder() throws Exception {
+  void testStringBuilder() throws Exception {
     StringBuilder sb = new StringBuilder("test");
     StringBuilder sb2 = (StringBuilder) tc.decode(tc.encode(sb));
     assertEquals(sb.toString(), sb2.toString());
   }
 
   @Test
-  public void testStringBuffer() throws Exception {
+  void testStringBuffer() throws Exception {
     StringBuffer sb = new StringBuffer("test");
     StringBuffer sb2 = (StringBuffer) tc.decode(tc.encode(sb));
     assertEquals(sb.toString(), sb2.toString());
@@ -98,7 +98,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testFloat() throws Exception {
+  void testFloat() throws Exception {
     assertFloat(0f);
     assertFloat(Float.MIN_VALUE);
     assertFloat(Float.MAX_VALUE);
@@ -114,7 +114,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testDouble() throws Exception {
+  void testDouble() throws Exception {
     assertDouble(0d);
     assertDouble(Double.MIN_VALUE);
     assertDouble(Double.MAX_VALUE);
@@ -142,7 +142,7 @@ public abstract class BaseTranscoderCase {
     */
 
   @Test
-  public void testLongEncoding() throws Exception {
+  void testLongEncoding() throws Exception {
     assertLong(Long.MIN_VALUE);
     assertLong(1);
     assertLong(23852);
@@ -159,7 +159,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testIntEncoding() throws Exception {
+  void testIntEncoding() throws Exception {
     assertInt(Integer.MIN_VALUE);
     assertInt(83526);
     assertInt(1);
@@ -170,13 +170,13 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testBooleanEncoding() throws Exception {
+  void testBooleanEncoding() throws Exception {
     assertTrue((Boolean) tc.decode(tc.encode(true)));
     assertFalse((Boolean) tc.decode(tc.encode(false)));
   }
 
   @Test
-  public void testByteArray() throws Exception {
+  void testByteArray() throws Exception {
     byte[] a = {'a', 'b', 'c'};
     CachedData cd = tc.encode(a);
     assertTrue(Arrays.equals(a, cd.getData()));
@@ -184,7 +184,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testStrings() throws Exception {
+  void testStrings() throws Exception {
     String s1 = "This is a simple test string.";
     CachedData cd = tc.encode(s1);
     assertEquals(getStringFlags(), cd.getFlags());
@@ -192,7 +192,7 @@ public abstract class BaseTranscoderCase {
   }
 
   @Test
-  public void testUTF8String() throws Exception {
+  void testUTF8String() throws Exception {
     String s1 = "\u2013\u00f3\u2013\u00a5\u2014\u00c4\u2013\u221e\u2013"
             + "\u2264\u2014\u00c5\u2014\u00c7\u2013\u2264\u2014\u00c9\u2013"
             + "\u03c0, \u2013\u00ba\u2013\u220f\u2014\u00c4.";

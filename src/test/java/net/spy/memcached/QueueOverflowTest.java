@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * So this test is no longer necessary.
  */
 @Disabled
-public class QueueOverflowTest extends ClientBaseCase {
+class QueueOverflowTest extends ClientBaseCase {
 
   @Override
   protected void initClient() throws Exception {
@@ -97,12 +97,12 @@ public class QueueOverflowTest extends ClientBaseCase {
   }
 
   @Test
-  public void testOverflowingInputQueue() throws Exception {
+  void testOverflowingInputQueue() throws Exception {
     runOverflowTest(new byte[]{1});
   }
 
   @Test
-  public void testOverflowingWriteQueue() throws Exception {
+  void testOverflowingWriteQueue() throws Exception {
     byte[] b = new byte[8192];
     Random r = new Random();
     r.nextBytes(b);
@@ -110,7 +110,7 @@ public class QueueOverflowTest extends ClientBaseCase {
   }
 
   @Test
-  public void testOverflowingReadQueue() throws Exception {
+  void testOverflowingReadQueue() throws Exception {
     byte[] b = new byte[8192];
     Random r = new Random();
     r.nextBytes(b);

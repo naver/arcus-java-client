@@ -39,10 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BulkStoreTest extends BaseIntegrationTest {
+class BulkStoreTest extends BaseIntegrationTest {
 
   @Test
-  public void testZeroSizedKeys() {
+  void testZeroSizedKeys() {
     try {
       mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
               60, "value");
@@ -67,7 +67,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSetAndGet2() {
+  void testSetAndGet2() {
     int KEY_SIZE = 10;
 
     try {
@@ -123,7 +123,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSetAndGet() {
+  void testSetAndGet() {
     String value = "MyValue";
 
     int KEY_SIZE = 10;
@@ -181,7 +181,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
 
   @Test
-  public void testAddAndGet() {
+  void testAddAndGet() {
     String value = "MyValue";
 
     int KEY_SIZE = 10;
@@ -231,7 +231,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
 
 
   @Test
-  public void testReplaceAndGet() {
+  void testReplaceAndGet() {
     String value = "MyValue";
 
     int KEY_SIZE = 10;
@@ -280,7 +280,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStoreWithTranscoder() {
+  void testStoreWithTranscoder() {
     String value = "MyValue";
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
@@ -330,7 +330,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testStoreWithTranscoder2() {
+  void testStoreWithTranscoder2() {
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
     int KEY_SIZE = 10;
@@ -380,7 +380,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSetWithTranscoder() {
+  void testSetWithTranscoder() {
     String value = "MyValue";
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
@@ -431,7 +431,7 @@ public class BulkStoreTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSetWithTranscoder2() {
+  void testSetWithTranscoder2() {
     Transcoder<Object> transcoder = new WhalinTranscoder();
 
     int KEY_SIZE = 10;

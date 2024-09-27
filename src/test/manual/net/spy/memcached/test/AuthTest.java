@@ -10,7 +10,7 @@ import net.spy.memcached.compat.SpyObject;
 /**
  * Authentication functional test.
  */
-public class AuthTest extends SpyObject implements Runnable {
+class AuthTest extends SpyObject implements Runnable {
 
   private final String username;
   private final String password;

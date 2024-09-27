@@ -25,12 +25,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProtocolSetDeleteTest {
+class ProtocolSetDeleteTest {
   private final Object value = "value";
   private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
 
   @Test
-  public void testStringify() {
+  void testStringify() {
     // default setting : dropIfEmpty = true
 
     SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
@@ -53,7 +53,7 @@ public class ProtocolSetDeleteTest {
   }
 
   @Test
-  public void testGetAdditionalArgs() {
+  void testGetAdditionalArgs() {
     byte[] expected = new byte[]{'v', 'a', 'l', 'u', 'e'};
     SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
     assertArrayEquals(expected, del.getAdditionalArgs());

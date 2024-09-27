@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class BTreeGetAttrTest extends BaseIntegrationTest {
+class BTreeGetAttrTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();
   private final String VALUE = "VALUE";
@@ -53,7 +53,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetTrimmedTest() {
+  void testGetTrimmedTest() {
     try {
       // create with default.
       CollectionAttributes attribute = new CollectionAttributes();
@@ -91,7 +91,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetMinMaxBkeyTest() {
+  void testGetMinMaxBkeyTest() {
     try {
       assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
@@ -125,7 +125,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetMinMaxBkeyByBytesTest() {
+  void testGetMinMaxBkeyByBytesTest() {
     try {
       assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());
@@ -162,7 +162,7 @@ public class BTreeGetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetOverflowAttrTest() {
+  void testGetOverflowAttrTest() {
     try {
       assertTrue(mc.asyncBopCreate(KEY, ElementValueType.STRING,
               new CollectionAttributes()).get());

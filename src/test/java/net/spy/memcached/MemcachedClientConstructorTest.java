@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Test the various memcached client constructors.
  */
-public class MemcachedClientConstructorTest {
+class MemcachedClientConstructorTest {
 
   private MemcachedClient client = null;
 
@@ -48,7 +48,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testVarargConstructor() throws Exception {
+  void testVarargConstructor() throws Exception {
     if (!USE_ZK) {
       String tokens[] = ARCUS_HOST.split(":");
       String ip = tokens[0];
@@ -60,7 +60,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testEmptyVarargConstructor() throws Exception {
+  void testEmptyVarargConstructor() throws Exception {
     try {
       client = new MemcachedClient();
       fail("Expected illegal arg exception, got " + client);
@@ -70,7 +70,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testNulListConstructor() throws Exception {
+  void testNulListConstructor() throws Exception {
     try {
       List<InetSocketAddress> l = null;
       client = new MemcachedClient(l);
@@ -81,7 +81,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testEmptyListConstructor() throws Exception {
+  void testEmptyListConstructor() throws Exception {
     try {
       client = new MemcachedClient(
               Collections.<InetSocketAddress>emptyList());
@@ -92,7 +92,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testNullFactoryConstructor() throws Exception {
+  void testNullFactoryConstructor() throws Exception {
     try {
       client = new MemcachedClient(null,
               AddrUtil.getAddresses(ARCUS_HOST));
@@ -103,7 +103,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testNegativeTimeout() throws Exception {
+  void testNegativeTimeout() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
         @Override
@@ -119,7 +119,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testZeroTimeout() throws Exception {
+  void testZeroTimeout() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
         @Override
@@ -135,7 +135,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testConnFactoryWithoutOpFactory() throws Exception {
+  void testConnFactoryWithoutOpFactory() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
         @Override
@@ -151,7 +151,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testConnFactoryWithoutConns() throws Exception {
+  void testConnFactoryWithoutConns() throws Exception {
     try {
       client = new MemcachedClient(new DefaultConnectionFactory() {
         @Override
@@ -169,7 +169,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testArraymodNodeLocatorAccessor() throws Exception {
+  void testArraymodNodeLocatorAccessor() throws Exception {
     client = new MemcachedClient(AddrUtil.getAddresses(ARCUS_HOST));
     assertTrue(client.getNodeLocator() instanceof ArrayModNodeLocator);
     assertTrue(client.getNodeLocator().getPrimary("x")
@@ -177,7 +177,7 @@ public class MemcachedClientConstructorTest {
   }
 
   @Test
-  public void testKetamaNodeLocatorAccessor() throws Exception {
+  void testKetamaNodeLocatorAccessor() throws Exception {
     client = new MemcachedClient(new KetamaConnectionFactory(),
             AddrUtil.getAddresses(ARCUS_HOST));
     assertTrue(client.getNodeLocator() instanceof KetamaNodeLocator);

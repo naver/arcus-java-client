@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BopFindPositionTest extends BaseIntegrationTest {
+class BopFindPositionTest extends BaseIntegrationTest {
 
   private String key = "BopFindPositionTest";
   private String invalidKey = "InvalidBopFindPositionTest";
@@ -55,7 +55,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyAsc() throws Exception {
+  void testLongBKeyAsc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -75,7 +75,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testLongBKeyDesc() throws Exception {
+  void testLongBKeyDesc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (long each : longBkeys) {
@@ -96,7 +96,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyAsc() throws Exception {
+  void testByteArrayBKeyAsc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -116,7 +116,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testByteArrayBKeyDesc() throws Exception {
+  void testByteArrayBKeyDesc() throws Exception {
     // insert
     CollectionAttributes attrs = new CollectionAttributes();
     for (byte[] each : byteArrayBkeys) {
@@ -137,7 +137,7 @@ public class BopFindPositionTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testUnsuccessfulResponses() throws Exception {
+  void testUnsuccessfulResponses() throws Exception {
     mc.delete(invalidKey).get();
     mc.delete(kvKey).get();
 

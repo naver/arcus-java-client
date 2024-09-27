@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Base tests of the base serializing transcoder stuff.
  */
-public class BaseSerializingTranscoderTest {
+class BaseSerializingTranscoderTest {
 
   private Exposer ex;
 
@@ -32,12 +32,12 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testValidCharacterSet() {
+  void testValidCharacterSet() {
     ex.setCharset("KOI8");
   }
 
   @Test
-  public void testInvalidCharacterSet() {
+  void testInvalidCharacterSet() {
     try {
       ex.setCharset("Dustin's Kick Ass Character Set");
     } catch (RuntimeException e) {
@@ -46,7 +46,7 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testCompressNull() {
+  void testCompressNull() {
     try {
       ex.compress(null);
       fail("Expected an assertion error");
@@ -56,17 +56,17 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testDecodeStringNull() {
+  void testDecodeStringNull() {
     assertNull(ex.decodeString(null));
   }
 
   @Test
-  public void testDeserializeNull() {
+  void testDeserializeNull() {
     assertNull(ex.deserialize(null));
   }
 
   @Test
-  public void testEncodeStringNull() {
+  void testEncodeStringNull() {
     try {
       ex.encodeString(null);
       fail("Expected an assertion error");
@@ -76,7 +76,7 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testSerializeNull() {
+  void testSerializeNull() {
     try {
       ex.serialize(null);
       fail("Expected an assertion error");
@@ -86,12 +86,12 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testDecompressNull() {
+  void testDecompressNull() {
     assertNull(ex.decompress(null));
   }
 
   @Test
-  public void testUndeserializable() throws Exception {
+  void testUndeserializable() throws Exception {
     byte[] data = {
       -84, -19, 0, 5, 115, 114, 0, 4, 84, 101, 115, 116, 2, 61, 102,
       -87, -28, 17, 52, 30, 2, 0, 1, 73, 0, 9, 115, 111, 109, 101,
@@ -101,13 +101,13 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testDeserializable() throws Exception {
+  void testDeserializable() throws Exception {
     byte[] data = {-84, -19, 0, 5, 116, 0, 5, 104, 101, 108, 108, 111};
     assertEquals("hello", ex.deserialize(data));
   }
 
   @Test
-  public void testBadCharsetDecode() {
+  void testBadCharsetDecode() {
     ex.overrideCharsetSet("Some Crap");
     try {
       ex.encodeString("Woo!");
@@ -119,7 +119,7 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testBadCharsetEncode() {
+  void testBadCharsetEncode() {
     ex.overrideCharsetSet("Some Crap");
     try {
       ex.decodeString("Woo!".getBytes());
@@ -131,7 +131,7 @@ public class BaseSerializingTranscoderTest {
   }
 
   @Test
-  public void testDifferentClassLoaderMakeDifferentValue() throws Exception {
+  void testDifferentClassLoaderMakeDifferentValue() throws Exception {
     // load CustomEntry class with custom class loader.
     CustomClassLoader customClassLoader = new CustomClassLoader();
     customClassLoader.findClass("net.spy.memcached.transcoders." +
