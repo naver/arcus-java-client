@@ -235,13 +235,8 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     }
   }
 
-  public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
-    update(toAttach, toDelete, new ArrayList<>(0));
-  }
-
   public void update(Collection<MemcachedNode> toAttach,
-                     Collection<MemcachedNode> toDelete,
-                     Collection<MemcachedReplicaGroup> changeRoleGroups) {
+                     Collection<MemcachedNode> toDelete) {
     /* We must keep the following execution order
      * - first, remove nodes.
      * - second, change role.
@@ -258,11 +253,6 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
         } catch (IOException e) {
           getLogger().error("Failed to closeChannel the node : " + node);
         }
-      }
-
-      // Change role
-      for (MemcachedReplicaGroup g : changeRoleGroups) {
-        g.changeRole();
       }
 
       // Add memcached nodes.

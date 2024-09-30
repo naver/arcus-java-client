@@ -549,8 +549,10 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
     }
+
     // Update the hash.
-    ((ArcusReplKetamaNodeLocator) locator).update(attachNodes, removeNodes, changeRoleGroups);
+    changeRoleGroups.forEach(MemcachedReplicaGroup::changeRole);
+    locator.update(attachNodes, removeNodes);
 
     // do task after locator update
     for (Task task : taskList) {

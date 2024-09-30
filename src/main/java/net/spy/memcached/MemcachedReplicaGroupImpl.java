@@ -65,6 +65,10 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
     return false;
   }
 
+  /**
+   * Only invoked for switchover or failover groups
+   * @return true if role change is successful
+   */
   public boolean changeRole() {
         /* role change */
     MemcachedNode tmpNode = this.masterNode;
@@ -76,6 +80,8 @@ public class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
       this.setMasterCandidate(null);
     }
 
+    // Switch the previous master node to the first elem in slave node list.
+    // Because new slave node is added to list in locator already.
     if (tmpNode != null) { // previous master node
       ((ArcusReplNodeAddress) tmpNode.getSocketAddress()).setMaster(false);
       this.slaveNodes.add(tmpNode);
