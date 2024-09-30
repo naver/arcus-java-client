@@ -321,6 +321,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     CacheManager exe = new CacheManager(hostPorts, serviceCode, cfb, poolSize, waitTimeForConnect);
+    exe.start();
     return new ArcusClientPool(poolSize, exe.getAC());
   }
 
