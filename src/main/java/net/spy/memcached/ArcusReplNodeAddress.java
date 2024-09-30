@@ -29,7 +29,7 @@ import java.util.Set;
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
 
-public class ArcusReplNodeAddress extends InetSocketAddress {
+public final class ArcusReplNodeAddress extends InetSocketAddress {
 
   private static final long serialVersionUID = -1555690881482453720L;
   private static final Logger arcusLogger = LoggerFactory.getLogger(ArcusReplNodeAddress.class);

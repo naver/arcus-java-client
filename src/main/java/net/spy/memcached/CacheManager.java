@@ -47,7 +47,7 @@ import org.apache.zookeeper.ZooKeeper;
  * memcached server in the remote machine. It also changes the
  * previous ketama node
  */
-public class CacheManager extends SpyThread implements Watcher,
+public final class CacheManager extends SpyThread implements Watcher,
         CacheMonitor.CacheMonitorListener, MigrationMonitor.MigrationMonitorListener {
   private static final String ARCUS_BASE_CACHE_LIST_ZPATH = "/arcus/cache_list/";
 

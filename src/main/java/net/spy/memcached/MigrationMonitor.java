@@ -32,7 +32,7 @@ import org.apache.zookeeper.ZooKeeper;
  * MigrationMonitor monitors the changes of the cloud_stat
  * in the ZooKeeper node{@code (/arcus/cloud_stat/<service_code>)}.
  */
-public class MigrationMonitor extends SpyObject implements Watcher {
+public final class MigrationMonitor extends SpyObject implements Watcher {
 
   private final ZooKeeper zk;
 
