@@ -29,11 +29,15 @@ public class SyncThread<T> extends SpyThread {
    */
   public SyncThread(CyclicBarrier b, Callable<T> c) {
     super("SyncThread");
-    setDaemon(true);
     callable = c;
     barrier = b;
     latch = new CountDownLatch(1);
-    start();
+  }
+
+  @Override
+  public synchronized void start() {
+    setDaemon(true);
+    super.start();
   }
 
   /**
@@ -81,7 +85,9 @@ public class SyncThread<T> extends SpyThread {
 
     CyclicBarrier barrier = new CyclicBarrier(num);
     for (int i = 0; i < num; i++) {
-      rv.add(new SyncThread<>(barrier, callable));
+      SyncThread<T> syncThread = new SyncThread<>(barrier, callable);
+      syncThread.start();
+      rv.add(syncThread);
     }
 
     for (SyncThread<T> t : rv) {

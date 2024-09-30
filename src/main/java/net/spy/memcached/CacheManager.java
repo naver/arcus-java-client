@@ -142,12 +142,15 @@ public class CacheManager extends SpyThread implements Watcher,
 
     this.startup = false;
 
-    setName("Cache Manager IO for " + serviceCode + "@" + hostPort);
-    setDaemon(true);
-    start();
-
     getLogger().info("CacheManager started. (" + serviceCode + "@" + hostPort + ")");
 
+  }
+
+  @Override
+  public synchronized void start() {
+    setName("Cache Manager IO for " + serviceCode + "@" + zkConnectString);
+    setDaemon(true);
+    super.start();
   }
 
   private String getCacheListZPath() {

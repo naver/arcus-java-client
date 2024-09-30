@@ -26,7 +26,6 @@ public class AuthThread extends SpyThread {
     opFact = o;
     authDescriptor = a;
     node = n;
-    start();
   }
 
   @Override

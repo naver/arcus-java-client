@@ -39,6 +39,7 @@ public class AuthThreadMonitor extends SpyObject {
     interruptOldAuth(node);
     AuthThread newSASLAuthenticator = new AuthThread(conn, opFact,
             authDescriptor, node);
+    newSASLAuthenticator.start();
     nodeMap.put(node, newSASLAuthenticator);
   }
 
