@@ -431,25 +431,13 @@ public class CacheManager extends SpyThread implements Watcher,
         addrs.append(temp[0]);
       }
     }
-    return convertToSocketAddrList(addrs.toString());
+    return convertToSocketAddresses(addrs.toString());
   }
 
-  private List<InetSocketAddress> convertToSocketAddrList(String addrs) {
+  private List<InetSocketAddress> convertToSocketAddresses(String addrs) {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
-      List<InetSocketAddress> socketList = ArcusReplNodeAddress.getAddresses(addrs);
-
-      Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-              ArcusReplNodeAddress.makeGroupAddrsList(socketList);
-
-      // recreate socket list
-      socketList.clear();
-      for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
-        if (ArcusReplNodeAddress.validateGroup(entry)) {
-          socketList.addAll(entry.getValue());
-        }
-      }
-      return socketList;
+      return ArcusReplNodeAddress.getAddresses(addrs);
     }
     /* ENABLE_REPLICATION end */
     return AddrUtil.getAddresses(addrs);
@@ -496,6 +484,11 @@ public class CacheManager extends SpyThread implements Watcher,
 
     if (client == null) {
       if (!addrs.isEmpty()) {
+        /* ENABLE_REPLICATION if */
+        if (arcusReplEnabled) {
+          addrs = validateReplicaGroup(addrs);
+        }
+        /* ENABLE_REPLICATION end */
         initArcusClient(addrs);
       }
       return;
@@ -662,6 +655,23 @@ public class CacheManager extends SpyThread implements Watcher,
     }
     return "[serviceCode=" + serviceCode + ", adminSessionId=" + zkSessionId + "]";
   }
+
+  /* ENABLE_REPLICATION if */
+  private List<InetSocketAddress> validateReplicaGroup(List<InetSocketAddress> socketList) {
+    Map<String, List<ArcusReplNodeAddress>> newAllGroups =
+            ArcusReplNodeAddress.makeGroupAddrsList(socketList);
+
+    // recreate socket list
+    socketList.clear();
+    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+      if (ArcusReplNodeAddress.validateGroup(entry)) {
+        socketList.addAll(entry.getValue());
+      }
+    }
+
+    return socketList;
+  }
+  /* ENABLE_REPLICATION end */
 
   /**
    * initialized ArcusClient Pool.
