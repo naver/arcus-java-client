@@ -66,9 +66,9 @@ Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, List<String>
 Future<Map<String, OperationStatus>> asyncStoreBulk(StoreType type, Map<String, Object> map, int exp)
 ```
 
-- 다수의 key-value item을 한번에 저장한다.
-  - 전자 API는 key list의 모든 key에 대해 동일한 obj로 저장 연산을 한번에 수행한다.  
-  - 후자 API는 map에 있는 모든 \<key, obj\>에 대해 저장 연산을 한번에 수행한다.
+- 다수의 key-value item을 한 번에 저장한다.
+  - 전자 API는 key list의 모든 key에 대해 동일한 obj로 저장 연산을 한 번에 수행한다.  
+  - 후자 API는 map에 있는 모든 \<key, obj\>에 대해 저장 연산을 한 번에 수행한다.
 - 저장된 key-value item들은 모두 exp 초 이후에 삭제된다.
 - StoreType은 연산의 저장 유형을 지정한다. 아래의 유형이 있다.
   - StoreType.set
@@ -106,7 +106,7 @@ future.get(key).getStatusCode() | 설명
 --------------------------------| ---------
 StatusCode.SUCCESS              | 조회 성공(key에 해당하는 item 존재하지 않아도 성공)
 
-여러 key들의 value를 한번에 조회하는 bulk API를 제공한다.
+여러 key들의 value를 한 번에 조회하는 bulk API를 제공한다.
 
 ```java
 BulkFuture<Map<String, Object>> asyncGetBulk(Collection<String> keys)
@@ -130,7 +130,7 @@ future.get(key).getStatusCode() | 설명
 --------------------------------| ---------
 StatusCode.SUCCESS              | 조회 성공(key에 해당하는 item 존재하지 않아도 성공)
 
-여러 key들의 CASValue를 한번에 조회하는 bulk API를 제공한다.
+여러 key들의 CASValue를 한 번에 조회하는 bulk API를 제공한다.
 
 ```java
 BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(Collection<String> keys)
@@ -176,7 +176,7 @@ StatusCode.ERR_NOT_FOUND                    | 증감 실패 (Key miss, 주어진
 ## Key-Value Item 삭제
 
 하나의 key에 대한 item을 삭제하는 API와
-여러 key들의 item들을 한번에 삭제하는 bulk API를 제공한다.
+여러 key들의 item들을 한 번에 삭제하는 bulk API를 제공한다.
 
 ```java
 OperationFuture<Boolean> delete(String key)
@@ -196,7 +196,7 @@ Future<Map<String, OperationStatus>> asyncDeleteBulk(List<String> key)
 Future<Map<String, OperationStatus>> asyncDeleteBulk(String... key)
 ```
 
-- 다수의 key-value item을 한번에 delete한다.
+- 다수의 key-value item을 한 번에 delete한다.
 - 다수 key들은 String 유형의 List이거나 String 유형의 나열된 key 목록일 수 있다.
 
 delete 실패한 키와 실패 원인은 future 객체를 통해 Map 형태로 조회할 수 있다.

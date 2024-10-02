@@ -16,7 +16,7 @@ Set item에 수행가능한 기본 연산들은 다음과 같다.
 - [Set Element 존재여부 확인](05-set-API.md#set-element-존재여부-확인)
 - [Set Element 조회](05-set-API.md#set-element-조회)
 
-여러 set element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
+여러 set element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
 - [Set Element 일괄 삽입](05-set-API.md#set-element-일괄-삽입)
 - [Set Element 일괄 존재여부 확인](05-set-API.md#set-element-일괄-존재여부-확인)
@@ -352,7 +352,7 @@ try {
 
 ## Set Element 일괄 삽입
 
-Set에 여러 element를 한번에 삽입하는 함수는 두 가지가 있다.
+Set에 여러 element를 한 번에 삽입하는 함수는 두 가지가 있다.
 
 첫째, 하나의 key가 가리키는 set에 다수의 element를 삽입하는 함수이다.
 
@@ -440,7 +440,7 @@ try {
 
 ## Set Element 일괄 존재여부 확인
 
-Set에서 여러 element의 존재여부를 한번에 확인하는 함수이다.
+Set에서 여러 element의 존재여부를 한 번에 확인하는 함수이다.
 
 ```java
 CollectionFuture<Map<Object, Boolean>> asyncSopPipedExistBulk(String key, List<Object> values)

@@ -17,7 +17,7 @@ Map item에 대해 수행가능한 기본 연산은 다음과 같다.
 - [Map Element 삭제](06-map-API.md#map-element-삭제)
 - [Map Element 조회](06-map-API.md#map-element-조회)
 
-여러 map element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
+여러 map element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
 - [Map Element 일괄 삽입](06-map-API.md#map-element-일괄-삽입)
 - [Map Element 일괄 변경](06-map-API.md#map-element-일괄-변경)
@@ -416,7 +416,7 @@ try {
 }
 ```
 
-1. map에서 mkey1, mkey2를 한번에 조회하기 위해 List에 add하고 mkeyList를 조회했다.
+1. map에서 mkey1, mkey2를 한 번에 조회하기 위해 List에 add하고 mkeyList를 조회했다.
 2. timeout은 1초로 지정했다. 지정한 시간에 조회 결과가 넘어 오지 않거나
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
    반환되는 Map 인터페이스의 구현체는 HashMap이며, 그 결과는 다음 중의 하나이다.
@@ -428,7 +428,7 @@ try {
 
 ## Map Element 일괄 삽입
 
-Map에 여러 element를 한번에 삽입하는 함수는 두 유형이 있다.
+Map에 여러 element를 한 번에 삽입하는 함수는 두 유형이 있다.
 
 첫째, 하나의 key가 가리키는 Map에 다수의 element를 삽입하는 함수이다.
 
