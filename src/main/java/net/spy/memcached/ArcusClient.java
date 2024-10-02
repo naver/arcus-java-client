@@ -348,6 +348,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param addrs socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
    */
+  @SuppressWarnings("this-escape")
   public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, name, addrs);
