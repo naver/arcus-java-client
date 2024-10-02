@@ -52,10 +52,10 @@ public final class CollectionCountOperationImpl extends OperationImpl implements
   private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
           false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-  protected final String key;
-  protected final CollectionCount collectionCount;
+  private final String key;
+  private final CollectionCount collectionCount;
 
-  protected int count = 0;
+  private int count = 0;
 
   public CollectionCountOperationImpl(String key,
                                       CollectionCount collectionCount, OperationCallback cb) {

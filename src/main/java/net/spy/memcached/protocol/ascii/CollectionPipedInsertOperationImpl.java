@@ -62,13 +62,13 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected final String key;
-  protected final CollectionPipedInsert<?> insert;
-  protected final CollectionPipedInsertOperation.Callback cb;
+  private final String key;
+  private final CollectionPipedInsert<?> insert;
+  private final CollectionPipedInsertOperation.Callback cb;
 
-  protected int count;
-  protected int index = 0;
-  protected boolean successAll = true;
+  private int count;
+  private int index = 0;
+  private boolean successAll = true;
 
   public CollectionPipedInsertOperationImpl(String key,
                                             CollectionPipedInsert<?> insert, OperationCallback cb) {

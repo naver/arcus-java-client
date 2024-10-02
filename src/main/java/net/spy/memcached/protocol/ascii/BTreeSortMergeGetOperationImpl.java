@@ -68,16 +68,16 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected final BTreeSMGet<?> smGet;
+  private final BTreeSMGet<?> smGet;
 
-  protected int flags = 0;
-  protected int lineCount = 0;
-  protected byte[] data = null;
-  protected int readOffset = 0;
-  protected byte lookingFor = '\0';
-  protected int spaceCount = 0;
+  private int flags = 0;
+  private int lineCount = 0;
+  private byte[] data = null;
+  private int readOffset = 0;
+  private byte lookingFor = '\0';
+  private int spaceCount = 0;
 
-  protected ReadState readState = ReadState.VALUE;
+  private ReadState readState = ReadState.VALUE;
 
   public BTreeSortMergeGetOperationImpl(BTreeSMGet<?> smGet,
                                         OperationCallback cb) {

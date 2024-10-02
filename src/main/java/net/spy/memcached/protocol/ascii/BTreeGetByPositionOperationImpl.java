@@ -55,19 +55,19 @@ public final class BTreeGetByPositionOperationImpl extends OperationImpl impleme
   private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
           false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
 
-  protected final String key;
-  protected final BTreeGetByPosition get;
+  private final String key;
+  private final BTreeGetByPosition get;
 
-  protected int flags = 0;
-  protected int count = 0;
-  protected int pos = 0;
-  protected int posDiff = 0;
-  protected byte[] data = null;
-  protected int readOffset = 0;
-  protected byte lookingFor = '\0';
-  protected final List<String> tokens = new ArrayList<>();
-  protected int eHeadCount;
-  protected int eFlagIndex;
+  private int flags = 0;
+  private int count = 0;
+  private int pos = 0;
+  private int posDiff = 0;
+  private byte[] data = null;
+  private int readOffset = 0;
+  private byte lookingFor = '\0';
+  private final List<String> tokens = new ArrayList<>();
+  private int eHeadCount;
+  private int eFlagIndex;
 
   public BTreeGetByPositionOperationImpl(String key, BTreeGetByPosition get,
                                          OperationCallback cb) {

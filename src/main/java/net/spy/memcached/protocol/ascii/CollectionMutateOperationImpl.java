@@ -58,9 +58,9 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
   private static final OperationStatus OUT_OF_RANGE = new CollectionOperationStatus(
           false, "OUT_OF_RANGE", CollectionResponse.OUT_OF_RANGE);
 
-  protected final String key;
-  protected final String subkey;
-  protected final CollectionMutate collectionMutate;
+  private final String key;
+  private final String subkey;
+  private final CollectionMutate collectionMutate;
 
   public CollectionMutateOperationImpl(String key, String subkey,
                                        CollectionMutate collectionMutate, OperationCallback cb) {

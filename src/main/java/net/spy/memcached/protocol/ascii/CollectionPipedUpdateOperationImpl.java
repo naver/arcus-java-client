@@ -64,13 +64,13 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
   private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
           false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
-  protected final String key;
-  protected final CollectionPipedUpdate<?> update;
-  protected final CollectionPipedUpdateOperation.Callback cb;
+  private final String key;
+  private final CollectionPipedUpdate<?> update;
+  private final CollectionPipedUpdateOperation.Callback cb;
 
-  protected int count;
-  protected int index = 0;
-  protected boolean successAll = true;
+  private int count;
+  private int index = 0;
+  private boolean successAll = true;
 
   public CollectionPipedUpdateOperationImpl(String key,
                                             CollectionPipedUpdate<?> update, OperationCallback cb) {

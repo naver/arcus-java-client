@@ -65,16 +65,16 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
   private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
           false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-  protected final BTreeGetBulk<?> getBulk;
+  private final BTreeGetBulk<?> getBulk;
 
-  protected String key;
-  protected int flags = 0;
-  protected int elementCount = 0;
+  private String key;
+  private int flags = 0;
+  private int elementCount = 0;
 
-  protected byte[] data = null;
-  protected int readOffset = 0;
-  protected byte lookingFor = '\0';
-  protected int spaceCount = 0;
+  private byte[] data = null;
+  private int readOffset = 0;
+  private byte lookingFor = '\0';
+  private int spaceCount = 0;
 
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);

@@ -52,8 +52,8 @@ public final class BTreeFindPositionOperationImpl extends OperationImpl implemen
   private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
           false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
 
-  protected final String key;
-  protected final BTreeFindPosition get;
+  private final String key;
+  private final BTreeFindPosition get;
 
   public BTreeFindPositionOperationImpl(String key, BTreeFindPosition get,
                                         OperationCallback cb) {

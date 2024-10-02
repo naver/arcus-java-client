@@ -55,8 +55,8 @@ public final class CollectionCreateOperationImpl extends OperationImpl
   private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
           false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
-  protected final String key;
-  protected final CollectionCreate collectionCreate;
+  private final String key;
+  private final CollectionCreate collectionCreate;
 
   public CollectionCreateOperationImpl(String key,
                                        CollectionCreate collectionCreate, OperationCallback cb) {
