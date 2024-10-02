@@ -190,6 +190,7 @@ public class MemcachedClient extends SpyThread
    * @param addrs the socket addresses
    * @throws IOException if connections cannot be established
    */
+  @SuppressWarnings("this-escape")
   public MemcachedClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     if (cf == null) {
