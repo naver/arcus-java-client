@@ -29,7 +29,7 @@ B+tree item에 대해 수행가능한 기본 연산은 다음과 같다.
 - [B+Tree Element 개수 계산](07-btree-API.md#btree-element-개수-계산)
 - [B+Tree Element 조회](07-btree-API.md#btree-element-조회)
 
-여러 b+tree element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
+여러 b+tree element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
 - [B+Tree Element 일괄 삽입](07-btree-API.md#btree-element-일괄-삽입)
 - [B+Tree Element 일괄 변경](07-btree-API.md#btree-element-일괄-변경)
@@ -953,7 +953,7 @@ try {
 
 ## B+Tree Element 일괄 삽입
 
-B+tree에 여러 element를 한번에 삽입하는 함수는 두 유형이 있다.
+B+tree에 여러 element를 한 번에 삽입하는 함수는 두 유형이 있다.
 
 첫째, 하나의 key가 가리키는 b+tree에 다수의 element를 삽입하는 함수이다.
 

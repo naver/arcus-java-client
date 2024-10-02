@@ -16,7 +16,7 @@ List item에 대해 수행가능한 기본 연산들은 아래와 같다.
 - [List Element 삭제](04-list-API.md#list-element-삭제) 
 - [List Element 조회](04-list-API.md#list-element-조회)
 
-여러 list element들에 대해 한번에 일괄 수행하는 연산은 다음과 같다.
+여러 list element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
 - [List Element 일괄 삽입](04-list-API.md#list-element-일괄-삽입)
 
