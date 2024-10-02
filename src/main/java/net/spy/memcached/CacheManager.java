@@ -200,6 +200,9 @@ public final class CacheManager extends SpyThread implements Watcher,
       shutdownZooKeeperClient();
       throw e;
     } catch (Exception e) {
+      if (e instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't connect to zookeeper.", e);
     }
@@ -266,6 +269,9 @@ public final class CacheManager extends SpyThread implements Watcher,
       shutdownZooKeeperClient();
       throw e;
     } catch (Exception e) {
+      if (e instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
       shutdownZooKeeperClient();
       throw new InitializeClientException("Can't initialize Arcus client.", e);
     }
@@ -748,6 +754,7 @@ public final class CacheManager extends SpyThread implements Watcher,
       zk.close();
       zk = null;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       getLogger().warn("An exception occured while closing ZooKeeper client.", e);
     }
   }
