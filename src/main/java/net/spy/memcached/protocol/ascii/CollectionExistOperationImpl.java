@@ -56,9 +56,9 @@ public final class CollectionExistOperationImpl extends OperationImpl
   private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
           false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-  protected final String key;
-  protected final String subkey;
-  protected final CollectionExist collectionExist;
+  private final String key;
+  private final String subkey;
+  private final CollectionExist collectionExist;
 
   public CollectionExistOperationImpl(String key, String subkey,
                                       CollectionExist collectionExist, OperationCallback cb) {

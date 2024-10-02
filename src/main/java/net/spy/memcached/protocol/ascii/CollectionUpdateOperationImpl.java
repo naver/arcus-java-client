@@ -64,10 +64,10 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
   private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
           false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
-  protected final String key;
-  protected final String subkey; // e.g.) 0 or 0x00
-  protected final CollectionUpdate<?> collectionUpdate;
-  protected final byte[] data;
+  private final String key;
+  private final String subkey; // e.g.) 0 or 0x00
+  private final CollectionUpdate<?> collectionUpdate;
+  private final byte[] data;
 
   public CollectionUpdateOperationImpl(String key, String subkey,
                                        CollectionUpdate<?> collectionUpdate, byte[] data,

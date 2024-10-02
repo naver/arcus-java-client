@@ -54,13 +54,13 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
   private static final OperationStatus UNREADABLE = new CollectionOperationStatus(
           false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
-  protected final String key;
-  protected final SetPipedExist<?> setPipedExist;
-  protected final CollectionPipedExistOperation.Callback cb;
+  private final String key;
+  private final SetPipedExist<?> setPipedExist;
+  private final CollectionPipedExistOperation.Callback cb;
 
-  protected int count;
-  protected int index = 0;
-  protected boolean successAll = true;
+  private int count;
+  private int index = 0;
+  private boolean successAll = true;
 
   public CollectionPipedExistOperationImpl(String key,
                                            SetPipedExist<?> collectionExist, OperationCallback cb) {

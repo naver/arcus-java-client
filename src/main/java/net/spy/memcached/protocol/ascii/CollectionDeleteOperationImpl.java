@@ -61,8 +61,8 @@ public final class CollectionDeleteOperationImpl extends OperationImpl
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected String key;
-  protected CollectionDelete collectionDelete;
+  private String key;
+  private CollectionDelete collectionDelete;
 
   public CollectionDeleteOperationImpl(String key,
                                        CollectionDelete collectionDelete, OperationCallback cb) {

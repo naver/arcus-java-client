@@ -61,12 +61,12 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected final CollectionBulkInsert<?> insert;
-  protected final CollectionBulkInsertOperation.Callback cb;
+  private final CollectionBulkInsert<?> insert;
+  private final CollectionBulkInsertOperation.Callback cb;
 
-  protected int count;
-  protected int index = 0;
-  protected boolean successAll = true;
+  private int count;
+  private int index = 0;
+  private boolean successAll = true;
 
   public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);

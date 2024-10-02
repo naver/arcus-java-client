@@ -69,10 +69,10 @@ public final class CollectionInsertOperationImpl extends OperationImpl
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
-  protected final String key;
-  protected final String subkey;    // e.g.) 0 or 0x00
-  protected final CollectionInsert<?> collectionInsert;
-  protected final byte[] data;
+  private final String key;
+  private final String subkey;    // e.g.) 0 or 0x00
+  private final CollectionInsert<?> collectionInsert;
+  private final byte[] data;
 
   public CollectionInsertOperationImpl(String key, String subkey,
                                        CollectionInsert<?> collectionInsert, byte[] data,

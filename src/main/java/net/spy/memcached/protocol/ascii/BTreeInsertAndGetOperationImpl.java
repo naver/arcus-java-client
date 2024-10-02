@@ -81,18 +81,18 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
 
   private static final OperationStatus[] STORE_AND_GET_ON_DATA = {TRIMMED};
 
-  protected final String key;
-  protected final BTreeInsertAndGet<?> get;
-  protected final byte[] dataToStore;
+  private final String key;
+  private final BTreeInsertAndGet<?> get;
+  private final byte[] dataToStore;
 
-  protected int flags = 0;
-  protected int count = 0;
-  protected byte[] data = null;
-  protected int readOffset = 0;
-  protected byte lookingFor = '\0';
-  protected final List<String> tokens = new ArrayList<>();
-  protected int eHeadCount;
-  protected int eFlagIndex;
+  private int flags = 0;
+  private int count = 0;
+  private byte[] data = null;
+  private int readOffset = 0;
+  private byte lookingFor = '\0';
+  private final List<String> tokens = new ArrayList<>();
+  private int eHeadCount;
+  private int eFlagIndex;
 
   public BTreeInsertAndGetOperationImpl(String key, BTreeInsertAndGet<?> get,
                                         byte[] dataToStore, OperationCallback cb) {
