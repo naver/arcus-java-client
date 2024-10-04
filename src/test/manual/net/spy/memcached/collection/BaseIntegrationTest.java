@@ -120,7 +120,7 @@ public class BaseIntegrationTest {
     };
     cfb.setInitialObservers(Collections.singleton(obs));
 
-    mc = new ArcusClient(cfb.build(), AddrUtil.getAddresses(ARCUS_HOST));
+    mc = ArcusClient.createArcusClient(AddrUtil.getAddresses(ARCUS_HOST), cfb);
     latch.await();
   }
 

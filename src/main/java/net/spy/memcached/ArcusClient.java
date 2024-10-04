@@ -342,13 +342,51 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   /**
    * Create an Arcus client for the given memcached server addresses.
+   * Recommend only invoked with arcus server without zk.
+   * @param addrs socket addresses for the memcached servers
+   * @param cfb   connection factory builder to configure connections for this client
+   * @return Arcus client instance
+   * @throws IOException
+   */
+  public static ArcusClient createArcusClient(List<InetSocketAddress> addrs,
+                                              ConnectionFactoryBuilder cfb)
+          throws IOException {
+    return new ArcusClient(cfb.build(), addrs);
+  }
+
+  /**
+   * Create an Arcus client pool for the given memcached server addresses.
+   * Recommend only invoked with arcus server without zk.
+   * @param addrs socket addresses for the memcached servers
+   * @param cfb   connection factory builder to configure connections for this client
+   * @param poolSize  pool size
+   * @return Arcus client pool instance
+   * @throws IOException
+   */
+  public static ArcusClientPool createArcusClientPool(List<InetSocketAddress> addrs,
+                                                      ConnectionFactoryBuilder cfb, int poolSize)
+          throws IOException {
+    ArcusClient[] clients = new ArcusClient[poolSize];
+    int poolId = CacheManager.POOL_ID.getAndIncrement();
+    for (int i = 0; i < poolSize; i++) {
+      String clientName = "ArcusClient" + "-" + poolId +
+              "(" + (i + 1) + "-" + poolSize + ")";
+      clients[i] = new ArcusClient(cfb.build(), clientName, addrs);
+    }
+    return new ArcusClientPool(poolSize, clients);
+  }
+
+  /**
+   * Create an Arcus client for the given memcached server addresses.
    *
    * @param cf    connection factory to configure connections for this client
    * @param name  client name
    * @param addrs socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
+   * @deprecated Use {@link #createArcusClient(java.util.List, ConnectionFactoryBuilder)} instead.
    */
   @SuppressWarnings("this-escape")
+  @Deprecated
   public ArcusClient(ConnectionFactory cf, String name, List<InetSocketAddress> addrs)
           throws IOException {
     super(cf, name, addrs);
@@ -369,7 +407,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param cf    connection factory to configure connections for this client
    * @param addrs socket addresses for the memcached servers
    * @throws IOException if connections cannot be established
+   * @deprecated Use {@link #createArcusClient(java.util.List, ConnectionFactoryBuilder)} instead.
    */
+  @Deprecated
   public ArcusClient(ConnectionFactory cf, List<InetSocketAddress> addrs)
           throws IOException {
     this(cf, DEFAULT_ARCUS_CLIENT_NAME + "-" + CLIENT_ID.getAndIncrement(), addrs);

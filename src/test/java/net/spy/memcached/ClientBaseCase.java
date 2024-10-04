@@ -301,7 +301,10 @@ abstract class ClientBaseCase {
     if (USE_ZK) {
       openFromZK(new CFB(cf));
     } else {
-      openDirect(cf);
+      openDirect(new ConnectionFactoryBuilder()
+              .setOpTimeout(cf.getOperationTimeout())
+              .setFailureMode(cf.getFailureMode())
+              .setInitialObservers(cf.getInitialObservers()));
     }
   }
 
@@ -309,8 +312,8 @@ abstract class ClientBaseCase {
     client = ArcusClient.createArcusClient(ZK_ADDRESS, SERVICE_CODE, cfb);
   }
 
-  protected void openDirect(ConnectionFactory cf) throws Exception {
-    client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
+  protected void openDirect(ConnectionFactoryBuilder cfb) throws Exception {
+    client = ArcusClient.createArcusClient(AddrUtil.getAddresses(ARCUS_HOST), cfb);
   }
 
   @BeforeEach

@@ -70,7 +70,7 @@ public class CacheManager extends SpyThread implements Watcher,
   private static final int ZK_SESSION_TIMEOUT = 15000;
 
   private static final long ZK_CONNECT_TIMEOUT = ZK_SESSION_TIMEOUT;
-  private static final AtomicInteger POOL_ID = new AtomicInteger(1);
+  static final AtomicInteger POOL_ID = new AtomicInteger(1);
 
   private final String zkConnectString;
 

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
@@ -38,19 +37,8 @@ class ArcusClientCreateTest {
   }
 
   @Test
-  void testCreateClientWithCustomName() throws IOException {
-    ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), clientName, addrs);
-
-    Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
-    MemcachedNode node = nodes.iterator().next();
-
-    assertEquals(nodes.size(), 1);
-    assertEquals(node.getNodeName(), clientName + " " + hostName);
-  }
-
-  @Test
   void testCreateClientWithDefaultName() throws IOException {
-    ArcusClient arcusClient = new ArcusClient(new DefaultConnectionFactory(), addrs);
+    ArcusClient arcusClient = ArcusClient.createArcusClient(addrs, new ConnectionFactoryBuilder());
 
     Collection<MemcachedNode> nodes = arcusClient.getAllNodes();
     assertEquals(nodes.size(), 1);
@@ -59,12 +47,5 @@ class ArcusClientCreateTest {
     Pattern compile = Pattern.compile("ArcusClient-\\d+ " + hostName);
     Matcher matcher = compile.matcher(node.getNodeName());
     assertTrue(matcher.matches());
-  }
-
-  @Test
-  void testCreateClientNullName() throws IOException {
-    assertThrows(NullPointerException.class, () -> {
-      new ArcusClient(new DefaultConnectionFactory(), null, addrs);
-    });
   }
 }
