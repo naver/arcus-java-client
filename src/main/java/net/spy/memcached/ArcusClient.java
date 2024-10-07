@@ -85,6 +85,9 @@ import net.spy.memcached.collection.CollectionPipedInsert.SetPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
+import net.spy.memcached.collection.CollectionPipedUpsert;
+import net.spy.memcached.collection.CollectionPipedUpsert.BTreePipedUpsert;
+import net.spy.memcached.collection.CollectionPipedUpsert.ByteArrayBTreePipedUpsert;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.Element;
@@ -2299,6 +2302,64 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(key, op);
     return rv;
+  }
+
+  @Override
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, Object> elements,
+          CollectionAttributes attributesForCreate) {
+    return asyncBopPipedUpsertBulk(key, elements, attributesForCreate, collectionTranscoder);
+  }
+
+  @Override
+  public CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<Object>> elements, CollectionAttributes collectionAttributes) {
+    return asyncBopPipedUpsertBulk(key, elements, collectionAttributes, collectionTranscoder);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, Map<Long, T> elements, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException("The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> upsertList = new ArrayList<CollectionPipedInsert<T>>();
+
+    if (elements.size() <= CollectionPipedUpsert.MAX_PIPED_ITEM_COUNT) {
+      upsertList.add(new BTreePipedUpsert<T>(key, elements, attributesForCreate, tc));
+    } else {
+      PartitionedMap<Long, T> list = new PartitionedMap<Long, T>(
+              elements, CollectionPipedUpsert.MAX_PIPED_ITEM_COUNT);
+      for (Map<Long, T> elementMap : list) {
+        upsertList.add(new BTreePipedUpsert<T>(key, elementMap, attributesForCreate, tc));
+      }
+    }
+    return asyncCollectionPipedInsert(key, upsertList);
+  }
+
+  @Override
+  public <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncBopPipedUpsertBulk(
+          String key, List<Element<T>> elements, CollectionAttributes attributesForCreate, Transcoder<T> tc) {
+
+    if (elements.isEmpty()) {
+      throw new IllegalArgumentException("The number of piped operations must be larger than 0.");
+    }
+
+    List<CollectionPipedInsert<T>> upsertList = new ArrayList<CollectionPipedInsert<T>>();
+
+
+    if (elements.size() <= CollectionPipedUpsert.MAX_PIPED_ITEM_COUNT) {
+      upsertList.add(new ByteArrayBTreePipedUpsert<T>(key, elements, attributesForCreate, tc));
+    } else {
+      PartitionedList<Element<T>> list = new PartitionedList<Element<T>>(
+              elements, CollectionPipedInsert.MAX_PIPED_ITEM_COUNT);
+      for (List<Element<T>> elementList : list) {
+        upsertList.add(new ByteArrayBTreePipedUpsert<T>(key, elementList, attributesForCreate, tc));
+      }
+    }
+    return asyncCollectionPipedInsert(key, upsertList);
   }
 
   @Override

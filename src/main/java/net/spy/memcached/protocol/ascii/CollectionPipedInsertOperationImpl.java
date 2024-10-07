@@ -49,6 +49,8 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
   private static final OperationStatus STORED = new CollectionOperationStatus(
           true, "STORED", CollectionResponse.STORED);
+  private static final OperationStatus REPLACED = new CollectionOperationStatus(
+          true, "REPLACED", CollectionResponse.REPLACED);
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
           false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
   private static final OperationStatus ELEMENT_EXISTS = new CollectionOperationStatus(
@@ -117,8 +119,8 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
 
     if (insert.isNotPiped()) {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
-              NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-              TYPE_MISMATCH, BKEY_MISMATCH);
+              REPLACED, NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED,
+              OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH);
       if (status.isSuccess()) {
         cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
@@ -157,8 +159,8 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
       count = Integer.parseInt(stuff[1]);
     } else {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
-              NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
-              TYPE_MISMATCH, BKEY_MISMATCH);
+              REPLACED, NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED,
+              OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
         cb.gotStatus(index, status);
