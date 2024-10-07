@@ -41,7 +41,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
-  private final Collection<MemcachedNode> allNodes;
+  private Collection<MemcachedNode> allNodes;
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedNode>> ketamaAlterNodes;
@@ -203,15 +203,16 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
                      Collection<MemcachedNode> toDelete) {
     lock.lock();
     try {
+      ArrayList<MemcachedNode> newAllNodes = new ArrayList<>(allNodes);
       // Add memcached nodes.
       for (MemcachedNode node : toAttach) {
-        allNodes.add(node);
+        newAllNodes.add(node);
         insertHash(node);
       }
 
       // Remove memcached nodes.
       for (MemcachedNode node : toDelete) {
-        allNodes.remove(node);
+        newAllNodes.remove(node);
         removeHash(node);
         try {
           node.closeChannel();
@@ -220,6 +221,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
                   "Failed to closeChannel the node : " + node);
         }
       }
+      allNodes = newAllNodes;
     } finally {
       /* ENABLE_MIGRATION if */
       if (migrationInProgress && alterNodes.isEmpty()) {
