@@ -141,9 +141,6 @@ public class CacheManager extends SpyThread implements Watcher,
     /* ENABLE_MIGRATION end */
 
     this.startup = false;
-
-    getLogger().info("CacheManager started. (" + serviceCode + "@" + hostPort + ")");
-
   }
 
   @Override
@@ -151,6 +148,7 @@ public class CacheManager extends SpyThread implements Watcher,
     setName("Cache Manager IO for " + serviceCode + "@" + zkConnectString);
     setDaemon(true);
     super.start();
+    getLogger().info("CacheManager started. (" + serviceCode + "@" + zkConnectString + ")");
   }
 
   private String getCacheListZPath() {
