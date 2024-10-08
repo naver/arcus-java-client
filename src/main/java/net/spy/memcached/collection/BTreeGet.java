@@ -22,7 +22,7 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeGet extends CollectionGet {
 
-  private static final String command = "bop get";
+  private static final String COMMAND = "bop get";
   protected int offset = -1;
   protected int count = -1;
   protected ElementFlagFilter elementFlagFilter;
@@ -117,7 +117,7 @@ public class BTreeGet extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   @Override

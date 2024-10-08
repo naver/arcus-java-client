@@ -30,7 +30,7 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class BTreeFindPosition {
 
-  private static final String command = "bop position";
+  private static final String COMMAND = "bop position";
 
   private final String bkey;
   private final BTreeOrder order;
@@ -60,7 +60,7 @@ public class BTreeFindPosition {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   public BTreeOrder getOrder() {

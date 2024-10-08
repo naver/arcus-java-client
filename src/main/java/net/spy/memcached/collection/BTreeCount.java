@@ -20,14 +20,14 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeCount extends CollectionCount {
 
-  private static final String command = "bop count";
+  private static final String COMMAND = "bop count";
 
   protected final String range;
 
   protected final ElementFlagFilter elementFlagFilter;
 
   public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.range = from + ".." + to;
     this.elementFlagFilter = elementFlagFilter;
   }
 
@@ -37,13 +37,13 @@ public class BTreeCount extends CollectionCount {
   }
 
   public BTreeCount(long from, long to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.range = from + ".." + to;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   public BTreeCount(byte[] from, byte[] to, ElementMultiFlagsFilter elementMultiFlagsFilter) {
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   public String stringify() {
@@ -64,6 +64,6 @@ public class BTreeCount extends CollectionCount {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 }

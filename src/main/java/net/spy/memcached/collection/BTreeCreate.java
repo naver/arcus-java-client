@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 public class BTreeCreate extends CollectionCreate {
 
-  private static final String command = "bop create";
+  private static final String COMMAND = "bop create";
 
   public BTreeCreate(int flags, Integer expTime, Long maxCount,
                      CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
@@ -26,6 +26,6 @@ public class BTreeCreate extends CollectionCreate {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 }

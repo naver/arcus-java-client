@@ -42,7 +42,7 @@ import net.spy.memcached.util.BTreeUtil;
  * - SERVER_ERROR
  */
 public class BTreeFindPositionWithGet extends CollectionGet {
-  private static final String command = "bop pwg";
+  private static final String COMMAND = "bop pwg";
 
   private final BKeyObject bkeyObject;
   private final BTreeOrder order;
@@ -81,7 +81,7 @@ public class BTreeFindPositionWithGet extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   public BKeyObject getBkeyObject() {

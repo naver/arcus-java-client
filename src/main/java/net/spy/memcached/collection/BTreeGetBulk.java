@@ -22,7 +22,7 @@ import net.spy.memcached.MemcachedNode;
 
 public interface BTreeGetBulk<T> {
 
-  int headerCount = 3;
+  int HEADER_COUNT = 3;
 
   void setKeySeparator(String keySeparator);
 
