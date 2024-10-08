@@ -18,9 +18,15 @@
 /* ENABLE_REPLICATION if */
 package net.spy.memcached;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.spy.memcached.compat.SpyObject;
 
@@ -189,6 +195,48 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
 
   public static String getGroupNameFromNode(final MemcachedNode node) {
     return ((ArcusReplNodeAddress) node.getSocketAddress()).getGroupName();
+  }
+
+  static Set<String> findChangedGroups(List<InetSocketAddress> newAddrs,
+                                       Collection<MemcachedNode> oldNodes) {
+    Set<String> changedGroupSet = new HashSet<>();
+    Map<String, InetSocketAddress> addrMap = newAddrs.stream()
+            .collect(Collectors.toMap(InetSocketAddress::toString, addr -> addr));
+
+    for (MemcachedNode node : oldNodes) {
+      if (addrMap.remove(node.getSocketAddress().toString()) == null) {
+        changedGroupSet.add(node.getReplicaGroup().getGroupName());
+      }
+    }
+
+    addrMap.values().stream()
+            .map(addr -> ((ArcusReplNodeAddress) addr).getGroupName())
+            .forEach(changedGroupSet::add);
+
+    return changedGroupSet;
+  }
+
+  static List<InetSocketAddress> findAddrsOfChangedGroups(List<InetSocketAddress> newAddrs,
+                                                          Set<String> changedGroups) {
+    List<InetSocketAddress> changedGroupAddrs = new ArrayList<>();
+    newAddrs.stream()
+            .filter(addr -> changedGroups.contains(((ArcusReplNodeAddress) addr).getGroupName()))
+            .forEach(changedGroupAddrs::add);
+    return changedGroupAddrs;
+  }
+
+  static Set<ArcusReplNodeAddress> getAddrsFromNodes(List<MemcachedNode> nodes) {
+    return nodes.stream()
+            .map(node -> (ArcusReplNodeAddress) node.getSocketAddress())
+            .collect(Collectors.toSet());
+  }
+
+  static Set<ArcusReplNodeAddress> getSlaveAddrsFromGroupAddrs(
+          List<ArcusReplNodeAddress> groupAddrs) {
+    if (groupAddrs.size() <= 1) {
+      return Collections.emptySet();
+    }
+    return new HashSet<>(groupAddrs.subList(1, groupAddrs.size()));
   }
 }
 /* ENABLE_REPLICATION end */

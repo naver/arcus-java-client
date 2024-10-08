@@ -32,7 +32,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -367,38 +366,6 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  private Set<String> findChangedGroups(List<InetSocketAddress> addrs,
-                                        Collection<MemcachedNode> nodes) {
-    Map<String, InetSocketAddress> addrMap = new HashMap<>();
-    for (InetSocketAddress each : addrs) {
-      addrMap.put(each.toString(), each);
-    }
-
-    Set<String> changedGroupSet = new HashSet<>();
-    for (MemcachedNode node : nodes) {
-      String nodeAddr = ((InetSocketAddress) node.getSocketAddress()).toString();
-      if (addrMap.remove(nodeAddr) == null) { // removed node
-        changedGroupSet.add(node.getReplicaGroup().getGroupName());
-      }
-    }
-    for (String addr : addrMap.keySet()) { // newly added node
-      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addrMap.get(addr);
-      changedGroupSet.add(a.getGroupName());
-    }
-    return changedGroupSet;
-  }
-
-  private List<InetSocketAddress> findAddrsOfChangedGroups(List<InetSocketAddress> addrs,
-                                                           Set<String> changedGroups) {
-    List<InetSocketAddress> changedGroupAddrs = new ArrayList<>();
-    for (InetSocketAddress addr : addrs) {
-      if (changedGroups.contains(((ArcusReplNodeAddress) addr).getGroupName())) {
-        changedGroupAddrs.add(addr);
-      }
-    }
-    return changedGroupAddrs;
-  }
-
   private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<>();
     List<MemcachedNode> removeNodes = new ArrayList<>();
@@ -416,10 +383,11 @@ public final class MemcachedConnection extends SpyObject {
      * we find out the changed groups with the comparison of previous and current znode list,
      * and update the state of groups based on them.
      */
-    Set<String> changedGroups = findChangedGroups(addrs, locator.getAll());
+    Set<String> changedGroups = MemcachedReplicaGroup.findChangedGroups(addrs, locator.getAll());
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            ArcusReplNodeAddress.makeGroupAddrsList(findAddrsOfChangedGroups(addrs, changedGroups));
+            ArcusReplNodeAddress.makeGroupAddrsList(
+                    MemcachedReplicaGroup.findAddrsOfChangedGroups(addrs, changedGroups));
 
     // remove invalidated groups in changedGroups
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
@@ -467,8 +435,10 @@ public final class MemcachedConnection extends SpyObject {
       assert oldMasterAddr != null : "invalid old rgroup";
       assert newMasterAddr != null : "invalid new rgroup";
 
-      Set<ArcusReplNodeAddress> oldSlaveAddrs = getAddrsFromNodes(oldSlaveNodes);
-      Set<ArcusReplNodeAddress> newSlaveAddrs = getSlaveAddrsFromGroupAddrs(newGroupAddrs);
+      Set<ArcusReplNodeAddress> oldSlaveAddrs
+              = MemcachedReplicaGroup.getAddrsFromNodes(oldSlaveNodes);
+      Set<ArcusReplNodeAddress> newSlaveAddrs
+              = MemcachedReplicaGroup.getSlaveAddrsFromGroupAddrs(newGroupAddrs);
 
       if (oldMasterAddr.isSameAddress(newMasterAddr)) {
         // add newly added slave node
@@ -559,30 +529,6 @@ public final class MemcachedConnection extends SpyObject {
 
     // Remove the unavailable nodes.
     handleNodesToRemove(removeNodes);
-  }
-
-  private Set<ArcusReplNodeAddress> getAddrsFromNodes(List<MemcachedNode> nodes) {
-    Set<ArcusReplNodeAddress> addrs = Collections.emptySet();
-    if (!nodes.isEmpty()) {
-      addrs = new HashSet<>((int) (nodes.size() / .75f) + 1);
-      for (MemcachedNode node : nodes) {
-        addrs.add((ArcusReplNodeAddress) node.getSocketAddress());
-      }
-    }
-    return addrs;
-  }
-
-  private Set<ArcusReplNodeAddress> getSlaveAddrsFromGroupAddrs(
-          List<ArcusReplNodeAddress> groupAddrs) {
-    Set<ArcusReplNodeAddress> slaveAddrs = Collections.emptySet();
-    int groupSize = groupAddrs.size();
-    if (groupSize > 1) {
-      slaveAddrs = new HashSet<>((int) ((groupSize - 1) / .75f) + 1);
-      for (int i = 1; i < groupSize; i++) {
-        slaveAddrs.add(groupAddrs.get(i));
-      }
-    }
-    return slaveAddrs;
   }
   /* ENABLE_REPLICATION end */
 
