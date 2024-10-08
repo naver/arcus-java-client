@@ -35,10 +35,9 @@ public class BTreeGetByPosition extends CollectionGet {
 
   public static final int HEADER_EFLAG_POSITION = 1; // 0-based
 
-  private static final String command = "bop gbp";
+  private static final String COMMAND = "bop gbp";
 
   private final BTreeOrder order;
-  private final String range;
   private final int posFrom;
   private final int posTo;
   private BKeyObject bkey;
@@ -54,7 +53,7 @@ public class BTreeGetByPosition extends CollectionGet {
 
   public BTreeGetByPosition(BTreeOrder order, int posFrom, int posTo) {
     this.order = order;
-    this.range = String.valueOf(posFrom) + ".." + String.valueOf(posTo);
+    this.range = posFrom + ".." + posTo;
     this.posFrom = posFrom;
     this.posTo = posTo;
     this.eHeadCount = 2;
@@ -83,7 +82,7 @@ public class BTreeGetByPosition extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   @Override

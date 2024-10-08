@@ -20,7 +20,7 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeDelete extends CollectionDelete {
 
-  private static final String command = "bop delete";
+  private static final String COMMAND = "bop delete";
   protected int count = -1;
 
   protected ElementFlagFilter elementFlagFilter;
@@ -38,12 +38,12 @@ public class BTreeDelete extends CollectionDelete {
   }
 
   public BTreeDelete(long from, long to, boolean noreply) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.range = from + ".." + to;
     this.noreply = noreply;
   }
 
   public BTreeDelete(long from, long to, int count, boolean noreply) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
+    this.range = from + ".." + to;
     this.count = count;
     this.noreply = noreply;
   }
@@ -77,14 +77,14 @@ public class BTreeDelete extends CollectionDelete {
                      ElementMultiFlagsFilter elementMultiFlagsFilter) {
     this(bkey, noreply);
     this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   public BTreeDelete(long from, long to, int count, boolean noreply, boolean dropIfEmpty,
                      ElementMultiFlagsFilter elementMultiFlagsFilter) {
     this(from, to, count, noreply);
     this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   public BTreeDelete(byte[] bkey, boolean noreply, boolean dropIfEmpty,
@@ -92,7 +92,7 @@ public class BTreeDelete extends CollectionDelete {
     this.range = BTreeUtil.toHex(bkey);
     this.noreply = noreply;
     this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   public BTreeDelete(byte[] from, byte[] to, int count, boolean noreply, boolean dropIfEmpty,
@@ -101,7 +101,7 @@ public class BTreeDelete extends CollectionDelete {
     this.count = count;
     this.noreply = noreply;
     this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = (ElementFlagFilter) elementMultiFlagsFilter;
+    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   @Override
@@ -138,7 +138,7 @@ public class BTreeDelete extends CollectionDelete {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

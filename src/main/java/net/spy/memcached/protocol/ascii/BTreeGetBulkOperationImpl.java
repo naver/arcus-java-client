@@ -146,7 +146,7 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
             String itemHeader = byteBuffer.toString();
 
             String[] chunk = itemHeader.split(" ");
-            if (chunk.length == BTreeGetBulk.headerCount
+            if (chunk.length == BTreeGetBulk.HEADER_COUNT
                     && chunk[2].startsWith("0x")) {
               spaceCount--;
               byteBuffer.write(b);

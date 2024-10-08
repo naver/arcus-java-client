@@ -134,7 +134,7 @@ public abstract class BTreeGetBulkImpl<T> implements BTreeGetBulk<T> {
   }
 
   public boolean headerReady(int spaceCount) {
-    return spaceCount == BTreeGetBulk.headerCount;
+    return spaceCount == BTreeGetBulk.HEADER_COUNT;
   }
 
   public int getDataLength() {
