@@ -259,10 +259,7 @@ public final class CacheManager extends SpyThread implements Watcher,
         initMigrationMonitor();
       }
       /* ENABLE_MIGRATION end */
-    } catch (NotExistsServiceCodeException e) {
-      shutdownZooKeeperClient();
-      throw e;
-    } catch (InitializeClientException e) {
+    } catch (NotExistsServiceCodeException | InitializeClientException e) {
       shutdownZooKeeperClient();
       throw e;
     } catch (Exception e) {
@@ -350,6 +347,7 @@ public final class CacheManager extends SpyThread implements Watcher,
     }
   }
 
+  @Override
   public void run() {
     synchronized (this) {
       while (!shutdownRequested) {
@@ -365,9 +363,7 @@ public final class CacheManager extends SpyThread implements Watcher,
             initZooKeeperClient();
           } catch (AdminConnectTimeoutException e) {
             retrySleepTime = 1000L; // 1 second
-          } catch (NotExistsServiceCodeException e) {
-            retrySleepTime = 5000L; // 5 second
-          } catch (InitializeClientException e) {
+          } catch (NotExistsServiceCodeException | InitializeClientException e) {
             retrySleepTime = 5000L; // 5 second
           } catch (Exception e) {
             retrySleepTime = 1000L; // 1 second
@@ -596,18 +592,18 @@ public final class CacheManager extends SpyThread implements Watcher,
     /* There are following znodes in cloud_stat :
      * INTERNAL, STATE, alter_list
      */
-    int child_count = 3;
-    int valid_count = 0;
-    if (children.size() < child_count) {
+    int childCount = 3;
+    int validCount = 0;
+    if (children.size() < childCount) {
       return null;
     }
 
-    MigrationType type = MigrationType.UNKNOWN;
-    MigrationState state = MigrationState.UNKNOWN;
+    MigrationType newType = MigrationType.UNKNOWN;
+    MigrationState newState = MigrationState.UNKNOWN;
 
     for (String znode : children) {
       if (znode.equals("INTERNAL") || znode.equals("alter_list")) {
-        valid_count++;
+        validCount++;
         continue;
       }
 
@@ -620,24 +616,24 @@ public final class CacheManager extends SpyThread implements Watcher,
           break;
         }
 
-        type = MigrationType.fromString(tokens[1]);
-        if (type == MigrationType.UNKNOWN) {
+        newType = MigrationType.fromString(tokens[1]);
+        if (newType == MigrationType.UNKNOWN) {
           break;
         }
 
-        state = MigrationState.fromString(tokens[2]);
-        if (state == MigrationState.UNKNOWN) {
+        newState = MigrationState.fromString(tokens[2]);
+        if (newState == MigrationState.UNKNOWN) {
           break;
         }
 
-        valid_count++;
+        validCount++;
       }
     }
-    if (valid_count != child_count) {
+    if (validCount != childCount) {
       getLogger().warn("Invalid cloud_stat znodes.");
       return null;
     }
-    return new AbstractMap.SimpleEntry<>(type, state);
+    return new AbstractMap.SimpleEntry<>(newType, newState);
   }
 
   private boolean isMigrationMonitorDead() {
