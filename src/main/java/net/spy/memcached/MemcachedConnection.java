@@ -825,45 +825,42 @@ public final class MemcachedConnection extends SpyObject {
 
   // Handle any requests that have been made against the client.
   private void handleInputQueue() {
-    if (!addedQueue.isEmpty()) {
-      getLogger().debug("Handling queue");
-      // If there's stuff in the added queue.  Try to process it.
-      Collection<MemcachedNode> toAdd = new HashSet<>();
-      // Transfer the queue into a hashset.  There are very likely more
-      // additions than there are nodes.
-      Collection<MemcachedNode> todo = new HashSet<>();
+    getLogger().debug("Handling queue");
+    // If there's stuff in the added queue.  Try to process it.
+    Collection<MemcachedNode> toAdd = new HashSet<>();
+    // Transfer the queue into a hashset.  There are very likely more
+    // additions than there are nodes.
+    Collection<MemcachedNode> todo = new HashSet<>();
 
-      MemcachedNode node;
-      while ((node = addedQueue.poll()) != null) {
-        todo.add(node);
-      }
-
-      // Now process the queue.
-      for (MemcachedNode qa : todo) {
-        boolean readyForIO = false;
-        if (qa.isActive()) {
-          if (qa.getCurrentWriteOp() != null) {
-            readyForIO = true;
-            getLogger().debug("Handling queued write %s", qa);
-          }
-        } else {
-          toAdd.add(qa);
-        }
-        qa.copyInputQueue();
-        if (readyForIO) {
-          try {
-            if (qa.getWbuf().hasRemaining()) {
-              handleWrites(qa);
-            }
-          } catch (IOException e) {
-            getLogger().warn("Exception handling write", e);
-            lostConnection(qa, ReconnDelay.DEFAULT, "exception handling write");
-          }
-        }
-        qa.fixupOps();
-      }
-      addedQueue.addAll(toAdd);
+    while (!addedQueue.isEmpty()) {
+      todo.add(addedQueue.poll());
     }
+
+    // Now process the queue.
+    for (MemcachedNode qa : todo) {
+      boolean readyForIO = false;
+      if (qa.isActive()) {
+        if (qa.getCurrentWriteOp() != null) {
+          readyForIO = true;
+          getLogger().debug("Handling queued write %s", qa);
+        }
+      } else {
+        toAdd.add(qa);
+      }
+      qa.copyInputQueue();
+      if (readyForIO) {
+        try {
+          if (qa.getWbuf().hasRemaining()) {
+            handleWrites(qa);
+          }
+        } catch (IOException e) {
+          getLogger().warn("Exception handling write", e);
+          lostConnection(qa, ReconnDelay.DEFAULT, "exception handling write");
+        }
+      }
+      qa.fixupOps();
+    }
+    addedQueue.addAll(toAdd);
   }
 
   /**
