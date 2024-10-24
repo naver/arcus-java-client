@@ -171,7 +171,7 @@ public class StatisticsHandler extends SpyObject implements DynamicMBean {
               "version", true, false, false));
     }
 
-    getLogger().info("retrieve client statistics mbean informations.");
+    getLogger().debug("retrieve client statistics mbean informations.");
 
     return new MBeanInfo(this.getClass().getName(),
             "Arcus client statistics MBean",
