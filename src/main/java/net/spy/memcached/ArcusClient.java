@@ -2736,7 +2736,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               getLogger().warn("Unhandled state: " + status);
               cstatus = new CollectionOperationStatus(status);
             }
-            if (cstatus.isSuccess()) {
+            if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
             }
