@@ -979,8 +979,7 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     private static final int flags = 238885206;
 
     public String decode(CachedData d) {
-      assert d.getFlags() == flags
-              : "expected " + flags + " got " + d.getFlags();
+      assertEquals(flags, d.getFlags());
       return new String(d.getData());
     }
 
@@ -1007,8 +1006,7 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     }
 
     public String decode(CachedData d) {
-      assert d.getFlags() == flags
-              : "expected " + flags + " got " + d.getFlags();
+      assertEquals(flags, d.getFlags());
 
       ByteBuffer bb = ByteBuffer.wrap(d.getData());
 

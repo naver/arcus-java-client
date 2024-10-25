@@ -50,9 +50,7 @@ class LongClientTest extends ClientBaseCase {
         Map<String, Object> m = client.getBulk(keys);
         for (String s : keys) {
           byte b[] = (byte[]) m.get(s);
-          assert Arrays.hashCode(b) == hashcode
-                  : "Expected " + hashcode + " was "
-                  + Arrays.hashCode(b);
+          assertEquals(hashcode, Arrays.hashCode(b));
         }
       }
       return hashcode;

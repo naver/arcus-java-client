@@ -8,6 +8,9 @@ import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
 /**
  * Verify what happens when the memory is full on the server.
  *
@@ -40,11 +43,11 @@ final class MemoryFullTest {
         c.set("k" + i, 3600, somebytes).get();
       }
     } catch (ExecutionException e) {
-      assert e.getCause() instanceof OperationException;
+      assertInstanceOf(OperationException.class, e.getCause());
       OperationException oe = (OperationException) e.getCause();
-      assert oe.getType() == OperationErrorType.SERVER;
-      assert oe.getMessage().equals(
-              "SERVER_ERROR out of memory storing object");
+
+      assertEquals(OperationErrorType.SERVER, oe.getType());
+      assertEquals("SERVER_ERROR out of memory storing object", oe.getMessage());
       success = true;
     } finally {
       c.shutdown();
