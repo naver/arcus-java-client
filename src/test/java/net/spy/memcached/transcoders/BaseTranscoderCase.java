@@ -22,7 +22,9 @@ abstract class BaseTranscoderCase {
   private Transcoder<Object> tc;
 
   protected void setTranscoder(Transcoder<Object> t) {
-    assert t != null;
+    if (t == null) {
+      throw new IllegalArgumentException("transcoder must not be null.");
+    }
     tc = t;
   }
 

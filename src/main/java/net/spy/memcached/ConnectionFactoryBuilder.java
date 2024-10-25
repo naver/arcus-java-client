@@ -258,7 +258,7 @@ public class ConnectionFactoryBuilder {
         opFact = new BinaryOperationFactory();
         break;
       default:
-        assert false : "Unhandled protocol: " + prot;
+        throw new IllegalArgumentException("Unhandled protocol: " + prot);
     }
     return this;
   }
@@ -272,10 +272,12 @@ public class ConnectionFactoryBuilder {
   }
 
   /**
-   * Set the maximum reconnect delay.
+   * Set the maximum reconnect delay. Should be positive number.
    */
   public ConnectionFactoryBuilder setMaxReconnectDelay(long to) {
-    assert to > 0 : "Reconnect delay must be a positive number";
+    if (to <= 0) {
+      throw new IllegalArgumentException("Reconnect delay must be a positive number");
+    }
     maxReconnectDelay = to;
     return this;
   }
@@ -289,13 +291,14 @@ public class ConnectionFactoryBuilder {
   }
 
   /**
-   * Set the maximum timeout exception threshold
+   * Set the maximum timeout exception threshold. Should be larger than 2 because
+   * this property is to detect continuously occurred exceptions.
    */
   public ConnectionFactoryBuilder setTimeoutExceptionThreshold(int to) {
-    assert to > 1 : "Minimum timeout exception threshold is 2";
-    if (to > 1) {
-      timeoutExceptionThreshold = to - 2;
+    if (to < 2) {
+      throw new IllegalArgumentException("Minimum timeout exception threshold is 2");
     }
+    timeoutExceptionThreshold = to - 2;
     return this;
   }
 
@@ -303,40 +306,44 @@ public class ConnectionFactoryBuilder {
    * Set the maximum timeout ratio threshold: 0(disabled, default), 1~99
    */
   public ConnectionFactoryBuilder setTimeoutRatioThreshold(int to) {
-    assert (to >= 0 && to < 100) : "Timeout ratio threshold range is 0~99.";
     if (to < 0 || to >= 100) {
-      timeoutRatioThreshold = 0; // disable
-    } else {
-      timeoutRatioThreshold = to;
+      throw new IllegalArgumentException("Timeout ratio threshold must be 0~99.");
     }
+    timeoutRatioThreshold = to;
     return this;
   }
 
   /**
-   * Set the maximum timeout duration threshold
+   * Set the maximum timeout duration threshold: 0(disabled), 1000~5000
    */
   public ConnectionFactoryBuilder setTimeoutDurationThreshold(int to) {
-    assert (to == 0 || to >= 1000 && to <= 5000) :
-        "Timeout duration threshold must be 0 or 1000~5000 range.";
-    timeoutDurationThreshold = to == 0 ? 0 : // 0 is disable
-        Math.max(Math.min(to, 5000), 1000);
+    if (!(to == 0 || to >= 1000 && to <= 5000)) {
+      throw new IllegalArgumentException(
+              "Timeout duration threshold must be 0 or 1000~5000 range.");
+    }
+    timeoutDurationThreshold = to;
     return this;
   }
 
   /**
-   * Set the maximum number of front cache elements.
+   * Set the maximum number of front cache elements. Should be positive number.
    */
   public ConnectionFactoryBuilder setMaxFrontCacheElements(int to) {
-    assert to > 0 : "In case of front cache, the number must be a positive number";
+    if (to <= 0) {
+      throw new IllegalArgumentException(
+              "In case of front cache, the number must be a positive number");
+    }
     maxFrontCacheElements = to;
     return this;
   }
 
   /**
-   * Set front cache's expire time.
+   * Set front cache's expire time. Should be positive number.
    */
   public ConnectionFactoryBuilder setFrontCacheExpireTime(int to) {
-    assert to > 0 : "Front cache's expire time must be a positive number";
+    if (to <= 0) {
+      throw new IllegalArgumentException("Front cache's expire time must be a positive number");
+    }
     frontCacheExpireTime = to;
     return this;
   }

@@ -24,6 +24,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -108,7 +109,7 @@ class AddrUtilTest {
     validLocalhostNames.add("ip6-localhost");
     validLocalhostNames.add("localhost6.localdomain6");
     validLocalhostNames.add("0:0:0:0:0:0:0:1");
-    assert (validLocalhostNames.contains(addrs.get(0).getHostName()));
+    assertTrue(validLocalhostNames.contains(addrs.get(0).getHostName()));
     assertEquals(80, addrs.get(0).getPort());
   }
 }
