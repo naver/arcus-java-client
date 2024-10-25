@@ -294,7 +294,7 @@ class BopFindPositionWithGetTest extends BaseIntegrationTest {
     longBkey = 200;
     f = mc.asyncBopFindPositionWithGet(key, longBkey, BTreeOrder.ASC, 0);
     result = f.get();
-    assertNull(result);
+    assertEquals(0, result.size());
     assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, f.getOperationStatus().getResponse());
 
     // BKEY_MISMATCH
