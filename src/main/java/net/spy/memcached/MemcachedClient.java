@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthThreadMonitor;
@@ -1880,7 +1881,8 @@ public class MemcachedClient extends SpyThread
    *                               is too full to accept any more requests
    */
   public Future<Boolean> flush(final int delay) {
-    Collection<MemcachedNode> nodes = getAllNodes();
+    Collection<MemcachedNode> nodes = getFlushNodes();
+
     final BroadcastFuture<Boolean> rv
             = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
@@ -2145,6 +2147,18 @@ public class MemcachedClient extends SpyThread
    * @return all memcached nodes from node locator
    */
   protected Collection<MemcachedNode> getAllNodes() {
+    return conn.getLocator().getAll();
+  }
+
+  protected Collection<MemcachedNode> getFlushNodes() {
+    /* ENABLE_REPLICATION if */
+    if (conn.getArcusReplEnabled()) {
+      return ((ArcusReplKetamaNodeLocator) getNodeLocator()).getAllGroups().values()
+              .stream()
+              .map(MemcachedReplicaGroup::getMasterNode)
+              .collect(Collectors.toList());
+    }
+    /* ENABLE_REPLICATION end */
     return conn.getLocator().getAll();
   }
 
