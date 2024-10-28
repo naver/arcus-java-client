@@ -1902,7 +1902,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
-    Collection<MemcachedNode> nodes = getAllNodes();
+    Collection<MemcachedNode> nodes = getFlushNodes();
+
     final BroadcastFuture<Boolean> rv
             = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();

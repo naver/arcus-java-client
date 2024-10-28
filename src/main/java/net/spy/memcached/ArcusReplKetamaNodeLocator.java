@@ -32,6 +32,7 @@ import java.util.NavigableMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -41,7 +42,7 @@ import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
-  private final HashMap<String, MemcachedReplicaGroup> allGroups;
+  private final ConcurrentHashMap<String, MemcachedReplicaGroup> allGroups;
   private final Collection<MemcachedNode> allNodes;
 
   /* ENABLE_MIGRATION if */
@@ -67,7 +68,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
     super();
     allNodes = nodes;
     ketamaGroups = new TreeMap<>();
-    allGroups = new HashMap<>();
+    allGroups = new ConcurrentHashMap<>();
 
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
@@ -103,7 +104,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
   }
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
-                                     HashMap<String, MemcachedReplicaGroup> ag,
+                                     ConcurrentHashMap<String, MemcachedReplicaGroup> ag,
                                      Collection<MemcachedNode> an) {
     super();
     ketamaGroups = kg;
@@ -208,7 +209,8 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
     lock.lock();
     try {
       TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaCopy = new TreeMap<>();
-      HashMap<String, MemcachedReplicaGroup> groupsCopy = new HashMap<>(allGroups.size());
+      ConcurrentHashMap<String, MemcachedReplicaGroup> groupsCopy
+              = new ConcurrentHashMap<>(allGroups.size());
       Collection<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
 
       // Rewrite the values a copy of the map
