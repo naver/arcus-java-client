@@ -134,4 +134,8 @@ public interface Operation {
   /* ENABLE_MIGRATION end */
 
   APIType getAPIType();
+
+  void setStartTime(long startTime);
+
+  long getStartTime();
 }

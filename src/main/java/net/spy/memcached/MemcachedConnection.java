@@ -50,6 +50,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
+import net.spy.memcached.metrics.OpLatencyMonitor;
+import net.spy.memcached.metrics.OpThroughputMonitor;
 import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.Operation;
@@ -990,6 +992,7 @@ public final class MemcachedConnection extends SpyObject {
           throw new IllegalStateException("No read operation.");
         }
         currentOp.readFromBuffer(rbuf);
+        OpLatencyMonitor.getInstance().recordLatency(currentOp.getStartTime());
         if (currentOp.getState() == OperationState.COMPLETE) {
           getLogger().debug("Completed read op: %s and giving the next %d bytes",
                   currentOp, rbuf.remaining());
@@ -1519,6 +1522,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param op
    */
   public static void opTimedOut(Operation op) {
+    OpThroughputMonitor.getInstance().addTimeOutedOpCount(1);
     MemcachedConnection.setTimeout(op, true);
   }
 
@@ -1528,6 +1532,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param ops
    */
   public static void opsTimedOut(Collection<Operation> ops) {
+    OpThroughputMonitor.getInstance().addTimeOutedOpCount(ops.size());
     Collection<String> timedOutNodes = new HashSet<>();
     for (Operation op : ops) {
       try {

@@ -316,6 +316,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         Operation cancelledOp = removeCurrentWriteOp();
         assert o == cancelledOp;
       } else {
+        o.setStartTime(System.nanoTime());
         o.writing();
         readQ.add(o);
         return o;

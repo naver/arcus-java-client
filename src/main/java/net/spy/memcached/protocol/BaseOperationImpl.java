@@ -26,6 +26,7 @@ import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.RedirectHandler;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.metrics.OpThroughputMonitor;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -57,6 +58,16 @@ public abstract class BaseOperationImpl extends SpyObject {
 
   private OperationType opType = OperationType.UNDEFINED;
   private APIType apiType = APIType.UNDEFINED;
+
+  private long startTime;
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
 
   /* ENABLE_MIGRATION if */
   private RedirectHandler redirectHandler = null;
@@ -95,6 +106,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   public final boolean cancel(String cause) {
     if (callbacked.compareAndSet(false, true)) {
       cancelled = true;
+      OpThroughputMonitor.getInstance().addCanceledOpCount();
       if (handlingNode != null) {
         cause += " @ " + handlingNode.getNodeName();
       }
@@ -222,6 +234,7 @@ public abstract class BaseOperationImpl extends SpyObject {
     }
     if (state == OperationState.COMPLETE &&
             callbacked.compareAndSet(false, true)) {
+      OpThroughputMonitor.getInstance().addCompletedOpCount();
       callback.complete();
     }
   }
