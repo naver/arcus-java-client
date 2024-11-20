@@ -4,6 +4,13 @@ package net.spy.memcached.compat.log;
 
 // XXX:  This really needs to get log4j configured first.
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.spy.memcached.internal.CompositeException;
+import net.spy.memcached.ops.OperationErrorType;
+import net.spy.memcached.ops.OperationException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -154,4 +161,24 @@ class LoggingTest {
     assertNull(t);
   }
 
+  @Test
+  void logCompositeException() {
+    List<Exception> exceptions = new ArrayList<>();
+    exceptions.add(new OperationException(OperationErrorType.SERVER, "msg1"));
+    exceptions.add(new OperationException(OperationErrorType.CLIENT, "msg2"));
+    CompositeException exception = new CompositeException(exceptions);
+
+    logger.error("failed to get", exception);
+  }
+
+  @Test
+  void slf4jCompositeException() {
+    List<Exception> exceptions = new ArrayList<>();
+    exceptions.add(new OperationException(OperationErrorType.SERVER, "msg1"));
+    exceptions.add(new OperationException(OperationErrorType.CLIENT, "msg2"));
+    CompositeException exception = new CompositeException(exceptions);
+
+    Log4JLogger log4JLogger = new Log4JLogger(getClass().getName());
+    log4JLogger.error("failed to get", exception);
+  }
 }

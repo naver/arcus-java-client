@@ -70,6 +70,10 @@ public final class ExceptionMessageFactory {
   }
 
   public static String createCompositeMessage(List<Exception> exceptions) {
+    if (exceptions == null || exceptions.isEmpty()) {
+      throw new IllegalArgumentException("At least one exception must be specified");
+    }
+
     StringBuilder rv = new StringBuilder();
     rv.append("Multiple exceptions (");
     rv.append(exceptions.size());
