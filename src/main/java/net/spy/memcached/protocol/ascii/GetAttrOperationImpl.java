@@ -50,18 +50,19 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
           CollectionResponse.ATTR_ERROR_NOT_FOUND);
 
   protected final String key;
-  protected final GetAttrOperation.Callback cb;
 
   public GetAttrOperationImpl(String key, GetAttrOperation.Callback cb) {
     super(cb);
     this.key = key;
-    this.cb = cb;
     setAPIType(APIType.GETATTR);
     setOperationType(OperationType.READ);
   }
 
   @Override
   public void handleLine(String line) {
+    GetAttrOperation.Callback cb =
+            (GetAttrOperation.Callback) getCallback();
+
     /* ENABLE_MIGRATION if */
     if (hasNotMyKey(line)) {
       addRedirectSingleKeyOperation(line, key);

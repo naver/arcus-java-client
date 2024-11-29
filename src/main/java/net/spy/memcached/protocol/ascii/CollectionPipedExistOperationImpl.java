@@ -56,7 +56,6 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
 
   private final String key;
   private final SetPipedExist<?> setPipedExist;
-  private final CollectionPipedExistOperation.Callback cb;
 
   private int count;
   private int index = 0;
@@ -67,7 +66,6 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
     super(cb);
     this.key = key;
     this.setPipedExist = collectionExist;
-    this.cb = (Callback) cb;
     if (this.setPipedExist instanceof SetPipedExist) {
       setAPIType(APIType.SOP_EXIST);
     }
@@ -78,6 +76,8 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
   public void handleLine(String line) {
     assert getState() == OperationState.READING : "Read ``" + line
             + "'' when in " + getState() + " state";
+    CollectionPipedExistOperation.Callback cb =
+            (CollectionPipedExistOperation.Callback) getCallback();
 
     /* ENABLE_MIGRATION if */
     if (hasNotMyKey(line)) {

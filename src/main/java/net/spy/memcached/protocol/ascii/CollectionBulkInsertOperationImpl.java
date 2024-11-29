@@ -62,7 +62,6 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
   private final CollectionBulkInsert<?> insert;
-  private final CollectionBulkInsertOperation.Callback cb;
 
   private int count;
   private int index = 0;
@@ -71,7 +70,6 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
   public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);
     this.insert = insert;
-    this.cb = (Callback) cb;
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert) {
@@ -88,6 +86,9 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
   public void handleLine(String line) {
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
+    CollectionBulkInsertOperation.Callback cb =
+            (CollectionBulkInsertOperation.Callback) getCallback();
+
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
       this.insert.setNextOpIndex(index);

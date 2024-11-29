@@ -64,7 +64,6 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
 
   private final String key;
   private final CollectionPipedInsert<?> insert;
-  private final CollectionPipedInsertOperation.Callback cb;
 
   private int count;
   private int index = 0;
@@ -75,7 +74,6 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
     super(cb);
     this.key = key;
     this.insert = insert;
-    this.cb = (Callback) cb;
     if (this.insert instanceof CollectionPipedInsert.ListPipedInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionPipedInsert.SetPipedInsert) {
@@ -94,6 +92,8 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
   public void handleLine(String line) {
     assert getState() == OperationState.READING
             : "Read ``" + line + "'' when in " + getState() + " state";
+    CollectionPipedInsertOperation.Callback cb =
+            (CollectionPipedInsertOperation.Callback) getCallback();
 
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {

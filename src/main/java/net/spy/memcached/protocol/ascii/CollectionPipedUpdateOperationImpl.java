@@ -66,7 +66,6 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
 
   private final String key;
   private final CollectionPipedUpdate<?> update;
-  private final CollectionPipedUpdateOperation.Callback cb;
 
   private int count;
   private int index = 0;
@@ -77,7 +76,6 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
     super(cb);
     this.key = key;
     this.update = update;
-    this.cb = (Callback) cb;
     if (this.update instanceof BTreePipedUpdate) {
       setAPIType(APIType.BOP_UPDATE);
     } else if (this.update instanceof MapPipedUpdate) {
@@ -90,6 +88,8 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
   public void handleLine(String line) {
     assert getState() == OperationState.READING : "Read ``" + line
             + "'' when in " + getState() + " state";
+    CollectionPipedUpdateOperation.Callback cb =
+            (CollectionPipedUpdateOperation.Callback) getCallback();
 
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
