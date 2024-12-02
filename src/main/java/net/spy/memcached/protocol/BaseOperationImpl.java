@@ -52,7 +52,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   private final AtomicBoolean callbacked = new AtomicBoolean(false);
   private String cancelCause = null;
   private OperationException exception = null;
-  protected OperationCallback callback = null;
+  private OperationCallback callback = null;
   private volatile MemcachedNode handlingNode = null;
 
   private OperationType opType = OperationType.UNDEFINED;
