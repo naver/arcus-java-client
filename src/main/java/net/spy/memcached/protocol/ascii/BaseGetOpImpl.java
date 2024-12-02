@@ -136,8 +136,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
         GetOperation.Callback gcb = (GetOperation.Callback) getCallback();
         gcb.gotData(currentKey, currentFlags, data);
       } catch (ClassCastException e) {
-        GetsOperation.Callback gcb = (GetsOperation.Callback)
-                getCallback();
+        GetsOperation.Callback gcb = (GetsOperation.Callback) getCallback();
         gcb.gotData(currentKey, currentFlags, casValue, data);
       }
       lookingFor = '\r';
