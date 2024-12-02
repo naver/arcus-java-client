@@ -50,7 +50,7 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
 
   protected OperationImpl(OperationCallback cb) {
     super();
-    callback = cb;
+    setCallback(cb);
   }
 
   /**
