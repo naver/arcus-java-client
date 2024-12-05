@@ -32,17 +32,12 @@ public final class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
   }
 
   public boolean setMemcachedNode(final MemcachedNode node) {
-    if (node == null) {
-      return false;
-    }
-
-    if (this.group.equals(getGroupNameFromNode(node))) {
+    if (node != null && this.group.equals(getGroupNameFromNode(node))) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = node;
       } else {
         this.slaveNodes.add(node);
       }
-
       node.setReplicaGroup(this);
       return true;
     }
@@ -50,11 +45,7 @@ public final class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
   }
 
   public boolean deleteMemcachedNode(final MemcachedNode node) {
-    if (node == null) {
-      return false;
-    }
-
-    if (this.group.equals(getGroupNameFromNode(node))) {
+    if (node != null && this.group.equals(getGroupNameFromNode(node))) {
       if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
         this.masterNode = null;
       } else {
@@ -66,7 +57,7 @@ public final class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
   }
 
   public boolean changeRole() {
-        /* role change */
+    /* role change */
     MemcachedNode tmpNode = this.masterNode;
 
     this.masterNode = this.masterCandidate;
