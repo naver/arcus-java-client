@@ -17,6 +17,7 @@
 package net.spy.memcached.collection.set;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,5 +127,27 @@ class SopBulkAPITest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
     fail();
+  }
+
+  @Test
+  void testSopBulkNotPiped() {
+    CollectionFuture<Map<Integer, CollectionOperationStatus>> future;
+    Map<Integer, CollectionOperationStatus> errorList;
+    try {
+      mc.delete(key).get();
+      // INSERT FAIL
+      future = mc.asyncSopPipedInsertBulk(key, Arrays.asList(valueList.get(0)),
+                      null);
+      errorList = future.get(10000, TimeUnit.MILLISECONDS);
+      assertEquals(1, errorList.size());
+      // INSERT
+      future = mc.asyncSopPipedInsertBulk(key, Arrays.asList(valueList.get(0)),
+                      new CollectionAttributes());
+      errorList = future.get(10000, TimeUnit.MILLISECONDS);
+      assertEquals(0, errorList.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
   }
 }

@@ -284,4 +284,29 @@ class BopPipeUpdateTest extends BaseIntegrationTest {
     }
 
   }
+
+  @Test
+  void testBopUpdateNotPiped() {
+    List<Element<Object>> updateElements = new ArrayList<>();
+    updateElements.add(new Element<>(0, "updated" + 0,
+              new ElementFlagUpdate(new byte[]{1, 1, 1, 1})));
+    CollectionFuture<Map<Integer, CollectionOperationStatus>> future;
+    Map<Integer, CollectionOperationStatus> errorList;
+
+    try {
+      // UPDATE
+      future = mc.asyncBopPipedUpdateBulk(KEY, updateElements);
+      errorList = future.get(5000L, TimeUnit.MILLISECONDS);
+      assertTrue(errorList.isEmpty());
+      // DELETE
+      mc.delete(KEY).get();
+      // UPDATE FAIL
+      future = mc.asyncBopPipedUpdateBulk(KEY, updateElements);
+      errorList = future.get(5000L, TimeUnit.MILLISECONDS);
+      assertEquals(1, errorList.size());
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
 }

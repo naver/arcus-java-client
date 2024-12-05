@@ -374,4 +374,32 @@ class BopInsertBulkTest extends BaseIntegrationTest {
       fail();
     }
   }
+
+  @Test
+  void testBopInsertNotPiped() {
+    String value = "MyValue";
+    long bkey = Long.MAX_VALUE;
+    Future<Map<String, CollectionOperationStatus>> future;
+    Map<String, CollectionOperationStatus> errorList;
+    String[] keys = {"MyBopKeyA"};
+
+    try {
+      // DELETE
+      mc.delete(keys[0]).get();
+      // SET FAIL
+      future = mc.asyncBopInsertBulk(Arrays.asList(keys), bkey, null, value,
+              null);
+      errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+      assertEquals(1, errorList.size());
+      // SET
+      future = mc.asyncBopInsertBulk(Arrays.asList(keys), bkey, null, value,
+              new CollectionAttributes());
+      errorList = future.get(20000L, TimeUnit.MILLISECONDS);
+      assertTrue(errorList.isEmpty(),
+              "Error list is not empty.");
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
 }
