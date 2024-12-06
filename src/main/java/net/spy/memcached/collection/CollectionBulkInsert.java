@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.collection;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -105,7 +104,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       }
 
       // flip the buffer
-      ((Buffer) bb).flip();
+      bb.flip();
 
       return bb;
     }
@@ -159,7 +158,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       }
 
       // flip the buffer
-      ((Buffer) bb).flip();
+      bb.flip();
 
       return bb;
     }
@@ -209,7 +208,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
         bb.put(CRLF);
       }
       // flip the buffer
-      ((Buffer) bb).flip();
+      bb.flip();
 
       return bb;
     }
@@ -263,7 +262,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       }
 
       // flip the buffer
-      ((Buffer) bb).flip();
+      bb.flip();
 
       return bb;
     }

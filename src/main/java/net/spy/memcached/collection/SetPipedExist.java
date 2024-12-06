@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.collection;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class SetPipedExist<T> extends CollectionPipe {
       bb.put(CRLF);
     }
     // flip the buffer
-    ((Buffer) bb).flip();
+    bb.flip();
 
     return bb;
   }

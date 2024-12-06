@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.binary;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,7 +117,7 @@ public final class OptimizedSetImpl extends OperationImpl implements Operation {
     bb.putInt(terminalOpaque);
     bb.putLong(0); // cas
 
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
   }
 

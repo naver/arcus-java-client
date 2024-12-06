@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -98,7 +97,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
     int size = CMD.length() + KeyUtil.getKeyBytes(key).length + 16;
     ByteBuffer bb = ByteBuffer.allocate(size);
     setArguments(bb, CMD, key);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

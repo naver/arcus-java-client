@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
@@ -240,7 +239,7 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
 
     setArguments(bb, getBulk.getSpaceSeparatedKeys());
 
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

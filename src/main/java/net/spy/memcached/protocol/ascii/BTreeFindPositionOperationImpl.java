@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -111,7 +110,7 @@ public final class BTreeFindPositionOperationImpl extends OperationImpl implemen
             + cmd.length() + args.length() + 16);
 
     setArguments(bb, cmd, key, args);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

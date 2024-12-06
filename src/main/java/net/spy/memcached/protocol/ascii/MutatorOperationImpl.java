@@ -19,7 +19,6 @@
 
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -107,7 +106,7 @@ final class MutatorOperationImpl extends OperationImpl
     } else {
       setArguments(b, mutator.name(), key, amount);
     }
-    ((Buffer) b).flip();
+    b.flip();
     setBuffer(b);
   }
 

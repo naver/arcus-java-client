@@ -19,7 +19,6 @@
 
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.ops.APIType;
@@ -71,7 +70,7 @@ final class FlushOperationImpl extends OperationImpl
     } else {
       b = ByteBuffer.allocate(32);
       b.put(("flush_all " + delay + "\r\n").getBytes());
-      ((Buffer) b).flip();
+      b.flip();
     }
     setBuffer(b);
   }

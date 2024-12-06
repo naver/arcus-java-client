@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.binary;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -98,7 +97,7 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
     bb.putInt(terminalOpaque);
     bb.putLong(0); // cas
 
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
   }
 

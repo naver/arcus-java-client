@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -91,7 +90,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
             + (2 + data.length - bb.remaining());
     bb.put(data);
     bb.put(CRLF);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

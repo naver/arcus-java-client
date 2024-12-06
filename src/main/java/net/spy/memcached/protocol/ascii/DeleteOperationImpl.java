@@ -19,7 +19,6 @@
 
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,7 +79,7 @@ final class DeleteOperationImpl extends OperationImpl
     ByteBuffer b = ByteBuffer.allocate(
             KeyUtil.getKeyBytes(key).length + OVERHEAD);
     setArguments(b, "delete", key);
-    ((Buffer) b).flip();
+    b.flip();
     setBuffer(b);
   }
 

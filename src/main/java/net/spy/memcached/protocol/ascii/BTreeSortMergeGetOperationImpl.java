@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 
@@ -435,7 +434,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
     setArguments(bb, smGet.getSpaceSeparatedKeys());
 
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

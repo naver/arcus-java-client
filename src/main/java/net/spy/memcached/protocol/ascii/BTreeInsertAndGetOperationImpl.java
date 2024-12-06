@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -274,7 +273,7 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
             get.getElementFlagByHex(), dataToStore.length, args);
     bb.put(dataToStore);
     bb.put(CRLF);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

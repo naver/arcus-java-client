@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -133,7 +132,7 @@ public abstract class BaseOperationImpl extends SpyObject {
         // fallthrough
       case WRITE_QUEUED:
         if (getBuffer() != null) {
-          ((Buffer) getBuffer()).reset(); // buffer offset reset
+          getBuffer().reset(); // buffer offset reset
         } else {
           initialize(); // this case cannot happen.
         }
@@ -206,7 +205,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   protected final void setBuffer(ByteBuffer to) {
     assert to != null : "Trying to set buffer to null";
     cmd = to;
-    ((Buffer) cmd).mark();
+    cmd.mark();
   }
 
   /**

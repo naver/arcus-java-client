@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -101,7 +100,7 @@ public final class CollectionCreateOperationImpl extends OperationImpl
             + args.length()
             + OVERHEAD);
     setArguments(bb, collectionCreate.getCommand(), key, args);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
 
     if (getLogger().isDebugEnabled()) {

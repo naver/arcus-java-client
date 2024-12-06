@@ -19,7 +19,6 @@ package net.spy.memcached.protocol;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -142,7 +141,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     setSocketAddress(sa);
     rbuf = ByteBuffer.allocate(bufSize);
     wbuf = ByteBuffer.allocate(bufSize);
-    ((Buffer) getWbuf()).clear();
+    getWbuf().clear();
     readQ = rq;
     writeQ = wq;
     inputQueue = iq;
@@ -224,8 +223,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       op.cancel(cause);
     }
 
-    ((Buffer) getWbuf()).clear();
-    ((Buffer) getRbuf()).clear();
+    getWbuf().clear();
+    getRbuf().clear();
     toWrite = 0;
   }
 
@@ -246,7 +245,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final void fillWriteBuffer(boolean shouldOptimize) {
     if (toWrite == 0 && readQ.remainingCapacity() > 0) {
-      ((Buffer) getWbuf()).clear();
+      getWbuf().clear();
       Operation o = getNextWritableOp();
       while (o != null && toWrite < getWbuf().capacity()) {
         assert o.getState() == OperationState.WRITING;
@@ -277,7 +276,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         }
         toWrite += bytesToCopy;
       }
-      ((Buffer) getWbuf()).flip();
+      getWbuf().flip();
       assert toWrite <= getWbuf().capacity()
               : "toWrite exceeded capacity: " + this;
       assert toWrite == getWbuf().remaining()

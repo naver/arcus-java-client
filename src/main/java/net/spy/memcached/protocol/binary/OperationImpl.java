@@ -18,7 +18,6 @@
 package net.spy.memcached.protocol.binary;
 
 import java.io.IOException;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -300,7 +299,7 @@ abstract class OperationImpl extends BaseOperationImpl {
     bb.put(keyBytes);
     bb.put(val);
 
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
   }
 

@@ -19,7 +19,6 @@
 
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -89,12 +88,12 @@ class BaseOpTest {
     SimpleOp op = new SimpleOp(OperationReadType.LINE);
 
     b.put(input1.getBytes());
-    ((Buffer) b).flip();
+    b.flip();
     op.readFromBuffer(b);
     assertNull(op.getCurrentLine());
-    ((Buffer) b).clear();
+    b.clear();
     b.put(input2.getBytes());
-    ((Buffer) b).flip();
+    b.flip();
     op.readFromBuffer(b);
     assertEquals("this is a test", op.getCurrentLine());
   }

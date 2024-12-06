@@ -17,7 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,7 +99,7 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
             + (2 + data.length - bb.remaining());
     bb.put(data);
     bb.put(CRLF);
-    ((Buffer) bb).flip();
+    bb.flip();
     setBuffer(bb);
   }
 
