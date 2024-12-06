@@ -80,10 +80,6 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     return masterCandidate;
   }
 
-  public void setMasterCandidate(MemcachedNode masterCandidate) {
-    this.masterCandidate = masterCandidate;
-  }
-
   public void setMasterCandidate() {
     if (!slaveNodes.isEmpty()) {
       this.masterCandidate = slaveNodes.get(0);
@@ -93,16 +89,7 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
   public void setMasterCandidateByAddr(String address) {
     for (MemcachedNode node : this.getSlaveNodes()) {
       if (address.equals(((ArcusReplNodeAddress) node.getSocketAddress()).getIPPort())) {
-        this.setMasterCandidate(node);
-        break;
-      }
-    }
-  }
-
-  public void setMasterCandidateByAddr(ArcusReplNodeAddress address) {
-    for (MemcachedNode node : this.getSlaveNodes()) {
-      if (address.isSameAddress((ArcusReplNodeAddress) node.getSocketAddress())) {
-        this.setMasterCandidate(node);
+        this.masterCandidate = node;
         break;
       }
     }
