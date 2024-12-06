@@ -61,8 +61,6 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
   private static final OperationStatus EFLAG_MISMATCH = new CollectionOperationStatus(
           false, "EFLAG_MISMATCH", CollectionResponse.EFLAG_MISMATCH);
-  private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
-          false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
   private final String key;
   private final String subkey; // e.g.) 0 or 0x00
@@ -104,7 +102,7 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     /* ENABLE_MIGRATION end */
     OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,
             NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
-            EFLAG_MISMATCH, SERVER_ERROR);
+            EFLAG_MISMATCH);
     getCallback().receivedStatus(status);
     transitionState(OperationState.COMPLETE);
   }

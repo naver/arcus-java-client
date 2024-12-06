@@ -52,8 +52,6 @@ public final class CollectionCreateOperationImpl extends OperationImpl
           true, "CREATED", CollectionResponse.CREATED);
   private static final OperationStatus EXISTS = new CollectionOperationStatus(
           false, "EXISTS", CollectionResponse.EXISTS);
-  private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
-          false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
   private final String key;
   private final CollectionCreate collectionCreate;
@@ -92,7 +90,7 @@ public final class CollectionCreateOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS, SERVER_ERROR));
+    getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS));
     transitionState(OperationState.COMPLETE);
   }
 

@@ -132,7 +132,7 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
   }
 
   @Override
-  public final void handleRead(ByteBuffer bb) {
+  public void handleRead(ByteBuffer bb) {
     if (lookingFor == '\0' && data == null) {
       while (bb.hasRemaining()) {
         byte b = bb.get();
