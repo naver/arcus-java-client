@@ -149,7 +149,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   }
 
   @Override
-  public final void handleRead(ByteBuffer bb) {
+  public void handleRead(ByteBuffer bb) {
     switch (readState) {
       case VALUE:
         readValue(bb);

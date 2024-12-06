@@ -61,8 +61,6 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
   private static final OperationStatus EFLAG_MISMATCH = new CollectionOperationStatus(
           false, "EFLAG_MISMATCH", CollectionResponse.EFLAG_MISMATCH);
-  private static final OperationStatus SERVER_ERROR = new CollectionOperationStatus(
-          false, "SERVER_ERROR", CollectionResponse.SERVER_ERROR);
 
   private final String key;
   private final CollectionPipedUpdate<?> update;
@@ -114,7 +112,7 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
     if (update.isNotPiped()) {
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
               NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
-              BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
+              BKEY_MISMATCH, EFLAG_MISMATCH);
       if (status.isSuccess()) {
         cb.receivedStatus((successAll) ? END : FAILED_END);
       } else {
@@ -154,7 +152,7 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
     } else {
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
               NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
-              BKEY_MISMATCH, EFLAG_MISMATCH, SERVER_ERROR);
+              BKEY_MISMATCH, EFLAG_MISMATCH);
 
       if (!status.isSuccess()) {
         cb.gotStatus(index, status);

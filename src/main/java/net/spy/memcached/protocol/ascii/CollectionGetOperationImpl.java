@@ -149,7 +149,7 @@ public final class CollectionGetOperationImpl extends OperationImpl
   }
 
   @Override
-  public final void handleRead(ByteBuffer bb) {
+  public void handleRead(ByteBuffer bb) {
     // Decode a collection data header.
     if (lookingFor == '\0' && data == null) {
       while (bb.hasRemaining()) {
@@ -166,10 +166,9 @@ public final class CollectionGetOperationImpl extends OperationImpl
           tokens.add(byteBuffer.toString());
           byteBuffer.reset();
 
-          if (eFlagIndex >= 0) {
-            if (tokens.size() == eFlagIndex + 1 && tokens.get(eFlagIndex).startsWith("0x")) {
-              eHeadCount++;
-            }
+          if (eFlagIndex >= 0 &&
+                  tokens.size() == eFlagIndex + 1 && tokens.get(eFlagIndex).startsWith("0x")) {
+            eHeadCount++;
           }
           if (tokens.size() == eHeadCount) {
             collectionGet.decodeElemHeader(tokens);
