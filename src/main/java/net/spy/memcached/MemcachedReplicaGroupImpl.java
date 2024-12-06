@@ -73,7 +73,7 @@ public final class MemcachedReplicaGroupImpl extends MemcachedReplicaGroup {
     if (this.masterNode != null) { // previous slave node
       ((ArcusReplNodeAddress) this.masterNode.getSocketAddress()).setMaster(true);
       this.slaveNodes.remove(this.masterNode);
-      this.setMasterCandidate(null);
+      this.masterCandidate = null;
     }
 
     if (tmpNode != null) { // previous master node

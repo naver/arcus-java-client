@@ -488,7 +488,7 @@ public final class MemcachedConnection extends SpyObject {
           }
         }
       } else if (oldSlaveAddrs.contains(newMasterAddr)) {
-        oldGroup.setMasterCandidateByAddr(newMasterAddr);
+        oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
         if (newSlaveAddrs.contains(oldMasterAddr)) {
           // Switchover
           if (oldMasterNode.hasNonIdempotentOperationInReadQ()) {
