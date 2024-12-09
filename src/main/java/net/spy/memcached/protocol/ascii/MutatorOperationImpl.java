@@ -101,14 +101,14 @@ final class MutatorOperationImpl extends OperationImpl
   @Override
   public void initialize() {
     int size = KeyUtil.getKeyBytes(key).length + OVERHEAD;
-    ByteBuffer b = ByteBuffer.allocate(size);
+    ByteBuffer bb = ByteBuffer.allocate(size);
     if (def > -1) {
-      setArguments(b, mutator.name(), key, amount, 0, exp, def);
+      setArguments(bb, mutator.name(), key, amount, 0, exp, def);
     } else {
-      setArguments(b, mutator.name(), key, amount);
+      setArguments(bb, mutator.name(), key, amount);
     }
-    ((Buffer) b).flip();
-    setBuffer(b);
+    ((Buffer) bb).flip();
+    setBuffer(bb);
   }
 
   @Override

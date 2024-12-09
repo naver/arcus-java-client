@@ -65,15 +65,15 @@ final class FlushOperationImpl extends OperationImpl
 
   @Override
   public void initialize() {
-    ByteBuffer b = null;
+    ByteBuffer bb = null;
     if (delay == -1) {
-      b = ByteBuffer.wrap(FLUSH);
+      bb = ByteBuffer.wrap(FLUSH);
     } else {
-      b = ByteBuffer.allocate(32);
-      b.put(("flush_all " + delay + "\r\n").getBytes());
-      ((Buffer) b).flip();
+      bb = ByteBuffer.allocate(32);
+      bb.put(("flush_all " + delay + "\r\n").getBytes());
+      ((Buffer) bb).flip();
     }
-    setBuffer(b);
+    setBuffer(bb);
   }
 
   @Override
