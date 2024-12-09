@@ -166,7 +166,7 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Request in ascii protocol: %s",
-              (new String(buffer.array())).replaceAll("\\r\\n", "\n"));
+              (new String(buffer.array())).replace("\r\n", "\\r\\n"));
     }
   }
 

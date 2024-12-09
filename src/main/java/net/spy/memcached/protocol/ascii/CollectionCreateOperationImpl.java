@@ -106,7 +106,7 @@ public final class CollectionCreateOperationImpl extends OperationImpl
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Request in ascii protocol: %s",
-              (new String(bb.array())).replaceAll("\\r\\n", ""));
+              (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
   }
 
