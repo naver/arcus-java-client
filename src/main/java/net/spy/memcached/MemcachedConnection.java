@@ -453,7 +453,7 @@ public final class MemcachedConnection extends SpyObject {
 
       if (oldGroup.isDelayedSwitchover()) {
         delayedSwitchoverGroups.remove(oldGroup);
-        switchoverMemcachedReplGroup(oldGroup.getMasterNode(), true);
+        switchoverMemcachedReplGroup(oldGroup, true);
       }
 
       MemcachedNode oldMasterNode = oldGroup.getMasterNode();
@@ -587,8 +587,15 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_REPLICATION if */
-  private void switchoverMemcachedReplGroup(MemcachedNode node, boolean cancelNonIdempotent) {
-    MemcachedReplicaGroup group = node.getReplicaGroup();
+  private void switchoverMemcachedReplGroup(MemcachedReplicaGroup group,
+                                            boolean cancelNonIdempotent) {
+
+    if (group.getMasterCandidate() == null) {
+      getLogger().warn("Delay switchover because invalid group state : " + group);
+      return;
+    }
+
+    MemcachedNode oldMaster = group.getMasterNode();
 
     /*  must keep the following execution order when switchover
      * - first moveOperations
@@ -596,17 +603,13 @@ public final class MemcachedConnection extends SpyObject {
      *
      * because moves all operations
      */
-    if (group.getMasterNode() != null && group.getMasterCandidate() != null) {
-      if (((ArcusReplNodeAddress) node.getSocketAddress()).isMaster()) {
-        ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
-      }
-      node.moveOperations(group.getMasterNode(), cancelNonIdempotent);
-      addedQueue.offer(group.getMasterNode());
-      queueReconnect(node, ReconnDelay.IMMEDIATE,
-          "Discarded all pending reading state operation to move operations.");
-    } else {
-      getLogger().warn("Delay switchover because invalid group state : " + group);
-    }
+    ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
+    MemcachedNode newMaster = group.getMasterNode();
+
+    oldMaster.moveOperations(newMaster, cancelNonIdempotent);
+    addedQueue.offer(newMaster);
+    queueReconnect(oldMaster, ReconnDelay.IMMEDIATE,
+        "Discarded all pending reading state operation to move operations.");
   }
   /* ENABLE_REPLICATION end */
 
@@ -1015,8 +1018,9 @@ public final class MemcachedConnection extends SpyObject {
       /* ENABLE_REPLICATION if */
       if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
         ((Buffer) rbuf).clear();
-        delayedSwitchoverGroups.remove(qa.getReplicaGroup());
-        switchoverMemcachedReplGroup(qa, false);
+        MemcachedReplicaGroup group = qa.getReplicaGroup();
+        delayedSwitchoverGroups.remove(group);
+        switchoverMemcachedReplGroup(group, false);
         break;
       }
       /* ENABLE_REPLICATION end */
@@ -1031,10 +1035,10 @@ public final class MemcachedConnection extends SpyObject {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       if (currentOp == null) { // readQ is empty
-        if (qa.getReplicaGroup().isDelayedSwitchover() &&
-            qa.getReplicaGroup().masterNode == qa) {
-          delayedSwitchoverGroups.remove(qa.getReplicaGroup());
-          switchoverMemcachedReplGroup(qa, false);
+        MemcachedReplicaGroup group = qa.getReplicaGroup();
+        if (group.isDelayedSwitchover() && group.getMasterNode() == qa) {
+          delayedSwitchoverGroups.remove(group);
+          switchoverMemcachedReplGroup(group, false);
         }
       }
     }
@@ -1179,10 +1183,10 @@ public final class MemcachedConnection extends SpyObject {
 
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
-      if (qa.getReplicaGroup().isDelayedSwitchover() &&
-          qa.getReplicaGroup().getMasterNode() == qa) {
-        delayedSwitchoverGroups.remove(qa.getReplicaGroup());
-        switchoverMemcachedReplGroup(qa, true);
+      MemcachedReplicaGroup group = qa.getReplicaGroup();
+      if (group.isDelayedSwitchover() && group.getMasterNode() == qa) {
+        delayedSwitchoverGroups.remove(group);
+        switchoverMemcachedReplGroup(group, true);
         return;
       }
     }
@@ -1800,12 +1804,15 @@ public final class MemcachedConnection extends SpyObject {
       Iterator<Entry<Long, MemcachedReplicaGroup>> iterator = groups.entrySet().iterator();
       while (iterator.hasNext()) {
         Entry<Long, MemcachedReplicaGroup> entry = iterator.next();
-        if (now < entry.getKey()) {
+        long switchoverTime = entry.getKey();
+        MemcachedReplicaGroup group = entry.getValue();
+
+        if (now < switchoverTime) {
           return;
         } else {
           iterator.remove();
-          entry.getValue().setDelayedSwitchover(false);
-          switchoverMemcachedReplGroup(entry.getValue().getMasterNode(), true);
+          group.setDelayedSwitchover(false);
+          switchoverMemcachedReplGroup(group, true);
         }
       }
     }
