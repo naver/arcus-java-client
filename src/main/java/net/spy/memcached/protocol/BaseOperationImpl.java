@@ -166,6 +166,7 @@ public abstract class BaseOperationImpl extends SpyObject {
 
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
     transitionState(OperationState.MOVING);
+    group.setAlreadySwitched(true);
   }
   /* ENABLE_REPLICATION end */
 
