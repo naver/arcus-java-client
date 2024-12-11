@@ -2352,7 +2352,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     List<CollectionPipedUpdate<T>> updateList = new ArrayList<>();
 
-    if (elements.size() <= CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
+    if (elements.size() <= CollectionPipedUpdate.MAX_PIPED_ITEM_COUNT) {
       updateList.add(new MapPipedUpdate<>(key, elements, tc));
     } else {
       PartitionedMap<String, T> list = new PartitionedMap<>(
@@ -2962,10 +2962,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalArgumentException(
               "The number of piped operations must be larger than 0.");
     }
-    if (exist.getItemCount() > CollectionPipedInsert.MAX_PIPED_ITEM_COUNT) {
+    if (exist.getItemCount() > SetPipedExist.MAX_PIPED_ITEM_COUNT) {
       throw new IllegalArgumentException(
               "The number of piped operations must not exceed a maximum of "
-                      + CollectionPipedInsert.MAX_PIPED_ITEM_COUNT + ".");
+                      + SetPipedExist.MAX_PIPED_ITEM_COUNT + ".");
     }
 
     final CountDownLatch latch = new CountDownLatch(1);
