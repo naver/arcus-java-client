@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.collection.SMGetMode;
@@ -141,7 +142,7 @@ class ArcusTimeoutTest {
   @Test
   void testSopPipedInsertBulkTimeout() {
     String key = "testTimeout";
-    int valueCount = mc.getMaxPipedItemCount();
+    int valueCount = CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
     Object[] valueList = new Object[valueCount];
     for (int i = 0; i < valueList.length; i++) {
       valueList[i] = "MyValue" + i;
@@ -198,7 +199,7 @@ class ArcusTimeoutTest {
     String key = "MyBopKey";
     String value = "MyValue";
 
-    int bkeySize = mc.getMaxPipedItemCount();
+    int bkeySize = CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
     Map<Long, Object> bkeys = new TreeMap<>();
     for (int i = 0; i < bkeySize; i++) {
       bkeys.put((long) i, value);
@@ -296,7 +297,7 @@ class ArcusTimeoutTest {
     String key = "MyMopKey";
     String value = "MyValue";
 
-    int elementSize = mc.getMaxPipedItemCount();
+    int elementSize = CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
     Map<String, Object> elements = new TreeMap<>();
     for (int i = 0; i < elementSize; i++) {
       elements.put(String.valueOf(i), value);

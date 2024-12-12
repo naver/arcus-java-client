@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -42,7 +43,7 @@ class SopBulkAPITest extends BaseIntegrationTest {
   private final List<Object> valueList = new ArrayList<>();
 
   private int getValueCount() {
-    return mc.getMaxPipedItemCount();
+    return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
   }
 
   @BeforeEach

@@ -441,13 +441,6 @@ public interface ArcusClientIF {
           List<String> keyList, Object value, CollectionAttributes attributesForCreate);
 
   /**
-   * Get maximum possible piped bulk insert item count.
-   *
-   * @return Get maximum possible piped bulk insert item count.
-   */
-  int getMaxPipedItemCount();
-
-  /**
    * Create an empty b+ tree
    *
    * @param key        key of a b+ tree

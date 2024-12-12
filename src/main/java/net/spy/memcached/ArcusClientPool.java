@@ -32,7 +32,6 @@ import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.ByteArrayBKey;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
@@ -625,11 +624,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
           CollectionAttributes attributesForCreate) {
     return this.getClient().asyncSopInsertBulk(keyList, value,
             attributesForCreate);
-  }
-
-  @Override
-  public int getMaxPipedItemCount() {
-    return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
   }
 
   @Override
