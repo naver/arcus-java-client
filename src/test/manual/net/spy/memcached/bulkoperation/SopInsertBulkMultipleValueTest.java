@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
     String key = "testInsertAndGet";
     String prefix = "MyValue";
 
-    int valueCount = mc.getMaxPipedItemCount();
+    int valueCount = CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
     Object[] valueList = new Object[valueCount];
     for (int i = 0; i < valueList.length; i++) {
       valueList[i] = String.format("%s%d", prefix, i);

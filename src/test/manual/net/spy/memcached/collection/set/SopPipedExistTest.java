@@ -24,6 +24,7 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.internal.CollectionFuture;
 
 import org.junit.jupiter.api.AfterEach;
@@ -145,7 +146,7 @@ class SopPipedExistTest extends BaseIntegrationTest {
       List<Object> findValues = new ArrayList<>();
 
       // insert items
-      for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
+      for (int i = 0; i < SetPipedExist.MAX_PIPED_ITEM_COUNT; i++) {
         findValues.add("VALUE" + i);
 
         if (i / 2 == 0) {
@@ -163,7 +164,7 @@ class SopPipedExistTest extends BaseIntegrationTest {
 
       assertTrue(future.getOperationStatus().isSuccess());
 
-      for (int i = 0; i < mc.getMaxPipedItemCount(); i++) {
+      for (int i = 0; i < SetPipedExist.MAX_PIPED_ITEM_COUNT; i++) {
         if (i / 2 == 0) {
           assertFalse(map.get("VALUE" + i));
         } else {

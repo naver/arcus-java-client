@@ -1163,11 +1163,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   }
 
   @Override
-  public int getMaxPipedItemCount() {
-    return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
-  }
-
-  @Override
   public CollectionFuture<Boolean> asyncBopCreate(String key,
                                                   ElementValueType valueType,
                                                   CollectionAttributes attributes) {
