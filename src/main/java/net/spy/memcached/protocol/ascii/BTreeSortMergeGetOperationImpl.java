@@ -77,7 +77,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   private byte lookingFor = '\0';
   private int spaceCount = 0;
 
-  private ReadState readState = ReadState.VALUE;
+  private ReadState readState = ReadState.ELEMENTS;
 
   public BTreeSortMergeGetOperationImpl(BTreeSMGet<?> smGet,
                                         OperationCallback cb) {
@@ -92,7 +92,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
     getLogger().debug("Got line %s", line);
 
     /*
-      VALUE|ELEMENTS <ecount>\r\n
+      ELEMENTS|VALUE <ecount>\r\n
       <key> <flags> <bkey> [<eflag>] <bytes> <data>\r\n
       [ ... ]
       MISSED_KEYS <kcount>\r\n
@@ -103,16 +103,13 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       [ ... ]
       END|DUPLICATED|TRIMMED|DUPLICATRED_TRIMMED\r\n
      */
-    if (line.startsWith("VALUE ") ||
-            line.startsWith("ELEMENTS ")) {
-      readState = ReadState.VALUE;
+    if (line.startsWith("ELEMENTS ") || line.startsWith("VALUE ")) {
+      readState = ReadState.ELEMENTS;
 
       String[] stuff = line.split(" ");
-      assert "VALUE".equals(stuff[0]) ||
-              "ELEMENTS".equals(stuff[0]);
+      assert "ELEMENTS".equals(stuff[0]) || "VALUE".equals(stuff[0]);
 
       lineCount = Integer.parseInt(stuff[1]);
-
       if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
@@ -123,7 +120,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       assert "MISSED_KEYS".equals(stuff[0]);
 
       lineCount = Integer.parseInt(stuff[1]);
-
       if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
@@ -134,7 +130,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       assert "TRIMMED_KEYS".equals(stuff[0]);
 
       lineCount = Integer.parseInt(stuff[1]);
-
       if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
@@ -151,8 +146,8 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   @Override
   public void handleRead(ByteBuffer bb) {
     switch (readState) {
-      case VALUE:
-        readValue(bb);
+      case ELEMENTS:
+        readElements(bb);
         break;
       case MISSED_KEYS:
         readMissedKeys(bb);
@@ -163,7 +158,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
     }
   }
 
-  private void readValue(ByteBuffer bb) {
+  private void readElements(ByteBuffer bb) {
     // Decode a collection data header.
     int count = 0;
     if (lookingFor == '\0' && data == null) {
@@ -459,7 +454,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   }
 
   private enum ReadState {
-    VALUE,
+    ELEMENTS,
     MISSED_KEYS,
     TRIMMED_KEYS,
   }
