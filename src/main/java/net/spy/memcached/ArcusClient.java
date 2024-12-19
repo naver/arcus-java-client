@@ -2505,32 +2505,28 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Map<Integer, Element<Object>>> asyncBopGetByPosition(
           String key, BTreeOrder order, int pos) {
     BTreeGetByPosition get = new BTreeGetByPosition(order, pos);
-    boolean reverse = false;
-    return asyncBopGetByPosition(key, get, reverse, collectionTranscoder);
+    return asyncBopGetByPosition(key, get, collectionTranscoder);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
           String key, BTreeOrder order, int pos, Transcoder<T> tc) {
     BTreeGetByPosition get = new BTreeGetByPosition(order, pos);
-    boolean reverse = false;
-    return asyncBopGetByPosition(key, get, reverse, tc);
+    return asyncBopGetByPosition(key, get, tc);
   }
 
   @Override
   public CollectionFuture<Map<Integer, Element<Object>>> asyncBopGetByPosition(
           String key, BTreeOrder order, int from, int to) {
     BTreeGetByPosition get = new BTreeGetByPosition(order, from, to);
-    boolean reverse = from > to;
-    return asyncBopGetByPosition(key, get, reverse, collectionTranscoder);
+    return asyncBopGetByPosition(key, get, collectionTranscoder);
   }
 
   @Override
   public <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
           String key, BTreeOrder order, int from, int to, Transcoder<T> tc) {
     BTreeGetByPosition get = new BTreeGetByPosition(order, from, to);
-    boolean reverse = from > to;
-    return asyncBopGetByPosition(key, get, reverse, tc);
+    return asyncBopGetByPosition(key, get, tc);
   }
 
   /**
@@ -2539,13 +2535,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    *
    * @param k       b+tree item's key
    * @param get     operation parameters (element position and so on)
-   * @param reverse forward or backward
    * @param tc      transcoder to serialize and unserialize value
    * @return future holding the map of the fetched element and its position
    */
   private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
-          final String k, final BTreeGetByPosition get,
-          final boolean reverse, final Transcoder<T> tc) {
+          final String k, final BTreeGetByPosition get, final Transcoder<T> tc) {
     // Check for invalid arguments (not to get CLIENT_ERROR)
     if (get.getOrder() == null) {
       throw new IllegalArgumentException("BTreeOrder must not be null.");
@@ -2562,7 +2556,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap =
               new HashMap<>();
       private final GetResult<Map<Integer, Element<T>>> result =
-              new BopGetByPositionResultImpl<>(cachedDataMap, reverse, tc);
+              new BopGetByPositionResultImpl<>(cachedDataMap, get.isReversed(), tc);
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus;
