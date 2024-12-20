@@ -144,7 +144,7 @@ public abstract class BaseOperationImpl extends SpyObject {
     }
   }
 
-  protected final void receivedMoveOperations(String cause) {
+  protected final void prepareSwitchover(String cause) {
     // switchover message e.g.
     // one slave node case : "SWITCHOVER", "REPL_SLAVE",
     // two or more than slave nodes case : "SWITCHOVER <ip:port>", "REPL_SLAVE <ip:port>"
@@ -165,7 +165,7 @@ public abstract class BaseOperationImpl extends SpyObject {
     }
 
     getLogger().info("%s message received by %s operation from %s", cause, this, handlingNode);
-    transitionState(OperationState.MOVING);
+    transitionState(OperationState.NEED_SWITCHOVER);
   }
   /* ENABLE_REPLICATION end */
 

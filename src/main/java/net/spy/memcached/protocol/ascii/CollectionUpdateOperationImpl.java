@@ -89,7 +89,7 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
             + "'' when in " + getState() + " state";
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */

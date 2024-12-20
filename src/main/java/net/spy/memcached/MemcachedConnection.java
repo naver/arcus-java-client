@@ -1000,7 +1000,7 @@ public final class MemcachedConnection extends SpyObject {
           assert op == currentOp : "Expected to pop " + currentOp + " got " + op;
           currentOp = qa.getCurrentReadOp();
         /* ENABLE_REPLICATION if */
-        } else if (currentOp.getState() == OperationState.MOVING) {
+        } else if (currentOp.getState() == OperationState.NEED_SWITCHOVER) {
           break;
         /* ENABLE_REPLICATION end */
         /* ENABLE_MIGRATION if */
@@ -1016,7 +1016,7 @@ public final class MemcachedConnection extends SpyObject {
         /* ENABLE_MIGRATION end */
       }
       /* ENABLE_REPLICATION if */
-      if (currentOp != null && currentOp.getState() == OperationState.MOVING) {
+      if (currentOp != null && currentOp.getState() == OperationState.NEED_SWITCHOVER) {
         ((Buffer) rbuf).clear();
         MemcachedReplicaGroup group = qa.getReplicaGroup();
         delayedSwitchoverGroups.remove(group);

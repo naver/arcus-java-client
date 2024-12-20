@@ -38,9 +38,10 @@ public enum OperationState {
   COMPLETE,
   /* ENABLE_REPLICATION if */
   /**
-   * State indicating this operation will be moved by switchover or failover
+   * State indicating this operation received SWITCHOVER | REPL_SLAVE
+   * and the node handling this operation need to switchover in the locator.
    */
-  MOVING,
+  NEED_SWITCHOVER,
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_MIGRATION if */

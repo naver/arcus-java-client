@@ -73,7 +73,7 @@ final class MutatorOperationImpl extends OperationImpl
   public void handleLine(String line) {
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */

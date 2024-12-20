@@ -121,7 +121,7 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
 
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */
