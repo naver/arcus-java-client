@@ -79,7 +79,7 @@ public final class CollectionCreateOperationImpl extends OperationImpl
             : "Read ``" + line + "'' when in " + getState() + " state";
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */

@@ -82,7 +82,7 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
 
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */

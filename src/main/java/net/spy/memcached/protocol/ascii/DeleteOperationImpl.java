@@ -60,7 +60,7 @@ final class DeleteOperationImpl extends OperationImpl
     getLogger().debug("Delete of %s returned %s", key, line);
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */

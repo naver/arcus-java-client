@@ -92,7 +92,7 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
     /* ENABLE_REPLICATION if */
     if (hasSwitchedOver(line)) {
       this.update.setNextOpIndex(index);
-      receivedMoveOperations(line);
+      prepareSwitchover(line);
       return;
     }
     /* ENABLE_REPLICATION end */
