@@ -86,7 +86,7 @@ public class BTreeGetByPosition extends CollectionGet {
   }
 
   @Override
-  public byte[] getAddtionalArgs() {
+  public byte[] getAdditionalArgs() {
     return null;
   }
 

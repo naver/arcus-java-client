@@ -153,7 +153,7 @@ class MultibyteKeyTest {
         }
 
         @Override
-        public byte[] getAddtionalArgs() {
+        public byte[] getAdditionalArgs() {
           return null;
         }
 

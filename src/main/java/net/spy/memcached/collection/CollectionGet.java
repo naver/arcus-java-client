@@ -64,7 +64,7 @@ public abstract class CollectionGet {
     return eHeadCount;
   }
 
-  public abstract byte[] getAddtionalArgs();
+  public abstract byte[] getAdditionalArgs();
 
   public abstract String stringify();
 

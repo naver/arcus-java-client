@@ -58,7 +58,7 @@ public class MapGet extends CollectionGet {
   }
 
   @Override
-  public byte[] getAddtionalArgs() {
+  public byte[] getAdditionalArgs() {
     return additionalArgs;
   }
 

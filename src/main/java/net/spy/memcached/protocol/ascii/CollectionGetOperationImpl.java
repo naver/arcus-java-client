@@ -267,7 +267,7 @@ public final class CollectionGetOperationImpl extends OperationImpl
       }
     }
     String args = collectionGet.stringify();
-    byte[] additionalArgs = collectionGet.getAddtionalArgs();
+    byte[] additionalArgs = collectionGet.getAdditionalArgs();
 
     ByteBuffer bb = ByteBuffer.allocate(
             KeyUtil.getKeyBytes(key).length + cmd.length() + args.length() +
