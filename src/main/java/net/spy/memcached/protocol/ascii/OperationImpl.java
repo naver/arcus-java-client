@@ -163,6 +163,9 @@ abstract class OperationImpl extends BaseOperationImpl implements Operation {
       } else { // OperationReadType.DATA
         handleRead(data);
       }
+      if (isPipeOperation() && getState() == OperationState.COMPLETE && hasErrored()) {
+        throw getException();
+      }
     }
   }
 

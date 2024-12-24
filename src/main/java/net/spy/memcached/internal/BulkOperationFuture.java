@@ -3,6 +3,7 @@ package net.spy.memcached.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -90,14 +91,19 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
       MemcachedConnection.opsSucceeded(ops);
     }
 
+    List<Exception> exceptions = new ArrayList<>();
     for (Operation op : ops) {
       if (op != null && op.hasErrored()) {
-        throw new ExecutionException(op.getException());
+        exceptions.add(op.getException());
       }
 
       if (op != null && op.isCancelled()) {
-        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+        exceptions.add(new RuntimeException(op.getCancelCause()));
       }
+    }
+
+    if (!exceptions.isEmpty()) {
+      throw new CompositeException(exceptions);
     }
 
     return failedResult;

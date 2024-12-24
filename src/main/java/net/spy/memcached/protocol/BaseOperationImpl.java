@@ -51,7 +51,7 @@ public abstract class BaseOperationImpl extends SpyObject {
   private boolean cancelled = false;
   private final AtomicBoolean callbacked = new AtomicBoolean(false);
   private String cancelCause = null;
-  private OperationException exception = null;
+  protected OperationException exception = null;
   private OperationCallback callback = null;
   private volatile MemcachedNode handlingNode = null;
 
@@ -241,25 +241,15 @@ public abstract class BaseOperationImpl extends SpyObject {
   protected void handleError(OperationErrorType eType, String line)
           throws IOException {
     getLogger().error("Error:  %s by %s", line, this);
-    switch (eType) {
-      case GENERAL:
-      case SERVER:
-        exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
-        break;
-      case CLIENT:
-        if (line.contains("bad command line format")) {
-          initialize();
-          byte[] bytes = new byte[cmd.remaining()];
-          cmd.get(bytes);
+    if (eType == OperationErrorType.CLIENT && line.contains("bad command line format")) {
+      initialize();
+      byte[] bytes = new byte[cmd.remaining()];
+      cmd.get(bytes);
 
-          String[] cmdLines = new String(bytes).split("\r\n");
-          getLogger().error("Bad command: %s", cmdLines[0]);
-        }
-        exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
-        break;
-      default:
-        assert false;
+      String[] cmdLines = new String(bytes).split("\r\n");
+      getLogger().error("Bad command: %s", cmdLines[0]);
     }
+    exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
     transitionState(OperationState.COMPLETE);
     throw exception;
   }
