@@ -19,14 +19,24 @@
 
 package net.spy.memcached.protocol.ascii;
 
+import java.net.InetSocketAddress;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import net.spy.memcached.collection.CollectionPipedInsert;
+import net.spy.memcached.ops.CollectionPipedInsertOperation;
+import net.spy.memcached.ops.Operation;
+import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationException;
+import net.spy.memcached.ops.OperationStatus;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -97,6 +107,51 @@ class BaseOpTest {
     ((Buffer) b).flip();
     op.readFromBuffer(b);
     assertEquals("this is a test", op.getCurrentLine());
+  }
+
+  @Test
+  void throwExceptionAfterReadingEndOrPipeError() throws Exception {
+    String key = "testPipeLine";
+    CollectionPipedInsert.ListPipedInsert<String> insert =
+            new CollectionPipedInsert.ListPipedInsert<>(key, 0,
+                    Arrays.asList("a", "b"), null, null);
+    OperationCallback cb = new CollectionPipedInsertOperation.Callback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+      }
+
+      @Override
+      public void complete() {
+      }
+
+      @Override
+      public void gotStatus(Integer index, OperationStatus status) {
+      }
+    };
+    CollectionPipedInsertOperationImpl op =
+            new CollectionPipedInsertOperationImpl("test", insert, cb);
+    LinkedBlockingQueue<Operation> queue = new LinkedBlockingQueue<>();
+    op.setHandlingNode(new AsciiMemcachedNodeImpl("testnode", new InetSocketAddress(11211),
+            60, queue, queue, queue, 0L));
+
+    ByteBuffer b = ByteBuffer.allocate(40);
+    String line1 = "RESPONSE 2\r\n";
+    op.writeComplete();
+    b.put(line1.getBytes());
+    b.flip();
+    assertDoesNotThrow(() -> op.readFromBuffer(b));
+    b.clear();
+
+    String line2 = "SERVER_ERROR out of memory\r\n";
+    b.put(line2.getBytes());
+    b.flip();
+    assertDoesNotThrow(() -> op.readFromBuffer(b));
+    b.clear();
+
+    String line4 = "PIPE_ERROR failed\r\n";
+    b.put(line4.getBytes());
+    b.flip();
+    assertThrows(OperationException.class, () -> op.readFromBuffer(b));
   }
 
   private static class SimpleOp extends OperationImpl {

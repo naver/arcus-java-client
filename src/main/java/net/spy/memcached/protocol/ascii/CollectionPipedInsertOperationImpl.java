@@ -17,6 +17,7 @@
  */
 package net.spy.memcached.protocol.ascii;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,8 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedInsertOperation;
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationErrorType;
+import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
@@ -69,6 +72,7 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
   private int count;
   private int index = 0;
   private boolean successAll = true;
+  private boolean readUntilLastLine = false;
 
   public CollectionPipedInsertOperationImpl(String key,
                                             CollectionPipedInsert<?> insert, OperationCallback cb) {
@@ -102,6 +106,7 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_REPLICATION end */
+
     /* ENABLE_MIGRATION if */
     if (hasNotMyKey(line)) {
       // Only one NOT_MY_KEY is provided in response of single key piped operation when redirection.
@@ -155,6 +160,7 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
       String[] stuff = line.split(" ");
       assert "RESPONSE".equals(stuff[0]);
       count = Integer.parseInt(stuff[1]);
+      readUntilLastLine = true;
     } else {
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
@@ -169,9 +175,24 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
   }
 
   @Override
+  protected void handleError(OperationErrorType eType, String line) throws IOException {
+    if (!readUntilLastLine) {
+      // this case means that error message came without 'RESPONSE <count>'.
+      // so it doesn't need to read 'PIPE_ERROR'.
+      super.handleError(eType, line);
+    } else {
+      // this case means that error message came after 'RESPONSE <count>'.
+      // so it needs to read 'PIPE_ERROR'.
+      getLogger().error("Error:  %s by %s", line, this);
+      exception = new OperationException(eType, line + " @ " + getHandlingNode().getNodeName());
+    }
+  }
+
+  @Override
   public void initialize() {
     ByteBuffer buffer = insert.getAsciiCommand();
     setBuffer(buffer);
+    readUntilLastLine = false;
 
     if (getLogger().isDebugEnabled()) {
       getLogger().debug("Request in ascii protocol: %s",
