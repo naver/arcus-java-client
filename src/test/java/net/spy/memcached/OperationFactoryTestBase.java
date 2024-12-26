@@ -214,7 +214,7 @@ public abstract class OperationFactoryTestBase {
   void testMultipleGetOperationCloning() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
     GetOperation.Callback callback = context.mock(GetOperation.Callback.class);
-    GetOperation op = ofact.get(keys, callback);
+    GetOperation op = ofact.get(keys, callback, false);
 
     Collection<Operation> ops = ofact.clone(op);
     assertEquals(3, ops.size());
@@ -244,7 +244,7 @@ public abstract class OperationFactoryTestBase {
       e.oneOf(callback).gotData(e.with("k3"), e.with(3), e.with(any(byte[].class)));
     }));
 
-    GetOperation op = ofact.get(keys, callback);
+    GetOperation op = ofact.get(keys, callback, false);
 
     // Transition each operation callback into the complete state.
     Iterator<String> ki = keys.iterator();
@@ -262,7 +262,7 @@ public abstract class OperationFactoryTestBase {
   public void testMultipleGetsOperationCloning() {
     Collection<String> keys = Arrays.asList("k1", "k2", "k3");
     GetsOperation.Callback callback = context.mock(GetsOperation.Callback.class);
-    GetsOperation op = ofact.gets(keys, callback);
+    GetsOperation op = ofact.gets(keys, callback, false);
 
     Collection<Operation> ops = ofact.clone(op);
     assertEquals(3, ops.size());
@@ -296,7 +296,7 @@ public abstract class OperationFactoryTestBase {
               e.with(casId[2]), e.with(any(byte[].class)));
     }));
 
-    GetsOperation op = ofact.gets(keys, callback);
+    GetsOperation op = ofact.gets(keys, callback, false);
 
     // Transition each operation callback into the complete state.
     Iterator<String> ki = keys.iterator();

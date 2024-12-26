@@ -15,6 +15,7 @@ import net.spy.memcached.ops.GetOperation;
 class GetOperationImpl extends BaseGetOpImpl implements GetOperation {
 
   private static final String CMD = "get";
+  private static final String CMD_MGET = "mget";
 
   public GetOperationImpl(String key, GetOperation.Callback c) {
     super(CMD, c, Collections.singleton(key));
@@ -24,6 +25,11 @@ class GetOperationImpl extends BaseGetOpImpl implements GetOperation {
   public GetOperationImpl(Collection<String> k, GetOperation.Callback c) {
     super(CMD, c, new HashSet<>(k));
     setAPIType(APIType.GET);
+  }
+
+  public GetOperationImpl(Collection<String> keys, GetOperation.Callback cb, boolean isMGet) {
+    super(isMGet ? CMD_MGET : CMD, cb, new HashSet<>(keys));
+    setAPIType(isMGet ? APIType.MGET : APIType.GET);
   }
 
 }
