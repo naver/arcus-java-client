@@ -20,7 +20,6 @@ package net.spy.memcached.protocol.ascii;
 import java.net.SocketAddress;
 import java.util.concurrent.BlockingQueue;
 
-import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -45,10 +44,10 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
     // make sure there are at least two get operations in a row before
     // attempting to optimize them.
     Operation nxtOp = writeQ.peek();
-    if (nxtOp instanceof GetOperation && nxtOp.getAPIType() != APIType.MGET) {
+    if (nxtOp instanceof GetOperation) {
       optimizedOp = writeQ.remove();
       nxtOp = writeQ.peek();
-      if (nxtOp instanceof GetOperation && nxtOp.getAPIType() != APIType.MGET) {
+      if (nxtOp instanceof GetOperation) {
         OptimizedGetImpl og = new OptimizedGetImpl(
                 (GetOperation) optimizedOp);
         optimizedOp = og;
@@ -59,8 +58,7 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
             og.addOperation(o);
           }
           nxtOp = writeQ.peek();
-        } while (nxtOp instanceof GetOperation &&
-                nxtOp.getAPIType() != APIType.MGET);
+        } while (nxtOp instanceof GetOperation);
 
         // Initialize the new mega get
         optimizedOp.initialize();

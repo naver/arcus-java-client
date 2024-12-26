@@ -100,27 +100,17 @@ public class BinaryOperationFactory extends BaseOperationFactory {
     return new GetOperationImpl(key, callback);
   }
 
-  public GetOperation get(Collection<String> value, Callback cb) {
-    return new MultiGetOperationImpl(value, cb);
+  public GetOperation get(Collection<String> keys, Callback cb, boolean isMGet) {
+    return new MultiGetOperationImpl(keys, cb);
   }
 
   public GetsOperation gets(String key, GetsOperation.Callback cb) {
     return new GetOperationImpl(key, cb);
   }
 
-  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback callback) {
+  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet) {
     throw new RuntimeException(
-            "gets is not supported in binary protocol yet.");
-  }
-
-  public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
-    throw new RuntimeException(
-            "mget is not supported in binary protocol yet.");
-  }
-
-  public GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb) {
-    throw new RuntimeException(
-            "mgets is not supported in binary protocol yet.");
+            "multiple key gets is not supported in binary protocol yet.");
   }
 
   public MutatorOperation mutate(Mutator m, String key, int by,

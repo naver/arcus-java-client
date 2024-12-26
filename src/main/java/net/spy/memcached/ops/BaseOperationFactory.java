@@ -136,11 +136,9 @@ public abstract class BaseOperationFactory implements OperationFactory {
     assert !op.hasErrored() : "Attempted to clone an errored op";
 
     if (op instanceof GetOperation) {
-      // If MemcachedNode supports this clone feature, it should support mget operation too.
-      return mget(redirectKeys, (GetOperation.Callback) mcb);
+      return get(redirectKeys, (GetOperation.Callback) mcb, node.enabledMGetOp());
     } else if (op instanceof GetsOperation) {
-      // If MemcachedNode supports this clone feature, it should support mgets operation too.
-      return mgets(redirectKeys, (GetsOperation.Callback) mcb);
+      return gets(redirectKeys, (GetsOperation.Callback) mcb, node.enabledMGetsOp());
     } else if (op instanceof CollectionBulkInsertOperation) {
       final CollectionBulkInsert<?> insert = ((CollectionBulkInsertOperation) op).getInsert();
       return collectionBulkInsert(insert.clone(node, redirectKeys), mcb);

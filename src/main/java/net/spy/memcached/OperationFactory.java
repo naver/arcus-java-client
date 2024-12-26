@@ -133,42 +133,25 @@ public interface OperationFactory {
    */
   GetsOperation gets(String key, GetsOperation.Callback callback);
 
-
   /**
    * Create a get operation.
    *
    * @param keys the collection of keys to get
    * @param cb   the callback that will contain the results
+   * @param isMGet   true if the handling node provides mget command
    * @return a new GetOperation
    */
-  GetOperation get(Collection<String> keys, GetOperation.Callback cb);
+  GetOperation get(Collection<String> keys, GetOperation.Callback cb, boolean isMGet);
 
   /**
    * Create a gets operation.
    *
    * @param keys the collection of keys to get
    * @param cb   the callback that will contain the results
+   * @param isMGet   true if the handling node provides mgets command
    * @return a new GetsOperation
    */
-  GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb);
-
-  /**
-   * Create a mget operation.
-   *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @return a new GetOperation
-   */
-  GetOperation mget(Collection<String> keys, GetOperation.Callback cb);
-
-  /**
-   * Create a mgets operation.
-   *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @return a new GetOperation
-   */
-  GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb);
+  GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet);
 
   /**
    * Create a mutator operation.
