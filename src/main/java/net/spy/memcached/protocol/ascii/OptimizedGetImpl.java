@@ -10,13 +10,14 @@ import net.spy.memcached.protocol.ProxyCallback;
  */
 final class OptimizedGetImpl extends GetOperationImpl {
 
+  private static final String CMD = "get";
   private final ProxyCallback pcb;
 
   /**
    * Construct an optimized get starting with the given get operation.
    */
   public OptimizedGetImpl(GetOperation firstGet) {
-    super(new HashSet<>(), new ProxyCallback());
+    super(new HashSet<>(), new ProxyCallback(), CMD);
     pcb = (ProxyCallback) getCallback();
     addOperation(firstGet);
   }

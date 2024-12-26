@@ -95,7 +95,7 @@ class TCPMemcachedNodeImplTest {
             @Override
             public void complete() {
             }
-          });
+          }, false);
       op.initialize();
       fromOperations.add(op);
     }

@@ -81,6 +81,9 @@ import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.ops.VersionOperation;
 
+import static net.spy.memcached.protocol.ascii.GetOperationImpl.generateGetOp;
+import static net.spy.memcached.protocol.ascii.GetsOperationImpl.generateGetsOp;
+
 /**
  * Operation factory for the ascii protocol.
  */
@@ -94,28 +97,20 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new FlushOperationImpl(delay, cb);
   }
 
-  public GetOperation get(String key, GetOperation.Callback cb) {
-    return new GetOperationImpl(key, cb);
+  public GetOperation get(String key, GetOperation.Callback cb, boolean isMget) {
+    return generateGetOp(key, cb, isMget);
   }
 
-  public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {
-    return new GetOperationImpl(keys, cb);
+  public GetOperation get(Collection<String> keys, GetOperation.Callback cb, boolean isMget) {
+    return generateGetOp(keys, cb, isMget);
   }
 
-  public GetsOperation gets(String key, GetsOperation.Callback cb) {
-    return new GetsOperationImpl(key, cb);
+  public GetsOperation gets(String key, GetsOperation.Callback cb, boolean isMget) {
+    return generateGetsOp(key, cb, isMget);
   }
 
-  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb) {
-    return new GetsOperationImpl(keys, cb);
-  }
-
-  public GetOperation mget(Collection<String> keys, GetOperation.Callback cb) {
-    return new MGetOperationImpl(keys, cb);
-  }
-
-  public GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb) {
-    return new MGetsOperationImpl(keys, cb);
+  public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMget) {
+    return generateGetsOp(keys, cb, isMget);
   }
 
   public MutatorOperation mutate(Mutator m, String key, int by,

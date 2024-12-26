@@ -52,13 +52,13 @@ public abstract class BaseOperationFactory implements OperationFactory {
       GetOperation.Callback getCb = new MultiGetOperationCallback(
               op.getCallback(), op.getKeys().size());
       for (String k : op.getKeys()) {
-        rv.add(get(k, getCb));
+        rv.add(get(k, getCb, false));
       }
     } else if (op instanceof GetsOperation) {
       GetsOperation.Callback getsCb = new MultiGetsOperationCallback(
               op.getCallback(), op.getKeys().size());
       for (String k : op.getKeys()) {
-        rv.add(gets(k, getsCb));
+        rv.add(gets(k, getsCb, false));
       }
     } else if (op instanceof CASOperation) {
       CASOperation cop = (CASOperation) op;
@@ -137,10 +137,10 @@ public abstract class BaseOperationFactory implements OperationFactory {
 
     if (op instanceof GetOperation) {
       // If MemcachedNode supports this clone feature, it should support mget operation too.
-      return mget(redirectKeys, (GetOperation.Callback) mcb);
+      return get(redirectKeys, (GetOperation.Callback) mcb, true);
     } else if (op instanceof GetsOperation) {
       // If MemcachedNode supports this clone feature, it should support mgets operation too.
-      return mgets(redirectKeys, (GetsOperation.Callback) mcb);
+      return gets(redirectKeys, (GetsOperation.Callback) mcb, true);
     } else if (op instanceof CollectionBulkInsertOperation) {
       final CollectionBulkInsert<?> insert = ((CollectionBulkInsertOperation) op).getInsert();
       return collectionBulkInsert(insert.clone(node, redirectKeys), mcb);

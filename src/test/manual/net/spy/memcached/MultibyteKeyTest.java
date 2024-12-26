@@ -123,7 +123,7 @@ class MultibyteKeyTest {
         @Override
         public void gotData(String key, int flags, long cas, byte[] data) {
         }
-      }).initialize();        // BaseGetOpImpl.initialize()
+      }, false).initialize();        // BaseGetOpImpl.initialize()
     } catch (java.nio.BufferOverflowException e) {
       fail();
     }

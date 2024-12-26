@@ -120,18 +120,20 @@ public interface OperationFactory {
    *
    * @param key      the key to get
    * @param callback the callback that will contain the results
+   * @param isMget   true if this is a multi-key get
    * @return a new GetOperation
    */
-  GetOperation get(String key, GetOperation.Callback callback);
+  GetOperation get(String key, GetOperation.Callback callback, boolean isMget);
 
   /**
    * Create a gets operation.
    *
    * @param key      the key to get
    * @param callback the callback that will contain the results
+   * @param isMget   true if this is a multi-key get
    * @return a new GetsOperation
    */
-  GetsOperation gets(String key, GetsOperation.Callback callback);
+  GetsOperation gets(String key, GetsOperation.Callback callback, boolean isMget);
 
 
   /**
@@ -139,36 +141,20 @@ public interface OperationFactory {
    *
    * @param keys the collection of keys to get
    * @param cb   the callback that will contain the results
+   * @param isMget   true if this is a multi-key get
    * @return a new GetOperation
    */
-  GetOperation get(Collection<String> keys, GetOperation.Callback cb);
+  GetOperation get(Collection<String> keys, GetOperation.Callback cb, boolean isMget);
 
   /**
    * Create a gets operation.
    *
    * @param keys the collection of keys to get
    * @param cb   the callback that will contain the results
+   * @param isMget   true if this is a multi-key get
    * @return a new GetsOperation
    */
-  GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb);
-
-  /**
-   * Create a mget operation.
-   *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @return a new GetOperation
-   */
-  GetOperation mget(Collection<String> keys, GetOperation.Callback cb);
-
-  /**
-   * Create a mgets operation.
-   *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @return a new GetOperation
-   */
-  GetsOperation mgets(Collection<String> keys, GetsOperation.Callback cb);
+  GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMget);
 
   /**
    * Create a mutator operation.
