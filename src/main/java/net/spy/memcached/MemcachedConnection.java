@@ -488,23 +488,29 @@ public final class MemcachedConnection extends SpyObject {
           }
         }
       } else if (oldSlaveAddrs.contains(newMasterAddr)) {
-        oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
         if (newSlaveAddrs.contains(oldMasterAddr)) {
           // Switchover
-          if (oldMasterNode.hasNonIdempotentOperationInReadQ()) {
-            // delay to change role and move operations
-            // by the time switchover timeout occurs or
-            // "SWITCHOVER", "REPL_SLAVE" response received.
-            delayedSwitchoverGroups.put(oldGroup);
-          } else {
+          if (oldGroup.getMasterCandidate() != null) {
             changeRoleGroups.add(oldGroup);
-            taskList.add(new MoveOperationTask(
-                oldMasterNode, oldGroup.getMasterCandidate(), false));
-            taskList.add(new QueueReconnectTask(
-                oldMasterNode, ReconnDelay.IMMEDIATE,
-                "Discarded all pending reading state operation to move operations."));
+          } else {
+            // ZK event occurs before cache server response.
+            oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
+            if (oldMasterNode.hasNonIdempotentOperationInReadQ()) {
+              // delay to change role and move operations
+              // by the time switchover timeout occurs or
+              // "SWITCHOVER", "REPL_SLAVE" response received.
+              delayedSwitchoverGroups.put(oldGroup);
+            } else {
+              changeRoleGroups.add(oldGroup);
+              taskList.add(new MoveOperationTask(
+                      oldMasterNode, oldGroup.getMasterCandidate(), false));
+              taskList.add(new QueueReconnectTask(
+                      oldMasterNode, ReconnDelay.IMMEDIATE,
+                      "Discarded all pending reading state operation to move operations."));
+            }
           }
         } else {
+          oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
           changeRoleGroups.add(oldGroup);
           // Failover
           removeNodes.add(oldMasterNode);
@@ -1019,8 +1025,16 @@ public final class MemcachedConnection extends SpyObject {
       if (currentOp != null && currentOp.getState() == OperationState.NEED_SWITCHOVER) {
         ((Buffer) rbuf).clear();
         MemcachedReplicaGroup group = qa.getReplicaGroup();
-        delayedSwitchoverGroups.remove(group);
-        switchoverMemcachedReplGroup(group, false);
+        if (group.isDelayedSwitchover()) {
+          delayedSwitchoverGroups.remove(group);
+          switchoverMemcachedReplGroup(group, false);
+        } else {
+          MemcachedNode masterCandidate = group.getMasterCandidate();
+          group.getMasterNode().moveOperations(masterCandidate, false);
+          addedQueue.offer(masterCandidate);
+          queueReconnect(group.getMasterNode(), ReconnDelay.IMMEDIATE,
+                  "Discarded all pending reading state operation to move operations.");
+        }
         break;
       }
       /* ENABLE_REPLICATION end */

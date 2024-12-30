@@ -100,7 +100,11 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
 
     switch (pick) {
       case MASTER:
-        node = masterNode;
+        if (masterCandidate != null && !delayedSwitchover) {
+          node = masterCandidate;
+        } else {
+          node = masterNode;
+        }
         break;
       case SLAVE:
         if (!slaveNodes.isEmpty()) {
