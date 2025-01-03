@@ -50,6 +50,7 @@ public class BTreeFindPosition {
     if (str != null) {
       return str;
     }
+
     StringBuilder b = new StringBuilder();
     b.append(bkey);
     b.append(" ");

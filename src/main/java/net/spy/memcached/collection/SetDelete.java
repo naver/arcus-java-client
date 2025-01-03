@@ -51,6 +51,10 @@ public class SetDelete<T> extends CollectionDelete {
   }
 
   public String stringify() {
+    if (str != null) {
+      return str;
+    }
+
     StringBuilder b = new StringBuilder();
     b.append(additionalArgs.length);
 

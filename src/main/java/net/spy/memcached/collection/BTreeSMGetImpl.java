@@ -106,6 +106,7 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
     if (str != null) {
       return str;
     }
+
     StringBuilder b = new StringBuilder();
     b.append(KeyUtil.getKeyBytes(getSpaceSeparatedKeys()).length);
     b.append(" ").append(keyList.size());
@@ -122,6 +123,7 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
       }
       b.append(" ").append(count);
     }
+
     str = b.toString();
     return str;
   }

@@ -36,6 +36,10 @@ public class Attributes extends SpyObject {
   }
 
   protected String stringify() {
+    if (str != null) {
+      return str;
+    }
+
     StringBuilder b = new StringBuilder();
 
     if (flags != null) {

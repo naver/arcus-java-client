@@ -66,17 +66,21 @@ public class BTreeFindPositionWithGet extends CollectionGet {
   }
 
   public String stringify() {
-    if (str == null) {
-      StringBuilder b = new StringBuilder();
-      b.append(bkeyObject);
-      b.append(" ");
-      b.append(order.getAscii());
-      if (count > 0) {
-        b.append(" ");
-        b.append(String.valueOf(count));
-      }
-      str = b.toString();
+    if (str != null) {
+      return str;
     }
+
+    StringBuilder b = new StringBuilder();
+    b.append(bkeyObject);
+    b.append(" ");
+    b.append(order.getAscii());
+
+    if (count > 0) {
+      b.append(" ");
+      b.append(String.valueOf(count));
+    }
+
+    str = b.toString();
     return str;
   }
 
