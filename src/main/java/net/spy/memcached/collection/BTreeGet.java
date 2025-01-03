@@ -26,6 +26,7 @@ public class BTreeGet extends CollectionGet {
   protected int offset = -1;
   protected int count = -1;
   protected ElementFlagFilter elementFlagFilter;
+  private boolean reverse = false;
 
   private BTreeGet(String range,
                    boolean delete, boolean dropIfEmpty,
@@ -50,18 +51,19 @@ public class BTreeGet extends CollectionGet {
     this(BTreeUtil.toHex(bkey), delete, dropIfEmpty, elementFlagFilter);
   }
 
-  private BTreeGet(String range, int offset, int count,
-                   boolean delete, boolean dropIfEmpty,
+  private BTreeGet(String range, boolean reverse, int offset,
+                   int count, boolean delete, boolean dropIfEmpty,
                    ElementFlagFilter elementFlagFilter) {
     this(range, delete, dropIfEmpty, elementFlagFilter);
     this.offset = offset;
     this.count = count;
+    this.reverse = reverse;
   }
 
   public BTreeGet(long from, long to, int offset, int count,
                   boolean delete, boolean dropIfEmpty,
                   ElementFlagFilter elementFlagFilter) {
-    this(from + ".." + to,
+    this(from + ".." + to, from > to,
         offset, count, delete, dropIfEmpty, elementFlagFilter);
   }
 
@@ -69,7 +71,12 @@ public class BTreeGet extends CollectionGet {
                   boolean delete, boolean dropIfEmpty,
                   ElementFlagFilter elementFlagFilter) {
     this(BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to),
+            BTreeUtil.compareByteArraysInLexOrder(from, to) > 0,
         offset, count, delete, dropIfEmpty, elementFlagFilter);
+  }
+
+  public boolean isReversed() {
+    return reverse;
   }
 
   public String getRange() {
