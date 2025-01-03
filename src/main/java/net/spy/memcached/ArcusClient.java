@@ -639,13 +639,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    *
    * @param k             b+tree item's key
    * @param collectionGet operation parameters (element keys and so on)
-   * @param reverse       false=forward or true=backward
    * @param tc            transcoder to serialize and unserialize value
    * @return future holding the map of fetched elements and their keys
    */
   private <T> CollectionFuture<Map<Long, Element<T>>> asyncBopGet(
-          final String k, final CollectionGet collectionGet,
-          final boolean reverse, final Transcoder<T> tc) {
+          final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Long, Element<T>>> rv =
             new CollectionGetFuture<>(latch, operationTimeout);
@@ -654,7 +652,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new CollectionGetOperation.Callback() {
           private final HashMap<Long, CachedData> cachedDataMap = new HashMap<>();
           private final GetResult<Map<Long, Element<T>>> result =
-                  new BopGetResultImpl<>(cachedDataMap, reverse, tc);
+                  new BopGetResultImpl<>(cachedDataMap, ((BTreeGet) collectionGet).isReversed(), tc);
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
@@ -1270,7 +1268,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
-    return asyncBopGet(key, get, false, collectionTranscoder);
+    return asyncBopGet(key, get, collectionTranscoder);
   }
 
 //  @Override
@@ -1290,8 +1288,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
-    boolean reverse = from > to;
-    return asyncBopGet(key, get, reverse, collectionTranscoder);
+    return asyncBopGet(key, get, collectionTranscoder);
   }
 
 //  @Override
@@ -1311,7 +1308,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                  Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
-    return asyncBopGet(key, get, false, tc);
+    return asyncBopGet(key, get, tc);
   }
 
 //  @Override
@@ -1333,8 +1330,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                  Transcoder<T> tc) {
     BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
-    boolean reverse = from > to;
-    return asyncBopGet(key, get, reverse, tc);
+    return asyncBopGet(key, get, tc);
   }
 
 //  @Override
@@ -2392,7 +2388,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
-    return asyncBopExtendedGet(key, get, false, collectionTranscoder);
+    return asyncBopExtendedGet(key, get, collectionTranscoder);
   }
 
 //  @Override
@@ -2407,7 +2403,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
     BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
-    return asyncBopExtendedGet(key, get, false, tc);
+    return asyncBopExtendedGet(key, get, tc);
   }
 
 //  @Override
@@ -2423,8 +2419,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           int offset, int count, boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
-    boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
-    return asyncBopExtendedGet(key, get, reverse, collectionTranscoder);
+    return asyncBopExtendedGet(key, get, collectionTranscoder);
   }
 
 //  @Override
@@ -2442,8 +2437,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           Transcoder<T> tc) {
     BTreeUtil.validateBkey(from, to);
     BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
-    boolean reverse = BTreeUtil.compareByteArraysInLexOrder(from, to) > 0;
-    return asyncBopExtendedGet(key, get, reverse, tc);
+    return asyncBopExtendedGet(key, get, tc);
   }
 
   /**
@@ -2452,13 +2446,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    *
    * @param k             b+tree item's key
    * @param collectionGet operation parameters (element key and so on)
-   * @param reverse       forward or backward
    * @param tc            transcoder to serialize and unserialize value
    * @return future holding the map of the fetched element and its byte-array bkey
    */
   private <T> CollectionFuture<Map<ByteArrayBKey, Element<T>>> asyncBopExtendedGet(
-          final String k, final CollectionGet collectionGet,
-          final boolean reverse, final Transcoder<T> tc) {
+          final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<ByteArrayBKey, Element<T>>> rv
@@ -2468,7 +2460,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new CollectionGetOperation.Callback() {
           private final HashMap<ByteArrayBKey, CachedData> cachedDataMap = new HashMap<>();
           private final GetResult<Map<ByteArrayBKey, Element<T>>> result =
-                  new BopGetResultImpl<>(cachedDataMap, reverse, tc);
+                  new BopGetResultImpl<>(cachedDataMap, ((BTreeGet) collectionGet).isReversed(), tc);
 
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus;
