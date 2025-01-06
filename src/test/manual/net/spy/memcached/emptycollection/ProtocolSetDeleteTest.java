@@ -31,21 +31,13 @@ class ProtocolSetDeleteTest {
 
   @Test
   void testStringify() {
-    // default setting : dropIfEmpty = true
-
-    SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
-    assertEquals("5 drop", del.stringify());
-
-    del = new SetDelete<>(value, false, false, testTranscoder);
+    SetDelete<Object> del = new SetDelete<>(value, false, false, testTranscoder);
     assertEquals("5", del.stringify());
 
-    del = new SetDelete<>(value, false, true, testTranscoder);
+    del = new SetDelete<>(value, true, false, testTranscoder);
     assertEquals("5 drop", del.stringify());
 
-    del = new SetDelete<>(value, true, testTranscoder);
-    assertEquals("5 drop noreply", del.stringify());
-
-    del = new SetDelete<>(value, true, false, testTranscoder);
+    del = new SetDelete<>(value, false, true, testTranscoder);
     assertEquals("5 noreply", del.stringify());
 
     del = new SetDelete<>(value, true, true, testTranscoder);
@@ -55,19 +47,13 @@ class ProtocolSetDeleteTest {
   @Test
   void testGetAdditionalArgs() {
     byte[] expected = new byte[]{'v', 'a', 'l', 'u', 'e'};
-    SetDelete<Object> del = new SetDelete<>(value, false, testTranscoder);
-    assertArrayEquals(expected, del.getAdditionalArgs());
-
-    del = new SetDelete<>(value, false, false, testTranscoder);
-    assertArrayEquals(expected, del.getAdditionalArgs());
-
-    del = new SetDelete<>(value, false, true, testTranscoder);
-    assertArrayEquals(expected, del.getAdditionalArgs());
-
-    del = new SetDelete<>(value, true, testTranscoder);
+    SetDelete<Object> del = new SetDelete<>(value, false, false, testTranscoder);
     assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, true, false, testTranscoder);
+    assertArrayEquals(expected, del.getAdditionalArgs());
+
+    del = new SetDelete<>(value, false, true, testTranscoder);
     assertArrayEquals(expected, del.getAdditionalArgs());
 
     del = new SetDelete<>(value, true, true, testTranscoder);

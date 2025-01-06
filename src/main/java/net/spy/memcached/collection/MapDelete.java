@@ -26,14 +26,10 @@ public class MapDelete extends CollectionDelete {
   private String spaceSeparatedKeys;
   protected byte[] additionalArgs;
 
-  public MapDelete(List<String> mkeyList, boolean noreply) {
+  public MapDelete(List<String> mkeyList, boolean dropIfEmpty, boolean noreply) {
     this.mkeyList = mkeyList;
-    this.noreply = noreply;
-  }
-
-  public MapDelete(List<String> mkeyList, boolean noreply, boolean dropIfEmpty) {
-    this(mkeyList, noreply);
     this.dropIfEmpty = dropIfEmpty;
+    this.noreply = noreply;
   }
 
   public void setKeySeparator(String keySeparator) {

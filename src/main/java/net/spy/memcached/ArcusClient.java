@@ -1522,7 +1522,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementFlagFilter eFlagFilter,
                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
-    BTreeDelete delete = new BTreeDelete(bkey, false, dropIfEmpty, eFlagFilter);
+    BTreeDelete delete = new BTreeDelete(bkey, eFlagFilter, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -1532,7 +1532,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementFlagFilter eFlagFilter, int count,
                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
-    BTreeDelete delete = new BTreeDelete(from, to, count, false, dropIfEmpty, eFlagFilter);
+    BTreeDelete delete = new BTreeDelete(from, to, count, eFlagFilter, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -1540,7 +1540,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncMopDelete(String key,
                                                   boolean dropIfEmpty) {
     List<String> mkeyList = new ArrayList<>();
-    MapDelete delete = new MapDelete(mkeyList, false, dropIfEmpty);
+    MapDelete delete = new MapDelete(mkeyList, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -1553,7 +1553,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     validateMKey(mkey);
     List<String> mkeyList = new ArrayList<>(1);
     mkeyList.add(mkey);
-    MapDelete delete = new MapDelete(mkeyList, false, dropIfEmpty);
+    MapDelete delete = new MapDelete(mkeyList, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -1574,21 +1574,21 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int index,
                                                   boolean dropIfEmpty) {
-    ListDelete delete = new ListDelete(index, false, dropIfEmpty);
+    ListDelete delete = new ListDelete(index, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncLopDelete(String key, int from,
                                                   int to, boolean dropIfEmpty) {
-    ListDelete delete = new ListDelete(from, to, false, dropIfEmpty);
+    ListDelete delete = new ListDelete(from, to, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
   @Override
   public CollectionFuture<Boolean> asyncSopDelete(String key, Object value,
                                                   boolean dropIfEmpty) {
-    SetDelete<Object> delete = new SetDelete<>(value, false, dropIfEmpty,
+    SetDelete<Object> delete = new SetDelete<>(value, dropIfEmpty, false,
             collectionTranscoder);
     return asyncCollectionDelete(key, delete);
   }
@@ -1596,7 +1596,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   @Override
   public <T> CollectionFuture<Boolean> asyncSopDelete(String key, T value,
                                                       boolean dropIfEmpty, Transcoder<T> tc) {
-    SetDelete<T> delete = new SetDelete<>(value, false, dropIfEmpty, tc);
+    SetDelete<T> delete = new SetDelete<>(value, dropIfEmpty, false, tc);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -2873,7 +2873,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementFlagFilter eFlagFilter, int count,
                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
-    BTreeDelete delete = new BTreeDelete(from, to, count, false, dropIfEmpty, eFlagFilter);
+    BTreeDelete delete = new BTreeDelete(from, to, count, eFlagFilter, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 
@@ -2882,7 +2882,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   byte[] bkey, ElementFlagFilter eFlagFilter,
                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
-    BTreeDelete delete = new BTreeDelete(bkey, false, dropIfEmpty, eFlagFilter);
+    BTreeDelete delete = new BTreeDelete(bkey, eFlagFilter, dropIfEmpty, false);
     return asyncCollectionDelete(key, delete);
   }
 

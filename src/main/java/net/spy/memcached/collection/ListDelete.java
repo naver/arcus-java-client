@@ -20,24 +20,16 @@ public class ListDelete extends CollectionDelete {
 
   private static final String command = "lop delete";
 
-  public ListDelete(int index, boolean noreply) {
+  public ListDelete(int index, boolean dropIfEmpty, boolean noreply) {
     this.range = String.valueOf(index);
+    this.dropIfEmpty = dropIfEmpty;
     this.noreply = noreply;
   }
 
-  public ListDelete(int index, boolean noreply, boolean dropIfEmpty) {
-    this(index, noreply);
+  public ListDelete(int from, int to, boolean dropIfEmpty, boolean noreply) {
+    this.range = from + ".." + to;
     this.dropIfEmpty = dropIfEmpty;
-  }
-
-  public ListDelete(int from, int to, boolean noreply) {
-    this.range = String.valueOf(from) + ".." + String.valueOf(to);
     this.noreply = noreply;
-  }
-
-  public ListDelete(int from, int to, boolean noreply, boolean dropIfEmpty) {
-    this(from, to, noreply);
-    this.dropIfEmpty = dropIfEmpty;
   }
 
   @Override

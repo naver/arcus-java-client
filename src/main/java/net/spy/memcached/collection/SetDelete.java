@@ -26,16 +26,12 @@ public class SetDelete<T> extends CollectionDelete {
   protected byte[] additionalArgs;
   protected Transcoder<T> tc;
 
-  public SetDelete(T value, boolean noreply, Transcoder<T> tc) {
+  public SetDelete(T value, boolean dropIfEmpty, boolean noreply, Transcoder<T> tc) {
     this.value = value;
+    this.dropIfEmpty = dropIfEmpty;
     this.noreply = noreply;
     this.tc = tc;
     this.additionalArgs = tc.encode(value).getData();
-  }
-
-  public SetDelete(T value, boolean noreply, boolean dropIfEmpty, Transcoder<T> tc) {
-    this(value, noreply, tc);
-    this.dropIfEmpty = dropIfEmpty;
   }
 
   public T getValue() {
