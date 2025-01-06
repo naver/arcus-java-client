@@ -446,7 +446,7 @@ class MultibyteKeyTest {
   void CollectionDeleteOperationImplTest() {
     try {
       opFact.collectionDelete(MULTIBYTE_KEY,
-          new BTreeDelete(1L, false),
+          new BTreeDelete(1L, ElementFlagFilter.DO_NOT_FILTER, true, false),
           new OperationCallback() {
             @Override
             public void receivedStatus(OperationStatus status) {

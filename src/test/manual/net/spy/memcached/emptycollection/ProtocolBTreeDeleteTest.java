@@ -27,34 +27,32 @@ class ProtocolBTreeDeleteTest {
 
   @Test
   void testStringify() {
-    // default setting : dropIfEmpty = true
-
     assertEquals("10 drop",
-            (new BTreeDelete(10, false)).stringify());
+            (new BTreeDelete(10, ElementFlagFilter.DO_NOT_FILTER, true, false)).stringify());
 
-    assertEquals("10", (new BTreeDelete(10, false, false,
-            ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10 drop", (new BTreeDelete(10, false,
-            true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+    assertEquals("10", (new BTreeDelete(10, ElementFlagFilter.DO_NOT_FILTER, false,
+            false)).stringify());
+    assertEquals("10 drop", (new BTreeDelete(10, ElementFlagFilter.DO_NOT_FILTER,
+            true, false)).stringify());
 
     assertEquals("10..20 1", (new BTreeDelete(10, 20, 1,
-            false, false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+            ElementFlagFilter.DO_NOT_FILTER, false, false)).stringify());
     assertEquals("10..20 1 drop", (new BTreeDelete(10, 20,
-            1, false, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+            1, ElementFlagFilter.DO_NOT_FILTER, true, false)).stringify());
 
-    assertEquals("10 drop noreply", (new BTreeDelete(10,
-            true)).stringify());
+    assertEquals("10 drop noreply", (new BTreeDelete(10, ElementFlagFilter.DO_NOT_FILTER,
+            true, true)).stringify());
 
-    assertEquals("10 noreply", (new BTreeDelete(10, true,
-            false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+    assertEquals("10 noreply", (new BTreeDelete(10, ElementFlagFilter.DO_NOT_FILTER,
+            false, true)).stringify());
     assertEquals("10 drop noreply", (new BTreeDelete(10,
-            true, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+            ElementFlagFilter.DO_NOT_FILTER, true, true)).stringify());
 
     assertEquals("10..20 1 noreply", (new BTreeDelete(10,
-            20, 1, true, false, ElementFlagFilter.DO_NOT_FILTER))
+            20, 1, ElementFlagFilter.DO_NOT_FILTER, false, true))
             .stringify());
     assertEquals("10..20 1 drop noreply", (new BTreeDelete(
-            10, 20, 1, true, true, ElementFlagFilter.DO_NOT_FILTER))
+            10, 20, 1, ElementFlagFilter.DO_NOT_FILTER, true, true))
             .stringify());
   }
 }

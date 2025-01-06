@@ -25,83 +25,38 @@ public class BTreeDelete extends CollectionDelete {
 
   protected ElementFlagFilter elementFlagFilter;
 
-  public BTreeDelete(long bkey, boolean noreply) {
+  public BTreeDelete(long bkey, ElementFlagFilter elementFlagFilter,
+                     boolean dropIfEmpty, boolean noreply) {
     this.range = String.valueOf(bkey);
-    this.noreply = noreply;
-  }
-
-  public BTreeDelete(long bkey, boolean noreply, boolean dropIfEmpty,
-                     ElementFlagFilter elementFlagFilter) {
-    this(bkey, noreply);
-    this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
-  }
-
-  public BTreeDelete(long from, long to, boolean noreply) {
-    this.range = from + ".." + to;
+    this.dropIfEmpty = dropIfEmpty;
     this.noreply = noreply;
   }
 
-  public BTreeDelete(long from, long to, int count, boolean noreply) {
+  public BTreeDelete(long from, long to, int count, ElementFlagFilter elementFlagFilter,
+                     boolean dropIfEmpty, boolean noreply) {
     this.range = from + ".." + to;
     this.count = count;
-    this.noreply = noreply;
-  }
-
-  public BTreeDelete(long from, long to, int count, boolean noreply, boolean dropIfEmpty,
-                     ElementFlagFilter elementFlagFilter) {
-    this(from, to, count, noreply);
     this.dropIfEmpty = dropIfEmpty;
     this.noreply = noreply;
     this.elementFlagFilter = elementFlagFilter;
   }
 
-  public BTreeDelete(byte[] bkey, boolean noreply, boolean dropIfEmpty,
-                     ElementFlagFilter elementFlagFilter) {
+  public BTreeDelete(byte[] bkey, ElementFlagFilter elementFlagFilter,
+                     boolean dropIfEmpty, boolean noreply) {
     this.range = BTreeUtil.toHex(bkey);
     this.noreply = noreply;
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
   }
 
-  public BTreeDelete(byte[] from, byte[] to, int count, boolean noreply, boolean dropIfEmpty,
-                     ElementFlagFilter elementFlagFilter) {
+  public BTreeDelete(byte[] from, byte[] to, int count, ElementFlagFilter elementFlagFilter,
+                     boolean dropIfEmpty, boolean noreply) {
     this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
     this.count = count;
     this.noreply = noreply;
     this.dropIfEmpty = dropIfEmpty;
     this.elementFlagFilter = elementFlagFilter;
-  }
-
-  public BTreeDelete(long bkey, boolean noreply, boolean dropIfEmpty,
-                     ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this(bkey, noreply);
-    this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = elementMultiFlagsFilter;
-  }
-
-  public BTreeDelete(long from, long to, int count, boolean noreply, boolean dropIfEmpty,
-                     ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this(from, to, count, noreply);
-    this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = elementMultiFlagsFilter;
-  }
-
-  public BTreeDelete(byte[] bkey, boolean noreply, boolean dropIfEmpty,
-                     ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = BTreeUtil.toHex(bkey);
-    this.noreply = noreply;
-    this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = elementMultiFlagsFilter;
-  }
-
-  public BTreeDelete(byte[] from, byte[] to, int count, boolean noreply, boolean dropIfEmpty,
-                     ElementMultiFlagsFilter elementMultiFlagsFilter) {
-    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-    this.count = count;
-    this.noreply = noreply;
-    this.dropIfEmpty = dropIfEmpty;
-    this.elementFlagFilter = elementMultiFlagsFilter;
   }
 
   @Override

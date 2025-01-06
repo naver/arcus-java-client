@@ -35,39 +35,30 @@ class ProtocolMapDeleteTest {
     List<String> mkeyList2 = new ArrayList<>();
     mkeyList2.add("mkey1");
     mkeyList2.add("mkey2");
-    // default setting : dropIfEmpty = true
 
     MapDelete mapDelete;
-    mapDelete = new MapDelete(mkeyList, false);
-    mapDelete.setKeySeparator(" ");
-    assertEquals("4 1 drop", mapDelete.stringify());
-
     mapDelete = new MapDelete(mkeyList, false, false);
     mapDelete.setKeySeparator(" ");
     assertEquals("4 1", mapDelete.stringify());
-    mapDelete = new MapDelete(mkeyList, false, true);
+    mapDelete = new MapDelete(mkeyList, true, false);
     mapDelete.setKeySeparator(" ");
     assertEquals("4 1 drop", mapDelete.stringify());
 
     mapDelete = new MapDelete(mkeyList2, false, false);
     mapDelete.setKeySeparator(" ");
     assertEquals("11 2", mapDelete.stringify());
-    mapDelete = new MapDelete(mkeyList2, false, true);
+    mapDelete = new MapDelete(mkeyList2, true, false);
     mapDelete.setKeySeparator(" ");
     assertEquals("11 2 drop", mapDelete.stringify());
 
-    mapDelete = new MapDelete(mkeyList, true);
-    mapDelete.setKeySeparator(" ");
-    assertEquals("4 1 drop noreply", mapDelete.stringify());
-
-    mapDelete = new MapDelete(mkeyList, true, false);
+    mapDelete = new MapDelete(mkeyList, false, true);
     mapDelete.setKeySeparator(" ");
     assertEquals("4 1 noreply", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList, true, true);
     mapDelete.setKeySeparator(" ");
     assertEquals("4 1 drop noreply", mapDelete.stringify());
 
-    mapDelete = new MapDelete(mkeyList2, true, false);
+    mapDelete = new MapDelete(mkeyList2, false, true);
     mapDelete.setKeySeparator(" ");
     assertEquals("11 2 noreply", mapDelete.stringify());
     mapDelete = new MapDelete(mkeyList2, true, true);
