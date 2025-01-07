@@ -29,23 +29,25 @@ class ProtocolBTreeGetTest {
 
   @Test
   void testStringify() {
-    assertEquals("10 drop", (new BTreeGet(bkey, true, true,
-            ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10 delete", (new BTreeGet(bkey, true,
-            false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10", (new BTreeGet(bkey, false, true,
-            ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10", (new BTreeGet(bkey, false, false,
-            ElementFlagFilter.DO_NOT_FILTER)).stringify());
+    assertEquals("10 drop", (new BTreeGet(bkey, ElementFlagFilter.DO_NOT_FILTER,
+            true, true)).stringify());
+    assertEquals("10 delete", (new BTreeGet(bkey, ElementFlagFilter.DO_NOT_FILTER,
+            true, false)).stringify());
+    assertEquals("10", (new BTreeGet(bkey, ElementFlagFilter.DO_NOT_FILTER,
+            false, true)).stringify());
+    assertEquals("10", (new BTreeGet(bkey, ElementFlagFilter.DO_NOT_FILTER,
+            false, false)).stringify());
 
     assertEquals("10..20 1 1 delete", (new BTreeGet(10, 20,
-            1, 1, true, false, ElementFlagFilter.DO_NOT_FILTER))
+            ElementFlagFilter.DO_NOT_FILTER,
+            1, 1, true, false))
             .stringify());
-    assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20, 1,
-            1, true, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
-            false, true, ElementFlagFilter.DO_NOT_FILTER)).stringify());
-    assertEquals("10..20 1 1", (new BTreeGet(10, 20, 1, 1,
-            false, false, ElementFlagFilter.DO_NOT_FILTER)).stringify());
+    assertEquals("10..20 1 1 drop", (new BTreeGet(10, 20,
+            ElementFlagFilter.DO_NOT_FILTER, 1,
+            1, true, true)).stringify());
+    assertEquals("10..20 1 1", (new BTreeGet(10, 20, ElementFlagFilter.DO_NOT_FILTER,
+            1, 1, false, true)).stringify());
+    assertEquals("10..20 1 1", (new BTreeGet(10, 20, ElementFlagFilter.DO_NOT_FILTER,
+            1, 1, false, false)).stringify());
   }
 }

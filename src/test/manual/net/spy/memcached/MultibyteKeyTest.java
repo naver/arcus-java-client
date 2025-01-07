@@ -423,7 +423,7 @@ class MultibyteKeyTest {
     byte[] to = new byte[]{10, 10};
     try {
       opFact.collectionGet(MULTIBYTE_KEY,
-          new BTreeGet(from, to, 0, 0, false, false, ElementFlagFilter.DO_NOT_FILTER),
+          new BTreeGet(from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 0, false, false),
           new CollectionGetOperation.Callback() {
             @Override
             public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
