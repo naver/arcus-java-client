@@ -1267,7 +1267,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                   boolean withDelete,
                                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, eFlagFilter, withDelete, dropIfEmpty);
     return asyncBopGet(key, get, collectionTranscoder);
   }
 
@@ -1287,7 +1287,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                   boolean withDelete,
                                                                   boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
-    BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(from, to, eFlagFilter, offset, count, withDelete, dropIfEmpty);
     return asyncBopGet(key, get, collectionTranscoder);
   }
 
@@ -1307,7 +1307,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                  boolean dropIfEmpty,
                                                                  Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, eFlagFilter, withDelete, dropIfEmpty);
     return asyncBopGet(key, get, tc);
   }
 
@@ -1329,7 +1329,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                                  boolean dropIfEmpty,
                                                                  Transcoder<T> tc) {
     BTreeUtil.validateBkey(from, to);
-    BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(from, to, eFlagFilter, offset, count, withDelete, dropIfEmpty);
     return asyncBopGet(key, get, tc);
   }
 
@@ -2387,7 +2387,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, eFlagFilter, withDelete, dropIfEmpty);
     return asyncBopExtendedGet(key, get, collectionTranscoder);
   }
 
@@ -2402,7 +2402,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, ElementFlagFilter eFlagFilter,
           boolean withDelete, boolean dropIfEmpty, Transcoder<T> tc) {
     BTreeUtil.validateBkey(bkey);
-    BTreeGet get = new BTreeGet(bkey, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(bkey, eFlagFilter, withDelete, dropIfEmpty);
     return asyncBopExtendedGet(key, get, tc);
   }
 
@@ -2418,7 +2418,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int offset, int count, boolean withDelete, boolean dropIfEmpty) {
     BTreeUtil.validateBkey(from, to);
-    BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(from, to, eFlagFilter, offset, count, withDelete, dropIfEmpty);
     return asyncBopExtendedGet(key, get, collectionTranscoder);
   }
 
@@ -2436,7 +2436,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           int count, boolean withDelete, boolean dropIfEmpty,
           Transcoder<T> tc) {
     BTreeUtil.validateBkey(from, to);
-    BTreeGet get = new BTreeGet(from, to, offset, count, withDelete, dropIfEmpty, eFlagFilter);
+    BTreeGet get = new BTreeGet(from, to, eFlagFilter, offset, count, withDelete, dropIfEmpty);
     return asyncBopExtendedGet(key, get, tc);
   }
 
