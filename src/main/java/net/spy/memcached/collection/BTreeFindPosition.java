@@ -64,8 +64,4 @@ public class BTreeFindPosition {
     return COMMAND;
   }
 
-  public BTreeOrder getOrder() {
-    return order;
-  }
-
 }

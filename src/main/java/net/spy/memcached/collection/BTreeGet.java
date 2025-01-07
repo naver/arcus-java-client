@@ -75,22 +75,6 @@ public class BTreeGet extends CollectionGet {
     return reverse;
   }
 
-  public String getRange() {
-    return range;
-  }
-
-  public void setRange(String range) {
-    this.range = range;
-  }
-
-  public int getCount() {
-    return count;
-  }
-
-  public void setCount(int count) {
-    this.count = count;
-  }
-
   public String stringify() {
     if (str != null) {
       return str;

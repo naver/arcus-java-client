@@ -33,8 +33,6 @@ import net.spy.memcached.util.BTreeUtil;
  */
 public class BTreeGetByPosition extends CollectionGet {
 
-  public static final int HEADER_EFLAG_POSITION = 1; // 0-based
-
   private static final String COMMAND = "bop gbp";
 
   private final BTreeOrder order;

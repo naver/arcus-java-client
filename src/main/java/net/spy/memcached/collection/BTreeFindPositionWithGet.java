@@ -88,10 +88,6 @@ public class BTreeFindPositionWithGet extends CollectionGet {
     return COMMAND;
   }
 
-  public BKeyObject getBkeyObject() {
-    return bkeyObject;
-  }
-
   public BTreeOrder getOrder() {
     return order;
   }

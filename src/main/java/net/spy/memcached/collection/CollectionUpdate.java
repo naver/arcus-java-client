@@ -57,10 +57,6 @@ public abstract class CollectionUpdate<T> {
     return str;
   }
 
-  public int getFlags() {
-    return flags;
-  }
-
   public void setFlags(int flags) {
     this.flags = flags;
   }
@@ -69,24 +65,8 @@ public abstract class CollectionUpdate<T> {
     return newValue;
   }
 
-  public void setNewValue(T newValue) {
-    this.newValue = newValue;
-  }
-
   public ElementFlagUpdate getElementFlagUpdate() {
     return eflagUpdate;
-  }
-
-  public void setElementFlagUpdate(ElementFlagUpdate eflagUpdate) {
-    this.eflagUpdate = eflagUpdate;
-  }
-
-  public boolean isNoreply() {
-    return noreply;
-  }
-
-  public void setNoreply(boolean noreply) {
-    this.noreply = noreply;
   }
 
   public String toString() {

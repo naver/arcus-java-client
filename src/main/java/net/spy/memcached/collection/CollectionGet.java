@@ -36,10 +36,6 @@ public abstract class CollectionGet {
     return delete;
   }
 
-  public void setDelete(boolean delete) {
-    this.delete = delete;
-  }
-
   public boolean isDropIfEmpty() {
     return dropIfEmpty;
   }
