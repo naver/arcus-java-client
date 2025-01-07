@@ -32,14 +32,6 @@ public class SetGet extends CollectionGet {
     this.eFlagIndex = -1;
   }
 
-  public int getCount() {
-    return count;
-  }
-
-  public void setCount(int count) {
-    this.count = count;
-  }
-
   @Override
   public byte[] getAdditionalArgs() {
     return null;

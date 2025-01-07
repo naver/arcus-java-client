@@ -24,23 +24,6 @@ public abstract class CollectionDelete {
 
   protected String str;
 
-  public String getRange() {
-    return range;
-  }
-
-  public void setRange(String range) {
-    this.range = range;
-  }
-
-  public boolean isNoreply() {
-    return noreply;
-  }
-
-  public void setNoreply(boolean noreply) {
-    this.noreply = noreply;
-  }
-
-
   public abstract byte[] getAdditionalArgs();
 
   public abstract String stringify();

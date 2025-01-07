@@ -79,36 +79,12 @@ public abstract class CollectionInsert<T> {
     return BTreeUtil.toHex(elementFlag);
   }
 
-  public int getFlags() {
-    return flags;
-  }
-
   public void setFlags(int flags) {
     this.flags = flags;
   }
 
   public T getValue() {
     return value;
-  }
-
-  public void setValue(T value) {
-    this.value = value;
-  }
-
-  public RequestMode getRequestMode() {
-    return requestMode;
-  }
-
-  public void setRequestMode(RequestMode requestMode) {
-    this.requestMode = requestMode;
-  }
-
-  public void setElementFlag(byte[] elementFlag) {
-    this.elementFlag = elementFlag;
-  }
-
-  public void setCollectionAttributes(CollectionAttributes attributes) {
-    this.attribute = attributes;
   }
 
   public String toString() {

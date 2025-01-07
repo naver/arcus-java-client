@@ -34,14 +34,6 @@ public class SetDelete<T> extends CollectionDelete {
     this.additionalArgs = tc.encode(value).getData();
   }
 
-  public T getValue() {
-    return value;
-  }
-
-  public void setValue(T value) {
-    this.value = value;
-  }
-
   public byte[] getAdditionalArgs() {
     return additionalArgs;
   }
