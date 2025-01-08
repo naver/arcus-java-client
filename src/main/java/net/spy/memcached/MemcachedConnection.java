@@ -485,12 +485,31 @@ public final class MemcachedConnection extends SpyObject {
             // move operation slave -> master.
             taskList.add(new MoveOperationTask(
                 oldSlaveNode, oldMasterNode, false));
+            // clear the masterCandidate if the removed slave is the masterCandidate.
+            if (oldGroup.getMasterCandidate() == oldSlaveNode) {
+              oldGroup.clearMasterCandidate();
+            }
           }
         }
       } else if (oldSlaveAddrs.contains(newMasterAddr)) {
         if (newSlaveAddrs.contains(oldMasterAddr)) {
           // Switchover
-          if (oldGroup.getMasterCandidate() != null) {
+          MemcachedNode oldMasterCandidate = oldGroup.getMasterCandidate();
+          if (oldMasterCandidate != null) {
+            if (!newMasterAddr.isSameAddress(
+                    ((ArcusReplNodeAddress) oldMasterCandidate.getSocketAddress()))) {
+              /**
+               * Moves ops from oldMasterCandidate set by cache server to newMasterCandidate.
+               * Handling the below case.
+               * old group : [oldMaster, oldSlave1, oldSlave2]
+               * old group after switchover response :
+               * [oldMaster, oldSlave1-masterCandidate, oldSlave2]
+               * new group from zk cache list: [slave1, X, newMaster]
+               */
+              oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
+              taskList.add(new MoveOperationTask(
+                      oldMasterCandidate, oldGroup.getMasterCandidate(), false));
+            }
             changeRoleGroups.add(oldGroup);
           } else {
             // ZK event occurs before cache server response.
@@ -552,6 +571,10 @@ public final class MemcachedConnection extends SpyObject {
           // move operation slave -> master.
           taskList.add(new MoveOperationTask(
               oldSlaveNode, newMasterNode, false));
+          // clear the masterCandidate if the removed slave is the masterCandidate.
+          if (oldGroup.getMasterCandidate() == oldSlaveNode) {
+            oldGroup.clearMasterCandidate();
+          }
         }
       }
     }
