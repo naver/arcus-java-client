@@ -22,11 +22,6 @@ class GetOperationImpl extends BaseGetOpImpl implements GetOperation {
     setAPIType(APIType.GET);
   }
 
-  public GetOperationImpl(Collection<String> k, GetOperation.Callback c) {
-    super(CMD, c, new HashSet<>(k));
-    setAPIType(APIType.GET);
-  }
-
   public GetOperationImpl(Collection<String> keys, GetOperation.Callback cb, boolean isMGet) {
     super(isMGet ? CMD_MGET : CMD, cb, new HashSet<>(keys));
     setAPIType(APIType.GET);
