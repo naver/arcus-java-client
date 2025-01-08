@@ -49,7 +49,7 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
       nxtOp = writeQ.peek();
       if (nxtOp instanceof GetOperation) {
         OptimizedGetImpl og = new OptimizedGetImpl(
-                (GetOperation) optimizedOp);
+                (GetOperation) optimizedOp, enabledMGetOp());
         optimizedOp = og;
 
         do {
