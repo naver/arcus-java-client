@@ -4,6 +4,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.security.sasl.Sasl;
+import javax.security.sasl.SaslClient;
+
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.MemcachedNode;
@@ -19,6 +22,7 @@ public class AuthThread extends SpyThread {
   private final AuthDescriptor authDescriptor;
   private final OperationFactory opFact;
   private final MemcachedNode node;
+  private final SaslClient sc;
 
   public AuthThread(MemcachedConnection c, OperationFactory o,
                     AuthDescriptor a, MemcachedNode n) {
@@ -26,6 +30,12 @@ public class AuthThread extends SpyThread {
     opFact = o;
     authDescriptor = a;
     node = n;
+    try {
+      sc = Sasl.createSaslClient(authDescriptor.getMechs(), null,
+              "memcached", node.getSocketAddress().toString(), null, authDescriptor.getCallback());
+    } catch (Exception e) {
+      throw new RuntimeException("Can't create SaslClient", e);
+    }
   }
 
   @Override
@@ -89,15 +99,9 @@ public class AuthThread extends SpyThread {
 
   private Operation buildOperation(OperationStatus st, OperationCallback cb) {
     if (st == null) {
-      return opFact.saslAuth(authDescriptor.getMechs(),
-              node.getSocketAddress().toString(), null,
-              authDescriptor.getCallback(), cb);
+      return opFact.saslAuth(sc, cb);
     } else {
-      return opFact.saslStep(authDescriptor.getMechs(),
-              KeyUtil.getKeyBytes(st.getMessage()),
-              node.getSocketAddress().toString(), null,
-              authDescriptor.getCallback(), cb);
+      return opFact.saslStep(sc, KeyUtil.getKeyBytes(st.getMessage()), cb);
     }
-
   }
 }

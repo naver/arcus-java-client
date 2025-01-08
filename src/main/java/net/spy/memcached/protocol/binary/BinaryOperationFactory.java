@@ -17,9 +17,8 @@
 package net.spy.memcached.protocol.binary;
 
 import java.util.Collection;
-import java.util.Map;
 
-import javax.security.auth.callback.CallbackHandler;
+import javax.security.sasl.SaslClient;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
@@ -147,21 +146,16 @@ public class BinaryOperationFactory extends BaseOperationFactory {
     return new ConcatenationOperationImpl(catType, key, data, casId, cb);
   }
 
-  public SASLAuthOperation saslAuth(String[] mech, String serverName,
-                                    Map<String, ?> props, CallbackHandler cbh,
-                                    OperationCallback cb) {
-    return new SASLAuthOperationImpl(mech, serverName, props, cbh, cb);
+  public SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb) {
+    return new SASLAuthOperationImpl(sc, cb);
   }
 
   public SASLMechsOperation saslMechs(OperationCallback cb) {
     return new SASLMechsOperationImpl(cb);
   }
 
-  public SASLStepOperation saslStep(String[] mech, byte[] challenge,
-                                    String serverName, Map<String, ?> props, CallbackHandler cbh,
-                                    OperationCallback cb) {
-    return new SASLStepOperationImpl(mech, challenge, serverName,
-            props, cbh, cb);
+  public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
+    return new SASLStepOperationImpl(sc, challenge, cb);
   }
 
   //// UNSUPPORTED ////
