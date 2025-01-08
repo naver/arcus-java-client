@@ -1,10 +1,6 @@
 package net.spy.memcached.protocol.binary;
 
 import java.io.IOException;
-import java.util.Map;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
 
@@ -17,29 +13,19 @@ public abstract class SASLBaseOperationImpl extends OperationImpl {
 
   private static final int SASL_CONTINUE = 0x21;
 
-  protected final String[] mech;
+  protected final SaslClient sc;
   protected final byte[] challenge;
-  protected final String serverName;
-  protected final Map<String, ?> props;
-  protected final CallbackHandler cbh;
 
-  public SASLBaseOperationImpl(int c, String[] m, byte[] ch,
-                               String s, Map<String, ?> p, CallbackHandler h,
+  public SASLBaseOperationImpl(int c, SaslClient sc, byte[] challenge,
                                OperationCallback cb) {
     super(c, generateOpaque(), cb);
-    mech = m;
-    challenge = ch;
-    serverName = s;
-    props = p;
-    cbh = h;
+    this.sc = sc;
+    this.challenge = challenge;
   }
 
   @Override
   public void initialize() {
     try {
-      SaslClient sc = Sasl.createSaslClient(mech, null,
-              "memcached", serverName, props, cbh);
-
       byte[] response = buildResponse(sc);
       String mechanism = sc.getMechanismName();
 

@@ -18,9 +18,8 @@ package net.spy.memcached;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import javax.security.auth.callback.CallbackHandler;
+import javax.security.sasl.SaslClient;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
@@ -230,15 +229,12 @@ public interface OperationFactory {
   /**
    * Create a new sasl auth operation.
    */
-  SASLAuthOperation saslAuth(String[] mech, String serverName,
-                             Map<String, ?> props, CallbackHandler cbh, OperationCallback cb);
+  SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb);
 
   /**
    * Create a new sasl step operation.
    */
-  SASLStepOperation saslStep(String[] mech, byte[] challenge,
-                             String serverName, Map<String, ?> props, CallbackHandler cbh,
-                             OperationCallback cb);
+  SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb);
 
   /**
    * Set item attributes

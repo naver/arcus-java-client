@@ -17,9 +17,8 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.util.Collection;
-import java.util.Map;
 
-import javax.security.auth.callback.CallbackHandler;
+import javax.security.sasl.SaslClient;
 
 import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
@@ -147,15 +146,11 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     throw new UnsupportedOperationException();
   }
 
-  public SASLStepOperation saslStep(String[] mech, byte[] challenge,
-                                    String serverName, Map<String, ?> props, CallbackHandler cbh,
-                                    OperationCallback cb) {
+  public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
     throw new UnsupportedOperationException();
   }
 
-  public SASLAuthOperation saslAuth(String[] mech, String serverName,
-                                    Map<String, ?> props, CallbackHandler cbh,
-                                    OperationCallback cb) {
+  public SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb) {
     throw new UnsupportedOperationException();
   }
 

@@ -17,9 +17,6 @@
  */
 package net.spy.memcached.protocol.binary;
 
-import java.util.Map;
-
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
 
@@ -31,9 +28,8 @@ public class SASLStepOperationImpl extends SASLBaseOperationImpl
 
   private final static int CMD = 0x22;
 
-  public SASLStepOperationImpl(String[] m, byte[] ch, String s,
-                               Map<String, ?> p, CallbackHandler h, OperationCallback c) {
-    super(CMD, m, ch, s, p, h, c);
+  public SASLStepOperationImpl(SaslClient sc, byte[] challenge, OperationCallback cb) {
+    super(CMD, sc, challenge, cb);
   }
 
   @Override
