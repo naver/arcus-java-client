@@ -86,6 +86,10 @@ public abstract class MemcachedReplicaGroup extends SpyObject {
     }
   }
 
+  public void clearMasterCandidate() {
+    this.masterCandidate = null;
+  }
+
   public void setMasterCandidateByAddr(String address) {
     for (MemcachedNode node : this.getSlaveNodes()) {
       if (address.equals(((ArcusReplNodeAddress) node.getSocketAddress()).getIPPort())) {
