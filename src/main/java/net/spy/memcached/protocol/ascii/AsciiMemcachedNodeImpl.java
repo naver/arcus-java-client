@@ -30,6 +30,9 @@ import net.spy.memcached.protocol.TCPMemcachedNodeImpl;
  * Memcached node for the ASCII protocol.
  */
 public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
+
+  private static final int MAX_OPTIMIZE_KEY_SIZE = 100;
+
   public AsciiMemcachedNodeImpl(String name,
                                 SocketAddress sa,
                                 int bufSize, BlockingQueue<Operation> rq,
@@ -43,31 +46,38 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
   protected void optimize() {
     // make sure there are at least two get operations in a row before
     // attempting to optimize them.
-    Operation nxtOp = writeQ.peek();
-    if (nxtOp instanceof GetOperation) {
+    if (writeQ.peek() instanceof GetOperation) {
       optimizedOp = writeQ.remove();
-      nxtOp = writeQ.peek();
-      if (nxtOp instanceof GetOperation) {
-        OptimizedGetImpl og = new OptimizedGetImpl(
-                (GetOperation) optimizedOp, enabledMGetOp());
-        optimizedOp = og;
 
-        do {
-          GetOperationImpl o = (GetOperationImpl) writeQ.remove();
-          if (!o.isCancelled()) {
-            og.addOperation(o);
+      OptimizedGetImpl og = null;
+      int keySize = ((GetOperation) optimizedOp).getKeys().size();
+      Operation nxtOp = writeQ.peek();
+
+      while (nxtOp instanceof GetOperation) {
+        keySize += ((GetOperation) nxtOp).getKeys().size();
+        if (keySize > MAX_OPTIMIZE_KEY_SIZE) {
+          break;
+        }
+        GetOperationImpl currentOp = (GetOperationImpl) writeQ.remove();
+        if (!currentOp.isCancelled()) {
+          if (og == null) {
+            og = new OptimizedGetImpl((GetOperation) optimizedOp, enabledMGetOp());
+            optimizedOp = og;
           }
-          nxtOp = writeQ.peek();
-        } while (nxtOp instanceof GetOperation);
+          og.addOperation(currentOp);
+        }
+        nxtOp = writeQ.peek();
+      }
 
-        // Initialize the new mega get
-        optimizedOp.initialize();
+      // Initialize the new mega get
+      if (og != null) {
+        og.initialize();
         assert optimizedOp.getState() == OperationState.WRITE_QUEUED;
-        ProxyCallback pcb = (ProxyCallback) og.getCallback();
+        ProxyCallback pcb = (ProxyCallback) optimizedOp.getCallback();
         getLogger().debug("Set up %s with %s keys and %s callbacks",
                 this, pcb.numKeys(), pcb.numCallbacks());
       }
     }
-  }
 
+  }
 }
