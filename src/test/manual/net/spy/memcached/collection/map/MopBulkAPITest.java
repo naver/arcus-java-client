@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
-import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -42,7 +42,7 @@ class MopBulkAPITest extends BaseIntegrationTest {
   private final Map<String, Object> updateMap = new HashMap<>();
 
   private int getValueCount() {
-    return CollectionPipedInsert.MAX_PIPED_ITEM_COUNT;
+    return ArcusClient.MAX_PIPED_ITEM_COUNT;
   }
 
   @BeforeEach

@@ -29,8 +29,6 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
 
-  public static final int MAX_PIPED_ITEM_COUNT = 500;
-
   protected final String key;
   protected final Transcoder<T> tc;
 
