@@ -28,8 +28,6 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetPipedExist<T> extends CollectionPipe {
 
-  public static final int MAX_PIPED_ITEM_COUNT = 500;
-
   private static final String COMMAND = "sop exist";
 
   private final String key;
