@@ -17,192 +17,43 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
-import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.APIType;
-import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
-import net.spy.memcached.ops.PipedOperationCallback;
 
 /**
  * Operation to update collection data in a memcached server.
  */
-public final class CollectionPipedUpdateOperationImpl extends OperationImpl implements
+public final class CollectionPipedUpdateOperationImpl extends PipeOperationImpl implements
         CollectionPipedUpdateOperation {
 
-  private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
-  private static final OperationStatus END = new CollectionOperationStatus(
-          true, "END", CollectionResponse.END);
-  private static final OperationStatus FAILED_END = new CollectionOperationStatus(
-          false, "END", CollectionResponse.END);
-
-  private static final OperationStatus UPDATED = new CollectionOperationStatus(
-          true, "UPDATED", CollectionResponse.UPDATED);
-  private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
-          false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
-  private static final OperationStatus NOT_FOUND_ELEMENT = new CollectionOperationStatus(
-          false, "NOT_FOUND_ELEMENT", CollectionResponse.NOT_FOUND_ELEMENT);
-  private static final OperationStatus NOTHING_TO_UPDATE = new CollectionOperationStatus(
-          false, "NOTHING_TO_UPDATE", CollectionResponse.NOTHING_TO_UPDATE);
-  private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
-          false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
-  private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
-          false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-  private static final OperationStatus EFLAG_MISMATCH = new CollectionOperationStatus(
-          false, "EFLAG_MISMATCH", CollectionResponse.EFLAG_MISMATCH);
-
-  private final String key;
-  private final CollectionPipedUpdate<?> update;
-  private final PipedOperationCallback cb;
-
-  private int count;
-  private int index = 0;
-  private boolean successAll = true;
-
   public CollectionPipedUpdateOperationImpl(String key,
-                                            CollectionPipedUpdate<?> update,
-                                            OperationCallback cb) {
-    super(cb);
-    this.key = key;
-    this.update = update;
-    this.cb = (PipedOperationCallback) cb;
-    if (this.update instanceof BTreePipedUpdate) {
+                                            CollectionPipedUpdate<?> update, OperationCallback cb) {
+    super(Collections.singletonList(key), update, cb);
+    if (update instanceof BTreePipedUpdate) {
       setAPIType(APIType.BOP_UPDATE);
-    } else if (this.update instanceof MapPipedUpdate) {
+    } else if (update instanceof MapPipedUpdate) {
       setAPIType(APIType.MOP_UPDATE);
     }
     setOperationType(OperationType.WRITE);
   }
 
   @Override
-  public void handleLine(String line) {
-    assert getState() == OperationState.READING : "Read ``" + line
-            + "'' when in " + getState() + " state";
-
-    /* ENABLE_REPLICATION if */
-    if (hasSwitchedOver(line)) {
-      this.update.setNextOpIndex(index);
-      prepareSwitchover(line);
-      return;
-    }
-    /* ENABLE_REPLICATION end */
-    /* ENABLE_MIGRATION if */
-    if (hasNotMyKey(line)) {
-      // Only one NOT_MY_KEY is provided in response of single key piped operation when redirection.
-      addRedirectSingleKeyOperation(line, key);
-      if (update.isNotPiped()) {
-        transitionState(OperationState.REDIRECT);
-      } else {
-        update.setNextOpIndex(index);
-      }
-      return;
-    }
-    /* ENABLE_MIGRATION end */
-
-    if (update.isNotPiped()) {
-      OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
-              NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
-              BKEY_MISMATCH, EFLAG_MISMATCH);
-      if (!status.isSuccess()) {
-        successAll = false;
-      }
-
-      cb.gotStatus(index, status);
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
-      return;
-    }
-
-    /*
-      RESPONSE <count>\r\n
-      <status of the 1st pipelined command>\r\n
-      [ ... ]
-      <status of the last pipelined command>\r\n
-      END|PIPE_ERROR <error_string>\r\n
-    */
-    if (line.startsWith("END") || line.startsWith("PIPE_ERROR ")) {
-      /* ENABLE_MIGRATION if */
-      if (needRedirect()) {
-        transitionState(OperationState.REDIRECT);
-        return;
-      }
-      /* ENABLE_MIGRATION end */
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
-    } else if (line.startsWith("RESPONSE ")) {
-      getLogger().debug("Got line %s", line);
-
-      // TODO server should be fixed
-      line = line.replace("   ", " ");
-      line = line.replace("  ", " ");
-
-      String[] stuff = line.split(" ");
-      assert "RESPONSE".equals(stuff[0]);
-      count = Integer.parseInt(stuff[1]);
-    } else {
-      OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
-              NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
-              BKEY_MISMATCH, EFLAG_MISMATCH);
-
-      if (!status.isSuccess()) {
-        successAll = false;
-      }
-
-      cb.gotStatus(index, status);
-      index++;
-    }
+  protected OperationStatus checkStatus(String line) {
+    return matchStatus(line, UPDATED, NOT_FOUND,
+            NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
+            BKEY_MISMATCH, EFLAG_MISMATCH);
   }
 
   @Override
-  public void initialize() {
-    ByteBuffer buffer = update.getAsciiCommand();
-    setBuffer(buffer);
-
-    if (getLogger().isDebugEnabled()) {
-      getLogger().debug(
-              "Request in ascii protocol: %s",
-                      (new String(buffer.array())).replace("\r\n", "\\r\\n"));
-    }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(STORE_CANCELED);
-  }
-
-  public Collection<String> getKeys() {
-    return Collections.singleton(key);
-  }
-
   public CollectionPipedUpdate<?> getUpdate() {
-    return update;
+    return (CollectionPipedUpdate<?>) getCollectionPipe();
   }
-
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return true;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }
