@@ -32,6 +32,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.PipedOperationCallback;
 
 /**
  * Operation to update collection data in a memcached server.
@@ -64,18 +65,19 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
 
   private final String key;
   private final CollectionPipedUpdate<?> update;
-  private final CollectionPipedUpdateOperation.Callback cb;
+  private final PipedOperationCallback cb;
 
   private int count;
   private int index = 0;
   private boolean successAll = true;
 
   public CollectionPipedUpdateOperationImpl(String key,
-                                            CollectionPipedUpdate<?> update, OperationCallback cb) {
+                                            CollectionPipedUpdate<?> update,
+                                            OperationCallback cb) {
     super(cb);
     this.key = key;
     this.update = update;
-    this.cb = (Callback) cb;
+    this.cb = (PipedOperationCallback) cb;
     if (this.update instanceof BTreePipedUpdate) {
       setAPIType(APIType.BOP_UPDATE);
     } else if (this.update instanceof MapPipedUpdate) {
@@ -113,12 +115,12 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
       OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND,
               NOT_FOUND_ELEMENT, NOTHING_TO_UPDATE, TYPE_MISMATCH,
               BKEY_MISMATCH, EFLAG_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus((successAll) ? END : FAILED_END);
-      } else {
-        cb.gotStatus(index, status);
-        cb.receivedStatus(FAILED_END);
+      if (!status.isSuccess()) {
+        successAll = false;
       }
+
+      cb.gotStatus(index, status);
+      cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -155,9 +157,10 @@ public final class CollectionPipedUpdateOperationImpl extends OperationImpl impl
               BKEY_MISMATCH, EFLAG_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
         successAll = false;
       }
+
+      cb.gotStatus(index, status);
       index++;
     }
   }

@@ -30,6 +30,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.PipedOperationCallback;
 
 public final class CollectionPipedExistOperationImpl extends OperationImpl implements
         CollectionPipedExistOperation {
@@ -56,18 +57,19 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
 
   private final String key;
   private final SetPipedExist<?> setPipedExist;
-  private final CollectionPipedExistOperation.Callback cb;
+  private final PipedOperationCallback cb;
 
   private int count;
   private int index = 0;
   private boolean successAll = true;
 
   public CollectionPipedExistOperationImpl(String key,
-                                           SetPipedExist<?> collectionExist, OperationCallback cb) {
+                                           SetPipedExist<?> collectionExist,
+                                           OperationCallback cb) {
     super(cb);
     this.key = key;
     this.setPipedExist = collectionExist;
-    this.cb = (Callback) cb;
+    this.cb = (PipedOperationCallback) cb;
     if (this.setPipedExist instanceof SetPipedExist) {
       setAPIType(APIType.SOP_EXIST);
     }
@@ -95,8 +97,12 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
     if (setPipedExist.isNotPiped()) {
       OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
               NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
+      if (!status.isSuccess()) {
+        successAll = false;
+      }
+
       cb.gotStatus(index, status);
-      cb.receivedStatus(status.isSuccess() ? END : FAILED_END);
+      cb.receivedStatus(successAll ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -134,6 +140,7 @@ public final class CollectionPipedExistOperationImpl extends OperationImpl imple
       if (!status.isSuccess()) {
         successAll = false;
       }
+
       cb.gotStatus(index, status);
       index++;
     }

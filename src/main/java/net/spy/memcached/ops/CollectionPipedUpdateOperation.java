@@ -25,8 +25,4 @@ public interface CollectionPipedUpdateOperation extends KeyedOperation {
 
   CollectionPipedUpdate<?> getUpdate();
 
-  interface Callback extends OperationCallback {
-    void gotStatus(Integer index, OperationStatus status);
-  }
-
 }

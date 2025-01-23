@@ -25,8 +25,4 @@ public interface CollectionBulkInsertOperation extends KeyedOperation {
 
   CollectionBulkInsert<?> getInsert();
 
-  interface Callback extends OperationCallback {
-    void gotStatus(String key, OperationStatus status);
-  }
-
 }

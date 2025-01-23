@@ -25,8 +25,4 @@ public interface CollectionPipedInsertOperation extends KeyedOperation {
 
   CollectionPipedInsert<?> getInsert();
 
-  interface Callback extends OperationCallback {
-    void gotStatus(Integer index, OperationStatus status);
-  }
-
 }

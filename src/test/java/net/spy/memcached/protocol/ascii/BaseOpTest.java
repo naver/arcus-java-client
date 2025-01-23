@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.spy.memcached.collection.CollectionPipedInsert;
-import net.spy.memcached.ops.CollectionPipedInsertOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.PipedOperationCallback;
 
 import org.junit.jupiter.api.Test;
 
@@ -115,7 +115,7 @@ class BaseOpTest {
     CollectionPipedInsert.ListPipedInsert<String> insert =
             new CollectionPipedInsert.ListPipedInsert<>(key, 0,
                     Arrays.asList("a", "b"), null, null);
-    OperationCallback cb = new CollectionPipedInsertOperation.Callback() {
+    OperationCallback cb = new PipedOperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
       }

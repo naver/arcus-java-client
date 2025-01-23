@@ -137,17 +137,14 @@ import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
-import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.CollectionPipedExistOperation;
-import net.spy.memcached.ops.CollectionPipedInsertOperation;
-import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.PipedOperationCallback;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.FrontCacheMemcachedClient;
 import net.spy.memcached.transcoders.CollectionTranscoder;
@@ -823,7 +820,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       final int idx = i;
 
       Operation op = opFact.collectionPipedUpdate(key, update,
-          new CollectionPipedUpdateOperation.Callback() {
+          new PipedOperationCallback() {
             // each result status
             public void receivedStatus(OperationStatus status) {
               CollectionOperationStatus cstatus;
@@ -844,12 +841,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
+              if (!status.isSuccess()) {
+                if (status instanceof CollectionOperationStatus) {
+                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
+                          (CollectionOperationStatus) status);
+                } else {
+                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
+                          new CollectionOperationStatus(status));
+                }
               }
             }
           });
@@ -2947,7 +2946,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionPipedExist(key, exist,
-        new CollectionPipedExistOperation.Callback() {
+        new PipedOperationCallback() {
 
           private final Map<T, Boolean> result = new HashMap<>();
           private boolean hasAnError = false;
@@ -3078,7 +3077,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       final int idx = i;
 
       Operation op = opFact.collectionPipedInsert(key, insert,
-          new CollectionPipedInsertOperation.Callback() {
+          new PipedOperationCallback() {
             // each result status
             public void receivedStatus(OperationStatus status) {
               CollectionOperationStatus cstatus;
@@ -3099,12 +3098,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
-              if (status instanceof CollectionOperationStatus) {
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                                (CollectionOperationStatus) status);
-              } else {
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                                new CollectionOperationStatus(status));
+              if (!status.isSuccess()) {
+                if (status instanceof CollectionOperationStatus) {
+                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
+                          (CollectionOperationStatus) status);
+                } else {
+                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
+                          new CollectionOperationStatus(status));
+                }
               }
             }
           });
@@ -3293,7 +3294,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (final CollectionBulkInsert<T> insert : insertList) {
       Operation op = opFact.collectionBulkInsert(
-              insert, new CollectionBulkInsertOperation.Callback() {
+              insert, new PipedOperationCallback() {
                 public void receivedStatus(OperationStatus status) {
                   // Nothing to do here because the user MUST search the result Map instance.
                 }
@@ -3302,8 +3303,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   latch.countDown();
                 }
 
-                public void gotStatus(String key, OperationStatus status) {
+                public void gotStatus(Integer index, OperationStatus status) {
                   if (!status.isSuccess()) {
+                    String key = insert.getKey(index);
                     if (status instanceof CollectionOperationStatus) {
                       rv.addFailedResult(key, (CollectionOperationStatus) status);
                     } else {

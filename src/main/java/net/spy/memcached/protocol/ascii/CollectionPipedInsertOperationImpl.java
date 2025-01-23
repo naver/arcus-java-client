@@ -33,6 +33,7 @@ import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.PipedOperationCallback;
 
 /**
  * Operation to store collection data in a memcached server.
@@ -67,7 +68,7 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
 
   private final String key;
   private final CollectionPipedInsert<?> insert;
-  private final CollectionPipedInsertOperation.Callback cb;
+  private final PipedOperationCallback cb;
 
   private int count;
   private int index = 0;
@@ -75,11 +76,12 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
   private boolean readUntilLastLine = false;
 
   public CollectionPipedInsertOperationImpl(String key,
-                                            CollectionPipedInsert<?> insert, OperationCallback cb) {
+                                            CollectionPipedInsert<?> insert,
+                                            OperationCallback cb) {
     super(cb);
     this.key = key;
     this.insert = insert;
-    this.cb = (Callback) cb;
+    this.cb = (PipedOperationCallback) cb;
     if (this.insert instanceof CollectionPipedInsert.ListPipedInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionPipedInsert.SetPipedInsert) {
@@ -124,12 +126,12 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
       OperationStatus status = matchStatus(line, STORED, CREATED_STORED,
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
-      if (status.isSuccess()) {
-        cb.receivedStatus((successAll) ? END : FAILED_END);
-      } else {
-        cb.gotStatus(index, status);
-        cb.receivedStatus(FAILED_END);
+      if (!status.isSuccess()) {
+        successAll = false;
       }
+
+      cb.gotStatus(index, status);
+      cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -167,9 +169,10 @@ public final class CollectionPipedInsertOperationImpl extends OperationImpl
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(index, status);
         successAll = false;
       }
+
+      cb.gotStatus(index, status);
       index++;
     }
   }

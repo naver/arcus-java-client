@@ -25,8 +25,4 @@ public interface CollectionPipedExistOperation extends KeyedOperation {
 
   SetPipedExist<?> getExist();
 
-  interface Callback extends OperationCallback {
-    void gotStatus(Integer index, OperationStatus status);
-  }
-
 }
