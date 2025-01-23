@@ -59,17 +59,14 @@ import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
-import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
-import net.spy.memcached.ops.CollectionPipedExistOperation;
-import net.spy.memcached.ops.CollectionPipedInsertOperation;
-import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.PipedOperationCallback;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.CollectionTranscoder;
@@ -342,8 +339,8 @@ class MultibyteKeyTest {
 
   @Test
   void CollectionPipedInsertOperationImplTest() {
-    CollectionPipedInsertOperation.Callback cpsCallback =
-        new CollectionPipedInsertOperation.Callback() {
+    PipedOperationCallback cpsCallback =
+        new PipedOperationCallback() {
           @Override
           public void gotStatus(Integer index, OperationStatus status) {
           }
@@ -464,10 +461,10 @@ class MultibyteKeyTest {
   @Test
   void CollectionBulkInsertOperationImplTest() {
     CollectionBulkInsert<Integer> insert = null;
-    CollectionBulkInsertOperation.Callback cbsCallback =
-        new CollectionBulkInsertOperation.Callback() {
+    PipedOperationCallback cbsCallback =
+        new PipedOperationCallback() {
           @Override
-          public void gotStatus(String key, OperationStatus status) {
+          public void gotStatus(Integer index, OperationStatus status) {
           }
 
           @Override
@@ -585,7 +582,7 @@ class MultibyteKeyTest {
       opFact.collectionPipedUpdate(MULTIBYTE_KEY,
               new CollectionPipedUpdate.BTreePipedUpdate<>(
                       MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
-          new CollectionPipedUpdateOperation.Callback() {
+          new PipedOperationCallback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
             }
@@ -634,7 +631,7 @@ class MultibyteKeyTest {
     try {
       opFact.collectionPipedExist(MULTIBYTE_KEY,
               new SetPipedExist<>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
-          new CollectionPipedExistOperation.Callback() {
+          new PipedOperationCallback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
             }

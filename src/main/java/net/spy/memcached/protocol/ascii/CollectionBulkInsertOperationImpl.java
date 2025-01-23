@@ -29,6 +29,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+import net.spy.memcached.ops.PipedOperationCallback;
 
 /**
  * Operation to store collection data in a memcached server.
@@ -62,7 +63,7 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
   private final CollectionBulkInsert<?> insert;
-  private final CollectionBulkInsertOperation.Callback cb;
+  private final PipedOperationCallback cb;
 
   private int count;
   private int index = 0;
@@ -71,7 +72,7 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
   public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {
     super(cb);
     this.insert = insert;
-    this.cb = (Callback) cb;
+    this.cb = (PipedOperationCallback) cb;
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert) {
@@ -111,9 +112,10 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
               NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED, OUT_OF_RANGE,
               TYPE_MISMATCH, BKEY_MISMATCH);
       if (!status.isSuccess()) {
-        cb.gotStatus(insert.getKey(index), status);
         successAll = false;
       }
+
+      cb.gotStatus(index, status);
       cb.receivedStatus((successAll) ? END : FAILED_END);
       transitionState(OperationState.COMPLETE);
       return;
@@ -151,10 +153,10 @@ public final class CollectionBulkInsertOperationImpl extends OperationImpl
               TYPE_MISMATCH, BKEY_MISMATCH);
 
       if (!status.isSuccess()) {
-        cb.gotStatus(insert.getKey(index), status);
         successAll = false;
       }
 
+      cb.gotStatus(index, status);
       index++;
     }
   }
