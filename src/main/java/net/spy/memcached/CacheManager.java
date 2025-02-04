@@ -656,7 +656,7 @@ public final class CacheManager extends SpyThread implements Watcher,
   /* ENABLE_REPLICATION if */
   private List<InetSocketAddress> validateReplicaGroup(List<InetSocketAddress> socketList) {
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            ArcusReplNodeAddress.makeGroupAddrsList(socketList);
+            ArcusReplNodeAddress.makeGroupAddrs(socketList);
 
     // recreate socket list
     socketList.clear();

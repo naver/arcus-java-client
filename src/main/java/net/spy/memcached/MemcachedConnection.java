@@ -305,7 +305,7 @@ public final class MemcachedConnection extends SpyObject {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       // Deal with the memcached server group that need delayed switchover.
-      handleDelayedSwitchover();
+      handleDelayedSwitchover(false);
     }
     /* ENABLE_REPLICATION end */
 
@@ -369,79 +369,42 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  private Set<String> findChangedGroups(List<InetSocketAddress> addrs,
-                                        Collection<MemcachedNode> nodes) {
-    Map<String, InetSocketAddress> addrMap = new HashMap<>();
-    for (InetSocketAddress each : addrs) {
-      addrMap.put(each.toString(), each);
-    }
-
-    Set<String> changedGroupSet = new HashSet<>();
-    for (MemcachedNode node : nodes) {
-      String nodeAddr = ((InetSocketAddress) node.getSocketAddress()).toString();
-      if (addrMap.remove(nodeAddr) == null) { // removed node
-        changedGroupSet.add(node.getReplicaGroup().getGroupName());
-      }
-    }
-    for (String addr : addrMap.keySet()) { // newly added node
-      ArcusReplNodeAddress a = (ArcusReplNodeAddress) addrMap.get(addr);
-      changedGroupSet.add(a.getGroupName());
-    }
-    return changedGroupSet;
-  }
-
-  private List<InetSocketAddress> findAddrsOfChangedGroups(List<InetSocketAddress> addrs,
-                                                           Set<String> changedGroups) {
-    List<InetSocketAddress> changedGroupAddrs = new ArrayList<>();
-    for (InetSocketAddress addr : addrs) {
-      if (changedGroups.contains(((ArcusReplNodeAddress) addr).getGroupName())) {
-        changedGroupAddrs.add(addr);
-      }
-    }
-    return changedGroupAddrs;
-  }
-
   private void updateReplConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<>();
     List<MemcachedNode> removeNodes = new ArrayList<>();
     List<MemcachedReplicaGroup> changeRoleGroups = new ArrayList<>();
     List<Task> taskList = new ArrayList<>(); // tasks executed after locator update
 
-    /* In replication, after SWITCHOVER or REPL_SLAVE is received from a group
-     * and switchover is performed, but before the group's znode is changed,
-     * another group's znode can be changed.
-     *
-     * In this case, there is a problem that the switchover is restored
-     * because the state of the switchover group and the znode state are different.
-     *
-     * In order to remove the abnormal phenomenon,
-     * we find out the changed groups with the comparison of previous and current znode list,
-     * and update the state of groups based on them.
-     */
-    Set<String> changedGroups = findChangedGroups(addrs, locator.getAll());
+    // Create new group list from the provided addresses
+    Map<String, List<ArcusReplNodeAddress>> newGroups = ArcusReplNodeAddress.makeGroupAddrs(addrs);
+    // Get the existing groups from the locator
+    Map<String, MemcachedReplicaGroup> oldGroups =
+            ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
+    Set<String> invalidGroups = new HashSet<>();
 
-    Map<String, List<ArcusReplNodeAddress>> newAllGroups =
-            ArcusReplNodeAddress.makeGroupAddrsList(findAddrsOfChangedGroups(addrs, changedGroups));
+    // Immediately exec the previous delayed switchover case.
+    handleDelayedSwitchover(true);
 
-    // remove invalidated groups in changedGroups
-    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
+    for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newGroups.entrySet()) {
       if (!ArcusReplNodeAddress.validateGroup(entry)) {
-        changedGroups.remove(entry.getKey());
+        invalidGroups.add(entry.getKey());
+        continue;
+      }
+      // Handle newly added groups
+      if (!oldGroups.containsKey(entry.getKey())) {
+        for (ArcusReplNodeAddress newAddr : entry.getValue()) {
+          attachNodes.add(attachMemcachedNode(newAddr));
+        }
       }
     }
 
-    Map<String, MemcachedReplicaGroup> oldAllGroups =
-            ((ArcusReplKetamaNodeLocator) locator).getAllGroups();
+    for (Map.Entry<String, MemcachedReplicaGroup> oldGroupEntry : oldGroups.entrySet()) {
+      String groupName = oldGroupEntry.getKey();
+      MemcachedReplicaGroup oldGroup = oldGroupEntry.getValue();
+      List<ArcusReplNodeAddress> newGroupAddrs = newGroups.get(groupName);
 
-    for (String changedGroupName : changedGroups) {
-      MemcachedReplicaGroup oldGroup = oldAllGroups.get(changedGroupName);
-      List<ArcusReplNodeAddress> newGroupAddrs = newAllGroups.get(changedGroupName);
-
-      if (oldGroup == null) {
-        // Newly added group
-        for (ArcusReplNodeAddress newAddr : newGroupAddrs) {
-          attachNodes.add(attachMemcachedNode(newAddr));
-        }
+      // If group name exists in old groups, invalid case is ignored.
+      if (invalidGroups.contains(groupName)) {
         continue;
       }
 
@@ -449,13 +412,7 @@ public final class MemcachedConnection extends SpyObject {
         // Old group nodes have disappeared. Remove the old group nodes.
         removeNodes.add(oldGroup.getMasterNode());
         removeNodes.addAll(oldGroup.getSlaveNodes());
-        delayedSwitchoverGroups.remove(oldGroup);
         continue;
-      }
-
-      if (oldGroup.isDelayedSwitchover()) {
-        delayedSwitchoverGroups.remove(oldGroup);
-        switchoverMemcachedReplGroup(oldGroup, true);
       }
 
       MemcachedNode oldMasterNode = oldGroup.getMasterNode();
@@ -846,9 +803,9 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_MIGRATION end */
 
   // Handle the memcached server group that need delayed switchover.
-  private void handleDelayedSwitchover() {
+  private void handleDelayedSwitchover(boolean immediate) {
     if (!delayedSwitchoverGroups.isEmpty()) {
-      delayedSwitchoverGroups.switchover();
+      delayedSwitchoverGroups.switchover(immediate);
     }
   }
 
@@ -1793,7 +1750,7 @@ public final class MemcachedConnection extends SpyObject {
           1);
     }
 
-    public void switchover() {
+    public void switchover(boolean immediate) {
       long now = System.nanoTime();
       Iterator<Entry<Long, MemcachedReplicaGroup>> iterator = groups.entrySet().iterator();
       while (iterator.hasNext()) {
@@ -1801,7 +1758,7 @@ public final class MemcachedConnection extends SpyObject {
         long switchoverTime = entry.getKey();
         MemcachedReplicaGroup group = entry.getValue();
 
-        if (now < switchoverTime) {
+        if (!immediate && now < switchoverTime) {
           return;
         } else {
           iterator.remove();
