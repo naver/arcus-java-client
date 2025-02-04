@@ -109,8 +109,7 @@ public final class ArcusReplNodeAddress extends InetSocketAddress {
     return list;
   }
 
-  static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrsList(
-          List<InetSocketAddress> addrs) {
+  static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrs(List<InetSocketAddress> addrs) {
 
     Map<String, List<ArcusReplNodeAddress>> newAllGroups =
             new HashMap<>();
