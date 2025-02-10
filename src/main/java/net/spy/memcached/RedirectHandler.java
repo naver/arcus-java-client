@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.spy.memcached.ops.APIType;
+
 public abstract class RedirectHandler {
 
   private Long spoint = null;
@@ -91,12 +93,12 @@ public abstract class RedirectHandler {
     }
 
     public Map<MemcachedNode, List<String>> groupRedirectKeys(
-        MemcachedConnection conn) {
+            MemcachedConnection conn, APIType apiType) {
 
       Map<MemcachedNode, List<String>> keysByNode = null;
       List<String> keysWithoutOwner = keysByOwner.remove(UNKNOWN_OWNER);
       if (keysWithoutOwner != null) {
-        keysByNode = conn.groupKeysByNode(keysWithoutOwner);
+        keysByNode = conn.groupKeysByNode(keysWithoutOwner, apiType);
         if (keysByNode == null) {
           return null;
         }
