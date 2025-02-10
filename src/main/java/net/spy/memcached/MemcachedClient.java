@@ -53,6 +53,7 @@ import net.spy.memcached.internal.SingleElementInfiniteIterator;
 import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.internal.result.GetResultImpl;
 import net.spy.memcached.internal.result.GetsResultImpl;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.CancelledOperationStatus;
 import net.spy.memcached.ops.ConcatenationType;
@@ -1072,7 +1073,7 @@ public class MemcachedClient extends SpyThread
 
     // Grouping keys by memcached node
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKey
-            = groupingKeys(keys, GET_BULK_CHUNK_SIZE);
+            = groupingKeys(keys, GET_BULK_CHUNK_SIZE, APIType.GET);
     final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
 
     GetOperation.Callback cb = new GetOperation.Callback() {
@@ -1205,7 +1206,7 @@ public class MemcachedClient extends SpyThread
 
     // Grouping keys by memcached node
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKey
-            = groupingKeys(keys, GET_BULK_CHUNK_SIZE);
+            = groupingKeys(keys, GET_BULK_CHUNK_SIZE, APIType.GETS);
 
     final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
 
@@ -2169,11 +2170,11 @@ public class MemcachedClient extends SpyThread
    * @return list of grouped (memcached node + keys) in the group
    */
   protected Collection<Map.Entry<MemcachedNode, List<String>>> groupingKeys(
-          Collection<String> keyList, int maxKeyCountPerGroup) {
+          Collection<String> keyList, int maxKeyCountPerGroup, APIType apiType) {
     List<Map.Entry<MemcachedNode, List<String>>> resultList = new ArrayList<>();
     Map<MemcachedNode, List<String>> nodeMap = new HashMap<>();
     for (String key : keyList) {
-      MemcachedNode qa = conn.findNodeByKey(key);
+      MemcachedNode qa = conn.findNodeByKey(key, apiType);
       List<String> keyGroup = nodeMap.get(qa);
 
       if (keyGroup == null) {

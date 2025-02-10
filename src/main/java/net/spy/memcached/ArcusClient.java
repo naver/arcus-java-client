@@ -130,6 +130,7 @@ import net.spy.memcached.internal.result.MopGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultOldImpl;
 import net.spy.memcached.internal.result.SopGetResultImpl;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -1934,7 +1935,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize);
+            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
@@ -1964,7 +1965,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize);
+            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
@@ -3012,7 +3013,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize);
+            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
@@ -3045,7 +3046,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize);
+            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
@@ -3132,7 +3133,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     validateKeys(keyList);
     checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.BOP_INSERT);
 
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
             arrangedKey.size());
@@ -3166,7 +3167,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     validateKeys(keyList);
     checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.BOP_INSERT);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
             arrangedKey.size());
 
@@ -3199,7 +3200,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     validateKeys(keyList);
     checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.MOP_INSERT);
 
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
             arrangedKey.size());
@@ -3231,7 +3232,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.SOP_INSERT);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
             arrangedKey.size());
 
@@ -3262,7 +3263,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE);
+            groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.LOP_INSERT);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
             arrangedKey.size());
 
@@ -3343,7 +3344,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> rearrangedKeys =
-            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
+            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE, APIType.BOP_GET);
 
     List<BTreeGetBulk<T>> getBulkList = new ArrayList<>(
             rearrangedKeys.size());
@@ -3384,7 +3385,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> rearrangedKeys =
-            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE);
+            groupingKeys(keyList, BOPGET_BULK_CHUNK_SIZE, APIType.BOP_GET);
 
     List<BTreeGetBulk<T>> getBulkList = new ArrayList<>(
             rearrangedKeys.size());

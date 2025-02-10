@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.MultiOperationCallback;
 import net.spy.memcached.ops.Operation;
@@ -57,6 +58,7 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.OperationType;
 
 /**
  * Connection to a cluster of memcached servers.
@@ -1127,7 +1129,7 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private boolean redirectSingleKeyOperation(String key, Operation op) {
-    return redirectSingleKeyOperation(findNodeByKey(key), op);
+    return redirectSingleKeyOperation(findNodeByKey(key, op.getAPIType()), op);
   }
 
   private boolean redirectSingleKeyOperation(MemcachedNode node, Operation op) {
@@ -1148,7 +1150,8 @@ public final class MemcachedConnection extends SpyObject {
       RedirectHandler.RedirectHandlerMultiKey redirectHandler,
       Operation op) {
 
-    Map<MemcachedNode, List<String>> keysByNode = redirectHandler.groupRedirectKeys(this);
+    Map<MemcachedNode, List<String>> keysByNode =
+            redirectHandler.groupRedirectKeys(this, op.getAPIType());
     return redirectMultiKeyOperation(keysByNode, op);
   }
 
@@ -1291,7 +1294,7 @@ public final class MemcachedConnection extends SpyObject {
           String key = keys.toArray()[0].toString();
           success = success || redirectSingleKeyOperation(key, op);
         } else {
-          Map<MemcachedNode, List<String>> nodeByKeys = groupKeysByNode(keys);
+          Map<MemcachedNode, List<String>> nodeByKeys = groupKeysByNode(keys, op.getAPIType());
           success = success || redirectMultiKeyOperation(nodeByKeys, op);
         }
       } else {
@@ -1304,10 +1307,11 @@ public final class MemcachedConnection extends SpyObject {
     }
   }
 
-  public Map<MemcachedNode, List<String>> groupKeysByNode(Collection<String> keys) {
+  public Map<MemcachedNode, List<String>> groupKeysByNode(Collection<String> keys,
+                                                          APIType apiType) {
     Map<MemcachedNode, List<String>> keysByNode = new HashMap<>();
     for (String key : keys) {
-      MemcachedNode node = findNodeByKey(key);
+      MemcachedNode node = findNodeByKey(key, apiType);
       if (node == null) {
         return null;
       }
@@ -1390,32 +1394,18 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   /* ENABLE_REPLICATION if */
-  private ReplicaPick getReplicaPick(final Operation o) {
+  private ReplicaPick getReplicaPick(APIType apiType) {
     ReplicaPick pick = ReplicaPick.MASTER;
-
-    if (o.isReadOperation()) {
-      ReadPriority readPriority = connFactory.getAPIReadPriority().get(o.getAPIType());
-      if (readPriority != null) {
-        if (readPriority == ReadPriority.SLAVE) {
-          pick = ReplicaPick.SLAVE;
-        } else if (readPriority == ReadPriority.RR) {
-          pick = ReplicaPick.RR;
-        }
-      } else {
-        pick = getReplicaPick();
+    if (apiType.getAPIOpType() == OperationType.READ) {
+      ReadPriority readPriority = connFactory.getAPIReadPriority().get(apiType);
+      if (readPriority == null) {
+        readPriority = connFactory.getReadPriority();
       }
-    }
-    return pick;
-  }
-
-  private ReplicaPick getReplicaPick() {
-    ReadPriority readPriority = connFactory.getReadPriority();
-    ReplicaPick pick = ReplicaPick.MASTER;
-
-    if (readPriority == ReadPriority.SLAVE) {
-      pick = ReplicaPick.SLAVE;
-    } else if (readPriority == ReadPriority.RR) {
-      pick = ReplicaPick.RR;
+      if (readPriority == ReadPriority.SLAVE) {
+        pick = ReplicaPick.SLAVE;
+      } else if (readPriority == ReadPriority.RR) {
+        pick = ReplicaPick.RR;
+      }
     }
     return pick;
   }
@@ -1425,26 +1415,12 @@ public final class MemcachedConnection extends SpyObject {
    * Get the primary node for the key string.
    *
    * @param key the key the operation is operating upon
+   * @param apiType the type of the operation
    */
-  public MemcachedNode getPrimaryNode(final String key) {
+  public MemcachedNode getPrimaryNode(final String key, final APIType apiType) {
     /* ENABLE_REPLICATION if */
     if (this.arcusReplEnabled) {
-      return ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick());
-    }
-    /* ENABLE_REPLICATION end */
-    return locator.getPrimary(key);
-  }
-
-  /**
-   * Get the primary node for the key string and the operation.
-   *
-   * @param key the key the operation is operating upon
-   * @param o   the operation
-   */
-  public MemcachedNode getPrimaryNode(final String key, final Operation o) {
-    /* ENABLE_REPLICATION if */
-    if (this.arcusReplEnabled) {
-      return ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick(o));
+      return ((ArcusReplKetamaNodeLocator) locator).getPrimary(key, getReplicaPick(apiType));
     }
     /* ENABLE_REPLICATION end */
     return locator.getPrimary(key);
@@ -1454,30 +1430,17 @@ public final class MemcachedConnection extends SpyObject {
    * Get the another node sequence for the key string.
    *
    * @param key the key the operation is operating upon
+   * @param apiType the type of the operation
    */
-  public Iterator<MemcachedNode> getNodeSequence(final String key) {
+  public Iterator<MemcachedNode> getNodeSequence(final String key, final APIType apiType) {
     /* ENABLE_REPLICATION if */
     if (this.arcusReplEnabled) {
-      return ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick());
+      return ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick(apiType));
     }
     /* ENABLE_REPLICATION end */
     return locator.getSequence(key);
   }
 
-  /**
-   * Get the another node sequence for the key string and the operation.
-   *
-   * @param key the key the operation is operating upon
-   * @param o   the operation
-   */
-  public Iterator<MemcachedNode> getNodeSequence(final String key, final Operation o) {
-    /* ENABLE_REPLICATION if */
-    if (this.arcusReplEnabled) {
-      return ((ArcusReplKetamaNodeLocator) locator).getSequence(key, getReplicaPick(o));
-    }
-    /* ENABLE_REPLICATION end */
-    return locator.getSequence(key);
-  }
 
   /**
    * Add an operation to the given connection.
@@ -1486,7 +1449,7 @@ public final class MemcachedConnection extends SpyObject {
    * @param o   the operation
    */
   public void addOperation(final String key, final Operation o) {
-    addOperation(findNodeByKey(key), o);
+    addOperation(findNodeByKey(key, o.getAPIType()), o);
   }
 
   public void insertOperation(final MemcachedNode node, final Operation o) {
@@ -1638,10 +1601,11 @@ public final class MemcachedConnection extends SpyObject {
    * find memcachednode for key
    *
    * @param key
+   * @param apiType
    * @return a memcached node
    */
-  public MemcachedNode findNodeByKey(String key) {
-    MemcachedNode node = getPrimaryNode(key);
+  public MemcachedNode findNodeByKey(String key, APIType apiType) {
+    MemcachedNode node = getPrimaryNode(key, apiType);
     if (node == null) {
       return null;
     }
@@ -1649,7 +1613,7 @@ public final class MemcachedConnection extends SpyObject {
       return node;
     }
     if (failureMode == FailureMode.Redistribute) {
-      Iterator<MemcachedNode> iter = getNodeSequence(key);
+      Iterator<MemcachedNode> iter = getNodeSequence(key, apiType);
       while (iter.hasNext()) {
         MemcachedNode n = iter.next();
         if (n != null && n.isActive()) {
