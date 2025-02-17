@@ -50,6 +50,12 @@ public class BTreeFindPositionWithGet extends CollectionGet {
   private BKeyObject bkey;
 
   public BTreeFindPositionWithGet(long longBKey, BTreeOrder order, int count) {
+    if (order == null) {
+      throw new IllegalArgumentException("BTreeOrder must not be null.");
+    }
+    if (count < 0 || count > 100) {
+      throw new IllegalArgumentException("Count must be a value between 0 and 100.");
+    }
     this.bkeyObject = new BKeyObject(longBKey);
     this.order = order;
     this.count = count;
@@ -58,6 +64,12 @@ public class BTreeFindPositionWithGet extends CollectionGet {
   }
 
   public BTreeFindPositionWithGet(byte[] byteArrayBKey, BTreeOrder order, int count) {
+    if (order == null) {
+      throw new IllegalArgumentException("BTreeOrder must not be null.");
+    }
+    if (count < 0 || count > 100) {
+      throw new IllegalArgumentException("Count must be a value between 0 and 100.");
+    }
     this.bkeyObject = new BKeyObject(byteArrayBKey);
     this.order = order;
     this.count = count;
@@ -86,14 +98,6 @@ public class BTreeFindPositionWithGet extends CollectionGet {
 
   public String getCommand() {
     return COMMAND;
-  }
-
-  public BTreeOrder getOrder() {
-    return order;
-  }
-
-  public int getCount() {
-    return count;
   }
 
   @Override

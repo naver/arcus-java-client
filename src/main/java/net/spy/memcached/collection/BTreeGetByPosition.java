@@ -41,6 +41,12 @@ public class BTreeGetByPosition extends CollectionGet {
   private BKeyObject bkey;
 
   public BTreeGetByPosition(BTreeOrder order, int pos) {
+    if (order == null) {
+      throw new IllegalArgumentException("BTreeOrder must not be null.");
+    }
+    if (pos < 0) {
+      throw new IllegalArgumentException("Position must be 0 or positive integer.");
+    }
     this.order = order;
     this.range = String.valueOf(pos);
     this.posFrom = pos;
@@ -50,20 +56,18 @@ public class BTreeGetByPosition extends CollectionGet {
   }
 
   public BTreeGetByPosition(BTreeOrder order, int posFrom, int posTo) {
+    if (order == null) {
+      throw new IllegalArgumentException("BTreeOrder must not be null.");
+    }
+    if (posFrom < 0 || posTo < 0) {
+      throw new IllegalArgumentException("Position must be 0 or positive integer.");
+    }
     this.order = order;
     this.range = posFrom + ".." + posTo;
     this.posFrom = posFrom;
     this.posTo = posTo;
     this.eHeadCount = 2;
     this.eFlagIndex = 1;
-  }
-
-  public BTreeOrder getOrder() {
-    return order;
-  }
-
-  public String getRange() {
-    return range;
   }
 
   public String stringify() {
