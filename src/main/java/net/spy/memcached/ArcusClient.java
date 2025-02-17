@@ -2525,13 +2525,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopGetByPosition(
           final String k, final BTreeGetByPosition get, final Transcoder<T> tc) {
     // Check for invalid arguments (not to get CLIENT_ERROR)
-    if (get.getOrder() == null) {
-      throw new IllegalArgumentException("BTreeOrder must not be null.");
-    }
-    if (get.getPosFrom() < 0 || get.getPosTo() < 0) {
-      throw new IllegalArgumentException("Position must be 0 or positive integer.");
-    }
-
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Integer, Element<T>>> rv =
             new CollectionGetFuture<>(latch, operationTimeout);
@@ -2684,12 +2677,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    */
   private <T> CollectionFuture<Map<Integer, Element<T>>> asyncBopFindPositionWithGet(
           final String k, final BTreeFindPositionWithGet get, final Transcoder<T> tc) {
-    if (get.getOrder() == null) {
-      throw new IllegalArgumentException("BTreeOrder must not be null.");
-    }
-    if (get.getCount() < 0 || get.getCount() > 100) {
-      throw new IllegalArgumentException("Count must be a value between 0 and 100.");
-    }
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Integer, Element<T>>> rv

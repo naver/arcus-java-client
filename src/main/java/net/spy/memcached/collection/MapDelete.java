@@ -36,23 +36,6 @@ public class MapDelete extends CollectionDelete {
     this.keySeparator = keySeparator;
   }
 
-  public String getSpaceSeparatedMkeys() {
-    if (spaceSeparatedKeys != null) {
-      return spaceSeparatedKeys;
-    }
-
-    StringBuilder sb = new StringBuilder();
-    int numkeys = mkeyList.size();
-    for (int i = 0; i < numkeys; i++) {
-      sb.append(mkeyList.get(i));
-      if ((i + 1) < numkeys) {
-        sb.append(keySeparator);
-      }
-    }
-    spaceSeparatedKeys = sb.toString();
-    return spaceSeparatedKeys;
-  }
-
   public byte[] getAdditionalArgs() {
     return additionalArgs;
   }
@@ -85,6 +68,23 @@ public class MapDelete extends CollectionDelete {
 
     str = b.toString();
     return str;
+  }
+
+  private String getSpaceSeparatedMkeys() {
+    if (spaceSeparatedKeys != null) {
+      return spaceSeparatedKeys;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    int numkeys = mkeyList.size();
+    for (int i = 0; i < numkeys; i++) {
+      sb.append(mkeyList.get(i));
+      if ((i + 1) < numkeys) {
+        sb.append(keySeparator);
+      }
+    }
+    spaceSeparatedKeys = sb.toString();
+    return spaceSeparatedKeys;
   }
 
   public String getCommand() {

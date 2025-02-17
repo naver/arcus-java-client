@@ -38,14 +38,6 @@ public class ListGet extends CollectionGet {
     this(from + ".." + to, delete, dropIfEmpty);
   }
 
-  public String getRange() {
-    return range;
-  }
-
-  public void setRange(String range) {
-    this.range = range;
-  }
-
   @Override
   public byte[] getAdditionalArgs() {
     return null;
