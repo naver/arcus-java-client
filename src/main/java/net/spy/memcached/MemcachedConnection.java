@@ -485,8 +485,7 @@ public final class MemcachedConnection extends SpyObject {
           if (!newSlaveAddrs.contains((ArcusReplNodeAddress) oldSlaveNode.getSocketAddress())) {
             removeNodes.add(oldSlaveNode);
             // move operation slave -> master.
-            taskList.add(new MoveOperationTask(
-                oldSlaveNode, oldMasterNode, false));
+            taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
             // clear the masterCandidate if the removed slave is the masterCandidate.
             if (oldGroup.getMasterCandidate() == oldSlaveNode) {
               oldGroup.clearMasterCandidate();
@@ -510,7 +509,7 @@ public final class MemcachedConnection extends SpyObject {
                */
               oldGroup.setMasterCandidateByAddr(newMasterAddr.getIPPort());
               taskList.add(new MoveOperationTask(
-                      oldMasterCandidate, oldGroup.getMasterCandidate(), false));
+                      oldMasterCandidate, oldGroup.getMasterCandidate()));
             }
             changeRoleGroups.add(oldGroup);
           } else {
@@ -523,10 +522,8 @@ public final class MemcachedConnection extends SpyObject {
               delayedSwitchoverGroups.put(oldGroup);
             } else {
               changeRoleGroups.add(oldGroup);
-              taskList.add(new MoveOperationTask(
-                      oldMasterNode, oldGroup.getMasterCandidate(), false));
-              taskList.add(new QueueReconnectTask(
-                      oldMasterNode, ReconnDelay.IMMEDIATE,
+              taskList.add(new MoveOperationTask(oldMasterNode, oldGroup.getMasterCandidate()));
+              taskList.add(new QueueReconnectTask(oldMasterNode, ReconnDelay.IMMEDIATE,
                       "Discarded all pending reading state operation to move operations."));
             }
           }
@@ -537,7 +534,7 @@ public final class MemcachedConnection extends SpyObject {
           removeNodes.add(oldMasterNode);
           // move operation: master -> slave.
           taskList.add(new MoveOperationTask(
-              oldMasterNode, oldGroup.getMasterCandidate(), true));
+              oldMasterNode, oldGroup.getMasterCandidate()));
         }
 
         // add newly added slave node
@@ -554,7 +551,7 @@ public final class MemcachedConnection extends SpyObject {
             removeNodes.add(oldSlaveNode);
             // move operation slave -> master.
             taskList.add(new MoveOperationTask(
-                oldSlaveNode, oldGroup.getMasterCandidate(), false));
+                oldSlaveNode, oldGroup.getMasterCandidate()));
           }
         }
       } else {
@@ -566,13 +563,11 @@ public final class MemcachedConnection extends SpyObject {
         }
         removeNodes.add(oldMasterNode);
         // move operation: master -> master.
-        taskList.add(new MoveOperationTask(
-            oldMasterNode, newMasterNode, true));
+        taskList.add(new MoveOperationTask(oldMasterNode, newMasterNode));
         for (MemcachedNode oldSlaveNode : oldSlaveNodes) {
           removeNodes.add(oldSlaveNode);
           // move operation slave -> master.
-          taskList.add(new MoveOperationTask(
-              oldSlaveNode, newMasterNode, false));
+          taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
           // clear the masterCandidate if the removed slave is the masterCandidate.
           if (oldGroup.getMasterCandidate() == oldSlaveNode) {
             oldGroup.clearMasterCandidate();
@@ -1734,16 +1729,14 @@ public final class MemcachedConnection extends SpyObject {
   private class MoveOperationTask implements Task {
     private final MemcachedNode from;
     private final MemcachedNode to;
-    private final boolean cancelNonIdempotent;
 
-    public MoveOperationTask(MemcachedNode from, MemcachedNode to, boolean cancelNonIdempotent) {
+    public MoveOperationTask(MemcachedNode from, MemcachedNode to) {
       this.from = from;
       this.to = to;
-      this.cancelNonIdempotent = cancelNonIdempotent;
     }
 
     public void doTask() {
-      if (from.moveOperations(to, cancelNonIdempotent) > 0) {
+      if (from.moveOperations(to, true) > 0) {
         addedQueue.offer(to);
       }
     }
