@@ -34,6 +34,8 @@ public class CollectionTranscoder extends SerializingTranscoder implements
    */
   public static final int MAX_ELEMENT_BYTES = 32 * 1024;
 
+  private boolean optimize = true;
+
   /**
    * Get a serializing transcoder with the default max data size.
    */
@@ -50,6 +52,11 @@ public class CollectionTranscoder extends SerializingTranscoder implements
 
   public CollectionTranscoder(int max, ClassLoader cl) {
     super(max, cl);
+  }
+
+  private CollectionTranscoder(int max, ClassLoader cl, boolean optimize) {
+    super(max, cl);
+    this.optimize = optimize;
   }
 
   public static int examineFlags(ElementValueType type) {
@@ -78,6 +85,7 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     return flags;
   }
 
+  @Override
   public Object decode(CachedData d) {
     byte[] data = d.getData();
     Object rv = null;
@@ -119,9 +127,17 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     return rv;
   }
 
+  @Override
   public CachedData encode(Object o) {
-    byte[] b = null;
+    byte[] b;
     int flags = 0;
+
+    if (!optimize) {
+      flags |= SERIALIZED;
+      b = serialize(o);
+      return new CachedData(flags, b, getMaxSize());
+    }
+
     if (o instanceof String) {
       b = encodeString((String) o);
     } else if (o instanceof Long) {
@@ -154,5 +170,37 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     }
     assert b != null;
     return new CachedData(flags, b, getMaxSize());
+  }
+
+  public static class Builder {
+    private int max = MAX_ELEMENT_BYTES;
+    private boolean optimize = true;
+    private ClassLoader cl;
+
+    public Builder setMaxElementBytes(int max) {
+      this.max = max;
+      return this;
+    }
+
+    /**
+     * By default, this transcoder uses Java serialization only if the type is a user-defined class.
+     * This mechanism may cause malfunction if you store Object type values
+     * into an Arcus collection item and the values are actually
+     * different types like String, Integer.
+     * In this case, you should disable optimization.
+     */
+    public Builder disableOptimization() {
+      this.optimize = false;
+      return this;
+    }
+
+    public Builder setClassLoader(ClassLoader cl) {
+      this.cl = cl;
+      return this;
+    }
+
+    public CollectionTranscoder build() {
+      return new CollectionTranscoder(max, cl, optimize);
+    }
   }
 }
