@@ -75,10 +75,6 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
-  public void transitionWriteItem() {
-    // noop
-  }
-
   public Operation getCurrentReadOp() {
     return null;
   }

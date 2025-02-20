@@ -177,10 +177,6 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public void transitionWriteItem() {
-    throw new UnsupportedOperationException();
-  }
-
   public int writeSome() throws IOException {
     throw new UnsupportedOperationException();
   }

@@ -73,11 +73,6 @@ public interface MemcachedNode {
   void fillWriteBuffer(boolean optimizeGets);
 
   /**
-   * Transition the current write item into a read state.
-   */
-  void transitionWriteItem();
-
-  /**
    * Get the operation at the top of the queue that is requiring input.
    */
   Operation getCurrentReadOp();
