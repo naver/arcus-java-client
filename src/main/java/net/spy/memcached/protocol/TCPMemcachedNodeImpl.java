@@ -78,7 +78,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private final AtomicLong timeoutStartNanos = new AtomicLong(0);
   private boolean toRatioEnabled = false;
   private int[] toCountArray;
-  private final static int MAX_TOCOUNT = 100;   /* to count array size */
+  private static final int MAX_TOCOUNT = 100;   /* to count array size */
   private int toCountIdx;         /* to count array index */
   private int toRatioMax;         /* maximum timeout ratio */
   private int toRatioNow;         /* current timeout ratio */
@@ -260,9 +260,12 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         getWbuf().put(b);
         getLogger().debug("After copying stuff from %s: %s",
                 o, getWbuf());
-        if (!o.getBuffer().hasRemaining()) {
+        if (!obuf.hasRemaining()) {
           o.writeComplete();
-          transitionWriteItem();
+
+          Operation op = removeCurrentWriteOp();
+          assert o == op;
+          getLogger().debug("Finished writing %s", op);
 
           preparePending();
           if (shouldOptimize) {
@@ -286,12 +289,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     } else {
       getLogger().debug("Buffer is full, skipping");
     }
-  }
-
-  public final void transitionWriteItem() {
-    Operation op = removeCurrentWriteOp();
-    assert op != null : "There is no write item to transition";
-    getLogger().debug("Finished writing %s", op);
   }
 
   protected abstract void optimize();
