@@ -30,14 +30,14 @@ public enum APIType {
   LOP_CREATE(OperationType.WRITE),
   LOP_INSERT(OperationType.WRITE),
   LOP_DELETE(OperationType.WRITE),
-  LOP_GET(OperationType.RW),
+  LOP_GET(OperationType.READ),
 
   // Set API Type
   SOP_CREATE(OperationType.WRITE),
   SOP_INSERT(OperationType.WRITE),
   SOP_DELETE(OperationType.WRITE),
   SOP_EXIST(OperationType.READ),
-  SOP_GET(OperationType.RW),
+  SOP_GET(OperationType.READ),
 
   // Map API Type
   MOP_CREATE(OperationType.WRITE),
@@ -45,7 +45,7 @@ public enum APIType {
   MOP_UPSERT(OperationType.WRITE),
   MOP_UPDATE(OperationType.WRITE),
   MOP_DELETE(OperationType.WRITE),
-  MOP_GET(OperationType.RW),
+  MOP_GET(OperationType.READ),
 
   // B+Tree API Type
   BOP_CREATE(OperationType.WRITE),
@@ -54,7 +54,7 @@ public enum APIType {
   BOP_UPDATE(OperationType.WRITE),
   BOP_INCR(OperationType.WRITE), BOP_DECR(OperationType.WRITE),
   BOP_COUNT(OperationType.READ),
-  BOP_GET(OperationType.RW),
+  BOP_GET(OperationType.READ),
   BOP_SMGET(OperationType.READ),
   BOP_POSITION(OperationType.READ),
   BOP_GBP(OperationType.READ),
@@ -72,7 +72,7 @@ public enum APIType {
   // undefined API
   UNDEFINED(OperationType.UNDEFINED);
 
-  private final OperationType apiOpType;
+  private OperationType apiOpType;
 
   APIType(OperationType t) {
     this.apiOpType = t;
@@ -80,5 +80,9 @@ public enum APIType {
 
   public OperationType getAPIOpType() {
     return this.apiOpType;
+  }
+
+  public void setAPIOpType(OperationType t) {
+    this.apiOpType = t;
   }
 }
