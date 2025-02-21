@@ -1854,6 +1854,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       PartitionedList<T> list = new PartitionedList<>(valueList, MAX_PIPED_ITEM_COUNT);
       for (List<T> elementList : list) {
         insertList.add(new ListPipedInsert<>(key, index, elementList, attributesForCreate, tc));
+        if (index >= 0) {
+          index += elementList.size();
+        }
       }
     }
     return asyncCollectionPipedInsert(key, insertList);
