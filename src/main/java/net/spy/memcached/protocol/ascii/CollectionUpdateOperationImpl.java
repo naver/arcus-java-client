@@ -34,7 +34,6 @@ import net.spy.memcached.ops.CollectionUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to update collection data in a memcached server.
@@ -80,7 +79,6 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     } else if (this.collectionUpdate instanceof MapUpdate) {
       setAPIType(APIType.MOP_UPDATE);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

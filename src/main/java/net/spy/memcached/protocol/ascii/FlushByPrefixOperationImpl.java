@@ -25,7 +25,6 @@ import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
 
 /**
@@ -50,7 +49,6 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
     this.delay = delay;
     this.noreply = noreply;
     setAPIType(APIType.FLUSH);
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StatusCode;
 
@@ -51,7 +50,6 @@ final class StatsOperationImpl extends OperationImpl
       msg = ("stats " + arg + "\r\n").getBytes();
     }
     setAPIType(APIType.STATS);
-    setOperationType(OperationType.ETC);
   }
 
   @Override

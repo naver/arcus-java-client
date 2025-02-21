@@ -24,7 +24,6 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionPipedInsertOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to store collection data in a memcached server.
@@ -46,7 +45,6 @@ public final class CollectionPipedInsertOperationImpl extends PipeOperationImpl
     } else if (insert instanceof CollectionPipedInsert.ByteArraysBTreePipedInsert) {
       setAPIType(APIType.BOP_INSERT);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

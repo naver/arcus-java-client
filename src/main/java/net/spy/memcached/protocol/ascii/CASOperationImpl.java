@@ -30,7 +30,6 @@ import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 
@@ -66,7 +65,6 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     exp = e;
     data = d;
     setAPIType(APIType.CAS);
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

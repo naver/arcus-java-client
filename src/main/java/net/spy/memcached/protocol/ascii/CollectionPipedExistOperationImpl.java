@@ -24,7 +24,6 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 public final class CollectionPipedExistOperationImpl extends PipeOperationImpl implements
         CollectionPipedExistOperation {
@@ -33,7 +32,6 @@ public final class CollectionPipedExistOperationImpl extends PipeOperationImpl i
                                            SetPipedExist<?> collectionExist, OperationCallback cb) {
     super(Collections.singletonList(key), collectionExist, cb);
     setAPIType(APIType.SOP_EXIST);
-    setOperationType(OperationType.READ);
   }
 
   @Override

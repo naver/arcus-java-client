@@ -31,7 +31,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to retrieve b+tree data with multiple keys
@@ -77,7 +76,6 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
     super(cb);
     this.smGet = smGet;
     setAPIType(APIType.BOP_SMGET);
-    setOperationType(OperationType.READ);
   }
 
   /**

@@ -31,7 +31,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to retrieve b+tree data with multiple keys
@@ -80,7 +79,6 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
     super(cb);
     this.getBulk = getBulk;
     setAPIType(APIType.BOP_GET);
-    setOperationType(OperationType.READ);
   }
 
   public void handleLine(String line) {

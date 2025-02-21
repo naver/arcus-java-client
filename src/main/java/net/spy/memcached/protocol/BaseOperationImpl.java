@@ -54,8 +54,6 @@ public abstract class BaseOperationImpl extends SpyObject {
   protected OperationException exception = null;
   private OperationCallback callback = null;
   private volatile MemcachedNode handlingNode = null;
-
-  private OperationType opType = OperationType.UNDEFINED;
   private APIType apiType = APIType.UNDEFINED;
 
   /* ENABLE_MIGRATION if */
@@ -267,19 +265,19 @@ public abstract class BaseOperationImpl extends SpyObject {
   }
 
   public OperationType getOperationType() {
-    return opType;
+    return apiType.getAPIOpType();
   }
 
   public void setOperationType(OperationType opType) {
-    this.opType = opType;
+    apiType.setAPIOpType(opType);
   }
 
   public boolean isWriteOperation() {
-    return this.opType == OperationType.WRITE;
+    return apiType.getAPIOpType() == OperationType.WRITE;
   }
 
   public boolean isReadOperation() {
-    return this.opType == OperationType.READ;
+    return apiType.getAPIOpType() == OperationType.READ;
   }
 
   public APIType getAPIType() {

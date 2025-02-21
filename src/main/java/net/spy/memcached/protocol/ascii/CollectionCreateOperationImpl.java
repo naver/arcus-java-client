@@ -35,7 +35,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to create empty collection in a memcached server.
@@ -70,7 +69,6 @@ public final class CollectionCreateOperationImpl extends OperationImpl
     } else if (this.collectionCreate instanceof MapCreate) {
       setAPIType(APIType.MOP_CREATE);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

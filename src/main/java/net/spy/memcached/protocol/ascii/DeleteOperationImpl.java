@@ -30,7 +30,6 @@ import net.spy.memcached.ops.DeleteOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
 
 /**
@@ -52,7 +51,6 @@ final class DeleteOperationImpl extends OperationImpl
     super(cb);
     key = k;
     setAPIType(APIType.DELETE);
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

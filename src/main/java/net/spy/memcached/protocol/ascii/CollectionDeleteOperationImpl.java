@@ -35,7 +35,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to delete collection data in a memcached server.
@@ -78,7 +77,6 @@ public final class CollectionDeleteOperationImpl extends OperationImpl
     } else if (this.collectionDelete instanceof BTreeDelete) {
       setAPIType(APIType.BOP_DELETE);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

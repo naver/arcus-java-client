@@ -32,7 +32,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to get exists item count from collection in a memcached server.
@@ -65,7 +64,6 @@ public final class CollectionCountOperationImpl extends OperationImpl implements
     if (this.collectionCount instanceof BTreeCount) {
       setAPIType(APIType.BOP_COUNT);
     }
-    setOperationType(OperationType.READ);
   }
 
   public void handleLine(String line) {

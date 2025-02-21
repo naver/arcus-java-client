@@ -29,7 +29,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Implementation of the gets operation.
@@ -57,7 +56,6 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
     this.key = key;
     this.cb = cb;
     setAPIType(APIType.GETATTR);
-    setOperationType(OperationType.READ);
   }
 
   @Override

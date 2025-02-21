@@ -31,7 +31,6 @@ import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
 
 /**
@@ -66,7 +65,6 @@ final class MutatorOperationImpl extends OperationImpl
     } else if (m == Mutator.decr) {
       setAPIType(APIType.DECR);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

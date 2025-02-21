@@ -33,7 +33,6 @@ import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to incr/decr item value from collection in a memcached server.
@@ -75,7 +74,6 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
         setAPIType(APIType.BOP_DECR);
       }
     }
-    setOperationType(OperationType.WRITE);
   }
 
   public void handleLine(String line) {

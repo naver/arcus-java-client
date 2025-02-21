@@ -33,7 +33,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.util.BTreeUtil;
 
 /**
@@ -84,7 +83,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
     super(cb);
     this.smGet = smGet;
     setAPIType(APIType.BOP_SMGET);
-    setOperationType(OperationType.READ);
   }
 
   public void handleLine(String line) {

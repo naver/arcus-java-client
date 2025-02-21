@@ -34,7 +34,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 public final class BTreeGetByPositionOperationImpl extends OperationImpl implements
         BTreeGetByPositionOperation {
@@ -77,7 +76,6 @@ public final class BTreeGetByPositionOperationImpl extends OperationImpl impleme
     this.eHeadCount = get.getEHeadCount();
     this.eFlagIndex = get.getEFlagIndex();
     setAPIType(APIType.BOP_GBP);
-    setOperationType(OperationType.READ);
   }
 
   @Override

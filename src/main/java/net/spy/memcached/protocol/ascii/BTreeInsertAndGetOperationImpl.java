@@ -34,7 +34,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 public final class BTreeInsertAndGetOperationImpl extends OperationImpl implements
         BTreeInsertAndGetOperation {
@@ -107,7 +106,6 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
     } else {
       setAPIType(APIType.BOP_INSERT);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

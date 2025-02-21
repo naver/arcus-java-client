@@ -31,7 +31,6 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.SetAttrOperation;
 
 class SetAttrOperationImpl extends OperationImpl
@@ -64,7 +63,6 @@ class SetAttrOperationImpl extends OperationImpl
     // If no attributes given, set to default values
     this.attrs = (attrs == null) ? new CollectionAttributes() : attrs;
     setAPIType(APIType.SETATTR);
-    setOperationType(OperationType.WRITE);
   }
 
   @Override

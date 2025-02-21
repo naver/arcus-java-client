@@ -26,7 +26,6 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionPipedUpdateOperation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.OperationType;
 
 /**
  * Operation to update collection data in a memcached server.
@@ -42,7 +41,6 @@ public final class CollectionPipedUpdateOperationImpl extends PipeOperationImpl 
     } else if (update instanceof MapPipedUpdate) {
       setAPIType(APIType.MOP_UPDATE);
     }
-    setOperationType(OperationType.WRITE);
   }
 
   @Override
