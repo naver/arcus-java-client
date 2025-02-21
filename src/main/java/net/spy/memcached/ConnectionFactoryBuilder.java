@@ -392,7 +392,7 @@ public class ConnectionFactoryBuilder {
   public ConnectionFactoryBuilder setAPIReadPriority(APIType apiType, ReadPriority readPriority) {
     OperationType type = apiType.getAPIOpType();
 
-    if (type == OperationType.READ || type == OperationType.RW) {
+    if (type == OperationType.READ) {
       this.apiReadPriorityList.put(apiType, readPriority);
     }
 
@@ -404,7 +404,7 @@ public class ConnectionFactoryBuilder {
 
     for (Map.Entry<APIType, ReadPriority> entry : apiList.entrySet()) {
       OperationType type = entry.getKey().getAPIOpType();
-      if (type == OperationType.READ || type == OperationType.RW) {
+      if (type == OperationType.READ) {
         this.apiReadPriorityList.put(entry.getKey(), entry.getValue());
       }
     }

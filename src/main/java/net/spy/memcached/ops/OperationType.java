@@ -44,9 +44,6 @@ public enum OperationType {
    */
   READ,
 
-  /* for Collection Get API (with delete, dropIfEmpty) */
-  RW,
-
   /*
    * StatsOperationImpl (getStats)
    * VersionOperationImpl (getVersions)
