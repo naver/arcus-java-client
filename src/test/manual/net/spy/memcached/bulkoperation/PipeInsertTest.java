@@ -99,8 +99,6 @@ class PipeInsertTest extends BaseIntegrationTest {
     }
 
     try {
-      long start = System.currentTimeMillis();
-
       CollectionAttributes attr = new CollectionAttributes();
 
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -108,8 +106,6 @@ class PipeInsertTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
-
-      // System.out.println(System.currentTimeMillis() - start + "ms");
 
       assertTrue(map.isEmpty());
 
@@ -125,7 +121,7 @@ class PipeInsertTest extends BaseIntegrationTest {
   }
 
   @Test
-  void testLopPipeInsert() {
+  void testLopPipeInsertLast() {
     int elementCount = 5000;
 
     List<Object> elements = new ArrayList<>(elementCount);
@@ -135,8 +131,6 @@ class PipeInsertTest extends BaseIntegrationTest {
     }
 
     try {
-      long start = System.currentTimeMillis();
-
       CollectionAttributes attr = new CollectionAttributes();
 
       CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
@@ -145,7 +139,38 @@ class PipeInsertTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
 
-      // System.out.println(System.currentTimeMillis() - start + "ms");
+      assertTrue(map.isEmpty());
+
+      List<Object> list = mc.asyncLopGet(KEY, 0, 9999, false, false)
+              .get();
+
+      assertEquals(4000, list.size());
+      assertEquals("value1000", list.get(0));
+      assertEquals("value1501", list.get(501));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    }
+  }
+
+  @Test
+  void testLopPipeInsertFirst() {
+    int elementCount = 4000;
+
+    List<Object> elements = new ArrayList<>(elementCount);
+
+    for (int i = 0; i < elementCount; i++) {
+      elements.add("value" + i);
+    }
+
+    try {
+      CollectionAttributes attr = new CollectionAttributes();
+
+      CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+              .asyncLopPipedInsertBulk(KEY, 0, elements, attr);
+
+      Map<Integer, CollectionOperationStatus> map = future.get(5000L,
+              TimeUnit.MILLISECONDS);
 
       assertTrue(map.isEmpty());
 
@@ -153,6 +178,8 @@ class PipeInsertTest extends BaseIntegrationTest {
               .get();
 
       assertEquals(4000, list.size());
+      assertEquals("value0", list.get(0));
+      assertEquals("value501", list.get(501));
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());
@@ -190,7 +217,7 @@ class PipeInsertTest extends BaseIntegrationTest {
               = future2.get(5000L, TimeUnit.MILLISECONDS);
       Map<Integer, CollectionOperationStatus> map3
               = future3.get(5000L, TimeUnit.MILLISECONDS);
-      assertEquals(map1.size() + map2.size() + map3.size(), 0);
+      assertEquals(0, map1.size() + map2.size() + map3.size());
 
       List<Object> list = mc.asyncLopGet(KEY, 0, 9999, false, false).get();
       assertEquals((elementCount * 3) + 2, list.size());
