@@ -101,9 +101,10 @@ public final class CollectionGetOperationImpl extends OperationImpl
       setAPIType(APIType.BOP_GET);
     }
     if (collectionGet.isDelete()) {
-      getAPIType().setAPIOpType(OperationType.WRITE);
+      setOperationType(OperationType.WRITE);
+    } else {
+      setOperationType(OperationType.READ);
     }
-    setOperationType(getAPIType().getAPIOpType());
   }
 
   public void handleLine(String line) {
