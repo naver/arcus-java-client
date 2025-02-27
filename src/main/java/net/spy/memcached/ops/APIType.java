@@ -72,7 +72,7 @@ public enum APIType {
   // undefined API
   UNDEFINED(OperationType.UNDEFINED);
 
-  private OperationType apiOpType;
+  private final OperationType apiOpType;
 
   APIType(OperationType t) {
     this.apiOpType = t;
@@ -82,7 +82,4 @@ public enum APIType {
     return this.apiOpType;
   }
 
-  public void setAPIOpType(OperationType t) {
-    this.apiOpType = t;
-  }
 }
