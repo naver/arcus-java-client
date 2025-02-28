@@ -44,6 +44,7 @@ public enum CollectionResponse {
 
   UNDEFINED,
   CANCELED,
+  STOPPED,
 
   INTERRUPT_EXCEPTION,
   EXECUTION_EXCEPTION,

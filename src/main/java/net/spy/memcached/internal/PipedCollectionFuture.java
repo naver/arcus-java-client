@@ -2,6 +2,7 @@ package net.spy.memcached.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -17,9 +18,10 @@ import net.spy.memcached.ops.OperationState;
 
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
-  private final Collection<Operation> ops = new ArrayList<>();
+  private final List<Operation> ops = new ArrayList<>();
   private final AtomicReference<CollectionOperationStatus> operationStatus
           = new AtomicReference<>(null);
+  private int currentOpIdx = -1;
 
   private final Map<K, V> failedResult =
           new ConcurrentHashMap<>();
@@ -30,17 +32,21 @@ public class PipedCollectionFuture<K, V>
 
   @Override
   public boolean cancel(boolean ign) {
-    boolean rv = false;
-    for (Operation op : ops) {
-      rv |= op.cancel("by application.");
+    for (int i = currentOpIdx; i < ops.size(); i++) {
+      if (ops.get(i).cancel("by application.")) {
+        return true;
+      }
     }
-    return rv;
+    return false;
   }
 
+  /**
+   * @return true if any operation is cancelled.
+   */
   @Override
   public boolean isCancelled() {
-    for (Operation op : ops) {
-      if (op.isCancelled()) {
+    for (int i = currentOpIdx; i < ops.size(); i++) {
+      if (ops.get(i).isCancelled()) {
         return true;
       }
     }
@@ -118,5 +124,21 @@ public class PipedCollectionFuture<K, V>
 
   public void addOperation(Operation op) {
     ops.add(op);
+  }
+
+  public Operation getOperation(int idx) {
+    return ops.get(idx);
+  }
+
+  public void incrCurrentOpIdx() {
+    this.currentOpIdx++;
+  }
+
+  public Operation getNextOp() {
+    try {
+      return ops.get(currentOpIdx + 1);
+    } catch (IndexOutOfBoundsException e) {
+      return null;
+    }
   }
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
@@ -253,7 +254,7 @@ class PipeInsertTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
 
-      assertEquals(1000, map.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT + 1, map.size());
 
       Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
               .get();

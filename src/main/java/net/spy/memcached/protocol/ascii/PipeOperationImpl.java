@@ -62,13 +62,13 @@ abstract class PipeOperationImpl extends OperationImpl {
 
   protected boolean successAll = true;
 
-  private final CollectionPipe collectionPipe;
-  private final PipedOperationCallback cb;
-  private final List<String> keys;
+  protected final CollectionPipe collectionPipe;
+  protected final PipedOperationCallback cb;
+  protected final List<String> keys;
   private final boolean isIdempotent;
 
-  private int index = 0;
-  private boolean readUntilLastLine = false;
+  protected int index = 0;
+  protected boolean readUntilLastLine = false;
 
   protected PipeOperationImpl(List<String> keys, CollectionPipe collectionPipe,
                               OperationCallback cb) {

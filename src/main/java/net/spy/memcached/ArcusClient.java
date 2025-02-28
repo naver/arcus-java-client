@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -1783,7 +1784,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new BTreePipedInsert<>(key, elementMap, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1806,7 +1807,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new ByteArraysBTreePipedInsert<>(key, elementList, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1833,7 +1834,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new MapPipedInsert<>(key, elementMap, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1859,7 +1860,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1882,7 +1883,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new SetPipedInsert<>(key, elementList, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -3103,6 +3104,78 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       rv.addOperation(op);
       addOp(key, op);
     }
+    return rv;
+  }
+
+  /**
+   * insert items into collection synchronously.
+   *
+   * @param key arcus cache key
+   * @param insertList must not be empty.
+   * @return future holding the map of element index and the reason why insert operation failed
+   */
+  private <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> syncCollectionPipedInsert(
+          final String key, final List<CollectionPipedInsert<T>> insertList) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+            new PipedCollectionFuture<>(latch, operationTimeout);
+
+    BiFunction<Integer, Integer, OperationCallback> makeCallback = (opIdx, itemCount) -> new PipedOperationCallback() {
+
+      private int currentItemIdx = -1;
+
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
+
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          getLogger().warn("Unhandled state: " + status);
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
+      }
+
+      public void complete() {
+        if (rv.getOperationStatus().isSuccess()) {
+          Operation nextOp = rv.getNextOp();
+          if (nextOp != null && !nextOp.isCancelled()) {
+            addOp(key, nextOp);
+            rv.incrCurrentOpIdx();
+            return;
+          }
+        } else {
+          // If this operation has been errored or cancelled, some items in the operation may not be executed.
+          // The first item that is not executed will have the STOPPED flag.
+          if ((currentItemIdx + 1) < itemCount || (opIdx + 1 < insertList.size())) {
+            this.gotStatus(currentItemIdx + 1,
+                    new CollectionOperationStatus(false, "STOPPED", CollectionResponse.STOPPED));
+          }
+        }
+        latch.countDown();
+      }
+
+      public void gotStatus(Integer index, OperationStatus status) {
+        if (!status.isSuccess()) {
+          if (status instanceof CollectionOperationStatus) {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    (CollectionOperationStatus) status);
+          } else {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    new CollectionOperationStatus(status));
+          }
+        }
+        currentItemIdx = index;
+      }
+    };
+
+    for (int i = 0; i < insertList.size(); i++) {
+      final CollectionPipedInsert<T> insert = insertList.get(i);
+      Operation op = opFact.collectionPipedInsert(key, insert, makeCallback.apply(i, insert.getItemCount()));
+      rv.addOperation(op);
+    }
+    addOp(key, rv.getOperation(0));
+    rv.incrCurrentOpIdx();
     return rv;
   }
 
