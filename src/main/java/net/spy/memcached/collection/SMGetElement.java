@@ -17,6 +17,9 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import net.spy.memcached.util.BTreeUtil;
 
 public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
@@ -101,4 +104,26 @@ public class SMGetElement<T> implements Comparable<SMGetElement<T>> {
   public T getValue() {
     return value;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SMGetElement)) {
+      return false;
+    }
+
+    SMGetElement<?> that = (SMGetElement<?>) o;
+    return Objects.equals(key, that.key) &&
+            Objects.equals(bKeyObject, that.bKeyObject) &&
+            Arrays.equals(eflag, that.eflag) &&
+            Objects.equals(value, that.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, bKeyObject, Arrays.hashCode(eflag), value);
+  }
+
 }

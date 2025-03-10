@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,6 +15,7 @@ class SMGetElementTest {
   private static final String KEY = "test";
   private static final String VALUE = "testValue";
   private static final byte[] EFLAG = {1, 8, 16, 32, 64};
+  private static final byte[] DIFF_EFLAG = {2, 4, 8, 16, 32};
 
   @Test
   void createWithLongBkey() {
@@ -70,4 +72,21 @@ class SMGetElementTest {
     assertTrue(element.compareBkeyTo(anotherElement) > 0);
   }
 
+  @Test
+  void equalsAndHashCodeTest() {
+    //given
+    SMGetElement<String> element1 = new SMGetElement<>(KEY, 1L, EFLAG, VALUE);
+    SMGetElement<String> element2 = new SMGetElement<>(KEY, 1L, EFLAG, VALUE);
+    SMGetElement<String> elementWithDiffEflag = new SMGetElement<>(KEY, 1L, DIFF_EFLAG, VALUE);
+    SMGetElement<String> elementWithDiffKey = new SMGetElement<>("diffKey", 1L, EFLAG, VALUE);
+
+    //when, then
+    assertEquals(element1, element2);
+    assertEquals(element1.hashCode(), element2.hashCode());
+
+    assertNotEquals(element1, elementWithDiffEflag);
+    assertNotEquals(element1.hashCode(), elementWithDiffEflag.hashCode());
+
+    assertNotEquals(element1, elementWithDiffKey);
+  }
 }

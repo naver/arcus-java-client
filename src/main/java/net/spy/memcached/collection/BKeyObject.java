@@ -17,6 +17,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Objects;
+
 import net.spy.memcached.util.BTreeUtil;
 
 public class BKeyObject implements Comparable<BKeyObject> {
@@ -92,6 +94,26 @@ public class BKeyObject implements Comparable<BKeyObject> {
       return String.valueOf(longBKey);
     }
     return BTreeUtil.toHex(byteArrayBKey.getBytes());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BKeyObject)) {
+      return false;
+    }
+
+    BKeyObject that = (BKeyObject) o;
+    return type == that.type &&
+            Objects.equals(longBKey, that.longBKey) &&
+            Objects.equals(byteArrayBKey, that.byteArrayBKey);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(type, longBKey, byteArrayBKey);
   }
 
 }

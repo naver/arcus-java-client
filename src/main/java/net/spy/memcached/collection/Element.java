@@ -17,6 +17,9 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import net.spy.memcached.util.BTreeUtil;
 
 /**
@@ -140,6 +143,27 @@ public class Element<T> {
     sb.append(" }");
 
     return sb.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Element)) {
+      return false;
+    }
+
+    Element<?> that = (Element<?>) o;
+    return Objects.equals(bKeyObject, that.bKeyObject) &&
+            Objects.equals(value, that.value) &&
+            Arrays.equals(eflag, that.eflag) &&
+            Objects.equals(elementFlagUpdate, that.elementFlagUpdate);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(bKeyObject, value, Arrays.hashCode(eflag), elementFlagUpdate);
   }
 
 }
