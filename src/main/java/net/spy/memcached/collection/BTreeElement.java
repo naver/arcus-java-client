@@ -16,6 +16,9 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class BTreeElement<K, V> {
   private final K bkey;
   private final V value;
@@ -38,4 +41,25 @@ public class BTreeElement<K, V> {
   public byte[] getEflag() {
     return eflag;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BTreeElement)) {
+      return false;
+    }
+
+    BTreeElement<?, ?> that = (BTreeElement<?, ?>) o;
+    return Objects.equals(bkey, that.bkey) &&
+            Objects.equals(value, that.value) &&
+            Arrays.equals(eflag, that.eflag);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(bkey, value, Arrays.hashCode(eflag));
+  }
+
 }

@@ -1,5 +1,7 @@
 package net.spy.memcached.ops;
 
+import java.util.Objects;
+
 /**
  * Status indicator.
  */
@@ -44,4 +46,25 @@ public class OperationStatus {
   public String toString() {
     return "{OperationStatus success=" + isSuccess + ":  " + message + "}";
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    OperationStatus that = (OperationStatus) o;
+    return isSuccess == that.isSuccess &&
+            Objects.equals(message, that.message) &&
+            Objects.equals(statusCode, that.statusCode);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(isSuccess, message, statusCode);
+  }
+
 }

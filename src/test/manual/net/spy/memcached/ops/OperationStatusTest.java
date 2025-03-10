@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class OperationStatusTest extends BaseIntegrationTest {
   private static final int EXP = 100;
@@ -131,4 +132,19 @@ class OperationStatusTest extends BaseIntegrationTest {
     //then
     assertEquals(StatusCode.ERR_NOT_FOUND, deleteOperationFuture.getStatus().getStatusCode());
   }
+
+  @Test
+  void equalsAndHashCodeTest() {
+    // given
+    OperationStatus status1 = new OperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
+    OperationStatus status2 = new OperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
+    OperationStatus status3 = new OperationStatus(false, "FAILURE", StatusCode.ERR_NOT_FOUND);
+
+    // when, then
+    assertEquals(status1, status2);
+    assertNotEquals(status1, status3);
+    assertEquals(status1.hashCode(), status2.hashCode());
+    assertNotEquals(status1.hashCode(), status3.hashCode());
+  }
+
 }

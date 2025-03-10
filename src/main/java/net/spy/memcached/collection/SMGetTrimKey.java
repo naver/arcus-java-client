@@ -17,6 +17,8 @@
  */
 package net.spy.memcached.collection;
 
+import java.util.Objects;
+
 public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
   private String key;
   private BKeyObject bKeyObject;
@@ -66,6 +68,25 @@ public class SMGetTrimKey implements Comparable<SMGetTrimKey> {
 
   public byte[] getByteBkey() {
     return bKeyObject.getByteArrayBKeyRaw();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof SMGetTrimKey)) {
+      return false;
+    }
+
+    SMGetTrimKey that = (SMGetTrimKey) o;
+    return Objects.equals(key, that.key) &&
+            Objects.equals(bKeyObject, that.bKeyObject);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(key, bKeyObject);
   }
 
 }

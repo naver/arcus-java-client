@@ -54,4 +54,22 @@ public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
   public String toString() {
     return Arrays.toString(bkey);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ByteArrayBKey)) {
+      return false;
+    }
+
+    ByteArrayBKey that = (ByteArrayBKey) o;
+    return Arrays.equals(bkey, that.bkey);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(bkey);
+  }
 }

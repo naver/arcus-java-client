@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.ops;
 
+import java.util.Objects;
+
 import net.spy.memcached.collection.CollectionResponse;
 
 /**
@@ -25,8 +27,7 @@ public class CollectionOperationStatus extends OperationStatus {
 
   private final CollectionResponse collectionResponse;
 
-  public CollectionOperationStatus(boolean success, String msg,
-                                   CollectionResponse res) {
+  public CollectionOperationStatus(boolean success, String msg, CollectionResponse res) {
     super(success, msg);
     this.collectionResponse = res;
   }
@@ -41,6 +42,25 @@ public class CollectionOperationStatus extends OperationStatus {
    */
   public CollectionResponse getResponse() {
     return collectionResponse;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CollectionOperationStatus)) {
+      return false;
+    }
+
+    CollectionOperationStatus that = (CollectionOperationStatus) o;
+    return super.equals(that) &&
+            collectionResponse == that.collectionResponse;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), collectionResponse);
   }
 
 }

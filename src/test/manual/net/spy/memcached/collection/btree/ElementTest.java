@@ -6,6 +6,7 @@ import net.spy.memcached.util.BTreeUtil;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -84,6 +85,30 @@ class ElementTest {
     assertNull(element.getEFlag());
     assertEquals("", element.getStringEFlag());
     assertEquals(elementFlagUpdate, element.getElementFlagUpdate());
+  }
+
+  @Test
+  void equalsAndHashCodeTest() {
+    // given
+    long longBkey = 1;
+    byte[] byteBkey = {0x3F};
+    byte[] eflag1 = {0x34};
+    byte[] eflag2 = {0x35};
+    ElementFlagUpdate flagUpdate = new ElementFlagUpdate(eflag1);
+
+    Element<String> element1 = new Element<>(longBkey, VALUE, eflag1);
+    Element<String> element2 = new Element<>(longBkey, VALUE, eflag1);
+    Element<String> element3 = new Element<>(byteBkey, VALUE, eflag1);
+    Element<String> element4 = new Element<>(longBkey, VALUE, eflag2);
+    Element<String> element5 = new Element<>(longBkey, VALUE, flagUpdate);
+
+    // when, then
+    assertEquals(element1, element2);
+    assertEquals(element1.hashCode(), element2.hashCode());
+
+    assertNotEquals(element1, element3);
+    assertNotEquals(element1, element4);
+    assertNotEquals(element1, element5);
   }
 
 }
