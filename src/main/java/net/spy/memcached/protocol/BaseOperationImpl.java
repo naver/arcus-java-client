@@ -28,6 +28,7 @@ import net.spy.memcached.RedirectHandler;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CancelledOperationStatus;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
@@ -39,7 +40,7 @@ import net.spy.memcached.ops.StatusCode;
 /**
  * Base class for protocol-specific operation implementations.
  */
-public abstract class BaseOperationImpl extends SpyObject {
+public abstract class BaseOperationImpl extends SpyObject implements Operation {
 
   /**
    * Status object for canceled operations.

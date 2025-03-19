@@ -28,13 +28,12 @@ import java.util.Map;
 
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.CASOperation;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
 
-public final class OptimizedSetImpl extends OperationImpl implements Operation {
+public final class OptimizedSetImpl extends OperationImpl {
 
   private static final OperationCallback NOOP_CALLBACK = new NoopCallback();
 
