@@ -95,7 +95,7 @@ class CheckedOperationTimeoutExceptionTest {
     return op;
   }
 
-  static class TestOperation extends BaseOperationImpl implements Operation {
+  static class TestOperation extends BaseOperationImpl {
 
     @Override
     public void initialize() {

@@ -24,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.KeyUtil;
-import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationState;
@@ -35,7 +34,7 @@ import net.spy.memcached.protocol.BaseOperationImpl;
 /**
  * Operations on a memcached connection.
  */
-abstract class OperationImpl extends BaseOperationImpl implements Operation {
+abstract class OperationImpl extends BaseOperationImpl {
 
   protected static final byte[] CRLF = {'\r', '\n'};
   private static final String CHARSET = "UTF-8";
