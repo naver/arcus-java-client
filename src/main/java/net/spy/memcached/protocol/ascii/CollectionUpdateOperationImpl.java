@@ -167,19 +167,4 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     return data;
   }
 
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

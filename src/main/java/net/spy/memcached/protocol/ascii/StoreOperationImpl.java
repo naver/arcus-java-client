@@ -49,9 +49,4 @@ final class StoreOperationImpl extends BaseStoreOperationImpl
     return storeType;
   }
 
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

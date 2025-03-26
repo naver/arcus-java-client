@@ -40,9 +40,4 @@ public class SASLAuthOperationImpl extends SASLBaseOperationImpl
 
   }
 
-  @Override
-  public boolean isIdempotentOperation() {
-    return false;
-  }
-
 }

@@ -302,16 +302,6 @@ public final class CollectionGetOperationImpl extends OperationImpl
   }
 
   @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
   public boolean isIdempotentOperation() {
     return !collectionGet.isDelete() && !collectionGet.isDropIfEmpty();
   }

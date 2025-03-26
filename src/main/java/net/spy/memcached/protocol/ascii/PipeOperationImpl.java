@@ -216,11 +216,6 @@ abstract class PipeOperationImpl extends OperationImpl {
   }
 
   @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
   public final boolean isPipeOperation() {
     return true;
   }

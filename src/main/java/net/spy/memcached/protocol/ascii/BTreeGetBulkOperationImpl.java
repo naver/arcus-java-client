@@ -269,14 +269,4 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
     return true;
   }
 
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

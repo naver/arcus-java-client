@@ -86,16 +86,6 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
   }
 
   @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
   public boolean isIdempotentOperation() {
     return false;
   }

@@ -36,19 +36,4 @@ class NoopOperationImpl extends OperationImpl implements NoopOperation {
     prepareBuffer("", 0, EMPTY_BYTES);
   }
 
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }
