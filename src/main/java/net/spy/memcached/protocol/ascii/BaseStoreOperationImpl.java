@@ -121,14 +121,4 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
   public byte[] getData() {
     return data;
   }
-
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
 }

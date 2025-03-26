@@ -291,7 +291,15 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
     this.apiType = type;
   }
 
-  public abstract boolean isBulkOperation();
+  public boolean isBulkOperation() {
+    return false;
+  }
 
-  public abstract boolean isPipeOperation();
+  public boolean isPipeOperation() {
+    return false;
+  }
+
+  public boolean isIdempotentOperation() {
+    return true;
+  }
 }

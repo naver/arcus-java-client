@@ -131,19 +131,4 @@ public final class CollectionExistOperationImpl extends OperationImpl
     return collectionExist;
   }
 
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

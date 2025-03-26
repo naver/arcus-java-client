@@ -134,19 +134,4 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     return StoreType.set;
   }
 
-  @Override
-  public boolean isBulkOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

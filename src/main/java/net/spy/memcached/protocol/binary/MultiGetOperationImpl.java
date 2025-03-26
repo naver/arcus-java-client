@@ -136,14 +136,4 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
     return true;
   }
 
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

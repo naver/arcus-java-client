@@ -464,14 +464,4 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
     return true;
   }
 
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }

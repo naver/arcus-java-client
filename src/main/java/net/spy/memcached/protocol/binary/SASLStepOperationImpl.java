@@ -37,9 +37,4 @@ public class SASLStepOperationImpl extends SASLBaseOperationImpl
     return sc.evaluateChallenge(challenge);
   }
 
-  @Override
-  public boolean isIdempotentOperation() {
-    return false;
-  }
-
 }

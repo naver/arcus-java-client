@@ -237,14 +237,4 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return keys.size() > 1;
   }
 
-  @Override
-  public boolean isPipeOperation() {
-    return false;
-  }
-
-  @Override
-  public boolean isIdempotentOperation() {
-    return true;
-  }
-
 }
