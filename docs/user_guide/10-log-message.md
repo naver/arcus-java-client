@@ -8,7 +8,7 @@ Java client에서 남기는 로그들과 그것들이 의미하는 바는 아래
 ARCUS client가 정상적으로 초기화 되면 다음과 같은 로그를 남긴다.
 
 ```java
-INFO net.spy.memcached.CacheManager: CacheManager started. ([mailto:dev@dev.arcuscloud.nhncorp.com:17288 dev@dev.arcuscloud.nhncorp.com:17288])
+INFO net.spy.memcached.CacheManager: CacheManager started. ([mailto:dev@dev.arcuscloud.jam2in.com:2181 dev@dev.arcuscloud.jam2in.com:2181])
 
 WARN net.spy.memcached.CacheMonitor: Cache list has been changed : From=null, To=[127.0.0.1:11211-hostname, xxx.xxx.xxx.xxx:xxxx-hostname] : [serviceCode=dev]
 
