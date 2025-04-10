@@ -518,7 +518,7 @@ ArcusClient client = new ArcusClient(SERVICE_CODE, factory);
   명령어의 내용을 담는 operation 큐를 생성한다. 기본적으로 크기가 16,384인 큐를 사용한다.
   큐의 크기를 1000으로 변경하고 싶다면 setOpQueueFactory(new ArrayOperationQueueFactory(1000))으로 설정하면 된다.
 
-- setTranscoder(Transcoder<Object> t)
+- setTranscoder(Transcoder\<Object\> t)
 
   캐시의 데이터 영역에 대한 character set과 압축 기준을 설정한다.
   GZip 압축을 사용하며, 기본값은 UTF-8과 16,384 byte이다.
