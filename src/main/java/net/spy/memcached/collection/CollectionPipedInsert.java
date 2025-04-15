@@ -65,18 +65,20 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<>(list.size());
+      List<byte[]> encodedList = new ArrayList<>(list.size() - nextOpIndex);
       CachedData cd = null;
+      int i = 0;
       for (T each : list) {
-        cd = tc.encode(each);
-        encodedList.add(cd.getData());
+        if (i++ >= nextOpIndex) {
+          cd = tc.encode(each);
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
       for (byte[] each : encodedList) {
-        capacity += KeyUtil.getKeyBytes(key).length;
+        capacity += KeyUtil.getKeyBytes(key).length + 128;
         capacity += each.length;
-        capacity += 128;
       }
 
       // allocate the buffer
@@ -86,11 +88,11 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int eSize = encodedList.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (int i = this.nextOpIndex; i < eSize; i++) {
+      for (i = 0; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         int eIndex = index;
         if (index >= 0) {
-          eIndex += i;
+          eIndex += (i + nextOpIndex);
         }
         setArguments(bb, COMMAND, key, eIndex, each.length,
                      createOption, (i < eSize - 1) ? PIPE : "");
@@ -126,18 +128,20 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<>(set.size());
+      List<byte[]> encodedList = new ArrayList<>(set.size() - nextOpIndex);
       CachedData cd = null;
+      int i = 0;
       for (T each : set) {
-        cd = tc.encode(each);
-        encodedList.add(cd.getData());
+        if (i++ >= nextOpIndex) {
+          cd = tc.encode(each);
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
       for (byte[] each : encodedList) {
-        capacity += KeyUtil.getKeyBytes(key).length;
+        capacity += KeyUtil.getKeyBytes(key).length + 128;
         capacity += each.length;
-        capacity += 128;
       }
 
       // allocate the buffer
@@ -147,7 +151,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int eSize = encodedList.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (int i = this.nextOpIndex; i < eSize; i++) {
+      for (i = 0; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, each.length,
             createOption, (i < eSize - 1) ? PIPE : "");
@@ -183,35 +187,37 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<>(map.size());
+      List<Long> bkeyList = new ArrayList<>(map.size() - nextOpIndex);
+      List<byte[]> encodedList = new ArrayList<>(map.size() - nextOpIndex);
       CachedData cd = null;
-      for (T each : map.values()) {
-        cd = tc.encode(each);
-        encodedList.add(cd.getData());
+      int i = 0;
+      for (Map.Entry<Long, T> entry : map.entrySet()) {
+        if (i++ >= nextOpIndex) {
+          bkeyList.add(entry.getKey());
+          cd = tc.encode(entry.getValue());
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
-      int i = 0;
-      for (Long eachBkey : map.keySet()) {
-        capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes(String.valueOf(eachBkey)).length;
-        capacity += encodedList.get(i++).length;
-        capacity += 128;
+      int eSize = encodedList.size();
+      for (i = 0; i < eSize; i++) {
+        capacity += KeyUtil.getKeyBytes(key).length + 128;
+        capacity += KeyUtil.getKeyBytes(String.valueOf(bkeyList.get(i))).length;
+        capacity += encodedList.get(i).length;
       }
 
       // allocate the buffer
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
       // create ascii operation string
-      int keySize = map.keySet().size();
-      List<Long> keyList = new ArrayList<>(map.keySet());
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < keySize; i++) {
-        Long bkey = keyList.get(i);
+      for (i = 0; i < eSize; i++) {
+        Long bkey = bkeyList.get(i);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key, bkey, value.length,
-            createOption, (i < keySize - 1) ? PIPE : "");
+            createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -226,8 +232,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
   /**
    *
    */
-  public static class ByteArraysBTreePipedInsert<T> extends
-          CollectionPipedInsert<T> {
+  public static class ByteArraysBTreePipedInsert<T> extends CollectionPipedInsert<T> {
 
     private static final String COMMAND = "bop insert";
     private final List<Element<T>> elements;
@@ -245,32 +250,34 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<>(elements.size());
+      List<byte[]> encodedList = new ArrayList<>(elements.size() - nextOpIndex);
       CachedData cd = null;
+      int i = 0;
       for (Element<T> each : elements) {
-        cd = tc.encode(each.getValue());
-        encodedList.add(cd.getData());
+        if (i++ >= nextOpIndex) {
+          cd = tc.encode(each.getValue());
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
-      int i = 0;
-      for (Element<T> each : elements) {
-        capacity += KeyUtil.getKeyBytes(key).length;
+      int eSize = encodedList.size();
+      for (i = 0; i < eSize; i++) {
+        Element<T> each = elements.get(i + nextOpIndex);
+        capacity += KeyUtil.getKeyBytes(key).length + 128;
         capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
         capacity += KeyUtil.getKeyBytes(each.getStringEFlag()).length;
-        capacity += encodedList.get(i++).length;
-        capacity += 128;
+        capacity += encodedList.get(i).length;
       }
 
       // allocate the buffer
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
       // create ascii operation string
-      int eSize = elements.size();
       String createOption = attribute != null ?
           CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < eSize; i++) {
-        Element<T> element = elements.get(i);
+      for (i = 0; i < eSize; i++) {
+        Element<T> element = elements.get(i + nextOpIndex);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key,
                      element.getStringBkey(), element.getStringEFlag(), value.length,
@@ -307,35 +314,37 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode values
-      List<byte[]> encodedList = new ArrayList<>(map.size());
+      List<String> mkeyList = new ArrayList<>(map.size() - nextOpIndex);
+      List<byte[]> encodedList = new ArrayList<>(map.size() - nextOpIndex);
       CachedData cd = null;
-      for (T each : map.values()) {
-        cd = tc.encode(each);
-        encodedList.add(cd.getData());
+      int i = 0;
+      for (Map.Entry<String, T> entry : map.entrySet()) {
+        if (i++ >= nextOpIndex) {
+          mkeyList.add(entry.getKey());
+          cd = tc.encode(entry.getValue());
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
-      int i = 0;
-      for (String eachMkey : map.keySet()) {
-        capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes(eachMkey).length;
-        capacity += encodedList.get(i++).length;
-        capacity += 128;
+      int eSize = encodedList.size();
+      for (i = 0; i < eSize; i++) {
+        capacity += KeyUtil.getKeyBytes(key).length + 128;
+        capacity += KeyUtil.getKeyBytes(mkeyList.get(i)).length;
+        capacity += encodedList.get(i).length;
       }
 
       // allocate the buffer
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
       // create ascii operation string
-      int mkeySize = map.keySet().size();
-      List<String> keyList = new ArrayList<>(map.keySet());
       String createOption = attribute != null ?
-          CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
-      for (i = this.nextOpIndex; i < mkeySize; i++) {
-        String mkey = keyList.get(i);
+              CollectionCreate.makeCreateClause(attribute, cd.getFlags()) : "";
+      for (i = 0; i < eSize; i++) {
+        String mkey = mkeyList.get(i);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key, mkey, value.length,
-                     createOption, (i < mkeySize - 1) ? PIPE : "");
+                     createOption, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }

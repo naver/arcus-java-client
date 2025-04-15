@@ -53,24 +53,28 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
-      List<byte[]> encodedList = new ArrayList<>(elements.size());
-      CachedData cd = null;
+      List<byte[]> encodedList = new ArrayList<>(elements.size() - nextOpIndex);
+      CachedData cd;
+      int i = 0;
       for (Element<T> each : elements) {
-        if (each.getValue() != null) {
-          cd = tc.encode(each.getValue());
-          encodedList.add(cd.getData());
-        } else {
-          encodedList.add(null);
+        if (i++ >= nextOpIndex) {
+          if (each.getValue() != null) {
+            cd = tc.encode(each.getValue());
+            encodedList.add(cd.getData());
+          } else {
+            encodedList.add(null);
+          }
         }
       }
 
       // estimate the buffer capacity
-      int i = 0;
       ElementFlagUpdate eflagUpdate;
       byte[] value;
       StringBuilder b;
 
-      for (Element<T> each : elements) {
+      int eSize = encodedList.size();
+      for (i = 0; i < eSize; i++) {
+        Element<T> each = elements.get(i + nextOpIndex);
         eflagUpdate = each.getElementFlagUpdate();
         if (eflagUpdate != null) {
           // eflag
@@ -81,20 +85,19 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
           }
         }
 
-        capacity += KeyUtil.getKeyBytes(key).length;
+        capacity += KeyUtil.getKeyBytes(key).length + 64;
         capacity += KeyUtil.getKeyBytes(each.getStringBkey()).length;
         if (encodedList.get(i) != null) {
-          capacity += encodedList.get(i++).length;
+          capacity += encodedList.get(i).length;
         }
-        capacity += 64;
       }
 
       // allocate the buffer
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
-      int eSize = elements.size();
-      for (i = this.nextOpIndex; i < eSize; i++) {
-        Element<T> element = elements.get(i);
+      // create ascii operation string
+      for (i = 0; i < eSize; i++) {
+        Element<T> element = elements.get(i + nextOpIndex);
         value = encodedList.get(i);
         eflagUpdate = element.getElementFlagUpdate();
         b = new StringBuilder();
@@ -147,39 +150,40 @@ public abstract class CollectionPipedUpdate<T> extends CollectionPipe {
       int capacity = 0;
 
       // encode parameters
+      List<String> mkeyList = new ArrayList<>(elements.size());
       List<byte[]> encodedList = new ArrayList<>(elements.size());
-      CachedData cd = null;
-      for (T each : elements.values()) {
-        cd = tc.encode(each);
-        encodedList.add(cd.getData());
+      CachedData cd;
+      int i = 0;
+      for (Map.Entry<String, T> entry : elements.entrySet()) {
+        if (i++ >= nextOpIndex) {
+          mkeyList.add(entry.getKey());
+          cd = tc.encode(entry.getValue());
+          encodedList.add(cd.getData());
+        }
       }
 
       // estimate the buffer capacity
-      int i = 0;
       byte[] value;
-      StringBuilder b;
-
-      for (String eachMkey : elements.keySet()) {
-        capacity += KeyUtil.getKeyBytes(key).length;
-        capacity += KeyUtil.getKeyBytes(eachMkey).length;
-        capacity += encodedList.get(i++).length;
-        capacity += 64;
+      int eSize = encodedList.size();
+      for (i = 0; i < eSize; i++) {
+        capacity += KeyUtil.getKeyBytes(key).length + 64;
+        capacity += KeyUtil.getKeyBytes(mkeyList.get(i)).length;
+        capacity += encodedList.get(i).length;
       }
 
       // allocate the buffer
       ByteBuffer bb = ByteBuffer.allocate(capacity);
 
       // create ascii operation string
-      int mkeySize = elements.keySet().size();
-      List<String> keyList = new ArrayList<>(elements.keySet());
-      for (i = this.nextOpIndex; i < mkeySize; i++) {
-        String mkey = keyList.get(i);
+      StringBuilder b;
+      for (i = 0; i < eSize; i++) {
+        String mkey = mkeyList.get(i);
         value = encodedList.get(i);
         b = new StringBuilder();
 
         setArguments(bb, COMMAND, key, mkey,
                 b.toString(), (value == null ? -1 : value.length),
-                (i < mkeySize - 1) ? PIPE : "");
+                (i < eSize - 1) ? PIPE : "");
         if (value != null) {
           if (value.length > 0) {
             bb.put(value);
