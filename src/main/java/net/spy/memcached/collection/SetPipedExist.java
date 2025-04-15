@@ -49,18 +49,20 @@ public class SetPipedExist<T> extends CollectionPipe {
     int capacity = 0;
 
     // encode values
-    List<byte[]> encodedList = new ArrayList<>(values.size());
-    CachedData cd = null;
+    List<byte[]> encodedList = new ArrayList<>(values.size() - nextOpIndex);
+    CachedData cd;
+    int i = 0;
     for (T each : values) {
-      cd = tc.encode(each);
-      encodedList.add(cd.getData());
+      if (i++ >= nextOpIndex) {
+        cd = tc.encode(each);
+        encodedList.add(cd.getData());
+      }
     }
 
     // estimate the buffer capacity
     for (byte[] each : encodedList) {
-      capacity += KeyUtil.getKeyBytes(key).length;
+      capacity += KeyUtil.getKeyBytes(key).length + 64;
       capacity += each.length;
-      capacity += 64;
     }
 
     // allocate the buffer
@@ -68,7 +70,7 @@ public class SetPipedExist<T> extends CollectionPipe {
 
     // create ascii operation string
     int eSize = encodedList.size();
-    for (int i = this.nextOpIndex; i < eSize; i++) {
+    for (i = 0; i < eSize; i++) {
       byte[] each = encodedList.get(i);
 
       setArguments(bb, COMMAND, key, each.length,
