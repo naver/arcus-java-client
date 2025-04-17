@@ -35,7 +35,7 @@ public interface ArcusLock extends Lock {
    *
    * <p><b>Note:</b> Only {@link TimeUnit#SECONDS} or coarser units
    * (e.g., MINUTES, HOURS) are supported for the {@code unit} parameter.
-   * Finer units cause an {@link IllegalArgumentException}.
+   * Finer units or {@code null} cause an {@link IllegalArgumentException}.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
    *                  If {@code leaseTime} is negative or zero,
@@ -58,7 +58,7 @@ public interface ArcusLock extends Lock {
    *
    * <p><b>Note:</b> Only {@link TimeUnit#SECONDS} or coarser units
    * (e.g., MINUTES, HOURS) are supported for the {@code unit} parameter.
-   * Finer units cause an {@link IllegalArgumentException}.
+   * Finer units or {@code null} cause an {@link IllegalArgumentException}.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
    *                  If {@code leaseTime} is negative or zero,
@@ -79,7 +79,7 @@ public interface ArcusLock extends Lock {
    *
    * <p><b>Note:</b> Only {@link TimeUnit#SECONDS} or coarser units
    * (e.g., MINUTES, HOURS) are supported for the {@code unit} parameter.
-   * Finer units cause an {@link IllegalArgumentException}.
+   * Finer units or {@code null} cause an {@link IllegalArgumentException}.
    *
    * @param waitTime the maximum time to wait for the lock
    * @param unit the time unit of the {@code waitTime} (must be SECONDS or coarser)
@@ -96,7 +96,7 @@ public interface ArcusLock extends Lock {
    *
    * <p><b>Note:</b> Only {@link TimeUnit#SECONDS} or coarser units
    * (e.g., MINUTES, HOURS) are supported for the {@code unit} parameter.
-   * Finer units cause an {@link IllegalArgumentException}.
+   * Finer units or {@code null} cause an {@link IllegalArgumentException}.
    *
    * @param waitTime the maximum time to wait for the lock
    * @param leaseTime the maximum time to hold the lock after it is acquired.

@@ -37,6 +37,7 @@ import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.lock.ArcusLock;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
@@ -2425,5 +2426,13 @@ public interface ArcusClientIF extends MemcachedClientIF {
   <E> BTreeStoreAndGetFuture<Boolean, E> asyncBopUpsertAndGetTrimmed(
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder);
+
+  /**
+   * Returns a spin lock instance identified by the given name.
+   *
+   * @param name the name identifying the lock
+   * @return a spin lock instance
+   */
+  ArcusLock getSpinLock(String name);
 
 }
