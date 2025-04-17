@@ -45,6 +45,8 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
+import net.spy.memcached.lock.ArcusLock;
+import net.spy.memcached.lock.ArcusSpinLock;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
@@ -1597,6 +1599,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
     return this.getClient().asyncBopUpsertAndGetTrimmed(key, bkey, eFlag,
             value, attributesForCreate, transcoder);
+  }
+
+  @Override
+  public ArcusLock getSpinLock(String name) {
+    return new ArcusSpinLock(name, this);
   }
 
 }
