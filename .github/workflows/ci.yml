@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         jdk: [ 8, 21 ]
-        os: [ ubuntu-20.04 ]
+        os: [ ubuntu-latest ]
       fail-fast: true
     if: |
       (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
