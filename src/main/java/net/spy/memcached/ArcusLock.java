@@ -28,7 +28,8 @@ public interface ArcusLock extends Lock {
 
   /**
    * Acquires the lock and holds it for the specified {@code leaseTime}.
-   * Waits if necessary until the lock becomes available.
+   * If the lock is not available, the current thread waits until it is acquired
+   * and cannot be used for other tasks during this time.
    * Automatically releases the lock after {@code leaseTime}, unless unlocked earlier.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
@@ -39,7 +40,8 @@ public interface ArcusLock extends Lock {
 
   /**
    * Acquires the lock and holds it for the specified {@code leaseTime}, unless interrupted.
-   * Waits if necessary until the lock becomes available, or until the thread is interrupted.
+   * If the lock is not available, the current thread waits until it is acquired
+   * and cannot be used for other tasks during this time.
    * Automatically releases the lock after {@code leaseTime}, unless unlocked earlier.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
@@ -55,7 +57,7 @@ public interface ArcusLock extends Lock {
    *
    * @param waitTime the maximum time to wait for the lock
    * @param leaseTime the maximum time to hold the lock after it is acquired.
-   *                  If {@code leaseTime} is -1, the lock is held until {@code unlock()} is called.
+   *                  If {@code leaseTime} is negative or zero, the lock is held until {@code unlock()} is called.
    * @param unit the time unit of {@code waitTime} and {@code leaseTime}
    * @return {@code true} if the lock was acquired, otherwise {@code false}
    * @throws InterruptedException if the current thread is interrupted while waiting
