@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
@@ -268,8 +267,8 @@ abstract class ClientBaseCase {
         }
 
         @Override
-        public Map<APIType, ReadPriority> getAPIReadPriority() {
-          return inner.getAPIReadPriority();
+        public ReadPriority getAPIReadPriority(APIType apiType) {
+          return inner.getAPIReadPriority(apiType);
         }
         /* ENABLE_REPLICATION end */
       };

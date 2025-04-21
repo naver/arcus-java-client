@@ -1349,10 +1349,7 @@ public final class MemcachedConnection extends SpyObject {
   private ReplicaPick getReplicaPick(APIType apiType) {
     ReplicaPick pick = ReplicaPick.MASTER;
     if (apiType.getAPIOpType() == OperationType.READ) {
-      ReadPriority readPriority = connFactory.getAPIReadPriority().get(apiType);
-      if (readPriority == null) {
-        readPriority = connFactory.getReadPriority();
-      }
+      ReadPriority readPriority = connFactory.getAPIReadPriority(apiType);
       if (readPriority == ReadPriority.SLAVE) {
         pick = ReplicaPick.SLAVE;
       } else if (readPriority == ReadPriority.RR) {
@@ -1365,10 +1362,7 @@ public final class MemcachedConnection extends SpyObject {
   private ReplicaPick getReplicaPick(Operation op) {
     ReplicaPick pick = ReplicaPick.MASTER;
     if (op.isReadOperation()) {
-      ReadPriority readPriority = connFactory.getAPIReadPriority().get(op.getAPIType());
-      if (readPriority == null) {
-        readPriority = connFactory.getReadPriority();
-      }
+      ReadPriority readPriority = connFactory.getAPIReadPriority(op.getAPIType());
       if (readPriority == ReadPriority.SLAVE) {
         pick = ReplicaPick.SLAVE;
       } else if (readPriority == ReadPriority.RR) {
