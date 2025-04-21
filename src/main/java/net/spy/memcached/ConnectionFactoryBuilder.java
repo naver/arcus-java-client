@@ -417,16 +417,6 @@ public class ConnectionFactoryBuilder {
 
     return this;
   }
-
-  public ReadPriority getAPIReadPriority(APIType apiType) {
-    ReadPriority priority = this.apiReadPriorityList.get(apiType);
-
-    return priority != null ? priority : ReadPriority.MASTER;
-  }
-
-  public Map<APIType, ReadPriority> getAPIReadPriority() {
-    return this.apiReadPriorityList;
-  }
   /* ENABLE_REPLICATION end */
 
   public ConnectionFactoryBuilder setKeepAlive(boolean on) {
@@ -653,8 +643,12 @@ public class ConnectionFactoryBuilder {
       }
 
       @Override
-      public Map<APIType, ReadPriority> getAPIReadPriority() {
-        return apiReadPriorityList;
+      public ReadPriority getAPIReadPriority(APIType apiType) {
+        ReadPriority readPriority = apiReadPriorityList.get(apiType);
+        if (readPriority == null) {
+          return this.getReadPriority();
+        }
+        return readPriority;
       }
       /* ENABLE_REPLICATION end */
     };

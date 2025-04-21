@@ -377,8 +377,13 @@ public class DefaultConnectionFactory extends SpyObject
     return DEFAULT_READ_PRIORITY;
   }
 
-  public Map<APIType, ReadPriority> getAPIReadPriority() {
-    return DEFAULT_API_READ_PRIORITY_LIST;
+  @Override
+  public ReadPriority getAPIReadPriority(APIType apiType) {
+    ReadPriority readPriority = DEFAULT_API_READ_PRIORITY_LIST.get(apiType);
+    if (readPriority == null) {
+      return DEFAULT_READ_PRIORITY;
+    }
+    return readPriority;
   }
   /* ENABLE_REPLICATION end */
 }

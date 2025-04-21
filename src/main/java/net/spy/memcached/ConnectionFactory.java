@@ -22,7 +22,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import net.spy.memcached.auth.AuthDescriptor;
@@ -232,8 +231,7 @@ public interface ConnectionFactory {
   /**
    * get api read priority
    *
-   * @return
    */
-  Map<APIType, ReadPriority> getAPIReadPriority();
+  ReadPriority getAPIReadPriority(APIType apiType);
   /* ENABLE_REPLICATION end */
 }
