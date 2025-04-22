@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.spy.memcached;
+package net.spy.memcached.lock;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
@@ -33,7 +34,8 @@ public interface ArcusLock extends Lock {
    * Automatically releases the lock after {@code leaseTime}, unless unlocked earlier.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
-   *                  If {@code leaseTime} is -1, the lock is held until {@code unlock()} is called.
+   *                  If {@code leaseTime} is negative or zero,
+   *                  the lock is held until {@code unlock()} is called.
    * @param unit the time unit of {@code leaseTime}
    */
   void lock(long leaseTime, TimeUnit unit);
@@ -45,11 +47,13 @@ public interface ArcusLock extends Lock {
    * Automatically releases the lock after {@code leaseTime}, unless unlocked earlier.
    *
    * @param leaseTime the maximum time to hold the lock after it is acquired.
-   *                  If {@code leaseTime} is -1, the lock is held until {@code unlock()} is called.
+   *                  If {@code leaseTime} is negative or zero,
+   *                  the lock is held until {@code unlock()} is called.
    * @param unit the time unit of {@code leaseTime}
    * @throws InterruptedException if the current thread is interrupted
    */
-  void lockInterruptibly(long leaseTime, TimeUnit unit) throws InterruptedException;
+  void lockInterruptibly(long leaseTime, TimeUnit unit)
+          throws InterruptedException, ExecutionException;
 
   /**
    * Tries to acquire the lock within the specified {@code waitTime},
@@ -57,10 +61,35 @@ public interface ArcusLock extends Lock {
    *
    * @param waitTime the maximum time to wait for the lock
    * @param leaseTime the maximum time to hold the lock after it is acquired.
-   *                  If {@code leaseTime} is negative or zero, the lock is held until {@code unlock()} is called.
+   *                  If {@code leaseTime} is negative or zero,
+   *                  the lock is held until {@code unlock()} is called.
    * @param unit the time unit of {@code waitTime} and {@code leaseTime}
-   * @return {@code true} if the lock was acquired, otherwise {@code false}
+   * @return {@code true} if the lock was acquired and {@code false} otherwise
    * @throws InterruptedException if the current thread is interrupted while waiting
    */
-  boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException;
+  boolean tryLock(long waitTime, long leaseTime, TimeUnit unit)
+          throws InterruptedException, ExecutionException;
+
+  /**
+   * Checks if the lock is currently held by any thread.
+   *
+   * @return {@code true} if the lock is held by any thread and {@code false} otherwise
+   */
+  boolean isLocked();
+
+  /**
+   * Checks if the lock is currently held by the specified thread.
+   *
+   * @param threadId the ID of the thread to check
+   * @return {@code true} if the lock is held by the specified thread and {@code false} otherwise
+   */
+  boolean isHeldByThread(long threadId);
+
+  /**
+   * Checks if the current thread holds the lock.
+   *
+   * @return {@code true} if the current thread holds the lock and {@code false} otherwise
+   */
+  boolean isHeldByCurrentThread();
+
 }
