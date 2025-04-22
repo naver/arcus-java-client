@@ -130,6 +130,8 @@ import net.spy.memcached.internal.result.MopGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultImpl;
 import net.spy.memcached.internal.result.SMGetResultOldImpl;
 import net.spy.memcached.internal.result.SopGetResultImpl;
+import net.spy.memcached.lock.ArcusLock;
+import net.spy.memcached.lock.ArcusSpinLock;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -3608,5 +3610,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       }
     }
     return VERSION;
+  }
+
+  @Override
+  public ArcusLock getSpinLock(String name) {
+    return new ArcusSpinLock(name, this);
   }
 }
