@@ -98,7 +98,7 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
     boolean allDigit = line.chars().allMatch(Character::isDigit);
     OperationStatus status;
     if (allDigit) {
-      status = new OperationStatus(true, line);
+      status = new CollectionOperationStatus(true, line, CollectionResponse.END);
     } else {
       status = matchStatus(line, NOT_FOUND, NOT_FOUND_ELEMENT,
               UNREADABLE, OVERFLOWED, OUT_OF_RANGE,

@@ -1606,7 +1606,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
             if (cstatus.isSuccess()) {
               rv.set(Integer.valueOf(cstatus.getMessage()),
-                      new CollectionOperationStatus(new OperationStatus(true, "END")));
+                      new CollectionOperationStatus(true, "END", CollectionResponse.END));
               return;
             }
             rv.set(null, cstatus);
@@ -3520,10 +3520,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             if (status.isSuccess()) {
               try {
                 rv.set(Long.valueOf(status.getMessage()),
-                        new CollectionOperationStatus(new OperationStatus(true, "END")));
+                        new CollectionOperationStatus(true, "END", CollectionResponse.END));
               } catch (NumberFormatException e) {
-                rv.set(null, new CollectionOperationStatus(
-                        new OperationStatus(false, status.getMessage())));
+                rv.set(null, new CollectionOperationStatus(false, status.getMessage(), CollectionResponse.EXCEPTION));
 
                 getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, subkey, status);
               }
