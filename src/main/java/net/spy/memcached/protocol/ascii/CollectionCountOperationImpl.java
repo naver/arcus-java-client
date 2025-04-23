@@ -86,8 +86,7 @@ public final class CollectionCountOperationImpl extends OperationImpl implements
       assert "COUNT".equals(stuff[0]);
       count = Integer.parseInt(stuff[1]);
 
-      status = new CollectionOperationStatus(new OperationStatus(true,
-              String.valueOf(count)));
+      status = new CollectionOperationStatus(true, String.valueOf(count), CollectionResponse.END);
     } else {
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);

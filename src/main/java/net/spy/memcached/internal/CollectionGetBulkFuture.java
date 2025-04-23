@@ -26,11 +26,11 @@ import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
-import net.spy.memcached.ops.OperationStatus;
 
 public class CollectionGetBulkFuture<T> implements Future<T> {
 
@@ -124,9 +124,9 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
 
   public CollectionOperationStatus getOperationStatus() {
     if (isCancelled()) {
-      return new CollectionOperationStatus(new OperationStatus(false, "CANCELED"));
+      return new CollectionOperationStatus(false, "CANCELED", CollectionResponse.CANCELED);
     }
 
-    return new CollectionOperationStatus(new OperationStatus(true, "END"));
+    return new CollectionOperationStatus(true, "END", CollectionResponse.END);
   }
 }

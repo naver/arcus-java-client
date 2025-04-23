@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
@@ -153,13 +154,12 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
   public void makeResultOperationStatus() {
     refineTrimmedKeys();
 
-    final OperationStatus status;
     if (!unique && hasDuplicatedBKeyResult()) {
-      status = new OperationStatus(true, "DUPLICATED");
+      resultOperationStatus = new CollectionOperationStatus(true, "DUPLICATED",
+              CollectionResponse.DUPLICATED);
     } else {
-      status = new OperationStatus(true, "END");
+      resultOperationStatus = new CollectionOperationStatus(true, "END", CollectionResponse.END);
     }
-    resultOperationStatus = new CollectionOperationStatus(status);
   }
 
   /**
