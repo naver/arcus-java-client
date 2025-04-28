@@ -33,7 +33,7 @@ public class CollectionOperationStatus extends OperationStatus {
   }
 
   public CollectionOperationStatus(OperationStatus status) {
-    super(status.isSuccess(), status.getMessage());
+    super(status.isSuccess(), status.getMessage(), status.getStatusCode());
     this.collectionResponse = CollectionResponse.resolve(status.getMessage());
   }
 
