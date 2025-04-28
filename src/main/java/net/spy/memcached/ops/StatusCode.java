@@ -64,6 +64,8 @@ public enum StatusCode {
       return ERR_SERVER;
     } else if (line.equals("CLIENT_ERROR")) {
       return ERR_CLIENT;
+    } else if (line.startsWith("INVALID")) {
+      return ERR_INVAL;
     } else {
       logger.warn("Undefined response message: %s", line);
       return UNDEFINED;

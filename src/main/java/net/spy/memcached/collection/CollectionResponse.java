@@ -46,6 +46,7 @@ public enum CollectionResponse {
   CANCELED,
 
   EXCEPTION,
+  INVALID,
 
   UPDATED,
   BKEY_MISMATCH,
@@ -78,6 +79,8 @@ public enum CollectionResponse {
   public static CollectionResponse resolve(String s) {
     if (ENUM_STRINGS.contains(s)) {
       return CollectionResponse.valueOf(s);
+    } else if (s.startsWith(CollectionResponse.INVALID.name())) {
+      return CollectionResponse.INVALID;
     } else {
       return UNDEFINED;
     }
