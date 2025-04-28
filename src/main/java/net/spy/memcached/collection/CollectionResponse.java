@@ -45,9 +45,6 @@ public enum CollectionResponse {
   UNDEFINED,
   CANCELED,
 
-  INTERRUPT_EXCEPTION,
-  EXECUTION_EXCEPTION,
-  TIMEOUT_EXCEPTION,
   EXCEPTION,
 
   UPDATED,
@@ -56,12 +53,6 @@ public enum CollectionResponse {
 
   CREATED,
   EXISTS,
-  SERVER_ERROR,
-
-  /**
-   * Command pipelining result
-   */
-  RESPONSE,
 
   /**
    * read only collection
