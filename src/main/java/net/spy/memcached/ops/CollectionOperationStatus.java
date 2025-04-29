@@ -28,7 +28,7 @@ public class CollectionOperationStatus extends OperationStatus {
   private final CollectionResponse collectionResponse;
 
   public CollectionOperationStatus(boolean success, String msg, CollectionResponse res) {
-    super(success, msg);
+    super(success, msg, StatusCode.fromAsciiLine(res.name()));
     this.collectionResponse = res;
   }
 

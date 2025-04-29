@@ -66,8 +66,6 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
           false, "TYPE_MISMATCH", CollectionResponse.TYPE_MISMATCH);
   private static final OperationStatus BKEY_MISMATCH = new CollectionOperationStatus(
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
-  private static final OperationStatus UNDEFINED_OPERATION = new CollectionOperationStatus(
-          false, "UNDEFINED_OPERATION", CollectionResponse.UNDEFINED);
 
   private static final OperationStatus[] INSERT_AND_GET_STATUS_ON_LINE = {
       STORED, CREATED_STORED, NOT_FOUND, ELEMENT_EXISTS, OVERFLOWED,
