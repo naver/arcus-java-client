@@ -1,12 +1,18 @@
 package net.spy.memcached.ops;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class OperationStatusTest extends BaseIntegrationTest {
@@ -147,4 +153,59 @@ class OperationStatusTest extends BaseIntegrationTest {
     assertNotEquals(status1.hashCode(), status3.hashCode());
   }
 
+  @Test
+  void cancelMakesOperationStatus() {
+    GetFuture<Object> future = mc.asyncGet("key");
+    try {
+      future.cancel(true);
+    } catch (Exception e) {
+      // expected
+    }
+    OperationStatus status = future.getStatus();
+    assertFalse(status instanceof CollectionOperationStatus);
+    assertFalse(status.isSuccess());
+    assertEquals("cancelled", status.getMessage());
+    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
+  }
+
+  @Test
+  void collectionOperationStatusContainsStatusCode() {
+    OperationStatus os2 = new OperationStatus(false, "OK", StatusCode.SUCCESS);
+    OperationStatus os = new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
+    OperationStatus os3 = new OperationStatus(false, "EXCEPTION", StatusCode.EXCEPTION);
+
+    CollectionOperationStatus cos = new CollectionOperationStatus(os);
+    CollectionOperationStatus cos2 = new CollectionOperationStatus(os2);
+    CollectionOperationStatus cos3 = new CollectionOperationStatus(os3);
+    assertEquals(StatusCode.ERR_NOT_FOUND, cos.getStatusCode());
+    assertEquals(StatusCode.SUCCESS, cos2.getStatusCode());
+    assertEquals(StatusCode.EXCEPTION, cos3.getStatusCode());
+  }
+
+  @Test
+  void collectionOperationStatusContainsStatusCodeSuccess() {
+    List<CollectionOperationStatus> statusList = new ArrayList<>();
+    statusList.add(new CollectionOperationStatus(false, "OK",
+            CollectionResponse.OK));
+    statusList.add(new CollectionOperationStatus(false, "END",
+            CollectionResponse.END));
+    statusList.add(new CollectionOperationStatus(false, "STORED",
+            CollectionResponse.STORED));
+    statusList.add(new CollectionOperationStatus(false, "DELETED",
+            CollectionResponse.DELETED));
+    statusList.add(new CollectionOperationStatus(false, "DELETED_DROPPED",
+            CollectionResponse.DELETED_DROPPED));
+    statusList.add(new CollectionOperationStatus(false, "CREATE",
+            CollectionResponse.CREATED));
+    statusList.add(new CollectionOperationStatus(false, "CREATED_STORED",
+            CollectionResponse.CREATED_STORED));
+    statusList.add(new CollectionOperationStatus(false, "REPLACED",
+            CollectionResponse.REPLACED));
+    statusList.add(new CollectionOperationStatus(false, "UPDATED",
+            CollectionResponse.UPDATED));
+
+    for (CollectionOperationStatus status : statusList) {
+      assertEquals(StatusCode.SUCCESS, status.getStatusCode());
+    }
+  }
 }
