@@ -56,13 +56,16 @@ final class StatsOperationImpl extends OperationImpl
 
   @Override
   public void handleLine(String line) {
-    if (line.startsWith("END")) {
-      cb.receivedStatus(END);
-      transitionState(OperationState.COMPLETE);
-    } else {
+    if (line.startsWith("STAT") || line.startsWith("PREFIX") || line.startsWith("ITEM")) {
       String[] parts = line.split(" ", 3);
       assert parts.length == 3;
       cb.gotStat(parts[1], parts[2]);
+    } else if (line.startsWith("END")) {
+      cb.receivedStatus(END);
+      transitionState(OperationState.COMPLETE);
+    } else {
+      cb.receivedStatus(matchStatus(line));
+      transitionState(OperationState.COMPLETE);
     }
   }
 

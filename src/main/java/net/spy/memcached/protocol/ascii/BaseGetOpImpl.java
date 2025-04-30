@@ -105,7 +105,8 @@ abstract class BaseGetOpImpl extends OperationImpl {
       addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
     /* ENABLE_MIGRATION end */
     } else {
-      assert false : "Unknown line type: " + line;
+      getCallback().receivedStatus(matchStatus(line));
+      transitionState(OperationState.COMPLETE);
     }
   }
 
