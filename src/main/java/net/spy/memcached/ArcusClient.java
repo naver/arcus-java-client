@@ -1888,6 +1888,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
@@ -2916,6 +2917,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to,

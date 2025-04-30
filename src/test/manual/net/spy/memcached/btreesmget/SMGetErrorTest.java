@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@SuppressWarnings("deprecation")
 class SMGetErrorTest extends BaseIntegrationTest {
 
   private static final List<String> KEY_LIST = new ArrayList<>();

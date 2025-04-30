@@ -66,6 +66,7 @@ class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
       mc.asyncBopInsert(key2, new byte[]{4}, eFlag, value + "2",
               new CollectionAttributes()).get();
 
+      @SuppressWarnings("deprecation")
       List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
               testKeyList, new byte[]{0}, new byte[]{10},
               ElementFlagFilter.DO_NOT_FILTER, 0, 10).get();
