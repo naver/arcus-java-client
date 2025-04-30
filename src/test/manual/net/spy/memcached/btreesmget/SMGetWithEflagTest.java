@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@SuppressWarnings("deprecation")
 class SMGetWithEflagTest extends BaseIntegrationTest {
 
   private final String KEY = this.getClass().getSimpleName();

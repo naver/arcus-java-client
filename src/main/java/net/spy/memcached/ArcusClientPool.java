@@ -1104,6 +1104,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().flush(prefix, delay);
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to,
@@ -1363,6 +1364,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             count, withDelete, dropIfEmpty, tc);
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to,

@@ -1399,7 +1399,10 @@ public interface ArcusClientIF {
    * @param count       number of returning values. must be larger than 0.
    *                    {@code offset + count} must not be more than 1000.
    * @return a future that will hold the return value list of the fetch.
+   * @deprecated use {@link #asyncBopSortMergeGet(List, long, long,
+   * ElementFlagFilter, int, SMGetMode)}
    */
+  @Deprecated
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int offset, int count);
@@ -1949,7 +1952,10 @@ public interface ArcusClientIF {
    * @param count       number of returning values. must be larger than 0.
    *                    {@code offset + count} must not be more than 1000.
    * @return a future that will hold the return value list of the fetch.
+   * @deprecated use {@link #asyncBopSortMergeGet(java.util.List, byte[], byte[],
+   * ElementFlagFilter, int, SMGetMode)}
    */
+  @Deprecated
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int offset, int count);

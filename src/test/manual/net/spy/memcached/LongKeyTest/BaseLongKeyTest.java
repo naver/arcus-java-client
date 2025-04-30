@@ -178,6 +178,7 @@ class BaseLongKeyTest extends BaseIntegrationTest {
     SMGetMode smgetMode = SMGetMode.UNIQUE;
 
     /* old SMGetTest */
+    @SuppressWarnings("deprecation")
     SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
             .asyncBopSortMergeGet(keys, 0, 10,
                     ElementFlagFilter.DO_NOT_FILTER, 0, 10);
