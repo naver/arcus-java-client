@@ -105,9 +105,22 @@ public final class CacheMonitor extends SpyObject implements Watcher,
   /**
    * Processes every events from the ZooKeeper.
    */
+  @SuppressWarnings("fallthrough")
   public void process(WatchedEvent event) {
-    if (event.getType() == Event.EventType.NodeChildrenChanged) {
-      asyncGetCacheList();
+    switch (event.getType()) {
+      case None:
+        // Do nothing. Session events are handled by CacheManager.
+        break;
+      case ChildWatchRemoved:
+        getLogger().warn("Child watch removed. The znode is " + event.getPath());
+        // fallthrough
+      case NodeChildrenChanged:
+        asyncGetCacheList();
+        break;
+      default:
+        getLogger().warn("Unexpected event type: " + event.getType()
+            + ". The znode is " + event.getPath());
+        break;
     }
   }
 

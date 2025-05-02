@@ -111,14 +111,27 @@ public final class MigrationMonitor extends SpyObject implements Watcher {
   /**
    * Processes every event from the ZooKeeper.
    */
+  @SuppressWarnings("fallthrough")
   public void process(WatchedEvent event) {
-    if (event.getType() == Event.EventType.NodeChildrenChanged) {
-      String path = event.getPath();
-      if (cloudStatZPath.equals(path)) {
-        asyncGetCloudStat();
-      } else if (alterListZPath.equals(path)) {
-        asyncGetAlterList();
-      }
+    switch (event.getType()) {
+      case None:
+        // Do nothing. Session events are handled by CacheManager.
+        break;
+      case ChildWatchRemoved:
+        getLogger().warn("Child watch removed. The znode is " + event.getPath());
+        // fallthrough
+      case NodeChildrenChanged:
+        String path = event.getPath();
+        if (cloudStatZPath.equals(path)) {
+          asyncGetCloudStat();
+        } else if (alterListZPath.equals(path)) {
+          asyncGetAlterList();
+        }
+        break;
+      default:
+        getLogger().warn("Unexpected event type: " + event.getType()
+            + ". The znode is " + event.getPath());
+        break;
     }
   }
 
