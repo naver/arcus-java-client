@@ -1,11 +1,8 @@
 package net.spy.memcached.internal.result;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -172,15 +169,10 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     if (!trimmedKeyMap.isEmpty() && count <= mergedResult.size()) {
       SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
 
-      // FIXME: use removeIf with entrySet() when upgrading java version 8
-      Iterator<Map.Entry<String, BKeyObject>> iterator = trimmedKeyMap.entrySet().iterator();
-      while (iterator.hasNext()) {
-        Map.Entry<String, BKeyObject> entry = iterator.next();
+      trimmedKeyMap.entrySet().removeIf(entry -> {
         int comp = entry.getValue().compareTo(lastElement.getBkeyObject());
-        if ((reverse) ? (comp <= 0) : (comp >= 0)) {
-          iterator.remove();
-        }
-      }
+        return (reverse) ? (comp <= 0) : (comp >= 0);
+      });
     }
   }
 }
