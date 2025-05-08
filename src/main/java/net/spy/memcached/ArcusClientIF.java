@@ -45,7 +45,7 @@ import net.spy.memcached.transcoders.Transcoder;
 /**
  * Interface for Arcus specific commands
  */
-public interface ArcusClientIF {
+public interface ArcusClientIF extends MemcachedClientIF {
 
   /**
    * Sets attributes (metadata) associated with each key
