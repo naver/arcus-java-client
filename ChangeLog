@@ -1,3 +1,56 @@
+# 2025-05-09 [version 1.14.1]
+## 🐣 New Features
+  - Add node information into OperationException.
+  - Add option to disable optimization in CollectionTranscoder.
+  - Deprecate old smget API.
+  - Make ArcusClientIF extends MemcachedClientIF.
+  - Make waitForQueues method into private.
+  - Make getApiReadPriority method in ConnectionFactory returns ReadPriority.
+  - Override equals and hashCode methods in value classes.
+  - Remove deprecated repl setter in ConnectionFactoryBuilder.
+  - Return partial result if error or cancel occurred in getSome method.
+  - Return CompositeException in get method in BulkGetFuture.
+  - Return empty map if response is NOT_FOUND_ELEMENT in BopFindPositionWithGet API.
+  - Support custom classloader in transcoder when deserializing.
+  - Support JDK 21 by suppressing warnings.
+  - Support for checkstyle versions 8.42 and higher.
+  - Supports INVALID responses that do not require reconnection.
+  - Throw exception when wrong argument came into ConnectionFactoryBuilder.
+## 🔧 Enhancements
+  - Change cacheList and alterList parsing logic.
+  - Change some assert statement into IllegalArgumentException or Assertions methods.
+  - Encodes only elements after nextOpIndex, not the entire element.
+  - Optimize switch-over and updateReplConnections logics.
+  - Optimize variable data types in futures.
+## ⚙️ Internal Changes
+  - Choose get/mget by version when optimize get commands and limit key count 100.
+  - Log unexpected events received from ZooKeeper watcher.
+  - Read bytes from ARCUS while PIPE_ERROR received in the pipe operation.
+  - Remove wasCancelled() method.
+## 🐛 Bug Fixes
+  - Apply appropriate synchronization on fields of SMGetResult class.
+  - Do not send write op to slave node.
+  - Handling various switchover cases.
+  - Send flush op to master node only.
+  - Set StatusCode in CollectionOperationStatus.
+  - Use proper index when lop piped insert.
+  - Call receivedStatus callback in OperationImpl#handleError method.
+  - Return CANCELED status when getOperationStatus called.
+## 📝 Documentation
+  - Add backslash before `<`, `>`.
+  - Separate front cache docs.
+  - Update ChangeLog format to be more readable.
+  - Update ConnectionFactoryBuilder docs.
+## ✅ Testing
+  - Add test case for Pipe API when it's non-piped.
+  - Add test case for `MemcachedConnection.handleCacheNodesChange()` method in replication mode.
+  - Fix CI test failures.
+  - Fix test cases which could be failed sometimes.
+  - Update jdk ci version and ubuntu version.
+## ⬆️ Dependency Upgrades
+  - Upgrade ehcache version to 3.10.8.
+  - Upgrade JUnit version to 5.10.2, JMock version to 2.13.1.
+
 # 2024-07-31 [version 1.14.0]
 ## 🐣 New Features
   - Bulk methods using varargs keys are deprecated. Instead, methods using collection keys are still available.
