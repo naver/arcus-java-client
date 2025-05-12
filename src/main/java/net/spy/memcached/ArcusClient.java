@@ -357,7 +357,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               ". Invoke ConnectionFactoryBuilder.setDnsCacheTtlCheck(false) to avoid this constraint.");
       throw new IllegalStateException("DNS cache TTL is out of range from 0 to " + MAX_DNS_CACHE_TTL);
     }
-    collectionTranscoder = new CollectionTranscoder();
+    collectionTranscoder = cf.getDefaultCollectionTranscoder();
     smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean(name);
   }
