@@ -368,6 +368,10 @@ public class ConnectionFactoryBuilder {
    * Set max smget key chunk size
    */
   public ConnectionFactoryBuilder setMaxSMGetKeyChunkSize(int size) {
+    if (size <= 0 || size > 10000) {
+      throw new IllegalArgumentException(
+              "Max smget key chunk size must be a positive number and less than 10000");
+    }
     maxSMGetChunkSize = size;
     return this;
   }
