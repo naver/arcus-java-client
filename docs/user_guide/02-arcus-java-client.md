@@ -411,104 +411,167 @@ SLF4J: Class path contains multiple SLF4J bindings.
 SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 ```
 
-### ConnectionFactoryBuilder 클래스의 주요 메소드
+### ConnectionFactoryBuilder 설정
 
-- setFailureMode(FailureMode fm)
-
-  FailureMode를 변경한다.
-  Cancel, Redistrubute, Retry의 3개 FailureMode가 있으며, 각각의 의미는 다음과 같다.
-
-  - Cancel : 다운(down)된 노드에 요청하는 모든 작업을 자동으로 취소한다.
-  - Redistribute : 여러 개의 Node가 등록되어 있을 경우, Request가 실패하면 다음 Node에게 해당 Request를 다시 요청한다.                      이렇게 해서 Timeout이 날 때까지 수행한다. 만약 Node가 한 개라면 다음 Node는 자기 자신이 된다.
-  - Retry : Timeout이 날 때까지 Request가 실패하면 계속 현재 Node에 요청을 시도한다
-
-  ARCUS는 Cancel 모드를 디폴트로 사용한다.
-  Redistribute나 Retry를 사용할 경우, 반복적인 요청에 의해 응용 서버에 부하가 발생할 수 있어
-  이러한 두 가지 방식의 사용을 금지하고 있다.
-  
-- setOpTimeout(long t)
-
-  SpyThread가 ARCUS Cache Server로부터 응답을 받는 동안의 오퍼레이션 타임아웃을 밀리초 단위로 설정한다.
-  기본값은 1,000 밀리초이다.
-  참고로, 응용이 Callback을 받을 때까지 설정하는 Timeout은
-  “오퍼레이션 타임아웃 + 명령어 생성시간 + 명령어 등록시간”을 포함하는 Timeout으로 이것과는 다르다.
-
-- setProtocol(ConnectionFactoryBuilder.Protocol prot)
-
-  ARCUS client와 server 사이에 사용할 프로토콜을 지정한다.
-  Text와 Binary의 두 프로토콜이 있으나, **ARCUS에서는 Text 프로토콜만을 사용해야 한다.**
-  
-- setMaxReconnectDelay(long to)
-
-  ARCUS와 연결이 끊겼을 경우 다시 연결을 맺기 위해서 대기하는 최대 시간을 초 단위로 지정한다.
-  ARCUS는 기본 1초를 사용한다.
 
 - setOpQueueFactory(OperationQueueFactory q)
 
-  명령어의 내용을 담는 operation 큐를 생성한다. 기본적으로 크기가 16,384인 큐를 사용한다.
-  큐의 크기를 1000으로 변경하고 싶다면 setOpQueueFactory(new ArrayOperationQueueFactory(1000))으로 설정하면 된다.
+  명령어의 내용을 담는 operation이 최초로 담기는 Input Queue의 팩토리 객체를 지정한다.
+  지정하지 않을 경우 크기가 16,384인 ArrayBlockingQueue를 생성해 사용하게 된다.
+  - Arcus Java Client에서는 두 가지의 OperationQueueFactory 구현을 제공한다.
+    - ArrayOperationQueueFactory
+      - ArrayBlockingQueue를 생성한다.
+      - 생성자의 인자를 통해 큐의 크기를 지정할 수 있다.
+    - LinkedOperationQueueFactory
+      - LinkedBlockingQueue를 생성한다.
+      - 큐의 크기를 지정할 수 없다. LinkedBlockingQueue 자체에 큐 크기를 지정할 수 없기 때문이다.
 
-- setTranscoder(Transcoder\<Object\> t)
+- setWriteOpQueueFactory(OperationQueueFactory q)
 
-  캐시의 데이터 영역에 대한 character set과 압축 기준을 설정한다.
-  GZip 압축을 사용하며, 기본값은 UTF-8과 16,384 byte이다.
-  즉, 모든 요청의 data 영역은 UTF-8로 encoding/decoding 되고 data 영역의 크기가 16,384byte 이상이면
-  압축하여 ARCUS와 통신하게 된다.
-  
-  만약, character set을 EUC-KR로 설정하고 압축 기준을 4,096byte로 변경하려면 다음과 같이 설정한다.
+  Arcus 캐시 서버에 요청을 보내기 위해 대기 중인 operation들을 담는 Write Queue의 팩토리 객체를 지정한다.
 
-  ```java
-  SerializingTranscoder trans = new SerializingTranscoder();
-  trans.setCharset(“EUC-KR”);
-  trans.setCompressionThreshold(4096);
-  setTranscoder(trans);
-  ```
-  직접 ClassLoader 객체를 지정해 사용할 수 있다. Spring Devtools와 같이 클래스로더를 별도로 두는
-  라이브러리를 사용할 때 캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
-  ```java
-  SerializingTranscoder tc = new SerializingTranscoder(CachedData.MAX_SIZE, this.getClass().getClassLoader());
-  ```
+- setReadOpQueueFactory(OperationQueueFactory q)
 
-- setShouldOptimize(boolean o)
-
-  최적화 로직 사용여부를 결정한다.
-  최적화 로직은 Operation Queue에 순서대로 있는 get 연산들을  multi-get과 get 연산으로 조합형으로
-  한꺼번에 수행하게 된다. **ARCUS에서는 optimize 로직 사용을 권장하지 않는다.**
-
-- setReadBufferSize(int to)
-
-  ARCUS server socket과 통신할 때 사용되는 전역 ByteBuffer 크기를 설정한다.
-  (이름은 Read이지만 읽기/쓰기 버퍼의 크기는 이 값을 따른다)
-  만약 ByteBuffer 크기를 넘어서는 데이터가 넘어오면 재 사용성을 높이기 위해 ByteBuffer 크기만큼 처리한 후
-  ByteBuffer의 내용을 비우고, 다시 사용하도록 되어 있다. 크기의 단위는 byte이며, 기본값은 16,384이다.
-  
-- setDaemon(boolean d)
-
-  기본값이 true이다. 
-
-- setTimeoutExceptionThreshold(int to)
-
-  Timeout이 연속으로 발생할 경우 해당 Connection에 문제가 발생했다고 판단하여 Connection을 끊고 재접속을 시도한다.
-  ARCUS에서 사용하는 연속 Timeout 한계값은 10이다.
-
-- setTimeoutRatioThreshold(int to)
-
-  Client request가 어떤 이유로 오랫동안 처리되지 못하면, ARCUS client는 continuous timeout 방법으로
-  이를 탐지하고 응용에게 빠른 실패 응답을 전달한다. 따라서, 응용은 실패한 request 성격에 따라
-  DB 조회할 지 아니면 ARCUS에 재요청할 지를 결정하여 움직일 수 있다.
-
-  Client request가 오랫동안 처리되지 못하는 것이 아닌 그 처리 속도가 매우 느려진 경우에는
-  일부 request에 대해 operation timeout이 발생하지만 다른 일부 requests는 정상 처리될 수 있다.
-  이 경우, client request가 정상 처리되 않지만 continuous timeout이 발생하지 않을 수 있다.
-  이러한 상태를 탐지하기 위하여, 최근 100개 requests에 대해 timeout ratio를 계산하여 
-  특정 threshold 이상이면 현재 connection을 끊고 재접속을 시도하는 기능이다.
-  
-  Timeout ratio threshold의 default 값은 0으로 disabled된 상태이며,
-  1 ~ 99 사이의 값을 주면 그 값으로 timeout ratio threshold가 설정되어 동작하게 된다.
+  Arcus 캐시 서버로부터 응답을 받기 위해 대기 중인 operation들을 담는 Read Queue의 팩토리 객체를 지정한다.
 
 - setOpQueueMaxBlockTime(long t)
 
-  Operation을 요청할 때 비동기식으로 Operation queue에 등록하여 작업을 요청하게 되어 있는데,
-  이 옵션은 Queue가 모두 꽉 찬 상태가 되었을 때 최대 기다리는 시간을 의미한다.
+  사용자의 요청이 들어오면 Operation 객체를 생성한다. Operation을 Input Queue에 등록하면, 비동기 방식으로 순차 처리된다.
+  OpQueueMaxBlockTime은 Input Queue가 꽉 찬 상태가 되었을 때 사용자의 스레드가 최대 기다리는 시간을 의미한다.
   단위는 millisecond 이고, 기본값은 10000ms이다.
+
+- setOpTimeout(long t)
+
+  Future의 get() 메서드에서 캐시 서버로부터의 응답을 대기하는 최대 시간을 지정한다. 단위는 millisecond 이고, 기본값은 700ms이다.
+  기본 값을 사용하면 Future에서 `get()` 메서드 호출과 `get(700, TimeUnit.MILLISECONDS)` 메서드 호출이 동일하게 동작한다.
+
+- setTranscoder(Transcoder\<Object\> t)
+
+  Key-Value 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
+  기본적으로 SerializingTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
+  Character set, 압축 기준, ClassLoader를 설정할 수 있다.
+  
+  - Character set과 압축 기준은 setter로 설정 가능하다. Character set의 기본값은 UTF-8이다.
+    압축 기준의 단위는 byte이며, 기본값은 16,384bytes이다.
+    ```java
+    SerializingTranscoder transcoder = new SerializingTranscoder();
+    transcoder.setCharset("EUC-KR");
+    transcoder.setCompressionThreshold(4096);
     
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setTranscoder(transcoder);
+    ```
+  
+  - ClassLoader는 생성자 인자로 설정 가능하다. Spring Devtools와 같이 클래스로더를 별도로 두는
+  라이브러리를 사용할 때, 캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
+    ```java
+    SerializingTranscoder tc = new SerializingTranscoder(CachedData.MAX_SIZE, this.getClass().getClassLoader());
+    ```
+
+- setCollectionTranscoder(Transcoder\<Object\> t)
+
+  Collection 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
+  기본적으로 CollectionTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
+  Character set, 압축 기준, ClassLoader를 설정할 수 있다.
+
+  - 빌더를 통해 CollectionTranscoder를 설정할 수 있다.
+    ```java
+    CollectionTranscoder transcoder = new CollectionTranscoder.Builder()
+        .disableOptimization()
+        .setMaxElementBytes(16384)
+        .setClassLoader(this.getClass().getClassLoader())
+        .build();
+    ```
+
+  - Character set과 압축 기준은 객체 생성 후 setter를 사용해 설정 가능하다. Character set의 기본값은 UTF-8이다.
+    압축 기준의 단위는 byte이며, 기본값은 16,384bytes이다.
+    ```java
+    transcoder.setCharset("EUC-KR");
+    transcoder.setCompressionThreshold(4096);
+    
+    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+    cfb.setCollectionTranscoder(transcoder);
+    ```
+
+- setShouldOptimize(boolean o)
+
+  최적화 로직 사용여부를 결정한다. 기본값은 false이다. **optimize 로직 사용을 권장하지 않고 있다.**
+  Operation Queue에 연속해서 존재하는 get 연산들을 조합하여 최대 100개의 키가 담긴 하나의 요청으로 ARCUS에 전달된다.
+
+- setReadBufferSize(int to)
+
+  ARCUS 캐시 서버와 소켓 통신할 때 사용되는 전역 ByteBuffer 크기를 설정한다. 단위는 byte이며, 기본값은 16,384이다.
+  (이름은 Read이지만 읽기/쓰기 버퍼 모두 이 값을 기준으로 생성된다.)
+  만약 ByteBuffer 크기를 넘어서는 데이터가 넘어오면 재사용성을 높이기 위해 ByteBuffer 크기만큼 처리한 후
+  ByteBuffer의 내용을 비우고, 다시 사용하도록 되어 있다.
+  
+- setDaemon(boolean d)
+
+  Memcached I/O 스레드를 Daemon으로 사용할 지 설정할 수 있다. 기본값은 true이다. 
+
+- setMaxReconnectDelay(long to)
+
+  Arcus 캐시 서버로부터 어떠한 오류가 발생했을 때 연결을 끊고 reconnect를 시도하는 경우 얼마 동안의 지연을 둘 지 정할 수 있다.
+  reconnect는 상황에 따라 즉시 수행하거나 일정 시간 후에 수행하는데, 이 메서드에서는 Arcus 캐시 서버와의 연결 부분에서 문제가 발생하여
+  일정 시간 후 Reconnect를 시도하는 경우에 대해 설정을 한다.
+  단위는 second이며, 기본값은 1초이다.
+
+- setTimeoutExceptionThreshold(int to) / setTimeoutDurationThreshold(int to)
+
+  요청을 처리하는 도중 네트워크 연결에 문제가 발생했을 때 reconnect가 적절히 수행되도록 하기 위해 threshold를 지정한다.
+
+  다음 조건을 만족하면 reconnect를 시도한다.
+  - 첫 Timeout이 발생한 시점부터 현재 시점까지 timeout이 지속적으로 TimeoutExceptionThreshold개 이상 발생하는 중이다.
+  - 첫 Timeout이 발생한 시점부터 현재 시점까지의 시간 간격이 TimeoutDurationThreshold 기간보다 길다.
+
+  동작 원리는 다음과 같다.
+  - reconnect를 시작하게 되면 연결이 끊긴 상태가 되므로, 사용자가 요청한 작업에 대해 timeout을 발생시키는 대신 실패 응답을 빠르게 전달할 수 있다.
+  - 네트워크 순단이 지속될 경우 reconnect를 시도하는 과정에서 실패하므로 이 때에 들어온 요청 역시 실패 응답을 빠르게 반환받게 된다. 
+  - 일시적으로 Burst 트래픽이 발생할 때 네트워크 장비 혹은 대역폭으로 인해 연속적인 timeout이 발생할 수 있지만, 이는 네트워크 순단이 발생했다고
+    보기 어려우므로 reconnect를 시도해도 의미가 없다. 따라서 이런 경우에는 reconnect가 발생하지 않도록 한다.
+  - 연속적인 timeout이 TimeoutDurationThreshold 이상으로 지속되는 경우에는 네트워크 연결에 문제가 발생한 것으로 간주하여 reconnect를 시도한다.
+
+  각 인자의 단위와 기본값은 다음과 같다.
+  - TimeoutExceptionThreshold Timeout의 발생 횟수를 단위로 하고, 기본값은 10이며, 2 이상 값을 지정해야 한다.
+  - TimeoutDurationThreshold의 단위는 millisecond 이고 기본값은 1000ms이다.
+    0을 지정해 비활성화하거나, 1000 ~ 5000 사이의 값을 지정할 수 있다.
+ 
+  쉽게 이해하기 위한 예시 상황은 다음과 같다.
+    - TimeoutDurationThreshold를 1000으로 설정하고 TimeoutExceptionThreshold를 10으로 설정한 경우,
+      1초 동안 10회 이상의 timeout이 연속적으로 발생했고 현재까지도 timeout이 발생하는 상태이므로, reconnect를 시도한다.
+    - TimeoutDurationThreshold를 0으로 설정하고 TimeoutExceptionThreshold를 100로 설정한 경우,
+      100회 이상의 timeout이 연속적으로 발생하면 reconnect를 시도한다. 따라서 정말 네트워크 연결에 문제가 발생하지 않는 상황이더라도
+      reconnect가 발생할 수 있다. 따라서 burst 트래픽 요청이 자주 발생하는 애플리케이션이라면 TimeoutDurationThreshold를 0으로 설정하는 것을 권장하지 않는다.
+
+- setTimeoutRatioThreshold(int to)
+
+  사용자 요청 중 일부는 성공하고 일부는 timeout이 발생하는 경우에는 이러한 상황이 지속적으로 발생하여 지연 시간이 늘어나지 않도록 해야 한다.
+  연속적인 coutinuous timeout이 발생하진 않지만 이러한 연결 불안정 상태를 탐지하기 위해 최근 100개 요청에 대한 timeout 비율이 threshold 이상이면
+  연결을 끊고 reconnect를 시도한다. 이를 통해 빠른 실패 응답을 사용자에게 전달할 수 있다.
+
+  기본값은 0으로 비활성화되어있으며, 1~99 사이의 값을 줄 수 있다.
+
+- setMaxSMGetKeyChunkSize(int size)
+
+  Arcus 캐시 서버에서 제공하는 SMGet 명령어를 사용할 때 여러 키들이 한 노드에 배치되어 있는 경우, 하나의 요청에 들어가는 키의 최대 개수를 설정한다.
+  만약 이 값을 초과하는 키가 요청되면, ARCUS Java Client는 자동으로 요청을 나누어 보낸다.
+  기본값은 500이다. 최대 10000까지 지정 가능하다.
+
+- setDelimiter(byte to)
+
+  Arcus 캐시 서버에 `-D <char>` 옵션으로 Prefix와 Subkey를 구분하기 위한 구분자를 직접 지정한 경우
+  Arcus Java Client에서도 동일한 구분자를 지정해주어야 한다. 서버에 옵션을 주지 않았다면 지정할 필요 없으며, 기본값은 콜론(`:`)이다. 
+
+- setKeepAlive(boolean on)
+
+  Arcus 캐시 서버와의 연결을 TCP KeepAlive 옵션을 통해 유지할지 여부를 설정한다. 기본값은 false이다.
+  이 옵션을 true로 설정하면, ARCUS 캐시 서버와의 연결이 끊어지지 않도록 한다. 
+  장시간 트래픽이 없는 TCP 연결을 강제 종료하는 환경에서 주기적인 트래픽을 발생시켜 강제 종료를 방지하는 용도로 사용할 수 있다.
+
+- setDnsCacheTtlCheck(boolean dnsCacheTtlCheck)
+
+  ARCUS Java Client 구동 시에 DNS 캐시 TTL 검증을 활성화할 지 여부를 설정한다.
+  기본값은 true이다. ZooKeeper Ensemble을 도메인 주소로 관리하고 있는 경우, DNS에 매핑된 IP 정보가 변경될 때 정상적으로 반영되도록 하기 위해
+  DNS Cache TTL 값이 0 ~ 300초 내에 존재하는지 검증한다.
+
+- Front Cache 설정은 별도 [문서](13-front-cache.md#사용법)에 설명되어 있다.
