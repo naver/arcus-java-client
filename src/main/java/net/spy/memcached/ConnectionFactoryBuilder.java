@@ -123,6 +123,10 @@ public class ConnectionFactoryBuilder {
    * Set the operation queue factory.
    */
   public ConnectionFactoryBuilder setOpQueueFactory(OperationQueueFactory q) {
+    if (q == null) {
+      throw new IllegalArgumentException("OperationQueueFactory must not be null.");
+    }
+
     opQueueFactory = q;
     return this;
   }
@@ -131,6 +135,10 @@ public class ConnectionFactoryBuilder {
    * Set the read queue factory.
    */
   public ConnectionFactoryBuilder setReadOpQueueFactory(OperationQueueFactory q) {
+    if (q == null) {
+      throw new IllegalArgumentException("OperationQueueFactory must not be null.");
+    }
+
     readQueueFactory = q;
     return this;
   }
@@ -139,6 +147,10 @@ public class ConnectionFactoryBuilder {
    * Set the write queue factory.
    */
   public ConnectionFactoryBuilder setWriteOpQueueFactory(OperationQueueFactory q) {
+    if (q == null) {
+      throw new IllegalArgumentException("OperationQueueFactory must not be null.");
+    }
+
     writeQueueFactory = q;
     return this;
   }
@@ -146,6 +158,8 @@ public class ConnectionFactoryBuilder {
   /**
    * Set the maximum amount of time (in milliseconds) a client is willing to
    * wait for space to become available in an output queue.
+   * If the value is negative or 0, the client will not be blocked
+   * and the request will be failed immediately.
    */
   public ConnectionFactoryBuilder setOpQueueMaxBlockTime(long t) {
     opQueueMaxBlockTime = t;
@@ -156,6 +170,10 @@ public class ConnectionFactoryBuilder {
    * Set the default transcoder.
    */
   public ConnectionFactoryBuilder setTranscoder(Transcoder<Object> t) {
+    if (t == null) {
+      throw new IllegalArgumentException("Transcoder must not be null.");
+    }
+
     transcoder = t;
     return this;
   }
@@ -164,6 +182,10 @@ public class ConnectionFactoryBuilder {
    * Set the default collection transcoder.
    */
   public ConnectionFactoryBuilder setCollectionTranscoder(Transcoder<Object> t) {
+    if (t == null) {
+      throw new IllegalArgumentException("CollectionTranscoder must not be null.");
+    }
+
     collectionTranscoder = t;
     return this;
   }
@@ -172,6 +194,10 @@ public class ConnectionFactoryBuilder {
    * Set the failure mode.
    */
   public ConnectionFactoryBuilder setFailureMode(FailureMode fm) {
+    if (fm == null) {
+      throw new IllegalArgumentException("FailureMode must not be null.");
+    }
+
     failureMode = fm;
     return this;
   }
@@ -181,6 +207,10 @@ public class ConnectionFactoryBuilder {
    */
   public ConnectionFactoryBuilder setInitialObservers(
           Collection<ConnectionObserver> obs) {
+    if (obs == null || obs.isEmpty()) {
+      throw new IllegalArgumentException("Initial observers must not be null or empty.");
+    }
+
     initialObservers = obs;
     return this;
   }
@@ -194,6 +224,10 @@ public class ConnectionFactoryBuilder {
    * @see MemcachedNode
    */
   public ConnectionFactoryBuilder setOpFact(OperationFactory f) {
+    if (f == null) {
+      throw new IllegalArgumentException("OperationFactory must not be null.");
+    }
+
     opFact = f;
     return this;
   }
@@ -202,6 +236,10 @@ public class ConnectionFactoryBuilder {
    * Set the default operation timeout in milliseconds.
    */
   public ConnectionFactoryBuilder setOpTimeout(long t) {
+    if (t <= 0) {
+      throw new IllegalArgumentException("Operation timeout must be positive.");
+    }
+
     opTimeout = t;
     return this;
   }
@@ -226,6 +264,10 @@ public class ConnectionFactoryBuilder {
    * Set the read buffer size.
    */
   public ConnectionFactoryBuilder setReadBufferSize(int to) {
+    if (to <= 0) {
+      throw new IllegalArgumentException("Read buffer size must be positive.");
+    }
+
     readBufSize = to;
     return this;
   }
@@ -234,6 +276,10 @@ public class ConnectionFactoryBuilder {
    * Set the hash algorithm.
    */
   public ConnectionFactoryBuilder setHashAlg(HashAlgorithm to) {
+    if (to == null) {
+      throw new IllegalArgumentException("HashAlgorithm must not be null.");
+    }
+
     hashAlg = to;
     return this;
   }
@@ -267,6 +313,10 @@ public class ConnectionFactoryBuilder {
    * Set the locator type.
    */
   public ConnectionFactoryBuilder setLocatorType(Locator l) {
+    if (l == null) {
+      throw new IllegalArgumentException("Locator must not be null.");
+    }
+
     locator = l;
     return this;
   }
@@ -276,8 +326,9 @@ public class ConnectionFactoryBuilder {
    */
   public ConnectionFactoryBuilder setMaxReconnectDelay(long to) {
     if (to <= 0) {
-      throw new IllegalArgumentException("Reconnect delay must be a positive number");
+      throw new IllegalArgumentException("Reconnect delay must be a positive number.");
     }
+
     maxReconnectDelay = to;
     return this;
   }
@@ -286,6 +337,10 @@ public class ConnectionFactoryBuilder {
    * Set the auth descriptor to enable authentication on new connections.
    */
   public ConnectionFactoryBuilder setAuthDescriptor(AuthDescriptor to) {
+    if (to == null) {
+      throw new IllegalArgumentException("AuthDescriptor must not be null.");
+    }
+
     authDescriptor = to;
     return this;
   }
@@ -296,8 +351,9 @@ public class ConnectionFactoryBuilder {
    */
   public ConnectionFactoryBuilder setTimeoutExceptionThreshold(int to) {
     if (to < 2) {
-      throw new IllegalArgumentException("Minimum timeout exception threshold is 2");
+      throw new IllegalArgumentException("Minimum timeout exception threshold is 2.");
     }
+
     timeoutExceptionThreshold = to - 2;
     return this;
   }
@@ -309,6 +365,7 @@ public class ConnectionFactoryBuilder {
     if (to < 0 || to >= 100) {
       throw new IllegalArgumentException("Timeout ratio threshold must be 0~99.");
     }
+
     timeoutRatioThreshold = to;
     return this;
   }
@@ -321,6 +378,7 @@ public class ConnectionFactoryBuilder {
       throw new IllegalArgumentException(
               "Timeout duration threshold must be 0 or 1000~5000 range.");
     }
+
     timeoutDurationThreshold = to;
     return this;
   }
@@ -331,8 +389,9 @@ public class ConnectionFactoryBuilder {
   public ConnectionFactoryBuilder setMaxFrontCacheElements(int to) {
     if (to <= 0) {
       throw new IllegalArgumentException(
-              "In case of front cache, the number must be a positive number");
+              "Max number of front cache elements must be positive.");
     }
+
     maxFrontCacheElements = to;
     return this;
   }
@@ -342,8 +401,9 @@ public class ConnectionFactoryBuilder {
    */
   public ConnectionFactoryBuilder setFrontCacheExpireTime(int to) {
     if (to <= 0) {
-      throw new IllegalArgumentException("Front cache's expire time must be a positive number");
+      throw new IllegalArgumentException("Expire time of front cache elements must be positive.");
     }
+
     frontCacheExpireTime = to;
     return this;
   }
@@ -372,6 +432,7 @@ public class ConnectionFactoryBuilder {
       throw new IllegalArgumentException(
               "Max smget key chunk size must be a positive number and less than 10000");
     }
+
     maxSMGetChunkSize = size;
     return this;
   }
@@ -389,11 +450,19 @@ public class ConnectionFactoryBuilder {
    * Set read priority for choosing replica node to read data
    */
   public ConnectionFactoryBuilder setReadPriority(ReadPriority priority) {
+    if (priority == null) {
+      throw new IllegalArgumentException("ReadPriority must not be null.");
+    }
+
     readPriority = priority;
     return this;
   }
 
   public ConnectionFactoryBuilder setAPIReadPriority(APIType apiType, ReadPriority readPriority) {
+    if (apiType == null || readPriority == null) {
+      throw new IllegalArgumentException("APIType and ReadPriority must not be null.");
+    }
+
     OperationType type = apiType.getAPIOpType();
 
     if (type == OperationType.READ) {
@@ -404,6 +473,10 @@ public class ConnectionFactoryBuilder {
   }
 
   public ConnectionFactoryBuilder setAPIReadPriority(Map<APIType, ReadPriority> apiList) {
+    if (apiList == null || apiList.isEmpty()) {
+      throw new IllegalArgumentException("APIType and ReadPriority must not be null.");
+    }
+
     this.apiReadPriorityList.clear();
 
     for (Map.Entry<APIType, ReadPriority> entry : apiList.entrySet()) {
