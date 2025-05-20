@@ -33,8 +33,11 @@ import net.spy.memcached.compat.SyncThread;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.internal.GetFuture;
+import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -797,8 +800,10 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     byte data[] = new byte[10 * 1024 * 1024];
     r.nextBytes(data);
 
+    OperationFuture<Boolean> future = null;
     try {
-      client.set("bigassthing", 60, data, st).get();
+      future = client.set("bigassthing", 60, data, st);
+      future.get();
       fail("Didn't fail setting bigass thing.");
     } catch (ExecutionException e) {
       e.printStackTrace();
@@ -806,6 +811,13 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
       // ensure compatibility about changing E2BIG
       assertTrue(OperationErrorType.CLIENT == oe.getType() ||
             OperationErrorType.SERVER == oe.getType());
+
+      assertNotNull(future);
+      OperationStatus status = future.getStatus();
+      assertNotNull(status);
+      assertFalse(status.isSuccess());
+      assertTrue(status.getMessage().toLowerCase().contains("too large"));
+      assertEquals(StatusCode.ERR_INTERNAL, status.getStatusCode());
     }
 
     // But I should still be able to do something.

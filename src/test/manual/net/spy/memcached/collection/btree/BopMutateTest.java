@@ -24,11 +24,15 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.internal.CollectionFuture;
+import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BopMutateTest extends BaseIntegrationTest {
@@ -138,17 +142,20 @@ class BopMutateTest extends BaseIntegrationTest {
   void testBopIncrDecr_StringError() throws Exception {
     // Create a list and add it 9 items
     addToBTree(key, items9);
-
+    CollectionFuture<Long> future = null;
     try {
       // incr string value
-      CollectionFuture<Long> future3 = mc.asyncBopIncr(key, 9L, 2);
-      Long result3 = future3.get(1000, TimeUnit.MILLISECONDS);
-      CollectionResponse response3 = future3.getOperationStatus()
-              .getResponse();
-      System.out.println(response3.toString());
+      future = mc.asyncBopIncr(key, 9L, 2);
+      future.get(1000, TimeUnit.MILLISECONDS);
     } catch (Exception e) {
       assertTrue(e.getMessage().startsWith("OperationException: CLIENT:" +
               " CLIENT_ERROR cannot increment or decrement non-numeric value @ ArcusClient-"));
+      assertNotNull(future);
+      CollectionOperationStatus status = future.getOperationStatus();
+      assertNotNull(status);
+      assertFalse(status.isSuccess());
+      assertEquals(StatusCode.ERR_INTERNAL, status.getStatusCode());
+      assertEquals(CollectionResponse.EXCEPTION, status.getResponse());
     }
   }
 }

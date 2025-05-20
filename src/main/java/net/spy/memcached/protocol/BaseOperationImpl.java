@@ -251,6 +251,7 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
       getLogger().error("Bad command: %s", cmdLines[0]);
     }
     exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
+    getCallback().receivedStatus(new OperationStatus(false, line, StatusCode.ERR_INTERNAL));
     transitionState(OperationState.COMPLETE);
     throw exception;
   }
