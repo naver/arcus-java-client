@@ -42,6 +42,7 @@ public enum StatusCode {
   ERR_ERROR("ERROR"),
   ERR_SERVER("SERVER_ERROR"),
   ERR_CLIENT("CLIENT_ERROR"),
+  ERR_INTERNAL("INTERNAL_ERROR"),
 
   // error from client
   CANCELLED("CANCELED"),

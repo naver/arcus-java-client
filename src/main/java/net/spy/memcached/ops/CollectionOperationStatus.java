@@ -34,7 +34,11 @@ public class CollectionOperationStatus extends OperationStatus {
 
   public CollectionOperationStatus(OperationStatus status) {
     super(status.isSuccess(), status.getMessage(), status.getStatusCode());
-    this.collectionResponse = CollectionResponse.resolve(status.getMessage());
+    if (status.getStatusCode() == StatusCode.ERR_INTERNAL) {
+      this.collectionResponse = CollectionResponse.EXCEPTION;
+    } else {
+      this.collectionResponse = CollectionResponse.resolve(status.getMessage());
+    }
   }
 
   /**
