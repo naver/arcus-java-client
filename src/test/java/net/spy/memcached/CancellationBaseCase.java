@@ -47,7 +47,7 @@ abstract class CancellationBaseCase {
   }
 
   protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(serverList));
+    client = new MemcachedClient(cf, AddrUtil.getAddresses(Collections.singletonList(serverList)));
   }
 
   private void tryCancellation(Future<?> f) throws Exception {

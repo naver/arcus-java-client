@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.test;
 
+import java.util.Collections;
+
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.MemcachedClient;
@@ -63,7 +65,7 @@ class MemcachedThreadBench {
 
     MemcachedClient client = new MemcachedClient(
             new DefaultConnectionFactory(100000, 32768),
-            AddrUtil.getAddresses(serverlist));
+            AddrUtil.getAddresses(Collections.singletonList(serverlist)));
 
     WorkerStat[] statArray = new WorkerStat[threads];
     Thread[] threadArray = new Thread[threads];

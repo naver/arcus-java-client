@@ -347,11 +347,10 @@ public final class MemcachedConnection extends SpyObject {
   private void updateConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<>();
     List<MemcachedNode> removeNodes = new ArrayList<>();
+    addrs = new ArrayList<>(addrs);
 
     for (MemcachedNode node : locator.getAll()) {
-      if (addrs.contains(node.getSocketAddress())) {
-        addrs.remove(node.getSocketAddress());
-      } else {
+      if (!addrs.remove(node.getSocketAddress())) {
         removeNodes.add(node);
       }
     }
@@ -684,7 +683,6 @@ public final class MemcachedConnection extends SpyObject {
     /* ENABLE_MIGRATION end */
     List<InetSocketAddress> cacheList = cacheNodesChange.getAndSet(null);
     if (cacheList != null) {
-      cacheList = new ArrayList<>(cacheList);
       // Update the memcached server group.
       /* ENABLE_REPLICATION if */
       if (arcusReplEnabled) {
@@ -696,7 +694,6 @@ public final class MemcachedConnection extends SpyObject {
     }
     /* ENABLE_MIGRATION if */
     if (arcusMigrEnabled && alterList != null) {
-      alterList = new ArrayList<>(alterList);
       if (mgState == MigrationState.PREPARED) {
         if (!mgInProgress) {
           // prepare connections of alter nodes
@@ -716,8 +713,7 @@ public final class MemcachedConnection extends SpyObject {
 
   // Called by CacheManger to add the memcached server group.
   public void setCacheNodesChange(List<InetSocketAddress> addrs) {
-    List<InetSocketAddress> old = cacheNodesChange.getAndSet(
-            Collections.unmodifiableList(addrs));
+    List<InetSocketAddress> old = cacheNodesChange.getAndSet(addrs);
     if (old != null) {
       getLogger().info("Ignored previous cache nodes change.");
     }
@@ -734,14 +730,12 @@ public final class MemcachedConnection extends SpyObject {
   /* Called by CacheManger to add the alter memcached server group. */
   public void setAlterNodesChange(List<InetSocketAddress> addrs, boolean readingCacheList) {
     if (readingCacheList) {
-      List<InetSocketAddress> old = delayedAlterNodesChange.getAndSet(
-              Collections.unmodifiableList(addrs));
+      List<InetSocketAddress> old = delayedAlterNodesChange.getAndSet(addrs);
       if (old != null) {
         getLogger().info("Ignored previous delayed alter nodes change.");
       }
     } else {
-      List<InetSocketAddress> old = alterNodesChange.getAndSet(
-              Collections.unmodifiableList(addrs));
+      List<InetSocketAddress> old = alterNodesChange.getAndSet(addrs);
       if (old != null) {
         getLogger().info("Ignored previous alter nodes change.");
       }
@@ -771,21 +765,17 @@ public final class MemcachedConnection extends SpyObject {
   private void updateAlterConnections(List<InetSocketAddress> addrs) throws IOException {
     List<MemcachedNode> attachNodes = new ArrayList<>();
     List<MemcachedNode> removeNodes = new ArrayList<>();
+    addrs = new ArrayList<>(addrs);
 
     for (MemcachedNode node : locator.getAlterAll()) {
-      if (addrs.contains(node.getSocketAddress())) {
-        addrs.remove(node.getSocketAddress());
-      } else {
-        if (mgType == MigrationType.JOIN) {
-          removeNodes.add(node);
-        }
+      boolean removed = addrs.remove(node.getSocketAddress());
+      if (!removed && mgType == MigrationType.JOIN) {
+        removeNodes.add(node);
       }
     }
     if (mgType == MigrationType.JOIN) {
       for (MemcachedNode node : locator.getAll()) {
-        if (addrs.contains(node.getSocketAddress())) {
-          addrs.remove(node.getSocketAddress());
-        }
+        addrs.remove(node.getSocketAddress());
       }
     }
 

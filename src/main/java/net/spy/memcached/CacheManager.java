@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -418,20 +419,17 @@ public final class CacheManager extends SpyThread implements Watcher,
     }
   }
 
+  /**
+   * @param children The {@link java.util.List} of {@link java.lang.String}
+   *                 containing {@code ip:port-hostname} or {@code group^{M,S}^ip:port-hostname}
+   * @return The {@link java.util.List} of {@link java.net.InetSocketAddress}
+   *         or {@link net.spy.memcached.ArcusReplNodeAddress}
+   */
   private List<InetSocketAddress> getSocketAddrList(List<String> children) {
-    StringBuilder addrs = new StringBuilder();
-    for (int i = 0; i < children.size(); i++) {
-      String[] temp = children.get(i).split("-");
-      if (i != 0) {
-        addrs.append(",").append(temp[0]);
-      } else {
-        addrs.append(temp[0]);
-      }
+    List<String> addrs = new ArrayList<>(children.size());
+    for (String child : children) {
+      addrs.add(child.split("-")[0]);
     }
-    return convertToSocketAddresses(addrs.toString());
-  }
-
-  private List<InetSocketAddress> convertToSocketAddresses(String addrs) {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       return ArcusReplNodeAddress.getAddresses(addrs);

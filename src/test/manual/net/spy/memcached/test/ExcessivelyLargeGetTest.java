@@ -3,6 +3,7 @@ package net.spy.memcached.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
@@ -37,7 +38,7 @@ class ExcessivelyLargeGetTest extends SpyObject implements Runnable {
   public ExcessivelyLargeGetTest() throws Exception {
     client = new MemcachedClient(new ConnectionFactoryBuilder()
             .setProtocol(Protocol.BINARY).setOpTimeout(15000).build(),
-            AddrUtil.getAddresses(ARCUS_HOST));
+            AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
     keys = new ArrayList<>(N);
     new Random().nextBytes(value);
   }

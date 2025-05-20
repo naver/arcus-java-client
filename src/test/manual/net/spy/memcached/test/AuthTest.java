@@ -1,5 +1,7 @@
 package net.spy.memcached.test;
 
+import java.util.Collections;
+
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
@@ -25,7 +27,7 @@ class AuthTest extends SpyObject implements Runnable {
     client = new MemcachedClient(new ConnectionFactoryBuilder()
             .setProtocol(Protocol.BINARY)
             .setAuthDescriptor(AuthDescriptor.typical(username, password))
-            .build(), AddrUtil.getAddresses("localhost:11212"));
+            .build(), AddrUtil.getAddresses(Collections.singletonList("localhost:11212")));
   }
 
   public void shutdown() throws Exception {

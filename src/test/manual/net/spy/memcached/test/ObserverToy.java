@@ -45,7 +45,7 @@ final class ObserverToy {
         return false;
       }
 
-    }, AddrUtil.getAddresses("localhost:11212"));
+    }, AddrUtil.getAddresses(Collections.singletonList("localhost:11212")));
 
     while (true) {
       try {

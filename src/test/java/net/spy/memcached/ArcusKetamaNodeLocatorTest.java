@@ -20,6 +20,7 @@ package net.spy.memcached;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -142,7 +143,7 @@ class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
 
     for (int i = 0; i < nodes.length; i++) {
       final int idx = i;
-      List<InetSocketAddress> a = AddrUtil.getAddresses(servers[i]);
+      List<InetSocketAddress> a = AddrUtil.getAddresses(Collections.singletonList(servers[i]));
 
       nodes[i] = context.mock(MemcachedNode.class, "node##" + i);
       context.checking(buildExpectations(e -> {

@@ -1,5 +1,6 @@
 package net.spy.memcached.test;
 
+import java.util.Collections;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +26,7 @@ class LoaderTest extends SpyObject implements Runnable {
   public void init() throws Exception {
     client = new MemcachedClient(new ConnectionFactoryBuilder()
             .setProtocol(Protocol.BINARY).setOpQueueMaxBlockTime(1000)
-            .build(), AddrUtil.getAddresses("localhost:11211"));
+            .build(), AddrUtil.getAddresses(Collections.singletonList("localhost:11211")));
   }
 
   public void shutdown() throws Exception {

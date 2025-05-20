@@ -1,5 +1,6 @@
 package net.spy.memcached.test;
 
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -32,8 +33,8 @@ final class MemoryFullTest {
       // OK
     }
 
-    MemcachedClient c = new MemcachedClient(
-            AddrUtil.getAddresses("localhost:11200"));
+    MemcachedClient c = new MemcachedClient(AddrUtil.getAddresses(
+            Collections.singletonList("localhost:11200")));
     boolean success = false;
     Random r = new Random();
     byte[] somebytes = new byte[71849];

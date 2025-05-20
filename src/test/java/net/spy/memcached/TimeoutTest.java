@@ -1,6 +1,7 @@
 package net.spy.memcached;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,7 @@ class TimeoutTest {
         return FailureMode.Retry;
       }
     },
-            AddrUtil.getAddresses("127.0.0.1:64213"));
+            AddrUtil.getAddresses(Collections.singletonList("127.0.0.1:64213")));
   }
 
   @AfterEach

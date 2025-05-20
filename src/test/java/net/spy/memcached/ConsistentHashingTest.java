@@ -37,7 +37,7 @@ class ConsistentHashingTest {
    * @param totalNodes totalNodes
    */
   private void runThisManyNodes(final int totalNodes) {
-    final String[] stringNodes = generateAddresses(totalNodes);
+    final List<String>[] stringNodes = generateAddresses(totalNodes);
 
     List<MemcachedNode> smaller = createNodes(
             AddrUtil.getAddresses(stringNodes[0]));
@@ -88,8 +88,11 @@ class ConsistentHashingTest {
 
   }
 
-  private String[] generateAddresses(final int maxSize) {
-    final String[] results = new String[2];
+  private List<String>[] generateAddresses(final int maxSize) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    final List<String>[] results = new List[2];
+    results[0] = new ArrayList<>(maxSize);
+    results[1] = new ArrayList<>(maxSize);
 
     // Generate a pseudo-random set of addresses.
     long now = new Date().getTime();
@@ -100,28 +103,16 @@ class ConsistentHashingTest {
     String port = ":11211 ";
     int last = (int) ((now % 100) + 3);
 
-    StringBuilder prefix = new StringBuilder();
-    prefix.append(first);
-    prefix.append(".");
-    prefix.append(second);
-    prefix.append(".1.");
+    String prefix = first + "." + second + ".1.";
 
     // Don't protect the possible range too much, as we are our own client.
-    StringBuilder buf = new StringBuilder();
     for (int ix = 0; ix < maxSize - 1; ix++) {
-      buf.append(prefix);
-      buf.append(last + ix);
-      buf.append(port);
+      String addr = prefix + (last + ix) + port;
+      results[0].add(addr);
+      results[1].add(addr);
     }
 
-    results[0] = buf.toString();
-
-    buf.append(prefix);
-    buf.append(last + maxSize - 1);
-    buf.append(port);
-
-    results[1] = buf.toString();
-
+    results[1].add(prefix + (last + maxSize - 1) + port);
     return results;
   }
 

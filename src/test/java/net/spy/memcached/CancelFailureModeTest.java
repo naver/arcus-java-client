@@ -1,5 +1,6 @@
 package net.spy.memcached;
 
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -21,7 +22,7 @@ class CancelFailureModeTest {
       public FailureMode getFailureMode() {
         return FailureMode.Cancel;
       }
-    }, AddrUtil.getAddresses(serverList));
+    }, AddrUtil.getAddresses(Collections.singletonList(serverList)));
   }
 
   @AfterEach
