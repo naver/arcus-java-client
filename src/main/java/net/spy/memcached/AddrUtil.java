@@ -3,6 +3,7 @@ package net.spy.memcached;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,49 +14,51 @@ public final class AddrUtil {
   private AddrUtil() {
   }
 
-  /**
-   * Split a string containing whitespace or comma separated host or
-   * IP addresses and port numbers of the form "host:port host2:port"
-   * or "host:port, host2:port" into a List of InetSocketAddress
+  /***
+   * Convert a List of String containing IP addresses and port numbers
+   * of the form "host:port" into a List of InetSocketAddress
    * instances suitable for instantiating a MemcachedClient.
    *
    * Note that colon-delimited IPv6 is also supported.
    * For example:  ::1:11211
+   * @param s The {@link java.util.List} of {@link java.lang.String}
+   *          containing {@code host:port}
+   * @return The {@link java.util.List} of {@link java.net.InetSocketAddress}
    */
-  public static List<InetSocketAddress> getAddresses(String s) {
+  public static List<InetSocketAddress> getAddresses(List<String> s) {
     if (s == null) {
       throw new NullPointerException("Null host list");
     }
     ArrayList<InetSocketAddress> addrs =
             new ArrayList<>();
 
-    if (s.trim().equals("")) {
+    if (s.isEmpty()) {
       return addrs;
     }
 
-    for (String hoststuff : s.split("(?:\\s|,)+")) {
+    for (String hoststuff : s) {
+      hoststuff = hoststuff.trim();
       if (hoststuff.equals("")) {
         continue;
       }
-
-      int finalColon = hoststuff.lastIndexOf(':');
-      if (finalColon < 1) {
-        throw new IllegalArgumentException("Invalid server ``"
-                + hoststuff + "'' in list:  " + s);
-
-      }
-      String hostPart = hoststuff.substring(0, finalColon);
-      String portNum = hoststuff.substring(finalColon + 1);
-
-      addrs.add(new InetSocketAddress(hostPart,
-              Integer.parseInt(portNum)));
+      addrs.add(getAddress(hoststuff));
     }
     assert !addrs.isEmpty() : "No addrs found";
-    return addrs;
+    return Collections.unmodifiableList(addrs);
   }
 
   public static InetSocketAddress getAddress(String s) {
-    return getAddresses(s).get(0);
+    s = s.trim();
+
+    int finalColon = s.lastIndexOf(':');
+    if (finalColon < 1) {
+      throw new IllegalArgumentException("Invalid server ``" + s + "''");
+    }
+    String hostPart = s.substring(0, finalColon);
+    String portNum = s.substring(finalColon + 1);
+
+    return new InetSocketAddress(hostPart,
+            Integer.parseInt(portNum));
   }
 
   public static String getSocketAddressString(SocketAddress addr) {

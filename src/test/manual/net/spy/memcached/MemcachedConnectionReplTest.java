@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -56,8 +58,8 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -79,14 +81,14 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_switchover() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^S^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^S^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -105,8 +107,8 @@ class MemcachedConnectionReplTest {
     assertEquals("{g0 M 127.0.0.1:11211}", masterAddr.toString());
     assertEquals("{g0 S 127.0.0.2:11211}", slaveAddr.toString());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^S^127.0.0.1:11211,g0^M^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^S^127.0.0.1:11211", "g0^M^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -128,13 +130,14 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_failover_master() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses("g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Collections.singletonList(
+            "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -148,7 +151,8 @@ class MemcachedConnectionReplTest {
     assertNotNull(master);
     assertNotNull(slave);
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses("g0^M^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Collections.singletonList(
+            "g0^M^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(1, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -166,13 +170,14 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_failover_slave() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses("g0^M^127.0.0.1:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Collections.singletonList(
+            "g0^M^127.0.0.1:11211")));
     conn.handleCacheNodesChange();
 
     assertEquals(1, locator.getAll().size());
@@ -191,8 +196,8 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_failover_all() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211")));
     conn.handleCacheNodesChange();
     assertEquals(2, locator.getAll().size());
     assertEquals(1, locator.getAllGroups().size());
@@ -206,8 +211,9 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_multiple_groups() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211,g1^M^127.0.0.3:11211,g1^S^127.0.0.4:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211",
+            "g1^M^127.0.0.3:11211", "g1^S^127.0.0.4:11211")));
     conn.handleCacheNodesChange();
     assertEquals(4, locator.getAll().size());
     assertEquals(2, locator.getAllGroups().size());
@@ -243,14 +249,16 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_edge_case_1() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211,g1^M^127.0.0.3:11211,g1^S^127.0.0.4:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211",
+            "g1^M^127.0.0.3:11211", "g1^S^127.0.0.4:11211")));
     conn.handleCacheNodesChange();
     assertEquals(4, locator.getAll().size());
     assertEquals(2, locator.getAllGroups().size());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g1^M^127.0.0.1:11211,g1^S^127.0.0.2:11211,g0^M^127.0.0.3:11211,g0^S^127.0.0.4:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g1^M^127.0.0.1:11211", "g1^S^127.0.0.2:11211",
+            "g0^M^127.0.0.3:11211", "g0^S^127.0.0.4:11211")));
     conn.handleCacheNodesChange();
     assertEquals(4, locator.getAll().size());
     assertEquals(2, locator.getAllGroups().size());
@@ -286,14 +294,16 @@ class MemcachedConnectionReplTest {
 
   @Test
   void testHandleCacheNodesChange_edge_case_2() throws IOException {
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g0^M^127.0.0.1:11211,g0^S^127.0.0.2:11211,g1^M^127.0.0.3:11211,g1^S^127.0.0.4:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g0^M^127.0.0.1:11211", "g0^S^127.0.0.2:11211",
+            "g1^M^127.0.0.3:11211", "g1^S^127.0.0.4:11211")));
     conn.handleCacheNodesChange();
     assertEquals(4, locator.getAll().size());
     assertEquals(2, locator.getAllGroups().size());
 
-    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(
-            "g1^S^127.0.0.1:11211,g1^M^127.0.0.2:11211,g0^S^127.0.0.3:11211,g0^M^127.0.0.4:11211"));
+    conn.setCacheNodesChange(ArcusReplNodeAddress.getAddresses(Arrays.asList(
+            "g1^S^127.0.0.1:11211", "g1^M^127.0.0.2:11211",
+            "g0^S^127.0.0.3:11211", "g0^M^127.0.0.4:11211")));
     conn.handleCacheNodesChange();
     assertEquals(4, locator.getAll().size());
     assertEquals(2, locator.getAllGroups().size());

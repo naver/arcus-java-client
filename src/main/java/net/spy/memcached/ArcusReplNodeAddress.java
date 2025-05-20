@@ -20,6 +20,7 @@ package net.spy.memcached;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,11 +70,11 @@ public final class ArcusReplNodeAddress extends InetSocketAddress {
     return new ArcusReplNodeAddress(group, master, ip, port);
   }
 
-  private static List<InetSocketAddress> parseNodeNames(String s) {
+  private static List<InetSocketAddress> parseNodeNames(List<String> s) {
     List<InetSocketAddress> addrs = new ArrayList<>();
 
-    for (String node : s.split(",")) {
-      String[] temp = node.split("\\^");
+    for (String node : s) {
+      String[] temp = node.trim().split("\\^");
       String group = temp[0];
       boolean master = temp[1].equals("M");
       String ipport = temp[2];
@@ -87,9 +88,14 @@ public final class ArcusReplNodeAddress extends InetSocketAddress {
     return addrs;
   }
 
-  // Similar to AddrUtil.getAddresses.  This version parses replication znode names.
-  // Znode names are group^{M,S}^ip:port-hostname
-  static List<InetSocketAddress> getAddresses(String s) {
+  /***
+   * Similar to AddrUtil.getAddresses.  This version parses replication znode names.
+   * Znode names are group^{M,S}^ip:port-hostname
+   * @param s The {@link java.util.List} of {@link java.lang.String}
+   *    *          containing {@code group^{M,S}^ip:port}
+   * @return The {@link java.util.List} of {@link net.spy.memcached.ArcusReplNodeAddress}
+   */
+  static List<InetSocketAddress> getAddresses(List<String> s) {
     List<InetSocketAddress> list = null;
 
     if (s != null && !s.isEmpty()) {
@@ -106,7 +112,7 @@ public final class ArcusReplNodeAddress extends InetSocketAddress {
     if (list == null) {
       list = new ArrayList<>(0);
     }
-    return list;
+    return Collections.unmodifiableList(list);
   }
 
   static Map<String, List<ArcusReplNodeAddress>> makeGroupAddrs(List<InetSocketAddress> addrs) {

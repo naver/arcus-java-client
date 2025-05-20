@@ -94,8 +94,8 @@ class MemcachedClientConstructorTest {
   @Test
   void testNullFactoryConstructor() throws Exception {
     try {
-      client = new MemcachedClient(null,
-              AddrUtil.getAddresses(ARCUS_HOST));
+      client = new MemcachedClient(null, AddrUtil.getAddresses(
+              Collections.singletonList(ARCUS_HOST)));
       fail("Expected null pointer exception, got " + client);
     } catch (NullPointerException e) {
       assertEquals("Connection factory required", e.getMessage());
@@ -111,7 +111,7 @@ class MemcachedClientConstructorTest {
           return -1;
         }
       },
-              AddrUtil.getAddresses(ARCUS_HOST));
+              AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
       fail("Expected null pointer exception, got " + client);
     } catch (IllegalArgumentException e) {
       assertEquals("Operation timeout must be positive.", e.getMessage());
@@ -127,7 +127,7 @@ class MemcachedClientConstructorTest {
           return 0;
         }
       },
-              AddrUtil.getAddresses(ARCUS_HOST));
+              AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
       fail("Expected null pointer exception, got " + client);
     } catch (IllegalArgumentException e) {
       assertEquals("Operation timeout must be positive.", e.getMessage());
@@ -142,7 +142,7 @@ class MemcachedClientConstructorTest {
         public OperationFactory getOperationFactory() {
           return null;
         }
-      }, AddrUtil.getAddresses(ARCUS_HOST));
+      }, AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
       fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make op factory",
@@ -159,7 +159,7 @@ class MemcachedClientConstructorTest {
                 List<InetSocketAddress> addrs) throws IOException {
           return null;
         }
-      }, AddrUtil.getAddresses(ARCUS_HOST));
+      }, AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
       fail("Expected AssertionError, got " + client);
     } catch (AssertionError e) {
       assertEquals("Connection factory failed to make a connection",
@@ -170,7 +170,8 @@ class MemcachedClientConstructorTest {
 
   @Test
   void testArraymodNodeLocatorAccessor() throws Exception {
-    client = new MemcachedClient(AddrUtil.getAddresses(ARCUS_HOST));
+    client = new MemcachedClient(AddrUtil.getAddresses(
+            Collections.singletonList(ARCUS_HOST)));
     assertTrue(client.getNodeLocator() instanceof ArrayModNodeLocator);
     assertTrue(client.getNodeLocator().getPrimary("x")
             instanceof MemcachedNodeROImpl);
@@ -178,8 +179,8 @@ class MemcachedClientConstructorTest {
 
   @Test
   void testKetamaNodeLocatorAccessor() throws Exception {
-    client = new MemcachedClient(new KetamaConnectionFactory(),
-            AddrUtil.getAddresses(ARCUS_HOST));
+    client = new MemcachedClient(new KetamaConnectionFactory(), AddrUtil.getAddresses(
+            Collections.singletonList(ARCUS_HOST)));
     assertTrue(client.getNodeLocator() instanceof KetamaNodeLocator);
     assertTrue(client.getNodeLocator().getPrimary("x")
             instanceof MemcachedNodeROImpl);

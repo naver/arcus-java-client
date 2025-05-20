@@ -15,8 +15,8 @@ final class MultiNodeFailureTest {
   }
 
   public static void main(String args[]) throws Exception {
-    MemcachedClient c = new MemcachedClient(
-            AddrUtil.getAddresses("localhost:11200 localhost:11201"));
+    MemcachedClient c = new MemcachedClient(AddrUtil.getAddresses(
+            Arrays.asList("localhost:11200", " localhost:11201")));
     while (true) {
       for (int i = 0; i < 1000; i++) {
         try {

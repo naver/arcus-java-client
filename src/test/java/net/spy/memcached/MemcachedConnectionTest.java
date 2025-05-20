@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -71,7 +73,7 @@ class MemcachedConnectionTest {
   @Test
   void testNodesChangeQueue() throws Exception {
     // when
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(Collections.singletonList("0.0.0.0:11211")));
 
     // 1st test (nodes=1)
     conn.handleCacheNodesChange();
@@ -80,7 +82,8 @@ class MemcachedConnectionTest {
     assertTrue(1 == locator.getAll().size());
 
     // when
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211,0.0.0.0:11212,0.0.0.0:11213"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(
+            Arrays.asList("0.0.0.0:11211", "0.0.0.0:11212", "0.0.0.0:11213")));
 
     // 2nd test (nodes=3)
     conn.handleCacheNodesChange();
@@ -89,7 +92,7 @@ class MemcachedConnectionTest {
     assertTrue(3 == locator.getAll().size());
 
     // when
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11212"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(Collections.singletonList("0.0.0.0:11212")));
 
     // 3rd test (nodes=1)
     conn.handleCacheNodesChange();
@@ -114,7 +117,7 @@ class MemcachedConnectionTest {
   void testNodesChangeQueue_invalid_addr() {
     try {
       // when : putting an invalid address
-      conn.setCacheNodesChange(AddrUtil.getAddresses(""));
+      conn.setCacheNodesChange(Collections.emptyList());
 
       // test
       conn.handleCacheNodesChange();
@@ -130,7 +133,8 @@ class MemcachedConnectionTest {
   @Test
   void testNodesChangeQueue_redundant() throws Exception {
     // when
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211,0.0.0.0:11211"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(
+            Arrays.asList("0.0.0.0:11211", "0.0.0.0:11211")));
 
     // test
     conn.handleCacheNodesChange();
@@ -142,8 +146,8 @@ class MemcachedConnectionTest {
   @Test
   void testNodesChangeQueue_twice() throws Exception {
     // when
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
-    conn.setCacheNodesChange(AddrUtil.getAddresses("0.0.0.0:11211"));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(Collections.singletonList("0.0.0.0:11211")));
+    conn.setCacheNodesChange(AddrUtil.getAddresses(Collections.singletonList("0.0.0.0:11211")));
 
     // test
     conn.handleCacheNodesChange();

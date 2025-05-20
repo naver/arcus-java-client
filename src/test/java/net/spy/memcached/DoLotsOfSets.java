@@ -2,6 +2,7 @@ package net.spy.memcached;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -23,7 +24,7 @@ final class DoLotsOfSets {
     // we're going to add.
     MemcachedClient client = new MemcachedClient(
             new DefaultConnectionFactory(350000, 32768),
-            AddrUtil.getAddresses("localhost:11211"));
+            AddrUtil.getAddresses(Collections.singletonList("localhost:11211")));
     int count = 300000;
     long start = System.currentTimeMillis();
     byte[] toStore = new byte[26];

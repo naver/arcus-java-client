@@ -2,6 +2,7 @@ package net.spy.memcached.test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
@@ -36,7 +37,7 @@ class SASLConnectReconnect {
     AuthDescriptor ad = new AuthDescriptor(new String[]{"PLAIN"},
             new PlainCallbackHandler(username, password));
     try {
-      List<InetSocketAddress> addresses = AddrUtil.getAddresses(host);
+      List<InetSocketAddress> addresses = AddrUtil.getAddresses(Collections.singletonList(host));
       mc = new MemcachedClient(
               new ConnectionFactoryBuilder().setProtocol(Protocol.BINARY)
                       .setAuthDescriptor(ad).build(), addresses);

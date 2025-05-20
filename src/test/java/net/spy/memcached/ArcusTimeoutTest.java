@@ -19,6 +19,7 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -63,7 +64,7 @@ class ArcusTimeoutTest {
       public FailureMode getFailureMode() {
         return FailureMode.Retry;
       }
-    }, AddrUtil.getAddresses("0.0.0.0:23456"));
+    }, AddrUtil.getAddresses(Collections.singletonList("0.0.0.0:23456")));
   }
 
   @AfterEach

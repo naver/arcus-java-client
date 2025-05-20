@@ -17,39 +17,44 @@ class ArcusKetamaHashingTest {
 
   @Test
   void testSmallSet() {
-    String[] stringNodes = generateAddresses(3);
+    List<String>[] stringNodes = generateAddresses(3);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
   @Test
   void testLargeSet() {
-    String[] stringNodes = generateAddresses(100);
+    List<String>[] stringNodes = generateAddresses(100);
     runThisManyNodes(stringNodes[0], stringNodes[1]);
   }
 
   @Test
   void testHashCollision() {
-    StringBuilder sb = new StringBuilder();
     int maxIdx = 103;
+    List<String> sb = new ArrayList<>(maxIdx + 6);
     for (int i = 0; i <= maxIdx; i++) {
-      sb.append("28.67.1." + i + ":11211 ");
+      sb.add("28.67.1." + i + ":11211 ");
     }
 
     /* Both stringNode1 and stringNode2 do not cause hash collision */
-    String stringNode1 = sb.toString();
-    String stringNode2 = sb.append("28.67.1." + (++maxIdx) + ":11211 ").toString();
+    List<String> stringNode1 = new ArrayList<>(sb);
+    sb.add("28.67.1." + (++maxIdx) + ":11211 ");
+    List<String> stringNode2 = sb;
     runThisManyNodes(stringNode1, stringNode2);
 
     /* stringNode1 does not cause hash collision
      * stringNode2 causes hash collision
      */
-    stringNode1 = sb.append("28.67.1." + (++maxIdx) + ":11211 ").toString();
-    stringNode2 = sb.append("28.67.1." + (++maxIdx) + ":11211 ").toString();
+    sb.add("28.67.1." + (++maxIdx) + ":11211 ");
+    stringNode1 = new ArrayList<>(sb);
+    sb.add("28.67.1." + (++maxIdx) + ":11211 ");
+    stringNode2 = new ArrayList<>(sb);
     runThisManyNodes(stringNode1, stringNode2);
 
     /* Both stringNode1 and stringNode2 cause hash collision */
-    stringNode1 = sb.append("28.67.1." + (++maxIdx) + ":11211 ").toString();
-    stringNode2 = sb.append("28.67.1." + (++maxIdx) + ":11211 ").toString();
+    sb.add("28.67.1." + (++maxIdx) + ":11211 ");
+    stringNode1 = new ArrayList<>(sb);
+    sb.add("28.67.1." + (++maxIdx) + ":11211 ");
+    stringNode2 = new ArrayList<>(sb);
     runThisManyNodes(stringNode1, stringNode2);
   }
 
@@ -60,7 +65,7 @@ class ArcusKetamaHashingTest {
    * @param stringNode1
    * @param stringNode2
    */
-  private void runThisManyNodes(String stringNode1, String stringNode2) {
+  private void runThisManyNodes(List<String> stringNode1, List<String> stringNode2) {
     List<MemcachedNode> smaller = createNodes(
             AddrUtil.getAddresses(stringNode1));
     List<MemcachedNode> larger = createNodes(
@@ -117,8 +122,11 @@ class ArcusKetamaHashingTest {
 
   }
 
-  private String[] generateAddresses(final int maxSize) {
-    final String[] results = new String[2];
+  private List<String>[] generateAddresses(final int maxSize) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    final List<String>[] results = new List[2];
+    results[0] = new ArrayList<>(maxSize);
+    results[1] = new ArrayList<>(maxSize);
 
     // Generate a pseudo-random set of addresses.
     long now = new Date().getTime();
@@ -129,28 +137,16 @@ class ArcusKetamaHashingTest {
     String port = ":11211 ";
     int last = (int) ((now % 100) + 3);
 
-    StringBuffer prefix = new StringBuffer();
-    prefix.append(first);
-    prefix.append(".");
-    prefix.append(second);
-    prefix.append(".1.");
+    String prefix = first + "." + second + ".1.";
 
     // Don't protect the possible range too much, as we are our own client.
-    StringBuffer buf = new StringBuffer();
     for (int ix = 0; ix < maxSize - 1; ix++) {
-      buf.append(prefix);
-      buf.append(last + ix);
-      buf.append(port);
+      String addr = prefix + (last + ix) + port;
+      results[0].add(addr);
+      results[1].add(addr);
     }
 
-    results[0] = buf.toString();
-
-    buf.append(prefix);
-    buf.append(last + maxSize - 1);
-    buf.append(port);
-
-    results[1] = buf.toString();
-
+    results[1].add(prefix + (last + maxSize - 1) + port);
     return results;
   }
 

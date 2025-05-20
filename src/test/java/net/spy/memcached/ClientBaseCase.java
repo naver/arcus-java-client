@@ -309,7 +309,7 @@ abstract class ClientBaseCase {
   }
 
   protected void openDirect(ConnectionFactory cf) throws Exception {
-    client = new ArcusClient(cf, AddrUtil.getAddresses(ARCUS_HOST));
+    client = new ArcusClient(cf, AddrUtil.getAddresses(Collections.singletonList(ARCUS_HOST)));
   }
 
   @BeforeEach

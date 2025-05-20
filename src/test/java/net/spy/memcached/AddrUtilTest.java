@@ -17,6 +17,8 @@
 package net.spy.memcached;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,8 +36,8 @@ class AddrUtilTest {
 
   @Test
   void testSingle() throws Exception {
-    List<InetSocketAddress> addrs =
-            AddrUtil.getAddresses("www.google.com:80");
+    List<InetSocketAddress> addrs = AddrUtil.getAddresses(
+            Collections.singletonList("www.google.com:80"));
     assertEquals(1, addrs.size());
     assertEquals("www.google.com", addrs.get(0).getHostName());
     assertEquals(80, addrs.get(0).getPort());
@@ -43,8 +45,8 @@ class AddrUtilTest {
 
   @Test
   void testTwo() throws Exception {
-    List<InetSocketAddress> addrs =
-            AddrUtil.getAddresses("www.google.com:80 www.yahoo.com:81");
+    List<InetSocketAddress> addrs = AddrUtil.getAddresses(
+            Arrays.asList("www.google.com:80", " www.yahoo.com:81"));
     assertEquals(2, addrs.size());
     assertEquals("www.google.com", addrs.get(0).getHostName());
     assertEquals(80, addrs.get(0).getPort());
@@ -54,8 +56,8 @@ class AddrUtilTest {
 
   @Test
   void testThree() throws Exception {
-    List<InetSocketAddress> addrs =
-            AddrUtil.getAddresses(" ,  www.google.com:80 ,, ,, www.yahoo.com:81 , ,,");
+    List<InetSocketAddress> addrs = AddrUtil.getAddresses(Arrays.asList(
+            " ", "  www.google.com:80 ", "", " ", "", " www.yahoo.com:81 ", " ", "", ""));
     assertEquals(2, addrs.size());
     assertEquals("www.google.com", addrs.get(0).getHostName());
     assertEquals(80, addrs.get(0).getPort());
@@ -65,7 +67,7 @@ class AddrUtilTest {
 
   @Test
   void testBrokenHost() throws Exception {
-    String s = "www.google.com:80 www.yahoo.com:81:more";
+    List<String> s = Arrays.asList("www.google.com:80", " www.yahoo.com:81:more");
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
       fail("Expected failure, got " + addrs);
@@ -77,19 +79,18 @@ class AddrUtilTest {
 
   @Test
   void testBrokenHost2() throws Exception {
-    String s = "www.google.com:80 www.yahoo.com";
+    List<String> s = Arrays.asList("www.google.com:80", " www.yahoo.com");
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
       fail("Expected failure, got " + addrs);
     } catch (IllegalArgumentException e) {
-      assertEquals("Invalid server ``www.yahoo.com'' in list:  "
-              + s, e.getMessage());
+      assertEquals("Invalid server ``www.yahoo.com''", e.getMessage());
     }
   }
 
   @Test
   void testNullList() throws Exception {
-    String s = null;
+    List<String> s = null;
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
       fail("Expected failure, got " + addrs);
@@ -100,8 +101,8 @@ class AddrUtilTest {
 
   @Test
   void testIPv6Host() throws Exception {
-    List<InetSocketAddress> addrs =
-            AddrUtil.getAddresses("::1:80");
+    List<InetSocketAddress> addrs = AddrUtil.getAddresses(
+            Collections.singletonList("::1:80"));
     assertEquals(1, addrs.size());
 
     Set<String> validLocalhostNames = new HashSet<>();

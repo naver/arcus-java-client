@@ -1,6 +1,7 @@
 package net.spy.memcached;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -34,7 +35,7 @@ class RedistributeFailureModeTest extends ClientBaseCase {
 
   @Override
   protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(serverList));
+    client = new MemcachedClient(cf, AddrUtil.getAddresses(Collections.singletonList(serverList)));
   }
 
   @Override
