@@ -469,12 +469,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
     Operation op = opFact.setAttr(key, attrs, new OperationCallback() {
       public void receivedStatus(OperationStatus status) {
-        if (status instanceof CollectionOperationStatus) {
-          rv.set(status.isSuccess(), (CollectionOperationStatus) status);
-        } else {
-          getLogger().warn("Unhandled state: " + status);
-          rv.set(status.isSuccess(), new CollectionOperationStatus(status));
-        }
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+        rv.set(status.isSuccess(), cstatus);
       }
 
       public void complete() {
@@ -495,14 +491,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       private final CollectionAttributes attrs = new CollectionAttributes();
 
       public void receivedStatus(OperationStatus status) {
-        CollectionOperationStatus stat;
-
-        if (status instanceof CollectionOperationStatus) {
-          stat = (CollectionOperationStatus) status;
-        } else {
-          stat = new CollectionOperationStatus(status);
-        }
-        rv.set(stat.isSuccess() ? attrs : null, stat);
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+        rv.set(cstatus.isSuccess() ? attrs : null, cstatus);
       }
 
       public void complete() {
@@ -540,13 +530,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           private final GetResult<List<T>> result = new LopGetResultImpl<>(cachedDataList, tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -602,13 +586,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           private final GetResult<Set<T>> result = new SopGetResultImpl<>(cachedDataSet, tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -653,13 +631,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   new BopGetResultImpl<>(cachedDataMap, ((BTreeGet) collectionGet).isReversed(), tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -703,13 +675,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   = new MopGetResultImpl<>(cachedDataMap, tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -771,14 +737,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.collectionInsert(key, subkey, collectionInsert,
             co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
+                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
                 rv.set(cstatus.isSuccess(), cstatus);
                 if (!cstatus.isSuccess()) {
                   getLogger().debug(
@@ -823,14 +782,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           new PipedOperationCallback() {
             // each result status
             public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
-
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
+              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
               rv.setOperationStatus(cstatus);
             }
 
@@ -842,13 +794,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
               if (!status.isSuccess()) {
-                if (status instanceof CollectionOperationStatus) {
-                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                          (CollectionOperationStatus) status);
-                } else {
-                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                          new CollectionOperationStatus(status));
-                }
+                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
               }
             }
           });
@@ -874,14 +821,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.collectionDelete(key, collectionDelete,
         new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             rv.set(cstatus.isSuccess(), cstatus);
             if (!cstatus.isSuccess()) {
               getLogger().debug("Deletion to the collection failed : %s (type=%s, key=%s)",
@@ -917,14 +857,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.collectionExist(key, subkey, collectionExist,
         new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             boolean isExist = CollectionResponse.EXIST == cstatus.getResponse();
             rv.set(isExist, cstatus);
             if (!cstatus.isSuccess()) {
@@ -1226,14 +1159,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new OperationCallback() {
           @Override
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             rv.set(cstatus.isSuccess(), cstatus);
             if (!cstatus.isSuccess()) {
               getLogger().debug("Insertion to the collection failed : %s (type=%s, key=%s, attribute=%s)",
@@ -1596,14 +1522,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           @Override
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess()) {
               rv.set(Integer.valueOf(cstatus.getMessage()),
                       new CollectionOperationStatus(true, "END", CollectionResponse.END));
@@ -2215,14 +2134,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Operation op = opFact.collectionUpdate(key, subkey, collectionUpdate,
             ((co == null) ? null : co.getData()), new OperationCallback() {
               public void receivedStatus(OperationStatus status) {
-                CollectionOperationStatus cstatus;
-
-                if (status instanceof CollectionOperationStatus) {
-                  cstatus = (CollectionOperationStatus) status;
-                } else {
-                  getLogger().warn("Unhandled state: " + status);
-                  cstatus = new CollectionOperationStatus(status);
-                }
+                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
                 rv.set(cstatus.isSuccess(), cstatus);
                 if (!cstatus.isSuccess()) {
                   getLogger().debug(
@@ -2404,13 +2316,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   new BopGetResultImpl<>(cachedDataMap, ((BTreeGet) collectionGet).isReversed(), tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -2483,13 +2389,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               new BopGetByPositionResultImpl<>(cachedDataMap, get.isReversed(), tc);
 
       public void receivedStatus(OperationStatus status) {
-        CollectionOperationStatus cstatus;
-        if (status instanceof CollectionOperationStatus) {
-          cstatus = (CollectionOperationStatus) status;
-        } else {
-          getLogger().warn("Unhandled state: " + status);
-          cstatus = new CollectionOperationStatus(status);
-        }
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
         if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
           rv.setResult(result, cstatus);
           return;
@@ -2555,13 +2455,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       private int position = 0;
 
       public void receivedStatus(OperationStatus status) {
-        CollectionOperationStatus cstatus;
-        if (status instanceof CollectionOperationStatus) {
-          cstatus = (CollectionOperationStatus) status;
-        } else {
-          getLogger().warn("Unhandled state: " + status);
-          cstatus = new CollectionOperationStatus(status);
-        }
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
         if (cstatus.isSuccess()) {
           rv.set(position, cstatus);
           return;
@@ -2635,13 +2529,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   = new BopGetByPositionResultImpl<>(cachedDataMap, false, tc);
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess() || cstatus.getResponse() == CollectionResponse.NOT_FOUND_ELEMENT) {
               rv.setResult(result, cstatus);
               return;
@@ -2752,13 +2640,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         new BTreeInsertAndGetOperation.Callback() {
 
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess()) {
               rv.set(true, cstatus);
               return;
@@ -2877,13 +2759,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               return;
             }
 
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              getLogger().warn("Unhandled state: " + status);
-              cstatus = new CollectionOperationStatus(status);
-            }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             rv.set(result, cstatus);
           }
 
@@ -2892,13 +2768,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
 
           public void gotStatus(Integer index, OperationStatus status) {
-            CollectionOperationStatus cstatus;
-            if (status instanceof CollectionOperationStatus) {
-              cstatus = (CollectionOperationStatus) status;
-            } else {
-              cstatus = new CollectionOperationStatus(status);
-            }
-
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             if (cstatus.isSuccess()) {
               result.put(exist.getValues().get(index),
                       (CollectionResponse.EXIST.equals(cstatus
@@ -3002,14 +2872,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           new PipedOperationCallback() {
             // each result status
             public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus;
-
-              if (status instanceof CollectionOperationStatus) {
-                cstatus = (CollectionOperationStatus) status;
-              } else {
-                getLogger().warn("Unhandled state: " + status);
-                cstatus = new CollectionOperationStatus(status);
-              }
+              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
               rv.setOperationStatus(cstatus);
             }
 
@@ -3021,13 +2884,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             // got status
             public void gotStatus(Integer index, OperationStatus status) {
               if (!status.isSuccess()) {
-                if (status instanceof CollectionOperationStatus) {
-                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                          (CollectionOperationStatus) status);
-                } else {
-                  rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT),
-                          new CollectionOperationStatus(status));
-                }
+                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
               }
             }
           });
@@ -3225,11 +3083,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 public void gotStatus(Integer index, OperationStatus status) {
                   if (!status.isSuccess()) {
                     String key = insert.getKey(index);
-                    if (status instanceof CollectionOperationStatus) {
-                      rv.addFailedResult(key, (CollectionOperationStatus) status);
-                    } else {
-                      rv.addFailedResult(key, new CollectionOperationStatus(status));
-                    }
+                    CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+                    rv.addFailedResult(key, cstatus);
                   }
                 }
               });
@@ -3568,6 +3423,16 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       if (!keySet.add(key)) {
         throw new IllegalArgumentException("Duplicate keys exist in key list.");
       }
+    }
+  }
+
+  private CollectionOperationStatus toCollectionOperationStatus(OperationStatus status) {
+    if (status instanceof CollectionOperationStatus) {
+      return (CollectionOperationStatus) status;
+    } else {
+      // This case is occurred when undefined status is returned from the ARCUS
+      // or there's no master node while processing switchover.
+      return new CollectionOperationStatus(status);
     }
   }
 
