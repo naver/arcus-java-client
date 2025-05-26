@@ -74,9 +74,4 @@ final class StatsOperationImpl extends OperationImpl
     setBuffer(ByteBuffer.wrap(msg));
   }
 
-  @Override
-  protected void wasCancelled() {
-    cb.receivedStatus(CANCELLED);
-  }
-
 }

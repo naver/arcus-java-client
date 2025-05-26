@@ -39,9 +39,6 @@ class SetAttrOperationImpl extends OperationImpl
 
   private static final int OVERHEAD = 64;
 
-  private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus OK =
           new CollectionOperationStatus(true, "OK", CollectionResponse.OK);
   private static final OperationStatus NOT_FOUND =
@@ -104,11 +101,6 @@ class SetAttrOperationImpl extends OperationImpl
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(ATTR_CANCELED);
   }
 
   public Collection<String> getKeys() {

@@ -20,9 +20,6 @@ import net.spy.memcached.ops.PipedOperationCallback;
 
 abstract class PipeOperationImpl extends OperationImpl {
 
-  protected static final OperationStatus CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   protected static final OperationStatus END = new CollectionOperationStatus(
           true, "END", CollectionResponse.END);
   protected static final OperationStatus FAILED_END = new CollectionOperationStatus(
@@ -200,11 +197,6 @@ abstract class PipeOperationImpl extends OperationImpl {
       getLogger().debug("Request in ascii protocol: %s",
               (new String(buffer.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(CANCELED);
   }
 
   public Collection<String> getKeys() {

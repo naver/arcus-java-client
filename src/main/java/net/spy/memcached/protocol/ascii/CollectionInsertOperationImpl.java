@@ -47,9 +47,6 @@ public final class CollectionInsertOperationImpl extends OperationImpl
 
   private static final int OVERHEAD = 32;
 
-  private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
   private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -143,11 +140,6 @@ public final class CollectionInsertOperationImpl extends OperationImpl
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(STORE_CANCELED);
   }
 
   public Collection<String> getKeys() {

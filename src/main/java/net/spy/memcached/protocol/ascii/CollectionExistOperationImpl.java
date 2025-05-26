@@ -42,9 +42,6 @@ public final class CollectionExistOperationImpl extends OperationImpl
 
   private static final int OVERHEAD = 32;
 
-  private static final OperationStatus EXIST_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus EXIST = new CollectionOperationStatus(
           true, "EXIST", CollectionResponse.EXIST);
   private static final OperationStatus NOT_EXIST = new CollectionOperationStatus(
@@ -112,11 +109,6 @@ public final class CollectionExistOperationImpl extends OperationImpl
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(EXIST_CANCELED);
   }
 
   public Collection<String> getKeys() {

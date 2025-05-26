@@ -40,9 +40,6 @@ import net.spy.memcached.ops.OperationType;
 public final class CollectionCountOperationImpl extends OperationImpl implements
         CollectionCountOperation {
 
-  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
           false, "NOT_FOUND", CollectionResponse.NOT_FOUND);
   private static final OperationStatus TYPE_MISMATCH = new CollectionOperationStatus(
@@ -110,11 +107,6 @@ public final class CollectionCountOperationImpl extends OperationImpl implements
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(GET_CANCELED);
   }
 
   public Collection<String> getKeys() {

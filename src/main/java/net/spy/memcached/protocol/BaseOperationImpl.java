@@ -25,9 +25,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.RedirectHandler;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CancelledOperationStatus;
+import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
@@ -47,6 +49,11 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
    */
   public static final OperationStatus CANCELLED =
           new CancelledOperationStatus();
+
+  public static final CollectionOperationStatus COLLECTION_CANCELLED =
+          new CollectionOperationStatus(false, "collection canceled",
+                  CollectionResponse.CANCELED);
+
   private OperationState state = OperationState.WRITE_QUEUED;
   private ByteBuffer cmd = null;
   private boolean cancelled = false;
@@ -100,7 +107,7 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
         cause += " @ " + handlingNode.getNodeName();
       }
       cancelCause = "Cancelled (" + cause + ")";
-      wasCancelled();
+      callback.receivedStatus(CANCELLED);
       callback.complete();
       return true;
     }
@@ -109,13 +116,6 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
 
   public final String getCancelCause() {
     return cancelCause;
-  }
-
-  /**
-   * This is called on each subclass whenever an operation was cancelled.
-   */
-  protected void wasCancelled() {
-    getLogger().debug("was cancelled.");
   }
 
   public final OperationState getState() {

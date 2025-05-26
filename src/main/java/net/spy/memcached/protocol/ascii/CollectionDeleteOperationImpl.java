@@ -43,9 +43,6 @@ import net.spy.memcached.ops.OperationType;
 public final class CollectionDeleteOperationImpl extends OperationImpl
         implements CollectionDeleteOperation {
 
-  private static final OperationStatus DELETE_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus DELETED = new CollectionOperationStatus(
           true, "DELETED", CollectionResponse.DELETED);
   private static final OperationStatus DELETED_DROPPED = new CollectionOperationStatus(
@@ -137,11 +134,6 @@ public final class CollectionDeleteOperationImpl extends OperationImpl
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(DELETE_CANCELED);
   }
 
   public Collection<String> getKeys() {

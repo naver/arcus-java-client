@@ -36,9 +36,6 @@ import net.spy.memcached.ops.OperationType;
 public final class BTreeFindPositionOperationImpl extends OperationImpl implements
         BTreeFindPositionOperation {
 
-  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus POSITION = new CollectionOperationStatus(
           true, "POSITION", CollectionResponse.OK); // OK is arbitrary response
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
@@ -118,11 +115,6 @@ public final class BTreeFindPositionOperationImpl extends OperationImpl implemen
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(GET_CANCELED);
   }
 
   public Collection<String> getKeys() {
