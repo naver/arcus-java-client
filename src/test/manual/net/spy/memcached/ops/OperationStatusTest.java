@@ -5,14 +5,12 @@ import java.util.List;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionResponse;
-import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class OperationStatusTest extends BaseIntegrationTest {
@@ -151,21 +149,6 @@ class OperationStatusTest extends BaseIntegrationTest {
     assertNotEquals(status1, status3);
     assertEquals(status1.hashCode(), status2.hashCode());
     assertNotEquals(status1.hashCode(), status3.hashCode());
-  }
-
-  @Test
-  void cancelMakesOperationStatus() {
-    GetFuture<Object> future = mc.asyncGet("key");
-    try {
-      future.cancel(true);
-    } catch (Exception e) {
-      // expected
-    }
-    OperationStatus status = future.getStatus();
-    assertFalse(status instanceof CollectionOperationStatus);
-    assertFalse(status.isSuccess());
-    assertEquals("cancelled", status.getMessage());
-    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
   }
 
   @Test

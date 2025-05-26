@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.OperationState;
 
 /**
  * Managed future for collection operations.
@@ -47,7 +46,7 @@ public class CollectionFuture<T> extends OperationFuture<T> {
   }
 
   public CollectionOperationStatus getOperationStatus() {
-    return (op.getState() == OperationState.COMPLETE) ? collectionOpStatus : null;
+    return this.isDone() ? collectionOpStatus : null;
   }
 
 }
