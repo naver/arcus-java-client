@@ -6,7 +6,6 @@ import java.util.List;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.ops.CollectionOperationStatus;
-import net.spy.memcached.ops.OperationStatus;
 
 public final class SMGetResultImpl<T> extends SMGetResult<T> {
   private final int count;
@@ -24,9 +23,9 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
     return mergedResult;
   }
 
-  public void setFailedOperationStatus(OperationStatus status) {
+  public void setFailedOperationStatus(CollectionOperationStatus status) {
     if (failedOperationStatus == null) {
-      failedOperationStatus = new CollectionOperationStatus(status);
+      failedOperationStatus = status;
     }
     mergedResult.clear();
     trimmedKeyMap.clear();

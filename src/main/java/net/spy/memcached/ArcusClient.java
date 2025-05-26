@@ -1524,12 +1524,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           @Override
           public void receivedStatus(OperationStatus status) {
-            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-            if (cstatus.isSuccess()) {
-              rv.set(Integer.valueOf(cstatus.getMessage()),
+            if (status.isSuccess()) {
+              rv.set(Integer.valueOf(status.getMessage()),
                       new CollectionOperationStatus(true, "END", CollectionResponse.END));
               return;
             }
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             rv.set(null, cstatus);
           }
 
@@ -1909,8 +1909,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
           } else {
             stopCollect.set(true);
-            result.setFailedOperationStatus(status);
-            getLogger().warn("SMGetFailed. status=%s", status);
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+            result.setFailedOperationStatus(cstatus);
+            getLogger().warn("SMGetFailed. status=%s", cstatus);
           }
         }
 
@@ -1974,8 +1975,9 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             }
           } else {
             stopCollect.set(true);
-            result.setFailedOperationStatus(status);
-            getLogger().warn("SMGetFailed. status=%s", status);
+            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+            result.setFailedOperationStatus(cstatus);
+            getLogger().warn("SMGetFailed. status=%s", cstatus);
           }
         }
 

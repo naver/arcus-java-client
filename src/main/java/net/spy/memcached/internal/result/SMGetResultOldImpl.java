@@ -39,9 +39,9 @@ public final class SMGetResultOldImpl<T> extends SMGetResult<T> {
     return finalResult;
   }
 
-  public void setFailedOperationStatus(OperationStatus status) {
+  public void setFailedOperationStatus(CollectionOperationStatus status) {
     if (failedOperationStatus == null) {
-      failedOperationStatus = new CollectionOperationStatus(status);
+      failedOperationStatus = status;
     }
     mergedResult.clear();
   }
