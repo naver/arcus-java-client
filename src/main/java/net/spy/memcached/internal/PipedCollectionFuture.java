@@ -104,11 +104,13 @@ public class PipedCollectionFuture<K, V>
   public void setOperationStatus(CollectionOperationStatus status) {
     if (operationStatus.get() == null) {
       operationStatus.set(status);
+      super.set(null, status);
       return;
     }
 
     if (!status.isSuccess() && operationStatus.get().isSuccess()) {
       operationStatus.set(status);
+      super.set(null, status);
     }
   }
 

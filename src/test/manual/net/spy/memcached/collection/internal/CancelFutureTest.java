@@ -18,6 +18,7 @@ import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.CollectionGetFuture;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.internal.PipedCollectionFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -118,7 +118,9 @@ class CancelFutureTest extends BaseIntegrationTest {
 
     // then
     OperationStatus status = future.getStatus();
-    assertNull(status);
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status.isSuccess());
+    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
 
     CollectionOperationStatus operationStatus = future.getOperationStatus();
     assertInstanceOf(CollectionOperationStatus.class, operationStatus);
@@ -133,8 +135,9 @@ class CancelFutureTest extends BaseIntegrationTest {
   @Test
   void cancelWithPipedCollectionFuture() {
     // given
-    CollectionFuture<Map<Integer, CollectionOperationStatus>> future =
-            mc.asyncLopPipedInsertBulk("list", 0, Arrays.asList("value1", "value2"), null);
+    PipedCollectionFuture<Integer, CollectionOperationStatus> future =
+            (PipedCollectionFuture<Integer, CollectionOperationStatus>)
+                    mc.asyncLopPipedInsertBulk("list", 0, Arrays.asList("value1", "value2"), null);
 
     // when
     try {
@@ -145,7 +148,9 @@ class CancelFutureTest extends BaseIntegrationTest {
 
     // then
     OperationStatus status = future.getStatus();
-    assertNull(status);
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status.isSuccess());
+    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
 
     CollectionOperationStatus operationStatus = future.getOperationStatus();
     assertInstanceOf(CollectionOperationStatus.class, operationStatus);
@@ -172,7 +177,9 @@ class CancelFutureTest extends BaseIntegrationTest {
 
     // then
     OperationStatus status = future.getStatus();
-    assertNull(status);
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status.isSuccess());
+    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
 
     CollectionOperationStatus operationStatus = future.getOperationStatus();
     assertInstanceOf(CollectionOperationStatus.class, operationStatus);
@@ -199,7 +206,9 @@ class CancelFutureTest extends BaseIntegrationTest {
 
     // then
     OperationStatus status = future.getStatus();
-    assertNull(status);
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status.isSuccess());
+    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
 
     CollectionOperationStatus operationStatus = future.getOperationStatus();
     assertInstanceOf(CollectionOperationStatus.class, operationStatus);

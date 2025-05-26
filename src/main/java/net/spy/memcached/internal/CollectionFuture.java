@@ -41,7 +41,7 @@ public class CollectionFuture<T> extends OperationFuture<T> {
   }
 
   public void set(T o, CollectionOperationStatus status) {
-    objRef.set(o);
+    super.set(o, status);
     collectionOpStatus = status;
   }
 
