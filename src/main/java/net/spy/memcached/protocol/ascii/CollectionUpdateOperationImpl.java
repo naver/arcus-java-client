@@ -44,9 +44,6 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
 
   private static final int OVERHEAD = 32;
 
-  private static final OperationStatus STORE_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus UPDATED = new CollectionOperationStatus(
           true, "UPDATED", CollectionResponse.UPDATED);
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
@@ -144,11 +141,6 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
               "Request in ascii protocol: '%s'",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(STORE_CANCELED);
   }
 
   public Collection<String> getKeys() {

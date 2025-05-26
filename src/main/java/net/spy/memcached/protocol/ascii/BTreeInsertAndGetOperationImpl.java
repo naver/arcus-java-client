@@ -43,9 +43,6 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);
   private static final OperationStatus STORED = new CollectionOperationStatus(
@@ -279,11 +276,6 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(GET_CANCELED);
   }
 
   @Override

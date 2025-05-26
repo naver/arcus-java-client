@@ -41,9 +41,6 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus END = new CollectionOperationStatus(
           true, "END", CollectionResponse.END);
 
@@ -247,11 +244,6 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(GET_CANCELED);
   }
 
   @Override

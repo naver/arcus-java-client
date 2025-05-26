@@ -146,8 +146,10 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.FrontCacheMemcachedClient;
+import net.spy.memcached.protocol.BaseOperationImpl;
 import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
@@ -3429,6 +3431,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private CollectionOperationStatus toCollectionOperationStatus(OperationStatus status) {
     if (status instanceof CollectionOperationStatus) {
       return (CollectionOperationStatus) status;
+    } else if (status.getStatusCode() == StatusCode.CANCELLED) {
+      return BaseOperationImpl.COLLECTION_CANCELLED;
     } else {
       // This case is occurred when undefined status is returned from the ARCUS
       // or there's no master node while processing switchover.

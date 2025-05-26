@@ -41,9 +41,6 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
 
   private final ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-  private static final OperationStatus GET_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus END = new CollectionOperationStatus(
           true, "END", CollectionResponse.END);
   private static final OperationStatus DUPLICATED = new CollectionOperationStatus(
@@ -301,11 +298,6 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(GET_CANCELED);
   }
 
   public Collection<String> getKeys() {

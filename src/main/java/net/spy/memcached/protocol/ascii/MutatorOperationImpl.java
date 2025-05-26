@@ -111,12 +111,6 @@ final class MutatorOperationImpl extends OperationImpl
     setBuffer(bb);
   }
 
-  @Override
-  protected void wasCancelled() {
-    // XXX:  Replace this comment with why the hell I did this.
-    getCallback().receivedStatus(CANCELLED);
-  }
-
   public Collection<String> getKeys() {
     return Collections.singleton(key);
   }

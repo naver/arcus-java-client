@@ -38,9 +38,6 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
 
   private static final String CMD = "getattr";
 
-  private static final OperationStatus ATTR_CANCELED = new CollectionOperationStatus(
-          false, "collection canceled", CollectionResponse.CANCELED);
-
   private static final OperationStatus END = new CollectionOperationStatus(
           true, "END", CollectionResponse.END);
   private static final OperationStatus NOT_FOUND = new CollectionOperationStatus(
@@ -105,11 +102,6 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
       getLogger().debug("Request in ascii protocol: %s",
               (new String(bb.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  @Override
-  protected void wasCancelled() {
-    getCallback().receivedStatus(ATTR_CANCELED);
   }
 
   @Override

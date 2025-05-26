@@ -229,11 +229,6 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   @Override
-  protected final void wasCancelled() {
-    getCallback().receivedStatus(CANCELLED);
-  }
-
-  @Override
   public boolean isBulkOperation() {
     return keys.size() > 1;
   }
