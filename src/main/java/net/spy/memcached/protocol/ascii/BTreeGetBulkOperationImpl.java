@@ -122,9 +122,7 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
     } else {
       OperationStatus status = matchStatus(line, END);
       getLogger().debug(status);
-
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 

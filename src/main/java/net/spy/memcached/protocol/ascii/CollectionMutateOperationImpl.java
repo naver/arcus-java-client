@@ -104,9 +104,7 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
 
       getLogger().debug(status);
     }
-
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   public void initialize() {

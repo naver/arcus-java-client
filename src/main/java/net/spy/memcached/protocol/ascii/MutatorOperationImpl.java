@@ -93,9 +93,7 @@ final class MutatorOperationImpl extends OperationImpl
     } else {
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH);
     }
-
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

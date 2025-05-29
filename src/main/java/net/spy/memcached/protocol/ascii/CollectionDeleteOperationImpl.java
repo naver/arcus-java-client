@@ -98,8 +98,7 @@ public final class CollectionDeleteOperationImpl extends OperationImpl
     OperationStatus status = matchStatus(line, DELETED, DELETED_DROPPED,
             NOT_FOUND, NOT_FOUND_ELEMENT, OUT_OF_RANGE, TYPE_MISMATCH,
             BKEY_MISMATCH);
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

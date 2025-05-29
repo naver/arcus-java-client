@@ -29,7 +29,6 @@ import java.util.Map;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.CASOperation;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
 
@@ -146,7 +145,7 @@ public final class OptimizedSetImpl extends OperationImpl {
         cb.receivedStatus(STATUS_OK);
         cb.complete();
       }
-      transitionState(OperationState.COMPLETE);
+      complete(STATUS_OK);
     } else {
       OperationCallback cb = callbacks.remove(responseOpaque);
       assert cb != null : "No callback for " + responseOpaque;

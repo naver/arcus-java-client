@@ -135,8 +135,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
               DUPLICATED, DUPLICATED_TRIMMED, OUT_OF_RANGE,
               ATTR_MISMATCH, TYPE_MISMATCH, BKEY_MISMATCH);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 
@@ -311,8 +310,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
               return;
             }
             /* ENABLE_MIGRATION end */
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
+            complete(status);
             return;
           } else if (count < lineCount) {
             // <key> [<cause>]\r\n
@@ -340,8 +338,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
               return;
             }
             /* ENABLE_MIGRATION end */
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
+            complete(status);
             return;
           }
           byteBuffer.reset();
@@ -376,8 +373,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
               return;
             }
             /* ENABLE_MIGRATION end */
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
+            complete(status);
             return;
           } else if (count < lineCount) {
             // <key> <bkey>\r\n
@@ -399,8 +395,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
               return;
             }
             /* ENABLE_MIGRATION end */
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
+            complete(status);
             return;
           }
           byteBuffer.reset();

@@ -71,7 +71,7 @@ class MutatorOperationImpl extends OperationImpl implements
 
   @Override
   protected void decodePayload(byte[] pl) {
-    getCallback().receivedStatus(new OperationStatus(true,
+    complete(new OperationStatus(true,
             String.valueOf(decodeLong(pl, 0)), StatusCode.SUCCESS));
   }
 

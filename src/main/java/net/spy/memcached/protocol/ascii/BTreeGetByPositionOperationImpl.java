@@ -120,8 +120,7 @@ public final class BTreeGetByPositionOperationImpl extends OperationImpl impleme
       OperationStatus status = matchStatus(line, END, NOT_FOUND,
               UNREADABLE, TYPE_MISMATCH, NOT_FOUND_ELEMENT);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 
@@ -164,8 +163,7 @@ public final class BTreeGetByPositionOperationImpl extends OperationImpl impleme
                   NOT_FOUND_ELEMENT);
 
           getLogger().debug("Get complete!");
-          getCallback().receivedStatus(status);
-          transitionState(OperationState.COMPLETE);
+          complete(status);
           data = null;
           break;
         }

@@ -88,9 +88,7 @@ public final class CollectionCountOperationImpl extends OperationImpl implements
       status = matchStatus(line, NOT_FOUND, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);
     }
-
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   public void initialize() {
