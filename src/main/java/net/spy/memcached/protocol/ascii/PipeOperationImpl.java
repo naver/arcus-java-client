@@ -123,8 +123,7 @@ abstract class PipeOperationImpl extends OperationImpl {
       }
       cb.gotStatus(index, status);
 
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
+      complete((successAll) ? END : FAILED_END);
       return;
     }
 
@@ -142,8 +141,7 @@ abstract class PipeOperationImpl extends OperationImpl {
         return;
       }
       /* ENABLE_MIGRATION end */
-      cb.receivedStatus((successAll) ? END : FAILED_END);
-      transitionState(OperationState.COMPLETE);
+      complete((successAll) ? END : FAILED_END);
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 

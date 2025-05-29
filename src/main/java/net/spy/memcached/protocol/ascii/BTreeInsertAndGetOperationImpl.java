@@ -153,8 +153,7 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
         status = matchStatus(line, INSERT_AND_GET_STATUS_ON_LINE);
       }
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 
@@ -191,8 +190,7 @@ public final class BTreeInsertAndGetOperationImpl extends OperationImpl implemen
         if (b == '\n') { // Finish the operation.
           OperationStatus status = matchStatus(byteBuffer.toString(), STORE_AND_GET_ON_DATA);
           getLogger().debug("Get complete!");
-          getCallback().receivedStatus(status);
-          transitionState(OperationState.COMPLETE);
+          complete(status);
           data = null;
           break;
         }

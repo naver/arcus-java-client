@@ -140,8 +140,7 @@ public final class CollectionGetOperationImpl extends OperationImpl
               DELETED_DROPPED, NOT_FOUND, NOT_FOUND_ELEMENT,
               OUT_OF_RANGE, TYPE_MISMATCH, BKEY_MISMATCH, UNREADABLE);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 
@@ -190,8 +189,7 @@ public final class CollectionGetOperationImpl extends OperationImpl
                   BKEY_MISMATCH, UNREADABLE);
 
           getLogger().debug("Get complete!");
-          getCallback().receivedStatus(status);
-          transitionState(OperationState.COMPLETE);
+          complete(status);
           data = null;
           break;
         }

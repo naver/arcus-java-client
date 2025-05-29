@@ -19,7 +19,6 @@ package net.spy.memcached.protocol.binary;
 
 import java.io.IOException;
 
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.StatsOperation;
 
 public class StatsOperationImpl extends OperationImpl
@@ -49,8 +48,7 @@ public class StatsOperationImpl extends OperationImpl
       cb.gotStat(new String(keyBytes, "UTF-8"),
               new String(data, "UTF-8"));
     } else {
-      getCallback().receivedStatus(STATUS_OK);
-      transitionState(OperationState.COMPLETE);
+      complete(STATUS_OK);
     }
     resetInput();
   }

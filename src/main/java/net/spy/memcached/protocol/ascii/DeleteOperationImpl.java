@@ -71,8 +71,7 @@ final class DeleteOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(matchStatus(line, DELETED, NOT_FOUND));
-    transitionState(OperationState.COMPLETE);
+    complete(matchStatus(line, DELETED, NOT_FOUND));
   }
 
   @Override

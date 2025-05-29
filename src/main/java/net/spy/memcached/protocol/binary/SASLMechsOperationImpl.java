@@ -38,8 +38,7 @@ class SASLMechsOperationImpl extends OperationImpl implements
 
   @Override
   protected void decodePayload(byte[] pl) {
-    getCallback().receivedStatus(
-            new OperationStatus(true, new String(pl), StatusCode.SUCCESS));
+    complete(new OperationStatus(true, new String(pl), StatusCode.SUCCESS));
   }
 
 

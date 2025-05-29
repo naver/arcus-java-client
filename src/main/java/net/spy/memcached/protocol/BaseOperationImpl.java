@@ -114,6 +114,23 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
     return false;
   }
 
+  /**
+   * Completes the operation by transitioning its state to COMPLETE and invoking the callback.
+   *
+   * <p>This method ensures thread-safety by using an {@link AtomicBoolean} to guarantee
+   * that the callback is invoked only once, even if called from multiple threads.</p>
+   *
+   * @param status The status to pass to the callback.
+   */
+  protected final void complete(OperationStatus status) {
+    boolean needComplete = callbacked.compareAndSet(false, true);
+    callback.receivedStatus(status);
+    transitionState(OperationState.COMPLETE);
+    if (needComplete) {
+      callback.complete();
+    }
+  }
+
   public final String getCancelCause() {
     return cancelCause;
   }
@@ -160,8 +177,7 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
     if (group.getMasterCandidate() == null) {
       getLogger().error("there is a problem to set master candidate : %s by %s from %s",
               cause, this, handlingNode);
-      getCallback().receivedStatus(new OperationStatus(false, cause, StatusCode.UNDEFINED));
-      transitionState(OperationState.COMPLETE);
+      complete(new OperationStatus(false, cause, StatusCode.UNDEFINED));
       return;
     }
 
@@ -221,10 +237,6 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
         state != OperationState.WRITING) {
       cmd = null;
     }
-    if (state == OperationState.COMPLETE &&
-            callbacked.compareAndSet(false, true)) {
-      callback.complete();
-    }
   }
 
   public final void writing() {
@@ -251,8 +263,7 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
       getLogger().error("Bad command: %s", cmdLines[0]);
     }
     exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
-    getCallback().receivedStatus(new OperationStatus(false, line, StatusCode.ERR_INTERNAL));
-    transitionState(OperationState.COMPLETE);
+    complete(new OperationStatus(false, line, StatusCode.ERR_INTERNAL));
     throw exception;
   }
 

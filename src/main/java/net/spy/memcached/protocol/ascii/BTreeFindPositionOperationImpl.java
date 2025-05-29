@@ -78,6 +78,7 @@ public final class BTreeFindPositionOperationImpl extends OperationImpl implemen
     }
     /* ENABLE_MIGRATION end */
 
+    OperationStatus status;
     if (line.startsWith("POSITION=")) {
       String[] stuff = line.split("=");
       assert stuff.length == 2;
@@ -88,15 +89,13 @@ public final class BTreeFindPositionOperationImpl extends OperationImpl implemen
       BTreeFindPositionOperation.Callback cb =
               (BTreeFindPositionOperation.Callback) getCallback();
       cb.gotData(position);
-      getCallback().receivedStatus(POSITION);
+      status = POSITION;
     } else {
-      OperationStatus status = matchStatus(line, NOT_FOUND, UNREADABLE,
+      status = matchStatus(line, NOT_FOUND, UNREADABLE,
               BKEY_MISMATCH, TYPE_MISMATCH, NOT_FOUND_ELEMENT);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
     }
-
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
@@ -62,8 +61,7 @@ final class FlushByPrefixOperationImpl extends OperationImpl implements
       return;
     }
     /* ENABLE_REPLICATION end */
-    getCallback().receivedStatus(matchStatus(line, OK, NOT_FOUND));
-    transitionState(OperationState.COMPLETE);
+    complete(matchStatus(line, OK, NOT_FOUND));
   }
 
   @Override

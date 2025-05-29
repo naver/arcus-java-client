@@ -77,8 +77,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(matchStatus(line, STORED, NOT_FOUND, EXISTS));
-    transitionState(OperationState.COMPLETE);
+    complete(matchStatus(line, STORED, NOT_FOUND, EXISTS));
   }
 
   @Override

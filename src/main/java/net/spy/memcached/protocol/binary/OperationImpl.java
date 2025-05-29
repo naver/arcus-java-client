@@ -28,7 +28,6 @@ import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.CASOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationErrorType;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.protocol.BaseOperationImpl;
@@ -169,12 +168,10 @@ abstract class OperationImpl extends BaseOperationImpl {
       if (status == null) {
         handleError(OperationErrorType.SERVER, new String(pl));
       } else {
-        getCallback().receivedStatus(status);
-        transitionState(OperationState.COMPLETE);
+        complete(status);
       }
     } else {
       decodePayload(pl);
-      transitionState(OperationState.COMPLETE);
     }
   }
 
@@ -195,7 +192,7 @@ abstract class OperationImpl extends BaseOperationImpl {
    */
   protected void decodePayload(byte[] pl) {
     assert pl.length == 0 : "Payload has bytes, but decode isn't overridden";
-    getCallback().receivedStatus(STATUS_OK);
+    complete(STATUS_OK);
   }
 
   /**
