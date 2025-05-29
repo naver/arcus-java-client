@@ -87,8 +87,7 @@ public final class CollectionCreateOperationImpl extends OperationImpl
       return;
     }
     /* ENABLE_MIGRATION end */
-    getCallback().receivedStatus(matchStatus(line, CREATED, EXISTS));
-    transitionState(OperationState.COMPLETE);
+    complete(matchStatus(line, CREATED, EXISTS));
   }
 
   @Override

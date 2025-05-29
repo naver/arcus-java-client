@@ -85,8 +85,7 @@ class GetAttrOperationImpl extends OperationImpl implements GetAttrOperation {
     } else {
       OperationStatus status = matchStatus(line, END, NOT_FOUND, ATTR_ERROR_NOT_FOUND);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 

@@ -100,8 +100,7 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     OperationStatus status = matchStatus(line, UPDATED, NOT_FOUND, NOT_FOUND_ELEMENT,
             NOTHING_TO_UPDATE, TYPE_MISMATCH, BKEY_MISMATCH,
             EFLAG_MISMATCH);
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

@@ -83,8 +83,7 @@ class SetAttrOperationImpl extends OperationImpl
     /* ENABLE_MIGRATION end */
     OperationStatus status = matchStatus(line, OK, NOT_FOUND,
             ATTR_ERROR_NOT_FOUND, ATTR_ERROR_BAD_VALUE);
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

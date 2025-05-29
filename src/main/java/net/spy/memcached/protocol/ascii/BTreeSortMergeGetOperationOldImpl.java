@@ -29,7 +29,6 @@ import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
@@ -113,9 +112,7 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
               DUPLICATED, DUPLICATED_TRIMMED, OUT_OF_RANGE,
               ATTR_MISMATCH, TYPE_MISMATCH, BKEY_MISMATCH);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
-      return;
+      complete(status);
     }
   }
 
@@ -259,8 +256,7 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
                   BKEY_MISMATCH);
 
           if (status.isSuccess()) {
-            getCallback().receivedStatus(status);
-            transitionState(OperationState.COMPLETE);
+            complete(status);
             return;
           } else {
             ((BTreeSortMergeGetOperationOld.Callback) getCallback())
