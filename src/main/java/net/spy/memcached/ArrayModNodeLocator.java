@@ -20,6 +20,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -74,6 +75,14 @@ public final class ArrayModNodeLocator implements NodeLocator {
 
   public void update(Collection<MemcachedNode> toAttach, Collection<MemcachedNode> toDelete) {
     throw new UnsupportedOperationException("update not supported");
+  }
+
+  public Collection<MemcachedNode> getDelayedClosingNodes() {
+    return new HashSet<MemcachedNode>();
+  }
+
+  public void updateDelayedClosingNodes(Collection<MemcachedNode> closedNodes) {
+    // do NOT throw UnsupportedOperationException here for test codes.
   }
 
   /* ENABLE_MIGRATION if */
