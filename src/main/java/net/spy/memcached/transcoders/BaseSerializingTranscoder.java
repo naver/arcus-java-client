@@ -25,11 +25,8 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import net.spy.memcached.CachedData;
-import net.spy.memcached.compat.CloseUtil;
 import net.spy.memcached.compat.SpyObject;
 
 /**
@@ -38,15 +35,7 @@ import net.spy.memcached.compat.SpyObject;
  */
 public abstract class BaseSerializingTranscoder extends SpyObject {
 
-  /**
-   * Default compression threshold value.
-   */
-  public static final int DEFAULT_COMPRESSION_THRESHOLD = 16384;
-
   private static final String DEFAULT_CHARSET = "UTF-8";
-
-  protected int compressionThreshold = DEFAULT_COMPRESSION_THRESHOLD;
-  protected String charset = DEFAULT_CHARSET;
 
   private final int maxSize;
 
@@ -57,19 +46,20 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    */
   private final ClassLoader classLoader;
 
+  private final CompressionUtils cu = new CompressionUtils();
+  protected String charset = DEFAULT_CHARSET;
+
   /**
    * Initialize a serializing transcoder with the given maximum data size.
    */
   public BaseSerializingTranscoder(int max) {
-    super();
-    maxSize = max;
-    classLoader = null;
+    this(max, null);
   }
 
   public BaseSerializingTranscoder(int max, ClassLoader cl) {
     super();
-    maxSize = max;
-    classLoader = cl;
+    this.maxSize = max;
+    this.classLoader = cl;
   }
 
   public boolean asyncDecode(CachedData d) {
@@ -81,10 +71,10 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * transcoder will attempt to compress any data being stored that's larger
    * than this.
    *
-   * @param to the number of bytes
+   * @param threshold the number of bytes
    */
-  public void setCompressionThreshold(int to) {
-    compressionThreshold = to;
+  public void setCompressionThreshold(int threshold) {
+    cu.setCompressionThreshold(threshold);
   }
 
   /**
@@ -146,52 +136,33 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
 
   /**
    * Compress the given array of bytes.
+   *
+   * @param in the data to compress
+   * @return the compressed data
+   * @throws NullPointerException if the input is null
    */
   protected byte[] compress(byte[] in) {
-    if (in == null) {
-      throw new NullPointerException("Can't compress null");
-    }
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    GZIPOutputStream gz = null;
-    try {
-      gz = new GZIPOutputStream(bos);
-      gz.write(in);
-    } catch (IOException e) {
-      throw new RuntimeException("IO exception compressing data", e);
-    } finally {
-      CloseUtil.close(gz);
-      CloseUtil.close(bos);
-    }
-    byte[] rv = bos.toByteArray();
-    getLogger().debug("Compressed %d bytes to %d", in.length, rv.length);
-    return rv;
+    return cu.compress(in);
   }
 
   /**
    * Decompress the given array of bytes.
    *
-   * @return null if the bytes cannot be decompressed
+   * @param in the compressed byte array, or null
+   * @return the decompressed byte array, or null if input is null or decompression fails
    */
   protected byte[] decompress(byte[] in) {
-    ByteArrayOutputStream bos = null;
-    if (in != null) {
-      ByteArrayInputStream bis = new ByteArrayInputStream(in);
-      bos = new ByteArrayOutputStream();
-      GZIPInputStream gis;
-      try {
-        gis = new GZIPInputStream(bis);
-
-        byte[] buf = new byte[8192];
-        int r = -1;
-        while ((r = gis.read(buf)) > 0) {
-          bos.write(buf, 0, r);
-        }
-      } catch (IOException e) {
-        getLogger().warn("Failed to decompress data", e);
-        bos = null;
-      }
-    }
-    return bos == null ? null : bos.toByteArray();
+    return cu.decompress(in);
+  }
+  
+  /**
+   * Check if the data should be compressed based on its length and the compression threshold.
+   * 
+   * @param data the data to check
+   * @return true if the data should be compressed, false otherwise
+   */
+  protected boolean isCompressionCandidate(byte[] data) {
+    return cu.isCompressionCandidate(data);
   }
 
   /**

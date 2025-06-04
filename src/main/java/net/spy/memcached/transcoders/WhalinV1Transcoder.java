@@ -66,7 +66,7 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (b.length > compressionThreshold) {
+    if (isCompressionCandidate(b)) {
       byte[] compressed = compress(b);
       if (compressed.length < b.length) {
         getLogger().info("Compressed %s from %d to %d",
