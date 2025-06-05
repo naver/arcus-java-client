@@ -15,10 +15,6 @@ public final class IntegerTranscoder extends SpyObject
 
   private final TranscoderUtils tu = new TranscoderUtils(true);
 
-  public boolean asyncDecode(CachedData d) {
-    return false;
-  }
-
   public CachedData encode(java.lang.Integer l) {
     return new CachedData(flags, tu.encodeInt(l), getMaxSize());
   }

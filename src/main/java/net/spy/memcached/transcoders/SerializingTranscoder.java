@@ -66,15 +66,6 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     super(max, cl);
   }
 
-  @Override
-  public boolean asyncDecode(CachedData d) {
-    if ((d.getFlags() & COMPRESSED) != 0
-            || (d.getFlags() & SERIALIZED) != 0) {
-      return true;
-    }
-    return super.asyncDecode(d);
-  }
-
   public Object decode(CachedData d) {
     byte[] data = d.getData();
     Object rv = null;

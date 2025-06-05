@@ -26,7 +26,6 @@ import java.io.ObjectStreamClass;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
 
-import net.spy.memcached.CachedData;
 import net.spy.memcached.compat.SpyObject;
 
 /**
@@ -60,10 +59,6 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
     super();
     this.maxSize = max;
     this.classLoader = cl;
-  }
-
-  public boolean asyncDecode(CachedData d) {
-    return false;
   }
 
   /**
@@ -154,10 +149,10 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
   protected byte[] decompress(byte[] in) {
     return cu.decompress(in);
   }
-  
+
   /**
    * Check if the data should be compressed based on its length and the compression threshold.
-   * 
+   *
    * @param data the data to check
    * @return true if the data should be compressed, false otherwise
    */
