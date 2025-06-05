@@ -17,6 +17,7 @@
         <ehcache.version>3.10.8</ehcache.version>
         <junit.version>5.10.2</junit.version>
         <jmock.version>2.13.1</jmock.version>
+        <jackson.version>2.19.0</jackson.version>
     </properties>
     <licenses>
         <license>
@@ -117,6 +118,11 @@
                     <artifactId>slf4j-reload4j</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- TEST -->
