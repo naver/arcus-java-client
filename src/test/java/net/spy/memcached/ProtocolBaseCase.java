@@ -752,10 +752,6 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
 
     // Used a transcoder without compression to quickly send operations to the server.
     final Transcoder<byte[]> tc = new Transcoder<byte[]>() {
-      @Override
-      public boolean asyncDecode(CachedData d) {
-        return false;
-      }
 
       @Override
       public CachedData encode(byte[] o) {
@@ -1002,10 +998,6 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     public int getMaxSize() {
       return CachedData.MAX_SIZE;
     }
-
-    public boolean asyncDecode(CachedData d) {
-      return false;
-    }
   }
 
   private static class TestWithKeyTranscoder implements Transcoder<String> {
@@ -1051,10 +1043,6 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
 
     public int getMaxSize() {
       return CachedData.MAX_SIZE;
-    }
-
-    public boolean asyncDecode(CachedData d) {
-      return false;
     }
   }
 }

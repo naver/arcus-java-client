@@ -15,10 +15,6 @@ public final class LongTranscoder extends SpyObject
 
   private final TranscoderUtils tu = new TranscoderUtils(true);
 
-  public boolean asyncDecode(CachedData d) {
-    return false;
-  }
-
   public CachedData encode(java.lang.Long l) {
     return new CachedData(flags, tu.encodeLong(l), getMaxSize());
   }

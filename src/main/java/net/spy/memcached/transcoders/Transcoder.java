@@ -11,13 +11,6 @@ import net.spy.memcached.CachedData;
 public interface Transcoder<T> {
 
   /**
-   * Should the transcoder be run asynchronously.
-   *
-   * @return True if the CachedData should be decoded Asynchronously
-   */
-  boolean asyncDecode(CachedData d);
-
-  /**
    * Encode the given object for storage.
    *
    * @param o the object
