@@ -123,8 +123,7 @@ public final class BTreeFindPositionWithGetOperationImpl extends OperationImpl i
       OperationStatus status = matchStatus(line, END, NOT_FOUND, NOT_FOUND_ELEMENT,
               UNREADABLE, TYPE_MISMATCH, BKEY_MISMATCH);
       getLogger().debug(status);
-      getCallback().receivedStatus(status);
-      transitionState(OperationState.COMPLETE);
+      complete(status);
     }
   }
 
@@ -161,8 +160,7 @@ public final class BTreeFindPositionWithGetOperationImpl extends OperationImpl i
                   NOT_FOUND, NOT_FOUND_ELEMENT, UNREADABLE, TYPE_MISMATCH, BKEY_MISMATCH);
 
           getLogger().debug("Get complete!");
-          getCallback().receivedStatus(status);
-          transitionState(OperationState.COMPLETE);
+          complete(status);
           data = null;
           break;
         }

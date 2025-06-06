@@ -82,8 +82,7 @@ public final class CollectionExistOperationImpl extends OperationImpl
     /* ENABLE_MIGRATION end */
     OperationStatus status = matchStatus(line, EXIST, NOT_EXIST,
             NOT_FOUND, TYPE_MISMATCH, UNREADABLE);
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override

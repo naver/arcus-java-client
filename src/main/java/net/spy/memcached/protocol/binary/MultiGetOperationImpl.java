@@ -28,7 +28,6 @@ import java.util.Map;
 import net.spy.memcached.KeyUtil;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 
 import static net.spy.memcached.protocol.binary.GetOperationImpl.EXTRA_HDR_LEN;
 
@@ -105,8 +104,7 @@ class MultiGetOperationImpl extends OperationImpl implements GetOperation {
   @Override
   protected void finishedPayload(byte[] pl) throws IOException {
     if (responseOpaque == terminalOpaque) {
-      getCallback().receivedStatus(STATUS_OK);
-      transitionState(OperationState.COMPLETE);
+      complete(STATUS_OK);
     } else if (errorCode != 0) {
       getLogger().warn("Error on key %s:  %s (%d)",
               keys.get(responseOpaque), new String(pl), errorCode);

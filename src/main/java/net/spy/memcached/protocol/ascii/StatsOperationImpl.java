@@ -22,7 +22,6 @@ package net.spy.memcached.protocol.ascii;
 import java.nio.ByteBuffer;
 
 import net.spy.memcached.ops.APIType;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatsOperation;
@@ -61,11 +60,9 @@ final class StatsOperationImpl extends OperationImpl
       assert parts.length == 3;
       cb.gotStat(parts[1], parts[2]);
     } else if (line.startsWith("END")) {
-      cb.receivedStatus(END);
-      transitionState(OperationState.COMPLETE);
+      complete(END);
     } else {
-      cb.receivedStatus(matchStatus(line));
-      transitionState(OperationState.COMPLETE);
+      complete(matchStatus(line));
     }
   }
 

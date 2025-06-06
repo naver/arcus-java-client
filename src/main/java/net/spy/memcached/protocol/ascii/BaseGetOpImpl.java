@@ -82,8 +82,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
         return;
       }
       /* ENABLE_MIGRATION end */
-      getCallback().receivedStatus(END);
-      transitionState(OperationState.COMPLETE);
+      complete(END);
       data = null;
     } else if (line.startsWith("VALUE ")) {
       getLogger().debug("Got line %s", line);
@@ -105,8 +104,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
       addRedirectMultiKeyOperation(notMyKeyLine, line.trim());
     /* ENABLE_MIGRATION end */
     } else {
-      getCallback().receivedStatus(matchStatus(line));
-      transitionState(OperationState.COMPLETE);
+      complete(matchStatus(line));
     }
   }
 

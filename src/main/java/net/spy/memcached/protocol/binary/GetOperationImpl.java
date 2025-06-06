@@ -64,7 +64,7 @@ class GetOperationImpl extends OperationImpl
       GetsOperation.Callback cb = (GetsOperation.Callback) getCallback();
       cb.gotData(key, flags, responseCas, data);
     }
-    getCallback().receivedStatus(STATUS_OK);
+    complete(STATUS_OK);
   }
 
   @Override

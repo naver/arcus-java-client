@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.NoopOperation;
 import net.spy.memcached.ops.OperationCallback;
-import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
@@ -52,9 +51,7 @@ final class VersionOperationImpl extends OperationImpl
     } else {
       status = new OperationStatus(false, line, StatusCode.fromAsciiLine(line));
     }
-
-    getCallback().receivedStatus(status);
-    transitionState(OperationState.COMPLETE);
+    complete(status);
   }
 
   @Override
