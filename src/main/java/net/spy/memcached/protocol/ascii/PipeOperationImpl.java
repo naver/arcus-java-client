@@ -122,8 +122,9 @@ abstract class PipeOperationImpl extends OperationImpl {
         successAll = false;
       }
       cb.gotStatus(index, status);
+      index++;
 
-      cb.receivedStatus((successAll) ? END : FAILED_END);
+      cb.receivedStatus(getEndStatus());
       transitionState(OperationState.COMPLETE);
       return;
     }
@@ -142,7 +143,7 @@ abstract class PipeOperationImpl extends OperationImpl {
         return;
       }
       /* ENABLE_MIGRATION end */
-      cb.receivedStatus((successAll) ? END : FAILED_END);
+      cb.receivedStatus(getEndStatus());
       transitionState(OperationState.COMPLETE);
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
@@ -165,11 +166,17 @@ abstract class PipeOperationImpl extends OperationImpl {
     }
   }
 
+  private OperationStatus getEndStatus() {
+    return (exception == null && index == collectionPipe.getItemCount() && successAll)
+            ? END : FAILED_END;
+  }
+
   @Override
   protected void handleError(OperationErrorType eType, String line) throws IOException {
     if (!readUntilLastLine) {
       // this case means that error message came without 'RESPONSE <count>'.
       // so it doesn't need to read 'PIPE_ERROR'.
+      cb.receivedStatus(FAILED_END);
       super.handleError(eType, line);
     } else {
       // this case means that error message came after 'RESPONSE <count>'.

@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -769,43 +770,43 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * @param updateList list of operation parameters (values and so on)
    * @return future holding the success/failure codes of individual operations and their index
    */
-  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedUpdate(
-          final String key, final List<CollectionPipedUpdate<T>> updateList) {
-
-    final CountDownLatch latch = new CountDownLatch(updateList.size());
-    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<>(latch, operationTimeout);
-
-    for (int i = 0; i < updateList.size(); i++) {
-      final CollectionPipedUpdate<T> update = updateList.get(i);
-      final int idx = i;
-
-      Operation op = opFact.collectionPipedUpdate(key, update,
-          new PipedOperationCallback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-              rv.setOperationStatus(cstatus);
-            }
-
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
-
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (!status.isSuccess()) {
-                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
-              }
-            }
-          });
-      rv.addOperation(op);
-      addOp(key, op);
-    }
-    return rv;
-  }
+//  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedUpdate(
+//          final String key, final List<CollectionPipedUpdate<T>> updateList) {
+//
+//    final CountDownLatch latch = new CountDownLatch(updateList.size());
+//    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+//            new PipedCollectionFuture<>(latch, operationTimeout);
+//
+//    for (int i = 0; i < updateList.size(); i++) {
+//      final CollectionPipedUpdate<T> update = updateList.get(i);
+//      final int idx = i;
+//
+//      Operation op = opFact.collectionPipedUpdate(key, update,
+//          new PipedOperationCallback() {
+//            // each result status
+//            public void receivedStatus(OperationStatus status) {
+//              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+//              rv.setOperationStatus(cstatus);
+//            }
+//
+//            // complete
+//            public void complete() {
+//              latch.countDown();
+//            }
+//
+//            // got status
+//            public void gotStatus(Integer index, OperationStatus status) {
+//              if (!status.isSuccess()) {
+//                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+//                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
+//              }
+//            }
+//          });
+//      rv.addOperation(op);
+//      addOp(key, op);
+//    }
+//    return rv;
+//  }
 
   /**
    * Generic delete operation for collection items.
@@ -1672,7 +1673,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new BTreePipedInsert<>(key, elementMap, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1695,7 +1696,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new ByteArraysBTreePipedInsert<>(key, elementList, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1722,7 +1723,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new MapPipedInsert<>(key, elementMap, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1748,7 +1749,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         }
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
   }
 
   @Override
@@ -1771,7 +1772,56 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         insertList.add(new SetPipedInsert<>(key, elementList, attributesForCreate, tc));
       }
     }
-    return asyncCollectionPipedInsert(key, insertList);
+    return syncCollectionPipedInsert(key, insertList);
+  }
+
+  private <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> syncCollectionPipedInsert(
+          final String key, final List<CollectionPipedInsert<T>> insertList) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+            new PipedCollectionFuture<>(latch, operationTimeout);
+
+    final List<Operation> ops = new ArrayList<>(insertList.size());
+    BiFunction<Integer, Integer, OperationCallback> makeCallback = (opIdx, itemCount) -> new PipedOperationCallback() {
+
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+        rv.setOperationStatus(cstatus);
+      }
+
+      public void complete() {
+        if (rv.getOperationStatus().isSuccess() && opIdx + 1 < ops.size()) {
+          Operation nextOp = ops.get(opIdx + 1);
+          if (!nextOp.isCancelled()) {
+            addOp(key, nextOp);
+            return;
+          }
+        }
+        latch.countDown();
+      }
+
+      public void gotStatus(Integer index, OperationStatus status) {
+        if (!status.isSuccess()) {
+          if (status instanceof CollectionOperationStatus) {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    (CollectionOperationStatus) status);
+          } else {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    new CollectionOperationStatus(status));
+          }
+        }
+      }
+    };
+
+    for (int i = 0; i < insertList.size(); i++) {
+      CollectionPipedInsert<T> insert = insertList.get(i);
+      ops.add(opFact.collectionPipedInsert(key, insert,
+              makeCallback.apply(i, insert.getItemCount())));
+    }
+
+    rv.addOperations(ops);
+    addOp(key, ops.get(0));
+    return rv;
   }
 
   @Override
@@ -2185,7 +2235,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         updateList.add(new BTreePipedUpdate<>(key, elementList, tc));
       }
     }
-    return asyncCollectionPipedUpdate(key, updateList);
+    return syncCollectionPipedUpdate(key, updateList);
   }
 
   @Override
@@ -2217,7 +2267,56 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
         updateList.add(new MapPipedUpdate<>(key, elementMap, tc));
       }
     }
-    return asyncCollectionPipedUpdate(key, updateList);
+    return syncCollectionPipedUpdate(key, updateList);
+  }
+
+  private <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> syncCollectionPipedUpdate(
+          final String key, final List<CollectionPipedUpdate<T>> updateList) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+            new PipedCollectionFuture<>(latch, operationTimeout);
+
+    final List<Operation> ops = new ArrayList<>(updateList.size());
+    BiFunction<Integer, Integer, OperationCallback> makeCallback = (opIdx, itemCount) -> new PipedOperationCallback() {
+
+      public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+        rv.setOperationStatus(cstatus);
+      }
+
+      public void complete() {
+        if (rv.getOperationStatus().isSuccess() && opIdx + 1 < ops.size()) {
+          Operation nextOp = ops.get(opIdx + 1);
+          if (!nextOp.isCancelled()) {
+            addOp(key, nextOp);
+            return;
+          }
+        }
+        latch.countDown();
+      }
+
+      public void gotStatus(Integer index, OperationStatus status) {
+        if (!status.isSuccess()) {
+          if (status instanceof CollectionOperationStatus) {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    (CollectionOperationStatus) status);
+          } else {
+            rv.addEachResult(index + (opIdx * MAX_PIPED_ITEM_COUNT),
+                    new CollectionOperationStatus(status));
+          }
+        }
+      }
+    };
+
+    for (int i = 0; i < updateList.size(); i++) {
+      CollectionPipedUpdate<T> update = updateList.get(i);
+      ops.add(opFact.collectionPipedUpdate(key, update,
+              makeCallback.apply(i, update.getItemCount())));
+    }
+
+    rv.addOperations(ops);
+    addOp(key, ops.get(0));
+    return rv;
   }
 
   @Override
@@ -2853,51 +2952,51 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0), collectionTranscoder);
   }
 
-  /**
-   * Generic pipelined insert operation for collection items.
-   * Public methods for collection items call this method.
-   *
-   * @param key       collection item's key
-   * @param insertList list of operation parameters (element values and so on)
-   * @return future holding the map of element index and the result of its insert operation
-   */
-  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedInsert(
-          final String key, final List<CollectionPipedInsert<T>> insertList) {
-
-    final CountDownLatch latch = new CountDownLatch(insertList.size());
-    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<>(latch, operationTimeout);
-
-    for (int i = 0; i < insertList.size(); i++) {
-      final CollectionPipedInsert<T> insert = insertList.get(i);
-      final int idx = i;
-
-      Operation op = opFact.collectionPipedInsert(key, insert,
-          new PipedOperationCallback() {
-            // each result status
-            public void receivedStatus(OperationStatus status) {
-              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-              rv.setOperationStatus(cstatus);
-            }
-
-            // complete
-            public void complete() {
-              latch.countDown();
-            }
-
-            // got status
-            public void gotStatus(Integer index, OperationStatus status) {
-              if (!status.isSuccess()) {
-                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
-              }
-            }
-          });
-      rv.addOperation(op);
-      addOp(key, op);
-    }
-    return rv;
-  }
+//  /**
+//   * Generic pipelined insert operation for collection items.
+//   * Public methods for collection items call this method.
+//   *
+//   * @param key       collection item's key
+//   * @param insertList list of operation parameters (element values and so on)
+//   * @return future holding the map of element index and the result of its insert operation
+//   */
+//  <T> CollectionFuture<Map<Integer, CollectionOperationStatus>> asyncCollectionPipedInsert(
+//          final String key, final List<CollectionPipedInsert<T>> insertList) {
+//
+//    final CountDownLatch latch = new CountDownLatch(insertList.size());
+//    final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
+//            new PipedCollectionFuture<>(latch, operationTimeout);
+//
+//    for (int i = 0; i < insertList.size(); i++) {
+//      final CollectionPipedInsert<T> insert = insertList.get(i);
+//      final int idx = i;
+//
+//      Operation op = opFact.collectionPipedInsert(key, insert,
+//          new PipedOperationCallback() {
+//            // each result status
+//            public void receivedStatus(OperationStatus status) {
+//              CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+//              rv.setOperationStatus(cstatus);
+//            }
+//
+//            // complete
+//            public void complete() {
+//              latch.countDown();
+//            }
+//
+//            // got status
+//            public void gotStatus(Integer index, OperationStatus status) {
+//              if (!status.isSuccess()) {
+//                CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+//                rv.addEachResult(index + (idx * MAX_PIPED_ITEM_COUNT), cstatus);
+//              }
+//            }
+//          });
+//      rv.addOperation(op);
+//      addOp(key, op);
+//    }
+//    return rv;
+//  }
 
   @Override
   public Future<Map<String, CollectionOperationStatus>> asyncBopInsertBulk(
