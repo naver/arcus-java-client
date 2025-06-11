@@ -17,6 +17,7 @@ import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.StatusCode;
 
 abstract class PipeOperationImpl extends OperationImpl {
 
@@ -141,7 +142,13 @@ abstract class PipeOperationImpl extends OperationImpl {
         return;
       }
       /* ENABLE_MIGRATION end */
-      complete((successAll) ? END : FAILED_END);
+      OperationStatus status;
+      if (exception == null) {
+        status = (successAll) ? END : FAILED_END;
+      } else {
+        status = new OperationStatus(false, exception.getMessage(), StatusCode.ERR_INTERNAL);
+      }
+      complete(status);
     } else if (line.startsWith("RESPONSE ")) {
       getLogger().debug("Got line %s", line);
 

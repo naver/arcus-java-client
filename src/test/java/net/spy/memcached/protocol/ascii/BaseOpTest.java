@@ -25,23 +25,30 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.spy.memcached.collection.CollectionPipedInsert;
+import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.internal.PipedCollectionFuture;
+import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.StatusCode;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test the basic operation buffer handling stuff.
@@ -115,17 +122,28 @@ class BaseOpTest {
     CollectionPipedInsert.ListPipedInsert<String> insert =
             new CollectionPipedInsert.ListPipedInsert<>(key, 0,
                     Arrays.asList("a", "b"), null, null);
+    PipedCollectionFuture<Object, Object> rv =
+            new PipedCollectionFuture<>(new CountDownLatch(1), 700);
     OperationCallback cb = new PipedOperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
+        CollectionOperationStatus cstatus;
+        if (status instanceof CollectionOperationStatus) {
+          cstatus = (CollectionOperationStatus) status;
+        } else {
+          cstatus = new CollectionOperationStatus(status);
+        }
+        rv.setOperationStatus(cstatus);
       }
 
       @Override
       public void complete() {
+        // do nothing
       }
 
       @Override
       public void gotStatus(Integer index, OperationStatus status) {
+        fail();
       }
     };
     CollectionPipedInsertOperationImpl op =
@@ -152,6 +170,10 @@ class BaseOpTest {
     b.put(line4.getBytes());
     b.flip();
     assertThrows(OperationException.class, () -> op.readFromBuffer(b));
+
+    assertFalse(rv.getOperationStatus().isSuccess());
+    assertEquals(StatusCode.ERR_INTERNAL, rv.getOperationStatus().getStatusCode());
+    assertEquals(CollectionResponse.EXCEPTION, rv.getOperationStatus().getResponse());
   }
 
   private static class SimpleOp extends OperationImpl {
