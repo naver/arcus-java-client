@@ -3,6 +3,7 @@ package net.spy.memcached.internal.result;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.SMGetElement;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -166,10 +167,10 @@ public final class SMGetResultImpl<T> extends SMGetResult<T> {
    */
   private void refineTrimmedKeys() {
     if (!trimmedKeyMap.isEmpty() && count <= mergedResult.size()) {
-      SMGetElement<T> lastElement = mergedResult.get(mergedResult.size() - 1);
+      BKeyObject lastBKey = mergedResult.get(mergedResult.size() - 1).getBkeyObject();
 
       trimmedKeyMap.entrySet().removeIf(entry -> {
-        int comp = entry.getValue().compareTo(lastElement.getBkeyObject());
+        int comp = entry.getValue().compareTo(lastBKey);
         return (reverse) ? (comp <= 0) : (comp >= 0);
       });
     }
