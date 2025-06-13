@@ -125,6 +125,10 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     return root.hasReadOp();
   }
 
+  public boolean hasOp() {
+    return root.hasOp();
+  }
+
   public boolean isActive() {
     return root.isActive();
   }
