@@ -22,8 +22,9 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.collection.ElementValueType;
 
 /**
- * Transcoder that serialized and compresses objects for collection elements.
+ * @deprecated Use {@link SerializingTranscoder#forCollection()} instead.
  */
+@Deprecated
 public class CollectionTranscoder extends SerializingTranscoder implements
         Transcoder<Object> {
 
