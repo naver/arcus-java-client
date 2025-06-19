@@ -38,7 +38,6 @@ import net.spy.memcached.protocol.ascii.AsciiMemcachedNodeImpl;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryMemcachedNodeImpl;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
-import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
@@ -297,7 +296,7 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   public Transcoder<Object> getDefaultCollectionTranscoder() {
-    return new CollectionTranscoder();
+    return SerializingTranscoder.forCollection();
   }
 
   public boolean useNagleAlgorithm() {
