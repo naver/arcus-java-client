@@ -21,6 +21,7 @@ package net.spy.memcached.transcoders;
 import java.util.Date;
 
 import net.spy.memcached.CachedData;
+import net.spy.memcached.collection.ElementValueType;
 
 /**
  * Transcoder that serializes and compresses objects.
@@ -31,6 +32,13 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
   // General flags
   static final int SERIALIZED = 1;
   static final int COMPRESSED = 2;
+
+  /**
+   * Maximum element size allowed by memcached collections.
+   * The cache server's default setting of max_element_bytes is 16KB
+   * and it can be changed up to 32KB
+   */
+  public static final int MAX_COLLECTION_ELEMENT_SIZE = 32 * 1024;
 
   // Special flags for specially handled types.
   protected static final int SPECIAL_MASK = 0xff00;
@@ -43,31 +51,110 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
   static final int SPECIAL_DOUBLE = (7 << 8);
   static final int SPECIAL_BYTEARRAY = (8 << 8);
 
+  private final boolean isCollection;
+  private final boolean optimize;
+
   protected final TranscoderUtils tu = new TranscoderUtils(true);
 
-  /**
-   * Get a serializing transcoder with the default max data size.
-   */
+  // Constructors for various use cases
   public SerializingTranscoder() {
-    this(CachedData.MAX_SIZE, null);
+    this(CachedData.MAX_SIZE, null, false, false);
   }
 
-  /**
-   * Get a serializing transcoder that specifies the max data size.
-   */
   public SerializingTranscoder(int max) {
-    super(max, null);
+    this(max, null, false, false);
+  }
+
+  public SerializingTranscoder(ClassLoader cl) {
+    this(CachedData.MAX_SIZE, cl, false, false);
+  }
+
+  public SerializingTranscoder(int max, ClassLoader cl) {
+    this(max, cl, false, false);
+  }
+
+  public SerializingTranscoder(boolean isCollection) {
+    this(isCollection ? MAX_COLLECTION_ELEMENT_SIZE : CachedData.MAX_SIZE,
+            null, isCollection, isCollection);
+  }
+
+  public SerializingTranscoder(int max, boolean isCollection) {
+    this(max, null, isCollection, isCollection);
+  }
+
+  public SerializingTranscoder(ClassLoader cl, boolean isCollection) {
+    this(isCollection ? MAX_COLLECTION_ELEMENT_SIZE : CachedData.MAX_SIZE,
+            cl, isCollection, isCollection);
+  }
+
+  public SerializingTranscoder(int max, ClassLoader cl, boolean isCollection) {
+    this(max, cl, isCollection, isCollection);
   }
 
   /**
-   * Get a serializing transcoder that specifies the max data size and classloader.
+   * Constructor with full customization.
    */
-  public SerializingTranscoder(int max, ClassLoader cl) {
+  public SerializingTranscoder(int max, ClassLoader cl, boolean isCollection, boolean optimize) {
     super(max, cl);
+    this.isCollection = isCollection;
+    this.optimize = optimize;
+
+    if (isCollection && max > MAX_COLLECTION_ELEMENT_SIZE) {
+      throw new IllegalArgumentException("The maximum size cannot exceed " +
+              MAX_COLLECTION_ELEMENT_SIZE + " in collection mode due to element size limitations.");
+    }
+  }
+
+  /**
+   * Factory method for general key-value usage.
+   */  public static SerializingTranscoder forKV() {
+    return new SerializingTranscoder(CachedData.MAX_SIZE, null, false, false);
+  }
+
+  /**
+   * Factory method for collection item usage.
+   */
+  public static SerializingTranscoder forCollection() {
+    return new SerializingTranscoder(MAX_COLLECTION_ELEMENT_SIZE, null, true, true);
+  }
+
+  /**
+   * Determines the appropriate flags based on the element type.
+   */
+  public static int examineFlags(ElementValueType type) {
+    int flags = 0;
+    if (type == ElementValueType.STRING) {
+      // string type has no flags.
+    } else if (type == ElementValueType.LONG) {
+      flags |= SPECIAL_LONG;
+    } else if (type == ElementValueType.INTEGER) {
+      flags |= SPECIAL_INT;
+    } else if (type == ElementValueType.BOOLEAN) {
+      flags |= SPECIAL_BOOLEAN;
+    } else if (type == ElementValueType.DATE) {
+      flags |= SPECIAL_DATE;
+    } else if (type == ElementValueType.BYTE) {
+      flags |= SPECIAL_BYTE;
+    } else if (type == ElementValueType.FLOAT) {
+      flags |= SPECIAL_FLOAT;
+    } else if (type == ElementValueType.DOUBLE) {
+      flags |= SPECIAL_DOUBLE;
+    } else if (type == ElementValueType.BYTEARRAY) {
+      flags |= SPECIAL_BYTEARRAY;
+    } else {
+      flags |= SERIALIZED;
+    }
+    return flags;
   }
 
   public Object decode(CachedData d) {
     byte[] data = d.getData();
+
+    // Skip decompression for collections
+    if (!isCollection && (d.getFlags() & COMPRESSED) != 0) {
+      data = decompress(data);
+    }
+
     Object rv = null;
     if ((d.getFlags() & COMPRESSED) != 0) {
       data = decompress(d.getData());
@@ -102,7 +189,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
           rv = data;
           break;
         default:
-          getLogger().warn("Undecodeable with flags %x", flags);
+          getLogger().warn("Unable to decode: Unknown flag %x", flags);
       }
     } else {
       rv = decodeString(data);
@@ -111,8 +198,15 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
   }
 
   public CachedData encode(Object o) {
-    byte[] b = null;
+    byte[] b;
     int flags = 0;
+
+    if (isCollection && !optimize) {
+      b = serialize(o);
+      flags |= SERIALIZED;
+      return new CachedData(flags, b, getMaxSize());
+    }
+
     if (o instanceof String) {
       b = encodeString((String) o);
     } else if (o instanceof Long) {
@@ -144,7 +238,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (isCompressionCandidate(b)) {
+    if (!isCollection && isCompressionCandidate(b)) {
       byte[] compressed = compress(b);
       if (compressed.length < b.length) {
         getLogger().debug("Compressed %s from %d to %d",
@@ -160,4 +254,50 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     return new CachedData(flags, b, getMaxSize());
   }
 
+  /**
+   * Builder for constructing SerializingTranscoder instances with custom settings.
+   */
+  public static class Builder {
+    private int max = CachedData.MAX_SIZE;
+    private ClassLoader cl = null;
+    private boolean isCollection = false;
+    private boolean optimize = false;
+
+    public Builder setMaxSize(int max) {
+      this.max = max;
+      return this;
+    }
+
+    public Builder setClassLoader(ClassLoader cl) {
+      this.cl = cl;
+      return this;
+    }
+
+    public Builder forCollection() {
+      this.isCollection = true;
+      this.max = MAX_COLLECTION_ELEMENT_SIZE;
+      return this;
+    }
+
+    public Builder enableOptimization() {
+      this.optimize = true;
+      return this;
+    }
+
+    /**
+     * By default, this transcoder uses Java serialization only if the type is a user-defined class.
+     * This mechanism may cause malfunction if you store Object type values
+     * into an Arcus collection item and the values are actually
+     * different types like String, Integer.
+     * In this case, you should disable optimization.
+     */
+    public Builder disableOptimization() {
+      this.optimize = false;
+      return this;
+    }
+
+    public SerializingTranscoder build() {
+      return new SerializingTranscoder(max, cl, isCollection, optimize);
+    }
+  }
 }
