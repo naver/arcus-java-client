@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +49,11 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
     try {
       super.get(super.timeout, TimeUnit.MILLISECONDS);
     } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException(e);
+      }
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     } catch (TimeoutException e) {

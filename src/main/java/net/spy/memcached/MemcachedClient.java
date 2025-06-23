@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
@@ -607,6 +608,7 @@ public class MemcachedClient extends SpyThread
    * @return a CASResponse
    * @throws OperationTimeoutException if global operation timeout is
    *                                   exceeded
+   * @throws CancellationException     if operation was canceled
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
    */
@@ -624,7 +626,11 @@ public class MemcachedClient extends SpyThread
       throw new RuntimeException("Interrupted waiting for value", e);
     } catch (ExecutionException e) {
       future.cancel(true);
-      throw new RuntimeException("Exception waiting for value", e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException("Exception waiting for value", e);
+      }
     } catch (TimeoutException e) {
       future.cancel(true);
       throw new OperationTimeoutException(e);
@@ -1320,6 +1326,7 @@ public class MemcachedClient extends SpyThread
    * @return a map of the values (for each value that exists)
    * @throws OperationTimeoutException if the global operation timeout is
    *                                   exceeded
+   * @throws CancellationException     if operation was canceled
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
    */
@@ -1333,7 +1340,11 @@ public class MemcachedClient extends SpyThread
       throw new RuntimeException("Interrupted getting bulk values", e);
     } catch (ExecutionException e) {
       future.cancel(true);
-      throw new RuntimeException("Failed getting bulk values", e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException("Failed getting bulk values", e);
+      }
     } catch (TimeoutException e) {
       future.cancel(true);
       throw new OperationTimeoutException(e);
@@ -1399,6 +1410,7 @@ public class MemcachedClient extends SpyThread
    * @return a map of the CAS values (for each value that exists)
    * @throws OperationTimeoutException if the global operation timeout is
    *                                   exceeded
+   * @throws CancellationException     if operation was canceled
    * @throws IllegalStateException     in the rare circumstance where queue
    *                                   is too full to accept any more requests
    */
@@ -1412,7 +1424,11 @@ public class MemcachedClient extends SpyThread
       throw new RuntimeException("Interrupted getting bulk values", e);
     } catch (ExecutionException e) {
       future.cancel(true);
-      throw new RuntimeException("Failed getting bulk values", e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException("Failed getting bulk values", e);
+      }
     } catch (TimeoutException e) {
       future.cancel(true);
       throw new OperationTimeoutException(e.toString(), e);
@@ -1476,6 +1492,7 @@ public class MemcachedClient extends SpyThread
    * @return a Map of SocketAddress to String for connected servers
    * @throws OperationTimeoutException if the global operation timeout is
    *                                   exceeded
+   * @throws CancellationException     if operation was canceled
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
@@ -1513,7 +1530,11 @@ public class MemcachedClient extends SpyThread
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted waiting for versions", e);
     } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException(e);
+      }
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e.getMessage());
     }
@@ -1541,6 +1562,7 @@ public class MemcachedClient extends SpyThread
    * keys to String stat values.
    * @throws OperationTimeoutException if the global operation timeout is
    *                                   exceeded
+   * @throws CancellationException     if operation was canceled
    * @throws IllegalStateException in the rare circumstance where queue
    *                               is too full to accept any more requests
    */
@@ -1588,7 +1610,11 @@ public class MemcachedClient extends SpyThread
     } catch (InterruptedException e) {
       throw new RuntimeException("Interrupted waiting for stats", e);
     } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException(e);
+      }
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e.getMessage());
     }
@@ -1701,7 +1727,11 @@ public class MemcachedClient extends SpyThread
         throw new RuntimeException("Interrupted waiting for store", e);
       } catch (ExecutionException e) {
         f.cancel(true);
-        throw new RuntimeException("Failed waiting for store", e);
+        if (e.getCause() instanceof CancellationException) {
+          throw (CancellationException) e.getCause();
+        } else {
+          throw new RuntimeException("Failed waiting for store", e);
+        }
       } catch (TimeoutException e) {
         f.cancel(true);
         throw new OperationTimeoutException(e);
@@ -1954,7 +1984,11 @@ public class MemcachedClient extends SpyThread
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
-      throw new RuntimeException(e);
+      if (e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException(e);
+      }
     } catch (TimeoutException e) {
       throw new OperationTimeoutException(e.getMessage());
     }

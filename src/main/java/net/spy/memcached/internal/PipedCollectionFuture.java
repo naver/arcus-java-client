@@ -3,6 +3,7 @@ package net.spy.memcached.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -89,7 +90,7 @@ public class PipedCollectionFuture<K, V>
       }
 
       if (op != null && op.isCancelled()) {
-        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+        throw new ExecutionException(new CancellationException(op.getCancelCause()));
       }
     }
 

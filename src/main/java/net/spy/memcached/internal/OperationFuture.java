@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.internal;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -89,7 +90,7 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
       throw new ExecutionException(op.getException());
     }
     if (op != null && op.isCancelled()) {
-      throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+      throw new ExecutionException(new CancellationException(op.getCancelCause()));
     }
 
     return objRef.get();
