@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -84,7 +85,7 @@ public final class SMGetFuture<T extends List<?>> implements Future<T> {
       }
 
       if (op != null && op.isCancelled()) {
-        throw new ExecutionException(new RuntimeException(op.getCancelCause()));
+        throw new ExecutionException(new CancellationException(op.getCancelCause()));
       }
     }
 

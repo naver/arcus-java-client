@@ -3,6 +3,7 @@ package net.spy.memcached;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -62,7 +64,7 @@ abstract class CancellationBaseCase {
         assertTrue(((CompositeException) e).getExceptions()
                 .get(0).getMessage().contains("Cancelled"));
       } else {
-        assertTrue(e.getCause() instanceof RuntimeException);
+        assertInstanceOf(CancellationException.class, e.getCause());
         assertTrue(e.getCause().getMessage().contains("Cancelled"));
       }
     }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -98,7 +99,7 @@ public class BulkOperationFuture<T> implements Future<Map<String, T>> {
       }
 
       if (op != null && op.isCancelled()) {
-        exceptions.add(new RuntimeException(op.getCancelCause()));
+        exceptions.add(new CancellationException(op.getCancelCause()));
       }
     }
 
