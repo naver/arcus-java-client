@@ -59,7 +59,7 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
     String s1 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     tc.setCompressionThreshold(8);
     CachedData cd = tc.encode(s1);
-    assertEquals(SerializingTranscoder.COMPRESSED, cd.getFlags());
+    assertEquals(TranscoderUtils.COMPRESSED, cd.getFlags());
     assertFalse(Arrays.equals(s1.getBytes(), cd.getData()));
     assertEquals(s1, tc.decode(cd));
   }
@@ -68,7 +68,7 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
   void testObject() throws Exception {
     Calendar c = Calendar.getInstance();
     CachedData cd = tc.encode(c);
-    assertEquals(SerializingTranscoder.SERIALIZED, cd.getFlags());
+    assertEquals(TranscoderUtils.SERIALIZED, cd.getFlags());
     assertEquals(c, tc.decode(cd));
   }
 
@@ -77,8 +77,8 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
     tc.setCompressionThreshold(8);
     Calendar c = Calendar.getInstance();
     CachedData cd = tc.encode(c);
-    assertEquals(SerializingTranscoder.SERIALIZED
-            | SerializingTranscoder.COMPRESSED, cd.getFlags());
+    assertEquals(TranscoderUtils.SERIALIZED
+            | TranscoderUtils.COMPRESSED, cd.getFlags());
     assertEquals(c, tc.decode(cd));
   }
 
@@ -96,8 +96,8 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
   void testUndecodeable() throws Exception {
     CachedData cd = new CachedData(
             Integer.MAX_VALUE &
-                    ~(SerializingTranscoder.COMPRESSED
-                            | SerializingTranscoder.SERIALIZED),
+                    ~(TranscoderUtils.COMPRESSED
+                            | TranscoderUtils.SERIALIZED),
             tu.encodeInt(Integer.MAX_VALUE),
             tc.getMaxSize());
     assertNull(tc.decode(cd));
@@ -105,7 +105,7 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
 
   @Test
   void testUndecodeableSerialized() throws Exception {
-    CachedData cd = new CachedData(SerializingTranscoder.SERIALIZED,
+    CachedData cd = new CachedData(TranscoderUtils.SERIALIZED,
             tu.encodeInt(Integer.MAX_VALUE),
             tc.getMaxSize());
     assertNull(tc.decode(cd));
@@ -114,7 +114,7 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
   @Test
   void testUndecodeableCompressed() throws Exception {
     CachedData cd = new CachedData(
-            SerializingTranscoder.COMPRESSED,
+            TranscoderUtils.COMPRESSED,
             tu.encodeInt(Integer.MAX_VALUE),
             tc.getMaxSize());
     System.out.println("got " + tc.decode(cd));

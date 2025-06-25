@@ -42,10 +42,8 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
   static final int COMPRESSED = 2;
   static final int SERIALIZED = 8;
 
-  private final TranscoderUtils tu = new TranscoderUtils(false);
-
   public WhalinTranscoder() {
-    super(CachedData.MAX_SIZE);
+    super(CachedData.MAX_SIZE, null, false);
   }
 
   public Object decode(CachedData d) {
@@ -87,13 +85,13 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
           rv = data;
           break;
         case SPECIAL_STRING:
-          rv = decodeString(data);
+          rv = tu.decodeString(data);
           break;
         case SPECIAL_STRINGBUFFER:
-          rv = new StringBuffer(decodeString(data));
+          rv = new StringBuffer(tu.decodeString(data));
           break;
         case SPECIAL_STRINGBUILDER:
-          rv = new StringBuilder(decodeString(data));
+          rv = new StringBuilder(tu.decodeString(data));
           break;
         case SPECIAL_CHARACTER:
           rv = decodeCharacter(data);
@@ -109,14 +107,14 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
     byte[] b = null;
     int flags = 0;
     if (o instanceof String) {
-      b = encodeString((String) o);
+      b = tu.encodeString((String) o);
       flags |= SPECIAL_STRING;
     } else if (o instanceof StringBuffer) {
       flags |= SPECIAL_STRINGBUFFER;
-      b = encodeString(String.valueOf(o));
+      b = tu.encodeString(String.valueOf(o));
     } else if (o instanceof StringBuilder) {
       flags |= SPECIAL_STRINGBUILDER;
-      b = encodeString(String.valueOf(o));
+      b = tu.encodeString(String.valueOf(o));
     } else if (o instanceof Long) {
       b = tu.encodeLong((Long) o);
       flags |= SPECIAL_LONG;

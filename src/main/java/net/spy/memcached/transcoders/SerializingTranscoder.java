@@ -22,28 +22,23 @@ import java.util.Date;
 
 import net.spy.memcached.CachedData;
 
+import static net.spy.memcached.transcoders.TranscoderUtils.COMPRESSED;
+import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BOOLEAN;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTEARRAY;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DATE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DOUBLE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_FLOAT;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_INT;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_LONG;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_MASK;
+
 /**
  * Transcoder that serializes and compresses objects.
  */
 public class SerializingTranscoder extends BaseSerializingTranscoder
         implements Transcoder<Object> {
-
-  // General flags
-  static final int SERIALIZED = 1;
-  static final int COMPRESSED = 2;
-
-  // Special flags for specially handled types.
-  protected static final int SPECIAL_MASK = 0xff00;
-  static final int SPECIAL_BOOLEAN = (1 << 8);
-  static final int SPECIAL_INT = (2 << 8);
-  static final int SPECIAL_LONG = (3 << 8);
-  static final int SPECIAL_DATE = (4 << 8);
-  static final int SPECIAL_BYTE = (5 << 8);
-  static final int SPECIAL_FLOAT = (6 << 8);
-  static final int SPECIAL_DOUBLE = (7 << 8);
-  static final int SPECIAL_BYTEARRAY = (8 << 8);
-
-  protected final TranscoderUtils tu = new TranscoderUtils(true);
 
   /**
    * Get a serializing transcoder with the default max data size.
@@ -105,7 +100,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
           getLogger().warn("Undecodeable with flags %x", flags);
       }
     } else {
-      rv = decodeString(data);
+      rv = tu.decodeString(data);
     }
     return rv;
   }
@@ -114,7 +109,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     byte[] b = null;
     int flags = 0;
     if (o instanceof String) {
-      b = encodeString((String) o);
+      b = tu.encodeString((String) o);
     } else if (o instanceof Long) {
       b = tu.encodeLong((Long) o);
       flags |= SPECIAL_LONG;

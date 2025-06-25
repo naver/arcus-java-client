@@ -11,7 +11,7 @@ import net.spy.memcached.compat.SpyObject;
 public final class IntegerTranscoder extends SpyObject
         implements Transcoder<Integer> {
 
-  private static final int flags = SerializingTranscoder.SPECIAL_INT;
+  private static final int flags = TranscoderUtils.SPECIAL_INT;
 
   private final TranscoderUtils tu = new TranscoderUtils(true);
 

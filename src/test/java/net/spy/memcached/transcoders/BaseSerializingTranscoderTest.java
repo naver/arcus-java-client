@@ -10,13 +10,12 @@ import net.spy.memcached.CachedData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -56,23 +55,8 @@ class BaseSerializingTranscoderTest {
   }
 
   @Test
-  void testDecodeStringNull() {
-    assertNull(ex.decodeString(null));
-  }
-
-  @Test
   void testDeserializeNull() {
     assertNull(ex.deserialize(null));
-  }
-
-  @Test
-  void testEncodeStringNull() {
-    try {
-      ex.encodeString(null);
-      fail("Expected an assertion error");
-    } catch (NullPointerException e) {
-      // pass
-    }
   }
 
   @Test
@@ -104,30 +88,6 @@ class BaseSerializingTranscoderTest {
   void testDeserializable() throws Exception {
     byte[] data = {-84, -19, 0, 5, 116, 0, 5, 104, 101, 108, 108, 111};
     assertEquals("hello", ex.deserialize(data));
-  }
-
-  @Test
-  void testBadCharsetDecode() {
-    ex.overrideCharsetSet("Some Crap");
-    try {
-      ex.encodeString("Woo!");
-      fail("Expected runtime exception");
-    } catch (RuntimeException e) {
-      assertSame(UnsupportedEncodingException.class,
-              e.getCause().getClass());
-    }
-  }
-
-  @Test
-  void testBadCharsetEncode() {
-    ex.overrideCharsetSet("Some Crap");
-    try {
-      ex.decodeString("Woo!".getBytes());
-      fail("Expected runtime exception");
-    } catch (RuntimeException e) {
-      assertSame(UnsupportedEncodingException.class,
-              e.getCause().getClass());
-    }
   }
 
   @Test
@@ -199,18 +159,9 @@ class BaseSerializingTranscoderTest {
       super(CachedData.MAX_SIZE);
     }
 
-    public void overrideCharsetSet(String to) {
-      charset = to;
-    }
-
     @Override
     public byte[] compress(byte[] in) {
       return super.compress(in);
-    }
-
-    @Override
-    public String decodeString(byte[] data) {
-      return super.decodeString(data);
     }
 
     @Override
@@ -221,11 +172,6 @@ class BaseSerializingTranscoderTest {
     @Override
     public Object deserialize(byte[] in) {
       return super.deserialize(in);
-    }
-
-    @Override
-    public byte[] encodeString(String in) {
-      return super.encodeString(in);
     }
 
     @Override

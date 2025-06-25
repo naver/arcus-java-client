@@ -21,6 +21,17 @@ import java.util.Date;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.collection.ElementValueType;
 
+import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BOOLEAN;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTEARRAY;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DATE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DOUBLE;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_FLOAT;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_INT;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_LONG;
+import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_MASK;
+
 /**
  * Transcoder that serialized and compresses objects for collection elements.
  */
@@ -122,7 +133,7 @@ public class CollectionTranscoder extends SerializingTranscoder implements
           getLogger().warn("Undecodeable with flags %x", flags);
       }
     } else {
-      rv = decodeString(data);
+      rv = tu.decodeString(data);
     }
     return rv;
   }
@@ -139,7 +150,7 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     }
 
     if (o instanceof String) {
-      b = encodeString((String) o);
+      b = tu.encodeString((String) o);
     } else if (o instanceof Long) {
       b = tu.encodeLong((Long) o);
       flags |= SPECIAL_LONG;
