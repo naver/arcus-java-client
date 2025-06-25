@@ -150,8 +150,8 @@ import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.FrontCacheMemcachedClient;
 import net.spy.memcached.protocol.BaseOperationImpl;
-import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
+import net.spy.memcached.transcoders.TranscoderUtils;
 import net.spy.memcached.util.BTreeUtil;
 
 /**
@@ -1099,7 +1099,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopCreate(String key,
                                                   ElementValueType valueType,
                                                   CollectionAttributes attributes) {
-    int flag = CollectionTranscoder.examineFlags(valueType);
+    int flag = TranscoderUtils.examineFlags(valueType);
     boolean noreply = false;
     CollectionCreate bTreeCreate = new BTreeCreate(flag,
             attributes.getExpireTime(), attributes.getMaxCount(),
@@ -1111,7 +1111,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncMopCreate(String key,
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
-    int flag = CollectionTranscoder.examineFlags(type);
+    int flag = TranscoderUtils.examineFlags(type);
     boolean noreply = false;
     CollectionCreate mapCreate = new MapCreate(flag,
             attributes.getExpireTime(), attributes.getMaxCount(),
@@ -1123,7 +1123,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncSopCreate(String key,
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
-    int flag = CollectionTranscoder.examineFlags(type);
+    int flag = TranscoderUtils.examineFlags(type);
     boolean noreply = false;
     CollectionCreate setCreate = new SetCreate(flag,
             attributes.getExpireTime(), attributes.getMaxCount(),
@@ -1135,7 +1135,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncLopCreate(String key,
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
-    int flag = CollectionTranscoder.examineFlags(type);
+    int flag = TranscoderUtils.examineFlags(type);
     boolean noreply = false;
     CollectionCreate listCreate = new ListCreate(flag,
             attributes.getExpireTime(), attributes.getMaxCount(),

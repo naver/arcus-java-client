@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
 
 import net.spy.memcached.compat.SpyObject;
@@ -33,8 +32,6 @@ import net.spy.memcached.compat.SpyObject;
  * compressed data.
  */
 public abstract class BaseSerializingTranscoder extends SpyObject {
-
-  private static final String DEFAULT_CHARSET = "UTF-8";
 
   private final int maxSize;
 
@@ -46,19 +43,24 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
   private final ClassLoader classLoader;
 
   private final CompressionUtils cu = new CompressionUtils();
-  protected String charset = DEFAULT_CHARSET;
+  protected final TranscoderUtils tu;
 
   /**
    * Initialize a serializing transcoder with the given maximum data size.
    */
   public BaseSerializingTranscoder(int max) {
-    this(max, null);
+    this(max, null, true);
   }
 
   public BaseSerializingTranscoder(int max, ClassLoader cl) {
+    this(max, cl, true);
+  }
+
+  public BaseSerializingTranscoder(int max, ClassLoader cl, boolean pack) {
     super();
     this.maxSize = max;
     this.classLoader = cl;
+    this.tu = new TranscoderUtils(pack);
   }
 
   /**
@@ -72,17 +74,15 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
     cu.setCompressionThreshold(threshold);
   }
 
+  public String getCharset() {
+    return tu.getCharset();
+  }
+
   /**
    * Set the character set for string value transcoding (defaults to UTF-8).
    */
   public void setCharset(String to) {
-    // Validate the character set.
-    try {
-      new String(new byte[97], to);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-    charset = to;
+    tu.setCharset(to);
   }
 
   /**
@@ -158,34 +158,6 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    */
   protected boolean isCompressionCandidate(byte[] data) {
     return cu.isCompressionCandidate(data);
-  }
-
-  /**
-   * Decode the string with the current character set.
-   */
-  protected String decodeString(byte[] data) {
-    String rv = null;
-    try {
-      if (data != null) {
-        rv = new String(data, charset);
-      }
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-    return rv;
-  }
-
-  /**
-   * Encode a string into the current character set.
-   */
-  protected byte[] encodeString(String in) {
-    byte[] rv = null;
-    try {
-      rv = in.getBytes(charset);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-    return rv;
   }
 
   public int getMaxSize() {

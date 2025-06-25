@@ -185,7 +185,7 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
 
   private String decodeW1String(byte[] b) {
     try {
-      return new String(b, 1, b.length - 1, charset);
+      return new String(b, 1, b.length - 1, getCharset());
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
@@ -260,7 +260,7 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
   private byte[] encodeW1String(String value) {
     byte[] svalue = null;
     try {
-      svalue = value.getBytes(charset);
+      svalue = value.getBytes(getCharset());
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }

@@ -11,7 +11,7 @@ import net.spy.memcached.compat.SpyObject;
 public final class LongTranscoder extends SpyObject
         implements Transcoder<Long> {
 
-  private static final int flags = SerializingTranscoder.SPECIAL_LONG;
+  private static final int flags = TranscoderUtils.SPECIAL_LONG;
 
   private final TranscoderUtils tu = new TranscoderUtils(true);
 

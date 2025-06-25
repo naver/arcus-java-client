@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -57,6 +58,21 @@ class TranscoderUtilsTest {
       long b = tu.decodeLong(oversizeBytes);
       fail("Got " + b + " expected assertion.");
     } catch (AssertionError e) {
+      // pass
+    }
+  }
+
+  @Test
+  void testDecodeStringNull() {
+    assertNull(tu.decodeString(null));
+  }
+
+  @Test
+  void testEncodeStringNull() {
+    try {
+      tu.encodeString(null);
+      fail("Expected an assertion error");
+    } catch (NullPointerException e) {
       // pass
     }
   }
