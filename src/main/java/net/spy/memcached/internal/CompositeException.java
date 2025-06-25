@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import net.spy.memcached.ExceptionMessageFactory;
-
 public class CompositeException extends ExecutionException {
 
   private static final long serialVersionUID = -599478797582490012L;
@@ -15,7 +13,7 @@ public class CompositeException extends ExecutionException {
   private final Throwable cause;
 
   public CompositeException(List<Exception> exceptions) {
-    super(ExceptionMessageFactory.createCompositeMessage(exceptions));
+    super(createMessage(exceptions));
 
     if (exceptions.size() > 1) {
       StringWriter sw = new StringWriter();
@@ -58,5 +56,26 @@ public class CompositeException extends ExecutionException {
     public synchronized Throwable fillInStackTrace() {
       return this;
     }
+  }
+
+  private static String createMessage(List<Exception> exceptions) {
+    if (exceptions == null || exceptions.isEmpty()) {
+      throw new IllegalArgumentException("At least one exception must be specified");
+    }
+
+    StringBuilder rv = new StringBuilder();
+    rv.append("Multiple exceptions (");
+    rv.append(exceptions.size());
+    rv.append(") reported: ");
+    boolean first = true;
+    for (Exception e : exceptions) {
+      if (first) {
+        first = false;
+      } else {
+        rv.append(", ");
+      }
+      rv.append(e.getMessage());
+    }
+    return rv.toString();
   }
 }
