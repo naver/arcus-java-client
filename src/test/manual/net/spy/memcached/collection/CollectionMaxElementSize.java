@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.internal.CollectionFuture;
-import net.spy.memcached.transcoders.CollectionTranscoder;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -64,12 +64,12 @@ class CollectionMaxElementSize extends BaseIntegrationTest {
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < CollectionTranscoder.MAX_ELEMENT_BYTES + 1; i++) {
+    for (int i = 0; i < SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE + 1; i++) {
       sb.append(i % 9);
     }
 
     String tooLargeValue = sb.toString();
-    assertEquals(CollectionTranscoder.MAX_ELEMENT_BYTES + 1, tooLargeValue.length());
+    assertEquals(SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE + 1, tooLargeValue.length());
 
     try {
       future = mc.asyncLopInsert(key, -1, tooLargeValue,
