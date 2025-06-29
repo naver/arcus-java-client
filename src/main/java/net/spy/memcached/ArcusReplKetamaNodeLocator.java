@@ -44,6 +44,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
   private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
   private final ConcurrentHashMap<String, MemcachedReplicaGroup> allGroups;
   private final Collection<MemcachedNode> allNodes;
+  private final Collection<MemcachedNode> delayedClosingNodes = new HashSet<MemcachedNode>();
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaAlterGroups;
@@ -255,6 +256,10 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
       for (MemcachedNode node : toDelete) {
         allNodes.remove(node);
         removeNodeFromGroup(node);
+        if (node.hasOp() && node.isActive()) {
+          delayedClosingNodes.add(node);
+          continue;
+        }
         try {
           node.closeChannel();
         } catch (IOException e) {
@@ -289,6 +294,14 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
       /* ENABLE_MIGRATION end */
       lock.unlock();
     }
+  }
+
+  public Collection<MemcachedNode> getDelayedClosingNodes() {
+    return Collections.unmodifiableCollection(delayedClosingNodes);
+  }
+
+  public void updateDelayedClosingNodes(Collection<MemcachedNode> closedNodes) {
+    delayedClosingNodes.removeAll(closedNodes);
   }
 
   public void switchoverReplGroup(MemcachedReplicaGroup group) {
@@ -560,6 +573,10 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
           if (mrg.isEmptyGroup()) {
             removeHashOfAlter(mrg);
           }
+        }
+        if (node.hasOp() && node.isActive()) {
+          delayedClosingNodes.add(node);
+          continue;
         }
         try {
           node.closeChannel();
