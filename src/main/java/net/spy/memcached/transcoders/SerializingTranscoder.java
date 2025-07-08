@@ -41,32 +41,65 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
         implements Transcoder<Object> {
 
   /**
+   * Maximum element size allowed by memcached collections.
+   * The cache server's default setting of max_element_bytes is 16KB
+   * and it can be changed up to 32KB
+   */
+  public static final int MAX_COLLECTION_ELEMENT_SIZE = 32 * 1024;
+
+  private final boolean isCollection;
+  private final boolean forceJDKSerializeForCollection;
+
+  /**
    * Get a serializing transcoder with the default max data size.
    */
   public SerializingTranscoder() {
-    this(CachedData.MAX_SIZE, null);
+    this(CachedData.MAX_SIZE, null, false, false);
   }
 
-  /**
-   * Get a serializing transcoder that specifies the max data size.
-   */
   public SerializingTranscoder(int max) {
-    super(max, null);
+    this(max, null, false, false);
+  }
+
+  public SerializingTranscoder(int max, ClassLoader cl) {
+    this(max, cl, false, false);
   }
 
   /**
-   * Get a serializing transcoder that specifies the max data size and classloader.
+   * Constructor with full customization.
+   * Use static factory methods forKV() or forCollection() for default settings,
+   * or Builder for custom configurations.
    */
-  public SerializingTranscoder(int max, ClassLoader cl) {
+  protected SerializingTranscoder(int max, ClassLoader cl, boolean isCollection,
+                               boolean forceJDKSerializeForCollection) {
     super(max, cl);
+    this.isCollection = isCollection;
+    this.forceJDKSerializeForCollection = forceJDKSerializeForCollection;
+  }
+
+  /**
+   * Factory method for general key-value usage.
+   */
+  public static Builder forKV() {
+    return new Builder().forKV();
+  }
+
+  /**
+   * Factory method for collection item usage.
+   */
+  public static Builder forCollection() {
+    return new Builder().forCollection();
   }
 
   public Object decode(CachedData d) {
     byte[] data = d.getData();
-    Object rv = null;
-    if ((d.getFlags() & COMPRESSED) != 0) {
-      data = decompress(d.getData());
+
+    // Skip decompression for collections
+    if (!isCollection && (d.getFlags() & COMPRESSED) != 0) {
+      data = decompress(data);
     }
+
+    Object rv = null;
     int flags = d.getFlags() & SPECIAL_MASK;
     if ((d.getFlags() & SERIALIZED) != 0 && data != null) {
       rv = deserialize(data);
@@ -97,7 +130,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
           rv = data;
           break;
         default:
-          getLogger().warn("Undecodeable with flags %x", flags);
+          getLogger().warn("Unable to decode: Unknown flag %x", flags);
       }
     } else {
       rv = tu.decodeString(data);
@@ -106,8 +139,15 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
   }
 
   public CachedData encode(Object o) {
-    byte[] b = null;
+    byte[] b;
     int flags = 0;
+
+    if (isCollection && forceJDKSerializeForCollection) {
+      b = serialize(o);
+      flags |= SERIALIZED;
+      return new CachedData(flags, b, getMaxSize());
+    }
+
     if (o instanceof String) {
       b = tu.encodeString((String) o);
     } else if (o instanceof Long) {
@@ -139,7 +179,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (isCompressionCandidate(b)) {
+    if (!isCollection && isCompressionCandidate(b)) {
       byte[] compressed = compress(b);
       if (compressed.length < b.length) {
         getLogger().debug("Compressed %s from %d to %d",
@@ -155,4 +195,63 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     return new CachedData(flags, b, getMaxSize());
   }
 
+  /**
+   * Builder for constructing SerializingTranscoder instances with custom settings.
+   */
+  public static final class Builder {
+    private int max;
+    private ClassLoader cl;
+    private boolean isCollection;
+    private boolean forceJDKSerializeForCollection;
+
+    private Builder() {}
+
+    Builder forKV() {
+      this.max = CachedData.MAX_SIZE;
+      this.cl = null;
+      this.isCollection = false;
+      this.forceJDKSerializeForCollection = false;
+      return this;
+    }
+
+    Builder forCollection() {
+      this.max = MAX_COLLECTION_ELEMENT_SIZE;
+      this.cl = null;
+      this.isCollection = true;
+      this.forceJDKSerializeForCollection = false;
+      return this;
+    }
+
+    public Builder maxSize(int max) {
+      this.max = max;
+      return this;
+    }
+
+    public Builder classLoader(ClassLoader cl) {
+      this.cl = cl;
+      return this;
+    }
+
+    /**
+     * By default, this transcoder uses Java serialization only if the type is a user-defined class.
+     * This mechanism may cause malfunction if you store Object type values
+     * into an Arcus collection item and the values are actually
+     * different types like String, Integer.
+     * In this case, you should enable {@code forceJDKSerializeForCollection},
+     * which enforces Java serialization for all values regardless of their actual type.
+     * This option is only available for collection transcoders.
+     */
+    public Builder forceJDKSerializationForCollection() {
+      if (!isCollection) {
+        throw new IllegalStateException("forceJDKSerializationForCollection can only be " +
+                "used with collection transcoders");
+      }
+      this.forceJDKSerializeForCollection = true;
+      return this;
+    }
+
+    public SerializingTranscoder build() {
+      return new SerializingTranscoder(max, cl, isCollection, forceJDKSerializeForCollection);
+    }
+  }
 }

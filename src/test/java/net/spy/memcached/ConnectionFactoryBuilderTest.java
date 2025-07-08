@@ -33,7 +33,6 @@ import net.spy.memcached.protocol.ascii.AsciiMemcachedNodeImpl;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryMemcachedNodeImpl;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
-import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.WhalinTranscoder;
 
@@ -68,7 +67,7 @@ class ConnectionFactoryBuilderTest {
     //assertSame(DefaultConnectionFactory.DEFAULT_HASH, f.getHashAlg());
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
     assertTrue(f.getDefaultTranscoder() instanceof SerializingTranscoder);
-    assertInstanceOf(CollectionTranscoder.class, f.getDefaultCollectionTranscoder());
+    assertInstanceOf(SerializingTranscoder.class, f.getDefaultCollectionTranscoder());
     //assertSame(DefaultConnectionFactory.DEFAULT_FAILURE_MODE,
     // f.getFailureMode());
     assertSame(FailureMode.Cancel, f.getFailureMode());
@@ -142,8 +141,8 @@ class ConnectionFactoryBuilderTest {
             .setWriteOpQueueFactory(wQueueFactory)
             .setReadBufferSize(19)
             .setTranscoder(new WhalinTranscoder())
-            .setCollectionTranscoder(
-                    new CollectionTranscoder(CollectionTranscoder.MAX_ELEMENT_BYTES - 1))
+            .setCollectionTranscoder(SerializingTranscoder.forCollection()
+                    .maxSize(SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE - 1).build())
             .setUseNagleAlgorithm(true)
             .setKeepAlive(true)
             .setDnsCacheTtlCheck(false)
@@ -156,7 +155,7 @@ class ConnectionFactoryBuilderTest {
     assertEquals(19, f.getReadBufSize());
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
     assertTrue(f.getDefaultTranscoder() instanceof WhalinTranscoder);
-    assertEquals(CollectionTranscoder.MAX_ELEMENT_BYTES - 1,
+    assertEquals(SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE - 1,
             f.getDefaultCollectionTranscoder().getMaxSize());
     assertSame(FailureMode.Redistribute, f.getFailureMode());
     assertEquals(1, f.getInitialObservers().size());

@@ -16,175 +16,34 @@
  */
 package net.spy.memcached.transcoders;
 
-import java.util.Date;
-
-import net.spy.memcached.CachedData;
-import net.spy.memcached.collection.ElementValueType;
-
-import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BOOLEAN;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTE;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_BYTEARRAY;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DATE;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_DOUBLE;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_FLOAT;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_INT;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_LONG;
-import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_MASK;
-
 /**
- * Transcoder that serialized and compresses objects for collection elements.
+ * @deprecated Use {@link SerializingTranscoder#forCollection()} instead.
  */
-public class CollectionTranscoder extends SerializingTranscoder implements
-        Transcoder<Object> {
+@Deprecated
+public class CollectionTranscoder extends SerializingTranscoder {
 
-  /**
-   * Maximum element size allowed by memcached collections.
-   * The cache server's default setting of max_element_bytes is 16KB
-   * and it can be changed up to 32KB
-   */
-  public static final int MAX_ELEMENT_BYTES = 32 * 1024;
-
-  private boolean optimize = true;
-
-  /**
-   * Get a serializing transcoder with the default max data size.
-   */
   public CollectionTranscoder() {
-    this(MAX_ELEMENT_BYTES);
+    super(MAX_COLLECTION_ELEMENT_SIZE, null, true, false);
   }
 
-  /**
-   * Get a serializing transcoder that specifies the max data size.
-   */
   public CollectionTranscoder(int max) {
-    super(max);
+    super(max, null, true, false);
   }
 
   public CollectionTranscoder(int max, ClassLoader cl) {
-    super(max, cl);
+    super(max, cl, true, false);
   }
 
-  private CollectionTranscoder(int max, ClassLoader cl, boolean optimize) {
-    super(max, cl);
-    this.optimize = optimize;
+  private CollectionTranscoder(int max, ClassLoader cl, boolean forceJDKSerializeForCollection) {
+    super(max, cl, true, forceJDKSerializeForCollection);
   }
 
-  public static int examineFlags(ElementValueType type) {
-    int flags = 0;
-    if (type == ElementValueType.STRING) {
-      // string type has no flags.
-    } else if (type == ElementValueType.LONG) {
-      flags |= SPECIAL_LONG;
-    } else if (type == ElementValueType.INTEGER) {
-      flags |= SPECIAL_INT;
-    } else if (type == ElementValueType.BOOLEAN) {
-      flags |= SPECIAL_BOOLEAN;
-    } else if (type == ElementValueType.DATE) {
-      flags |= SPECIAL_DATE;
-    } else if (type == ElementValueType.BYTE) {
-      flags |= SPECIAL_BYTE;
-    } else if (type == ElementValueType.FLOAT) {
-      flags |= SPECIAL_FLOAT;
-    } else if (type == ElementValueType.DOUBLE) {
-      flags |= SPECIAL_DOUBLE;
-    } else if (type == ElementValueType.BYTEARRAY) {
-      flags |= SPECIAL_BYTEARRAY;
-    } else {
-      flags |= SERIALIZED;
-    }
-    return flags;
-  }
-
-  @Override
-  public Object decode(CachedData d) {
-    byte[] data = d.getData();
-    Object rv = null;
-    int flags = d.getFlags() & SPECIAL_MASK;
-    if ((d.getFlags() & SERIALIZED) != 0 && data != null) {
-      rv = deserialize(data);
-    } else if (flags != 0 && data != null) {
-      switch (flags) {
-        case SPECIAL_BOOLEAN:
-          rv = tu.decodeBoolean(data);
-          break;
-        case SPECIAL_INT:
-          rv = tu.decodeInt(data);
-          break;
-        case SPECIAL_LONG:
-          rv = tu.decodeLong(data);
-          break;
-        case SPECIAL_DATE:
-          rv = new Date(tu.decodeLong(data));
-          break;
-        case SPECIAL_BYTE:
-          rv = tu.decodeByte(data);
-          break;
-        case SPECIAL_FLOAT:
-          rv = Float.intBitsToFloat(tu.decodeInt(data));
-          break;
-        case SPECIAL_DOUBLE:
-          rv = Double.longBitsToDouble(tu.decodeLong(data));
-          break;
-        case SPECIAL_BYTEARRAY:
-          rv = data;
-          break;
-        default:
-          getLogger().warn("Undecodeable with flags %x", flags);
-      }
-    } else {
-      rv = tu.decodeString(data);
-    }
-    return rv;
-  }
-
-  @Override
-  public CachedData encode(Object o) {
-    byte[] b;
-    int flags = 0;
-
-    if (!optimize) {
-      flags |= SERIALIZED;
-      b = serialize(o);
-      return new CachedData(flags, b, getMaxSize());
-    }
-
-    if (o instanceof String) {
-      b = tu.encodeString((String) o);
-    } else if (o instanceof Long) {
-      b = tu.encodeLong((Long) o);
-      flags |= SPECIAL_LONG;
-    } else if (o instanceof Integer) {
-      b = tu.encodeInt((Integer) o);
-      flags |= SPECIAL_INT;
-    } else if (o instanceof Boolean) {
-      b = tu.encodeBoolean((Boolean) o);
-      flags |= SPECIAL_BOOLEAN;
-    } else if (o instanceof Date) {
-      b = tu.encodeLong(((Date) o).getTime());
-      flags |= SPECIAL_DATE;
-    } else if (o instanceof Byte) {
-      b = tu.encodeByte((Byte) o);
-      flags |= SPECIAL_BYTE;
-    } else if (o instanceof Float) {
-      b = tu.encodeInt(Float.floatToRawIntBits((Float) o));
-      flags |= SPECIAL_FLOAT;
-    } else if (o instanceof Double) {
-      b = tu.encodeLong(Double.doubleToRawLongBits((Double) o));
-      flags |= SPECIAL_DOUBLE;
-    } else if (o instanceof byte[]) {
-      b = (byte[]) o;
-      flags |= SPECIAL_BYTEARRAY;
-    } else {
-      b = serialize(o);
-      flags |= SERIALIZED;
-    }
-    assert b != null;
-    return new CachedData(flags, b, getMaxSize());
-  }
-
+  /**
+   * @deprecated Use {@link SerializingTranscoder.Builder} with {@code forCollection()} instead.
+   */
+  @Deprecated
   public static class Builder {
-    private int max = MAX_ELEMENT_BYTES;
+    private int max = MAX_COLLECTION_ELEMENT_SIZE;
     private boolean optimize = true;
     private ClassLoader cl;
 
@@ -211,7 +70,7 @@ public class CollectionTranscoder extends SerializingTranscoder implements
     }
 
     public CollectionTranscoder build() {
-      return new CollectionTranscoder(max, cl, optimize);
+      return new CollectionTranscoder(max, cl, !optimize);
     }
   }
 }

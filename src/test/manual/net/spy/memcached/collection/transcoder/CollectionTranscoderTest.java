@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutionException;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.transcoders.CollectionTranscoder;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,8 @@ class CollectionTranscoderTest extends BaseIntegrationTest {
 
   private static final String KEY = "CollectionTranscoderTest";
 
-  private final CollectionTranscoder transcoder = new CollectionTranscoder.Builder()
-          .disableOptimization()
+  private final SerializingTranscoder transcoder = SerializingTranscoder.forCollection()
+          .forceJDKSerializationForCollection()
           .build();
 
   @AfterEach
