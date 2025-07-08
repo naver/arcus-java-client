@@ -17,7 +17,7 @@
 package net.spy.memcached.emptycollection;
 
 import net.spy.memcached.collection.SetExist;
-import net.spy.memcached.transcoders.CollectionTranscoder;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProtocolSetExistTest {
   private final Object value = "value";
-  private final Transcoder<Object> testTranscoder = new CollectionTranscoder();
+  private final Transcoder<Object> testTranscoder = SerializingTranscoder.forCollection().build();
 
   @Test
   void testStringify() {

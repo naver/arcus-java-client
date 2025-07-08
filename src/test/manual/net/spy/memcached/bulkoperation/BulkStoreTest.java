@@ -29,7 +29,7 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
-import net.spy.memcached.transcoders.CollectionTranscoder;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.WhalinTranscoder;
 
@@ -56,7 +56,7 @@ class BulkStoreTest extends BaseIntegrationTest {
 
     try {
       mc.asyncStoreBulk(StoreType.set, new ArrayList<>(0),
-              60, new Object(), new CollectionTranscoder());
+              60, new Object(), SerializingTranscoder.forCollection().build());
       fail();
     } catch (IllegalArgumentException e) {
       // should get here.

@@ -26,7 +26,7 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    tc = new SerializingTranscoder();
+    tc = SerializingTranscoder.forKV().build();
     setTranscoder(tc);
     tu = new TranscoderUtils(true);
   }

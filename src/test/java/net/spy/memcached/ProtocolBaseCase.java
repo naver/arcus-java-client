@@ -824,7 +824,7 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
   @Test
   void testStupidlyLargeSet() throws Exception {
     Random r = new Random();
-    SerializingTranscoder st = new SerializingTranscoder();
+    SerializingTranscoder st = SerializingTranscoder.forKV().build();
     st.setCompressionThreshold(Integer.MAX_VALUE);
 
     byte data[] = new byte[10 * 1024 * 1024];

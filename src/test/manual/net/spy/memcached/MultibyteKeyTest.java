@@ -69,8 +69,8 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.PipedOperationCallback;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
-import net.spy.memcached.transcoders.CollectionTranscoder;
 import net.spy.memcached.transcoders.IntegerTranscoder;
+import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.util.BTreeUtil;
 
@@ -214,7 +214,7 @@ class MultibyteKeyTest {
   @Test
   void SetExistOperationImplTest() {
     try {
-      Transcoder<Object> tc = new CollectionTranscoder();
+      Transcoder<Object> tc = SerializingTranscoder.forCollection().build();
       opFact.collectionExist(MULTIBYTE_KEY, "",
           new SetExist<Object>(new Random().nextInt(), tc) {
             @Override
