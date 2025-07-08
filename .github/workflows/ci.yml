@@ -39,6 +39,8 @@ jobs:
           cache: 'maven'
       - name: Update apt-get
         run: sudo apt-get update
+      - name: Install iproute2
+        run: sudo apt-get install -y iproute2
       - name: Install ARCUS
         run: |
           # clone
@@ -47,6 +49,8 @@ jobs:
           # build server
           cd ~/arcus && docker compose up -d
 
+      - name: Add 1ms localhost delay
+        run: sudo tc qdisc add dev lo root netem delay 1ms
       - name: Test ARCUS Client Without ZK
         run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest,ArcusClientCreateTest
       - name: Test ARCUS Client With ZK
