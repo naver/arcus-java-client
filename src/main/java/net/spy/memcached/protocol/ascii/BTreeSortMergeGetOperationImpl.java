@@ -69,6 +69,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
   private int flags = 0;
   private int lineCount = 0;
+  private int readCount = 0;
   private byte[] data = null;
   private int readOffset = 0;
   private byte lookingFor = '\0';
@@ -114,12 +115,12 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       readState = ReadState.MISSED_KEYS;
 
       String[] stuff = line.split(" ");
-      assert "MISSED_KEYS".equals(stuff[0]);
 
       lineCount = Integer.parseInt(stuff[1]);
       if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
+      readCount = 0;
     } else if (line.startsWith("TRIMMED_KEYS")) {
       readState = ReadState.TRIMMED_KEYS;
 
@@ -130,6 +131,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
+      readCount = 0;
     } else {
       OperationStatus status = matchStatus(line, END, TRIMMED,
               DUPLICATED, DUPLICATED_TRIMMED, OUT_OF_RANGE,
@@ -156,7 +158,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
   private void readElements(ByteBuffer bb) {
     // Decode a collection data header.
-    int count = 0;
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
         byte b = bb.get();
@@ -199,7 +200,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
             String[] stuff = sep.split(" ");
             lineCount = Integer.parseInt(stuff[1]);
-
+            readCount = 0;
             return;
           }
 
@@ -241,7 +242,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
       readOffset += toRead;
     }
 
-    if (lookingFor == '\0' && readOffset == data.length && count < lineCount) {
+    if (lookingFor == '\0' && readOffset == data.length) {
       BTreeSortMergeGetOperation.Callback cb = (BTreeSortMergeGetOperation.Callback) getCallback();
       cb.gotData(smGet.getKey(), smGet.getFlags(), smGet.getBkey(), smGet.getEflag(), data);
       lookingFor = '\r';
@@ -274,7 +275,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   }
 
   private void readMissedKeys(ByteBuffer bb) {
-    int count = 0;
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
         byte b = bb.get();
@@ -294,25 +294,11 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
             String[] stuff = sep.split(" ");
             lineCount = Integer.parseInt(stuff[1]);
-
+            readCount = 0;
             return;
           }
 
-          OperationStatus status = matchStatus(byteBuffer.toString(),
-                  END, TRIMMED, DUPLICATED, DUPLICATED_TRIMMED,
-                  OUT_OF_RANGE, ATTR_MISMATCH, TYPE_MISMATCH,
-                  BKEY_MISMATCH);
-
-          if (status.isSuccess()) {
-            /* ENABLE_MIGRATION if */
-            if (needRedirect()) {
-              transitionState(OperationState.REDIRECT);
-              return;
-            }
-            /* ENABLE_MIGRATION end */
-            complete(status);
-            return;
-          } else if (count < lineCount) {
+          if (readCount < lineCount) {
             // <key> [<cause>]\r\n
             String line = byteBuffer.toString();
             String[] chunk = line.split(" ");
@@ -329,15 +315,18 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
                       .gotMissedKey(chunk[0], new CollectionOperationStatus(false,
                               "UNDEFINED", CollectionResponse.UNDEFINED));
             }
-            count++;
+            readCount++;
           } else {
-            /* unexpected response */
             /* ENABLE_MIGRATION if */
             if (needRedirect()) {
               transitionState(OperationState.REDIRECT);
               return;
             }
             /* ENABLE_MIGRATION end */
+            OperationStatus status = matchStatus(byteBuffer.toString(),
+                    END, TRIMMED, DUPLICATED, DUPLICATED_TRIMMED,
+                    OUT_OF_RANGE, ATTR_MISMATCH, TYPE_MISMATCH,
+                    BKEY_MISMATCH);
             complete(status);
             return;
           }
@@ -350,7 +339,6 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
   }
 
   private void readTrimmedKeys(ByteBuffer bb) {
-    int count = 0;
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
         byte b = bb.get();
@@ -362,20 +350,8 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
         // Finish the operation.
         if (b == '\n') {
-          OperationStatus status = matchStatus(byteBuffer.toString(),
-                  END, DUPLICATED, OUT_OF_RANGE, ATTR_MISMATCH,
-                  TYPE_MISMATCH, BKEY_MISMATCH);
 
-          if (status.isSuccess()) {
-            /* ENABLE_MIGRATION if */
-            if (needRedirect()) {
-              transitionState(OperationState.REDIRECT);
-              return;
-            }
-            /* ENABLE_MIGRATION end */
-            complete(status);
-            return;
-          } else if (count < lineCount) {
+          if (readCount < lineCount) {
             // <key> <bkey>\r\n
             String[] chunk = byteBuffer.toString().split(" ");
             if (smGet instanceof BTreeSMGetWithLongTypeBkey) {
@@ -386,15 +362,17 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
                   .gotTrimmedKey(chunk[0],
                       BTreeUtil.hexStringToByteArrays(chunk[1].substring(2)));
             }
-            count++;
+            readCount++;
           } else {
-            /* unexpected response */
             /* ENABLE_MIGRATION if */
             if (needRedirect()) {
               transitionState(OperationState.REDIRECT);
               return;
             }
             /* ENABLE_MIGRATION end */
+            OperationStatus status = matchStatus(byteBuffer.toString(),
+                    END, DUPLICATED, OUT_OF_RANGE, ATTR_MISMATCH,
+                    TYPE_MISMATCH, BKEY_MISMATCH);
             complete(status);
             return;
           }

@@ -60,7 +60,8 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
   private final BTreeSMGet<?> smGet;
 
   private int flags = 0;
-  private int count = 0;
+  private int lineCount = 0;
+  private int readCount = 0;
   private byte[] data = null;
   private int readOffset = 0;
   private byte lookingFor = '\0';
@@ -91,22 +92,21 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
       String[] stuff = line.split(" ");
       assert "VALUE".equals(stuff[0]);
 
-      count = Integer.parseInt(stuff[1]);
+      lineCount = Integer.parseInt(stuff[1]);
 
-      if (count > 0) {
+      if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
     } else if (line.startsWith("MISSED_KEYS")) {
       readState = 1;
 
       String[] stuff = line.split(" ");
-      assert "MISSED_KEYS".equals(stuff[0]);
 
-      count = Integer.parseInt(stuff[1]);
-
-      if (count > 0) {
+      lineCount = Integer.parseInt(stuff[1]);
+      if (lineCount > 0) {
         setReadType(OperationReadType.DATA);
       }
+      readCount = 0;
     } else {
       OperationStatus status = matchStatus(line, END, TRIMMED,
               DUPLICATED, DUPLICATED_TRIMMED, OUT_OF_RANGE,
@@ -159,15 +159,19 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
 
         // Finish the operation.
         if (b == '\n') {
-
-          if ((byteBuffer.toString()).startsWith("MISSED_KEYS")) {
+          String sep = byteBuffer.toString();
+          if (sep.startsWith("MISSED_KEYS")) {
             readState = 1;
             byteBuffer.reset();
             spaceCount = 0;
+
+            String[] stuff = sep.split(" ");
+            lineCount = Integer.parseInt(stuff[1]);
+            readCount = 0;
             return;
           }
 
-          OperationStatus status = matchStatus(byteBuffer.toString(),
+          OperationStatus status = matchStatus(sep,
                   END, TRIMMED, DUPLICATED, DUPLICATED_TRIMMED,
                   OUT_OF_RANGE, ATTR_MISMATCH, TYPE_MISMATCH,
                   BKEY_MISMATCH);
@@ -238,7 +242,7 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
     }
   }
 
-  private final void readMissedKeys(ByteBuffer bb) {
+  private void readMissedKeys(ByteBuffer bb) {
     if (lookingFor == '\0' && data == null) {
       while (bb.remaining() > 0) {
         byte b = bb.get();
@@ -250,24 +254,24 @@ public final class BTreeSortMergeGetOperationOldImpl extends OperationImpl imple
 
         // Finish the operation.
         if (b == '\n') {
-          OperationStatus status = matchStatus(byteBuffer.toString(),
-                  END, TRIMMED, DUPLICATED, DUPLICATED_TRIMMED,
-                  OUT_OF_RANGE, ATTR_MISMATCH, TYPE_MISMATCH,
-                  BKEY_MISMATCH);
-
-          if (status.isSuccess()) {
-            complete(status);
-            return;
-          } else {
+          if (readCount < lineCount) {
             ((BTreeSortMergeGetOperationOld.Callback) getCallback())
                     .gotMissedKey(byteBuffer.toByteArray());
+            readCount++;
+          } else {
+            OperationStatus status = matchStatus(byteBuffer.toString(),
+                    END, TRIMMED, DUPLICATED, DUPLICATED_TRIMMED,
+                    OUT_OF_RANGE, ATTR_MISMATCH, TYPE_MISMATCH,
+                    BKEY_MISMATCH);
+
+            complete(status);
+            return;
           }
           byteBuffer.reset();
         } else {
           byteBuffer.write(b);
         }
       }
-      return;
     }
   }
 

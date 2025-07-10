@@ -50,6 +50,9 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
   private static final OperationStatus EXISTS =
           new CASOperationStatus(false, "EXISTS",
                   CASResponse.EXISTS, StatusCode.ERR_EXISTS);
+  private static final OperationStatus TYPE_MISMATCH =
+          new CASOperationStatus(false, "TYPE_MISMATCH",
+                  CASResponse.TYPE_MISMATCH, StatusCode.ERR_TYPE_MISMATCH);
 
   private final String key;
   private final long casValue;
@@ -86,7 +89,7 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
       return;
     }
     /* ENABLE_MIGRATION end */
-    complete(matchStatus(line, STORED, NOT_FOUND, EXISTS));
+    complete(matchStatus(line, STORED, NOT_FOUND, EXISTS, TYPE_MISMATCH));
   }
 
   @Override

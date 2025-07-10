@@ -42,6 +42,10 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
           new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
   private static final OperationStatus EXISTS =
           new OperationStatus(false, "EXISTS", StatusCode.ERR_EXISTS);
+  private static final OperationStatus NOT_STORED =
+          new OperationStatus(false, "NOT_STORED", StatusCode.ERR_NOT_STORED);
+  private static final OperationStatus TYPE_MISMATCH =
+          new OperationStatus(false, "TYPE_MISMATCH", StatusCode.ERR_TYPE_MISMATCH);
 
   protected final String type;
   protected final String key;
@@ -77,7 +81,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
       return;
     }
     /* ENABLE_MIGRATION end */
-    complete(matchStatus(line, STORED, NOT_FOUND, EXISTS));
+    complete(matchStatus(line, STORED, NOT_STORED, NOT_FOUND, EXISTS, TYPE_MISMATCH));
   }
 
   @Override

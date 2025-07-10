@@ -26,6 +26,10 @@ public enum CASResponse {
    */
   CANCELED,
   /**
+   * Status indicating the type of value is not key-value.
+   */
+  TYPE_MISMATCH,
+  /**
    * Status indicating the undefined response was delivered from the cache.
    */
   UNDEFINED
