@@ -70,7 +70,7 @@ abstract class OperationImpl extends BaseOperationImpl {
       }
     }
     if (rv == null) {
-      getLogger().warn("Unhandled state: " + line);
+      getLogger().info("Unhandled state: " + line);
       rv = new OperationStatus(false, line, StatusCode.fromAsciiLine(line));
     }
     return rv;
