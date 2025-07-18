@@ -140,8 +140,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
     this.name = name;
     setSocketAddress(sa);
-    rbuf = ByteBuffer.allocate(bufSize);
-    wbuf = ByteBuffer.allocate(bufSize);
+    rbuf = ByteBuffer.allocateDirect(bufSize);
+    wbuf = ByteBuffer.allocateDirect(bufSize);
     ((Buffer) getWbuf()).clear();
     readQ = rq;
     writeQ = wq;
