@@ -12,6 +12,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
@@ -103,7 +104,8 @@ public class PipedCollectionFuture<K, V>
   }
 
   public void setOperationStatus(CollectionOperationStatus status) {
-    if (operationStatus.get() == null) {
+    if (operationStatus.get() == null
+            || operationStatus.get().getResponse() == CollectionResponse.CANCELED) {
       operationStatus.set(status);
       super.set(null, status);
       return;
