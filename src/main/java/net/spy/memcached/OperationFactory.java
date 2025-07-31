@@ -81,6 +81,7 @@ import net.spy.memcached.ops.SetAttrOperation;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.ops.TouchOperation;
 import net.spy.memcached.ops.VersionOperation;
 
 /**
@@ -188,6 +189,16 @@ public interface OperationFactory {
    */
   StoreOperation store(StoreType storeType, String key, int flags, int exp,
                        byte[] data, OperationCallback cb);
+
+  /**
+   * Create a touch operation.
+   *
+   * @param key        the key to touch
+   * @param expiration the new expiration time
+   * @param cb          the status callback
+   * @return the new touch operation
+   */
+  TouchOperation touch(String key, int expiration, OperationCallback cb);
 
   /**
    * Get a concatenation operation.

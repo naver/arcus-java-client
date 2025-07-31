@@ -142,6 +142,8 @@ public interface MemcachedClientIF {
   Map<String, CASValue<Object>> getsBulk(String... keys)
           throws OperationTimeoutException;
 
+  Future<Boolean> touch(String key, int exp);
+
   Map<SocketAddress, String> getVersions();
 
   Map<SocketAddress, Map<String, String>> getStats();

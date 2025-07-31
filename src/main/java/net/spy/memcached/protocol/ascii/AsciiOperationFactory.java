@@ -78,6 +78,7 @@ import net.spy.memcached.ops.SetAttrOperation;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.ops.TouchOperation;
 import net.spy.memcached.ops.VersionOperation;
 
 /**
@@ -121,6 +122,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   public StoreOperation store(StoreType storeType, String key, int flags,
                               int exp, byte[] data, OperationCallback cb) {
     return new StoreOperationImpl(storeType, key, flags, exp, data, cb);
+  }
+
+  public TouchOperation touch(String key, int expiration, OperationCallback cb) {
+    return new TouchOperationImpl(key, expiration, cb);
   }
 
   public VersionOperation version(OperationCallback cb) {

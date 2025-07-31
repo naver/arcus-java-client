@@ -63,5 +63,4 @@ class AsciiClientTest extends ProtocolBaseCase {
   protected String getExpectedVersionSource() {
     return "/" + ARCUS_HOST;
   }
-
 }
