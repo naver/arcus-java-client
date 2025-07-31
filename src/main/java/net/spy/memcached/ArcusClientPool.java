@@ -377,6 +377,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public Future<Boolean> touch(String key, int exp) {
+    return this.getClient().touch(key, exp);
+  }
+
+  @Override
   public Map<SocketAddress, String> getVersions() {
     return this.getClient().getVersions();
   }

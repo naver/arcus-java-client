@@ -16,6 +16,7 @@
  */
 package net.spy.memcached.collection.attribute;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -104,5 +105,17 @@ class GetAttrTest extends BaseIntegrationTest {
     assertNull(rattrs);
     assertEquals(CollectionResponse.NOT_FOUND, future.getOperationStatus()
             .getResponse());
+  }
+
+  @Test
+  void testGetAttr_Touch() throws Exception {
+    String key = "getattr_touch_attribute";
+
+    mc.set(key, 10, "v").get();
+    Future<Boolean> future = mc.touch(key, 100);
+    assertTrue(future.get());
+
+    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
+    assertTrue(rattrs.getExpireTime() > 10);
   }
 }

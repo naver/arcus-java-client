@@ -80,6 +80,9 @@ public abstract class BaseOperationFactory implements OperationFactory {
       ConcatenationOperation c = (ConcatenationOperation) op;
       rv.add(cat(c.getStoreType(), c.getCasValue(), first(op.getKeys()),
               c.getData(), c.getCallback()));
+    } else if (op instanceof TouchOperation) {
+      TouchOperation t = (TouchOperation) op;
+      rv.add(touch(first(t.getKeys()), t.getExpiration(), t.getCallback()));
     } else if (op instanceof SetAttrOperation) {
       SetAttrOperation c = (SetAttrOperation) op;
       rv.add(setAttr(first(c.getKeys()), c.getAttributes(),

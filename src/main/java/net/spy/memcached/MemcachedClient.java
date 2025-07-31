@@ -1485,6 +1485,34 @@ public class MemcachedClient extends SpyThread
     return getsBulk(Arrays.asList(keys), transcoder);
   }
 
+  /**
+   * Touch the given key to reset its expiration time.
+   *
+   * @param key the key to touch
+   * @param exp the new expiration to set for the given key
+   * @return a future that will be true if the operation was successful
+   * and false otherwise.
+   * @throws IllegalStateException in the rare circumstance where queue is too
+   *                               full to accept any more requests
+   */
+  public OperationFuture<Boolean> touch(final String key, final int exp) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final OperationFuture<Boolean> rv = new OperationFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.touch(key, exp,
+      new OperationCallback() {
+        public void receivedStatus(OperationStatus s) {
+          rv.set(s.isSuccess(), s);
+        }
+
+        public void complete() {
+          latch.countDown();
+        }
+      });
+    rv.setOperation(op);
+    addOp(key, op);
+    return rv;
+  }
 
   /**
    * Get the versions of all the connected memcached nodes.

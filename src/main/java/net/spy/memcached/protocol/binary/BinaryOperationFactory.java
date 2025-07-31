@@ -79,6 +79,7 @@ import net.spy.memcached.ops.SetAttrOperation;
 import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreOperation;
 import net.spy.memcached.ops.StoreType;
+import net.spy.memcached.ops.TouchOperation;
 import net.spy.memcached.ops.VersionOperation;
 
 /**
@@ -125,6 +126,11 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   public StoreOperation store(StoreType storeType, String key, int flags,
                               int exp, byte[] data, OperationCallback cb) {
     return new StoreOperationImpl(storeType, key, flags, exp, data, 0, cb);
+  }
+
+  public TouchOperation touch(String key, int expiration, OperationCallback cb) {
+    throw new RuntimeException(
+            "TouchOperation is not supported in binary protocol yet.");
   }
 
   public VersionOperation version(OperationCallback cb) {
