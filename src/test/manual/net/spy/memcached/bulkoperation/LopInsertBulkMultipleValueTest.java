@@ -23,8 +23,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
 import org.junit.jupiter.api.AfterEach;
@@ -32,6 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -111,9 +114,7 @@ class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
   void testErrorCount() {
     int valueCount = 1200;
     Object[] valueList = new Object[valueCount];
-    for (int i = 0; i < valueList.length; i++) {
-      valueList[i] = "MyValue";
-    }
+    Arrays.fill(valueList, "MyValue");
 
     try {
       // SET
@@ -123,8 +124,10 @@ class LopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(1000L,
               TimeUnit.MILLISECONDS);
-      assertEquals(valueCount, map.size());
-
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map.size());
+      assertEquals(CollectionResponse.NOT_FOUND,
+              map.get(ArcusClient.MAX_PIPED_ITEM_COUNT - 1).getResponse());
+      assertNull(map.get(ArcusClient.MAX_PIPED_ITEM_COUNT));
     } catch (Exception e) {
       e.printStackTrace();
       fail();

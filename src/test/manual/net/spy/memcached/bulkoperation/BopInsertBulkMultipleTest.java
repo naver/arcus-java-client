@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
@@ -122,7 +123,7 @@ class BopInsertBulkMultipleTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(2000L,
               TimeUnit.MILLISECONDS);
-      assertEquals(bkeySize, map.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map.size());
 
     } catch (Exception e) {
       e.printStackTrace();

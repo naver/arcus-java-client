@@ -2,6 +2,7 @@ package net.spy.memcached.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
@@ -19,12 +21,13 @@ import net.spy.memcached.ops.OperationState;
 
 public class PipedCollectionFuture<K, V>
         extends CollectionFuture<Map<K, V>> {
-  private final Collection<Operation> ops = new ArrayList<>();
+  private final List<Operation> ops = new ArrayList<>();
   private final AtomicReference<CollectionOperationStatus> operationStatus
           = new AtomicReference<>(null);
 
   private final Map<K, V> failedResult =
           new ConcurrentHashMap<>();
+  private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
   public PipedCollectionFuture(CountDownLatch l, long opTimeout) {
     super(l, opTimeout);
@@ -32,31 +35,33 @@ public class PipedCollectionFuture<K, V>
 
   @Override
   public boolean cancel(boolean ign) {
-    boolean rv = false;
-    for (Operation op : ops) {
-      rv |= op.cancel("by application.");
-    }
-    return rv;
-  }
-
-  @Override
-  public boolean isCancelled() {
-    for (Operation op : ops) {
-      if (op.isCancelled()) {
-        return true;
+    if (!isCancelled()) {
+      for (Operation op : ops) {
+        if (op.cancel("by application.")) {
+          cancelled.set(true);
+          return true;
+        }
       }
     }
     return false;
   }
 
   @Override
-  public boolean isDone() {
-    for (Operation op : ops) {
-      if (!(op.getState() == OperationState.COMPLETE || op.isCancelled())) {
-        return false;
+  public boolean isCancelled() {
+    if (!cancelled.get()) {
+      for (Operation op : ops) {
+        if (op.isCancelled()) {
+          cancelled.set(true);
+          break;
+        }
       }
     }
-    return true;
+    return cancelled.get();
+  }
+
+  @Override
+  public boolean isDone() {
+    return latch.getCount() == 0;
   }
 
   @Override
@@ -121,7 +126,7 @@ public class PipedCollectionFuture<K, V>
     failedResult.put(index, status);
   }
 
-  public void addOperation(Operation op) {
-    ops.add(op);
+  public void addOperations(Collection<Operation> ops) {
+    this.ops.addAll(ops);
   }
 }

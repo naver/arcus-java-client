@@ -122,7 +122,7 @@ class SopInsertBulkMultipleValueTest extends BaseIntegrationTest {
 
       Map<Integer, CollectionOperationStatus> map = future.get(2000L,
               TimeUnit.MILLISECONDS);
-      assertEquals(valueCount, map.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map.size());
     } catch (Exception e) {
       e.printStackTrace();
       fail();
