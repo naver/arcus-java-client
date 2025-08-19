@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -253,7 +255,7 @@ class PipeInsertTest extends BaseIntegrationTest {
       Map<Integer, CollectionOperationStatus> map = future.get(5000L,
               TimeUnit.MILLISECONDS);
 
-      assertEquals(1000, map.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map.size());
 
       Map<String, Object> rmap = mc.asyncMopGet(KEY, false, false)
               .get();
@@ -263,6 +265,52 @@ class PipeInsertTest extends BaseIntegrationTest {
       e.printStackTrace();
       fail(e.getMessage());
     }
+  }
+
+  @Test
+  void cancel() {
+    //given
+    int elementCount = 600;
+
+    Map<String, Object> elements = new TreeMap<>();
+
+    for (int i = 0; i < elementCount; i++) {
+      elements.put(String.valueOf(i), "value" + i);
+    }
+    CollectionAttributes attr = new CollectionAttributes();
+
+    CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+            .asyncMopPipedInsertBulk(KEY, elements, attr);
+
+    // when & then
+    if (future.cancel(true)) {
+      assertTrue(future.isCancelled());
+      assertFalse(future.cancel(true));
+    }
+  }
+
+  @Test
+  void cancelFailed() {
+    //given
+    int elementCount = 600;
+
+    Map<String, Object> elements = new TreeMap<>();
+
+    for (int i = 0; i < elementCount; i++) {
+      elements.put(String.valueOf(i), "value" + i);
+    }
+    CollectionAttributes attr = new CollectionAttributes();
+
+    CollectionFuture<Map<Integer, CollectionOperationStatus>> future = mc
+            .asyncMopPipedInsertBulk(KEY, elements, attr);
+    try {
+      future.get();
+    } catch (Exception e) {
+      fail("failed to test cancel failure");
+    }
+
+    // when & then
+    assertFalse(future.cancel(true));
   }
 
 }

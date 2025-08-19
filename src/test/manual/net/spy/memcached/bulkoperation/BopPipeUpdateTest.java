@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.spy.memcached.ArcusClient;
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
@@ -233,13 +234,13 @@ class BopPipeUpdateTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
 
-      assertEquals(600, map2.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map2.size());
       assertEquals(CollectionResponse.NOT_FOUND_ELEMENT, map2.get(0)
               .getResponse());
 
       for (long i = 600; i < elementCount; i++) {
         assertEquals(
-                "updated" + i,
+                "value" + i,
                 mc.asyncBopGet(KEY, i, ElementFlagFilter.DO_NOT_FILTER,
                         false, false).get(1000L, TimeUnit.MILLISECONDS)
                         .get(i).getValue());
@@ -274,7 +275,7 @@ class BopPipeUpdateTest extends BaseIntegrationTest {
 
       // System.out.println(System.currentTimeMillis() - start + "ms");
 
-      assertEquals(elementCount, map2.size());
+      assertEquals(ArcusClient.MAX_PIPED_ITEM_COUNT, map2.size());
       assertEquals(CollectionResponse.NOT_FOUND, map2.get(0)
               .getResponse());
 
