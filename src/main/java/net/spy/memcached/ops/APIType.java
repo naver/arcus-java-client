@@ -68,6 +68,9 @@ public enum APIType {
   FLUSH(OperationType.WRITE),
   STATS(OperationType.ETC),
   VERSION(OperationType.ETC),
+  SASL_MECHS(OperationType.ETC),
+  SASL_AUTH(OperationType.ETC),
+  SASL_STEP(OperationType.ETC),
 
   // undefined API
   UNDEFINED(OperationType.UNDEFINED);

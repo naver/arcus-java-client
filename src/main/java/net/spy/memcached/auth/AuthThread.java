@@ -36,6 +36,10 @@ public class AuthThread extends SpyThread {
     } catch (Exception e) {
       throw new IllegalStateException("Can't create SaslClient", e);
     }
+
+    if (sc == null) {
+      throw new IllegalStateException("SaslClient is null");
+    }
   }
 
   @Override
@@ -90,7 +94,8 @@ public class AuthThread extends SpyThread {
       if (priorStatus != null) {
         if (!priorStatus.isSuccess()) {
           getLogger().warn("Authentication failed to "
-                  + node.getSocketAddress());
+                  + node.getSocketAddress() + ": " + priorStatus.getMessage());
+          break;
         }
       }
     }

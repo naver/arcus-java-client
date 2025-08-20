@@ -47,6 +47,9 @@ public enum OperationType {
   /*
    * StatsOperationImpl (getStats)
    * VersionOperationImpl (getVersions)
+   * SASLMechsOperationImpl (sasl mechs)
+   * SASLAuthOperationImpl (sasl auth)
+   * SASLStepOperationImpl (sasl auth)
    */
   ETC,
 

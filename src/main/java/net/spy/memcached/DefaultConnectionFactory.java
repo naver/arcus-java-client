@@ -31,6 +31,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.auth.ScramMechanism;
+import net.spy.memcached.auth.ScramSaslClientProvider;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
@@ -200,18 +202,25 @@ public class DefaultConnectionFactory extends SpyObject
                                            int bufSize) {
 
     OperationFactory of = getOperationFactory();
+    boolean doAuth = false;
+    if (getAuthDescriptor() != null) {
+      doAuth = true;
+      for (String mech : getAuthDescriptor().getMechs()) {
+        if (ScramMechanism.mechanismNames().contains(mech)) {
+          ScramSaslClientProvider.initialize(mech);
+        }
+      }
+    }
+
     if (of instanceof AsciiOperationFactory) {
       return new AsciiMemcachedNodeImpl(name,
               sa, bufSize,
               createReadOperationQueue(),
               createWriteOperationQueue(),
               createOperationQueue(),
-              getOpQueueMaxBlockTime());
+              getOpQueueMaxBlockTime(),
+              doAuth);
     } else if (of instanceof BinaryOperationFactory) {
-      boolean doAuth = false;
-      if (getAuthDescriptor() != null) {
-        doAuth = true;
-      }
       return new BinaryMemcachedNodeImpl(name,
               sa, bufSize,
               createReadOperationQueue(),

@@ -150,7 +150,7 @@ class BaseOpTest {
             new CollectionPipedInsertOperationImpl("test", insert, cb);
     LinkedBlockingQueue<Operation> queue = new LinkedBlockingQueue<>();
     op.setHandlingNode(new AsciiMemcachedNodeImpl("testnode", new InetSocketAddress(11211),
-            60, queue, queue, queue, 0L));
+            60, queue, queue, queue, 0L, false));
 
     ByteBuffer b = ByteBuffer.allocate(40);
     String line1 = "RESPONSE 2\r\n";

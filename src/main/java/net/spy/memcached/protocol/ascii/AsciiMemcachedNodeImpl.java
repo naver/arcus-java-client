@@ -37,9 +37,9 @@ public final class AsciiMemcachedNodeImpl extends TCPMemcachedNodeImpl {
                                 SocketAddress sa,
                                 int bufSize, BlockingQueue<Operation> rq,
                                 BlockingQueue<Operation> wq, BlockingQueue<Operation> iq,
-                                Long opQueueMaxBlockTimeNs) {
+                                Long opQueueMaxBlockTimeNs, boolean waitForAuth) {
     super(name, sa, bufSize, rq, wq, iq, opQueueMaxBlockTimeNs,
-        false /* ascii never does auth */, true /* ascii protocol */);
+            waitForAuth, true /* ascii protocol */);
   }
 
   @Override
