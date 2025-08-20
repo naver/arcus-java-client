@@ -143,15 +143,15 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   public SASLMechsOperation saslMechs(OperationCallback cb) {
-    throw new UnsupportedOperationException();
+    return new SASLMechsOperationImpl(cb);
   }
 
   public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
-    throw new UnsupportedOperationException();
+    return new SASLStepOperationImpl(sc, challenge, cb);
   }
 
   public SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb) {
-    throw new UnsupportedOperationException();
+    return new SASLAuthOperationImpl(sc, cb);
   }
 
   public SetAttrOperation setAttr(String key, Attributes attrs,

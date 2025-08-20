@@ -45,6 +45,19 @@ public class AuthDescriptor {
             new PlainCallbackHandler(u, p));
   }
 
+  /**
+   * Get a typical auth descriptor for SCRAM-SHA-256 auth with the given
+   * username and password.
+   *
+   * @param u the username
+   * @param p the password
+   * @return an AuthDescriptor
+   */
+  public static AuthDescriptor scramSha256(String u, String p) {
+    return new AuthDescriptor(new String[]{"SCRAM-SHA-256"},
+            new PlainCallbackHandler(u, p));
+  }
+
   public boolean authThresholdReached() {
     if (allowedAuthAttempts < 0) {
       return false; // negative value means auth forever
