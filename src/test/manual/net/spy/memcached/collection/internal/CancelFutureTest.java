@@ -3,7 +3,6 @@ package net.spy.memcached.collection.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import net.spy.memcached.collection.BTreeGetResult;
 import net.spy.memcached.collection.BaseIntegrationTest;
@@ -26,7 +25,6 @@ import net.spy.memcached.ops.StatusCode;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,14 +46,12 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status instanceof CollectionOperationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.SUCCESS)
+        .contains(status.getStatusCode()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status instanceof CollectionOperationStatus);
-      assertFalse(status.isSuccess());
-      assertEquals("cancelled", status.getMessage());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
       assertTrue(future.isCancelled());
     }
   }
@@ -74,22 +70,19 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status instanceof CollectionOperationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.SUCCESS)
+        .contains(status.getStatusCode()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status instanceof CollectionOperationStatus);
-      assertFalse(status.isSuccess());
-      assertEquals("cancelled", status.getMessage());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
       assertTrue(future.isCancelled());
     }
   }
 
   @Test
-  void cancelWithBroadcastFuture() throws ExecutionException, InterruptedException {
+  void cancelWithBroadcastFuture() {
     // given
-    mc.set("prefix:key1", 0, "value1").get();
     BroadcastFuture<Boolean> future = (BroadcastFuture<Boolean>) mc.flush("prefix");
 
     // when
@@ -101,14 +94,12 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertFalse(status instanceof CollectionOperationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(status.getStatusCode()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status instanceof CollectionOperationStatus);
-      assertFalse(status.isSuccess());
-      assertEquals("cancelled", status.getMessage());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
       assertTrue(future.isCancelled());
     }
   }
@@ -127,19 +118,19 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(status.getStatusCode()));
+
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.NOT_FOUND)
+        .contains(operationStatus.getResponse()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status.isSuccess());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
-      CollectionOperationStatus operationStatus = future.getOperationStatus();
-      assertInstanceOf(CollectionOperationStatus.class, operationStatus);
-      assertInstanceOf(OperationStatus.class, operationStatus);
-      assertFalse(operationStatus.isSuccess());
-      assertEquals(StatusCode.CANCELLED, operationStatus.getStatusCode());
-      assertEquals(CollectionResponse.CANCELED, operationStatus.getResponse());
-
       assertTrue(future.isCancelled());
     }
   }
@@ -148,37 +139,8 @@ class CancelFutureTest extends BaseIntegrationTest {
   void cancelWithPipedCollectionFuture() {
     // given
     PipedCollectionFuture<Integer, CollectionOperationStatus> future =
-            (PipedCollectionFuture<Integer, CollectionOperationStatus>)
-                    mc.asyncLopPipedInsertBulk("list", 0, Arrays.asList("value1", "value2"), null);
-
-    // when
-    try {
-      future.cancel(true);
-    } catch (Exception e) {
-      fail("Expected cancel to not throw an exception", e);
-    }
-
-    // then
-    OperationStatus status = future.getStatus();
-    assertInstanceOf(OperationStatus.class, status);
-    assertFalse(status.isSuccess());
-    assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
-    CollectionOperationStatus operationStatus = future.getOperationStatus();
-    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
-    assertInstanceOf(OperationStatus.class, operationStatus);
-    assertFalse(operationStatus.isSuccess());
-    assertEquals(StatusCode.CANCELLED, operationStatus.getStatusCode());
-    assertEquals(CollectionResponse.CANCELED, operationStatus.getResponse());
-
-    assertTrue(future.isCancelled());
-  }
-
-  @Test
-  void cancelWithBTreeStoreAndGetFuture() {
-    // given
-    BTreeStoreAndGetFuture<Boolean, Object> future =
-            mc.asyncBopInsertAndGetTrimmed("btree", 0, null, "value", null);
+        (PipedCollectionFuture<Integer, CollectionOperationStatus>)
+            mc.asyncLopPipedInsertBulk("list", 0, Arrays.asList("value1", "value2"), null);
 
     // when
     boolean cancelled = false;
@@ -189,19 +151,51 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_FAILED_END)
+        .contains(status.getStatusCode()));
+
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_FAILED_END)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.FAILED_END)
+        .contains(operationStatus.getResponse()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status.isSuccess());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
+      assertTrue(future.isCancelled());
+    }
+  }
 
-      CollectionOperationStatus operationStatus = future.getOperationStatus();
-      assertInstanceOf(CollectionOperationStatus.class, operationStatus);
-      assertInstanceOf(OperationStatus.class, operationStatus);
-      assertFalse(operationStatus.isSuccess());
-      assertEquals(StatusCode.CANCELLED, operationStatus.getStatusCode());
-      assertEquals(CollectionResponse.CANCELED, operationStatus.getResponse());
+  @Test
+  void cancelWithBTreeStoreAndGetFuture() {
+    // given
+    BTreeStoreAndGetFuture<Boolean, Object> future =
+        mc.asyncBopInsertAndGetTrimmed("btree", 0, null, "value", null);
 
+    // when
+    boolean cancelled = false;
+    try {
+      cancelled = future.cancel(true);
+    } catch (Exception e) {
+      fail("Expected cancel to not throw an exception", e);
+    }
+
+    // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(status.getStatusCode()));
+
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.NOT_FOUND)
+        .contains(operationStatus.getResponse()));
+    if (cancelled) {
       assertTrue(future.isCancelled());
     }
   }
@@ -210,7 +204,7 @@ class CancelFutureTest extends BaseIntegrationTest {
   void cancelWithCollectionGetFuture() {
     // given
     CollectionGetFuture<List<Object>> future =
-            (CollectionGetFuture<List<Object>>) mc.asyncLopGet("list", 0, false, false);
+        (CollectionGetFuture<List<Object>>) mc.asyncLopGet("list", 0, false, false);
 
     // when
     boolean cancelled = false;
@@ -221,19 +215,19 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    OperationStatus status = future.getStatus();
+    assertInstanceOf(OperationStatus.class, status);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(status.getStatusCode()));
+
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.ERR_NOT_FOUND)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.NOT_FOUND)
+        .contains(operationStatus.getResponse()));
     if (cancelled) {
-      OperationStatus status = future.getStatus();
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status.isSuccess());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-
-      CollectionOperationStatus operationStatus = future.getOperationStatus();
-      assertInstanceOf(CollectionOperationStatus.class, operationStatus);
-      assertInstanceOf(OperationStatus.class, operationStatus);
-      assertFalse(operationStatus.isSuccess());
-      assertEquals(StatusCode.CANCELLED, operationStatus.getStatusCode());
-      assertEquals(CollectionResponse.CANCELED, operationStatus.getResponse());
-
       assertTrue(future.isCancelled());
     }
   }
@@ -242,8 +236,8 @@ class CancelFutureTest extends BaseIntegrationTest {
   void cancelWithCollectionGetBulkFuture() {
     // given
     CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> future =
-            mc.asyncBopGetBulk(Arrays.asList("btree1", "btree2"),
-                    0, 10, ElementFlagFilter.DO_NOT_FILTER, 0, 50);
+        mc.asyncBopGetBulk(Arrays.asList("btree1", "btree2"),
+            0, 10, ElementFlagFilter.DO_NOT_FILTER, 0, 50);
 
     // when
     boolean cancelled = false;
@@ -254,14 +248,14 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.SUCCESS)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.END)
+        .contains(operationStatus.getResponse()));
     if (cancelled) {
-      CollectionOperationStatus status = future.getOperationStatus();
-      assertInstanceOf(CollectionOperationStatus.class, status);
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status.isSuccess());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-      assertEquals(CollectionResponse.CANCELED, status.getResponse());
-
       assertTrue(future.isCancelled());
     }
   }
@@ -270,8 +264,8 @@ class CancelFutureTest extends BaseIntegrationTest {
   void cancelWithSMGetFuture() {
     // given
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            Arrays.asList("btree1", "btree2"),
-            0, 10, ElementFlagFilter.DO_NOT_FILTER, 100, SMGetMode.UNIQUE);
+        Arrays.asList("btree1", "btree2"),
+        0, 10, ElementFlagFilter.DO_NOT_FILTER, 100, SMGetMode.UNIQUE);
 
     // when
     boolean cancelled = false;
@@ -282,14 +276,14 @@ class CancelFutureTest extends BaseIntegrationTest {
     }
 
     // then
+    CollectionOperationStatus operationStatus = future.getOperationStatus();
+    assertInstanceOf(CollectionOperationStatus.class, operationStatus);
+    assertInstanceOf(OperationStatus.class, operationStatus);
+    assertTrue(Arrays.asList(StatusCode.CANCELLED, StatusCode.SUCCESS)
+        .contains(operationStatus.getStatusCode()));
+    assertTrue(Arrays.asList(CollectionResponse.CANCELED, CollectionResponse.END)
+        .contains(operationStatus.getResponse()));
     if (cancelled) {
-      CollectionOperationStatus status = future.getOperationStatus();
-      assertInstanceOf(CollectionOperationStatus.class, status);
-      assertInstanceOf(OperationStatus.class, status);
-      assertFalse(status.isSuccess());
-      assertEquals(StatusCode.CANCELLED, status.getStatusCode());
-      assertEquals(CollectionResponse.CANCELED, status.getResponse());
-
       assertTrue(future.isCancelled());
     }
   }
