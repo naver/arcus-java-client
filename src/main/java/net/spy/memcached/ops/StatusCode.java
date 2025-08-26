@@ -71,6 +71,9 @@ public enum StatusCode {
   ERR_ATTR_NOT_FOUND("ATTR_ERROR_NOT_FOUND"),
   ERR_ATTR_BAD_VALUE("ATTR_ERROR_BAD_VALUE"),
 
+  // Piped operation specific
+  ERR_FAILED_END("FAILED_END"),
+
   // Set specific
   EXIST("EXIST"),
   NOT_EXIST("NOT_EXIST"),

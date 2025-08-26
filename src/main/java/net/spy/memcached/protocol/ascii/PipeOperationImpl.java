@@ -24,7 +24,7 @@ abstract class PipeOperationImpl extends OperationImpl {
   protected static final OperationStatus END = new CollectionOperationStatus(
           true, "END", CollectionResponse.END);
   protected static final OperationStatus FAILED_END = new CollectionOperationStatus(
-          false, "END", CollectionResponse.END);
+          false, "FAILED_END", CollectionResponse.FAILED_END);
 
   protected static final OperationStatus CREATED_STORED = new CollectionOperationStatus(
           true, "CREATED_STORED", CollectionResponse.CREATED_STORED);

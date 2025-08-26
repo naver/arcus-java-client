@@ -11,7 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OperationStatusTest extends BaseIntegrationTest {
   private static final int EXP = 100;
@@ -140,9 +142,9 @@ class OperationStatusTest extends BaseIntegrationTest {
   @Test
   void equalsAndHashCodeTest() {
     // given
-    OperationStatus status1 = new OperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
-    OperationStatus status2 = new OperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
-    OperationStatus status3 = new OperationStatus(false, "FAILURE", StatusCode.ERR_NOT_FOUND);
+    OperationStatus status1 = makeOperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
+    OperationStatus status2 = makeOperationStatus(true, "SUCCESS", StatusCode.SUCCESS);
+    OperationStatus status3 = makeOperationStatus(false, "FAILURE", StatusCode.ERR_NOT_FOUND);
 
     // when, then
     assertEquals(status1, status2);
@@ -153,42 +155,98 @@ class OperationStatusTest extends BaseIntegrationTest {
 
   @Test
   void collectionOperationStatusContainsStatusCode() {
-    OperationStatus os2 = new OperationStatus(false, "OK", StatusCode.SUCCESS);
-    OperationStatus os = new OperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
-    OperationStatus os3 = new OperationStatus(false, "EXCEPTION", StatusCode.EXCEPTION);
+    OperationStatus os2 = makeOperationStatus(true, "OK", StatusCode.SUCCESS);
+    OperationStatus os = makeOperationStatus(false, "NOT_FOUND", StatusCode.ERR_NOT_FOUND);
+    OperationStatus os3 = makeOperationStatus(false, "EXCEPTION", StatusCode.EXCEPTION);
 
-    CollectionOperationStatus cos = new CollectionOperationStatus(os);
-    CollectionOperationStatus cos2 = new CollectionOperationStatus(os2);
-    CollectionOperationStatus cos3 = new CollectionOperationStatus(os3);
+    CollectionOperationStatus cos = makeCollectionOperationStatus(os);
+    CollectionOperationStatus cos2 = makeCollectionOperationStatus(os2);
+    CollectionOperationStatus cos3 = makeCollectionOperationStatus(os3);
+    CollectionOperationStatus cos4 = makeCollectionOperationStatus(false, "FAILED_END",
+            CollectionResponse.FAILED_END);
     assertEquals(StatusCode.ERR_NOT_FOUND, cos.getStatusCode());
     assertEquals(StatusCode.SUCCESS, cos2.getStatusCode());
     assertEquals(StatusCode.EXCEPTION, cos3.getStatusCode());
+    assertFalse(cos4.isSuccess());
+    assertEquals(StatusCode.ERR_FAILED_END, cos4.getStatusCode());
   }
 
   @Test
   void collectionOperationStatusContainsStatusCodeSuccess() {
     List<CollectionOperationStatus> statusList = new ArrayList<>();
-    statusList.add(new CollectionOperationStatus(false, "OK",
+    statusList.add(makeCollectionOperationStatus(true, "OK",
             CollectionResponse.OK));
-    statusList.add(new CollectionOperationStatus(false, "END",
+    statusList.add(makeCollectionOperationStatus(true, "END",
             CollectionResponse.END));
-    statusList.add(new CollectionOperationStatus(false, "STORED",
+    statusList.add(makeCollectionOperationStatus(true, "STORED",
             CollectionResponse.STORED));
-    statusList.add(new CollectionOperationStatus(false, "DELETED",
+    statusList.add(makeCollectionOperationStatus(true, "DELETED",
             CollectionResponse.DELETED));
-    statusList.add(new CollectionOperationStatus(false, "DELETED_DROPPED",
+    statusList.add(makeCollectionOperationStatus(true, "DELETED_DROPPED",
             CollectionResponse.DELETED_DROPPED));
-    statusList.add(new CollectionOperationStatus(false, "CREATE",
+    statusList.add(makeCollectionOperationStatus(true, "CREATE",
             CollectionResponse.CREATED));
-    statusList.add(new CollectionOperationStatus(false, "CREATED_STORED",
+    statusList.add(makeCollectionOperationStatus(true, "CREATED_STORED",
             CollectionResponse.CREATED_STORED));
-    statusList.add(new CollectionOperationStatus(false, "REPLACED",
+    statusList.add(makeCollectionOperationStatus(true, "REPLACED",
             CollectionResponse.REPLACED));
-    statusList.add(new CollectionOperationStatus(false, "UPDATED",
+    statusList.add(makeCollectionOperationStatus(true, "UPDATED",
             CollectionResponse.UPDATED));
 
     for (CollectionOperationStatus status : statusList) {
+      assertTrue(status.isSuccess());
       assertEquals(StatusCode.SUCCESS, status.getStatusCode());
     }
+  }
+
+  /**
+   * This method ensures that an {@link OperationStatus} object is not created in a state
+   * where {@link OperationStatus#isSuccess()} would be {@code false} and
+   * {@link OperationStatus#getStatusCode()} would be {@link StatusCode#SUCCESS}.
+   * <br/><br/>
+   * Related issue : <a href="https://github.com/jam2in/arcus-works/issues/750">#750</a>
+   */
+  private OperationStatus makeOperationStatus(boolean isSuccess, String msg, StatusCode code) {
+    OperationStatus os = new OperationStatus(isSuccess, msg, code);
+    if (os.getStatusCode() == StatusCode.SUCCESS && !os.isSuccess()) {
+      throw new IllegalArgumentException("StatusCode is SUCCESS, but isSuccess is false.");
+    }
+
+    return os;
+  }
+
+  /**
+   * This method ensures that an {@link CollectionOperationStatus} object is not created in a state
+   * where {@link CollectionOperationStatus#isSuccess()} would be {@code false} and
+   * {@link CollectionOperationStatus#getStatusCode()} would be {@link StatusCode#SUCCESS}.
+   * <br/><br/>
+   * Related issue : <a href="https://github.com/jam2in/arcus-works/issues/750">#750</a>
+   */
+  private CollectionOperationStatus makeCollectionOperationStatus(OperationStatus status) {
+    CollectionOperationStatus cos = new CollectionOperationStatus(status);
+    if (status.getStatusCode() == StatusCode.SUCCESS && !status.isSuccess()) {
+      throw new IllegalArgumentException("StatusCode is SUCCESS, but isSuccess is false.");
+    }
+
+    return cos;
+  }
+
+  /**
+   * This method ensures that an {@link CollectionOperationStatus} object is not created in a state
+   * where {@link CollectionOperationStatus#isSuccess()} would be {@code false} and
+   * {@link CollectionOperationStatus#getStatusCode()} would be {@link StatusCode#SUCCESS}.
+   * <br/><br/>
+   * Related issue : <a href="https://github.com/jam2in/arcus-works/issues/750">#750</a>
+   */
+  private CollectionOperationStatus makeCollectionOperationStatus(boolean isSuccess,
+                                                                  String msg,
+                                                                  CollectionResponse res) {
+
+    CollectionOperationStatus cos = new CollectionOperationStatus(isSuccess, msg, res);
+    if (cos.getStatusCode() == StatusCode.SUCCESS && !cos.isSuccess()) {
+      throw new IllegalArgumentException("StatusCode is SUCCESS, but isSuccess is false.");
+    }
+
+    return cos;
   }
 }
