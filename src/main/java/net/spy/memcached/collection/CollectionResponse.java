@@ -26,6 +26,7 @@ public enum CollectionResponse {
 
   OK,
   END,
+  FAILED_END,
   NOT_FOUND,
   NOT_FOUND_ELEMENT,
   ELEMENT_EXISTS,
