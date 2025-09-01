@@ -61,22 +61,6 @@ public abstract class AbstractLogger implements Logger {
   }
 
   /**
-   * True if debug is enabled for this logger.
-   * Default implementation always returns false
-   *
-   * @return true if debug messages would be displayed
-   */
-  public abstract boolean isDebugEnabled();
-
-  /**
-   * True if debug is enabled for this logger.
-   * Default implementation always returns false
-   *
-   * @return true if info messages would be displayed
-   */
-  public abstract boolean isInfoEnabled();
-
-  /**
    * Log a message at trace level.
    *
    * @param message   the message to log
@@ -265,15 +249,5 @@ public abstract class AbstractLogger implements Logger {
   public void log(Level level, Object message) {
     log(level, message, null);
   }
-
-  /**
-   * Subclasses should implement this method to determine what to do when
-   * a client wants to log at a particular level.
-   *
-   * @param level   the level to log at (see the fields of this class)
-   * @param message the message to log
-   * @param e       the exception that caused the message (or null)
-   */
-  public abstract void log(Level level, Object message, Throwable e);
 
 }
