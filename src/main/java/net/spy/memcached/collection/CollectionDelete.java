@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import javax.annotation.Nullable;
+
 public abstract class CollectionDelete {
 
   protected String range;
@@ -24,6 +26,7 @@ public abstract class CollectionDelete {
 
   protected String str;
 
+  @Nullable
   public abstract byte[] getAdditionalArgs();
 
   public abstract String stringify();

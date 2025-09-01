@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import javax.annotation.Nullable;
+
 public class ListDelete extends CollectionDelete {
 
   private static final String COMMAND = "lop delete";
@@ -32,6 +34,7 @@ public class ListDelete extends CollectionDelete {
     this.noreply = noreply;
   }
 
+  @Nullable
   @Override
   public byte[] getAdditionalArgs() {
     return null;

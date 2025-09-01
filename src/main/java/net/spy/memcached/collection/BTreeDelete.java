@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import javax.annotation.Nullable;
+
 import net.spy.memcached.util.BTreeUtil;
 
 public class BTreeDelete extends CollectionDelete {
@@ -59,6 +61,7 @@ public class BTreeDelete extends CollectionDelete {
     this.elementFlagFilter = elementFlagFilter;
   }
 
+  @Nullable
   @Override
   public byte[] getAdditionalArgs() {
     return null;

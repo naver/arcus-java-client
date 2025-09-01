@@ -16,6 +16,8 @@
  */
 package net.spy.memcached.collection;
 
+import javax.annotation.Nullable;
+
 import net.spy.memcached.transcoders.Transcoder;
 
 public class SetDelete<T> extends CollectionDelete {
@@ -34,6 +36,7 @@ public class SetDelete<T> extends CollectionDelete {
     this.additionalArgs = tc.encode(value).getData();
   }
 
+  @Nullable
   public byte[] getAdditionalArgs() {
     return additionalArgs;
   }

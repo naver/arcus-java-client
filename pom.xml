@@ -19,6 +19,7 @@
         <jmock.version>2.13.1</jmock.version>
         <bolyartech.version>2.0.2</bolyartech.version>
         <jackson.version>2.19.0</jackson.version>
+        <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
     </properties>
     <licenses>
         <license>
@@ -149,6 +150,14 @@
             <artifactId>jmock</artifactId>
             <version>${jmock.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- PROVIDED -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${findbugs-jsr305.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
