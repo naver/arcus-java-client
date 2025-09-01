@@ -53,7 +53,7 @@ public abstract class AbstractLogger implements Logger {
    * Get the throwable from the last element of this array if it is
    * Throwable, else null.
    */
-  public Throwable getThrowable(Object args[]) {
+  public Throwable getThrowable(Object[] args) {
     if (args.length > 0 && args[args.length - 1] instanceof Throwable) {
       return (Throwable) args[args.length - 1];
     }
