@@ -34,7 +34,7 @@ public class AuthThread extends SpyThread {
       sc = Sasl.createSaslClient(authDescriptor.getMechs(), null,
               "memcached", node.getSocketAddress().toString(), null, authDescriptor.getCallback());
     } catch (Exception e) {
-      throw new RuntimeException("Can't create SaslClient", e);
+      throw new IllegalStateException("Can't create SaslClient", e);
     }
   }
 
