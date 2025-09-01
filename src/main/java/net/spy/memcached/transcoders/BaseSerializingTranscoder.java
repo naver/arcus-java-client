@@ -92,41 +92,31 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
     if (o == null) {
       throw new NullPointerException("Can't serialize null");
     }
-    byte[] rv = null;
-    try {
-      ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      ObjectOutputStream os = new ObjectOutputStream(bos);
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+         ObjectOutputStream os = new ObjectOutputStream(bos)) {
       os.writeObject(o);
-      os.close();
-      bos.close();
-      rv = bos.toByteArray();
+      return bos.toByteArray();
     } catch (IOException e) {
       throw new IllegalArgumentException("Non-serializable object, cause=" + e.getMessage(), e);
     }
-    return rv;
   }
 
   /**
    * Get the object represented by the given serialized bytes.
    */
   protected Object deserialize(byte[] in) {
-    Object rv = null;
-    try {
-      if (in != null) {
-        ByteArrayInputStream bis = new ByteArrayInputStream(in);
-        ObjectInputStream is = new ClassLoaderObjectInputStream(bis, this.classLoader);
-        rv = is.readObject();
-        is.close();
-        bis.close();
-      }
-    } catch (IOException e) {
-      getLogger().warn("Caught IOException decoding %d bytes of data",
-              in == null ? 0 : in.length, e);
-    } catch (ClassNotFoundException e) {
-      getLogger().warn("Caught CNFE decoding %d bytes of data",
-              in == null ? 0 : in.length, e);
+    if (in == null) {
+      return null;
     }
-    return rv;
+    try (ByteArrayInputStream bis = new ByteArrayInputStream(in);
+         ObjectInputStream is = new ClassLoaderObjectInputStream(bis, this.classLoader)) {
+      return is.readObject();
+    } catch (IOException e) {
+      getLogger().warn("Caught IOException decoding %d bytes of data", in.length, e);
+    } catch (ClassNotFoundException e) {
+      getLogger().warn("Caught CNFE decoding %d bytes of data", in.length, e);
+    }
+    return null;
   }
 
   /**
