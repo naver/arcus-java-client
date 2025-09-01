@@ -18,6 +18,8 @@ package net.spy.memcached.collection;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class MapDelete extends CollectionDelete {
   private static final String COMMAND = "mop delete";
 
@@ -36,6 +38,7 @@ public class MapDelete extends CollectionDelete {
     this.keySeparator = keySeparator;
   }
 
+  @Nullable
   public byte[] getAdditionalArgs() {
     return additionalArgs;
   }
