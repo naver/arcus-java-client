@@ -26,7 +26,7 @@ public abstract class CollectionCreate {
 
   protected String str;
 
-  public CollectionCreate(CollectionType type, int flags, Integer expTime, Long maxCount,
+  protected CollectionCreate(CollectionType type, int flags, Integer expTime, Long maxCount,
                           CollectionOverflowAction overflowAction, Boolean readable,
                           boolean noreply) {
     checkOverflowAction(type, overflowAction);
