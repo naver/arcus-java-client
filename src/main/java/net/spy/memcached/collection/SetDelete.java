@@ -20,7 +20,7 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetDelete<T> extends CollectionDelete {
 
-  private static final String command = "sop delete";
+  private static final String COMMAND = "sop delete";
 
   protected T value;
   protected byte[] additionalArgs;
@@ -59,7 +59,7 @@ public class SetDelete<T> extends CollectionDelete {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

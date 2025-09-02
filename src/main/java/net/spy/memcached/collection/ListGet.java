@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ListGet extends CollectionGet {
 
-  private static final String command = "lop get";
+  private static final String COMMAND = "lop get";
 
   private ListGet(String range, boolean delete, boolean dropIfEmpty) {
     this.range = range;
@@ -62,7 +62,7 @@ public class ListGet extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   @Override

@@ -18,14 +18,14 @@ package net.spy.memcached.collection;
 
 public class MapInsert<T> extends CollectionInsert<T> {
 
-  private static final String command = "mop insert";
+  private static final String COMMAND = "mop insert";
 
   public MapInsert(T value, RequestMode requestMode, CollectionAttributes attr) {
     super(CollectionType.map, value, null, requestMode, attr);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

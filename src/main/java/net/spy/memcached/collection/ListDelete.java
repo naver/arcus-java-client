@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 public class ListDelete extends CollectionDelete {
 
-  private static final String command = "lop delete";
+  private static final String COMMAND = "lop delete";
 
   public ListDelete(int index, boolean dropIfEmpty, boolean noreply) {
     this.range = String.valueOf(index);
@@ -58,7 +58,7 @@ public class ListDelete extends CollectionDelete {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

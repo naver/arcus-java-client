@@ -18,14 +18,14 @@ package net.spy.memcached.collection;
 
 public class BTreeInsert<T> extends CollectionInsert<T> {
 
-  private static final String command = "bop insert";
+  private static final String COMMAND = "bop insert";
 
   public BTreeInsert(T value, byte[] eFlag, RequestMode requestMode, CollectionAttributes attr) {
     super(CollectionType.btree, value, eFlag, requestMode, attr);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

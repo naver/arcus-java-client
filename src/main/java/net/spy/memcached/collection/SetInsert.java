@@ -18,14 +18,14 @@ package net.spy.memcached.collection;
 
 public class SetInsert<T> extends CollectionInsert<T> {
 
-  private static final String command = "sop insert";
+  private static final String COMMAND = "sop insert";
 
   public SetInsert(T value, RequestMode requestMode, CollectionAttributes attr) {
     super(CollectionType.set, value, null, requestMode, attr);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

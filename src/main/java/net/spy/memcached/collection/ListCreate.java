@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 public class ListCreate extends CollectionCreate {
 
-  private static final String command = "lop create";
+  private static final String COMMAND = "lop create";
 
   public ListCreate(int flags, Integer expTime, Long maxCount,
                     CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
@@ -26,7 +26,7 @@ public class ListCreate extends CollectionCreate {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

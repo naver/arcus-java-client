@@ -18,14 +18,14 @@ package net.spy.memcached.collection;
 
 public class MapUpdate<T> extends CollectionUpdate<T> {
 
-  private static final String command = "mop update";
+  private static final String COMMAND = "mop update";
 
   public MapUpdate(T newValue, boolean noreply) {
     super(newValue, null, noreply);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

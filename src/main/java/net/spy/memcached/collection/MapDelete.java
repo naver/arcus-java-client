@@ -19,7 +19,7 @@ package net.spy.memcached.collection;
 import java.util.List;
 
 public class MapDelete extends CollectionDelete {
-  private static final String command = "mop delete";
+  private static final String COMMAND = "mop delete";
 
   protected List<String> mkeyList;
   private String keySeparator;
@@ -88,6 +88,6 @@ public class MapDelete extends CollectionDelete {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 }

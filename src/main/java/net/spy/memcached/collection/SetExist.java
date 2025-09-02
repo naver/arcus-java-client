@@ -20,7 +20,7 @@ import net.spy.memcached.transcoders.Transcoder;
 
 public class SetExist<T> extends CollectionExist {
 
-  private static final String command = "sop exist";
+  private static final String COMMAND = "sop exist";
 
   protected T value;
   protected byte[] additionalArgs;
@@ -42,7 +42,7 @@ public class SetExist<T> extends CollectionExist {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }
