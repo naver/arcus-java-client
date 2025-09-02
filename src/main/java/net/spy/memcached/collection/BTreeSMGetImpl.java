@@ -45,14 +45,14 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private int dataLength;
   private byte[] eflag = null;
 
-  public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
+  protected BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
                         String range,
                         ElementFlagFilter eFlagFilter,
                         int count, SMGetMode smgetMode) {
     this(node, keyList, range, eFlagFilter, -1, count, smgetMode);
   }
 
-  public BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
+  protected BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
                         String range,
                         ElementFlagFilter eFlagFilter,
                         int offset, int count) {

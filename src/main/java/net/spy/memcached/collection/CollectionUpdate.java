@@ -24,7 +24,7 @@ public abstract class CollectionUpdate<T> {
   protected boolean noreply = false;
   protected String str;
 
-  public CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
+  protected CollectionUpdate(T newValue, ElementFlagUpdate eflagUpdate, boolean noreply) {
 
     if (eflagUpdate == null) {
       if (newValue == null) {

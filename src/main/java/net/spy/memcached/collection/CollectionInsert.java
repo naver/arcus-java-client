@@ -27,10 +27,10 @@ public abstract class CollectionInsert<T> {
   protected byte[] elementFlag;
   protected String str;
 
-  public CollectionInsert() {
+  protected CollectionInsert() {
   }
 
-  public CollectionInsert(CollectionType type, T value, byte[] elementFlag,
+  protected CollectionInsert(CollectionType type, T value, byte[] elementFlag,
                           RequestMode requestMode, CollectionAttributes attr) {
     if (attr != null) { /* item creation option */
       CollectionCreate.checkOverflowAction(type, attr.getOverflowAction());
