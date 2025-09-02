@@ -24,7 +24,7 @@ import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.util.BTreeUtil;
 
 public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
-  private static final String command = "bop smget";
+  private static final String COMMAND = "bop smget";
 
   private final MemcachedNode node;
   private String str;
@@ -129,11 +129,11 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   public boolean headerReady(int spaceCount) {
-    return headerCount == spaceCount;
+    return HEADER_COUNT == spaceCount;
   }
 
   public String getKey() {

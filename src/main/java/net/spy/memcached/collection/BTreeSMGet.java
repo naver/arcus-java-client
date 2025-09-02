@@ -22,7 +22,7 @@ import net.spy.memcached.MemcachedNode;
 
 public interface BTreeSMGet<T> {
 
-  int headerCount = 4;
+  int HEADER_COUNT = 4;
 
   void setKeySeparator(String keySeparator);
 

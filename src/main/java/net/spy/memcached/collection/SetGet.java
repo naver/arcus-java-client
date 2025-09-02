@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SetGet extends CollectionGet {
 
-  private static final String command = "sop get";
+  private static final String COMMAND = "sop get";
 
   protected int count;
 
@@ -56,7 +56,7 @@ public class SetGet extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   @Override

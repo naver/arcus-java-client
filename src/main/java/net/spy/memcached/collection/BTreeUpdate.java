@@ -18,14 +18,14 @@ package net.spy.memcached.collection;
 
 public class BTreeUpdate<T> extends CollectionUpdate<T> {
 
-  private static final String command = "bop update";
+  private static final String COMMAND = "bop update";
 
   public BTreeUpdate(T newValue, ElementFlagUpdate elementFlagUpdate, boolean noreply) {
     super(newValue, elementFlagUpdate, noreply);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
 }

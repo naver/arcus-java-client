@@ -18,13 +18,13 @@ package net.spy.memcached.collection;
 
 public class MapCreate extends CollectionCreate {
 
-  private static final String command = "mop create";
+  private static final String COMMAND = "mop create";
 
   public MapCreate(int flags, Integer expTime, Long maxCount, Boolean readable, boolean noreply) {
     super(CollectionType.map, flags, expTime, maxCount, null, readable, noreply);
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 }

@@ -20,7 +20,7 @@ import java.util.List;
 
 public class MapGet extends CollectionGet {
 
-  private static final String command = "mop get";
+  private static final String COMMAND = "mop get";
 
   protected List<String> mkeyList;
   protected byte[] data;
@@ -93,7 +93,7 @@ public class MapGet extends CollectionGet {
   }
 
   public String getCommand() {
-    return command;
+    return COMMAND;
   }
 
   @Override
