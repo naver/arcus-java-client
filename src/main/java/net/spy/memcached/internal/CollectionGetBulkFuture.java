@@ -123,6 +123,12 @@ public class CollectionGetBulkFuture<T> implements Future<T> {
     return true;
   }
 
+  /**
+   * @deprecated Operations are performed asynchronously and distributed
+   * across multiple keys or nodes. So, a single OperationStatus does not provide
+   * meaningful information.
+   */
+  @Deprecated
   public CollectionOperationStatus getOperationStatus() {
     if (isCancelled()) {
       return new CollectionOperationStatus(false, "CANCELED", CollectionResponse.CANCELED);

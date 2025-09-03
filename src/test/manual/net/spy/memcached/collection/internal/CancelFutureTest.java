@@ -233,6 +233,7 @@ class CancelFutureTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   void cancelWithCollectionGetBulkFuture() {
     // given
     CollectionGetBulkFuture<Map<String, BTreeGetResult<Long, Object>>> future =
