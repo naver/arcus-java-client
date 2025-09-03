@@ -41,11 +41,14 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
+import net.spy.memcached.v2.AsyncArcusCommands;
 
 /**
  * Interface for Arcus specific commands
  */
 public interface ArcusClientIF extends MemcachedClientIF {
+
+  <T> AsyncArcusCommands<T> asyncCommands();
 
   /**
    * Sets attributes (metadata) associated with each key

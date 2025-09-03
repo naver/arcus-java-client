@@ -138,7 +138,7 @@ public class MemcachedClient extends SpyThread
 
   private static final String DEFAULT_MEMCACHED_CLIENT_NAME = "MemcachedClient";
 
-  private static final int GET_BULK_CHUNK_SIZE = 200;
+  public static final int GET_BULK_CHUNK_SIZE = 200;
 
   private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
 
@@ -289,6 +289,10 @@ public class MemcachedClient extends SpyThread
     return transcoder;
   }
 
+  public OperationFactory getOpFact() {
+    return opFact;
+  }
+
   protected void validateKey(String key) {
     boolean hasPrefix = false;
 
@@ -347,20 +351,20 @@ public class MemcachedClient extends SpyThread
    * @param op    the operation to perform
    * @return the Operation
    */
-  protected Operation addOp(final String key, final Operation op) {
+  public Operation addOp(final String key, final Operation op) {
     validateKey(key);
     checkState();
     conn.addOperation(key, op);
     return op;
   }
 
-  protected Operation addOp(final MemcachedNode node, final Operation op) {
+  public Operation addOp(final MemcachedNode node, final Operation op) {
     checkState();
     conn.addOperation(node, op);
     return op;
   }
 
-  protected void addOpMap(final Map<String, Operation> opMap) {
+  public void addOpMap(final Map<String, Operation> opMap) {
     checkState();
     for (Map.Entry<String, Operation> me : opMap.entrySet()) {
       conn.addOperation(me.getKey(), me.getValue());
@@ -2211,7 +2215,7 @@ public class MemcachedClient extends SpyThread
     return conn.getLocator().getAll();
   }
 
-  protected Collection<MemcachedNode> getFlushNodes() {
+  public Collection<MemcachedNode> getFlushNodes() {
     /* ENABLE_REPLICATION if */
     if (conn.getArcusReplEnabled()) {
       return ((ArcusReplKetamaNodeLocator) conn.getLocator()).getAllGroups().values()
@@ -2231,7 +2235,7 @@ public class MemcachedClient extends SpyThread
    * @param maxKeyCountPerGroup max size of the key group (number of keys)
    * @return list of grouped (memcached node + keys) in the group
    */
-  protected Collection<Map.Entry<MemcachedNode, List<String>>> groupingKeys(
+  public Collection<Map.Entry<MemcachedNode, List<String>>> groupingKeys(
           Collection<String> keyList, int maxKeyCountPerGroup, APIType apiType) {
     List<Map.Entry<MemcachedNode, List<String>>> resultList = new ArrayList<>();
     Map<MemcachedNode, List<String>> nodeMap = new HashMap<>();
