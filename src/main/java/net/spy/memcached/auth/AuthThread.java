@@ -50,8 +50,8 @@ public class AuthThread extends SpyThread {
 
       final OperationCallback cb = new OperationCallback() {
         public void receivedStatus(OperationStatus val) {
-          // If the status we found was null, we're done.
-          if (val.getMessage().length() == 0) {
+          // If the status we found was SASL_OK, we're done.
+          if ("SASL_OK".equals(val.getMessage())) {
             done.set(true);
             node.authComplete();
             getLogger().info("Authenticated to "
