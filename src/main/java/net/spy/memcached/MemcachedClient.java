@@ -1248,7 +1248,7 @@ public class MemcachedClient extends SpyThread
       if (node == null) {
         op = opFact.gets(keyList, cb, false);
       } else {
-        op = opFact.gets(keyList, cb, node.enabledMGetOp());
+        op = opFact.gets(keyList, cb, node.enabledMGetsOp());
       }
       conn.addOperation(node, op);
       ops.add(op);
