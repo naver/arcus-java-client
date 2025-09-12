@@ -657,14 +657,14 @@ public final class CacheManager extends SpyThread implements Watcher,
             ArcusReplNodeAddress.makeGroupAddrs(socketList);
 
     // recreate socket list
-    socketList.clear();
+    List<InetSocketAddress> result = new ArrayList<>(socketList.size());
     for (Map.Entry<String, List<ArcusReplNodeAddress>> entry : newAllGroups.entrySet()) {
       if (ArcusReplNodeAddress.validateGroup(entry)) {
-        socketList.addAll(entry.getValue());
+        result.addAll(entry.getValue());
       }
     }
 
-    return socketList;
+    return result;
   }
   /* ENABLE_REPLICATION end */
 
