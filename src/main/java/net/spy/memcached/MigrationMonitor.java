@@ -113,25 +113,29 @@ public final class MigrationMonitor extends SpyObject implements Watcher {
    */
   @SuppressWarnings("fallthrough")
   public void process(WatchedEvent event) {
-    switch (event.getType()) {
-      case None:
-        // Do nothing. Session events are handled by CacheManager.
-        break;
-      case ChildWatchRemoved:
-        getLogger().warn("Child watch removed. The znode is " + event.getPath());
-        // fallthrough
-      case NodeChildrenChanged:
-        String path = event.getPath();
-        if (cloudStatZPath.equals(path)) {
-          asyncGetCloudStat();
-        } else if (alterListZPath.equals(path)) {
-          asyncGetAlterList();
-        }
-        break;
-      default:
-        getLogger().warn("Unexpected event type: " + event.getType()
-            + ". The znode is " + event.getPath());
-        break;
+    try {
+      switch (event.getType()) {
+        case None:
+          // Do nothing. Session events are handled by CacheManager.
+          break;
+        case ChildWatchRemoved:
+          getLogger().warn("Child watch removed. The znode is " + event.getPath());
+          // fallthrough
+        case NodeChildrenChanged:
+          String path = event.getPath();
+          if (cloudStatZPath.equals(path)) {
+            asyncGetCloudStat();
+          } else if (alterListZPath.equals(path)) {
+            asyncGetAlterList();
+          }
+          break;
+        default:
+          getLogger().warn("Unexpected event type: " + event.getType() + ". " +
+                           "The znode is " + event.getPath());
+          break;
+      }
+    } catch (Exception e) {
+      getLogger().error("Exception occurred while processing ZooKeeper watch event.", e);
     }
   }
 
@@ -139,83 +143,90 @@ public final class MigrationMonitor extends SpyObject implements Watcher {
    * A callback function to process the result of cloud_stat getChildren(watch=true).
    */
   public void processCloudStatResult(int rc, List<String> list) {
-    boolean doCountDown = true;
+    try {
+      boolean doCountDown = true;
 
-    switch (Code.get(rc)) {
-      case OK:
-        if (listener.commandCloudStatChange(list)) {
-          asyncGetAlterList();
+      switch (Code.get(rc)) {
+        case OK:
+          if (listener.commandCloudStatChange(list)) {
+            asyncGetAlterList();
+            doCountDown = false;
+          }
+          break;
+        case NONODE:
+          getLogger().fatal("Cannot find the cloud_stat znode. Stop watching. " + getInfo());
+          shutdown();
+          break;
+        case SESSIONEXPIRED:
+          getLogger().warn("Session expired. Reconnect to the Arcus admin. " + getInfo());
+          shutdown();
+          break;
+        case NOAUTH:
+          getLogger().fatal("Authorization failed " + getInfo());
+          shutdown();
+          break;
+        case CONNECTIONLOSS:
+          getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
+          asyncGetCloudStat();
           doCountDown = false;
-        }
-        break;
-      case NONODE:
-        getLogger().fatal("Cannot find the cloud_stat znode. Stop watching. " + getInfo());
-        shutdown();
-        break;
-      case SESSIONEXPIRED:
-        getLogger().warn("Session expired. Reconnect to the Arcus admin. " + getInfo());
-        shutdown();
-        break;
-      case NOAUTH:
-        getLogger().fatal("Authorization failed " + getInfo());
-        shutdown();
-        break;
-      case CONNECTIONLOSS:
-        getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
-        asyncGetCloudStat();
-        doCountDown = false;
-        break;
-      default:
-        getLogger().warn("Ignoring an unexpected event on cloud_stat. code="
-            + Code.get(rc) + ", " + getInfo());
-        asyncGetCloudStat();
-        doCountDown = false;
-        break;
-    }
+          break;
+        default:
+          getLogger().warn("Ignoring an unexpected event on cloud_stat. " +
+                           "code=" + Code.get(rc) + ", " + getInfo());
+          asyncGetCloudStat();
+          doCountDown = false;
+          break;
+      }
 
-    countDownMigrationInitLatch(doCountDown);
+      countDownMigrationInitLatch(doCountDown);
+    } catch (Exception e) {
+      getLogger().error("Exception occurred while processing cloud_stat znode.", e);
+    }
   }
 
   /**
    * A callback function to process the result of alter_list getChildren(watch=true).
    */
   public void processAlterListResult(int rc, List<String> list) {
-    boolean doCountDown = true;
-    // process alter_list iif STATE == PREPARED.
+    try {
+      boolean doCountDown = true;
+      // process alter_list iif STATE == PREPARED.
 
-    switch (Code.get(rc)) {
-      case OK:
-        if (!listener.commandAlterListChange(list)) {
-          getLogger().fatal("Cannot initialize alter_list znode.");
+      switch (Code.get(rc)) {
+        case OK:
+          if (!listener.commandAlterListChange(list)) {
+            getLogger().fatal("Cannot initialize alter_list znode.");
+            shutdown();
+          }
+          break;
+        case NONODE:
+          getLogger().info("Cannot find the alter_list znode. Stop watching. " + getInfo());
+          break;
+        case SESSIONEXPIRED:
+          getLogger().warn("Session expired. Reconnect to the Arcus admin. " + getInfo());
           shutdown();
-        }
-        break;
-      case NONODE:
-        getLogger().info("Cannot find the alter_list znode. Stop watching. " + getInfo());
-        break;
-      case SESSIONEXPIRED:
-        getLogger().warn("Session expired. Reconnect to the Arcus admin. " + getInfo());
-        shutdown();
-        break;
-      case NOAUTH:
-        getLogger().fatal("Authorization failed " + getInfo());
-        shutdown();
-        break;
-      case CONNECTIONLOSS:
-        getLogger().warn(
-            "Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
-        asyncGetAlterList();
-        doCountDown = false;
-        break;
-      default:
-        getLogger().warn("Ignoring an unexpected event on alter_list. code="
-            + Code.get(rc) + ", " + getInfo());
-        asyncGetAlterList();
-        doCountDown = false;
-        break;
-    }
+          break;
+        case NOAUTH:
+          getLogger().fatal("Authorization failed " + getInfo());
+          shutdown();
+          break;
+        case CONNECTIONLOSS:
+          getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
+          asyncGetAlterList();
+          doCountDown = false;
+          break;
+        default:
+          getLogger().warn("Ignoring an unexpected event on alter_list. " +
+                           "code=" + Code.get(rc) + ", " + getInfo());
+          asyncGetAlterList();
+          doCountDown = false;
+          break;
+      }
 
-    countDownMigrationInitLatch(doCountDown);
+      countDownMigrationInitLatch(doCountDown);
+    } catch (Exception e) {
+      getLogger().error("Exception occurred while processing alter_list znode.", e);
+    }
   }
 
   /**

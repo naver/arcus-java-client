@@ -107,20 +107,24 @@ public final class CacheMonitor extends SpyObject implements Watcher,
    */
   @SuppressWarnings("fallthrough")
   public void process(WatchedEvent event) {
-    switch (event.getType()) {
-      case None:
-        // Do nothing. Session events are handled by CacheManager.
-        break;
-      case ChildWatchRemoved:
-        getLogger().warn("Child watch removed. The znode is " + event.getPath());
-        // fallthrough
-      case NodeChildrenChanged:
-        asyncGetCacheList();
-        break;
-      default:
-        getLogger().warn("Unexpected event type: " + event.getType()
-            + ". The znode is " + event.getPath());
-        break;
+    try {
+      switch (event.getType()) {
+        case None:
+          // Do nothing. Session events are handled by CacheManager.
+          break;
+        case ChildWatchRemoved:
+          getLogger().warn("Child watch removed. The znode is " + event.getPath());
+          // fallthrough
+        case NodeChildrenChanged:
+          asyncGetCacheList();
+          break;
+        default:
+          getLogger().warn("Unexpected event type: " + event.getType() + ". " +
+                           "The znode is " + event.getPath());
+          break;
+      }
+    } catch (Exception e) {
+      getLogger().error("Exception occurred while processing ZooKeeper watch event.", e);
     }
   }
 
@@ -129,45 +133,48 @@ public final class CacheMonitor extends SpyObject implements Watcher,
    */
   public void processResult(int rc, String path, Object ctx,
                             List<String> children) {
-    boolean doCountDown = true;
-    /* ENABLE_MIGRATION if */
-    listener.setReadingCacheList(false);
-    /* ENABLE_MIGRATION end */
 
-    switch (Code.get(rc)) {
-      case OK:
-        listener.commandCacheListChange(children);
-        break;
-      case NONODE:
-        getLogger().fatal(
-            "Cannot find your service code. Please contact Arcus support to solve this problem. "
-            + getInfo());
-        shutdown();
-        break;
-      case SESSIONEXPIRED:
-        getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
-        shutdown();
-        break;
-      case NOAUTH:
-        getLogger().fatal("Authorization failed " + getInfo());
-        shutdown();
-        break;
-      case CONNECTIONLOSS:
-        getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
-        asyncGetCacheList();
-        doCountDown = false;
-        break;
-      default:
-        getLogger().warn(
-            "Ignoring an unexpected event from the Arcus admin. code="
-            + Code.get(rc) + ", " + getInfo());
-        asyncGetCacheList();
-        doCountDown = false;
-        break;
-    }
+    try {
+      boolean doCountDown = true;
+      /* ENABLE_MIGRATION if */
+      listener.setReadingCacheList(false);
+      /* ENABLE_MIGRATION end */
 
-    if (doCountDown && clientInitLatch.getCount() > 0) {
-      clientInitLatch.countDown();
+      switch (Code.get(rc)) {
+        case OK:
+          listener.commandCacheListChange(children);
+          break;
+        case NONODE:
+          getLogger().fatal("Cannot find your service code. " +
+                            "Please contact Arcus support to solve this problem. " + getInfo());
+          shutdown();
+          break;
+        case SESSIONEXPIRED:
+          getLogger().warn("Session expired. Trying to reconnect to the Arcus admin. " + getInfo());
+          shutdown();
+          break;
+        case NOAUTH:
+          getLogger().fatal("Authorization failed " + getInfo());
+          shutdown();
+          break;
+        case CONNECTIONLOSS:
+          getLogger().warn("Connection lost. Trying to reconnect to the Arcus admin." + getInfo());
+          asyncGetCacheList();
+          doCountDown = false;
+          break;
+        default:
+          getLogger().warn("Ignoring an unexpected event from the Arcus admin. " +
+                           "code=" + Code.get(rc) + ", " + getInfo());
+          asyncGetCacheList();
+          doCountDown = false;
+          break;
+      }
+
+      if (doCountDown && clientInitLatch.getCount() > 0) {
+        clientInitLatch.countDown();
+      }
+    } catch (Exception e) {
+      getLogger().error("Exception occurred while processing cache_list znode.", e);
     }
   }
 
