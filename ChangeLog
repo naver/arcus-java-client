@@ -1,4 +1,4 @@
-# 2025-05-09 [version 1.14.1]
+# 2025-05-09 [version 1.14.1] (Unstable to connect to replication server)
 ## 🐣 New Features
   - Add node information into OperationException.
   - Add option to disable optimization in CollectionTranscoder.
