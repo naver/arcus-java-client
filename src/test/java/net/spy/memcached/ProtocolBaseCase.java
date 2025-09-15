@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -113,8 +114,12 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     Map<SocketAddress, Map<String, String>> stats = client.getStats("cachedump 0 10000");
     System.out.println("Stats:  " + stats);
     assertEquals(client.getAllNodes().size(), stats.size());
-    Map<String, String> oneStat = stats.values().iterator().next();
-    String val = oneStat.get("dumpinitializer");
+    Optional<Map<String, String>> oneStat = stats.values().stream()
+            .filter(m -> m.containsKey("dumpinitializer"))
+            .findFirst();
+    assertTrue(oneStat.isPresent());
+    Map<String, String> stat = oneStat.get();
+    String val = stat.get("dumpinitializer");
     assertTrue(val.matches("\\[acctime=\\d+, exptime=\\d+\\]"), val + "doesn't match");
   }
 
@@ -732,12 +737,8 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     assertTrue(client.shutdown(5, TimeUnit.SECONDS),
             "Couldn't shut down within five seconds");
 
-    initClient(new DefaultConnectionFactory() {
-      @Override
-      public long getOperationTimeout() {
-        return 1;
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setOpTimeout(1));
 
     assertTrue(client.set(key, 0, value).get(1, TimeUnit.SECONDS));
     try {

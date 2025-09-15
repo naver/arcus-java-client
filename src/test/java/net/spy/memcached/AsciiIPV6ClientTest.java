@@ -8,9 +8,9 @@ import java.util.Collections;
 class AsciiIPV6ClientTest extends AsciiClientTest {
 
   @Override
-  protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(
-            Collections.singletonList("::1:11211")));
+  protected void initClient(ConnectionFactoryBuilder cfb) throws Exception {
+    client = new MemcachedClient(cfb.build(),
+            AddrUtil.getAddresses(Collections.singletonList("::1:11211")));
   }
 
   @Override

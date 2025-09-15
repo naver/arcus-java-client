@@ -14,17 +14,10 @@ class BinaryClientTest extends ProtocolBaseCase {
 
   @Override
   protected void initClient() throws Exception {
-    initClient(new BinaryConnectionFactory() {
-      @Override
-      public long getOperationTimeout() {
-        return 15000;
-      }
-
-      @Override
-      public FailureMode getFailureMode() {
-        return FailureMode.Retry;
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setProtocol(ConnectionFactoryBuilder.Protocol.BINARY)
+            .setOpTimeout(15000)
+            .setFailureMode(FailureMode.Retry));
   }
 
   @Override

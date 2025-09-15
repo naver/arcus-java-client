@@ -1,16 +1,15 @@
 package net.spy.memcached;
 
 import java.net.SocketAddress;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.compat.SpyObject;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,12 +59,8 @@ class ObserverTest extends ClientBaseCase {
     };
 
     // Get a new client
-    initClient(new DefaultConnectionFactory() {
-      @Override
-      public Collection<ConnectionObserver> getInitialObservers() {
-        return Collections.singleton(obs);
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setInitialObservers(Collections.singleton(obs)));
 
     assertTrue(latch.await(2, TimeUnit.SECONDS),
             "Didn't detect connection");

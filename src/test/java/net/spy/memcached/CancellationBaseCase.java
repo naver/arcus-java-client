@@ -40,16 +40,13 @@ abstract class CancellationBaseCase {
   }
 
   protected void initClient() throws Exception {
-    initClient(new DefaultConnectionFactory() {
-      @Override
-      public FailureMode getFailureMode() {
-        return FailureMode.Retry;
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setFailureMode(FailureMode.Retry));
   }
 
-  protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(Collections.singletonList(serverList)));
+  protected void initClient(ConnectionFactoryBuilder cfb) throws Exception {
+    client = new MemcachedClient(cfb.build(),
+            AddrUtil.getAddresses(Collections.singletonList(serverList)));
   }
 
   private void tryCancellation(Future<?> f) throws Exception {

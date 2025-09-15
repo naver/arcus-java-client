@@ -22,17 +22,9 @@ class LongClientTest extends ClientBaseCase {
   void testParallelGet() throws Throwable {
     // Get a connection with the get optimization disabled.
     client.shutdown();
-    initClient(new DefaultConnectionFactory() {
-      @Override
-      public long getOperationTimeout() {
-        return 15000;
-      }
-
-      @Override
-      public boolean shouldOptimize() {
-        return false;
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setOpTimeout(15000)
+            .setShouldOptimize(false));
 
     // Throw in some seed data.
     byte data[] = new byte[32768];
