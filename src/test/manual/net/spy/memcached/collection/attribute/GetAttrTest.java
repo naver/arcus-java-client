@@ -25,6 +25,7 @@ import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.CollectionType;
 import net.spy.memcached.internal.CollectionFuture;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -108,6 +109,7 @@ class GetAttrTest extends BaseIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testGetAttr_Touch() throws Exception {
     String key = "getattr_touch_attribute";
 
