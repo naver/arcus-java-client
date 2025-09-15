@@ -5,13 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import net.spy.memcached.ops.Operation;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -36,39 +33,15 @@ class QueueOverflowTest extends ClientBaseCase {
     // We're creating artificially constrained queues with the explicit
     // goal of overrunning them to verify the client will still be
     // functional after such conditions occur.
-    initClient(new DefaultConnectionFactory(5, 1024) {
-      @Override
-      public long getOperationTimeout() {
-        return 1000;
-      }
-
-      @Override
-      public BlockingQueue<Operation> createOperationQueue() {
-        return new ArrayBlockingQueue<>(getOpQueueLen());
-      }
-
-      @Override
-      public BlockingQueue<Operation> createReadOperationQueue() {
-        return new ArrayBlockingQueue<>(
-                (int) (getOpQueueLen() * 1.1));
-      }
-
-      @Override
-      public BlockingQueue<Operation> createWriteOperationQueue() {
-        return createOperationQueue();
-      }
-
-      @Override
-      public boolean shouldOptimize() {
-        return false;
-      }
-
-      @Override
-      public long getOpQueueMaxBlockTime() {
-        return 0;
-      }
-
-    });
+    int opQueueLen = 5;
+    initClient(new ConnectionFactoryBuilder()
+            .setOpQueueFactory(() -> new ArrayBlockingQueue<>(opQueueLen))
+            .setReadOpQueueFactory(() -> new ArrayBlockingQueue<>((int) (1.1 * opQueueLen)))
+            .setWriteOpQueueFactory(() -> new ArrayBlockingQueue<>(opQueueLen))
+            .setOpTimeout(1000)
+            .setShouldOptimize(false)
+            .setOpQueueMaxBlockTime(0)
+            .setReadBufferSize(1024));
   }
 
   private void runOverflowTest(byte b[]) throws Exception {

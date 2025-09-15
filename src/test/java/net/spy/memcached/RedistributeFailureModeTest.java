@@ -34,18 +34,15 @@ class RedistributeFailureModeTest extends ClientBaseCase {
   }
 
   @Override
-  protected void initClient(ConnectionFactory cf) throws Exception {
-    client = new MemcachedClient(cf, AddrUtil.getAddresses(Collections.singletonList(serverList)));
+  protected void initClient(ConnectionFactoryBuilder cfb) throws Exception {
+    client = new MemcachedClient(cfb.build(),
+            AddrUtil.getAddresses(Collections.singletonList(serverList)));
   }
 
   @Override
   protected void initClient() throws Exception {
-    initClient(new DefaultConnectionFactory() {
-      @Override
-      public FailureMode getFailureMode() {
-        return FailureMode.Redistribute;
-      }
-    });
+    initClient(new ConnectionFactoryBuilder()
+            .setFailureMode(FailureMode.Redistribute));
   }
 
   @Override
