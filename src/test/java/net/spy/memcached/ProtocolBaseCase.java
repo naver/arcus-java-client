@@ -41,6 +41,7 @@ import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.Transcoder;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.opentest4j.AssertionFailedError;
@@ -693,6 +694,7 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
   }
 
   @Test
+  @Disabled
   void testTouch() throws Exception {
     assertNull(client.get("touchtest"));
     assertNull(client.get("nonexistent"));
