@@ -2214,7 +2214,7 @@ public class MemcachedClient extends SpyThread
   protected Collection<MemcachedNode> getFlushNodes() {
     /* ENABLE_REPLICATION if */
     if (conn.getArcusReplEnabled()) {
-      return ((ArcusReplKetamaNodeLocator) getNodeLocator()).getAllGroups().values()
+      return ((ArcusReplKetamaNodeLocator) conn.getLocator()).getAllGroups().values()
               .stream()
               .map(MemcachedReplicaGroup::getMasterNode)
               .collect(Collectors.toList());
