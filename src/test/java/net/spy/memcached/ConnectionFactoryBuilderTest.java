@@ -66,24 +66,24 @@ class ConnectionFactoryBuilderTest {
             f.getReadBufSize());
     //assertSame(DefaultConnectionFactory.DEFAULT_HASH, f.getHashAlg());
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
-    assertTrue(f.getDefaultTranscoder() instanceof SerializingTranscoder);
+    assertInstanceOf(SerializingTranscoder.class, f.getDefaultTranscoder());
     assertInstanceOf(SerializingTranscoder.class, f.getDefaultCollectionTranscoder());
     //assertSame(DefaultConnectionFactory.DEFAULT_FAILURE_MODE,
     // f.getFailureMode());
     assertSame(FailureMode.Cancel, f.getFailureMode());
     assertEquals(0, f.getInitialObservers().size());
-    assertTrue(f.getOperationFactory() instanceof AsciiOperationFactory);
+    assertInstanceOf(AsciiOperationFactory.class, f.getOperationFactory());
 
     BlockingQueue<Operation> opQueue = f.createOperationQueue();
-    assertTrue(opQueue instanceof ArrayBlockingQueue<?>);
+    assertInstanceOf(ArrayBlockingQueue.class, opQueue);
     assertEquals(DefaultConnectionFactory.DEFAULT_OP_QUEUE_LEN,
             opQueue.remainingCapacity());
 
     BlockingQueue<Operation> readOpQueue = f.createReadOperationQueue();
-    assertTrue(readOpQueue instanceof LinkedBlockingQueue<?>);
+    assertInstanceOf(LinkedBlockingQueue.class, readOpQueue);
 
     BlockingQueue<Operation> writeOpQueue = f.createWriteOperationQueue();
-    assertTrue(writeOpQueue instanceof LinkedBlockingQueue<?>);
+    assertInstanceOf(LinkedBlockingQueue.class, writeOpQueue);
 
     // This test case fails.  Arcus Ketama locator builds the hash ring
     // during construction.  Cannot get around the failure.  So, don't run...
@@ -96,9 +96,9 @@ class ConnectionFactoryBuilderTest {
         instanceof ArrayModNodeLocator);
     */
 
-    assertTrue(f.createMemcachedNode("factory builder test node",
-            InetSocketAddress.createUnresolved("localhost", 11211), 1)
-            instanceof AsciiMemcachedNodeImpl);
+    assertInstanceOf(AsciiMemcachedNodeImpl.class,
+            f.createMemcachedNode("factory builder test node",
+                    InetSocketAddress.createUnresolved("localhost", 11211), 1));
     assertTrue(f.isDaemon());
     assertFalse(f.shouldOptimize());
     assertFalse(f.useNagleAlgorithm());
@@ -154,13 +154,13 @@ class ConnectionFactoryBuilderTest {
     assertEquals(4225, f.getOperationTimeout());
     assertEquals(19, f.getReadBufSize());
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
-    assertTrue(f.getDefaultTranscoder() instanceof WhalinTranscoder);
+    assertInstanceOf(WhalinTranscoder.class, f.getDefaultTranscoder());
     assertEquals(SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE - 1,
             f.getDefaultCollectionTranscoder().getMaxSize());
     assertSame(FailureMode.Redistribute, f.getFailureMode());
     assertEquals(1, f.getInitialObservers().size());
     assertSame(testObserver, f.getInitialObservers().iterator().next());
-    assertTrue(f.getOperationFactory() instanceof BinaryOperationFactory);
+    assertInstanceOf(BinaryOperationFactory.class, f.getOperationFactory());
     assertSame(oQueue, f.createOperationQueue());
     assertSame(rQueue, f.createReadOperationQueue());
     assertSame(wQueue, f.createWriteOperationQueue());
@@ -174,26 +174,23 @@ class ConnectionFactoryBuilderTest {
 
     MemcachedNode n = new MockMemcachedNode(
             InetSocketAddress.createUnresolved("localhost", 11211));
-    assertTrue(f.createLocator(Collections.singletonList(n))
-            instanceof KetamaNodeLocator);
-    assertTrue(f.createMemcachedNode("factory builder test node",
-            InetSocketAddress.createUnresolved("localhost", 11211), 1)
-            instanceof BinaryMemcachedNodeImpl);
+    assertInstanceOf(KetamaNodeLocator.class,
+            f.createLocator(Collections.singletonList(n)));
+    assertInstanceOf(BinaryMemcachedNodeImpl.class,
+            f.createMemcachedNode("factory builder test node",
+            InetSocketAddress.createUnresolved("localhost", 11211), 1));
   }
 
   @Test
   void testProtocolSetterBinary() {
-    assertTrue(
-            b.setProtocol(Protocol.BINARY).build().getOperationFactory()
-                    instanceof BinaryOperationFactory);
+    assertInstanceOf(BinaryOperationFactory.class,
+            b.setProtocol(Protocol.BINARY).build().getOperationFactory());
   }
 
   @Test
   void testProtocolSetterText() {
-    assertTrue(
-            b.setProtocol(Protocol.TEXT).build().getOperationFactory()
-                    instanceof AsciiOperationFactory);
-
+    assertInstanceOf(AsciiOperationFactory.class,
+            b.setProtocol(Protocol.TEXT).build().getOperationFactory());
   }
 
   static class DirectFactory implements OperationQueueFactory {
