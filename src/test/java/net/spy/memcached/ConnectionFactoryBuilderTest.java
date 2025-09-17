@@ -53,23 +53,20 @@ class ConnectionFactoryBuilderTest {
   private ConnectionFactoryBuilder b;
 
   @BeforeEach
-  protected void setUp() throws Exception {
+  void setUp() {
     b = new ConnectionFactoryBuilder();
   }
 
   @Test
-  void testDefaults() throws Exception {
+  void testDefaults() {
     ConnectionFactory f = b.build();
     assertEquals(DefaultConnectionFactory.DEFAULT_OPERATION_TIMEOUT,
             f.getOperationTimeout());
     assertEquals(DefaultConnectionFactory.DEFAULT_READ_BUFFER_SIZE,
             f.getReadBufSize());
-    //assertSame(DefaultConnectionFactory.DEFAULT_HASH, f.getHashAlg());
     assertSame(HashAlgorithm.KETAMA_HASH, f.getHashAlg());
     assertInstanceOf(SerializingTranscoder.class, f.getDefaultTranscoder());
     assertInstanceOf(SerializingTranscoder.class, f.getDefaultCollectionTranscoder());
-    //assertSame(DefaultConnectionFactory.DEFAULT_FAILURE_MODE,
-    // f.getFailureMode());
     assertSame(FailureMode.Cancel, f.getFailureMode());
     assertEquals(0, f.getInitialObservers().size());
     assertInstanceOf(AsciiOperationFactory.class, f.getOperationFactory());
@@ -85,31 +82,25 @@ class ConnectionFactoryBuilderTest {
     BlockingQueue<Operation> writeOpQueue = f.createWriteOperationQueue();
     assertInstanceOf(LinkedBlockingQueue.class, writeOpQueue);
 
-    // This test case fails.  Arcus Ketama locator builds the hash ring
-    // during construction.  Cannot get around the failure.  So, don't run...
-    //
-    // ...: unexpected invocation
-    // Invoked: mockMemcachedNode.getSocketAddress()
-    /*
-    MemcachedNode n = (MemcachedNode)mock(MemcachedNode.class).proxy();
-    assertTrue(f.createLocator(Collections.singletonList(n))
-        instanceof ArrayModNodeLocator);
-    */
+    MemcachedNode node = f.createMemcachedNode("factory builder test node",
+            InetSocketAddress.createUnresolved("localhost", 11211), 1);
+    assertInstanceOf(AsciiMemcachedNodeImpl.class, node);
 
-    assertInstanceOf(AsciiMemcachedNodeImpl.class,
-            f.createMemcachedNode("factory builder test node",
-                    InetSocketAddress.createUnresolved("localhost", 11211), 1));
+    NodeLocator locator = f.createLocator(Collections.singletonList(node));
+    assertTrue((locator instanceof ArcusKetamaNodeLocator
+            || locator instanceof ArcusReplKetamaNodeLocator));
+
     assertTrue(f.isDaemon());
     assertFalse(f.shouldOptimize());
     assertFalse(f.useNagleAlgorithm());
     assertFalse(f.getKeepAlive());
     assertTrue(f.getDnsCacheTtlCheck());
-    assertEquals(f.getOpQueueMaxBlockTime(),
-            DefaultConnectionFactory.DEFAULT_OP_QUEUE_MAX_BLOCK_TIME);
+    assertEquals(DefaultConnectionFactory.DEFAULT_OP_QUEUE_MAX_BLOCK_TIME,
+            f.getOpQueueMaxBlockTime());
   }
 
   @Test
-  void testModifications() throws Exception {
+  void testModifications() {
     ConnectionObserver testObserver = new ConnectionObserver() {
       public void connectionLost(SocketAddress sa) {
         // none
@@ -169,7 +160,7 @@ class ConnectionFactoryBuilderTest {
     assertTrue(f.useNagleAlgorithm());
     assertTrue(f.getKeepAlive());
     assertFalse(f.getDnsCacheTtlCheck());
-    assertEquals(f.getOpQueueMaxBlockTime(), 19);
+    assertEquals(19, f.getOpQueueMaxBlockTime());
     assertSame(anAuthDescriptor, f.getAuthDescriptor());
 
     MemcachedNode n = new MockMemcachedNode(
