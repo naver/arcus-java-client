@@ -16,9 +16,11 @@
  */
 package net.spy.memcached;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -27,6 +29,7 @@ import net.spy.memcached.ConnectionFactoryBuilder.Locator;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.PlainCallbackHandler;
+import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationQueueFactory;
 import net.spy.memcached.protocol.ascii.AsciiMemcachedNodeImpl;
@@ -42,6 +45,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -170,6 +175,125 @@ class ConnectionFactoryBuilderTest {
     assertInstanceOf(BinaryMemcachedNodeImpl.class,
             f.createMemcachedNode("factory builder test node",
             InetSocketAddress.createUnresolved("localhost", 11211), 1));
+  }
+
+  @Test
+  void compareSameValueWithDefaultConnectionFactory() throws IOException {
+    ConnectionFactory connectionFactory = new ConnectionFactoryBuilder().build();
+    ConnectionFactory defaultConnectionFactory = new DefaultConnectionFactory();
+
+    assertEquals(connectionFactory.createConnection("test", Collections.singletonList(
+                    new InetSocketAddress("localhost", 11211))).getClass(),
+            defaultConnectionFactory.createConnection("test", Collections.singletonList(
+                    new InetSocketAddress("localhost", 11211))).getClass());
+    assertIterableEquals(connectionFactory.createOperationQueue(),
+            defaultConnectionFactory.createOperationQueue());
+    assertIterableEquals(connectionFactory.createReadOperationQueue(),
+            defaultConnectionFactory.createReadOperationQueue());
+    assertIterableEquals(connectionFactory.createWriteOperationQueue(),
+            defaultConnectionFactory.createWriteOperationQueue());
+    assertEquals(connectionFactory.getOpQueueMaxBlockTime(),
+            defaultConnectionFactory.getOpQueueMaxBlockTime());
+    assertEquals(connectionFactory.getOperationFactory().getClass(),
+            defaultConnectionFactory.getOperationFactory().getClass());
+    assertEquals(connectionFactory.getOperationTimeout(),
+            defaultConnectionFactory.getOperationTimeout());
+    assertTrue(connectionFactory.isDaemon());
+    assertFalse(defaultConnectionFactory.isDaemon());
+    assertEquals(connectionFactory.useNagleAlgorithm(),
+            defaultConnectionFactory.useNagleAlgorithm());
+    assertEquals(connectionFactory.getKeepAlive(),
+            defaultConnectionFactory.getKeepAlive());
+    assertEquals(connectionFactory.getDnsCacheTtlCheck(),
+            defaultConnectionFactory.getDnsCacheTtlCheck());
+    assertEquals(connectionFactory.getInitialObservers(),
+            defaultConnectionFactory.getInitialObservers());
+    assertEquals(connectionFactory.getDefaultTranscoder().getClass(),
+            defaultConnectionFactory.getDefaultTranscoder().getClass());
+    assertEquals(connectionFactory.getDefaultCollectionTranscoder().getClass(),
+            defaultConnectionFactory.getDefaultCollectionTranscoder().getClass());
+    assertEquals(connectionFactory.shouldOptimize(),
+            defaultConnectionFactory.shouldOptimize());
+    assertEquals(connectionFactory.getReadBufSize(),
+            defaultConnectionFactory.getReadBufSize());
+    assertEquals(connectionFactory.getAuthDescriptor(),
+            defaultConnectionFactory.getAuthDescriptor());
+    assertEquals(connectionFactory.getTimeoutRatioThreshold(),
+            defaultConnectionFactory.getTimeoutRatioThreshold());
+    assertEquals(connectionFactory.getMaxFrontCacheElements(),
+            defaultConnectionFactory.getMaxFrontCacheElements());
+    assertEquals(connectionFactory.getFrontCacheExpireTime(),
+            defaultConnectionFactory.getFrontCacheExpireTime());
+    assertEquals(connectionFactory.getFrontCacheCopyOnRead(),
+            defaultConnectionFactory.getFrontCacheCopyOnRead());
+    assertEquals(connectionFactory.getFrontCacheCopyOnWrite(),
+            defaultConnectionFactory.getFrontCacheCopyOnWrite());
+    assertEquals(connectionFactory.getDefaultMaxSMGetKeyChunkSize(),
+            defaultConnectionFactory.getDefaultMaxSMGetKeyChunkSize());
+    assertEquals(connectionFactory.getDelimiter(),
+            defaultConnectionFactory.getDelimiter());
+    assertEquals(connectionFactory.getReadPriority(),
+            defaultConnectionFactory.getReadPriority());
+  }
+
+  @Test
+  void compareSameValueWithDefaultConnectionFactoryForAPITypeReadPriority() {
+    ConnectionFactory connectionFactory = new ConnectionFactoryBuilder().build();
+    ConnectionFactory defaultConnectionFactory = new DefaultConnectionFactory();
+
+    for (APIType apiType : APIType.values()) {
+      assertEquals(connectionFactory.getAPIReadPriority(apiType),
+              defaultConnectionFactory.getAPIReadPriority(apiType));
+    }
+  }
+
+  @Test
+  void compareDiffValueWithDefaultConnectionFactory() {
+    ConnectionFactory connectionFactory = new ConnectionFactoryBuilder().build();
+    ConnectionFactory defaultConnectionFactory = new DefaultConnectionFactory();
+
+    assertNotEquals(connectionFactory.getFailureMode(),
+            defaultConnectionFactory.getFailureMode());
+    assertEquals(FailureMode.Cancel, connectionFactory.getFailureMode());
+    assertEquals(DefaultConnectionFactory.DEFAULT_FAILURE_MODE,
+            defaultConnectionFactory.getFailureMode());
+
+    List<MemcachedNode> nodes = Collections.singletonList(new MockMemcachedNode(
+            InetSocketAddress.createUnresolved("localhost", 11211)));
+    NodeLocator locator = connectionFactory.createLocator(nodes);
+    NodeLocator locatorFromDefault = defaultConnectionFactory.createLocator(nodes);
+    assertNotEquals(locator, locatorFromDefault);
+    assertTrue(locator instanceof ArcusKetamaNodeLocator
+            || locator instanceof ArcusReplKetamaNodeLocator);
+    assertInstanceOf(ArrayModNodeLocator.class, locatorFromDefault);
+
+    assertNotEquals(connectionFactory.getHashAlg(),
+            defaultConnectionFactory.getHashAlg());
+    assertEquals(HashAlgorithm.KETAMA_HASH, connectionFactory.getHashAlg());
+    assertEquals(DefaultConnectionFactory.DEFAULT_HASH, defaultConnectionFactory.getHashAlg());
+
+    assertNotEquals(connectionFactory.getMaxReconnectDelay(),
+            defaultConnectionFactory.getMaxReconnectDelay());
+    assertEquals(1, connectionFactory.getMaxReconnectDelay());
+    assertEquals(DefaultConnectionFactory.DEFAULT_MAX_RECONNECT_DELAY,
+            defaultConnectionFactory.getMaxReconnectDelay());
+
+    assertNotEquals(connectionFactory.getTimeoutExceptionThreshold(),
+            defaultConnectionFactory.getTimeoutExceptionThreshold());
+    assertEquals(10, connectionFactory.getTimeoutExceptionThreshold());
+    assertEquals(DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD,
+            defaultConnectionFactory.getTimeoutExceptionThreshold());
+
+    assertNotEquals(connectionFactory.getTimeoutDurationThreshold(),
+            defaultConnectionFactory.getTimeoutDurationThreshold());
+    assertEquals(1000, connectionFactory.getTimeoutDurationThreshold());
+    assertEquals(DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD,
+            defaultConnectionFactory.getTimeoutDurationThreshold());
+
+    assertNotEquals(connectionFactory.getFrontCacheName(),
+            defaultConnectionFactory.getFrontCacheName());
+    assertTrue(connectionFactory.getFrontCacheName().startsWith("ArcusFrontCache_"));
+    assertTrue(defaultConnectionFactory.getFrontCacheName().startsWith("ArcusFrontCache"));
   }
 
   @Test
