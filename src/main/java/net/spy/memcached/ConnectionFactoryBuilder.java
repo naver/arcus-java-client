@@ -61,8 +61,6 @@ public class ConnectionFactoryBuilder {
   private boolean useNagle = false;
   private boolean keepAlive = false;
   private boolean dnsCacheTtlCheck = true;
-  //private long maxReconnectDelay =
-  //DefaultConnectionFactory.DEFAULT_MAX_RECONNECT_DELAY;
   private long maxReconnectDelay = 1;
 
   private int readBufSize = -1;
@@ -70,8 +68,6 @@ public class ConnectionFactoryBuilder {
   private AuthDescriptor authDescriptor = null;
   private long opQueueMaxBlockTime = -1;
 
-  // private int timeoutExceptionThreshold =
-  //     DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
   private int timeoutExceptionThreshold = 10;
   private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
   private int timeoutDurationThreshold = 1000;
