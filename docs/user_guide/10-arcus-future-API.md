@@ -1,10 +1,11 @@
-# Future - get, getSome
+# Future API
+## get, getSome
 
 Arcus java client는 비동기 연산에 반환 값으로 Future를 구현한 반환 타입을 제공하고 있다.
 이 구현체들을 이용해 단순히 비동기 연산 값을 반환 받는 것 뿐만 아니라 추가적인 기능을 지원하고 있다.
 그중에 `get()`과 `getSome()` API를 통해 연산된 데이터를 얻는 방법에 차이가 있다. 이를 알아보도록 하자  
 
-## get
+### get
 일반적인 Future의 `get()`은 timeout 없이 연산이 완료될 때까지 대기하여 연산된 값을 반환한다.
 이와 다르게 Arcus java client에서는 default timeout이 설정되어 있어서, 설정된 시간이 지나면 그동안 처리된 결과는
 모두 버려지고 OperationTimeoutException과 함께 null이 반환된다. (all or nothing)
@@ -22,7 +23,7 @@ V get(long timeout, TimeUnit unit)
 - 연산 작업 처리 도중 해당 연산 작업이 인터럽트 되면 `InterruptedException`을 발생시킨다.
 - 연산 작업 처리 도중 위와 언급한 예외 이외에 다른 예외가 발생하면 `ExecutionException`을 발생시킨다.
 
-## getSome
+### getSome
 `asyncGetBulk()`, `asyncGetsBulk()` API 연산을 통해 반환받는 BulkGetFuture에서는 `getSome()` API를 지원한다.  
 이 API는 timeout이 발생하면 `get()` API와 같이 데이터를 버리고 null을 반환하는 것이 아니라,
 그 시점까지 처리된 결과를 반환한다 (partial). 따라서, 응용에서는 반환된 데이터를 사용할 수 있고, 
@@ -86,3 +87,16 @@ key189=value, key74=value, key100=value, key221=value, key183=value, key68=value
 ```
 - get()은 timeout에 의해 null을 반환하였다. (all or nothing)
 - getSome()은 timeout 시점까지 조회된 결과를 반환하였다. (partial)
+
+## getStatus, getOperationStatus
+Arcus java client의 Future 구현체들 중 `getStatus()` 또는 `getOperationStatus()` API를 제공하는 경우가 있다.
+이 API들은 연산의 상태 정보를 반환하는 API이다. 에러가 발생하면 그 상태 정보를 반환하고, 
+정상적으로 처리되었으면 성공 상태 정보를 반환한다.
+
+사용자가 직접 Future를 통해 명령을 cancel 시키거나 내부적으로 cancel 된 경우 CANCELED 상태 정보를 반환한다.
+하지만 이 정보는 추후 서버로부터 응답이 와서 응답을 읽었을 때 덮어쓰여질 수 있다.
+
+```java
+OperationStatus getStatus()
+CollectionOperationStatus getOperationStatus()
+```

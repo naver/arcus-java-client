@@ -574,4 +574,4 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
   기본값은 true이다. ZooKeeper Ensemble을 도메인 주소로 관리하고 있는 경우, DNS에 매핑된 IP 정보가 변경될 때 정상적으로 반영되도록 하기 위해
   DNS Cache TTL 값이 0 ~ 300초 내에 존재하는지 검증한다.
 
-- Front Cache 설정은 별도 [문서](13-front-cache.md#사용법)에 설명되어 있다.
+- Front Cache 설정은 별도 [문서](11-front-cache.md#사용법)에 설명되어 있다.
