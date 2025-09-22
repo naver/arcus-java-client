@@ -1,3 +1,45 @@
+# 2025-09-22 [version 1.15.0]
+## 🐣 New Features
+  - Add touch command to update item expiration
+  - Deprecate CollectionGetBulkFuture#getOperationStatus
+  - Deprecate CollectionTranscoder
+## 🔧 Enhancements
+  - Add try-catch and error logging in callback methods called by ZooKeeper thread
+  - Throw IllegalStateException instead of RuntimeException in AuthThread constructor
+  - Change auth messages of binary sasl operations
+  - Lower log level to info in matchStatus()
+  - Make piped insert operations process synchronously
+  - Make sure MultiOperationCallback is threadsafe
+  - Use direct buffers in TCPMemcachedNodeImpl
+  - Make refineTrimmedKeys easier to understand
+  - Set OperationStatus even if already CANCELED status exists
+  - Throw CancellationException when cancelled
+## ⚙️ Internal Changes
+  - Use try-with-resources in serialize/deserialize
+  - Merge KV and collection transcoders
+  - Move exception message logic into each exception class
+  - Refactor common constants and methods into TranscoderUtils
+  - Extract compression logic from BaseSerializingTranscoder
+## 🐛 Bug Fixes
+  - Use `conn.getLocator()` instead of `conn.getLocator().getReadonlyCopy()` for `MemcachedClient#getFlushNodes()` method
+  - Do not modify UnmodifiableList object while validating replication group addresses
+  - Use enabledMGetsOp in asyncGetsBulk method
+  - Add new StatusCode `ERR_FAILED_END` and return it when piped collection operation is failed
+  - Make matchStatus covers all responses
+  - Send ERR_INTERNAL status when pipe error occurred
+  - Do not cancel when command is completing in handleLine()
+## 📝 Documentation
+  - Add description for touch API
+  - Add description for `CANCELED` OperationStatus when an operation is cancelled
+  - Remove the usage example of deprecated class, CollectionTranscoder
+  - Declare version 1.14.1 as unstable to connect to replication server
+## ✅ Testing
+  - Tidy ConnectionFactoryBuilderTest
+  - Use assertInstanceOf in ConnectionFactoryBuilderTest
+  - Use ConnectionFactoryBuilder instead of CFB for test code
+  - Handle when the state is set after cancellation in CancelFutureTest
+  - Assert only if cancel succeed
+
 # 2025-05-09 [version 1.14.1] (Unstable to connect to replication server)
 ## 🐣 New Features
   - Add node information into OperationException.
