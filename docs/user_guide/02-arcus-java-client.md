@@ -471,15 +471,15 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 - setCollectionTranscoder(Transcoder\<Object\> t)
 
   Collection 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
-  기본적으로 CollectionTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
+  기본적으로 SerializingTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
   Character set, 압축 기준, ClassLoader를 설정할 수 있다.
 
-  - 빌더를 통해 CollectionTranscoder를 설정할 수 있다.
+  - 빌더를 통해 SerializingTranscoder를 설정할 수 있다.
     ```java
-    CollectionTranscoder transcoder = new CollectionTranscoder.Builder()
-        .disableOptimization()
-        .setMaxElementBytes(16384)
-        .setClassLoader(this.getClass().getClassLoader())
+    SerializingTranscoder transcoder = SerializingTranscoder.forCollection()
+        .forceJDKSerializationForCollection()
+        .maxSize(16384)
+        .classLoader(this.getClass().getClassLoader())
         .build();
     ```
 
