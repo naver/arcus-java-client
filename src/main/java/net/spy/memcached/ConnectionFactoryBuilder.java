@@ -538,7 +538,7 @@ public class ConnectionFactoryBuilder {
       @Override
       public BlockingQueue<Operation> createWriteOperationQueue() {
         return writeQueueFactory == null ?
-                super.createReadOperationQueue()
+                super.createWriteOperationQueue()
                 : writeQueueFactory.create();
       }
 
