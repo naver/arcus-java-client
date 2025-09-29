@@ -25,6 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.auth.AuthState;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
@@ -211,12 +212,16 @@ public class MockMemcachedNode implements MemcachedNode {
     return null;
   }
 
-  public void authComplete() {
+  public void authComplete(AuthState state) {
     // noop
   }
 
   public void setupForAuth(String cause) {
     // noop
+  }
+
+  public AuthState getAuthState() {
+    return null;
   }
 
   public int getContinuousTimeout() {

@@ -39,6 +39,7 @@ import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
+import net.spy.memcached.auth.AuthState;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
@@ -65,9 +66,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private int toWrite = 0;
   protected Operation optimizedOp = null;
   private volatile SelectionKey sk = null;
-  private boolean shouldAuth = false;
+  private final boolean shouldAuth;
+  private volatile AuthState authState;
   private CountDownLatch authLatch;
-  private ArrayList<Operation> reconnectBlocked;
+  private final ArrayList<Operation> reconnectBlocked = new ArrayList<>(0);
   private String version = null;
   private boolean isAsciiProtocol = true;
   private boolean enabledMGetOp = false;
@@ -151,6 +153,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
+    authState = shouldAuth ? AuthState.AUTH_NEEDED : AuthState.AUTH_SUCCESS;
     authLatch = new CountDownLatch(shouldAuth ? 1 : 0);
   }
 
@@ -342,6 +345,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         getLogger().debug("Canceled operation %s", op.toString());
         return;
       }
+      if (authState == AuthState.AUTH_FAILED) {
+        op.cancel("authentication failed");
+        return;
+      }
       if (!inputQueue.offer(op, opQueueMaxBlockTime,
               TimeUnit.MILLISECONDS)) {
         throw new IllegalStateException("Timed out waiting to add "
@@ -446,6 +453,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
+
+    if (authState == AuthState.AUTH_SKIPPING) {
+      authComplete(AuthState.AUTH_SUCCESS);
+    }
   }
 
   public final int getReconnectCount() {
@@ -617,26 +628,55 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  public final void authComplete() {
-    if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
-      inputQueue.addAll(reconnectBlocked);
+  public final void authComplete(AuthState state) {
+    authState = state;
+
+    if (!reconnectBlocked.isEmpty()) {
+      if (authState == AuthState.AUTH_FAILED) {
+        for (Operation op : reconnectBlocked) {
+          op.cancel("authentication failed");
+        }
+      } else {
+        inputQueue.addAll(reconnectBlocked);
+      }
+      reconnectBlocked.clear();
     }
-    authLatch.countDown();
+
+    if (authState == AuthState.AUTH_SUCCESS || authState == AuthState.AUTH_FAILED) {
+      authLatch.countDown();
+    }
   }
 
   public final void setupForAuth(String cause) {
     if (shouldAuth) {
-      authLatch = new CountDownLatch(1);
+      if (reconnDelay == ReconnDelay.DEFAULT && !reconnectBlocked.isEmpty()) {
+        for (Operation op : reconnectBlocked) {
+          op.cancel("connection attempt failed");
+        }
+        reconnectBlocked.clear();
+      }
+
       if (!writeQ.isEmpty() || !inputQueue.isEmpty()) {
-        reconnectBlocked = new ArrayList<>(
-                inputQueue.size() + writeQ.size() + 1);
+        reconnectBlocked.ensureCapacity(inputQueue.size() + writeQ.size() + 1);
         writeQ.drainTo(reconnectBlocked);
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.isEmpty() && writeQ.isEmpty());
+
+      if (authState != AuthState.AUTH_SKIPPING) {
+        if (authState != AuthState.AUTH_FAILED) {
+          authState = AuthState.AUTH_NEEDED;
+        }
+        authLatch = new CountDownLatch(1);
+      }
     } else {
+      authState = AuthState.AUTH_SUCCESS;
       authLatch = new CountDownLatch(0);
     }
+  }
+
+  public AuthState getAuthState() {
+    return authState;
   }
 
   public void closeChannel() throws IOException {

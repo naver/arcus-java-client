@@ -15,6 +15,7 @@ import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 public class AuthThread extends SpyThread {
 
@@ -54,12 +55,19 @@ public class AuthThread extends SpyThread {
 
       final OperationCallback cb = new OperationCallback() {
         public void receivedStatus(OperationStatus val) {
-          // If the status we found was SASL_OK, we're done.
-          if ("SASL_OK".equals(val.getMessage())) {
+          // If the status we found was SASL_OK or NOT_SUPPORTED, we're done.
+          String msg = val.getMessage();
+          if ("SASL_OK".equals(msg) || "NOT_SUPPORTED".equals(msg)) {
             done.set(true);
-            node.authComplete();
+            node.authComplete(AuthState.AUTH_SUCCESS);
             getLogger().info("Authenticated to "
                     + node.getSocketAddress());
+          } else if (!val.isSuccess()) {
+            done.set(true);
+            node.authComplete(AuthState.AUTH_FAILED);
+          } else if (val.getStatusCode() == StatusCode.ERR_UNKNOWN_COMMAND) {
+            done.set(true);
+            node.authComplete(AuthState.AUTH_SKIPPING);
           } else {
             foundStatus.set(val);
           }
@@ -77,7 +85,6 @@ public class AuthThread extends SpyThread {
 
       try {
         latch.await();
-        Thread.sleep(100);
       } catch (InterruptedException e) {
         // we can be interrupted if we were in the
         // process of auth'ing and the connection is
@@ -87,19 +94,19 @@ public class AuthThread extends SpyThread {
           op.cancel("interruption to authentication" + e);
         }
         done.set(true); // If we were interrupted, tear down.
+        continue;
       }
 
       // Get the new status to inspect it.
       priorStatus = foundStatus.get();
-      if (priorStatus != null) {
-        if (!priorStatus.isSuccess()) {
-          getLogger().warn("Authentication failed to "
-                  + node.getSocketAddress() + ": " + priorStatus.getMessage());
-          break;
-        }
+      if (priorStatus != null && !priorStatus.isSuccess()) {
+        getLogger().error("Authentication failed to "
+                + node.getSocketAddress() + ": " + priorStatus.getMessage());
+
+        // tear down for the new AuthThread object after reconnection.
+        done.set(true);
       }
     }
-    return;
   }
 
   private Operation buildOperation(OperationStatus st, OperationCallback cb) {

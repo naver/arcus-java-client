@@ -43,6 +43,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import net.spy.memcached.auth.AuthDescriptor;
+import net.spy.memcached.auth.AuthState;
 import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.internal.BroadcastFuture;
@@ -2165,7 +2166,12 @@ public class MemcachedClient extends SpyThread
       if (authDescriptor.authThresholdReached()) {
         this.shutdown();
       }
-      authMonitor.authConnection(conn, opFact, authDescriptor, findNode(sa));
+
+      MemcachedNode node = findNode(sa);
+      AuthState state = node.getAuthState();
+      if (state == AuthState.AUTH_NEEDED || state == AuthState.AUTH_FAILED) {
+        authMonitor.authConnection(conn, opFact, authDescriptor, node);
+      }
     }
   }
 

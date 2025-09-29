@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.auth.AuthState;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
@@ -242,7 +243,7 @@ public interface MemcachedNode {
    * mean the node can start processing and accept new operations to
    * its input queue.
    */
-  void authComplete();
+  void authComplete(AuthState state);
 
   /**
    * Tell a node to set up for authentication.  Typically this would
@@ -251,6 +252,8 @@ public interface MemcachedNode {
    * an auth complete state.
    */
   void setupForAuth(String cause);
+
+  AuthState getAuthState();
 
   /**
    * Count 'time out' exceptions to drop connections that fail perpetually

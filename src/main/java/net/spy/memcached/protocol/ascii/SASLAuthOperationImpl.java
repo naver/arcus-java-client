@@ -18,12 +18,19 @@
 
 package net.spy.memcached.protocol.ascii;
 
+import java.io.IOException;
+
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
 
+import net.spy.memcached.auth.AuthException;
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationErrorType;
+import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.SASLAuthOperation;
+import net.spy.memcached.ops.StatusCode;
 
 /**
  * Operation to initiate the SASL authentication process.
@@ -50,5 +57,14 @@ final class SASLAuthOperationImpl extends SASLBaseOperationImpl
       getLogger().error("Error while initializing SASL auth: ", e);
       throw new RuntimeException("Error while initializing SASL auth: ", e);
     }
+  }
+
+  @Override
+  protected void handleError(OperationErrorType eType, String line) throws IOException {
+    if (eType == OperationErrorType.GENERAL) {
+      complete(new OperationStatus(true, line, StatusCode.ERR_UNKNOWN_COMMAND));
+      throw new AuthException(line, ReconnDelay.IMMEDIATE);
+    }
+    super.handleError(eType, line);
   }
 }

@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.auth.AuthState;
 import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
@@ -194,11 +195,15 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public void authComplete() {
+  public void authComplete(AuthState state) {
     throw new UnsupportedOperationException();
   }
 
   public void setupForAuth(String cause) {
+    throw new UnsupportedOperationException();
+  }
+
+  public AuthState getAuthState() {
     throw new UnsupportedOperationException();
   }
 
