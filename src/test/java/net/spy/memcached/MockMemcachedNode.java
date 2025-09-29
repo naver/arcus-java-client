@@ -211,12 +211,16 @@ public class MockMemcachedNode implements MemcachedNode {
     return null;
   }
 
-  public void authComplete() {
+  public void authComplete(boolean isSuccessful) {
     // noop
   }
 
-  public void setupForAuth(String cause) {
+  public void setupForAuth() {
     // noop
+  }
+
+  public boolean isAuthFailed() {
+    return false;
   }
 
   public int getContinuousTimeout() {

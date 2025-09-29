@@ -65,8 +65,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private int toWrite = 0;
   protected Operation optimizedOp = null;
   private volatile SelectionKey sk = null;
-  private boolean shouldAuth = false;
-  private CountDownLatch authLatch;
+  private final boolean shouldAuth;
+  private volatile CountDownLatch authLatch;
+  private volatile boolean authFailed = false;
   private ArrayList<Operation> reconnectBlocked;
   private String version = null;
   private boolean isAsciiProtocol = true;
@@ -151,7 +152,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
-    authLatch = new CountDownLatch(shouldAuth ? 1 : 0);
+    authLatch = new CountDownLatch(0);
   }
 
   public final void copyInputQueue() {
@@ -340,6 +341,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
                         "or reconnection and authentication has " +
                         "taken more than one second to complete.");
         getLogger().debug("Canceled operation %s", op.toString());
+        return;
+      }
+      if (authFailed) {
+        op.cancel("authentication failed");
         return;
       }
       if (!inputQueue.offer(op, opQueueMaxBlockTime,
@@ -617,14 +622,24 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     }
   }
 
-  public final void authComplete() {
-    if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
-      inputQueue.addAll(reconnectBlocked);
+  public final void authComplete(boolean isSuccessful) {
+    if (authLatch.getCount() > 0) {
+      authFailed = !isSuccessful;
+
+      if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
+        if (authFailed) {
+          for (Operation op : reconnectBlocked) {
+            op.cancel("authentication failed");
+          }
+        } else {
+          inputQueue.addAll(reconnectBlocked);
+        }
+      }
+      authLatch.countDown();
     }
-    authLatch.countDown();
   }
 
-  public final void setupForAuth(String cause) {
+  public final void setupForAuth() {
     if (shouldAuth) {
       authLatch = new CountDownLatch(1);
       if (!writeQ.isEmpty() || !inputQueue.isEmpty()) {
@@ -634,9 +649,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.isEmpty() && writeQ.isEmpty());
-    } else {
-      authLatch = new CountDownLatch(0);
     }
+  }
+
+  public boolean isAuthFailed() {
+    return authFailed;
   }
 
   public void closeChannel() throws IOException {

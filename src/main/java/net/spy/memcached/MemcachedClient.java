@@ -1988,7 +1988,7 @@ public class MemcachedClient extends SpyThread
 
     checkState();
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.saslMechs(new OperationCallback() {
+      Operation op = opFact.saslMechs(false, new OperationCallback() {
         @Override
         public void receivedStatus(OperationStatus status) {
           for (String s : status.getMessage().split(" ")) {

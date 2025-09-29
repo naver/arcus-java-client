@@ -242,7 +242,7 @@ public interface MemcachedNode {
    * mean the node can start processing and accept new operations to
    * its input queue.
    */
-  void authComplete();
+  void authComplete(boolean isSuccessful);
 
   /**
    * Tell a node to set up for authentication.  Typically this would
@@ -250,7 +250,9 @@ public interface MemcachedNode {
    * this may mean putting any queued operations on hold to get to
    * an auth complete state.
    */
-  void setupForAuth(String cause);
+  void setupForAuth();
+
+  boolean isAuthFailed();
 
   /**
    * Count 'time out' exceptions to drop connections that fail perpetually

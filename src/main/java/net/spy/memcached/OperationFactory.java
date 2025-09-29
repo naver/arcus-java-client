@@ -235,7 +235,7 @@ public interface OperationFactory {
   /**
    * Create a new SASL mechs operation.
    */
-  SASLMechsOperation saslMechs(OperationCallback cb);
+  SASLMechsOperation saslMechs(boolean isInternal, OperationCallback cb);
 
   /**
    * Create a new sasl auth operation.

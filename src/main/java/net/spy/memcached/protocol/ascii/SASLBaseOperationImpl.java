@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 
 import javax.security.sasl.SaslClient;
 
+import net.spy.memcached.auth.AuthException;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
@@ -35,8 +36,10 @@ abstract class SASLBaseOperationImpl extends OperationImpl {
   protected static final String CMD = "sasl auth ";
   private static final String RN_STRING = "\r\n";
 
-  protected static final OperationStatus SASL_OK =
+  private static final OperationStatus SASL_OK =
           new OperationStatus(true, "SASL_OK", StatusCode.SUCCESS);
+  private static final OperationStatus SASL_NOT_SUPPORTED =
+          new OperationStatus(true, "NOT_SUPPORTED", StatusCode.SUCCESS);
 
   protected final SaslClient sc;
   private byte[] challenge;
@@ -69,6 +72,8 @@ abstract class SASLBaseOperationImpl extends OperationImpl {
      * The server can respond with one of the following:
      *  - SASL_CONTINUE {vlen}\r\n{value}\r\n
      *  - SASL_OK\r\n
+     *  - NOT_SUPPORTED\r\n
+     *  - AUTH_ERROR {message}\r\n
      */
     if (line.startsWith("SASL_CONTINUE")) {
       challengeLength = Integer.parseInt(line.substring("SASL_CONTINUE".length()).trim());
@@ -77,8 +82,14 @@ abstract class SASLBaseOperationImpl extends OperationImpl {
       setReadType(OperationReadType.DATA);
     } else if (line.startsWith("SASL_OK")) {
       complete(matchStatus(line, SASL_OK));
-    } else {
+    } else if (line.startsWith("NOT_SUPPORTED")) {
+      complete(matchStatus(line, SASL_NOT_SUPPORTED));
+    } else if (line.startsWith("AUTH_ERROR")) {
       complete(new OperationStatus(false, line, StatusCode.ERR_AUTH));
+      throw new AuthException(line);
+    } else {
+      complete(matchStatus(line));
+      throw new AuthException(line);
     }
   }
 

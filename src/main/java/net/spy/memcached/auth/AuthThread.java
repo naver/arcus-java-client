@@ -1,8 +1,6 @@
 package net.spy.memcached.auth;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslClient;
@@ -15,6 +13,7 @@ import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StatusCode;
 
 public class AuthThread extends SpyThread {
 
@@ -23,6 +22,10 @@ public class AuthThread extends SpyThread {
   private final OperationFactory opFact;
   private final MemcachedNode node;
   private final SaslClient sc;
+
+  private boolean mechDone = false;
+  private boolean authDone = false;
+  private OperationStatus priorStatus = null;
 
   public AuthThread(MemcachedConnection c, OperationFactory o,
                     AuthDescriptor a, MemcachedNode n) {
@@ -44,69 +47,63 @@ public class AuthThread extends SpyThread {
 
   @Override
   public void run() {
-    OperationStatus priorStatus = null;
-    final AtomicBoolean done = new AtomicBoolean();
-
-    while (!done.get()) {
+    while (!authDone) {
       final CountDownLatch latch = new CountDownLatch(1);
-      final AtomicReference<OperationStatus> foundStatus =
-              new AtomicReference<>();
-
       final OperationCallback cb = new OperationCallback() {
+        @Override
         public void receivedStatus(OperationStatus val) {
-          // If the status we found was SASL_OK, we're done.
-          if ("SASL_OK".equals(val.getMessage())) {
-            done.set(true);
-            node.authComplete();
-            getLogger().info("Authenticated to "
-                    + node.getSocketAddress());
+          String msg = val.getMessage();
+          // If the status we found was SASL_OK or NOT_SUPPORTED, we're authDone.
+          if ("SASL_OK".equals(msg) || "NOT_SUPPORTED".equals(msg)) {
+            authDone = true;
+            node.authComplete(true);
+            getLogger().info("Authenticated to " + node.getSocketAddress());
+          } else if (val.getStatusCode() == StatusCode.CANCELLED &&
+                     AuthThread.this == Thread.currentThread()) {
+            // Don't call authComplete() if this callback is called by auth thread
+            // through calling op.cancel() after the InterruptedException .
+            authDone = true;
+            getLogger().error("Authentication canceled to " + node.getSocketAddress() + ": " + msg);
+          } else if (!val.isSuccess()) {
+            authDone = true;
+            node.authComplete(false);
+            getLogger().error("Authentication failed to " + node.getSocketAddress() + ": " + msg);
+          } else if (!mechDone) {
+            mechDone = true;
           } else {
-            foundStatus.set(val);
+            // Get the prior status to create the correct operation.
+            priorStatus = val;
           }
         }
 
+        @Override
         public void complete() {
           latch.countDown();
         }
       };
 
-      // Get the prior status to create the correct operation.
-      final Operation op = buildOperation(priorStatus, cb);
-
+      final Operation op;
+      if (!mechDone) {
+        op = opFact.saslMechs(true, cb);
+      } else if (priorStatus == null) {
+        op = opFact.saslAuth(sc, cb);
+      } else {
+        op = opFact.saslStep(sc, KeyUtil.getKeyBytes(priorStatus.getMessage()), cb);
+      }
       conn.insertOperation(node, op);
 
       try {
         latch.await();
-        Thread.sleep(100);
       } catch (InterruptedException e) {
         // we can be interrupted if we were in the
         // process of auth'ing and the connection is
         // lost or dropped due to bad auth
         Thread.currentThread().interrupt();
         if (op != null) {
-          op.cancel("interruption to authentication" + e);
+          op.cancel("interruption to authentication: " + e);
         }
-        done.set(true); // If we were interrupted, tear down.
+        authDone = true; // If we were interrupted, tear down
       }
-
-      // Get the new status to inspect it.
-      priorStatus = foundStatus.get();
-      if (priorStatus != null) {
-        if (!priorStatus.isSuccess()) {
-          getLogger().warn("Authentication failed to "
-                  + node.getSocketAddress() + ": " + priorStatus.getMessage());
-          break;
-        }
-      }
-    }
-    return;
-  }
-
-  private Operation buildOperation(OperationStatus st, OperationCallback cb) {
-    if (st == null) {
-      return opFact.saslAuth(sc, cb);
-    } else {
-      return opFact.saslStep(sc, KeyUtil.getKeyBytes(st.getMessage()), cb);
     }
   }
 }

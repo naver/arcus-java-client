@@ -147,8 +147,8 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new ConcatenationOperationImpl(catType, key, data, cb);
   }
 
-  public SASLMechsOperation saslMechs(OperationCallback cb) {
-    return new SASLMechsOperationImpl(cb);
+  public SASLMechsOperation saslMechs(boolean isInternal, OperationCallback cb) {
+    return new SASLMechsOperationImpl(isInternal, cb);
   }
 
   public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
