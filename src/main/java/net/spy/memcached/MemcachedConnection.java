@@ -1283,8 +1283,8 @@ public final class MemcachedConnection extends SpyObject {
     final List<MemcachedNode> rereQueue = new ArrayList<>();
     final long nanoTime = System.nanoTime();
     SocketChannel ch = null;
-    MemcachedNode node = reconnectQueue.popReady(nanoTime);
-    while (node != null) {
+    MemcachedNode node;
+    while ((node = reconnectQueue.popReady(nanoTime)) != null) {
       if (node.getChannel() != null) {
         // Below the code cannot be executed.
         // Because the reconnect queue are not allowed to add the same node.
@@ -1331,7 +1331,6 @@ public final class MemcachedConnection extends SpyObject {
           }
         }
       }
-      node = reconnectQueue.popReady(nanoTime);
     }
     // Requeue any fast-failed connects.
     for (MemcachedNode n : rereQueue) {
