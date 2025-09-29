@@ -22,7 +22,7 @@ public class AuthThread extends SpyThread {
   private final AuthDescriptor authDescriptor;
   private final OperationFactory opFact;
   private final MemcachedNode node;
-  private final SaslClient sc;
+  private SaslClient sc;
 
   public AuthThread(MemcachedConnection c, OperationFactory o,
                     AuthDescriptor a, MemcachedNode n) {
@@ -30,6 +30,11 @@ public class AuthThread extends SpyThread {
     opFact = o;
     authDescriptor = a;
     node = n;
+
+    initSaslClient();
+  }
+
+  private void initSaslClient() {
     try {
       sc = Sasl.createSaslClient(authDescriptor.getMechs(), null,
               "memcached", node.getSocketAddress().toString(), null, authDescriptor.getCallback());
@@ -95,11 +100,14 @@ public class AuthThread extends SpyThread {
         if (!priorStatus.isSuccess()) {
           getLogger().warn("Authentication failed to "
                   + node.getSocketAddress() + ": " + priorStatus.getMessage());
-          break;
+
+          priorStatus = null;
+          foundStatus.set(null);
+
+          initSaslClient();
         }
       }
     }
-    return;
   }
 
   private Operation buildOperation(OperationStatus st, OperationCallback cb) {
