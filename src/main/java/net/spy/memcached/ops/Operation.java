@@ -129,6 +129,8 @@ public interface Operation {
 
   boolean isIdempotentOperation();
 
+  boolean doThrowException(OperationErrorType eType);
+
   /* ENABLE_MIGRATION if */
   RedirectHandler getAndClearRedirectHandler();
   /* ENABLE_MIGRATION end */

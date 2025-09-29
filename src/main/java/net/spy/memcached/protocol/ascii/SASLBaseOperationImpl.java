@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import javax.security.sasl.SaslClient;
 
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.ops.StatusCode;
@@ -97,5 +98,10 @@ abstract class SASLBaseOperationImpl extends OperationImpl {
     if (found == '\n') {
       complete(new OperationStatus(true, new String(challenge), StatusCode.SUCCESS));
     }
+  }
+
+  @Override
+  public boolean doThrowException(OperationErrorType eType) {
+    return eType != OperationErrorType.GENERAL;
   }
 }

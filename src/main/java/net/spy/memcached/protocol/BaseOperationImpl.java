@@ -264,7 +264,10 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
     }
     exception = new OperationException(eType, line + " @ " + handlingNode.getNodeName());
     complete(new OperationStatus(false, line, StatusCode.ERR_INTERNAL));
-    throw exception;
+
+    if (doThrowException(eType)) {
+      throw exception;
+    }
   }
 
   public void handleRead(ByteBuffer data) {
@@ -312,6 +315,10 @@ public abstract class BaseOperationImpl extends SpyObject implements Operation {
   }
 
   public boolean isIdempotentOperation() {
+    return true;
+  }
+
+  public boolean doThrowException(OperationErrorType eType) {
     return true;
   }
 }

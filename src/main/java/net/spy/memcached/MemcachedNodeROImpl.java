@@ -201,6 +201,22 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  public boolean authNeeded() {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean authSkipping() {
+    throw new UnsupportedOperationException();
+  }
+
+  public void authSkip() {
+    throw new UnsupportedOperationException();
+  }
+
+  public void authFail() {
+    throw new UnsupportedOperationException();
+  }
+
   public int getContinuousTimeout() {
     throw new UnsupportedOperationException();
   }

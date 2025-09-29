@@ -218,6 +218,22 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
+  public boolean authNeeded() {
+    return false;
+  }
+
+  public boolean authSkipping() {
+    return false;
+  }
+
+  public void authSkip() {
+    // noop
+  }
+
+  public void authFail() {
+    // noop
+  }
+
   public int getContinuousTimeout() {
     return 0;
   }

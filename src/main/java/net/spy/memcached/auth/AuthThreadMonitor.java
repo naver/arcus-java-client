@@ -35,10 +35,10 @@ public class AuthThreadMonitor extends SpyObject {
    */
   public synchronized void authConnection(MemcachedConnection conn,
                                           OperationFactory opFact, AuthDescriptor authDescriptor,
-                                          MemcachedNode node) {
+                                          MemcachedNode node, long operationTimeout) {
     interruptOldAuth(node);
     AuthThread newSASLAuthenticator = new AuthThread(conn, opFact,
-            authDescriptor, node);
+            authDescriptor, node, operationTimeout);
     newSASLAuthenticator.start();
     nodeMap.put(node, newSASLAuthenticator);
   }

@@ -40,13 +40,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.spy.memcached.auth.AuthException;
+import net.spy.memcached.auth.AuthExceptionType;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
@@ -91,6 +96,8 @@ public final class MemcachedConnection extends SpyObject {
   private final ConcurrentLinkedQueue<MemcachedNode> addedQueue;
   // reconnectQueue contains the attachments that need to be reconnected
   private final ReconnectQueue reconnectQueue;
+  private final ConcurrentLinkedHashSetQueue<QueueReconnectTask> reconnectRequests
+          = new ConcurrentLinkedHashSetQueue<>();
   private final AtomicReference<List<InetSocketAddress>> cacheNodesChange
           = new AtomicReference<>(null);
   /* ENABLE_MIGRATION if */
@@ -215,12 +222,12 @@ public final class MemcachedConnection extends SpyObject {
     while (it.hasNext()) {
       MemcachedNode qa = it.next();
       try {
-        prepareVersionInfo(qa);
+        if (prepareVersionInfo(qa)) {
+          it.remove();
+        }
       } catch (IllegalStateException e) {
         // queue overflow occurs. retry later
-        continue;
       }
-      it.remove();
     }
   }
 
@@ -236,7 +243,7 @@ public final class MemcachedConnection extends SpyObject {
     getLogger().debug("Done dealing with queue.");
 
     long delay = 0;
-    if (cacheNodesChange.get() != null) {
+    if (cacheNodesChange.get() != null || !reconnectRequests.isEmpty()) {
       delay = 1;
     } else if (!reconnectQueue.isEmpty()) {
       delay = reconnectQueue.getMinDelayMillis();
@@ -312,7 +319,7 @@ public final class MemcachedConnection extends SpyObject {
     // Deal with the memcached server group that's been added by CacheManager.
     handleCacheNodesChange();
 
-    if (!reconnectQueue.isEmpty()) {
+    if (!reconnectQueue.isEmpty() || !reconnectRequests.isEmpty()) {
       attemptReconnects();
     }
   }
@@ -643,11 +650,17 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("new memcached socket error on initial connect");
       queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
     }
-    prepareVersionInfo(qa);
+    if (!prepareVersionInfo(qa)) {
+      nodesNeedVersionOp.add(qa);
+    }
     return qa;
   }
 
-  private void prepareVersionInfo(final MemcachedNode node) {
+  private boolean prepareVersionInfo(final MemcachedNode node) {
+    if (node.authNeeded() || node.authSkipping()) {
+      return false;
+    }
+
     Operation op = opFactory.version(new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
@@ -666,6 +679,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     });
     addOperation(node, op);
+    return true;
   }
 
   // Handle the memcached server group that's been added by CacheManager.
@@ -912,6 +926,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     } catch (ClosedChannelException e) {
       // Note, not all channel closes end up here
+      qa.setupForAuth("closed channel exception"); // noop if !shouldAuth
       getLogger().warn("Closed channel.  "
               + "Queueing reconnect on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
@@ -925,6 +940,17 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("Reconnection due to exception " +
               "handling a memcached exception on %s.", qa, e);
       lostConnection(qa, ReconnDelay.IMMEDIATE, "operation exception");
+    } catch (AuthException e) {
+      if (e.getType() == AuthExceptionType.SKIP_AUTH) {
+        qa.authSkip();
+      } else if (e.getType() == AuthExceptionType.RETRY_AUTH) {
+        qa.setupForAuth(e.getMessage());
+      } else {
+        getLogger().warn("Unhandled auth exception type : " + e.getType(), e);
+        qa.authFail();
+        qa.setupForAuth(e.getMessage());
+      }
+      lostConnection(qa, e.getDelay(), e.getMessage());
     } catch (Exception e) {
       // Any particular error processing an item should simply
       // cause us to reconnect to the server.
@@ -1204,6 +1230,12 @@ public final class MemcachedConnection extends SpyObject {
     reconnectQueue.add(qa, type);
   }
 
+  public void setupReconnect(MemcachedNode qa, ReconnDelay delay, String cause) {
+    if (reconnectRequests.offerLast(new QueueReconnectTask(qa, delay, cause))) {
+      selector.wakeup();
+    }
+  }
+
   private void cancelOperations(Collection<Operation> ops, String cause) {
     for (Operation op : ops) {
       op.cancel(cause);
@@ -1274,6 +1306,11 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_MIGRATION end */
 
   private void attemptReconnects() {
+    QueueReconnectTask task = null;
+    while ((task = reconnectRequests.pollFirst()) != null) {
+      task.doTask();
+    }
+
     final List<MemcachedNode> rereQueue = new ArrayList<>();
     final long nanoTime = System.nanoTime();
     SocketChannel ch = null;
@@ -1632,6 +1669,31 @@ public final class MemcachedConnection extends SpyObject {
     return addedQueue.size();
   }
 
+  private static class ConcurrentLinkedHashSetQueue<E> {
+    private final Set<E> set = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Queue<E> queue = new ConcurrentLinkedQueue<>();
+
+    public boolean offerLast(E e) {
+      if (set.add(e)) {
+        queue.offer(e);
+        return true;
+      }
+      return false;
+    }
+
+    public E pollFirst() {
+      E e = queue.poll();
+      if (e != null) {
+        set.remove(e);
+      }
+      return e;
+    }
+
+    public boolean isEmpty() {
+      return set.isEmpty() && queue.isEmpty();
+    }
+  }
+
   public static class ReconnectQueue {
     // maximum amount of time to wait between reconnect attempts
     private final long maxReconnectDelaySeconds;
@@ -1731,6 +1793,21 @@ public final class MemcachedConnection extends SpyObject {
 
     public void doTask() {
       queueReconnect(node, delay, cause);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      QueueReconnectTask t = (QueueReconnectTask) o;
+      return Objects.equals(node, t.node) && delay == t.delay && Objects.equals(cause, t.cause);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(node, delay, cause);
     }
   }
 

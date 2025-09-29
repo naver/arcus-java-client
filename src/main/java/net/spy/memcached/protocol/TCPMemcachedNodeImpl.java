@@ -66,7 +66,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private volatile SelectionKey sk = null;
   private boolean shouldAuth = false;
   private CountDownLatch authLatch;
-  private ArrayList<Operation> reconnectBlocked;
+  private volatile boolean skippingAuth = false;
+  private volatile boolean authFailed = false;
+  private final BlockingQueue<Operation> reconnectBlocked;
   private String version = null;
   private boolean isAsciiProtocol = true;
   private boolean enabledMGetOp = false;
@@ -146,6 +148,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     readQ = rq;
     writeQ = wq;
     inputQueue = iq;
+    reconnectBlocked = new LinkedBlockingQueue<>();
     addOpCount = new AtomicLong(0);
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
@@ -344,6 +347,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     op.setHandlingNode(this);
     op.initialize();
     try {
+      if (authFailed) {
+        op.cancel("authentication failed");
+        return;
+      }
       if (!authLatch.await(1, TimeUnit.SECONDS)) {
         op.cancel("authentication timeout");
         getLogger().warn(
@@ -353,7 +360,9 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         getLogger().debug("Canceled operation %s", op.toString());
         return;
       }
-      if (!inputQueue.offer(op, opQueueMaxBlockTime,
+
+      BlockingQueue<Operation> queueToAdd = skippingAuth ? reconnectBlocked : inputQueue;
+      if (!queueToAdd.offer(op, opQueueMaxBlockTime,
               TimeUnit.MILLISECONDS)) {
         throw new IllegalStateException("Timed out waiting to add "
                 + op + "(max wait=" + opQueueMaxBlockTime + "ms)");
@@ -452,6 +461,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
+
+    if (skippingAuth && !authNeeded()) {
+      authComplete();
+    }
   }
 
   public final int getReconnectCount() {
@@ -611,6 +624,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void fixupOps() {
+    if (skippingAuth) {
+      return;
+    }
+
     // As the selection key can be changed at any point due to node
     // failure, we'll grab the current volatile value and configure it.
     SelectionKey s = sk;
@@ -624,18 +641,20 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void authComplete() {
-    if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
-      inputQueue.addAll(reconnectBlocked);
+    if (!reconnectBlocked.isEmpty()) {
+      reconnectBlocked.drainTo(inputQueue);
     }
+
+    skippingAuth = false;
+    authFailed = false;
     authLatch.countDown();
   }
 
   public final void setupForAuth(String cause) {
-    if (shouldAuth) {
+    if (shouldAuth && !skippingAuth) {
+      authFail();
       authLatch = new CountDownLatch(1);
       if (!inputQueue.isEmpty()) {
-        reconnectBlocked = new ArrayList<>(
-                inputQueue.size() + 1);
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.isEmpty());
@@ -643,6 +662,25 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     } else {
       authLatch = new CountDownLatch(0);
     }
+  }
+
+  public void authSkip() {
+    skippingAuth = true;
+    authFailed = false;
+    authLatch.countDown();
+  }
+
+  public void authFail() {
+    skippingAuth = false;
+    authFailed = true;
+  }
+
+  public boolean authNeeded() {
+    return authLatch.getCount() > 0;
+  }
+
+  public boolean authSkipping() {
+    return skippingAuth;
   }
 
   public void closeChannel() throws IOException {

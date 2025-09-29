@@ -6,6 +6,7 @@ import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
 
 import net.spy.memcached.ops.OperationCallback;
+import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
 
@@ -69,4 +70,8 @@ public abstract class SASLBaseOperationImpl extends OperationImpl {
     return false;
   }
 
+  @Override
+  public boolean doThrowException(OperationErrorType eType) {
+    return eType != OperationErrorType.GENERAL;
+  }
 }

@@ -254,6 +254,14 @@ public interface MemcachedNode {
    */
   void setupForAuth(String cause);
 
+  void authSkip();
+
+  void authFail();
+
+  boolean authNeeded();
+
+  boolean authSkipping();
+
   /**
    * Count 'time out' exceptions to drop connections that fail perpetually
    *
