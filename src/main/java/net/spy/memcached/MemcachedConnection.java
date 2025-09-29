@@ -47,6 +47,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.spy.memcached.auth.AuthException;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.internal.ReconnDelay;
@@ -874,6 +875,7 @@ public final class MemcachedConnection extends SpyObject {
   private void connected(MemcachedNode qa) {
     assert qa.getChannel().isConnected() : "Not connected.";
     int rt = qa.getReconnectCount();
+    qa.setupForAuth();
     qa.connected();
     for (ConnectionObserver observer : connObservers) {
       observer.connectionEstablished(qa.getSocketAddress(), rt);
@@ -931,6 +933,9 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("Reconnection due to exception " +
               "handling a memcached exception on %s.", qa, e);
       lostConnection(qa, ReconnDelay.IMMEDIATE, "operation exception");
+    } catch (AuthException e) {
+      getLogger().warn("Reconnecting due to %s on %s", e.getMessage(), qa);
+      lostConnection(qa, ReconnDelay.DEFAULT, e.getMessage());
     } catch (Exception e) {
       // Any particular error processing an item should simply
       // cause us to reconnect to the server.
@@ -1183,6 +1188,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
     /* ENABLE_REPLICATION end */
+    qa.authComplete(false);
     qa.reconnecting(type);
 
     getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
@@ -1206,7 +1212,6 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
 
-    qa.setupForAuth(cause);
     reconnectQueue.add(qa, type);
   }
 
@@ -1442,6 +1447,11 @@ public final class MemcachedConnection extends SpyObject {
   public void addOperation(final MemcachedNode node, final Operation o) {
     if (node == null) {
       o.cancel("no node");
+      return;
+    }
+    if (node.isAuthFailed()) {
+      o.setHandlingNode(node);
+      o.cancel("authentication failed");
       return;
     }
     if (!node.isActive() && failureMode == FailureMode.Cancel) {
