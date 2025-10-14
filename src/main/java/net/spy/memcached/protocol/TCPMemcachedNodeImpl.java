@@ -440,13 +440,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final void reconnecting() {
     reconnectAttempt.incrementAndGet();
-    isFirstConnecting = false;
-    continuousTimeout.set(0);
-    timeoutStartNanos.set(0);
-    resetTimeoutRatioCount();
   }
 
   public final void connected() {
+    version = null;
+    enabledMGetOp = false;
+    enabledMGetsOp = false;
+    enabledSpaceSeparate = false;
+
     reconnectAttempt.set(0);
     isFirstConnecting = false;
     continuousTimeout.set(0);
