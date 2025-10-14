@@ -255,7 +255,7 @@ public final class CollectionGetOperationImpl extends OperationImpl
     String cmd = collectionGet.getCommand();
     if (collectionGet instanceof MapGet) {
       MapGet mapGet = (MapGet) collectionGet;
-      if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+      if (getHandlingNode() != null && getHandlingNode().enabledSpaceSeparate()) {
         mapGet.setKeySeparator(" ");
       } else {
         mapGet.setKeySeparator(",");

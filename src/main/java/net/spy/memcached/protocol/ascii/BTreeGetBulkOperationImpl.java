@@ -221,7 +221,7 @@ public final class BTreeGetBulkOperationImpl extends OperationImpl implements
 
   public void initialize() {
     String cmd = getBulk.getCommand();
-    if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+    if (getHandlingNode() != null && getHandlingNode().enabledSpaceSeparate()) {
       getBulk.setKeySeparator(" ");
     } else {
       getBulk.setKeySeparator(",");
