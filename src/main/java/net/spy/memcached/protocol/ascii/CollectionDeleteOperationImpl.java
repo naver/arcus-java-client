@@ -106,7 +106,7 @@ public final class CollectionDeleteOperationImpl extends OperationImpl
     String cmd = collectionDelete.getCommand();
     if (collectionDelete instanceof MapDelete) {
       MapDelete mapDelete = (MapDelete) collectionDelete;
-      if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+      if (getHandlingNode() != null && getHandlingNode().enabledSpaceSeparate()) {
         mapDelete.setKeySeparator(" ");
       } else {
         mapDelete.setKeySeparator(",");

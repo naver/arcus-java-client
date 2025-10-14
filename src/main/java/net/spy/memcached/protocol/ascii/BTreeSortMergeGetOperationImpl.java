@@ -386,7 +386,7 @@ public final class BTreeSortMergeGetOperationImpl extends OperationImpl implemen
 
   public void initialize() {
     String cmd = smGet.getCommand();
-    if (getHandlingNode() == null || getHandlingNode().enabledSpaceSeparate()) {
+    if (getHandlingNode() != null && getHandlingNode().enabledSpaceSeparate()) {
       smGet.setKeySeparator(" ");
     } else {
       smGet.setKeySeparator(",");
