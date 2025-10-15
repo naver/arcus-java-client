@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.spy.memcached.collection.CollectionPipedInsert;
@@ -123,7 +124,8 @@ class BaseOpTest {
             new CollectionPipedInsert.ListPipedInsert<>(key, 0,
                     Arrays.asList("a", "b"), null, null);
     PipedCollectionFuture<Object, Object> rv =
-            new PipedCollectionFuture<>(new CountDownLatch(1), 700);
+            new PipedCollectionFuture<>(new CountDownLatch(1), 700,
+                    Executors.newSingleThreadExecutor());
     OperationCallback cb = new PipedOperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {

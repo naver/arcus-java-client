@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -15,8 +16,8 @@ import net.spy.memcached.ops.OperationState;
 public class BroadcastFuture<T> extends OperationFuture<T> {
   private final Collection<Operation> ops;
 
-  public BroadcastFuture(long timeout , T result, int latchSize) {
-    super(new CountDownLatch(latchSize), timeout);
+  public BroadcastFuture(long timeout , T result, int latchSize, ExecutorService service) {
+    super(new CountDownLatch(latchSize), timeout, service);
     ops = new ArrayList<>(latchSize);
     objRef.set(result);
   }
@@ -92,5 +93,8 @@ public class BroadcastFuture<T> extends OperationFuture<T> {
 
   public void complete() {
     latch.countDown();
+    if (latch.getCount() == 0) {
+      this.signalComplete();
+    }
   }
 }

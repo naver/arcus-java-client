@@ -18,6 +18,7 @@ package net.spy.memcached.plugin;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -38,8 +39,9 @@ public class FrontCacheGetFuture<T> extends GetFuture<T> {
   private final LocalCacheManager localCacheManager;
   private final String key;
 
-  public FrontCacheGetFuture(LocalCacheManager localCacheManager, String key, GetFuture<T> parent) {
-    super(new CountDownLatch(0), DEFAULT_OPERATION_TIMEOUT);
+  public FrontCacheGetFuture(LocalCacheManager localCacheManager, String key,
+                             GetFuture<T> parent, ExecutorService service) {
+    super(new CountDownLatch(0), DEFAULT_OPERATION_TIMEOUT, service);
     this.parent = parent;
     this.localCacheManager = localCacheManager;
     this.key = key;

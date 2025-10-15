@@ -469,7 +469,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncSetAttr(String key, Attributes attrs) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.setAttr(key, attrs, new OperationCallback() {
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
@@ -478,6 +478,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       public void complete() {
         latch.countDown();
+        rv.signalComplete();
       }
     });
     rv.setOperation(op);
@@ -489,7 +490,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<CollectionAttributes> asyncGetAttr(final String key) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<CollectionAttributes> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.getAttr(key, new GetAttrOperation.Callback() {
       private final CollectionAttributes attrs = new CollectionAttributes();
 
@@ -500,6 +501,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       public void complete() {
         latch.countDown();
+        rv.signalComplete();
       }
 
       public void gotAttribute(String k, String attr) {
@@ -525,7 +527,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                     final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<List<T>> rv =
-            new CollectionGetFuture<>(latch, operationTimeout);
+            new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -545,6 +547,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
@@ -581,7 +584,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                    final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Set<T>> rv =
-            new CollectionGetFuture<>(latch, operationTimeout);
+            new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -601,6 +604,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
@@ -625,7 +629,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Long, Element<T>>> rv =
-            new CollectionGetFuture<>(latch, operationTimeout);
+            new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -646,6 +650,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
@@ -669,7 +674,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String k, final CollectionGet collectionGet, final Transcoder<T> tc) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<String, T>> rv =
-            new CollectionGetFuture<>(latch, operationTimeout);
+            new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -690,6 +695,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotData(String mkey, int flags, byte[] data, byte[] eflag) {
@@ -736,7 +742,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       final CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.collectionInsert(key, subkey, collectionInsert,
             co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus status) {
@@ -755,6 +761,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
               public void complete() {
                 latch.countDown();
+                rv.signalComplete();
               }
             });
     rv.setOperation(op);
@@ -774,7 +781,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String key, final CollectionDelete collectionDelete) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.collectionDelete(key, collectionDelete,
         new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
@@ -790,6 +797,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -810,7 +818,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                              final CollectionExist collectionExist) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.collectionExist(key, subkey, collectionExist,
         new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
@@ -828,6 +836,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -1110,7 +1119,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   final CollectionCreate collectionCreate) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionCreate(key, collectionCreate,
         new OperationCallback() {
@@ -1130,6 +1139,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           @Override
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -1472,7 +1482,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CountDownLatch latch = new CountDownLatch(1);
 
     final CollectionFuture<Integer> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionCount(k, collectionCount,
         new OperationCallback() {
@@ -1491,6 +1501,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           @Override
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
 
@@ -1741,7 +1752,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String key, final List<CollectionPipedInsert<T>> insertList) {
     final CountDownLatch latch = new CountDownLatch(1);
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<>(latch, operationTimeout);
+            new PipedCollectionFuture<>(latch, operationTimeout, executorService);
 
     final List<Operation> ops = new ArrayList<>(insertList.size());
     IntFunction<OperationCallback> makeCallback = opIdx -> new PipedOperationCallback() {
@@ -1763,6 +1774,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
         latch.countDown();
+        rv.signalComplete();
       }
 
       public void gotStatus(Integer index, OperationStatus status) {
@@ -1793,7 +1805,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     Collection<MemcachedNode> nodes = getFlushNodes();
 
     final BroadcastFuture<Boolean> rv
-            = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
+            = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size(), executorService);
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
@@ -2142,7 +2154,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionUpdate(key, subkey, collectionUpdate,
             ((co == null) ? null : co.getData()), new OperationCallback() {
@@ -2162,6 +2174,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
               public void complete() {
                 latch.countDown();
+                rv.signalComplete();
               }
             });
     rv.setOperation(op);
@@ -2241,7 +2254,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           final String key, final List<CollectionPipedUpdate<T>> updateList) {
     final CountDownLatch latch = new CountDownLatch(1);
     final PipedCollectionFuture<Integer, CollectionOperationStatus> rv =
-            new PipedCollectionFuture<>(latch, operationTimeout);
+            new PipedCollectionFuture<>(latch, operationTimeout, executorService);
 
     final List<Operation> ops = new ArrayList<>(updateList.size());
     IntFunction<OperationCallback> makeCallback = opIdx -> new PipedOperationCallback() {
@@ -2263,6 +2276,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           }
         }
         latch.countDown();
+        rv.signalComplete();
       }
 
       public void gotStatus(Integer index, OperationStatus status) {
@@ -2374,7 +2388,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<ByteArrayBKey, Element<T>>> rv
-            = new CollectionGetFuture<>(latch, operationTimeout);
+            = new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionGet(k, collectionGet,
         new CollectionGetOperation.Callback() {
@@ -2395,6 +2409,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotData(String bkey, int flags, byte[] data, byte[] eflag) {
@@ -2447,7 +2462,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     // Check for invalid arguments (not to get CLIENT_ERROR)
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Integer, Element<T>>> rv =
-            new CollectionGetFuture<>(latch, operationTimeout);
+            new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.bopGetByPosition(k, get, new BTreeGetByPositionOperation.Callback() {
       private final HashMap<Integer, Entry<BKeyObject, CachedData>> cachedDataMap =
@@ -2469,6 +2484,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       @Override
       public void complete() {
         latch.countDown();
+        rv.signalComplete();
       }
 
       @Override
@@ -2515,7 +2531,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   private CollectionFuture<Integer> asyncBopFindPosition(final String k,
                                                          final BTreeFindPosition get) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final CollectionFuture<Integer> rv = new CollectionFuture<>(latch, operationTimeout);
+    final CollectionFuture<Integer> rv =
+            new CollectionFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.bopFindPosition(k, get, new BTreeFindPositionOperation.Callback() {
 
@@ -2534,6 +2551,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
       public void complete() {
         latch.countDown();
+        rv.signalComplete();
       }
 
       public void gotData(int position) {
@@ -2586,7 +2604,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionGetFuture<Map<Integer, Element<T>>> rv
-            = new CollectionGetFuture<>(latch, operationTimeout);
+            = new CollectionGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.bopFindPositionWithGet(k, get,
         new BTreeFindPositionWithGetOperation.Callback() {
@@ -2608,6 +2626,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           @Override
@@ -2701,7 +2720,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
     final BTreeStoreAndGetFuture<Boolean, E> rv =
-            new BTreeStoreAndGetFuture<>(latch, operationTimeout);
+            new BTreeStoreAndGetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.bopInsertAndGet(k, get, co.getData(),
         new BTreeInsertAndGetOperation.Callback() {
@@ -2719,6 +2738,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           @Override
@@ -2813,7 +2833,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Map<T, Boolean>> rv = new CollectionFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionPipedExist(key, exist,
         new PipedOperationCallback() {
@@ -2832,6 +2852,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
 
           public void gotStatus(Integer index, OperationStatus status) {
@@ -3388,7 +3409,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    final CollectionFuture<Long> rv = new CollectionFuture<>(latch, operationTimeout);
+    final CollectionFuture<Long> rv = new CollectionFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.collectionMutate(k, subkey, collectionMutate,
         new OperationCallback() {
@@ -3415,6 +3436,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           @Override
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
 

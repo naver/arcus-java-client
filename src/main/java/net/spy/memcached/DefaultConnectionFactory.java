@@ -27,7 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.auth.AuthDescriptor;
@@ -162,6 +165,11 @@ public class DefaultConnectionFactory extends SpyObject
   private final int readBufSize;
   private final HashAlgorithm hashAlg;
 
+  /**
+   * The ExecutorService in which the listener callbacks will be executed.
+   */
+  private ExecutorService executorService;
+
   /* ENABLE_REPLICATION if */
   public static final ReadPriority DEFAULT_READ_PRIORITY = ReadPriority.MASTER;
   private Map<APIType, ReadPriority> DEFAULT_API_READ_PRIORITY_LIST =
@@ -180,6 +188,10 @@ public class DefaultConnectionFactory extends SpyObject
     opQueueLen = qLen;
     readBufSize = bufSize;
     hashAlg = hash;
+    executorService = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors(),
+            r -> new Thread(r, "FutureNotifyListener")
+    );
   }
 
   /**
@@ -274,6 +286,26 @@ public class DefaultConnectionFactory extends SpyObject
    */
   public long getOpQueueMaxBlockTime() {
     return DEFAULT_OP_QUEUE_MAX_BLOCK_TIME;
+  }
+
+  /**
+   * Returns the stored {@link ExecutorService} for listeners.
+   *
+   * By default, a {@link ThreadPoolExecutor} is used that acts exactly
+   * like a default cachedThreadPool, but defines the upper limit of
+   * Threads to be created as the number of available processors to
+   * prevent resource exhaustion.
+   *
+   * @return the stored {@link ExecutorService}.
+   */
+  @Override
+  public ExecutorService getListenerExecutorService() {
+    return executorService;
+  }
+
+  @Override
+  public boolean isDefaultExecutorService() {
+    return executorService == null;
   }
 
   public int getReadBufSize() {

@@ -87,7 +87,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
 
     final T t = localCacheManager.get(key);
     if (t != null) {
-      return new GetFuture<T>(null, 0) {
+      return new GetFuture<T>(null, 0, executorService) {
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
           return false;
@@ -115,7 +115,7 @@ public class FrontCacheMemcachedClient extends MemcachedClient {
       };
     }
     GetFuture<T> parent = super.asyncGet(key, tc);
-    return new FrontCacheGetFuture<>(localCacheManager, key, parent);
+    return new FrontCacheGetFuture<>(localCacheManager, key, parent, executorService);
   }
 
   /**

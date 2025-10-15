@@ -2,6 +2,7 @@ package net.spy.memcached.internal;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -11,8 +12,8 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 public class CollectionGetFuture<T> extends CollectionFuture<T> {
   private GetResult<T> result;
 
-  public CollectionGetFuture(CountDownLatch l, long opTimeout) {
-    super(l, opTimeout);
+  public CollectionGetFuture(CountDownLatch l, long opTimeout, ExecutorService service) {
+    super(l, opTimeout, service);
   }
 
   @Override

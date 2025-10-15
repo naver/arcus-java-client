@@ -17,6 +17,7 @@
 package net.spy.memcached.internal;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -31,13 +32,13 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 public class CollectionFuture<T> extends OperationFuture<T> {
   protected CollectionOperationStatus collectionOpStatus;
 
-  public CollectionFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<>(null), opTimeout);
+  public CollectionFuture(CountDownLatch l, long opTimeout, ExecutorService service) {
+    this(l, new AtomicReference<>(null), opTimeout, service);
   }
 
   public CollectionFuture(CountDownLatch l, AtomicReference<T> oref,
-                          long opTimeout) {
-    super(l, oref, opTimeout);
+                          long opTimeout, ExecutorService service) {
+    super(l, oref, opTimeout, service);
   }
 
   public void set(T o, CollectionOperationStatus status) {

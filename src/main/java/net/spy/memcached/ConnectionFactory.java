@@ -23,6 +23,7 @@ import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.ops.APIType;
@@ -75,6 +76,18 @@ public interface ConnectionFactory {
    * to wait to add a new item to a queue.
    */
   long getOpQueueMaxBlockTime();
+
+  /**
+   * Returns true if the default provided {@link ExecutorService} has not been
+   * overriden through the builder.
+   */
+  boolean isDefaultExecutorService();
+
+  /**
+   * Get the ExecutorService which is used to asynchronously execute listeners
+   * on futures.
+   */
+  ExecutorService getListenerExecutorService();
 
   /**
    * Create a NodeLocator instance for the given list of nodes.

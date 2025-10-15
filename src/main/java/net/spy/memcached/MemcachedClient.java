@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -134,6 +135,8 @@ public class MemcachedClient extends SpyThread
 
   private final AuthDescriptor authDescriptor;
 
+  private final ConnectionFactory connectionFactory;
+
   private final byte delimiter;
 
   private static final String DEFAULT_MEMCACHED_CLIENT_NAME = "MemcachedClient";
@@ -141,6 +144,8 @@ public class MemcachedClient extends SpyThread
   private static final int GET_BULK_CHUNK_SIZE = 200;
 
   private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
+
+  protected final ExecutorService executorService;
 
   /**
    * Get a memcached client operating on the specified memcached locations.
@@ -213,6 +218,7 @@ public class MemcachedClient extends SpyThread
       throw new IllegalArgumentException(
               "Operation timeout must be positive.");
     }
+    connectionFactory = cf;
     transcoder = cf.getDefaultTranscoder();
     opFact = cf.getOperationFactory();
     assert opFact != null : "Connection factory failed to make op factory";
@@ -220,6 +226,7 @@ public class MemcachedClient extends SpyThread
     assert conn != null : "Connection factory failed to make a connection";
     operationTimeout = cf.getOperationTimeout();
     authDescriptor = cf.getAuthDescriptor();
+    executorService = cf.getListenerExecutorService();
     if (authDescriptor != null) {
       addObserver(this);
     }
@@ -372,7 +379,7 @@ public class MemcachedClient extends SpyThread
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
-            operationTimeout);
+            operationTimeout, executorService);
     Operation op = opFact.store(storeType, key, co.getFlags(),
             exp, co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus val) {
@@ -381,6 +388,7 @@ public class MemcachedClient extends SpyThread
 
               public void complete() {
                 latch.countDown();
+                rv.signalComplete();
               }
             });
     rv.setOperation(op);
@@ -399,7 +407,7 @@ public class MemcachedClient extends SpyThread
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
-            operationTimeout);
+            operationTimeout, executorService);
     Operation op = opFact.cat(catType, cas, key, co.getData(),
         new OperationCallback() {
           public void receivedStatus(OperationStatus val) {
@@ -408,6 +416,7 @@ public class MemcachedClient extends SpyThread
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -525,7 +534,7 @@ public class MemcachedClient extends SpyThread
     CachedData co = tc.encode(value);
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<CASResponse> rv = new OperationFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.cas(StoreType.set, key, casId, co.getFlags(), exp,
             co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus val) {
@@ -540,6 +549,7 @@ public class MemcachedClient extends SpyThread
 
               public void complete() {
                 latch.countDown();
+                rv.signalComplete();
               }
             });
     rv.setOperation(op);
@@ -897,7 +907,7 @@ public class MemcachedClient extends SpyThread
   public <T> GetFuture<T> asyncGet(final String key, final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<T> future = new GetFuture<>(latch, operationTimeout);
+    final GetFuture<T> future = new GetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.get(key,
         new GetOperation.Callback() {
@@ -914,6 +924,7 @@ public class MemcachedClient extends SpyThread
 
           public void complete() {
             latch.countDown();
+            future.signalComplete();
           }
         });
     future.setOperation(op);
@@ -948,7 +959,7 @@ public class MemcachedClient extends SpyThread
                                                     final Transcoder<T> tc) {
 
     final CountDownLatch latch = new CountDownLatch(1);
-    final GetFuture<CASValue<T>> rv = new GetFuture<>(latch, operationTimeout);
+    final GetFuture<CASValue<T>> rv = new GetFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.gets(key,
         new GetsOperation.Callback() {
@@ -966,6 +977,7 @@ public class MemcachedClient extends SpyThread
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -1081,7 +1093,9 @@ public class MemcachedClient extends SpyThread
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKey
             = groupingKeys(keys, GET_BULK_CHUNK_SIZE, APIType.GET);
     final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
-
+    List<Operation> ops = new ArrayList<>(arrangedKey.size());
+    BulkGetFuture<T> rv = new BulkGetFuture<>(
+            rvMap, ops, latch, operationTimeout, executorService);
     GetOperation.Callback cb = new GetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
         if (!status.isSuccess()) {
@@ -1099,11 +1113,13 @@ public class MemcachedClient extends SpyThread
 
       public void complete() {
         latch.countDown();
+        if (latch.getCount() == 0) {
+          rv.signalComplete();
+        }
       }
     };
 
     checkState();
-    List<Operation> ops = new ArrayList<>(arrangedKey.size());
     for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
@@ -1117,7 +1133,7 @@ public class MemcachedClient extends SpyThread
       conn.addOperation(node, op);
       ops.add(op);
     }
-    return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
+    return rv;
   }
 
   /**
@@ -1215,7 +1231,9 @@ public class MemcachedClient extends SpyThread
             = groupingKeys(keys, GET_BULK_CHUNK_SIZE, APIType.GETS);
 
     final CountDownLatch latch = new CountDownLatch(arrangedKey.size());
-
+    List<Operation> ops = new ArrayList<>(arrangedKey.size());
+    BulkGetFuture<CASValue<T>> rv = new BulkGetFuture<>(
+            rvMap, ops, latch, operationTimeout, executorService);
     GetsOperation.Callback cb = new GetsOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
         if (!status.isSuccess()) {
@@ -1233,13 +1251,15 @@ public class MemcachedClient extends SpyThread
 
       public void complete() {
         latch.countDown();
+        if (latch.getCount() == 0) {
+          rv.signalComplete();
+        }
       }
     };
 
     // Now that we know how many servers it breaks down into, and the latch
     // is all set up, convert all of these strings collections to operations
     checkState();
-    List<Operation> ops = new ArrayList<>(arrangedKey.size());
     for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
@@ -1253,7 +1273,7 @@ public class MemcachedClient extends SpyThread
       conn.addOperation(node, op);
       ops.add(op);
     }
-    return new BulkGetFuture<>(rvMap, ops, latch, operationTimeout);
+    return rv;
   }
 
   /**
@@ -1497,7 +1517,8 @@ public class MemcachedClient extends SpyThread
    */
   public OperationFuture<Boolean> touch(final String key, final int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
-    final OperationFuture<Boolean> rv = new OperationFuture<>(latch, operationTimeout);
+    final OperationFuture<Boolean> rv =
+            new OperationFuture<>(latch, operationTimeout, executorService);
 
     Operation op = opFact.touch(key, exp,
       new OperationCallback() {
@@ -1507,6 +1528,7 @@ public class MemcachedClient extends SpyThread
 
         public void complete() {
           latch.countDown();
+          rv.signalComplete();
         }
       });
     rv.setOperation(op);
@@ -1530,7 +1552,7 @@ public class MemcachedClient extends SpyThread
             new ConcurrentHashMap<>();
     final BroadcastFuture<Map<SocketAddress, String>> future
             = new BroadcastFuture<>(
-            operationTimeout, result, nodes.size());
+            operationTimeout, result, nodes.size(), executorService);
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
@@ -1600,7 +1622,7 @@ public class MemcachedClient extends SpyThread
             = new HashMap<>();
     final BroadcastFuture<Map<SocketAddress, Map<String, String>>> future
             = new BroadcastFuture<>(
-            operationTimeout, resultMap, nodes.size());
+            operationTimeout, resultMap, nodes.size(), executorService);
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
@@ -1772,7 +1794,7 @@ public class MemcachedClient extends SpyThread
                                    int exp) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Long> rv = new OperationFuture<>(
-            latch, operationTimeout);
+            latch, operationTimeout, executorService);
     Operation op = opFact.mutate(m, key, by, def, exp, new OperationCallback() {
       public void receivedStatus(OperationStatus s) {
         rv.set(Long.parseLong(s.isSuccess() ? s.getMessage() : "-1"), s);
@@ -1780,6 +1802,7 @@ public class MemcachedClient extends SpyThread
 
       public void complete() {
         latch.countDown();
+        rv.signalComplete();
       }
     });
     rv.setOperation(op);
@@ -1913,7 +1936,7 @@ public class MemcachedClient extends SpyThread
   public OperationFuture<Boolean> delete(String key) {
     final CountDownLatch latch = new CountDownLatch(1);
     final OperationFuture<Boolean> rv = new OperationFuture<>(latch,
-            operationTimeout);
+            operationTimeout, executorService);
     DeleteOperation op = opFact.delete(key,
         new OperationCallback() {
           public void receivedStatus(OperationStatus s) {
@@ -1922,6 +1945,7 @@ public class MemcachedClient extends SpyThread
 
           public void complete() {
             latch.countDown();
+            rv.signalComplete();
           }
         });
     rv.setOperation(op);
@@ -1941,7 +1965,8 @@ public class MemcachedClient extends SpyThread
     Collection<MemcachedNode> nodes = getFlushNodes();
 
     final BroadcastFuture<Boolean> rv
-            = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
+            = new BroadcastFuture<>(
+            operationTimeout, Boolean.TRUE, nodes.size(), executorService);
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
@@ -1983,7 +2008,7 @@ public class MemcachedClient extends SpyThread
             = new ConcurrentHashMap<>();
     final BroadcastFuture<ConcurrentMap<String, String>> future
             = new BroadcastFuture<>(
-            operationTimeout, resultMap, nodes.size());
+            operationTimeout, resultMap, nodes.size(), executorService);
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
     checkState();
@@ -2079,6 +2104,13 @@ public class MemcachedClient extends SpyThread
     String baseName = getName();
     setName(baseName + " - SHUTTING DOWN");
     boolean rv = false;
+    if (connectionFactory.isDefaultExecutorService()) {
+      try {
+        executorService.shutdown();
+      } catch (Exception ex) {
+        getLogger().warn("Failed shutting down the ExecutorService: ", ex);
+      }
+    }
     try {
       // Conditionally wait
       if (timeout > 0) {

@@ -19,6 +19,7 @@ package net.spy.memcached.internal;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,7 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import net.spy.memcached.MemcachedConnection;
 import net.spy.memcached.OperationTimeoutException;
-import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
@@ -39,7 +39,8 @@ import net.spy.memcached.ops.StatusCode;
  *
  * @param <T> Type of object returned from this future.
  */
-public class OperationFuture<T> extends SpyObject implements Future<T> {
+public class OperationFuture<T> extends AbstractListenableFuture<T, Void>
+    implements Future<T> {
 
   protected final CountDownLatch latch;
   protected final AtomicReference<T> objRef;
@@ -47,13 +48,13 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
   protected final long timeout;
   protected Operation op;
 
-  public OperationFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<>(null), opTimeout);
+  public OperationFuture(CountDownLatch l, long opTimeout, ExecutorService service) {
+    this(l, new AtomicReference<>(null), opTimeout, service);
   }
 
   public OperationFuture(CountDownLatch l, AtomicReference<T> oref,
-                         long opTimeout) {
-    super();
+                         long opTimeout, ExecutorService service) {
+    super(service);
     latch = l;
     objRef = oref;
     timeout = opTimeout;
@@ -127,5 +128,24 @@ public class OperationFuture<T> extends SpyObject implements Future<T> {
     assert op != null : "No operation";
     return latch.getCount() == 0 ||
             op.isCancelled() || op.getState() == OperationState.COMPLETE;
+  }
+
+  @Override
+  public Future<T> addListener(GenericCompletionListener<T> listener) {
+    super.addToListeners(listener);
+    return this;
+  }
+
+  @Override
+  public Future<T> removeListener(GenericCompletionListener<T> listener) {
+    super.removeFromListeners(listener);
+    return this;
+  }
+
+  /**
+   * Signals that this future is complete.
+   */
+  public void signalComplete() {
+    notifyListeners();
   }
 }

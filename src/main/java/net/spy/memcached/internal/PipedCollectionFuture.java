@@ -8,6 +8,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,8 +30,8 @@ public class PipedCollectionFuture<K, V>
           new ConcurrentHashMap<>();
   private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
-  public PipedCollectionFuture(CountDownLatch l, long opTimeout) {
-    super(l, opTimeout);
+  public PipedCollectionFuture(CountDownLatch l, long opTimeout, ExecutorService service) {
+    super(l, opTimeout, service);
   }
 
   @Override

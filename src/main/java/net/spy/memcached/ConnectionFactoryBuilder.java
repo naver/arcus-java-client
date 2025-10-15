@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.ops.APIType;
@@ -67,6 +68,7 @@ public class ConnectionFactoryBuilder {
   private HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
   private AuthDescriptor authDescriptor = null;
   private long opQueueMaxBlockTime = -1;
+  private ExecutorService executorService = null;
 
   private int timeoutExceptionThreshold = 10;
   private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
@@ -338,6 +340,21 @@ public class ConnectionFactoryBuilder {
     }
 
     authDescriptor = to;
+    return this;
+  }
+
+  /**
+   * Set a custom {@link ExecutorService} to execute the listener callbacks.
+   *
+   * Note that if a custom {@link ExecutorService} is passed in, it also needs to be properly
+   * shut down by the caller. The library itself treats it as a outside managed resource.
+   * Therefore, also make sure to not shut it down before all instances that use it are
+   * shut down.
+   *
+   * @param executorService the ExecutorService to use.
+   */
+  public ConnectionFactoryBuilder setListenerExecutorService(ExecutorService executorService) {
+    this.executorService = executorService;
     return this;
   }
 
@@ -644,6 +661,16 @@ public class ConnectionFactoryBuilder {
       @Override
       public AuthDescriptor getAuthDescriptor() {
         return authDescriptor;
+      }
+
+      @Override
+      public ExecutorService getListenerExecutorService() {
+        return executorService == null ? super.getListenerExecutorService() : executorService;
+      }
+
+      @Override
+      public boolean isDefaultExecutorService() {
+        return executorService == null;
       }
 
       @Override

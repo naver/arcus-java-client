@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +44,8 @@ import net.spy.memcached.ops.OperationState;
  *
  * @param <T> types of objects returned from the GET
  */
-public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
+public class BulkGetFuture<T> extends AbstractListenableFuture<Map<String, T>, Void>
+    implements BulkFuture<Map<String, T>> {
   private final Map<String, GetResult<T>> rvMap;
   private final Collection<Operation> ops;
   private final CountDownLatch latch;
@@ -50,8 +53,8 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   private AtomicBoolean isTimeout = new AtomicBoolean(false);
 
   public BulkGetFuture(Map<String, GetResult<T>> rvMap, Collection<Operation> ops,
-                       CountDownLatch latch, Long timeout) {
-    super();
+                       CountDownLatch latch, Long timeout, ExecutorService service) {
+    super(service);
     this.rvMap = rvMap;
     this.ops = ops;
     this.latch = latch;
@@ -59,7 +62,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
   }
 
   public BulkGetFuture(BulkGetFuture<T> other) {
-    super();
+    super(other.executor());
     rvMap = other.rvMap;
     ops = other.ops;
     latch = other.latch;
@@ -73,6 +76,7 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
     for (Operation op : ops) {
       rv |= op.cancel("by application.");
     }
+    notifyListeners();
     return rv;
   }
 
@@ -194,5 +198,24 @@ public class BulkGetFuture<T> implements BulkFuture<Map<String, T>> {
    */
   public boolean isTimeout() {
     return isTimeout.get();
+  }
+
+  @Override
+  public Future<Map<String, T>> addListener(GenericCompletionListener<Map<String, T>> listener) {
+    super.addToListeners(listener);
+    return this;
+  }
+
+  @Override
+  public Future<Map<String, T>> removeListener(GenericCompletionListener<Map<String, T>> listener) {
+    super.removeFromListeners(listener);
+    return this;
+  }
+
+  /**
+   * Signals that this future is complete.
+   */
+  public void signalComplete() {
+    notifyListeners();
   }
 }

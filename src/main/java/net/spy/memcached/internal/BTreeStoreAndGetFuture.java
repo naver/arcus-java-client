@@ -19,6 +19,7 @@ package net.spy.memcached.internal;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,12 +38,13 @@ public class BTreeStoreAndGetFuture<T, E> extends CollectionFuture<T> {
 
   private GetResult<Element<E>> element;
 
-  public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout) {
-    this(l, new AtomicReference<>(null), opTimeout);
+  public BTreeStoreAndGetFuture(CountDownLatch l, long opTimeout, ExecutorService service) {
+    this(l, new AtomicReference<>(null), opTimeout, service);
   }
 
-  public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref, long opTimeout) {
-    super(l, oref, opTimeout);
+  public BTreeStoreAndGetFuture(CountDownLatch l, AtomicReference<T> oref,
+                                long opTimeout, ExecutorService service) {
+    super(l, oref, opTimeout, service);
   }
 
   public Element<E> getElement() {
