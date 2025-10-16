@@ -211,17 +211,19 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   private void addVersionOpToVersionAbsentNodes() {
-    Iterator<MemcachedNode> it = nodesNeedVersionOp.iterator();
-    while (it.hasNext()) {
-      MemcachedNode qa = it.next();
+    List<MemcachedNode> nodes = new ArrayList<>(nodesNeedVersionOp);
+    List<MemcachedNode> retryNodes = new ArrayList<>(nodesNeedVersionOp.size());
+    nodesNeedVersionOp.clear();
+
+    for (MemcachedNode qa : nodes) {
       try {
         prepareVersionInfo(qa);
       } catch (IllegalStateException e) {
         // queue overflow occurs. retry later
-        continue;
+        retryNodes.add(qa);
       }
-      it.remove();
     }
+    nodesNeedVersionOp.addAll(retryNodes);
   }
 
   /**
@@ -643,7 +645,6 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("new memcached socket error on initial connect");
       queueReconnect(qa, ReconnDelay.DEFAULT, "initial connection error");
     }
-    prepareVersionInfo(qa);
     return qa;
   }
 
@@ -665,7 +666,12 @@ public final class MemcachedConnection extends SpyObject {
         }
       }
     });
-    addOperation(node, op);
+
+    node.addOpToWriteQ(op);
+    addedQueue.offer(node);
+    Selector s = selector.wakeup();
+    assert s == selector : "Wakeup returned the wrong selector.";
+    getLogger().debug("Added %s to writeQ of %s", op, node);
   }
 
   // Handle the memcached server group that's been added by CacheManager.
@@ -872,6 +878,7 @@ public final class MemcachedConnection extends SpyObject {
     for (ConnectionObserver observer : connObservers) {
       observer.connectionEstablished(qa.getSocketAddress(), rt);
     }
+    prepareVersionInfo(qa);
   }
 
   private void lostConnection(MemcachedNode qa, ReconnDelay type, String cause) {
