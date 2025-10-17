@@ -47,6 +47,9 @@ jobs:
           # build server
           cd ~/arcus && docker compose up -d
 
+      - name: Print Docker Logs On Failure
+        if: failure()
+        run: docker compose logs
       - name: Test ARCUS Client Without ZK
         run: mvn clean verify -DUSE_ZK=false -Dtest=ObserverTest,ArcusClientCreateTest
       - name: Test ARCUS Client With ZK
