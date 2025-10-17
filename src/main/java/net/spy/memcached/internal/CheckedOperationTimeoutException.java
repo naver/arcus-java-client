@@ -95,9 +95,6 @@ public class CheckedOperationTimeoutException extends TimeoutException {
       }
       if (node != null) {
         rv.append(" [").append(node.getOpQueueStatus()).append("]");
-        if (!node.isActive() && node.isFirstConnecting()) {
-          rv.append(" (Not connected yet)");
-        }
       }
     }
     return rv.toString();

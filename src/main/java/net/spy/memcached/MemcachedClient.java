@@ -2142,7 +2142,7 @@ public class MemcachedClient extends SpyThread
     boolean rv = conn.addObserver(obs);
     if (rv) {
       for (MemcachedNode node : conn.getLocator().getAll()) {
-        if (node.isActive()) {
+        if (node.isConnected()) {
           obs.connectionEstablished(node.getSocketAddress(), -1);
         }
       }
