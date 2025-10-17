@@ -25,6 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
 public class MockMemcachedNode implements MemcachedNode {
@@ -133,11 +134,11 @@ public class MockMemcachedNode implements MemcachedNode {
     return false;
   }
 
-  public boolean isFirstConnecting() {
+  public boolean isConnected() {
     return false;
   }
 
-  public void reconnecting() {
+  public void reconnecting(ReconnDelay delay) {
     // noop
   }
 

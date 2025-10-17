@@ -828,7 +828,7 @@ public final class MemcachedConnection extends SpyObject {
       // Now process the queue.
       for (MemcachedNode qa : todo) {
         boolean readyForIO = false;
-        if (qa.isActive()) {
+        if (qa.isConnected()) {
           if (qa.getCurrentWriteOp() != null) {
             readyForIO = true;
             getLogger().debug("Handling queued write %s", qa);
@@ -1089,7 +1089,7 @@ public final class MemcachedConnection extends SpyObject {
       op.cancel("Redirect failure. No node.");
       return false;
     }
-    if (!node.isActive() && !node.isFirstConnecting()) {
+    if (!node.isActive()) {
       op.cancel("Redirect failure. Inactive node.");
       return false;
     }
@@ -1129,7 +1129,7 @@ public final class MemcachedConnection extends SpyObject {
         clonedOp.cancel("Redirect failure. No node.");
         continue;
       }
-      if (!node.isActive() && !node.isFirstConnecting()) {
+      if (!node.isActive()) {
         clonedOp.cancel("Redirect failure. Inactive node.");
         continue;
       }
@@ -1183,6 +1183,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
     /* ENABLE_REPLICATION end */
+    qa.reconnecting(type);
 
     getLogger().warn("Closing, and reopening %s, attempt %d.", qa,
             qa.getReconnectCount());
@@ -1191,7 +1192,6 @@ public final class MemcachedConnection extends SpyObject {
     } catch (IOException e) {
       getLogger().warn("IOException trying to close a socket", e);
     }
-    qa.reconnecting();
 
     // Need to do a little queue management.
     qa.setupResend(cause);
@@ -1445,8 +1445,7 @@ public final class MemcachedConnection extends SpyObject {
       o.cancel("no node");
       return;
     }
-    if ((!node.isActive() && !node.isFirstConnecting()) &&
-        failureMode == FailureMode.Cancel) {
+    if (!node.isActive() && failureMode == FailureMode.Cancel) {
       o.setHandlingNode(node);
       o.cancel("inactive node");
       return;
@@ -1590,7 +1589,7 @@ public final class MemcachedConnection extends SpyObject {
     if (node == null) {
       return null;
     }
-    if (node.isActive() || node.isFirstConnecting()) {
+    if (node.isActive()) {
       return node;
     }
     if (failureMode == FailureMode.Redistribute) {
@@ -1618,7 +1617,7 @@ public final class MemcachedConnection extends SpyObject {
     if (node == null) {
       return null;
     }
-    if (node.isActive() || node.isFirstConnecting()) {
+    if (node.isActive()) {
       return node;
     }
     if (failureMode == FailureMode.Redistribute) {

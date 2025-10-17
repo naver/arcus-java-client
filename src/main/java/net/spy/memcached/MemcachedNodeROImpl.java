@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
 public final class MemcachedNodeROImpl implements MemcachedNode {
@@ -125,15 +126,15 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     return root.hasReadOp();
   }
 
+  public boolean isConnected() {
+    return root.isConnected();
+  }
+
   public boolean isActive() {
     return root.isActive();
   }
 
-  public boolean isFirstConnecting() {
-    return root.isFirstConnecting();
-  }
-
-  public void reconnecting() {
+  public void reconnecting(ReconnDelay delay) {
     throw new UnsupportedOperationException();
   }
 

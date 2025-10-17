@@ -40,6 +40,7 @@ import net.spy.memcached.ArcusReplNodeAddress;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.MemcachedReplicaGroup;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationState;
 
@@ -59,7 +60,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private final BlockingQueue<Operation> inputQueue;
   private final long opQueueMaxBlockTime;
   private final AtomicInteger reconnectAttempt = new AtomicInteger(1);
-  private boolean isFirstConnecting = true;
+  private volatile ReconnDelay reconnDelay = ReconnDelay.IMMEDIATE;
   private SocketChannel channel;
   private int toWrite = 0;
   protected Operation optimizedOp = null;
@@ -419,16 +420,17 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final boolean isActive() {
+    return isConnected() || reconnDelay == ReconnDelay.IMMEDIATE;
+  }
+
+  public final boolean isConnected() {
     return reconnectAttempt.get() == 0 && getChannel() != null && getChannel().isConnected();
   }
 
-  public final boolean isFirstConnecting() {
-    return isFirstConnecting;
-  }
+  public final void reconnecting(ReconnDelay delay) {
+    reconnDelay = delay;
 
-  public final void reconnecting() {
     reconnectAttempt.incrementAndGet();
-    isFirstConnecting = false;
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
@@ -441,7 +443,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     enabledSpaceSeparate = false;
 
     reconnectAttempt.set(0);
-    isFirstConnecting = false;
     continuousTimeout.set(0);
     timeoutStartNanos.set(0);
     resetTimeoutRatioCount();
@@ -559,10 +560,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public void setContinuousTimeout(boolean timedOut) {
-    if (isActive()) {
+    if (isConnected()) {
       addTimeoutRatioCount(timedOut);
     }
-    if (timedOut && isActive()) {
+    if (timedOut && isConnected()) {
       if (timeoutStartNanos.get() == 0) {
         timeoutStartNanos.set(System.nanoTime());
       }

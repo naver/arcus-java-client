@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 
+import net.spy.memcached.internal.ReconnDelay;
 import net.spy.memcached.ops.Operation;
 
 /**
@@ -156,15 +157,12 @@ public interface MemcachedNode {
    */
   boolean isActive();
 
-  /**
-   * True if it is the first connecting attempt.
-   */
-  boolean isFirstConnecting();
+  boolean isConnected();
 
   /**
    * Notify this node that it will be reconnecting.
    */
-  void reconnecting();
+  void reconnecting(ReconnDelay delay);
 
   /**
    * Notify this node that it has reconnected.
