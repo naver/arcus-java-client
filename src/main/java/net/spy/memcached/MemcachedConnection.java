@@ -919,7 +919,6 @@ public final class MemcachedConnection extends SpyObject {
       }
     } catch (ClosedChannelException e) {
       // Note, not all channel closes end up here
-      qa.setupForAuth("closed channel"); // noop if !shouldAuth
       getLogger().warn("Closed channel.  "
               + "Queueing reconnect on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
@@ -929,7 +928,6 @@ public final class MemcachedConnection extends SpyObject {
       getLogger().warn("Reconnecting due to failure to connect to %s", qa, e);
       queueReconnect(qa, ReconnDelay.DEFAULT, "failure to connect");
     } catch (OperationException e) {
-      qa.setupForAuth("operation exception"); // noop if !shouldAuth
       getLogger().warn("Reconnection due to exception " +
               "handling a memcached exception on %s.", qa, e);
       lostConnection(qa, ReconnDelay.IMMEDIATE, "operation exception");
@@ -940,7 +938,6 @@ public final class MemcachedConnection extends SpyObject {
       // One cause is just network oddness or servers
       // restarting, which lead here with IOException
 
-      qa.setupForAuth("due to exception"); // noop if !shouldAuth
       getLogger().warn("Reconnecting due to exception on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, e.getMessage());
     }
@@ -1209,6 +1206,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     }
 
+    qa.setupForAuth(cause);
     reconnectQueue.add(qa, type);
   }
 
