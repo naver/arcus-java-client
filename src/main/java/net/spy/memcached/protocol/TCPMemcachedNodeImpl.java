@@ -192,13 +192,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     // First, reset the current write op, or cancel it if we should
     // be authenticating
     Operation op = getCurrentWriteOp();
-    if (shouldAuth && op != null) {
-      /*
-       * Do not cancel the operation.
-       * There is no reason to cancel it first
-       * and it will be cancelled in the code below.
-       */
-    } else if (op != null) {
+    if (op != null) {
       if (op.getBuffer() != null) {
         op.reset();
       } else {
@@ -216,12 +210,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         getLogger().warn("Discarding partially completed op: %s", op);
         op.cancel(cause);
       }
-    }
-
-    while (shouldAuth && hasWriteOp()) {
-      op = removeCurrentWriteOp();
-      getLogger().warn("Discarding partially completed op: %s", op);
-      op.cancel(cause);
     }
 
     ((Buffer) getWbuf()).clear();
@@ -640,10 +628,11 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       authLatch = new CountDownLatch(1);
       if (!inputQueue.isEmpty()) {
         reconnectBlocked = new ArrayList<>(
-                inputQueue.size() + 1);
+                inputQueue.size() + writeQ.size() + 1);
+        writeQ.drainTo(reconnectBlocked);
         inputQueue.drainTo(reconnectBlocked);
       }
-      assert (inputQueue.isEmpty());
+      assert (inputQueue.isEmpty() && writeQ.isEmpty());
     } else {
       authLatch = new CountDownLatch(0);
     }
