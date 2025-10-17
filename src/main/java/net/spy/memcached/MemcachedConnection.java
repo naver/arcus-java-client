@@ -919,6 +919,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     } catch (ClosedChannelException e) {
       // Note, not all channel closes end up here
+      qa.setupForAuth("closed channel"); // noop if !shouldAuth
       getLogger().warn("Closed channel.  "
               + "Queueing reconnect on %s", qa, e);
       lostConnection(qa, ReconnDelay.DEFAULT, "closed channel");
