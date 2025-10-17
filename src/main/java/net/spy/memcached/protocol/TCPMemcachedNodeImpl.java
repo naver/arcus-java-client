@@ -644,7 +644,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         inputQueue.drainTo(reconnectBlocked);
       }
       assert (inputQueue.isEmpty());
-      setupResend(cause);
     } else {
       authLatch = new CountDownLatch(0);
     }
