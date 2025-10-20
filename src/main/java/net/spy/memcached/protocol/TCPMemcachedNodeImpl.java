@@ -626,7 +626,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void setupForAuth(String cause) {
     if (shouldAuth) {
       authLatch = new CountDownLatch(1);
-      if (!inputQueue.isEmpty()) {
+      if (!writeQ.isEmpty() || !inputQueue.isEmpty()) {
         reconnectBlocked = new ArrayList<>(
                 inputQueue.size() + writeQ.size() + 1);
         writeQ.drainTo(reconnectBlocked);
