@@ -574,4 +574,13 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
   기본값은 true이다. ZooKeeper Ensemble을 도메인 주소로 관리하고 있는 경우, DNS에 매핑된 IP 정보가 변경될 때 정상적으로 반영되도록 하기 위해
   DNS Cache TTL 값이 0 ~ 300초 내에 존재하는지 검증한다.
 
+- setAuthDescriptor(AuthDescriptor to);
+
+  Arcus 캐시 서버와 연결 시 SASL 인증을 시도한다. 인증에 실패하는 경우 해당 연결을 종료하고 1초 뒤 재시도한다.
+  현재 scramSha256 방식만 지원된다.
+  ```java
+  ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+  cfb.setAuthDescriptor(AuthDescriptor.scramSha256("username", "password"));
+  ```
+
 - Front Cache 설정은 별도 [문서](11-front-cache.md#사용법)에 설명되어 있다.
