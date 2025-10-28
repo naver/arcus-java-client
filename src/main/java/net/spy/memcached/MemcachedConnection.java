@@ -572,6 +572,12 @@ public final class MemcachedConnection extends SpyObject {
   /* ENABLE_REPLICATION end */
 
   /* ENABLE_REPLICATION if */
+  private void moveOperations(MemcachedNode from, MemcachedNode to, boolean cancelNonIdempotent) {
+    if (from.moveOperations(to, cancelNonIdempotent) > 0) {
+      addedQueue.offer(to);
+    }
+  }
+
   private void switchoverMemcachedReplGroup(MemcachedReplicaGroup group,
                                             boolean cancelNonIdempotent) {
 
@@ -591,8 +597,7 @@ public final class MemcachedConnection extends SpyObject {
     ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
     MemcachedNode newMaster = group.getMasterNode();
 
-    oldMaster.moveOperations(newMaster, cancelNonIdempotent);
-    addedQueue.offer(newMaster);
+    moveOperations(oldMaster, newMaster, cancelNonIdempotent);
     queueReconnect(oldMaster, ReconnDelay.IMMEDIATE,
         "Discarded all pending reading state operation to move operations.");
   }
@@ -1011,10 +1016,9 @@ public final class MemcachedConnection extends SpyObject {
           delayedSwitchoverGroups.remove(group);
           switchoverMemcachedReplGroup(group, false);
         } else {
-          MemcachedNode masterCandidate = group.getMasterCandidate();
-          group.getMasterNode().moveOperations(masterCandidate, false);
-          addedQueue.offer(masterCandidate);
-          queueReconnect(group.getMasterNode(), ReconnDelay.IMMEDIATE,
+          MemcachedNode masterNode = group.getMasterNode();
+          moveOperations(masterNode, group.getMasterCandidate(), false);
+          queueReconnect(masterNode, ReconnDelay.IMMEDIATE,
                   "Discarded all pending reading state operation to move operations.");
         }
         break;
@@ -1758,9 +1762,7 @@ public final class MemcachedConnection extends SpyObject {
     }
 
     public void doTask() {
-      if (from.moveOperations(to, true) > 0) {
-        addedQueue.offer(to);
-      }
+      moveOperations(from, to, true);
     }
   }
 
