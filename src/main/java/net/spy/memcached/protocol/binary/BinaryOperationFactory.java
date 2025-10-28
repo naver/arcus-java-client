@@ -157,7 +157,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   public SASLMechsOperation saslMechs(boolean isInternal, OperationCallback cb) {
-    return new SASLMechsOperationImpl(cb);
+    return new SASLMechsOperationImpl(isInternal, cb);
   }
 
   public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {

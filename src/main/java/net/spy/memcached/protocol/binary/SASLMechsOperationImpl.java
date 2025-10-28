@@ -17,6 +17,9 @@
  */
 package net.spy.memcached.protocol.binary;
 
+import java.io.IOException;
+
+import net.spy.memcached.auth.AuthException;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -27,8 +30,19 @@ class SASLMechsOperationImpl extends OperationImpl implements
 
   private static final int CMD = 0x20;
 
-  public SASLMechsOperationImpl(OperationCallback cb) {
+  private static final OperationStatus SASL_NOT_SUPPORTED =
+          new OperationStatus(true, "NOT_SUPPORTED", StatusCode.SUCCESS);
+
+  private static final int SUCCESS = 0x00;
+  private static final int UNKNOWN_COMMAND = 0x81;
+  private static final int NOT_SUPPORTED = 0x83;
+
+  private final boolean isInternal;
+
+  public SASLMechsOperationImpl(boolean isInternal, OperationCallback cb) {
     super(CMD, generateOpaque(), cb);
+
+    this.isInternal = isInternal;
   }
 
   @Override
@@ -37,10 +51,23 @@ class SASLMechsOperationImpl extends OperationImpl implements
   }
 
   @Override
-  protected void decodePayload(byte[] pl) {
-    complete(new OperationStatus(true, new String(pl), StatusCode.SUCCESS));
+  protected void finishedPayload(byte[] pl) throws IOException {
+    if (errorCode == SUCCESS) {
+      complete(new OperationStatus(true, new String(pl), StatusCode.SUCCESS));
+    } else if (errorCode == NOT_SUPPORTED) {
+      complete(SASL_NOT_SUPPORTED);
+    } else if (isInternal) {
+      if (errorCode == UNKNOWN_COMMAND) {
+        complete(SASL_NOT_SUPPORTED);
+      } else {
+        String line = new String(pl);
+        complete(new OperationStatus(false, line, StatusCode.fromAsciiLine(line)));
+        throw new AuthException(line);
+      }
+    } else {
+      super.finishedPayload(pl);
+    }
   }
-
 
   @Override
   public boolean isIdempotentOperation() {
