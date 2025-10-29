@@ -214,14 +214,6 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
-  public void enableTimeoutRatio() {
-    throw new UnsupportedOperationException();
-  }
-
-  public int getTimeoutRatioNow() {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public long getTimeoutDuration() {
     throw new UnsupportedOperationException();

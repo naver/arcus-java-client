@@ -109,11 +109,6 @@ public class DefaultConnectionFactory extends SpyObject
   public static final int DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD = 998;
 
   /**
-   * Maximum timeout ratio for shutdown connection
-   */
-  public static final int DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD = 0;
-
-  /**
    * Maximum timeout duration in milliseconds for shutdown connection
    */
   public static final int DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD = 0;
@@ -335,10 +330,6 @@ public class DefaultConnectionFactory extends SpyObject
 
   public int getTimeoutExceptionThreshold() {
     return DEFAULT_MAX_TIMEOUTEXCEPTION_THRESHOLD;
-  }
-
-  public int getTimeoutRatioThreshold() {
-    return DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
   }
 
   public int getTimeoutDurationThreshold() {

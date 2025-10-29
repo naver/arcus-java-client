@@ -218,8 +218,6 @@ class ConnectionFactoryBuilderTest {
             defaultConnectionFactory.getReadBufSize());
     assertEquals(connectionFactory.getAuthDescriptor(),
             defaultConnectionFactory.getAuthDescriptor());
-    assertEquals(connectionFactory.getTimeoutRatioThreshold(),
-            defaultConnectionFactory.getTimeoutRatioThreshold());
     assertEquals(connectionFactory.getMaxFrontCacheElements(),
             defaultConnectionFactory.getMaxFrontCacheElements());
     assertEquals(connectionFactory.getFrontCacheExpireTime(),

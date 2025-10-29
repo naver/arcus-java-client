@@ -69,7 +69,6 @@ public class ConnectionFactoryBuilder {
   private long opQueueMaxBlockTime = -1;
 
   private int timeoutExceptionThreshold = 10;
-  private int timeoutRatioThreshold = DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTRATIO_THRESHOLD;
   private int timeoutDurationThreshold = 1000;
 
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
@@ -351,18 +350,6 @@ public class ConnectionFactoryBuilder {
     }
 
     timeoutExceptionThreshold = to - 2;
-    return this;
-  }
-
-  /**
-   * Set the maximum timeout ratio threshold: 0(disabled, default), 1~99
-   */
-  public ConnectionFactoryBuilder setTimeoutRatioThreshold(int to) {
-    if (to < 0 || to >= 100) {
-      throw new IllegalArgumentException("Timeout ratio threshold must be 0~99.");
-    }
-
-    timeoutRatioThreshold = to;
     return this;
   }
 
@@ -655,11 +642,6 @@ public class ConnectionFactoryBuilder {
       @Override
       public int getTimeoutExceptionThreshold() {
         return timeoutExceptionThreshold;
-      }
-
-      @Override
-      public int getTimeoutRatioThreshold() {
-        return timeoutRatioThreshold;
       }
 
       @Override

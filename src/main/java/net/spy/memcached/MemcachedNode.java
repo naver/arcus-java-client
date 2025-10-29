@@ -263,10 +263,6 @@ public interface MemcachedNode {
 
   int getContinuousTimeout();
 
-  void enableTimeoutRatio();
-
-  int getTimeoutRatioNow();
-
   long getTimeoutDuration();
 
   /**

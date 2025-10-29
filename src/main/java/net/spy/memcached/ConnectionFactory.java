@@ -178,11 +178,6 @@ public interface ConnectionFactory {
   int getTimeoutExceptionThreshold();
 
   /**
-   * Maximum timeout ratio for shutdown connection
-   */
-  int getTimeoutRatioThreshold();
-
-  /**
    * Maximum timeout duration in milliseconds for shutdown connection
    */
   int getTimeoutDurationThreshold();

@@ -231,14 +231,6 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
-  public void enableTimeoutRatio() {
-    // noop
-  }
-
-  public int getTimeoutRatioNow() {
-    return -1; // disabled
-  }
-
   @Override
   public long getTimeoutDuration() {
     return 0;

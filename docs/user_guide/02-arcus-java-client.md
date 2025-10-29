@@ -543,14 +543,6 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
       100회 이상의 timeout이 연속적으로 발생하면 reconnect를 시도한다. 따라서 정말 네트워크 연결에 문제가 발생하지 않는 상황이더라도
       reconnect가 발생할 수 있다. 따라서 burst 트래픽 요청이 자주 발생하는 애플리케이션이라면 TimeoutDurationThreshold를 0으로 설정하는 것을 권장하지 않는다.
 
-- setTimeoutRatioThreshold(int to)
-
-  사용자 요청 중 일부는 성공하고 일부는 timeout이 발생하는 경우에는 이러한 상황이 지속적으로 발생하여 지연 시간이 늘어나지 않도록 해야 한다.
-  연속적인 coutinuous timeout이 발생하진 않지만 이러한 연결 불안정 상태를 탐지하기 위해 최근 100개 요청에 대한 timeout 비율이 threshold 이상이면
-  연결을 끊고 reconnect를 시도한다. 이를 통해 빠른 실패 응답을 사용자에게 전달할 수 있다.
-
-  기본값은 0으로 비활성화되어있으며, 1~99 사이의 값을 줄 수 있다.
-
 - setMaxSMGetKeyChunkSize(int size)
 
   Arcus 캐시 서버에서 제공하는 SMGet 명령어를 사용할 때 여러 키들이 한 노드에 배치되어 있는 경우, 하나의 요청에 들어가는 키의 최대 개수를 설정한다.

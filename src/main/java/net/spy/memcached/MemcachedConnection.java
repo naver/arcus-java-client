@@ -77,7 +77,6 @@ public final class MemcachedConnection extends SpyObject {
   private static final int EXCESSIVE_EMPTY = 0x1000000;
 
   private final int timeoutExceptionThreshold;
-  private final int timeoutRatioThreshold;
   private final int timeoutDurationThreshold;
 
   private final String connName;
@@ -145,7 +144,6 @@ public final class MemcachedConnection extends SpyObject {
     optimizeGetOp = f.shouldOptimize();
     opFactory = opfactory;
     timeoutExceptionThreshold = f.getTimeoutExceptionThreshold();
-    timeoutRatioThreshold = f.getTimeoutRatioThreshold();
     timeoutDurationThreshold = f.getTimeoutDurationThreshold();
     selector = Selector.open();
     List<MemcachedNode> connections = new ArrayList<>(a.size());
@@ -298,10 +296,6 @@ public final class MemcachedConnection extends SpyObject {
             mn.getNodeName(),
             timeoutExceptionThreshold, timeoutDurationThreshold, mn.getOpQueueStatus());
         lostConnection(mn, ReconnDelay.DEFAULT, "continuous timeout");
-      } else if (timeoutRatioThreshold > 0 && mn.getTimeoutRatioNow() > timeoutRatioThreshold) {
-        getLogger().warn("%s exceeded timeout ratio threshold. >%s (%s)",
-                mn.getNodeName(), timeoutRatioThreshold, mn.getOpQueueStatus());
-        lostConnection(mn, ReconnDelay.DEFAULT, "high timeout ratio");
       }
     }
 
@@ -619,10 +613,6 @@ public final class MemcachedConnection extends SpyObject {
   private MemcachedNode makeMemcachedNode(String name,
                                           SocketAddress sa) throws IOException {
     MemcachedNode qa = connFactory.createMemcachedNode(name, sa, connFactory.getReadBufSize());
-    if (timeoutRatioThreshold > 0) {
-      qa.enableTimeoutRatio();
-    }
-
     SocketChannel ch = SocketChannel.open();
     ch.configureBlocking(false);
     ch.socket().setTcpNoDelay(!connFactory.useNagleAlgorithm());
