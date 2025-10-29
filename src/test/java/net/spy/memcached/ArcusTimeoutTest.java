@@ -36,10 +36,11 @@ import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StoreType;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -92,9 +93,8 @@ class ArcusTimeoutTest {
       keys[i] = "MyKey" + i;
     }
 
-    @SuppressWarnings("deprecation")
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, "MyValue");
+    Future<Map<String, OperationStatus>> future = mc.asyncStoreBulk(
+            StoreType.set, Arrays.asList(keys), 60, "MyValue");
     assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
@@ -107,9 +107,8 @@ class ArcusTimeoutTest {
       keys[i] = "MyKey" + i;
     }
 
-    @SuppressWarnings("deprecation")
-    Future<Map<String, CollectionOperationStatus>> future = mc.asyncSetBulk(
-            Arrays.asList(keys), 60, "MyValue");
+    Future<Map<String, OperationStatus>> future = mc.asyncStoreBulk(
+            StoreType.set, Arrays.asList(keys), 60, "MyValue");
     assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
