@@ -1441,6 +1441,11 @@ public final class MemcachedConnection extends SpyObject {
   }
 
   public void insertOperation(final MemcachedNode node, final Operation o) {
+    if (!node.isConnected() && failureMode == FailureMode.Cancel) {
+      o.setHandlingNode(node);
+      o.cancel("inactive node");
+      return;
+    }
     node.insertOp(o);
     addedQueue.offer(node);
     Selector s = selector.wakeup();
