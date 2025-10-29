@@ -501,35 +501,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().asyncSopExist(key, value);
   }
 
-  @Deprecated
-  @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
-          List<String> key, int exp, T o, Transcoder<T> tc) {
-    return this.getClient().asyncSetBulk(key, exp, o, tc);
-  }
-
-  @Deprecated
-  @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
-          List<String> key, int exp, Object o) {
-    return this.getClient().asyncSetBulk(key, exp, o);
-  }
-
-  @Deprecated
-  @Override
-  public <T> Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
-          Map<String, T> o, int exp, Transcoder<T> tc) {
-    return this.getClient().asyncSetBulk(o, exp, tc);
-  }
-
-  @Deprecated
-  @Override
-  public Future<Map<String, CollectionOperationStatus>> asyncSetBulk(
-          Map<String, Object> o, int exp) {
-    return this.getClient().asyncSetBulk(o, exp);
-  }
-
-
   @Override
   public <T> Future<Map<String, OperationStatus>> asyncStoreBulk(
           StoreType type, List<String> key, int exp, T o, Transcoder<T> tc) {

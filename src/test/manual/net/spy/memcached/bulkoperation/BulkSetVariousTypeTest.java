@@ -24,7 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.collection.BaseIntegrationTest;
-import net.spy.memcached.ops.CollectionOperationStatus;
+import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.StoreType;
 
 import org.junit.jupiter.api.Test;
 
@@ -77,11 +78,10 @@ class BulkSetVariousTypeTest extends BaseIntegrationTest {
         mc.delete(key[0]).get();
 
         // SET
-        @SuppressWarnings("deprecation")
-        Future<Map<String, CollectionOperationStatus>> future = mc
-                .asyncSetBulk(Arrays.asList(key), 60, valueList[i]);
+        Future<Map<String, OperationStatus>> future = mc
+                .asyncStoreBulk(StoreType.set, Arrays.asList(key), 60, valueList[i]);
 
-        Map<String, CollectionOperationStatus> errorList;
+        Map<String, OperationStatus> errorList;
         try {
           errorList = future.get(20000L, TimeUnit.MILLISECONDS);
           assertTrue(errorList.isEmpty(),

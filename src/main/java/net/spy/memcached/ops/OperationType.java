@@ -8,7 +8,7 @@ public enum OperationType {
      */
 
   /*
-   * StoreOperationImpl (add / replace / set / asyncSetBulk)
+   * StoreOperationImpl (add / replace / set)
    * ConcatenationOperationImpl (append / prepend)
    * MutatorOperationImpl (asyncIncr / asyncDecr)
    * DeleteOperationImpl (delete)
