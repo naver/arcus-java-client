@@ -227,19 +227,6 @@ class ArcusTimeoutTest {
   }
 
   @Test
-  void testOldSMGetTimeout() {
-    List<String> keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(KEY + i);
-    }
-
-    @SuppressWarnings("deprecation")
-    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
-    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
-  }
-
-  @Test
   void testSMGetTimeout() {
     List<String> keyList = new ArrayList<>();
     for (int i = 0; i < 1000; i++) {
@@ -250,23 +237,6 @@ class ArcusTimeoutTest {
 
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
             keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
-    assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
-  }
-
-  @Test
-  void testByteArrayBKeyOldSMGetTimeout() {
-    ArrayList<String> keyList;
-    keyList = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      keyList.add(KEY + i);
-    }
-
-    byte[] from = new byte[]{(byte) 0};
-    byte[] to = new byte[]{(byte) 1000};
-
-    @SuppressWarnings("deprecation")
-    SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, 500);
     assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 

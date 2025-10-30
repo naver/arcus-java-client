@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@SuppressWarnings("deprecation")
 class SMGetErrorTest extends BaseIntegrationTest {
 
   private static final List<String> KEY_LIST = new ArrayList<>();
@@ -89,20 +88,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(KEY_LIST, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(3, map.size());
-      assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
     // sort merge get
     SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
@@ -140,20 +125,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
                 "VALUE", new CollectionAttributes()).get());
       }
     } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(KEY_LIST, 0, 15,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, 20);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(0, map.size());
-      assertEquals("BKEY_MISMATCH", oldFuture.getOperationStatus().getMessage());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -233,20 +204,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
     long to = 10;
     long count = from - to;
 
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(1, map.size());
-      assertEquals("TRIMMED", oldFuture.getOperationStatus().getMessage());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
     SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
@@ -322,20 +279,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
     long to = 0;
     long count = from - to;
 
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, (int) count);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(0, map.size());
-      assertEquals("OUT_OF_RANGE", oldFuture.getOperationStatus().getMessage());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
     SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
@@ -363,20 +306,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
                 null, "VALUE", new CollectionAttributes()).get());
       }
     } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(KEY_LIST, 10, 0,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(10, map.size());
-      assertEquals("DUPLICATED", oldFuture.getOperationStatus().getMessage());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
       fail(e.getMessage());
     }
 
@@ -419,18 +348,6 @@ class SMGetErrorTest extends BaseIntegrationTest {
     testKeyList.add(KEY_LIST.get(0));
     testKeyList.add(KEY_LIST.get(1));
 
-    /* old SMGetErrorTest */
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-    try {
-      List<SMGetElement<Object>> map = oldFuture.get(1000L, TimeUnit.SECONDS);
-      assertEquals(0, map.size());
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
     // sort merge get
     SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
@@ -471,8 +388,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     }
 
     // keylist is null
+    SMGetMode smgetMode = SMGetMode.UNIQUE;
     try {
-      mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+      mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is null.", e.getMessage());
@@ -481,42 +399,25 @@ class SMGetErrorTest extends BaseIntegrationTest {
     // keylist is empty
     try {
       mc.asyncBopSortMergeGet(
-              new ArrayList<>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
+              new ArrayList<>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is empty.", e.getMessage());
     }
 
-    // offset < 0
-    try {
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, -1, 10);
-      fail("This should be an exception");
-    } catch (Exception e) {
-      assertEquals("Offset must be 0 or positive integer.", e.getMessage());
-    }
-
     // count == 0
     try {
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 0);
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, smgetMode);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Count must be larger than 0.", e.getMessage());
-    }
-
-    // offset + count > 1000
-    try {
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 1001);
-      fail("This should be an exception");
-    } catch (Exception e) {
-      assertEquals("The sum of offset and count must not exceed a maximum of 1000.",
-          e.getMessage());
     }
 
     // duplicate keys
     try {
       // add duplicate key to testKeyList
       testKeyList.add(KEY_LIST.get(1));
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, 10);
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Duplicate keys exist in key list.", e.getMessage());

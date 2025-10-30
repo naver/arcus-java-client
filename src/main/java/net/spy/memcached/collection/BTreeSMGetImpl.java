@@ -35,7 +35,6 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private final List<String> keyList;
   protected final String range;
   protected final ElementFlagFilter eFlagFilter;
-  protected final int offset;
   protected final int count;
   protected final SMGetMode smgetMode;
 
@@ -46,29 +45,13 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   private byte[] eflag = null;
 
   protected BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
-                        String range,
-                        ElementFlagFilter eFlagFilter,
-                        int count, SMGetMode smgetMode) {
-    this(node, keyList, range, eFlagFilter, -1, count, smgetMode);
-  }
-
-  protected BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
-                        String range,
-                        ElementFlagFilter eFlagFilter,
-                        int offset, int count) {
-    this(node, keyList, range, eFlagFilter, offset, count, null);
-  }
-
-  private BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
-                         String range,
-                         ElementFlagFilter eFlagFilter,
-                         int offset, int count,
-                         SMGetMode smgetMode) {
+                           String range,
+                           ElementFlagFilter eFlagFilter,
+                           int count, SMGetMode smgetMode) {
     this.node = node;
     this.keyList = keyList;
     this.range = range;
     this.eFlagFilter = eFlagFilter;
-    this.offset = offset;
     this.count = count;
     this.smgetMode = smgetMode;
   }
@@ -114,15 +97,8 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
     if (eFlagFilter != null) {
       b.append(" ").append(eFlagFilter);
     }
-    if (smgetMode != null) { // new smget
-      b.append(" ").append(count);
-      b.append(" ").append(smgetMode.getMode());
-    } else { // old smget
-      if (offset > 0) {
-        b.append(" ").append(offset);
-      }
-      b.append(" ").append(count);
-    }
+    b.append(" ").append(count);
+    b.append(" ").append(smgetMode.getMode());
 
     str = b.toString();
     return str;
