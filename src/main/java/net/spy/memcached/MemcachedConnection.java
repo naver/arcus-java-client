@@ -439,10 +439,6 @@ public final class MemcachedConnection extends SpyObject {
             removeNodes.add(oldSlaveNode);
             // move operation slave -> master.
             taskList.add(new MoveOperationTask(oldSlaveNode, oldMasterNode));
-            // clear the masterCandidate if the removed slave is the masterCandidate.
-            if (oldGroup.getMasterCandidate() == oldSlaveNode) {
-              oldGroup.clearMasterCandidate();
-            }
           }
         }
       } else if (oldSlaveAddrs.contains(newMasterAddr)) {
@@ -521,10 +517,6 @@ public final class MemcachedConnection extends SpyObject {
           removeNodes.add(oldSlaveNode);
           // move operation slave -> master.
           taskList.add(new MoveOperationTask(oldSlaveNode, newMasterNode));
-          // clear the masterCandidate if the removed slave is the masterCandidate.
-          if (oldGroup.getMasterCandidate() == oldSlaveNode) {
-            oldGroup.clearMasterCandidate();
-          }
         }
       }
     }
