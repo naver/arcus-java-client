@@ -467,12 +467,18 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
 
   @Override
   public boolean addObserver(ConnectionObserver obs) {
-    return this.getClient().addObserver(obs);
+    for (ArcusClient ac : client) {
+      ac.addObserver(obs);
+    }
+    return true;
   }
 
   @Override
   public boolean removeObserver(ConnectionObserver obs) {
-    return this.getClient().removeObserver(obs);
+    for (ArcusClient ac : client) {
+      ac.removeObserver(obs);
+    }
+    return true;
   }
 
   @Override
