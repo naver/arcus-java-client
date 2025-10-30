@@ -20,7 +20,6 @@ package net.spy.memcached;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -679,9 +678,9 @@ public final class CacheManager extends SpyThread implements Watcher,
     final CountDownLatch latch = new CountDownLatch(addrCount * poolSize);
     final ConnectionObserver observer = new ConnectionObserver() {
       @Override
-      public void connectionLost(SocketAddress sa) { }
+      public void connectionLost(MemcachedNode node) { }
       @Override
-      public void connectionEstablished(SocketAddress sa, int reconnectCount) {
+      public void connectionEstablished(MemcachedNode node, int reconnectCount) {
         latch.countDown();
       }
     };

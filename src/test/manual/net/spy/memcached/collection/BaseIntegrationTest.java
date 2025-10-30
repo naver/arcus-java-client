@@ -16,7 +16,6 @@
  */
 package net.spy.memcached.collection;
 
-import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +25,7 @@ import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionObserver;
 import net.spy.memcached.LoggerSetter;
+import net.spy.memcached.MemcachedNode;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -107,13 +107,13 @@ public class BaseIntegrationTest {
     final ConnectionObserver obs = new ConnectionObserver() {
 
       @Override
-      public void connectionEstablished(SocketAddress sa,
+      public void connectionEstablished(MemcachedNode node,
                                         int reconnectCount) {
         latch.countDown();
       }
 
       @Override
-      public void connectionLost(SocketAddress sa) {
+      public void connectionLost(MemcachedNode node) {
         assert false : "Connection is failed.";
       }
 

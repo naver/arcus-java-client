@@ -18,7 +18,6 @@ package net.spy.memcached;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -107,11 +106,11 @@ class ConnectionFactoryBuilderTest {
   @Test
   void testModifications() {
     ConnectionObserver testObserver = new ConnectionObserver() {
-      public void connectionLost(SocketAddress sa) {
+      public void connectionLost(MemcachedNode node) {
         // none
       }
 
-      public void connectionEstablished(SocketAddress sa, int reconnectCount) {
+      public void connectionEstablished(MemcachedNode node, int reconnectCount) {
         // none
       }
     };
