@@ -46,7 +46,6 @@ import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
-import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.CASOperation;
 import net.spy.memcached.ops.CollectionBulkInsertOperation;
 import net.spy.memcached.ops.CollectionCountOperation;
@@ -388,16 +387,6 @@ public interface OperationFactory {
    * @return a new FlushOperation
    */
   FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb);
-
-  /**
-   * SMGet(Sort-Merge Get) operation for multiple b+tree items.
-   *
-   * @param smGet smget parameters (keys, eflags, and so on)
-   * @param cb    the callback that will contain the results
-   * @return a new BTreeSortMergeGetOperation
-   */
-  BTreeSortMergeGetOperationOld bopsmget(BTreeSMGet<?> smGet,
-                                         BTreeSortMergeGetOperationOld.Callback cb);
 
   /**
    * SMGet(Sort-Merge Get) operation for multiple b+tree items.

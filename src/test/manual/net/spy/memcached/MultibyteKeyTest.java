@@ -37,7 +37,6 @@ import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeInsertAndGet;
 import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
-import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkeyOld;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionBulkInsert;
@@ -58,7 +57,6 @@ import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
-import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetAttrOperation;
@@ -294,34 +292,6 @@ class MultibyteKeyTest {
 
             @Override
             public void gotTrimmedKey(String key, Object bkey) {
-            }
-
-            @Override
-            public void receivedStatus(OperationStatus status) {
-            }
-
-            @Override
-            public void complete() {
-            }
-          }).initialize();
-    } catch (java.nio.BufferOverflowException e) {
-      fail();
-    }
-  }
-
-  @Test
-  void BTreeSortMergeGetOperationOldImplTest() {
-    try {
-      opFact.bopsmget(
-              new BTreeSMGetWithLongTypeBkeyOld<>(null,
-                      keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, 0),
-          new BTreeSortMergeGetOperationOld.Callback() {
-            @Override
-            public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-            }
-
-            @Override
-            public void gotMissedKey(byte[] data) {
             }
 
             @Override

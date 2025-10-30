@@ -62,9 +62,7 @@ import net.spy.memcached.collection.BTreeMutate;
 import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
-import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkeyOld;
 import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
-import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkeyOld;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.ByteArrayBKey;
@@ -128,8 +126,7 @@ import net.spy.memcached.internal.result.BopStoreAndGetResultImpl;
 import net.spy.memcached.internal.result.GetResult;
 import net.spy.memcached.internal.result.LopGetResultImpl;
 import net.spy.memcached.internal.result.MopGetResultImpl;
-import net.spy.memcached.internal.result.SMGetResultImpl;
-import net.spy.memcached.internal.result.SMGetResultOldImpl;
+import net.spy.memcached.internal.result.SMGetResult;
 import net.spy.memcached.internal.result.SopGetResultImpl;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
@@ -138,7 +135,6 @@ import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
-import net.spy.memcached.ops.BTreeSortMergeGetOperationOld;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.GetAttrOperation;
@@ -1730,40 +1726,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
-          int offset, int count) {
-    validateKeys(keyList);
-    checkDupKey(keyList);
-    if (offset < 0) {
-      throw new IllegalArgumentException("Offset must be 0 or positive integer.");
-    }
-    if (count < 1) {
-      throw new IllegalArgumentException("Count must be larger than 0.");
-    }
-    if (offset + count > MAX_SMGET_COUNT) {
-      throw new IllegalArgumentException(
-              "The sum of offset and count must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
-    }
-
-    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
-    List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
-            arrangedKey.size());
-    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<>(entry.getKey(),
-                entry.getValue(), from, to, eFlagFilter, 0, offset + count));
-      } else {
-        smGetList.add(new BTreeSMGetWithLongTypeBkeyOld<>(entry.getKey(),
-                entry.getValue(), from, to, eFlagFilter, offset, count));
-      }
-    }
-    return smget(smGetList, offset, count, (from > to), collectionTranscoder);
-  }
-
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
@@ -1789,93 +1751,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return smget(smGetList, count, smgetMode == SMGetMode.UNIQUE, (from > to), collectionTranscoder);
   }
 
-  /**
-   * Generic smget operation for b+tree items. Public smget methods call this method.
-   *
-   * @param smGetList smget parameters (keys, eflags, and so on)
-   * @param offset    start index of the elements
-   * @param count     number of elements to fetch
-   * @param reverse   forward or backward
-   * @param tc        transcoder to serialize and unserialize element value
-   * @return future holding the smget result (elements, return codes, and so on)
-   */
-  @Deprecated
-  private <T> SMGetFuture<List<SMGetElement<T>>> smget(
-          final List<BTreeSMGet<T>> smGetList, final int offset,
-          final int count, final boolean reverse, final Transcoder<T> tc) {
-
-    final CountDownLatch blatch = new CountDownLatch(smGetList.size());
-    final Collection<Operation> ops = new ArrayList<>(smGetList.size());
-    final SMGetResultOldImpl<T> result = new SMGetResultOldImpl<>(offset, count, reverse, smGetList.size() > 1);
-
-    // if processedSMGetCount is 0, then all smget is done.
-    final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
-    final AtomicBoolean stopCollect = new AtomicBoolean(false);
-
-    for (BTreeSMGet<T> smGet : smGetList) {
-      Operation op = opFact.bopsmget(smGet, new BTreeSortMergeGetOperationOld.Callback() {
-        private final List<SMGetElement<T>> eachResult = new ArrayList<>();
-
-        @Override
-        public void receivedStatus(OperationStatus status) {
-          final int processed = processedSMGetCount.decrementAndGet();
-
-          if (status.isSuccess()) {
-            boolean isTrimmed = ("TRIMMED".equals(status.getMessage()) ||
-                    "DUPLICATED_TRIMMED".equals(status.getMessage()));
-
-            result.mergeSMGetElements(eachResult, isTrimmed);
-            if (processed == 0) {
-              result.makeResultOperationStatus();
-            }
-          } else {
-            stopCollect.set(true);
-            CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-            result.setFailedOperationStatus(cstatus);
-            getLogger().warn("SMGetFailed. status=%s", cstatus);
-          }
-        }
-
-        @Override
-        public void complete() {
-          blatch.countDown();
-        }
-
-        @Override
-        public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          if (stopCollect.get()) {
-            return;
-          }
-
-          if (bkey instanceof Long) {
-            eachResult.add(new SMGetElement<>(key, (Long) bkey, eflag,
-                    tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
-          } else if (bkey instanceof byte[]) {
-            eachResult.add(new SMGetElement<>(key, (byte[]) bkey, eflag,
-                    tc.decode(new CachedData(flags, data, tc.getMaxSize()))));
-          }
-        }
-
-        @Override
-        public void gotMissedKey(byte[] data) {
-          OperationStatus status = new OperationStatus(false, "UNDEFINED");
-          result.addMissedKey(new String(data), new CollectionOperationStatus(status));
-        }
-      });
-      ops.add(op);
-      addOp(smGet.getMemcachedNode(), op);
-    }
-
-    return new SMGetFuture<>(ops, result, blatch, operationTimeout);
-  }
-
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
           final List<BTreeSMGet<T>> smGetList, final int count, final boolean unique,
           final boolean reverse, final Transcoder<T> tc) {
 
     final CountDownLatch blatch = new CountDownLatch(smGetList.size());
     final Collection<Operation> ops = new ArrayList<>(smGetList.size());
-    final SMGetResultImpl<T> result = new SMGetResultImpl<>(count, unique, reverse);
+    final SMGetResult<T> result = new SMGetResult<>(count, unique, reverse);
 
     // if processedSMGetCount is 0, then all smget is done.
     final AtomicInteger processedSMGetCount = new AtomicInteger(smGetList.size());
@@ -2764,40 +2646,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(key, op);
     return rv;
-  }
-
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, byte[] from, byte[] to,
-          ElementFlagFilter eFlagFilter, int offset, int count) {
-    BTreeUtil.validateBkey(from, to);
-    validateKeys(keyList);
-    checkDupKey(keyList);
-    if (count < 1) {
-      throw new IllegalArgumentException("Count must be larger than 0.");
-    }
-    if (offset + count > MAX_SMGET_COUNT) {
-      throw new IllegalArgumentException(
-              "The sum of offset and count must not exceed a maximum of " + MAX_SMGET_COUNT + ".");
-    }
-
-    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
-    List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
-            arrangedKey.size());
-    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      if (arrangedKey.size() > 1) {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<>(entry.getKey(),
-                entry.getValue(), from, to, eFlagFilter, 0, offset + count));
-      } else {
-        smGetList.add(new BTreeSMGetWithByteTypeBkeyOld<>(entry.getKey(),
-                entry.getValue(), from, to, eFlagFilter, offset, count));
-      }
-    }
-
-    return smget(smGetList, offset, count, (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0),
-            collectionTranscoder);
   }
 
   @Override

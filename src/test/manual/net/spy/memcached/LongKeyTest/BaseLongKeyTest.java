@@ -176,30 +176,6 @@ class BaseLongKeyTest extends BaseIntegrationTest {
               new CollectionAttributes()).get());
     }
     SMGetMode smgetMode = SMGetMode.UNIQUE;
-
-    /* old SMGetTest */
-    @SuppressWarnings("deprecation")
-    SMGetFuture<List<SMGetElement<Object>>> oldFuture = mc
-            .asyncBopSortMergeGet(keys, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 0, 10);
-    try {
-      List<SMGetElement<Object>> map = oldFuture
-              .get();
-
-      assertEquals(10, map.size());
-      assertTrue(oldFuture.getMissedKeyList().isEmpty());
-
-      for (int i = 0; i < map.size(); i++) {
-        assertEquals(keys.get(i), map.get(i).getKey());
-        assertEquals(i, map.get(i).getBkey());
-        assertEquals("VALUE" + i, map.get(i).getValue());
-      }
-    } catch (Exception e) {
-      oldFuture.cancel(true);
-      e.printStackTrace();
-      fail(e.getMessage());
-    }
-
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keys, 0, 10,
                     ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
