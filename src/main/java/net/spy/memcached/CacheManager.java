@@ -673,15 +673,22 @@ public final class CacheManager extends SpyThread implements Watcher,
    * @param socketList current available Memcached Addresses
    */
   private void initArcusClient(List<InetSocketAddress> socketList) {
-    int addrCount = socketList.size();
+    final int addrCount = socketList.size();
+    final int totalConnections = addrCount * poolSize;
 
-    final CountDownLatch latch = new CountDownLatch(addrCount * poolSize);
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicInteger connectedCount = new AtomicInteger(0);
     final ConnectionObserver observer = new ConnectionObserver() {
       @Override
-      public void connectionLost(MemcachedNode node) { }
+      public void connectionLost(MemcachedNode node) {
+        connectedCount.decrementAndGet();
+      }
+
       @Override
       public void connectionEstablished(MemcachedNode node, int reconnectCount) {
-        latch.countDown();
+        if (connectedCount.incrementAndGet() == totalConnections) {
+          latch.countDown();
+        }
       }
     };
     cfb.setInitialObservers(Collections.singleton(observer));
@@ -701,6 +708,7 @@ public final class CacheManager extends SpyThread implements Watcher,
       getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
       /* shutdown created ArcusClient */
       while (--i >= 0) {
+        client[i].removeObserver(observer);
         client[i].shutdown();
       }
       client = null;
@@ -708,7 +716,7 @@ public final class CacheManager extends SpyThread implements Watcher,
     }
 
     try {
-      int awaitTime = waitTimeForConnect == 0 ? 50 * addrCount * poolSize : waitTimeForConnect;
+      int awaitTime = waitTimeForConnect == 0 ? 50 * totalConnections : waitTimeForConnect;
       if (latch.await(awaitTime, TimeUnit.MILLISECONDS)) {
         getLogger().warn("All arcus connections are established.");
       } else {
@@ -719,6 +727,9 @@ public final class CacheManager extends SpyThread implements Watcher,
       getLogger().fatal("Arcus Connection has critical problems. contact arcus manager.", e);
     }
 
+    while (--i >= 0) {
+      client[i].removeObserver(observer);
+    }
   }
 
   /**
