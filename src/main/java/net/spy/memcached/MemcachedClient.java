@@ -2143,7 +2143,7 @@ public class MemcachedClient extends SpyThread
     if (rv) {
       for (MemcachedNode node : conn.getLocator().getAll()) {
         if (node.isConnected()) {
-          obs.connectionEstablished(node.getSocketAddress(), -1);
+          obs.connectionEstablished(node, -1);
         }
       }
     }
@@ -2160,27 +2160,13 @@ public class MemcachedClient extends SpyThread
     return conn.removeObserver(obs);
   }
 
-  public void connectionEstablished(SocketAddress sa, int reconnectCount) {
+  public void connectionEstablished(MemcachedNode node, int reconnectCount) {
     if (authDescriptor != null) {
-      if (authDescriptor.authThresholdReached()) {
-        this.shutdown();
-      }
-      authMonitor.authConnection(conn, opFact, authDescriptor, findNode(sa));
+      authMonitor.authConnection(conn, opFact, authDescriptor, node);
     }
   }
 
-  private MemcachedNode findNode(SocketAddress sa) {
-    MemcachedNode node = null;
-    for (MemcachedNode n : conn.getLocator().getAll()) {
-      if (n.getSocketAddress().equals(sa)) {
-        node = n;
-      }
-    }
-    assert node != null : "Couldn't find node connected to " + sa;
-    return node;
-  }
-
-  public void connectionLost(SocketAddress sa) {
+  public void connectionLost(MemcachedNode node) {
     // Don't care.
   }
 

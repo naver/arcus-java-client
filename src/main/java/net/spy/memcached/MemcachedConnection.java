@@ -873,7 +873,7 @@ public final class MemcachedConnection extends SpyObject {
     qa.setupForAuth();
     qa.connected();
     for (ConnectionObserver observer : connObservers) {
-      observer.connectionEstablished(qa.getSocketAddress(), rt);
+      observer.connectionEstablished(qa, rt);
     }
     prepareVersionInfo(qa);
   }
@@ -881,7 +881,7 @@ public final class MemcachedConnection extends SpyObject {
   private void lostConnection(MemcachedNode qa, ReconnDelay type, String cause) {
     queueReconnect(qa, type, cause);
     for (ConnectionObserver observer : connObservers) {
-      observer.connectionLost(qa.getSocketAddress());
+      observer.connectionLost(qa);
     }
   }
 

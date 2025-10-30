@@ -1,6 +1,5 @@
 package net.spy.memcached.test;
 
-import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +8,7 @@ import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionObserver;
 import net.spy.memcached.DefaultConnectionFactory;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.MemcachedNode;
 
 /**
  * This expects a server on port 11212 that's somewhat unstable so it can report
@@ -21,14 +21,14 @@ final class ObserverToy {
 
   public static void main(String[] args) throws Exception {
     final ConnectionObserver obs = new ConnectionObserver() {
-      public void connectionEstablished(SocketAddress sa,
+      public void connectionEstablished(MemcachedNode node,
                                         int reconnectCount) {
-        System.out.println("*** Established:  " + sa + " count="
+        System.out.println("*** Established:  " + node + " count="
                 + reconnectCount);
       }
 
-      public void connectionLost(SocketAddress sa) {
-        System.out.println("*** Lost connection:  " + sa);
+      public void connectionLost(MemcachedNode node) {
+        System.out.println("*** Lost connection:  " + node);
       }
 
     };
