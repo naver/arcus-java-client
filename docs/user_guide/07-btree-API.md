@@ -1176,44 +1176,10 @@ for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { //
 물리적으로 여러 b+tree들로 구성되지만, 이들이 논리적으로 하나의 거대한 b+tree라 가정하고, 
 이러한 b+tree에 대해 element 조회를 수행하는 기능이다.
 
-smget 동작은 조회 범위와 어떤 b+tree의 trim 영역과의 겹침에 대한 처리로,
-아래 두 가지 동작 모드가 있다.
-
-1) 기존 Sort-Merge 조회 (1.8.X 이하 버전에서 동작하던 방식)
-   - smget 조회 조건을 만족하는 첫번째 element가 trim된 b+tree가 하나라도 존재하면 OUT_OF_RANGE 응답을 보낸다.
-     이 경우, 응용은 모든 key에 대해 백엔드 저장소인 DB에서 elements 조회한 후에
-     응용에서 sort-merge 작업을 수행하여야 한다.
-   - OUT_OF_RANGE가 없는 상황에서 smget을 수행하면서
-     조회 조건을 만족하는 두번째 이후의 element가 trim된 b+tree를 만나게 되면,
-     그 지점까지 조회한 elements를 최종 elements 결과로 하고
-     smget 수행 상태는 TRIMMED로 하여 응답을 보낸다.
-     이 경우, 응용은 모든 key에 대해 백엔드 저장소인 DB에서 trim 영역의 elements를 조회하여
-     smget 결과에 반영하여야 한다.
-
-2) 신규 Sort-Merge 조회 (1.9.0 이후 버전에서 추가된 방식)
-   - 기존의 OUT_OF_RANGE에 해당하는 b+tree를 missed keys로 분류하고
-     나머지 b+tree들에 대해 smget을 계속 수행한다.
-     따라서, 응용에서는 missed keys에 한해서만
-     백엔드 저장소인 DB에서 elements를 조회하여 최종 smget 결과에 반영할 수 있다.
-   - smget 조회 조건을 만족하는 두번째 이후의 element가 trim된 b+tree가 존재하더라도,
-     그 지점에서 smget을 중지하는 것이 아니라, 그러한 b+tree를 trimmed keys로 분류하고
-     원하는 개수의 elements를 찾을 때까지 smget을 계속 진행한다.
-     따라서, 응용에서는 trimmed keys에 한하여
-     백엔드 저장소인 DB에서 trim된 elements를 조회하여 최종 smget 결과에 반영할 수 있다.
-   - bkey에 대한 unique 조회 기능을 지원한다.
-     중복 bkey를 허용하여 조회하는 duplcate 조회 외에
-     중복 bkey를 제거하고 unique bkey만을 조회하는 unique 조회를 지원한다.
-   - 조회 조건에 offset 기능을 제거한다.
-
-기존 smget 연산을 사용하더라도, offset 값은 항상 0으로 사용하길 권고한다.
-양수의 offset을 사용하는 smget에서 missed keys가 존재하고
-missed keys에 대한 DB 조회가 offset으로 skip된 element를 가지는 경우,
-응용에서 정확한 offset 처리가 불가능해지기 때문이다.
-이전의 조회 결과에 이어서 추가로 조회하고자 하는 경우,
-이전에 조회된 bkey 값을 바탕으로 bkey range를 재조정하여 사용할 수 있다.
-
 sort-merge get을 수행하는 함수는 아래와 같다.
 여러 b+tree들에서 from ~ to 범위에 속한 bkey를 가지면서 eFlagFilter 조건을 만족하는 elements들을 sort merge하며 count개를 조회한다.
+이전의 조회 결과에 이어서 추가로 조회하고자 하는 경우,
+이전에 조회된 bkey 값을 바탕으로 bkey range를 재조정하여 사용할 수 있다.
 
 ```java
 SMGetFuture<List<SMGetElement<Object>>>
@@ -1229,8 +1195,8 @@ asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFi
 - count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 count 지정
   - **count 값은 1 이상 1000이하이어야 한다.**
   - 이는 sort-merge get 연산을 부담이 너무 크지 않은 연산으로 제한하기 위해서이다.
-- smgetMode: smget에 대해서 mode를 지정하는 flag
-  - unique 조회 또는 duplicate 조회를 지정한다.
+- smgetMode: smget 수행 결과에서 중복 bkey를 허용할 지 아닐지를 지정하는 조건
+  - unique 또는 duplicate 타입을 지정한다.
 
 수행 결과는 future 객체를 통해 얻는다.
 
@@ -1307,8 +1273,7 @@ try {
    - 응용은 이들 키들에 대해서는 back-end storage인 DB에서 동일 조회 조건으로 elements를 검색하여 sort-merge 결과에 반영하여야 한다.
 6. bkey 조회 범위의 처음 bkey가 존재하지만 bkey 범위의 끝에 다다르기 전에 trim이 발생한 key와 trim 직전에 cache에 있는 마지막 bkey를 조회할 수 있다.
    - 응용은 이들 키들에 대해 trim 직전 마지막 bkey 이후에 trim된 bkey들을 back-end storage인 DB에서 조회하여 sort-merge 결과에 반영하여야 한다.
-7. Sort merge get의 최종 수 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
-
+7. Sort merge get의 최종 수행 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 ## B+Tree Position 조회
 
