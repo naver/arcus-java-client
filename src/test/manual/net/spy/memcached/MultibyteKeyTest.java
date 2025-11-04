@@ -49,7 +49,6 @@ import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.collection.SetExist;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
@@ -280,7 +279,7 @@ class MultibyteKeyTest {
     try {
       opFact.bopsmget(
               new BTreeSMGetWithLongTypeBkey<>(null,
-                      keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, SMGetMode.UNIQUE),
+                      keyList, 0L, 100L, ElementFlagFilter.DO_NOT_FILTER, 0, true),
           new BTreeSortMergeGetOperation.Callback() {
             @Override
             public void gotData(String key, int flags, Object bkey, byte[] eflag, byte[] data) {

@@ -24,7 +24,6 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 
 import org.junit.jupiter.api.Test;
 
@@ -65,10 +64,9 @@ class ByteArrayBKeySMGetIrregularEflagTest extends BaseIntegrationTest {
       mc.asyncBopInsert(key2, new byte[]{4}, eFlag, value + "2",
               new CollectionAttributes()).get();
 
-      SMGetMode smgetMode = SMGetMode.UNIQUE;
       List<SMGetElement<Object>> list = mc.asyncBopSortMergeGet(
               testKeyList, new byte[]{0}, new byte[]{10},
-              ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode).get();
+              ElementFlagFilter.DO_NOT_FILTER, 10, true).get();
 
       for (int i = 0; i < list.size(); i++) {
         System.out.println(list.get(i));

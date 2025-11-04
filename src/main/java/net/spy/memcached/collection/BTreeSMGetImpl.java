@@ -36,7 +36,7 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   protected final String range;
   protected final ElementFlagFilter eFlagFilter;
   protected final int count;
-  protected final SMGetMode smgetMode;
+  protected final boolean unique;
 
   private String key;
   private int flags;
@@ -47,13 +47,13 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
   protected BTreeSMGetImpl(MemcachedNode node, List<String> keyList,
                            String range,
                            ElementFlagFilter eFlagFilter,
-                           int count, SMGetMode smgetMode) {
+                           int count, boolean unique) {
     this.node = node;
     this.keyList = keyList;
     this.range = range;
     this.eFlagFilter = eFlagFilter;
     this.count = count;
-    this.smgetMode = smgetMode;
+    this.unique = unique;
   }
 
   public void setKeySeparator(String keySeparator) {
@@ -98,7 +98,11 @@ public abstract class BTreeSMGetImpl<T> implements BTreeSMGet<T> {
       b.append(" ").append(eFlagFilter);
     }
     b.append(" ").append(count);
-    b.append(" ").append(smgetMode.getMode());
+    if (unique) {
+      b.append(" unique");
+    } else {
+      b.append(" duplicate");
+    }
 
     str = b.toString();
     return str;

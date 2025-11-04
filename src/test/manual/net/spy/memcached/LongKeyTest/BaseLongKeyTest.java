@@ -12,7 +12,6 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
 import net.spy.memcached.internal.SMGetFuture;
@@ -175,10 +174,9 @@ class BaseLongKeyTest extends BaseIntegrationTest {
       assertTrue(mc.asyncBopInsert(keys.get(i), i, null, "VALUE" + i,
               new CollectionAttributes()).get());
     }
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keys, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future
               .get();

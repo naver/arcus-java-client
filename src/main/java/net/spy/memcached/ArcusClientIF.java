@@ -1332,6 +1332,7 @@ public interface ArcusClientIF extends MemcachedClientIF {
    * @param smgetMode   smgetMode
    * @return a future that will hold the return value list of the fetch.
    */
+  @Deprecated
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode);
@@ -1865,9 +1866,42 @@ public interface ArcusClientIF extends MemcachedClientIF {
    * @param smgetMode   smgetMode
    * @return a future that will hold the return value list of the fetch.
    */
+  @Deprecated
   SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode);
+
+  /**
+   * Get elements that matched both filter and bkey range criteria from
+   * multiple b+tree. The result is sorted by order of bkey.
+   *
+   * @param keyList     b+ tree key list
+   * @param from        bkey index from
+   * @param to          bkey index to
+   * @param eFlagFilter element flag filter
+   * @param count       number of returning values. must be larger than 0 and not more than 1000.
+   * @param unique      true if only unique bkeys are returned.
+   * @return a future that will hold the return value list of the fetch.
+   */
+  SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique);
+
+  /**
+   * Get elements that matched both filter and bkey range criteria from
+   * multiple b+tree. The result is sorted by order of bkey.
+   *
+   * @param keyList     b+ tree key list
+   * @param from        bkey index from
+   * @param to          bkey index to
+   * @param eFlagFilter element flag filter
+   * @param count       number of returning values. must be larger than 0 and not more than 1000.
+   * @param unique      true if only unique bkeys are returned.
+   * @return a future that will hold the return value list of the fetch.
+   */
+  SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique);
 
   /**
    * Insert one item into multiple b+trees at once.

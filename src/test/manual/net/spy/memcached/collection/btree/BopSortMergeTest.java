@@ -28,7 +28,6 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.collection.SMGetTrimKey;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -102,13 +101,12 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyTo = 5L;
     queryCount = 10;
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = null;
     List<SMGetElement<Object>> result;
 
     try {
       future = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, false);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -191,13 +189,12 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyTo = 5L;
     queryCount = 10;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = null;
     List<SMGetElement<Object>> result;
 
     try {
       future = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, true);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -281,7 +278,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyFrom = 5L;
     bkeyTo = 0L;
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future10 = null;
     SMGetFuture<List<SMGetElement<Object>>> future6 = null;
     SMGetFuture<List<SMGetElement<Object>>> future5 = null;
@@ -295,15 +291,15 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future10 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, false);
       future6 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, false);
       future5 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, false);
       future3 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, false);
       future1 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, false);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -449,7 +445,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyFrom = 5L;
     bkeyTo = 0L;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future10 = null;
     SMGetFuture<List<SMGetElement<Object>>> future6 = null;
     SMGetFuture<List<SMGetElement<Object>>> future5 = null;
@@ -463,15 +458,15 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future10 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, true);
       future6 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, true);
       future5 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, true);
       future3 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, true);
       future1 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, true);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -621,13 +616,12 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyTo = 5L;
     queryCount = 10;
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = null;
     List<SMGetElement<Object>> result;
 
     try {
       future = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, false);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -710,13 +704,12 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyTo = 5L;
     queryCount = 10;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = null;
     List<SMGetElement<Object>> result;
 
     try {
       future = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, queryCount, true);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -800,7 +793,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyFrom = 5L;
     bkeyTo = 0L;
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future10 = null;
     SMGetFuture<List<SMGetElement<Object>>> future6 = null;
     SMGetFuture<List<SMGetElement<Object>>> future5 = null;
@@ -814,15 +806,15 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future10 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, false);
       future6 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, false);
       future5 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, false);
       future3 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, false);
       future1 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, false);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -968,7 +960,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     bkeyFrom = 5L;
     bkeyTo = 0L;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future10 = null;
     SMGetFuture<List<SMGetElement<Object>>> future6 = null;
     SMGetFuture<List<SMGetElement<Object>>> future5 = null;
@@ -982,15 +973,15 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future10 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 10, true);
       future6 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 6, true);
       future5 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 5, true);
       future3 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 3, true);
       future1 = mc.asyncBopSortMergeGet(
-          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, smgetMode);
+          keyList3, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, 1, true);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -1129,7 +1120,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     // - key0: 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, trim
     // - key1:  9,  8,  7,  6,  5,  4,  3,  2,  1
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future1 = null; // bop smget 9 2 20..10 100 duplicate
     SMGetFuture<List<SMGetElement<Object>>> future2 = null; // bop smget 9 2 9..5 100 duplicate
     List<SMGetElement<Object>> result1;
@@ -1137,9 +1127,9 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future1 = mc.asyncBopSortMergeGet(
-          keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
+          keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, false);
       future2 = mc.asyncBopSortMergeGet(
-          keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
+          keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, false);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }
@@ -1224,7 +1214,6 @@ class BopSortMergeTest extends BaseIntegrationTest {
     // - key0: 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, trim
     // - key1:  9,  8,  7,  6,  5,  4,  3,  2,  1
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future1 = null; // bop smget 9 2 20..10 100 unique
     SMGetFuture<List<SMGetElement<Object>>> future2 = null; // bop smget 9 2 9..5 100 unique
     List<SMGetElement<Object>> result1;
@@ -1232,9 +1221,9 @@ class BopSortMergeTest extends BaseIntegrationTest {
 
     try {
       future1 = mc.asyncBopSortMergeGet(
-          keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
+          keyList2, 20, 10, ElementFlagFilter.DO_NOT_FILTER, 100, true);
       future2 = mc.asyncBopSortMergeGet(
-          keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, smgetMode);
+          keyList2, 9, 5, ElementFlagFilter.DO_NOT_FILTER, 100, true);
     } catch (IllegalStateException e) {
       fail(e.getMessage());
     }

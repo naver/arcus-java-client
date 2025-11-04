@@ -25,15 +25,15 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
   public BTreeSMGetWithLongTypeBkey(MemcachedNode node, List<String> keyList,
                                     long from, long to,
                                     ElementFlagFilter eFlagFilter,
-                                    int count, SMGetMode smgetMode) {
-    super(node, keyList, from + ".." + to, eFlagFilter, count, smgetMode);
+                                    int count, boolean unique) {
+    super(node, keyList, from + ".." + to, eFlagFilter, count, unique);
   }
 
   private BTreeSMGetWithLongTypeBkey(MemcachedNode node, List<String> keyList,
                                      String range,
                                      ElementFlagFilter eFlagFilter,
-                                     int count, SMGetMode smgetMode) {
-    super(node, keyList, range, eFlagFilter, count, smgetMode);
+                                     int count, boolean unique) {
+    super(node, keyList, range, eFlagFilter, count, unique);
   }
 
   @Override
@@ -49,6 +49,6 @@ public class BTreeSMGetWithLongTypeBkey<T> extends BTreeSMGetImpl<T> {
   @Override
   public BTreeSMGet<T> clone(MemcachedNode node, List<String> keyList) {
     return new BTreeSMGetWithLongTypeBkey<>(node, keyList,
-            range, eFlagFilter, count, smgetMode);
+            range, eFlagFilter, count, unique);
   }
 }

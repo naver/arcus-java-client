@@ -1183,9 +1183,9 @@ sort-merge get을 수행하는 함수는 아래와 같다.
 
 ```java
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode)
+asyncBopSortMergeGet(List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter, int count, boolean unique)
 SMGetFuture<List<SMGetElement<Object>>>
-asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode)
+asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int count, boolean unique)
 ```
 
 - keyList: b+tree items의 key list
@@ -1195,8 +1195,7 @@ asyncBopSortMergeGet(List<String> keyList, byte[] from, byte[] to, ElementFlagFi
 - count: bkey range와 eflag filter 조건을 만족하는 elements에서 실제 조회할 element의 count 지정
   - **count 값은 1 이상 1000이하이어야 한다.**
   - 이는 sort-merge get 연산을 부담이 너무 크지 않은 연산으로 제한하기 위해서이다.
-- smgetMode: smget 수행 결과에서 중복 bkey를 허용할 지 아닐지를 지정하는 조건
-  - unique 또는 duplicate 타입을 지정한다.
+- unique: smget 수행 결과에서 중복 bkey를 허용할 지 아닐지를 지정하는 조건
 
 수행 결과는 future 객체를 통해 얻는다.
 
@@ -1223,11 +1222,10 @@ long bkeyFrom = 0L; // (1)
 long bkeyTo = 100L;
 int count = 10;
 
-SMGetMode smgetMode = SMGetMode.DUPLICATE;
 SMGetFuture<List<SMGetElement<Object>>> future = null;
 
 try {
-    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, count, smgetMode); // (2)
+    future = mc.asyncBopSortMergeGet(keyList, bkeyFrom, bkeyTo, ElementFlagFilter.DO_NOT_FILTER, count, false); // (2)
 } catch (IllegalStateException e) {
     // handle exception
 }

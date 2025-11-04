@@ -1729,29 +1729,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode) {
-    validateKeys(keyList);
-    checkDupKey(keyList);
-    if (count < 1) {
-      throw new IllegalArgumentException("Count must be larger than 0.");
-    }
-    if (count > MAX_SMGET_COUNT) {
-      throw new IllegalArgumentException("The count must not exceed a maximum of "
-              + MAX_SMGET_COUNT + ".");
-    }
-
-    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
-    List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
-            arrangedKey.size());
-    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
-      smGetList.add(new BTreeSMGetWithLongTypeBkey<>(entry.getKey(),
-              entry.getValue(), from, to, eFlagFilter, count, smgetMode));
-    }
-    return smget(smGetList, count, smgetMode == SMGetMode.UNIQUE, (from > to), collectionTranscoder);
+    return this.asyncBopSortMergeGet(keyList, from, to, eFlagFilter, count, smgetMode == SMGetMode.UNIQUE);
   }
 
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
@@ -2651,10 +2634,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
           int count, SMGetMode smgetMode) {
+    return this.asyncBopSortMergeGet(keyList, from, to, eFlagFilter, count, smgetMode == SMGetMode.UNIQUE);
+  }
+
+  @Override
+  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique) {
     BTreeUtil.validateBkey(from, to);
     validateKeys(keyList);
     checkDupKey(keyList);
@@ -2672,11 +2663,36 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       smGetList.add(new BTreeSMGetWithByteTypeBkey<>(entry.getKey(),
-              entry.getValue(), from, to, eFlagFilter, count, smgetMode));
+              entry.getValue(), from, to, eFlagFilter, count, unique));
     }
 
-    return smget(smGetList, count, smgetMode == SMGetMode.UNIQUE,
+    return smget(smGetList, count, unique,
             (BTreeUtil.compareByteArraysInLexOrder(from, to) > 0), collectionTranscoder);
+  }
+
+  @Override
+  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique) {
+    validateKeys(keyList);
+    checkDupKey(keyList);
+    if (count < 1) {
+      throw new IllegalArgumentException("Count must be larger than 0.");
+    }
+    if (count > MAX_SMGET_COUNT) {
+      throw new IllegalArgumentException("The count must not exceed a maximum of "
+              + MAX_SMGET_COUNT + ".");
+    }
+
+    Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
+            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
+    List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
+            arrangedKey.size());
+    for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
+      smGetList.add(new BTreeSMGetWithLongTypeBkey<>(entry.getKey(),
+              entry.getValue(), from, to, eFlagFilter, count, unique));
+    }
+    return smget(smGetList, count, unique, (from > to), collectionTranscoder);
   }
 
   @Override

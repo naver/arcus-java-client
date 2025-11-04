@@ -3,6 +3,7 @@ package net.spy.memcached.collection;
 /**
  * A type component for "bop smgetmode"
  */
+@Deprecated
 public enum SMGetMode {
   UNIQUE("unique"),
   DUPLICATE("duplicate");

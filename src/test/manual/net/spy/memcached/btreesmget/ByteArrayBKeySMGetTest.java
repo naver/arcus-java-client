@@ -27,7 +27,6 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -75,10 +74,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 1};
     byte[] to = new byte[]{(byte) 2};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertTrue(map.isEmpty());
@@ -109,10 +107,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -150,10 +147,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -191,10 +187,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -232,10 +227,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(9, map.size());
@@ -273,10 +267,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -308,10 +301,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(5, map.size());
@@ -343,10 +335,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 10};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(5, map.size());
@@ -380,10 +371,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 1000};
 
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 500, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.MILLISECONDS);
       // System.out.println("elapsed 1 "
@@ -423,10 +413,9 @@ class ByteArrayBKeySMGetTest extends BaseIntegrationTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 100};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 500, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(50, map.size());

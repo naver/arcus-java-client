@@ -9,7 +9,6 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BroadcastFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -266,7 +265,7 @@ class CancelFutureTest extends BaseIntegrationTest {
     // given
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
         Arrays.asList("btree1", "btree2"),
-        0, 10, ElementFlagFilter.DO_NOT_FILTER, 100, SMGetMode.UNIQUE);
+        0, 10, ElementFlagFilter.DO_NOT_FILTER, 100, true);
 
     // when
     boolean cancelled = false;
