@@ -1086,6 +1086,7 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().flush(prefix, delay);
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, long from, long to,
@@ -1337,12 +1338,29 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
             count, withDelete, dropIfEmpty, tc);
   }
 
+  @Deprecated
   @Override
   public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
           List<String> keyList, byte[] from, byte[] to,
           ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
     return this.getClient().asyncBopSortMergeGet(keyList, from, to,
             eFlagFilter, count, smgetMode);
+  }
+
+  @Override
+  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique) {
+    return this.getClient().asyncBopSortMergeGet(keyList, from, to,
+            eFlagFilter, count, unique);
+  }
+
+  @Override
+  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
+          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
+          int count, boolean unique) {
+    return this.getClient().asyncBopSortMergeGet(keyList, from, to,
+            eFlagFilter, count, unique);
   }
 
   @Override

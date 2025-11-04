@@ -27,7 +27,6 @@ import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 
 import org.junit.jupiter.api.AfterEach;
@@ -90,11 +89,10 @@ class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, new byte[]{(byte) 0},
                     new byte[]{(byte) 10},
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(3, map.size());
@@ -130,11 +128,10 @@ class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, new byte[]{(byte) 0},
                     new byte[]{(byte) 15},
-                    ElementFlagFilter.DO_NOT_FILTER, 20, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 20, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(0, map.size());
@@ -180,10 +177,9 @@ class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
     byte[] to = new byte[]{(byte) 10};
     long count = 100;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(1, map.size());
@@ -229,10 +225,9 @@ class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
     byte[] to = new byte[]{(byte) 0};
     long count = 100;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(9, map.size());
@@ -260,10 +255,9 @@ class ByteArrayBKeySMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, 10, 0,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());

@@ -26,7 +26,6 @@ import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 import net.spy.memcached.ops.CollectionOperationStatus;
 
@@ -75,10 +74,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 1, 2,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertTrue(map.isEmpty());
@@ -111,10 +109,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -153,10 +150,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -195,10 +191,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -237,10 +232,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(9, map.size());
@@ -279,10 +273,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 10, 0,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -316,10 +309,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(5, map.size());
@@ -353,10 +345,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 10, 0,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(5, map.size());
@@ -395,10 +386,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, 1000,
-                    ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 500, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
@@ -432,10 +422,9 @@ class SMGetWithCombinationEflagTest extends BaseIntegrationTest {
       fail(e.getMessage());
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(keyList, 0, testSize,
-                    ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 500, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(50, map.size());

@@ -29,7 +29,6 @@ import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.SMGetFuture;
 
 import org.junit.jupiter.api.AfterEach;
@@ -89,10 +88,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, 0, 10,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(3, map.size());
@@ -129,10 +127,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, 0, 15,
-                    ElementFlagFilter.DO_NOT_FILTER, 20, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 20, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(0, map.size());
@@ -204,10 +201,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     long to = 10;
     long count = from - to;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(1, map.size());
@@ -279,10 +275,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     long to = 0;
     long count = from - to;
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, from, to,
-                    ElementFlagFilter.DO_NOT_FILTER, (int) count, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, (int) count, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(9, map.size());
@@ -310,10 +305,9 @@ class SMGetErrorTest extends BaseIntegrationTest {
     }
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.DUPLICATE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc
             .asyncBopSortMergeGet(KEY_LIST, 10, 0,
-                    ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+                    ElementFlagFilter.DO_NOT_FILTER, 10, false);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(10, map.size());
@@ -349,9 +343,8 @@ class SMGetErrorTest extends BaseIntegrationTest {
     testKeyList.add(KEY_LIST.get(1));
 
     // sort merge get
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-        testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+        testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, true);
     try {
       List<SMGetElement<Object>> map = future.get(1000L, TimeUnit.SECONDS);
       assertEquals(0, map.size());
@@ -388,9 +381,8 @@ class SMGetErrorTest extends BaseIntegrationTest {
     }
 
     // keylist is null
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
     try {
-      mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+      mc.asyncBopSortMergeGet(null, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, true);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is null.", e.getMessage());
@@ -399,7 +391,7 @@ class SMGetErrorTest extends BaseIntegrationTest {
     // keylist is empty
     try {
       mc.asyncBopSortMergeGet(
-              new ArrayList<>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+              new ArrayList<>(), 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, true);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Key list is empty.", e.getMessage());
@@ -407,7 +399,7 @@ class SMGetErrorTest extends BaseIntegrationTest {
 
     // count == 0
     try {
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, smgetMode);
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 0, true);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Count must be larger than 0.", e.getMessage());
@@ -417,7 +409,7 @@ class SMGetErrorTest extends BaseIntegrationTest {
     try {
       // add duplicate key to testKeyList
       testKeyList.add(KEY_LIST.get(1));
-      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, smgetMode);
+      mc.asyncBopSortMergeGet(testKeyList, 10, 0, ElementFlagFilter.DO_NOT_FILTER, 10, true);
       fail("This should be an exception");
     } catch (Exception e) {
       assertEquals("Duplicate keys exist in key list.", e.getMessage());

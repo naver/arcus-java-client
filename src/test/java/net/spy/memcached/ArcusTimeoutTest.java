@@ -30,7 +30,6 @@ import java.util.concurrent.TimeoutException;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.internal.SMGetFuture;
@@ -233,10 +232,8 @@ class ArcusTimeoutTest {
       keyList.add(KEY + i);
     }
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
-
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+            keyList, 0, 1000, ElementFlagFilter.DO_NOT_FILTER, 500, true);
     assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
@@ -250,10 +247,8 @@ class ArcusTimeoutTest {
     byte[] from = new byte[]{(byte) 0};
     byte[] to = new byte[]{(byte) 1000};
 
-    SMGetMode smgetMode = SMGetMode.UNIQUE;
-
     SMGetFuture<List<SMGetElement<Object>>> future = mc.asyncBopSortMergeGet(
-            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, smgetMode);
+            keyList, from, to, ElementFlagFilter.DO_NOT_FILTER, 500, true);
     assertThrows(TimeoutException.class, () -> future.get(1L, TimeUnit.MILLISECONDS));
   }
 
