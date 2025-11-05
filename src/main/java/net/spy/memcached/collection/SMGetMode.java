@@ -3,9 +3,10 @@ package net.spy.memcached.collection;
 /**
  * A type component for "bop smgetmode"
  */
-@Deprecated
 public enum SMGetMode {
+  @Deprecated
   UNIQUE("unique"),
+  @Deprecated
   DUPLICATE("duplicate");
 
   private String mode;
@@ -14,6 +15,7 @@ public enum SMGetMode {
     this.mode = mode;
   }
 
+  @Deprecated
   public String getMode() {
     return mode;
   }
