@@ -16,7 +16,6 @@
  */
 package net.spy.memcached.transcoders;
 
-/*
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,13 +38,11 @@ import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_FLOAT;
 import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_INT;
 import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_LONG;
 import static net.spy.memcached.transcoders.TranscoderUtils.SPECIAL_MASK;
-*/
 
 /**
  * Transcoder that serializes and deserializes objects to and from JSON.
  * @param <T> the type of objects to be transcoded
  */
-/*
 public class JsonSerializingTranscoder<T> extends SpyObject implements Transcoder<T> {
 
   private final ObjectMapper objectMapper;
@@ -82,7 +79,7 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
   public int getMaxSize() {
     return maxSize;
   }
-*/
+
   /**
    * Set the compression threshold to the given number of bytes.  This
    * transcoder will attempt to compress any data being stored that's larger
@@ -90,15 +87,13 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
    *
    * @param threshold the number of bytes
    */
-/*
   public void setCompressionThreshold(int threshold) {
     cu.setCompressionThreshold(threshold);
   }
-*/
+
   /**
    * Set the character set for string value transcoding (defaults to UTF-8).
    */
-/*
   public void setCharset(String to) {
     tu.setCharset(to);
   }
@@ -234,4 +229,3 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
     }
   }
 }
-*/
