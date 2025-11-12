@@ -252,6 +252,8 @@ public interface MemcachedNode {
    */
   void setupForAuth();
 
+  boolean isAuthInProgress();
+
   boolean isAuthFailed();
 
   /**

@@ -25,6 +25,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -67,6 +69,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   private volatile CountDownLatch authLatch;
   private volatile boolean authFailed = false;
   private ArrayList<Operation> reconnectBlocked;
+  private Queue<Operation> authBlockedWriteQ;
   private String version = null;
   private boolean isAsciiProtocol = true;
   private boolean enabledMGetOp = false;
@@ -321,7 +324,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final boolean addOpToWriteQ(Operation op) {
     op.setHandlingNode(this);
     op.reset();
-    if (!writeQ.offer(op)) {
+    Queue<Operation> queue = authBlockedWriteQ != null ? authBlockedWriteQ : writeQ;
+    if (!queue.offer(op)) {
       op.cancel("write queue overflow");
       return false;
     }
@@ -561,6 +565,16 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     if (authLatch.getCount() > 0) {
       authFailed = !isSuccessful;
 
+      if (authBlockedWriteQ != null && !authBlockedWriteQ.isEmpty()) {
+        if (authFailed) {
+          for (Operation op : authBlockedWriteQ) {
+            op.cancel("authentication failed");
+          }
+        } else {
+          writeQ.addAll(authBlockedWriteQ);
+        }
+        authBlockedWriteQ = null;
+      }
       if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
         if (authFailed) {
           for (Operation op : reconnectBlocked) {
@@ -578,6 +592,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void setupForAuth() {
     if (shouldAuth) {
       authLatch = new CountDownLatch(1);
+      authBlockedWriteQ = new LinkedList<>();
       if (!writeQ.isEmpty() || !inputQueue.isEmpty()) {
         reconnectBlocked = new ArrayList<>(
                 inputQueue.size() + writeQ.size() + 1);
@@ -586,6 +601,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
       }
       assert (inputQueue.isEmpty() && writeQ.isEmpty());
     }
+  }
+
+  public boolean isAuthInProgress() {
+    return authLatch.getCount() > 0;
   }
 
   public boolean isAuthFailed() {
