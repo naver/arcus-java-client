@@ -940,7 +940,7 @@ public final class MemcachedConnection extends SpyObject {
       throws IOException {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
-      if (qa.getReplicaGroup().isDelayedSwitchover()) {
+      if (qa.getReplicaGroup().isDelayedSwitchover() && !qa.isAuthInProgress()) {
         return;
       }
     }

@@ -202,6 +202,10 @@ public final class MemcachedNodeROImpl implements MemcachedNode {
     throw new UnsupportedOperationException();
   }
 
+  public boolean isAuthInProgress() {
+    throw new UnsupportedOperationException();
+  }
+
   public boolean isAuthFailed() {
     throw new UnsupportedOperationException();
   }

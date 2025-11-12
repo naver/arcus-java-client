@@ -219,6 +219,10 @@ public class MockMemcachedNode implements MemcachedNode {
     // noop
   }
 
+  public boolean isAuthInProgress() {
+    return false;
+  }
+
   public boolean isAuthFailed() {
     return false;
   }
