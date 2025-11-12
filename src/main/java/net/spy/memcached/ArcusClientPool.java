@@ -49,6 +49,7 @@ import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
+import net.spy.memcached.v2.AsyncArcusCommands;
 
 /**
  * Bags for ArcusClient
@@ -82,6 +83,10 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
    */
   ArcusClient[] getAllClients() {
     return client;
+  }
+
+  public <T> AsyncArcusCommands<T> asyncCommands() {
+    return new AsyncArcusCommands<>(this::getClient);
   }
 
   @Override
