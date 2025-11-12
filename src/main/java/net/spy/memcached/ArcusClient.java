@@ -150,6 +150,7 @@ import net.spy.memcached.protocol.BaseOperationImpl;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.TranscoderUtils;
 import net.spy.memcached.util.BTreeUtil;
+import net.spy.memcached.v2.AsyncArcusCommands;
 
 /**
  * Client to a Arcus.
@@ -462,6 +463,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                 + mkey + "''");
       }
     }
+  }
+
+  public <T> AsyncArcusCommands<T> asyncCommands() {
+    return new AsyncArcusCommands<>(() -> this);
   }
 
   @Override
