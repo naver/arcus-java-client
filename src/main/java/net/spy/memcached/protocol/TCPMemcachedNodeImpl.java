@@ -336,11 +336,10 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   public final void insertOp(Operation op) {
     op.setHandlingNode(this);
     op.initialize();
-    ArrayList<Operation> tmp = new ArrayList<>(
-            inputQueue.size() + 1);
-    tmp.add(op);
-    inputQueue.drainTo(tmp);
-    inputQueue.addAll(tmp);
+    if (!writeQ.offer(op)) {
+      op.cancel("write queue overflow");
+      return;
+    }
     addOpCount.incrementAndGet();
   }
 

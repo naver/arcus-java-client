@@ -47,6 +47,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.security.sasl.Sasl;
+import javax.security.sasl.SaslClient;
+
+import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.auth.AuthException;
 import net.spy.memcached.compat.SpyObject;
 import net.spy.memcached.compat.log.LoggerFactory;
@@ -102,6 +106,7 @@ public final class MemcachedConnection extends SpyObject {
 
   private final OperationFactory opFactory;
   private final ConnectionFactory connFactory;
+  private final AuthDescriptor authDescriptor;
   private final Collection<ConnectionObserver> connObservers =
           new ConcurrentLinkedQueue<>();
   private final Set<MemcachedNode> nodesNeedVersionOp = new HashSet<>();
@@ -137,6 +142,7 @@ public final class MemcachedConnection extends SpyObject {
                              FailureMode fm, OperationFactory opfactory)
           throws IOException {
     this.connFactory = f;
+    authDescriptor = f.getAuthDescriptor();
     connName = name;
     connObservers.addAll(obs);
     addedQueue = new ConcurrentLinkedQueue<>();
@@ -636,6 +642,69 @@ public final class MemcachedConnection extends SpyObject {
     return qa;
   }
 
+  private void prepareAuthentication(final MemcachedNode node) {
+    if (authDescriptor == null) {
+      return;
+    }
+
+    final SaslClient sc;
+    try {
+      sc = Sasl.createSaslClient(authDescriptor.getMechs(), null,
+              "memcached", node.getSocketAddress().toString(), null, authDescriptor.getCallback());
+    } catch (Exception e) {
+      throw new IllegalStateException("Can't create SaslClient", e);
+    }
+    if (sc == null) {
+      throw new IllegalStateException("SaslClient is null");
+    }
+
+    final OperationCallback cb = new OperationCallback() {
+      private boolean authDone = false;
+      private boolean mechDone = false;
+      private OperationStatus priorStatus = null;
+
+      @Override
+      public void receivedStatus(OperationStatus val) {
+        String msg = val.getMessage();
+        // If the status we found was SASL_OK or NOT_SUPPORTED, we're authDone.
+        if ("SASL_OK".equals(msg) || "NOT_SUPPORTED".equals(msg)) {
+          authDone = true;
+          node.authComplete(true);
+          getLogger().info("Authenticated to " + node.getSocketAddress());
+        } else if (!val.isSuccess()) {
+          authDone = true;
+          node.authComplete(false);
+          getLogger().error("Authentication failed to " + node.getSocketAddress() + ": " + msg);
+        } else if (!mechDone) {
+          mechDone = true;
+        } else {
+          // Get the prior status to create the correct operation.
+          priorStatus = val;
+        }
+      }
+
+      @Override
+      public void complete() {
+        if (authDone) {
+          return;
+        }
+
+        // NOTE: `this` keyword below is the OperationCallback object itself.
+        final Operation op;
+        if (priorStatus == null) {
+          op = opFactory.saslAuth(sc, this);
+        } else {
+          op = opFactory.saslStep(sc, KeyUtil.getKeyBytes(priorStatus.getMessage()), this);
+        }
+
+        insertOperation(node, op);
+      }
+    };
+
+    final Operation mechOp = opFactory.saslMechs(true, cb);
+    insertOperation(node, mechOp);
+  }
+
   private void prepareVersionInfo(final MemcachedNode node) {
     Operation op = opFactory.version(new OperationCallback() {
       @Override
@@ -867,6 +936,7 @@ public final class MemcachedConnection extends SpyObject {
     for (ConnectionObserver observer : connObservers) {
       observer.connectionEstablished(qa, rt);
     }
+    prepareAuthentication(qa);
     prepareVersionInfo(qa);
   }
 
@@ -1422,7 +1492,7 @@ public final class MemcachedConnection extends SpyObject {
     addOperation(findNodeByKey(key, o), o);
   }
 
-  public void insertOperation(final MemcachedNode node, final Operation o) {
+  private void insertOperation(final MemcachedNode node, final Operation o) {
     if (!node.isConnected() && failureMode == FailureMode.Cancel) {
       o.setHandlingNode(node);
       o.cancel("inactive node");

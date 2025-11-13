@@ -42,8 +42,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import net.spy.memcached.auth.AuthDescriptor;
-import net.spy.memcached.auth.AuthThreadMonitor;
 import net.spy.memcached.compat.SpyThread;
 import net.spy.memcached.internal.BroadcastFuture;
 import net.spy.memcached.internal.BulkFuture;
@@ -120,7 +118,7 @@ import net.spy.memcached.transcoders.Transcoder;
  * }</pre>
  */
 public class MemcachedClient extends SpyThread
-        implements MemcachedClientIF, ConnectionObserver {
+        implements MemcachedClientIF {
 
   private volatile boolean running = true;
   private volatile boolean shuttingDown = false;
@@ -132,15 +130,11 @@ public class MemcachedClient extends SpyThread
 
   protected final Transcoder<Object> transcoder;
 
-  private final AuthDescriptor authDescriptor;
-
   private final byte delimiter;
 
   private static final String DEFAULT_MEMCACHED_CLIENT_NAME = "MemcachedClient";
 
   private static final int GET_BULK_CHUNK_SIZE = 200;
-
-  private final AuthThreadMonitor authMonitor = new AuthThreadMonitor();
 
   /**
    * Get a memcached client operating on the specified memcached locations.
@@ -219,10 +213,6 @@ public class MemcachedClient extends SpyThread
     conn = cf.createConnection(name, addrs);
     assert conn != null : "Connection factory failed to make a connection";
     operationTimeout = cf.getOperationTimeout();
-    authDescriptor = cf.getAuthDescriptor();
-    if (authDescriptor != null) {
-      addObserver(this);
-    }
     delimiter = cf.getDelimiter();
     setName("Memcached IO over " + conn);
     setDaemon(cf.isDaemon());
@@ -2158,16 +2148,6 @@ public class MemcachedClient extends SpyThread
    */
   public boolean removeObserver(ConnectionObserver obs) {
     return conn.removeObserver(obs);
-  }
-
-  public void connectionEstablished(MemcachedNode node, int reconnectCount) {
-    if (authDescriptor != null) {
-      authMonitor.authConnection(conn, opFact, authDescriptor, node);
-    }
-  }
-
-  public void connectionLost(MemcachedNode node) {
-    // Don't care.
   }
 
   /**
