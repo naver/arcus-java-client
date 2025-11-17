@@ -1,10 +1,10 @@
-## Other API
+# Other API
 
 본 절에서는 아래의 나머지 API들을 설명한다.
 
 - [Flush](09-other-API.md#flush)
 
-### Flush
+## Flush
 
 ARCUS는 prefix단위로 flush하는 기능을 제공한다.
 캐시 서버에 저장된 모든 데이터들 중 특정 prefix를 사용하는 모든 key들을 한번의 요청으로 삭제할 수 있다. 단, Front Cache의 데이터는 flush 되지 않는다.
