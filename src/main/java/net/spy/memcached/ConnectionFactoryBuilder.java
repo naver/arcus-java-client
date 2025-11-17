@@ -341,6 +341,15 @@ public class ConnectionFactoryBuilder {
   }
 
   /**
+   * Get the auth descriptor.
+   *
+   * @return the auth descriptor
+   */
+  public AuthDescriptor getAuthDescriptor() {
+    return authDescriptor;
+  }
+
+  /**
    * Set the maximum timeout exception threshold. Should be larger than 2 because
    * this property is to detect continuously occurred exceptions.
    */
