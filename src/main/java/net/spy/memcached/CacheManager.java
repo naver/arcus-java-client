@@ -31,7 +31,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+
 import net.spy.memcached.ArcusClientException.InitializeClientException;
+import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.compat.SpyThread;
 
 import org.apache.zookeeper.CreateMode;
@@ -279,6 +283,7 @@ public final class CacheManager extends SpyThread implements Watcher,
     // {client hostname}_{ip address}_{pool size}_java_{client version}_
     // {YYYYMMDDHHIISS}_{zk session id}
     // _jre={jre version}
+    // _sasluser={username}
 
     // get host info
     String hostInfo;
@@ -312,7 +317,29 @@ public final class CacheManager extends SpyThread implements Watcher,
       jreInfo = "_jre=null";
     }
 
-    return path + hostInfo + restInfo + jreInfo;
+    // get sasluser info (additional)
+    String sasluserInfo = "";
+    String username = getSaslUsername();
+    if (username != null) {
+      sasluserInfo = "_sasluser=" + username;
+    }
+
+    return path + hostInfo + restInfo + jreInfo + sasluserInfo;
+  }
+
+  private String getSaslUsername() {
+    AuthDescriptor authDescriptor = cfb.getAuthDescriptor();
+    if (authDescriptor == null) {
+      return null;
+    }
+
+    try {
+      NameCallback nc = new NameCallback("Name: ");
+      authDescriptor.getCallback().handle(new Callback[] {nc});
+      return nc.getName();
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /***************************************************************************
