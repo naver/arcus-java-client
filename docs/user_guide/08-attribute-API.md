@@ -1,4 +1,4 @@
-## Item Attributes
+# Item Attributes
 
 Item attributes는 각 cache item의 메타데이터를 의미한다.
 Item attributes의 기본 설명은 [ARCUS cache server의 item attributes 부분](https://github.com/naver/arcus-memcached/blob/master/docs/ascii-protocol/ch03-item-attributes.md)을 참고 하길 바란다.
@@ -9,7 +9,7 @@ Item attributes를 활용하여 item을 생성하거나, Item attributes를 조�
 - [Attribute 조회](08-attribute-API.md#attribute-조회)
 - [Attribute 변경](08-attribute-API.md#attribute-변경)
 
-### Attribute 생성
+## Attribute 생성
 
 CollectionAttributes
 - collection item 속성 구현체는 `CollectionAttributes`이며, 각 collection 유형의 item을 생성할 때 속성을 설정하기 위한 용도이다.   
@@ -44,7 +44,7 @@ try {
     
 ```
 
-### Attribute 조회
+## Attribute 조회
 
 주어진 key의 attributes를 조회하는 함수이다.
 
@@ -105,7 +105,7 @@ overflowaction: error
 3. Key가 없으면 null이 반환된다.
 
 
-### Attribute 변경
+## Attribute 변경
 
 주어진 key의 attributes를 변경하는 함수이다.
 
