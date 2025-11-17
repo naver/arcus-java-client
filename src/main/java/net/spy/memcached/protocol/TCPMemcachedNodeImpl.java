@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,9 +65,8 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   protected Operation optimizedOp = null;
   private volatile SelectionKey sk = null;
   private final boolean shouldAuth;
-  private volatile CountDownLatch authLatch;
+  private boolean authInProgress;
   private volatile boolean authFailed = false;
-  private ArrayList<Operation> reconnectBlocked;
   private Queue<Operation> authBlockedWriteQ;
   private String version = null;
   private boolean isAsciiProtocol = true;
@@ -112,10 +110,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     this.opQueueMaxBlockTime = opQueueMaxBlockTime;
     shouldAuth = waitForAuth;
     isAsciiProtocol = asciiProtocol;
-    authLatch = new CountDownLatch(0);
+    authInProgress = false;
   }
 
   public final void copyInputQueue() {
+    if (authInProgress) {
+      return;
+    }
+
     Collection<Operation> tmp = new ArrayList<>();
 
     // don't drain more than we have space to place
@@ -294,19 +296,6 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
     op.setHandlingNode(this);
     op.initialize();
     try {
-      if (!authLatch.await(1, TimeUnit.SECONDS)) {
-        op.cancel("authentication timeout");
-        getLogger().warn(
-                "Operation canceled because authentication " +
-                        "or reconnection and authentication has " +
-                        "taken more than one second to complete.");
-        getLogger().debug("Canceled operation %s", op.toString());
-        return;
-      }
-      if (authFailed) {
-        op.cancel("authentication failed");
-        return;
-      }
       if (!inputQueue.offer(op, opQueueMaxBlockTime,
               TimeUnit.MILLISECONDS)) {
         throw new IllegalStateException("Timed out waiting to add "
@@ -561,7 +550,7 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
   }
 
   public final void authComplete(boolean isSuccessful) {
-    if (authLatch.getCount() > 0) {
+    if (authInProgress) {
       authFailed = !isSuccessful;
 
       if (authBlockedWriteQ != null && !authBlockedWriteQ.isEmpty()) {
@@ -574,36 +563,23 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
         }
         authBlockedWriteQ = null;
       }
-      if (reconnectBlocked != null && !reconnectBlocked.isEmpty()) {
-        if (authFailed) {
-          for (Operation op : reconnectBlocked) {
-            op.cancel("authentication failed");
-          }
-        } else {
-          inputQueue.addAll(reconnectBlocked);
-        }
-        reconnectBlocked = null;
-      }
-      authLatch.countDown();
+      authInProgress = false;
     }
   }
 
   public final void setupForAuth() {
     if (shouldAuth) {
-      authLatch = new CountDownLatch(1);
+      authInProgress = true;
       authBlockedWriteQ = new LinkedList<>();
-      if (!writeQ.isEmpty() || !inputQueue.isEmpty()) {
-        reconnectBlocked = new ArrayList<>(
-                inputQueue.size() + writeQ.size() + 1);
-        writeQ.drainTo(reconnectBlocked);
-        inputQueue.drainTo(reconnectBlocked);
+      if (!writeQ.isEmpty()) {
+        writeQ.drainTo(authBlockedWriteQ);
       }
-      assert (inputQueue.isEmpty() && writeQ.isEmpty());
+      assert writeQ.isEmpty();
     }
   }
 
   public boolean isAuthInProgress() {
-    return authLatch.getCount() > 0;
+    return authInProgress;
   }
 
   public boolean isAuthFailed() {
