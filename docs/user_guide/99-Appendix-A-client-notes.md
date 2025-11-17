@@ -1,5 +1,45 @@
 # 부록 A. Java Client 사용시 주의사항
 
+## Expiretime 설정
+
+Expiretime은 아래와 같이 초 단위로 유효한 기간을 지정하는 것이며, 그 기간 이후에 해당 캐시 아이템은 자동 만료된다.
+- 0 : Expire되지 않는다.
+  - 단, 서버 메모리 부족시에 evict 될 수 있다.
+- N : N 초 이후에 expire 된다.
+  - N 값은 30일(30 * 24 * 60 * 60)이하이어야 한다.
+  - N 값이 30일(30 * 24 * 60 * 60) 초과이면, N 값을 만료 지점의 unit time으로 인식한다.
+
+Expiretime을 (40 * 24 * 60 * 60)으로 설정한다면,
+이는 1970년 기준의 unix time으로 인식되어 아주 옛날 시간이 되어 버리고 즉각 expire하게 된다.
+따라서, expiretime을 잘못 설정하면,
+client에서 분명히 저장하였지만 조회 시에 해당 데이터가 보이지 않을 수 있다.
+
+## Operation timeout 설정
+
+ARCUS Client의 비동기 메서드를 호출할 때 operation timeout을 지정할 수 있다.
+**이러한 operation timeout 값을 반드시 지정하여 사용할 것을 권장한다.**
+
+```java
+Future<Boolean> future = client.set("sample:testKey", 10, "testValue");
+boolean result = future.get(300L, TimeUnit.MILLISECONDS);
+```
+
+위 예제는 ARCUS 캐시 서버에 “testValue”를 저장할 때 timeout 값을 300ms로 지정한 코드이다.
+주어진 timeout 시간 내에 주어진 요청이 완료되지 않으면, `TimeoutException`이 발생한다.
+`TimeoutException` 발생의 주요 원인은 다음과 같다.
+
+- Burst traffic, small packet buffer size 등의 이유로 cache client와 cache server 사이에
+  packet retransmission이 발생할 수 있다.
+  Linux 환경에서 최소 retransmission timeout은 200ms이며,
+  그 다음의 retransmission timeout은 400ms, 800ms, ... 형태로 두 배씩 길어지게 된다.
+  Packet retransmission은 제법 흔하게 발생하고 있으므로,
+  이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
+  따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
+- 위의 코드가 실행되는 시점에서 full GC(garbage collection)가 발생했고, 
+  full GC time이 500ms였다면 이 요청은 timeout이 되게 된다.
+  **따라서, timeout값은 JVM full GC time을 고려하여 설정해야 한다.**
+  **대부분 몇십 개의 timeout이 발생하는 문제는 full GC time이 길어서 발생하는 문제이다.**
+
 ## Counter 사용
 
 ARCUS에서 counter를 사용할 경우 최초에 set 또는 add command를 이용하여 counter key를 등록해야 한다.
@@ -83,41 +123,6 @@ Operation queue block timeout 옵션을 설정하지 않으면, 작업 요청을
 해당 request를 요청하는 것보다 차라리 바로 실패로 처리하고,
 back-end 데이터 저장소로 요청을 보내는 것이 더 좋은 선택이 될 수 있다.
 
-
-## Expiretime 설정
-
-Expiretime은 초 단위로 지정된 시간만큼 미래의 시간인 Unix Time으로 변경되어 저장된다.
-그러나, '''expire time이 30일을 초과하면 1970년 기준의 Unix time으로 변경된다.''' 
-예를 들어, expiretime을 1000 * 60 * 60과 같은 식으로 등록을 하게 되면 대략 40일 정도가 되는데,
-이는 1970년 기준의 unix time으로 인식되어 아주 옛날 시간이 되어 버리고 즉각 expire하게 된다.
- '''따라서 client에서는 분명히 저장했다고 생각하여 retrieval command(get, gets)를 수행했을 경우에
- cache data가 전혀 나오지 않는 현상이 발생할 수 있는 것이다.'''
-
-
-### Operation timeout 설정
-
-ARCUS Client의 모든 비동기방식의 메서드를 호출할 때 timeout을 지정할 수 있다.
-**이러한 timeout 값을 반드시 지정하여 사용할 것을 권장한다.**
-
-```java
-Future<Boolean> setResult = client.set("sample:testKey", 10, "testValue");
-boolean result = setResult.get(300L, TimeUnit.MILLISECONDS);
-```
-
-위 예제는 ARCUS cache server에 “testValue”를 저장할 때 timeout값을 300ms로 지정한 코드이다.
-
-첫째, 이 코드가 실행되는 시점에서 full GC(garbage collection)가 발생했고, 
-full GC time이 500ms였다면 이 요청은 timeout이 되게 된다.
-**따라서, timeout값은 JVM full GC time을 고려하여 설정해야 한다.**
-**대부분 몇십 개의 timeout이 발생하는 문제는 full GC time이 길어서 발생하는 문제이다.**
-
-둘째, burst traffic, small packet buffer size 등의 이유로 cache client와 cache server 사이에
-packet retransmission이 발생할 수 있다.
-Linux 환경에서 최소 retransmission timeout은 200ms이며,
-그 다음의 retransmission timeout은 400ms, 800ms, ... 형태로 두 배씩 길어지게 된다.
-Packet retransmission은 제법 흔하게 발생하고 있으므로,
-이러한 packet retransmission에 대해 견딜 수 있을 정도로 timeout을 설정하길 권장한다.
-따라서, 300ms, 700ms 정도가 권장되는 timeout 값이다.
 
 ## 캐릭터 인코딩
 
