@@ -1,4 +1,4 @@
-# Map Item
+# 6. Map Item API
 
 Map item은 하나의 key에 대해 hash 구조 기반으로 mkey & value 쌍을 data 집합으로 가진다.
 Map을 Java의 Map 자료형을 저장하는 용도로 사용하길 권장한다.

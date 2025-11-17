@@ -1,4 +1,5 @@
-# Future API
+# 10. Future API 설명
+
 ## get, getSome
 
 Arcus java client는 비동기 연산에 반환 값으로 Future를 구현한 반환 타입을 제공하고 있다.

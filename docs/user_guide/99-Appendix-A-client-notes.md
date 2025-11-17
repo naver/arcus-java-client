@@ -1,4 +1,4 @@
-# Java Client 사용시 주의사항
+# 부록 A. Java Client 사용시 주의사항
 
 ## Counter 사용
 

@@ -1,4 +1,4 @@
-# Other API
+# 9. Other API
 
 본 절에서는 아래의 나머지 API들을 설명한다.
 

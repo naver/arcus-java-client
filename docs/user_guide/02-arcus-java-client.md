@@ -1,4 +1,4 @@
-# ARCUS Java Client
+# 2. ARCUS Java Client 사용법
 
 - [ARCUS Client 기본 사용법](02-arcus-java-client.md#arcus-client-기본-사용법) 
 - [ARCUS Client 생성, 소멸, 관리](02-arcus-java-client.md#arcus-client-생성-소멸-관리) 

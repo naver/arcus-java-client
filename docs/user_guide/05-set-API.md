@@ -1,4 +1,4 @@
-# Set Item
+# 5. Set Item API
 
 Set item은 하나의 key에 대해 unique value의 집합을 저장한다.
 주로 membership checking에 유용하게 사용할 수 있다.

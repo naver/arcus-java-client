@@ -1,4 +1,4 @@
-# B+tree Item
+# 7. B+Tree Item API
 
 B+tree item은 하나의 key에 대해 b+tree 구조 기반으로 b+tree key(bkey)로 정렬된 data의 집합을 가진다.
 

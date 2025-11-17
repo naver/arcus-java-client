@@ -1,4 +1,4 @@
-# Key-Value Item
+# 3. Key-Value Item API
 
 Key-value item은 하나의 key에 대해 하나의 value만을 저장하는 item이다.
 
