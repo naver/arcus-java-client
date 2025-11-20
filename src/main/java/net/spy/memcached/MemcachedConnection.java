@@ -693,7 +693,7 @@ public final class MemcachedConnection extends SpyObject {
       }
     });
 
-    node.addOpToWriteQ(op);
+    node.insertOp(op);
     addedQueue.offer(node);
     Selector s = selector.wakeup();
     assert s == selector : "Wakeup returned the wrong selector.";
@@ -926,8 +926,8 @@ public final class MemcachedConnection extends SpyObject {
     for (ConnectionObserver observer : connObservers) {
       observer.connectionEstablished(qa, rt);
     }
-    prepareAuthentication(qa);
     prepareVersionInfo(qa);
+    prepareAuthentication(qa);
   }
 
   private void lostConnection(MemcachedNode qa, ReconnDelay type, String cause) {
