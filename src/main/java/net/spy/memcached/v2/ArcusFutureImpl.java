@@ -8,16 +8,27 @@ import java.util.function.Function;
 import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.ops.Operation;
 
-public class ArcusFutureImpl<R, T> extends CompletableFuture<T> implements ArcusFuture<T> {
+public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFuture<T> {
 
   private Operation op;
 
-  private final ArcusResult<R> arcusResult;
-  private final Function<R, T> decoder;
+  private final ArcusResult<?> arcusResult;
+  private final Function<Object, T> decoder;
 
-  public ArcusFutureImpl(ArcusResult<R> arcusResult, Function<R, T> decoder) {
+  /**
+   * Use only when the result needs to be decoded.
+   */
+  public ArcusFutureImpl(ArcusResult<?> arcusResult, Function<Object, T> decoder) {
     this.arcusResult = arcusResult;
     this.decoder = decoder;
+  }
+
+  /**
+   * Use only when the result doesn't need to be decoded.
+   */
+  public ArcusFutureImpl(ArcusResult<?> arcusResult) {
+    this.arcusResult = arcusResult;
+    this.decoder = null;
   }
 
   /**
@@ -31,16 +42,23 @@ public class ArcusFutureImpl<R, T> extends CompletableFuture<T> implements Arcus
       return;
     }
 
+    Exception exception = getError();
+    if (exception != null) {
+      this.completeExceptionally(exception);
+      return;
+    }
+
+    if (decoder == null) {
+      @SuppressWarnings("unchecked")
+      T result = (T) this.arcusResult.get();
+      this.complete(result);
+      return;
+    }
+
     ArcusExecutors.COMPLETION_EXECUTOR.execute(() -> {
       try {
-        Exception exception = getError();
-        if (exception != null) {
-          this.completeExceptionally(exception);
-        } else {
-          R rawResult = this.arcusResult.get();
-          T decodedResult = decoder.apply(rawResult);
-          super.complete(decodedResult);
-        }
+        T result = decoder.apply(this.arcusResult.get());
+        this.complete(result);
       } catch (Exception e) {
         this.completeExceptionally(e);
       }

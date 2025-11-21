@@ -47,7 +47,7 @@ public class AsyncArcusCommands<T> {
 
   private ArcusFuture<Boolean> store(StoreType type, String key, int exp, T value) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
-    ArcusFutureImpl<Boolean, Boolean> future = new ArcusFutureImpl<>(result, b -> b);
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
     CachedData co = tc.encode(value);
     ArcusClient client = arcusClientSupplier.get();
 
@@ -129,8 +129,8 @@ public class AsyncArcusCommands<T> {
 
   public ArcusFuture<T> get(String key) {
     AbstractArcusResult<CachedData> result = new AbstractArcusResult<>(new AtomicReference<>());
-    ArcusFutureImpl<CachedData, T> future = new ArcusFutureImpl<>(result,
-        cachedData -> cachedData == null ? null : tc.decode(cachedData));
+    ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result,
+        r -> r == null ? null : tc.decode((CachedData) r));
     ArcusClient client = arcusClientSupplier.get();
 
     GetOperation.Callback cb = new GetOperation.Callback() {
@@ -214,10 +214,12 @@ public class AsyncArcusCommands<T> {
                                           List<String> keyList) {
     AbstractArcusResult<Map<String, CachedData>> result
         = new AbstractArcusResult<>((new AtomicReference<>(new HashMap<>())));
-    ArcusFutureImpl<Map<String, CachedData>, Map<String, T>> future = new ArcusFutureImpl<>(result,
-        cachedDataMap -> {
+    @SuppressWarnings("unchecked")
+    ArcusFutureImpl<Map<String, T>> future = new ArcusFutureImpl<>(result,
+        r -> {
           Map<String, T> decodedMap = new HashMap<>();
-          for (Map.Entry<String, CachedData> entry : cachedDataMap.entrySet()) {
+          for (Map.Entry<String, CachedData> entry
+                  : ((Map<String, CachedData>) r).entrySet()) {
             decodedMap.put(entry.getKey(), tc.decode(entry.getValue()));
           }
           return decodedMap;
@@ -296,7 +298,7 @@ public class AsyncArcusCommands<T> {
    */
   private ArcusFuture<Boolean> flush(ArcusClient client, MemcachedNode node, int delay) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
-    ArcusFutureImpl<Boolean, Boolean> future = new ArcusFutureImpl<>(result, b -> b);
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
 
     OperationCallback cb = new OperationCallback() {
       @Override
