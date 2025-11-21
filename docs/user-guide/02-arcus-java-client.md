@@ -533,7 +533,7 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 
   각 인자의 단위와 기본값은 다음과 같다.
   - TimeoutExceptionThreshold Timeout의 발생 횟수를 단위로 하고, 기본값은 10이며, 2 이상 값을 지정해야 한다.
-  - TimeoutDurationThreshold의 단위는 millisecond 이고 기본값은 1000ms이다.
+  - TimeoutDurationThreshold의 단위는 millisecond 이고 기본값은 1600ms이다.
     0을 지정해 비활성화하거나, 1000 ~ 5000 사이의 값을 지정할 수 있다.
  
   쉽게 이해하기 위한 예시 상황은 다음과 같다.

@@ -69,7 +69,7 @@ public class ConnectionFactoryBuilder {
   private long opQueueMaxBlockTime = -1;
 
   private int timeoutExceptionThreshold = 10;
-  private int timeoutDurationThreshold = 1000;
+  private int timeoutDurationThreshold = 1600;
 
   private int maxFrontCacheElements = DefaultConnectionFactory.DEFAULT_MAX_FRONTCACHE_ELEMENTS;
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
