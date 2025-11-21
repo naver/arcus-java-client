@@ -283,7 +283,7 @@ class ConnectionFactoryBuilderTest {
 
     assertNotEquals(connectionFactory.getTimeoutDurationThreshold(),
             defaultConnectionFactory.getTimeoutDurationThreshold());
-    assertEquals(1000, connectionFactory.getTimeoutDurationThreshold());
+    assertEquals(1600, connectionFactory.getTimeoutDurationThreshold());
     assertEquals(DefaultConnectionFactory.DEFAULT_MAX_TIMEOUTDURATION_THRESHOLD,
             defaultConnectionFactory.getTimeoutDurationThreshold());
 
