@@ -11,16 +11,16 @@ List collection은 하나의 key에 대해 여러 value들을 double linked list
 
 List item에 대해 수행가능한 기본 연산들은 아래와 같다.
 
-- [List Item 생성](04-list-API.md#list-item-생성) (List Item 삭제는 key-value item 삭제 함수로 수행한다)
-- [List Element 삽입](04-list-API.md#list-element-삽입)
-- [List Element 삭제](04-list-API.md#list-element-삭제) 
-- [List Element 조회](04-list-API.md#list-element-조회)
+- [List Item 생성](04-list-API.md#list-element-create) (List Item 삭제는 key-value item 삭제 함수로 수행한다)
+- [List Element 삽입](04-list-API.md#list-element-insert)
+- [List Element 삭제](04-list-API.md#list-element-delete)
+- [List Element 조회](04-list-API.md#list-element-get)
 
 여러 list element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
-- [List Element 일괄 삽입](04-list-API.md#list-element-일괄-삽입)
+- [List Element 일괄 삽입](04-list-API.md#list-element-bulk-insert)
 
-
+<a id="list-element-create"></a>
 ## List Item 생성
 
 새로운 empty list item을 생성한다.
@@ -86,9 +86,10 @@ try {
 2. timeout은 1초로 지정했다. 생성에 성공하면 future는 true를 반환한다.
    지정한 시간에 생성 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
-3. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.  
-   
+3. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
+
+<a id="list-element-insert"></a>
 ## List Element 삽입
 
 List에 하나의 element를 삽입하는 함수이다.
@@ -164,6 +165,7 @@ try {
 3. 삽입 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="list-element-delete"></a>
 ## List Element 삭제
 
 List에서 index 위치에 있는 하나의 element 또는 index range에 포함되는 다수 element를 삭제하는 함수는 아래와 같다.
@@ -231,6 +233,7 @@ try {
 3. 정상적으로 삭제되면 true를 반환한다.
    삭제 결과에 따른 반환 값은 future.getOperationStatus().getResponse()로 확인한다.
 
+<a id="list-element-get"></a>
 ## List Element 조회
 
 List 에서 하나의 index 또는 index range에 해당하는 element를 조회한다.
@@ -313,6 +316,7 @@ try {
 3. 조회 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
+<a id="list-element-bulk-insert"></a>
 ## List Element 일괄 삽입
 
 두 유형의 bulk 삽입 기능을 제공한다.

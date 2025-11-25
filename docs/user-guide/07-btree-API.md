@@ -13,39 +13,40 @@ B+tree item 구조와 기본 특징은 [ARCUS Server Ascii Protocol 문서의 �
 
 B+tree item 연산의 설명에 앞서, b+tree 조회 및 변경에 사용하는 객체들을 설명한다.
 
-- [Bkey(B+Tree Key)와 EFlag(Element Flag)](07-btree-API.md#bkeybtree-key와-eflagelement-flag)
-- [Element Flag Filter 객체](07-btree-API.md#element-flag-filter-객체)
-- [Element Flag Update 객체](07-btree-API.md#element-flag-update-객체)
+- [Bkey(B+Tree Key)와 EFlag(Element Flag)](07-btree-API.md#bkey-and-eflag)
+- [Element Flag Filter 객체](07-btree-API.md#element-flag-filter)
+- [Element Flag Update 객체](07-btree-API.md#element-flag-update)
 
 
 B+tree item에 대해 수행가능한 기본 연산은 다음과 같다.
 
-- [B+Tree Item 생성](07-btree-API.md#btree-item-생성) (B+tree item 삭제는 key-value item 삭제 함수로 수행한다)
-- [B+Tree Element 삽입](07-btree-API.md#btree-element-삽입)
+- [B+Tree Item 생성](07-btree-API.md#btree-item-create) (B+tree item 삭제는 key-value item 삭제 함수로 수행한다)
+- [B+Tree Element 삽입](07-btree-API.md#btree-element-insert)
 - [B+Tree Element Upsert](07-btree-API.md#btree-element-upsert)
-- [B+Tree Element 변경](07-btree-API.md#btree-element-변경)
-- [B+Tree Element 삭제](07-btree-API.md#btree-element-삭제)
-- [B+Tree Element 값의 증감](07-btree-API.md#btree-element-값의-증감)
-- [B+Tree Element 개수 계산](07-btree-API.md#btree-element-개수-계산)
-- [B+Tree Element 조회](07-btree-API.md#btree-element-조회)
+- [B+Tree Element 변경](07-btree-API.md#btree-element-update)
+- [B+Tree Element 삭제](07-btree-API.md#btree-element-delete)
+- [B+Tree Element 값의 증감](07-btree-API.md#btree-element-incr-decr)
+- [B+Tree Element 개수 계산](07-btree-API.md#btree-element-count)
+- [B+Tree Element 조회](07-btree-API.md#btree-element-get)
 
 여러 b+tree element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
-- [B+Tree Element 일괄 삽입](07-btree-API.md#btree-element-일괄-삽입)
-- [B+Tree Element 일괄 변경](07-btree-API.md#btree-element-일괄-변경)
-- [B+Tree Element 일괄 조회](07-btree-API.md#btree-element-일괄-조회)
+- [B+Tree Element 일괄 삽입](07-btree-API.md#btree-element-bulk-insert)
+- [B+Tree Element 일괄 변경](07-btree-API.md#btree-element-bulk-update)
+- [B+Tree Element 일괄 조회](07-btree-API.md#btree-element-bulk-get)
 
 여러 b+tree element들에 대해 sort-merge 조회 연산은 다음과 같다.
 
-- [B+Tree Element Sort-Merge 조회](07-btree-API.md#btree-element-sort-merge-조회)
+- [B+Tree Element Sort-Merge 조회](07-btree-API.md#btree-element-sort-merge-get)
 
 B+tree position 관련 연산들은 다음과 같다.
 
-- [B+Tree Position 조회](07-btree-API.md#btree-position-조회)
-- [B+Tree Position 기반의 Element 조회](07-btree-API.md#btree-position-기반의-element-조회)
-- [B+Tree Position과 Element 동시 조회](07-btree-API.md#btree-position과-element-동시-조회)
+- [B+Tree Position 조회](07-btree-API.md#btree-position-get)
+- [B+Tree Position 기반의 Element 조회](07-btree-API.md#btree-element-get-by-position)
+- [B+Tree Position과 Element 동시 조회](07-btree-API.md#btree-position-and-element-get)
 
 
+<a id="bkey-and-eflag"></a>
 ## BKey(B+Tree Key)와 EFlag(Element Flag)
 
 B+tree item에서 사용가능한 bkey 데이터 타입은 아래 두 가지이다.
@@ -65,6 +66,7 @@ eflag는 현재 b+tree element에만 존재하는 필드이다.
 eflag 데이터 타입은 byte[1~31] 타입만 가능하며, bkey의 byte array 사용 방식과 동일하다.
 
 
+<a id="element-flag-filter"></a>
 ## Element Flag Filter 객체
 
 
@@ -201,6 +203,7 @@ Integer count = future.get();
 ElementMultiFlagsFilter로 최대 100개 compare value를 지정할 수 있으며,
 asyncBopGet, asyncBopCount, asyncBopDelete, asyncBopSortMergeGet 에서만 사용이 가능하다.
 
+<a id="element-flag-update"></a>
 ### Element Flag Update 객체
 
 Eflag의 전체 또는 부분 값을 변경할 수 있다.
@@ -234,6 +237,7 @@ CollectionFuture<Boolean> future = mc.asyncBopUpdate(KEY, BKEY, eflagUpdate, nul
 ```
 
 
+<a id="btree-item-create"></a>
 ## B+Tree Item 생성
 
 새로운 empty b+tree item을 생성한다.
@@ -306,7 +310,7 @@ try {
    TimeoutException이 발생한다.
 4. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
-
+<a id="btree-element-insert"></a>
 ## B+Tree Element 삽입
 
 B+Tree에 하나의 element를 삽입한다.
@@ -476,6 +480,7 @@ public void testInsertAndGetTrimmedLongBKey() throws Exception {
 }
 ```
 
+<a id="btree-element-upsert"></a>
 ## B+Tree Element Upsert
 
 B+Tree에 하나의 element를 upsert하는 함수들이다.
@@ -556,6 +561,7 @@ try {
 3. Upsert 결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
 
+<a id="btree-element-update"></a>
 ## B+Tree Element 변경
 
 B+Tree에서 하나의 element를 변경하는 함수이다. Element의 eflag 그리고/또는 value를 변경한다.
@@ -621,6 +627,7 @@ CollectionFuture<Boolean> future = mc.asyncBopUpdate(KEY, BKEY, eflagUpdate, nul
 Element 수정에 대한 자세한 수행 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="btree-element-delete"></a>
 ## B+Tree Element 삭제
 
 B+tree에서 element를 삭제하는 함수들은 두 유형이 있다.
@@ -697,12 +704,13 @@ try {
 
 1. B+tree에서 bkey에 해당하는 element를 삭제한다.
    dropIfEmpty값이 true이면 element를 삭제하고 b+tree가 비어있게 되었을 때 b+tree도 함께 삭제한다.
-   예제에서 filter조건은 “filter하지 않음”으로 지정하였다.
+   예제에서 filter조건은 "filter하지 않음"으로 지정하였다.
 2. delete timeout은 1초로 지정했다. 지정한 시간에 삭제 결과가 넘어 오지 않거나 JVM의 과부하로
    operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다
 3. 삭제 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
+<a id="btree-element-incr-decr"></a>
 ## B+tree Element 값의 증감
 
 B+tree element의 값을 증가/감소 시키는 함수는 아래와 같다. 
@@ -771,12 +779,13 @@ try {
 }
 ```
 
-1. 이 예제는 b+tree에 저장된 element의 값을 2 만큼 increment 한다. 
+1. 이 예제는 b+tree에 저장된 element의 값을 2 만큼 increment 한다.
 2. timeout은 1초로 지정했다. 지정한 시간에 조회 결과가 넘어 오지 않거나
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
 3. Element increment 후 조회에 대한 자세한 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="btree-element-count"></a>
 ## B+Tree Element 개수 계산
 
 B+tree에서 from부터 to까지의 bkey를 가진 element들 중 eFlagFilter조건을 만족하는 element 개수를 조회한다.
@@ -842,6 +851,7 @@ try {
 3. element개수 조회에 대한 자세한 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="btree-element-get"></a>
 ## B+Tree Element 조회
 
 B+tree element를 조회하는 함수는 두 유형이 있다.
@@ -951,6 +961,7 @@ try {
 3. 조회 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()으로 확인한다.
 
 
+<a id="btree-element-bulk-insert"></a>
 ## B+Tree Element 일괄 삽입
 
 B+tree에 여러 element를 한 번에 삽입하는 함수는 두 유형이 있다.
@@ -1055,6 +1066,7 @@ try {
 6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
 
 
+<a id="btree-element-bulk-update"></a>
 ## B+Tree Element 일괄 변경
 
 B+tree에서 주어진 elements에 해당하는 모든 element의 value 그리고/또는 element flag를 일괄 변경한다.
@@ -1067,6 +1079,7 @@ asyncBopPipedUpdateBulk(String key, List<Element<Object>> elements)
 - elements: 변경 대상 elements에 대해 bkey와 eFlagUpdate, new value를 가진다.
 
 
+<a id="btree-element-bulk-get"></a>
 ## B+Tree Element 일괄 조회
 
 다수의 b+tree들 각각에 대해 from ~ to 범위에 속한 bkey를 가지면서 eFlagFilter 조건을 만족하는 elements 중 offset 위치에서 count 개를 조회한다.
@@ -1170,6 +1183,7 @@ for(Entry<String, BTreeGetResult<Long, Object>> entry : results.entrySet()) { //
 4. BTreeGetResult.getElements()로 조회한 BTreeElement객체로부터 element의 bkey, eflag, value를 조회할 수 있다.
 
 
+<a id="btree-element-sort-merge-get"></a>
 ## B+Tree Element Sort-Merge 조회
 
 다수의 B+tree들에 대해 element 조회를 sort-merge 방식으로 수행하는 기능이다.
@@ -1258,9 +1272,9 @@ try {
 }
 ```
 
-1. 예제는 “KeyA”, “KeyB”, “KeyC”에 저장된 element들 중 bkey가 0부터 100까지 해당하는 element들 10개를 조회한다.
+1. 예제는 "KeyA", "KeyB", "KeyC"에 저장된 element들 중 bkey가 0부터 100까지 해당하는 element들 10개를 조회한다.
    - 주의할 점은 key로 주어진 b+tree의 attribute설정은 모두 같아야 한다. 그렇지 않으면 오류가 발생한다.
-2. ElementFlagFilter는 bkey에 지정된 eflag가 elementFlagFilter로 지정된 조건을 만족하는 element들만 조회하는 조건이다    
+2. ElementFlagFilter는 bkey에 지정된 eflag가 elementFlagFilter로 지정된 조건을 만족하는 element들만 조회하는 조건이다
    예제에서는 eflag filter를 사용하지 않음으로 조회하였다.
 3. timeout은 1초로 지정했다. 지정한 시간에 조회 결과가 넘어 오지 않거나
    JVM의 과부하로 operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다.
@@ -1273,6 +1287,7 @@ try {
    - 응용은 이들 키들에 대해 trim 직전 마지막 bkey 이후에 trim된 bkey들을 back-end storage인 DB에서 조회하여 sort-merge 결과에 반영하여야 한다.
 7. Sort merge get의 최종 수행 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
+<a id="btree-position-get"></a>
 ## B+Tree Position 조회
 
 B+tree의 검색 조건으로 각 엘리먼트의 위치(position) 정보를 사용할 수 있다. 여기서 위치란 B+tree 안에서 bkey를 통해 일렬로 정렬되어 있는 각 엘리먼트의 인덱스를 뜻하며, 0부터 count-1 까지 순서대로 매겨진다. 순서에 대한 기준으로 오름차순(ASC)과 내림차순(DESC)이 지원된다.
@@ -1329,7 +1344,7 @@ public void testLongBKeyDesc() throws Exception {
     for (long each : longBkeys) {
         arcusClient.asyncBopInsert(key, each, null, "val", attrs).get();
     }
-    
+
     // bop position
     for (int i=0; i<longBkeys.length; i++) {
         CollectionFuture<Integer> f = arcusClient.asyncBopFindPosition(key, longBkeys[i], BTreeOrder.DESC);
@@ -1341,6 +1356,7 @@ public void testLongBKeyDesc() throws Exception {
 }
 ```
 
+<a id="btree-element-get-by-position"></a>
 ## B+Tree Position 기반의 Element 조회
 
 B+tree에서 하나의 position 또는 position range에 해당하는 elements를 조회하는 함수이다.
@@ -1390,13 +1406,13 @@ public void testLongBKeyMultiple() throws Exception {
 
     assertEquals(4, result.size());
     assertEquals(CollectionResponse.END, f.getOperationStatus().getResponse());
-    
+
     int elementCount = 0;
     for (Entry<Integer, Element<Object>> each : result.entrySet()) {
         int currPos = posFrom + elementCount++;
         int resultPosition = each.getKey();
         Element<Object> element = each.getValue();
-        
+
         assertEquals("invalid index", currPos, resultPosition);
         assertEquals("invalid bkey", longBkeys[currPos], element.getLongBkey());
         assertEquals("invalid value", "val", element.getValue());
@@ -1404,6 +1420,7 @@ public void testLongBKeyMultiple() throws Exception {
 }
 ```
 
+<a id="btree-position-and-element-get"></a>
 ## B+Tree Position과 Element 동시 조회
 
 B+tree의 검색 조건으로 특정 엘리먼트의 위치(position) 를 기준으로 주변(앞/뒤 position) 엘리먼트들을 조회 할 수 있다.  여기서 위치란 B+tree안에서 bkey를 통해 일렬로 정렬되어 있는 각 엘리먼트의 인덱스를 뜻하며, 0부터 count-1까지 순서대로 매겨진다. 순서에 대한 기준으로 오름차순(ASC)과 내림차순(DESC)이 지원된다.
