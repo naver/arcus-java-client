@@ -655,6 +655,7 @@ public final class MemcachedConnection extends SpyObject {
       @Override
       public void complete() {
         if (authDone) {
+          addedQueue.add(node);
           return;
         }
 
