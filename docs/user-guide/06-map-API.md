@@ -10,18 +10,19 @@ Map을 Java의 Map 자료형을 저장하는 용도로 사용하길 권장한다
 
 Map item에 대해 수행가능한 기본 연산은 다음과 같다.
 
-- [Map Item 생성](06-map-API.md#map-item-생성)
-- [Map Element 삽입](06-map-API.md#map-element-삽입)
+- [Map Item 생성](06-map-API.md#map-item-create)
+- [Map Element 삽입](06-map-API.md#map-element-insert)
 - [Map Element Upsert](06-map-API.md#map-element-upsert)
-- [Map Element 변경](06-map-API.md#map-element-변경)
-- [Map Element 삭제](06-map-API.md#map-element-삭제)
-- [Map Element 조회](06-map-API.md#map-element-조회)
+- [Map Element 변경](06-map-API.md#map-element-update)
+- [Map Element 삭제](06-map-API.md#map-element-delete)
+- [Map Element 조회](06-map-API.md#map-element-get)
 
 여러 map element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
-- [Map Element 일괄 삽입](06-map-API.md#map-element-일괄-삽입)
-- [Map Element 일괄 변경](06-map-API.md#map-element-일괄-변경)
+- [Map Element 일괄 삽입](06-map-API.md#map-element-bulk-insert)
+- [Map Element 일괄 변경](06-map-API.md#map-element-bulk-update)
 
+<a id="map-item-create"></a>
 ## Map Item 생성
 
 새로운 empty map item을 생성한다.
@@ -95,6 +96,7 @@ try {
 4. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
 
+<a id="map-element-insert"></a>
 ## Map Element 삽입
 
 Map에 하나의 element를 삽입한다.
@@ -162,6 +164,7 @@ try {
    TimeoutException이 발생한다.
 3. Insert결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
+<a id="map-element-upsert"></a>
 ## Map Element Upsert
 
 Map에 하나의 element를 upsert한다.
@@ -232,6 +235,7 @@ try {
    TimeoutException이 발생한다.
 3. Upsert 결과에 대한 자세한 결과 코드를 확인하려면 future.getOperationStatus().getResponse()를 사용한다.
 
+<a id="map-element-update"></a>
 ## Map Element 변경
 
 Map에서 하나의 element를 변경하는 함수이다. Element의 value를 변경한다.
@@ -262,6 +266,7 @@ CollectionFuture<Boolean> future = mc.asyncMopUpdate(key, mkey, value);
 Element 수정에 대한 자세한 수행 결과는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="map-element-delete"></a>
 ## Map Element 삭제
 
 Map에서 element를 삭제하는 함수들은 두 가지가 있다.
@@ -332,6 +337,7 @@ try {
    operation queue에서 처리되지 않을 경우 TimeoutException이 발생한다
 3. 삭제 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회 할 수 있다.
 
+<a id="map-element-get"></a>
 ## Map Element 조회
 
 Map element를 조회하는 함수는 세 유형이 있다.
@@ -426,6 +432,7 @@ try {
 3. 조회 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()으로 확인한다.
 
 
+<a id="map-element-bulk-insert"></a>
 ## Map Element 일괄 삽입
 
 Map에 여러 element를 한 번에 삽입하는 함수는 두 유형이 있다.
@@ -524,6 +531,7 @@ try {
 6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 mapKey이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
 
 
+<a id="map-element-bulk-update"></a>
 ## Map Element 일괄 변경
 
 Map에서 주어진 elements에 해당하는 모든 element의 value를 일괄 변경한다.

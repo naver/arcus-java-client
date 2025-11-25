@@ -5,10 +5,11 @@ Item attributes의 기본 설명은 [ARCUS cache server의 item attributes 부�
 
 Item attributes를 활용하여 item을 생성하거나, Item attributes를 조회 또는 변경하는 함수들을 설명한다.
 
-- [Attribute 생성](08-attribute-API.md#attribute-생성)
-- [Attribute 조회](08-attribute-API.md#attribute-조회)
-- [Attribute 변경](08-attribute-API.md#attribute-변경)
+- [Attribute 생성](08-attribute-API.md#attribute-create)
+- [Attribute 조회](08-attribute-API.md#attribute-get)
+- [Attribute 변경](08-attribute-API.md#attribute-update)
 
+<a id="attribute-create"></a>
 ## Attribute 생성
 
 CollectionAttributes
@@ -43,7 +44,7 @@ try {
 }
     
 ```
-
+<a id="attribute-get"></a>
 ## Attribute 조회
 
 주어진 key의 attributes를 조회하는 함수이다.
@@ -104,7 +105,7 @@ overflowaction: error
 2. timeout은 1초로 지정했다. 지정한 시간에 삭제 결과가 넘어오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 땐 `TimeoutException`이 발생한다.
 3. Key가 없으면 null이 반환된다.
 
-
+<a id="attribute-update"></a>
 ## Attribute 변경
 
 주어진 key의 attributes를 변경하는 함수이다.

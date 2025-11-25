@@ -4,6 +4,7 @@
 
 - [Flush](09-other-API.md#flush)
 
+<a id="flush"></a>
 ## Flush
 
 ARCUS는 prefix단위로 flush하는 기능을 제공한다.

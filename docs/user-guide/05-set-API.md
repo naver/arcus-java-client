@@ -10,18 +10,19 @@ Set item은 하나의 key에 대해 unique value의 집합을 저장한다.
 
 Set item에 수행가능한 기본 연산들은 다음과 같다.
 
-- [Set Item 생성](05-set-API.md#set-item-생성) (Set item 삭제는 key-value item 삭제 함수로 수행한다) 
-- [Set Element 삽입](05-set-API.md#set-element-삽입)
-- [Set Element 삭제](05-set-API.md#set-element-삭제)
-- [Set Element 존재여부 확인](05-set-API.md#set-element-존재여부-확인)
-- [Set Element 조회](05-set-API.md#set-element-조회)
+- [Set Item 생성](05-set-API.md#set-item-create) (Set item 삭제는 key-value item 삭제 함수로 수행한다)
+- [Set Element 삽입](05-set-API.md#set-element-insert)
+- [Set Element 삭제](05-set-API.md#set-element-delete)
+- [Set Element 존재여부 확인](05-set-API.md#set-element-exist)
+- [Set Element 조회](05-set-API.md#set-element-get)
 
 여러 set element들에 대해 한 번에 일괄 수행하는 연산은 다음과 같다.
 
-- [Set Element 일괄 삽입](05-set-API.md#set-element-일괄-삽입)
-- [Set Element 일괄 존재여부 확인](05-set-API.md#set-element-일괄-존재여부-확인)
+- [Set Element 일괄 삽입](05-set-API.md#set-element-bulk-insert)
+- [Set Element 일괄 존재여부 확인](05-set-API.md#set-element-bulk-exist)
 
 
+<a id="set-item-create"></a>
 ## Set Item 생성
 
 새로운 empty set item을 생성한다.
@@ -85,9 +86,10 @@ try {
 2. timeout은 1초로 지정했다. 생성에 성공하면 future는 true를 반환한다.
    지정한 시간에 생성 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
-3. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.  
+3. 생성 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="set-element-insert"></a>
 ## Set Element 삽입
 
 Set에 하나의 element를 삽입하는 함수이다.
@@ -158,6 +160,7 @@ try {
 4. 삽입 결과에 대한 상세 정보는 future.getOperationStatus().getResponse()를 통해 조회할 수 있다.
 
 
+<a id="set-element-delete"></a>
 ## Set Element 삭제
 
 Set에서 주어진 value를 가진 element를 삭제하는 함수이다.
@@ -217,6 +220,7 @@ try {
 3. 정상적으로 삭제되면 true를 반환한다. 자세한 삭제 결과는 future.getOperationStatus().getResponse() 로 확인 할 수 있다.
 
 
+<a id="set-element-exist"></a>
 ## Set Element 존재여부 확인
 
 Set에서 주어진 value를 가진 element의 존재여부를 확인한다.
@@ -284,6 +288,7 @@ try {
 3. 조회 결과에 관한 자세한 내용은 future.getOperationStatus().getResponse()로 확인이 가능하다.
 
 
+<a id="set-element-get"></a>
 ## Set Element 조회
 
 Set element를 조회하는 함수이다. 이 함수는 임의의 count 개 element를 조회한다.
@@ -350,6 +355,7 @@ try {
 3. 조회 결과에 관한 자세한 내용은 future.getOperationStatus().getResponse() 로 확인이 가능하다.
 
 
+<a id="set-element-bulk-insert"></a>
 ## Set Element 일괄 삽입
 
 Set에 여러 element를 한 번에 삽입하는 함수는 두 가지가 있다.
@@ -438,6 +444,7 @@ try {
 6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
 
 
+<a id="set-element-bulk-exist"></a>
 ## Set Element 일괄 존재여부 확인
 
 Set에서 여러 element의 존재여부를 한 번에 확인하는 함수이다.

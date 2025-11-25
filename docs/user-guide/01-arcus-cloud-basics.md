@@ -15,13 +15,14 @@ ARCUS Cache Server의 key-value 모델은 아래의 기본 제약 사항을 가�
 
 아래에서 ARCUS Cloud를 이해하는 데 있어 기본 사항들을 기술한다.
 
-- [서비스코드](01-arcus-cloud-basics.md#서비스코드)
+- [서비스코드](01-arcus-cloud-basics.md#service-code)
 - [ARCUS Admin](01-arcus-cloud-basics.md#arcus-admin)
 - [Cache Key](01-arcus-cloud-basics.md#cache-key)
 - [Cache Item](01-arcus-cloud-basics.md#cache-item)
-- [Expiration, Eviction, and Sticky Item](01-arcus-cloud-basics.md#expiration-eviction-and-sticky-item)
+- [Expiration, Eviction, and Sticky Item](01-arcus-cloud-basics.md#expiration-eviction-sticky)
 
 
+<a id="service-code"></a>
 ## 서비스코드
 
 서비스코드(service code)는 ARCUS에서 Cache Cloud를 구분하는 코드이다. 
@@ -32,6 +33,7 @@ ARCUS Java Client 객체는 하나의 ARCUS 서비스코드만을 가지며, 하
 해당 응용이 둘 이상의 ARCUS Cache Cloud를 접근해야 한다면,
 각 ARCUS Cache Cloud의 서비스코드를 가지는 ARCUS Java Client 객체를 따로 생성하여 사용하여야 한다.
 
+<a id="arcus-admin"></a>
 ## ARCUS Admin
 
 ARCUS admin은 ZooKeeper를 이용하여 각 서비스 코드에 해당하는 ARCUS Cache Cloud를 관리한다.
@@ -41,6 +43,7 @@ cache server 추가 및 삭제에 대해 cache server list를 최신 상태로 �
 ARCUS admin은 highly available하여야 하므로, 
 여러 ZooKeeper 서버들을 하나의 ZeeKeeper ensemble로 구성하여 사용한다.
 
+<a id="cache-key"></a>
 ## Cache Key
 
 Cache key는 ARCUS Cache에 저장하는 cache item을 유일하게 식별한다. Cache key 형식은 아래와 같다.
@@ -61,6 +64,7 @@ Prefix와 subkey는 아래의 명명 규칙을 가진다.
   이 중에 하이픈(-)은 prefix 명의 첫번째 문자로 올 수 없다.
 - Subkey는 공백을 포함할 수 없으며, 기본적으로 alphanumeric만을 사용하길 권장한다.
 
+<a id="cache-item"></a>
 ## Cache Item
 
 ARCUS Cache는 simple key-value item 외에 다양한 collection item 유형을 가진다.
@@ -72,6 +76,7 @@ ARCUS Cache는 simple key-value item 외에 다양한 collection item 유형을 
   - map item - \<mkey, value\>쌍으로 구성된 데이터 집합을 가지는 item
   - b+tree item - b+tree key 기반으로 정렬된 데이터 집합을 가지는 item
 
+<a id="expiration-eviction-sticky"></a>
 ## Expiration, Eviction, and Sticky Item
 
 각 cache item은 expiration time 속성을 가진다.

@@ -8,12 +8,13 @@ Key-value item은 하나의 key에 대해 하나의 value만을 저장하는 ite
 
 Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 
-- [Key-Value Item 저장](03-key-value-API.md#key-value-item-저장)
-- [Key-Value Item 조회](03-key-value-API.md#key-value-item-조회)
-- [Key-Value Item 값의 증감](03-key-value-API.md#key-value-item-값의-증감)
-- [Key-Value Item 삭제](03-key-value-API.md#key-value-item-삭제)
-- [Key-Value Item 만료 시간 갱신](03-key-value-API.md#key-value-item-만료-시간-갱신)
+- [Key-Value Item 저장](03-key-value-API.md#key-value-item-store)
+- [Key-Value Item 조회](03-key-value-API.md#key-value-item-get)
+- [Key-Value Item 값의 증감](03-key-value-API.md#key-value-item-incr-decr)
+- [Key-Value Item 삭제](03-key-value-API.md#key-value-item-delete)
+- [Key-Value Item 만료 시간 갱신](03-key-value-API.md#key-value-item-touch)
 
+<a id="key-value-item-store"></a>
 ## Key-Value Item 저장
 
 key-value item을 저장하는 API로 set, add, replace를 제공한다.
@@ -90,6 +91,7 @@ StatusCode.ERR_NOT_FOUND        | Key miss (주어진 key에 해당하는 item�
 StatusCode.ERR_EXISTS           | 동일 key가 이미 존재함
 
 
+<a id="key-value-item-get"></a>
 ## Key-Value Item 조회
 
 하나의 key를 가진 cache item에 저장된 value를 조회하는 API를 제공한다.
@@ -141,6 +143,7 @@ BulkFuture<Map<String, CASValue<Object>>> asyncGetsBulk(String... keys)
 - 다수 key들은 String 유형의 Collection이거나 String 유형의 나열된 key 목록일 수 있다.
 
 
+<a id="key-value-item-incr-decr"></a>
 ## Key-Value Item 값의 증감
 
 key-value item에서 value 부분의 값을 증가시키거나 감소시키는 연산이다. 
@@ -173,6 +176,7 @@ StatusCode.SUCCESS                          | 증감 성공
 StatusCode.ERR_NOT_FOUND                    | 증감 실패 (Key miss, 주어진 key에 해당하는 item이 없음)
 
 
+<a id="key-value-item-delete"></a>
 ## Key-Value Item 삭제
 
 하나의 key에 대한 item을 삭제하는 API와
@@ -205,6 +209,7 @@ future.get().get(key).getStatusCode() | 설명
 --------------------------------------| ---------
 StatusCode.ERR_NOT_FOUND              | 삭제 실패 (Key miss, 주어진 key에 해당하는 item이 없음)
 
+<a id="key-value-item-touch"></a>
 ## Key-Value Item 만료 시간 갱신
 하나의 key에 대한 item의 만료 시간을 갱신하는 API를 제공한다.
 
