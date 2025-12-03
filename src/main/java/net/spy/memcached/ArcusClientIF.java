@@ -69,6 +69,75 @@ public interface ArcusClientIF extends MemcachedClientIF {
    */
   CollectionFuture<CollectionAttributes> asyncGetAttr(final String key);
 
+  /**
+   * Set an item with multiple nodes using a specific transcoder.
+   *
+   * @param <T>          the expected class of the value
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @param exp          expiration time
+   * @param value        value to store
+   * @param tc           transcoder to encode value
+   * @return a future indicating the success/failure of each replica store
+   */
+  <T> Future<Map<String, OperationStatus>> setReplicas(
+          String key, int replicaCount, int exp, T value, Transcoder<T> tc);
+
+  /**
+   * Set an item with multiple nodes to distribute read traffic.
+   * The item is stored in N different nodes using replica keys (key#0, key#1, ...).
+   *
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @param exp          expiration time
+   * @param value        value to store
+   * @return a future indicating the success/failure of each replica store
+   */
+  Future<Map<String, OperationStatus>> setReplicas(
+          String key, int replicaCount, int exp, Object value);
+
+  /**
+   * Get an item from one of the nodes asynchronously using a specific transcoder.
+   *
+   * @param <T>          the expected class of the value
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @param tc           transcoder to decode value
+   * @return a future holding the value
+   */
+  <T> Future<T> asyncGetFromReplica(String key, int replicaCount, Transcoder<T> tc);
+
+  /**
+   * Get an item from one of the nodes asynchronously.
+   * Selects a random replica key (key#N) to distribute load.
+   *
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @return a future holding the value
+   */
+  Future<Object> asyncGetFromReplica(String key, int replicaCount);
+
+  /**
+   * Get an item from nodes synchronously with internal retry logic using a transcoder.
+   *
+   * @param <T>          the expected class of the value
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @param tc           transcoder to decode value
+   * @return the value, or null if all replicas miss
+   */
+  <T> T getFromReplica(String key, int replicaCount, Transcoder<T> tc);
+
+  /**
+   * Get an item from nodes synchronously with internal retry logic.
+   * If the selected replica returns null (miss), it tries other replicas
+   * to prevent false-negative misses due to node failure or eviction.
+   *
+   * @param key          the base key
+   * @param replicaCount number of replicas
+   * @return the value, or null if all replicas miss
+   */
+  Object getFromReplica(String key, int replicaCount);
 
   /**
    * Checks an item membership in a set.
