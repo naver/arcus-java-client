@@ -497,6 +497,38 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public Future<Map<String, OperationStatus>> setReplicas(
+          String key, int replicaCount, int exp, Object value) {
+    return this.getClient().setReplicas(key, replicaCount, exp, value);
+  }
+
+  @Override
+  public <T> Future<Map<String, OperationStatus>> setReplicas(
+          String key, int replicaCount, int exp, T value, Transcoder<T> tc) {
+    return this.getClient().setReplicas(key, replicaCount, exp, value, tc);
+  }
+
+  @Override
+  public Future<Object> asyncGetFromReplica(String key, int replicaCount) {
+    return this.getClient().asyncGetFromReplica(key, replicaCount);
+  }
+
+  @Override
+  public <T> Future<T> asyncGetFromReplica(String key, int replicaCount, Transcoder<T> tc) {
+    return this.getClient().asyncGetFromReplica(key, replicaCount, tc);
+  }
+
+  @Override
+  public Object getFromReplica(String key, int replicaCount) {
+    return this.getClient().getFromReplica(key, replicaCount);
+  }
+
+  @Override
+  public <T> T getFromReplica(String key, int replicaCount, Transcoder<T> tc) {
+    return this.getClient().getFromReplica(key, replicaCount, tc);
+  }
+
+  @Override
   public <T> CollectionFuture<Boolean> asyncSopExist(String key, T value,
                                                      Transcoder<T> tc) {
     return this.getClient().asyncSopExist(key, value, tc);
