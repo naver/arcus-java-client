@@ -31,6 +31,25 @@ public class ArcusReplKetamaNodeLocatorConfiguration implements
         KetamaNodeLocatorConfiguration {
 
   private static final int NUM_REPS = 160;
+  private boolean enableShardKey = false;
+
+  /**
+   * Returns whether the shard key feature is enabled.
+   *
+   * @return true if the shard key feature is enabled; false otherwise.
+   */
+  public boolean isShardKeyEnabled() {
+    return enableShardKey;
+  }
+
+  /**
+   * Sets the enable status of the shard key feature.
+   *
+   * @param useShardKey true to enable the shard key feature; false to disable.
+   */
+  public void enableShardKey(boolean useShardKey) {
+    enableShardKey = useShardKey;
+  }
 
   public String getKeyForNode(MemcachedNode node, int repetition) {
     ArcusReplNodeAddress addr = (ArcusReplNodeAddress) node.getSocketAddress();

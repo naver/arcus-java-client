@@ -34,6 +34,8 @@ import net.spy.memcached.ops.OperationType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.Transcoder;
+import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
+import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
 /**
  * Builder for more easily configuring a ConnectionFactory.
@@ -61,6 +63,7 @@ public class ConnectionFactoryBuilder {
   private boolean useNagle = false;
   private boolean keepAlive = false;
   private boolean dnsCacheTtlCheck = true;
+  private boolean enableShardKey = false;
   private long maxReconnectDelay = 1;
 
   private int readBufSize = -1;
@@ -493,6 +496,11 @@ public class ConnectionFactoryBuilder {
     return this;
   }
 
+  public ConnectionFactoryBuilder enableShardKey(boolean shardKey) {
+    this.enableShardKey = shardKey;
+    return this;
+  }
+
   /**
    * Get the ConnectionFactory set up with the provided parameters.
    */
@@ -547,10 +555,16 @@ public class ConnectionFactoryBuilder {
               // This locator uses ArcusReplKetamaNodeLocatorConfiguration
               // which builds keys off the server's group name, not
               // its ip:port.
-              return new ArcusReplKetamaNodeLocator(nodes);
+              ArcusReplKetamaNodeLocatorConfiguration conf =
+                      new ArcusReplKetamaNodeLocatorConfiguration();
+              conf.enableShardKey(enableShardKey);
+              return new ArcusReplKetamaNodeLocator(nodes, conf);
             }
             /* ENABLE_REPLICATION end */
-            return new ArcusKetamaNodeLocator(nodes);
+            ArcusKetamaNodeLocatorConfiguration conf =
+                    new ArcusKetamaNodeLocatorConfiguration();
+            conf.enableShardKey(enableShardKey);
+            return new ArcusKetamaNodeLocator(nodes, conf);
           default:
             throw new IllegalStateException(
                     "Unhandled locator type: " + locator);
@@ -625,6 +639,11 @@ public class ConnectionFactoryBuilder {
       @Override
       public boolean getDnsCacheTtlCheck() {
         return dnsCacheTtlCheck;
+      }
+
+      @Override
+      public boolean isShardKeyEnabled() {
+        return enableShardKey;
       }
 
       @Override

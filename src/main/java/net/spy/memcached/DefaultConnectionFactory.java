@@ -313,6 +313,11 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   @Override
+  public boolean isShardKeyEnabled() {
+    return false;
+  }
+
+  @Override
   public boolean getDnsCacheTtlCheck() {
     return true;
   }

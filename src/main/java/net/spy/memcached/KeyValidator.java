@@ -75,7 +75,8 @@ public final class KeyValidator {
         }
         if (!(('a' <= b && b <= 'z') || ('A' <= b && b <= 'Z') ||
             ('0' <= b && b <= '9') ||
-            (b == '_') || (b == '-') || (b == '+') || (b == '.'))) {
+            (b == '_') || (b == '-') || (b == '+') || (b == '.') ||
+            (b == '{') || (b == '}'))) {
           throw new IllegalArgumentException(
               "Key contains invalid prefix: ``" + key + "''");
         }

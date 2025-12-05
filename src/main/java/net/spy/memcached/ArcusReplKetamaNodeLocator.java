@@ -59,16 +59,19 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
   private final Collection<MemcachedReplicaGroup> toDeleteGroups;
   private final HashAlgorithm hashAlg = HashAlgorithm.KETAMA_HASH;
-  private final ArcusReplKetamaNodeLocatorConfiguration config
-          = new ArcusReplKetamaNodeLocatorConfiguration();
+  private final ArcusReplKetamaNodeLocatorConfiguration config;
 
   private final Lock lock = new ReentrantLock();
+  private final boolean enableShardKey;
 
-  public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes) {
+  public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes,
+                                    ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     allNodes = nodes;
     ketamaGroups = new TreeMap<>();
     allGroups = new ConcurrentHashMap<>();
+    config = conf;
+    enableShardKey = conf.isShardKeyEnabled();
 
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
@@ -105,12 +108,15 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
                                      ConcurrentHashMap<String, MemcachedReplicaGroup> ag,
-                                     Collection<MemcachedNode> an) {
+                                     Collection<MemcachedNode> an,
+                                     ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     ketamaGroups = kg;
     allGroups = ag;
     allNodes = an;
     toDeleteGroups = new HashSet<>();
+    config = conf;
+    enableShardKey = conf.isShardKeyEnabled();
 
     /* ENABLE_MIGRATION if */
     alterNodes = new HashSet<>();
@@ -172,11 +178,13 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
   }
 
   public MemcachedNode getPrimary(final String k) {
-    return getNodeForKey(hashAlg.hash(k), ReplicaPick.MASTER);
+    String shardKey = getShardKey(k);
+    return getNodeForKey(hashAlg.hash(shardKey), ReplicaPick.MASTER);
   }
 
   public MemcachedNode getPrimary(final String k, ReplicaPick pick) {
-    return getNodeForKey(hashAlg.hash(k), pick);
+    String shardKey = getShardKey(k);
+    return getNodeForKey(hashAlg.hash(shardKey), pick);
   }
 
   private MemcachedNode getNodeForKey(long hash, ReplicaPick pick) {
@@ -231,7 +239,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
         nodesCopy.add(new MemcachedNodeROImpl(node));
       }
 
-      return new ArcusReplKetamaNodeLocator(ketamaCopy, groupsCopy, nodesCopy);
+      return new ArcusReplKetamaNodeLocator(ketamaCopy, groupsCopy, nodesCopy, config);
     } finally {
       lock.unlock();
     }
@@ -295,6 +303,27 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
     lock.lock();
     group.changeRole();
     lock.unlock();
+  }
+
+  String getShardKey(String key) {
+    if (!enableShardKey) {
+      return key;
+    }
+
+    if (key == null) {
+      return null;
+    }
+
+    int left = key.indexOf('{');
+    if (left == -1) {
+      return key;
+    }
+    int right = key.indexOf('}', left + 1);
+    if (right == -1 || right == left + 1) {
+      return key;
+    }
+
+    return key.substring(left + 1, right);
   }
 
   private void insertNodeIntoGroup(MemcachedNode node) {
@@ -716,9 +745,11 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
     public ReplKetamaIterator(final String k, ReplicaPick p, final int t) {
       super();
-      hashVal = hashAlg.hash(k);
+
+      String shardKey = getShardKey(k);
+      hashVal = hashAlg.hash(shardKey);
       remainingTries = t;
-      key = k;
+      key = shardKey;
       pick = p;
     }
 

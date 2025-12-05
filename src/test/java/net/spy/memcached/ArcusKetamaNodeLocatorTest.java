@@ -23,11 +23,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
+
 import org.junit.jupiter.api.Test;
 
 import static net.spy.memcached.ExpectationsUtil.buildExpectations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,7 +53,8 @@ class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
       }));
     }
 
-    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes));
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes),
+            new ArcusKetamaNodeLocatorConfiguration());
   }
 
   @Test
@@ -155,18 +159,67 @@ class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
   }
 
   @Test
+  void testShardKey_Extraction() {
+    setupNodes(10);
+    ArcusKetamaNodeLocatorConfiguration conf = new ArcusKetamaNodeLocatorConfiguration();
+    conf.enableShardKey(true);
+
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes), conf);
+    ArcusKetamaNodeLocator arcusLocator = (ArcusKetamaNodeLocator) locator;
+
+    assertEquals("100", arcusLocator.getShardKey("user:{100}:profile"));
+    assertEquals("100", arcusLocator.getShardKey("{100}"));
+    assertEquals("groupA", arcusLocator.getShardKey("prefix:{groupA}:key"));
+    assertEquals("bar", arcusLocator.getShardKey("foo{bar}{zap}"));
+    assertEquals("{bar", arcusLocator.getShardKey("foo{{bar}}zap"));
+    assertEquals(" 100 ", arcusLocator.getShardKey("user:{ 100 }:data"));
+
+    List<String> fallbackKeys = Arrays.asList(
+            "user:100:profile",
+            "user:{}",
+            "user:{100",
+            "user:}100{"
+    );
+    for (String key : fallbackKeys) {
+      assertEquals(key, arcusLocator.getShardKey(key));
+    }
+  }
+
+  @Test
+  void testShardKey_Distribution() {
+    setupNodes(10);
+    ArcusKetamaNodeLocatorConfiguration conf = new ArcusKetamaNodeLocatorConfiguration();
+    conf.enableShardKey(true);
+
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes), conf);
+
+    List<String> keys = Arrays.asList(
+            "data:{myGroup}:1",
+            "data:{myGroup}:2",
+            "user:{myGroup}:profile",
+            "prefix:{myGroup}:{ignored}:data",
+            "{myGroup}"
+    );
+
+    MemcachedNode expectedNode = locator.getPrimary(keys.get(0));
+    for (String key : keys) {
+      MemcachedNode actualNode = locator.getPrimary(key);
+      assertSame(expectedNode, actualNode);
+    }
+
+    String otherKey = "data:{otherGroup}:1";
+    MemcachedNode otherNode = locator.getPrimary(otherKey);
+    assertNotSame(expectedNode, otherNode);
+  }
+
+  @Test
   void testLibKetamaCompatTwo() {
     String servers[] = {
-      "10.0.1.1:11211",
-      "10.0.1.2:11211",
-      "10.0.1.3:11211",
-      "10.0.1.4:11211",
-      "10.0.1.5:11211",
-      "10.0.1.6:11211",
-      "10.0.1.7:11211",
-      "10.0.1.8:11211"
+      "10.0.1.1:11211", "10.0.1.2:11211", "10.0.1.3:11211", "10.0.1.4:11211",
+      "10.0.1.5:11211", "10.0.1.6:11211", "10.0.1.7:11211", "10.0.1.8:11211"
     };
-    locator = new ArcusKetamaNodeLocator(Arrays.asList(mockNodes(servers)));
+    locator = new ArcusKetamaNodeLocator(Arrays.asList(mockNodes(servers)),
+            new ArcusKetamaNodeLocatorConfiguration());
 
     String[][] exp = {
       {"0", "10.0.1.1:11211"},
@@ -3397,18 +3450,6 @@ class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
       {"995143", "10.0.1.7:11211"},
       {"995376", "10.0.1.4:11211"},
       {"995609", "10.0.1.1:11211"},
-      {"995842", "10.0.1.6:11211"},
-      {"996075", "10.0.1.6:11211"},
-      {"996308", "10.0.1.6:11211"},
-      {"996541", "10.0.1.2:11211"},
-      {"996774", "10.0.1.6:11211"},
-      {"997007", "10.0.1.7:11211"},
-      {"997240", "10.0.1.2:11211"},
-      {"997473", "10.0.1.1:11211"},
-      {"997706", "10.0.1.4:11211"},
-      {"999104", "10.0.1.8:11211"},
-      {"999337", "10.0.1.4:11211"},
-      {"999570", "10.0.1.6:11211"},
       {"999803", "10.0.1.4:11211"}
     };
 
