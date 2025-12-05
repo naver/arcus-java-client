@@ -121,6 +121,11 @@ public interface ConnectionFactory {
   boolean getDnsCacheTtlCheck();
 
   /**
+   * If true, the shard key logic will be used for hashing.
+   */
+  boolean isShardKeyEnabled();
+
+  /**
    * Observers that should be established at the time of connection
    * instantiation.
    *

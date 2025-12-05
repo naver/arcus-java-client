@@ -58,6 +58,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
   private final ArcusKetamaNodeLocatorConfiguration config;
 
   private final Lock lock = new ReentrantLock();
+  private final boolean enableShardKey;
 
   public ArcusKetamaNodeLocator(List<MemcachedNode> nodes) {
     this(nodes, new ArcusKetamaNodeLocatorConfiguration());
@@ -69,6 +70,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
     allNodes = nodes;
     ketamaNodes = new TreeMap<>();
     config = conf;
+    enableShardKey = conf.isShardKeyEnabled();
 
     int numReps = config.getNodeRepetitions();
     // Ketama does some special work with md5 where it reuses chunks.
@@ -94,6 +96,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
     ketamaNodes = smn;
     allNodes = an;
     config = conf;
+    enableShardKey = conf.isShardKeyEnabled();
 
     /* ENABLE_MIGRATION if */
     existNodes = new HashSet<>();
@@ -151,7 +154,29 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
   }
 
   public MemcachedNode getPrimary(final String k) {
-    return getNodeForKey(hashAlg.hash(k));
+    String shardKey = getShardKey(k);
+    return getNodeForKey(hashAlg.hash(shardKey));
+  }
+
+  String getShardKey(String key) {
+    if (!enableShardKey) {
+      return key;
+    }
+
+    if (key == null) {
+      return null;
+    }
+
+    int left = key.indexOf('{');
+    if (left == -1) {
+      return key;
+    }
+    int right = key.indexOf('}', left + 1);
+    if (right == -1 || right == left + 1) {
+      return key;
+    }
+
+    return key.substring(left + 1, right);
   }
 
   MemcachedNode getNodeForKey(long hash) {
@@ -565,9 +590,10 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
 
     public KetamaIterator(final String k, final int t) {
       super();
-      hashVal = hashAlg.hash(k);
+      String shardKey = getShardKey(k);
+      hashVal = hashAlg.hash(shardKey);
       remainingTries = t;
-      key = k;
+      key = shardKey;
     }
 
     private void nextHash() {

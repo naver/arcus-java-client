@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -75,8 +77,10 @@ class ArcusKetamaHashingTest {
     MemcachedNode oddManOut = larger.get(larger.size() - 1);
     assertFalse(smaller.contains(oddManOut));
 
-    ArcusKetamaNodeLocator lgLocator = new ArcusKetamaNodeLocator(larger);
-    ArcusKetamaNodeLocator smLocator = new ArcusKetamaNodeLocator(smaller);
+    ArcusKetamaNodeLocator lgLocator =
+            new ArcusKetamaNodeLocator(larger, new ArcusKetamaNodeLocatorConfiguration());
+    ArcusKetamaNodeLocator smLocator =
+            new ArcusKetamaNodeLocator(smaller, new ArcusKetamaNodeLocatorConfiguration());
 
     SortedMap<Long, SortedSet<MemcachedNode>> lgMap = lgLocator.getKetamaNodes();
     SortedMap<Long, SortedSet<MemcachedNode>> smMap = smLocator.getKetamaNodes();

@@ -24,6 +24,8 @@ import net.spy.memcached.MemcachedNodeROImpl;
 public class ArcusKetamaNodeLocatorConfiguration extends
         DefaultKetamaNodeLocatorConfiguration {
 
+  private boolean enableShardKey = false;
+
   /**
    * insert a node from the internal node-address map.
    *
@@ -40,6 +42,23 @@ public class ArcusKetamaNodeLocatorConfiguration extends
    */
   public void removeNode(MemcachedNode node) {
     super.socketAddresses.remove(node);
+  }
+  /**
+   * Returns whether the shard key feature is enabled.
+   *
+   * @return true if the shard key feature is enabled; false otherwise.
+   */
+  public boolean isShardKeyEnabled() {
+    return enableShardKey;
+  }
+
+  /**
+   * Sets the enable status of the shard key feature.
+   *
+   * @param useShardKey true to enable the shard key feature; false to disable.
+   */
+  public void enableShardKey(boolean useShardKey) {
+    enableShardKey = useShardKey;
   }
 
   public class NodeNameComparator implements Comparator<MemcachedNode> {
