@@ -146,6 +146,7 @@ public class DefaultConnectionFactory extends SpyObject
   /**
    * Max smget key chunk size per request
    */
+  @Deprecated
   public static final int DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE = 500;
 
   /**
@@ -362,6 +363,7 @@ public class DefaultConnectionFactory extends SpyObject
   }
 
   @Override
+  @Deprecated
   public int getDefaultMaxSMGetKeyChunkSize() {
     return DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   }

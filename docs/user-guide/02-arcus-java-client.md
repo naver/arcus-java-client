@@ -546,12 +546,6 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
       100회 이상의 timeout이 연속적으로 발생하면 reconnect를 시도한다. 따라서 정말 네트워크 연결에 문제가 발생하지 않는 상황이더라도
       reconnect가 발생할 수 있다. 따라서 burst 트래픽 요청이 자주 발생하는 애플리케이션이라면 TimeoutDurationThreshold를 0으로 설정하는 것을 권장하지 않는다.
 
-- setMaxSMGetKeyChunkSize(int size)
-
-  Arcus 캐시 서버에서 제공하는 SMGet 명령어를 사용할 때 여러 키들이 한 노드에 배치되어 있는 경우, 하나의 요청에 들어가는 키의 최대 개수를 설정한다.
-  만약 이 값을 초과하는 키가 요청되면, ARCUS Java Client는 자동으로 요청을 나누어 보낸다.
-  기본값은 500이다. 최대 10000까지 지정 가능하다.
-
 - setDelimiter(byte to)
 
   Arcus 캐시 서버에 `-D <char>` 옵션으로 Prefix와 Subkey를 구분하기 위한 구분자를 직접 지정한 경우

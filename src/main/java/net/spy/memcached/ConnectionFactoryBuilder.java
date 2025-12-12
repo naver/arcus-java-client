@@ -75,7 +75,6 @@ public class ConnectionFactoryBuilder {
   private int frontCacheExpireTime = DefaultConnectionFactory.DEFAULT_FRONTCACHE_EXPIRETIME;
   private String frontCacheName;
 
-  private int maxSMGetChunkSize = DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
   private byte delimiter = DefaultConnectionFactory.DEFAULT_DELIMITER;
 
   /* ENABLE_REPLICATION if */
@@ -418,14 +417,10 @@ public class ConnectionFactoryBuilder {
 
   /**
    * Set max smget key chunk size
+   * @deprecated max smget key chunk size is fixed to 500. So this method has no effect.
    */
+  @Deprecated
   public ConnectionFactoryBuilder setMaxSMGetKeyChunkSize(int size) {
-    if (size <= 0 || size > 10000) {
-      throw new IllegalArgumentException(
-              "Max smget key chunk size must be a positive number and less than 10000");
-    }
-
-    maxSMGetChunkSize = size;
     return this;
   }
 
@@ -691,8 +686,10 @@ public class ConnectionFactoryBuilder {
       }
 
       @Override
+      @SuppressWarnings("deprecation")
+      @Deprecated
       public int getDefaultMaxSMGetKeyChunkSize() {
-        return maxSMGetChunkSize;
+        return DefaultConnectionFactory.DEFAULT_MAX_SMGET_KEY_CHUNK_SIZE;
       }
 
       @Override
