@@ -15,10 +15,6 @@ import net.spy.memcached.transcoders.Transcoder;
  * This interface is provided as a helper for testing clients of the MemcachedClient.
  */
 public interface MemcachedClientIF {
-  /**
-   * Maximum supported key length.
-   */
-  int MAX_KEY_LENGTH = 4000;
 
   Collection<SocketAddress> getAvailableServers();
 
