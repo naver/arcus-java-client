@@ -17,8 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.util.Collections;
-
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionPipedExistOperation;
@@ -26,12 +24,12 @@ import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
 
-public final class CollectionPipedExistOperationImpl extends PipeOperationImpl implements
+public final class CollectionPipedExistOperationImpl extends SingleKeyPipeOperationImpl implements
         CollectionPipedExistOperation {
 
   public CollectionPipedExistOperationImpl(String key,
                                            SetPipedExist<?> collectionExist, OperationCallback cb) {
-    super(Collections.singletonList(key), collectionExist, cb);
+    super(key, collectionExist, cb);
     setAPIType(APIType.SOP_EXIST);
     setOperationType(OperationType.READ);
   }

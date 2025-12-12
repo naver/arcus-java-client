@@ -60,10 +60,11 @@ import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.MultiKeyPipedOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.SingleKeyPipedOperationCallback;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.protocol.ascii.AsciiOperationFactory;
 import net.spy.memcached.transcoders.IntegerTranscoder;
@@ -308,8 +309,8 @@ class MultibyteKeyTest {
 
   @Test
   void CollectionPipedInsertOperationImplTest() {
-    PipedOperationCallback cpsCallback =
-        new PipedOperationCallback() {
+    SingleKeyPipedOperationCallback cpsCallback =
+        new SingleKeyPipedOperationCallback() {
           @Override
           public void gotStatus(Integer index, OperationStatus status) {
           }
@@ -430,10 +431,10 @@ class MultibyteKeyTest {
   @Test
   void CollectionBulkInsertOperationImplTest() {
     CollectionBulkInsert<Integer> insert = null;
-    PipedOperationCallback cbsCallback =
-        new PipedOperationCallback() {
+    MultiKeyPipedOperationCallback cbsCallback =
+        new MultiKeyPipedOperationCallback() {
           @Override
-          public void gotStatus(Integer index, OperationStatus status) {
+          public void gotStatus(String key, OperationStatus status) {
           }
 
           @Override
@@ -551,7 +552,7 @@ class MultibyteKeyTest {
       opFact.collectionPipedUpdate(MULTIBYTE_KEY,
               new CollectionPipedUpdate.BTreePipedUpdate<>(
                       MULTIBYTE_KEY, elementsList, new IntegerTranscoder()),
-          new PipedOperationCallback() {
+          new SingleKeyPipedOperationCallback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
             }
@@ -600,7 +601,7 @@ class MultibyteKeyTest {
     try {
       opFact.collectionPipedExist(MULTIBYTE_KEY,
               new SetPipedExist<>(MULTIBYTE_KEY, objectList, new IntegerTranscoder()),
-          new PipedOperationCallback() {
+          new SingleKeyPipedOperationCallback() {
             @Override
             public void gotStatus(Integer index, OperationStatus status) {
             }

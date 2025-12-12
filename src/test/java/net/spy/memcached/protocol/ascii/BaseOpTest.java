@@ -36,7 +36,7 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.SingleKeyPipedOperationCallback;
 import net.spy.memcached.ops.StatusCode;
 
 import org.junit.jupiter.api.Test;
@@ -46,8 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -124,7 +124,7 @@ class BaseOpTest {
                     Arrays.asList("a", "b"), null, null);
     PipedCollectionFuture<Object, Object> rv =
             new PipedCollectionFuture<>(new CountDownLatch(1), 700);
-    OperationCallback cb = new PipedOperationCallback() {
+    OperationCallback cb = new SingleKeyPipedOperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus;

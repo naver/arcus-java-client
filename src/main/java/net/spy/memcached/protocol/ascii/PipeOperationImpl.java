@@ -2,9 +2,6 @@ package net.spy.memcached.protocol.ascii;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import net.spy.memcached.collection.CollectionBulkInsert;
 import net.spy.memcached.collection.CollectionPipe;
@@ -16,7 +13,6 @@ import net.spy.memcached.ops.OperationErrorType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.PipedOperationCallback;
 import net.spy.memcached.ops.StatusCode;
 
 abstract class PipeOperationImpl extends OperationImpl {
@@ -61,21 +57,13 @@ abstract class PipeOperationImpl extends OperationImpl {
   protected boolean successAll = true;
 
   private final CollectionPipe collectionPipe;
-  private final PipedOperationCallback cb;
-  private final List<String> keys;
   private final boolean isIdempotent;
 
-  private int index = 0;
+  protected int index = 0;
   private boolean readUntilLastLine = false;
 
-  protected PipeOperationImpl(List<String> keys, CollectionPipe collectionPipe,
-                              OperationCallback cb) {
+  protected PipeOperationImpl(CollectionPipe collectionPipe, OperationCallback cb) {
     super(cb);
-    this.cb = (PipedOperationCallback) cb;
-    if (keys == null || keys.isEmpty()) {
-      throw new IllegalArgumentException("No keys provided");
-    }
-    this.keys = keys;
     this.collectionPipe = collectionPipe;
     this.isIdempotent = !(collectionPipe instanceof CollectionPipedInsert.ListPipedInsert ||
             collectionPipe instanceof CollectionBulkInsert.ListBulkInsert);
@@ -97,7 +85,7 @@ abstract class PipeOperationImpl extends OperationImpl {
     /* ENABLE_MIGRATION if */
     if (hasNotMyKey(line)) {
       if (isBulkOperation()) {
-        addRedirectMultiKeyOperation(line, keys.get(index));
+        addRedirectMultiKeyOperation(line, getKey(index));
         if (collectionPipe.isNotPiped()) {
           transitionState(OperationState.REDIRECT);
         } else {
@@ -106,7 +94,7 @@ abstract class PipeOperationImpl extends OperationImpl {
       } else {
         // Only one NOT_MY_KEY is provided in response of
         // single key piped operation when redirection.
-        addRedirectSingleKeyOperation(line, keys.get(0));
+        addRedirectSingleKeyOperation(line, getKey(0));
         if (collectionPipe.isNotPiped()) {
           transitionState(OperationState.REDIRECT);
         } else {
@@ -122,7 +110,7 @@ abstract class PipeOperationImpl extends OperationImpl {
       if (!status.isSuccess()) {
         successAll = false;
       }
-      cb.gotStatus(index, status);
+      gotStatus(status);
 
       complete((successAll) ? END : FAILED_END);
       return;
@@ -164,11 +152,15 @@ abstract class PipeOperationImpl extends OperationImpl {
       if (!status.isSuccess()) {
         successAll = false;
       }
-      cb.gotStatus(index, status);
+      gotStatus(status);
 
       index++;
     }
   }
+
+  protected abstract void gotStatus(OperationStatus status);
+
+  protected abstract String getKey(Integer index);
 
   @Override
   protected void handleError(OperationErrorType eType, String line) throws IOException {
@@ -202,10 +194,6 @@ abstract class PipeOperationImpl extends OperationImpl {
       getLogger().debug("Request in ascii protocol: %s",
               (new String(buffer.array())).replace("\r\n", "\\r\\n"));
     }
-  }
-
-  public Collection<String> getKeys() {
-    return Collections.unmodifiableList(keys);
   }
 
   public CollectionPipe getCollectionPipe() {

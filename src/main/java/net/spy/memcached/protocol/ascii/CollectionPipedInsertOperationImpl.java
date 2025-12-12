@@ -17,8 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.util.Collections;
-
 import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionPipedInsertOperation;
@@ -29,12 +27,12 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public final class CollectionPipedInsertOperationImpl extends PipeOperationImpl
+public final class CollectionPipedInsertOperationImpl extends SingleKeyPipeOperationImpl
         implements CollectionPipedInsertOperation {
 
   public CollectionPipedInsertOperationImpl(String key,
                                             CollectionPipedInsert<?> insert, OperationCallback cb) {
-    super(Collections.singletonList(key), insert, cb);
+    super(key, insert, cb);
     if (insert instanceof CollectionPipedInsert.ListPipedInsert) {
       setAPIType(APIType.LOP_INSERT);
     } else if (insert instanceof CollectionPipedInsert.SetPipedInsert) {

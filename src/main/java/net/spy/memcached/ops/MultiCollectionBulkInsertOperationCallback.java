@@ -18,14 +18,14 @@
 package net.spy.memcached.ops;
 
 public class MultiCollectionBulkInsertOperationCallback extends MultiOperationCallback
-    implements PipedOperationCallback {
+    implements MultiKeyPipedOperationCallback {
 
   public MultiCollectionBulkInsertOperationCallback(OperationCallback original, int todo) {
     super(original, todo);
   }
 
   @Override
-  public void gotStatus(Integer index, OperationStatus status) {
-    ((PipedOperationCallback) originalCallback).gotStatus(index, status);
+  public void gotStatus(String key, OperationStatus status) {
+    ((MultiKeyPipedOperationCallback) originalCallback).gotStatus(key, status);
   }
 }
