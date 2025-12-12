@@ -465,6 +465,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
   }
 
+  public Transcoder<Object> getCollectionTranscoder() {
+    return collectionTranscoder;
+  }
+
   public <T> AsyncArcusCommands<T> asyncCommands() {
     return new AsyncArcusCommands<>(() -> this);
   }

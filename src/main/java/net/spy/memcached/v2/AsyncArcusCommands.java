@@ -25,11 +25,14 @@ import net.spy.memcached.transcoders.Transcoder;
 public class AsyncArcusCommands<T> {
 
   private final Transcoder<T> tc;
+  private final Transcoder<T> tcForCollection;
 
   private final Supplier<ArcusClient> arcusClientSupplier;
 
+  @SuppressWarnings("unchecked")
   public AsyncArcusCommands(Supplier<ArcusClient> arcusClientSupplier) {
-    this.tc = new GenericTranscoder<>();
+    this.tc = (Transcoder<T>) arcusClientSupplier.get().getTranscoder();
+    this.tcForCollection = (Transcoder<T>) arcusClientSupplier.get().getCollectionTranscoder();
     this.arcusClientSupplier = arcusClientSupplier;
   }
 
