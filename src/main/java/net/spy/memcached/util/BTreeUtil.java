@@ -25,7 +25,6 @@ import net.spy.memcached.transcoders.Transcoder;
 public final class BTreeUtil {
 
   private static final String HEXES = "0123456789ABCDEF";
-  private static final int MAX_BKEY_BYTE_ARRAY_SIZE = 31;
 
   private BTreeUtil() {
   }
@@ -84,26 +83,6 @@ public final class BTreeUtil {
       }
     }
     return array1.length - array2.length;
-  }
-
-  public static void validateBkey(byte[] ...bkeys) {
-    for (byte[] bkey : bkeys) {
-      if (bkey == null) {
-        throw new IllegalArgumentException("bkey is null");
-      }
-      if (bkey.length > MAX_BKEY_BYTE_ARRAY_SIZE) {
-        throw new IllegalArgumentException("bkey size exceeded 31");
-      }
-    }
-  }
-
-  public static void validateBkey(long ...bkeys) {
-    for (long bkey : bkeys) {
-      if (bkey < 0) {
-        throw new IllegalArgumentException(
-                String.format("not supported unsigned long bkey : %s, use byte array bkey", bkey));
-      }
-    }
   }
 
   public static <T> Element<T> makeBTreeElement(BKeyObject bkey,

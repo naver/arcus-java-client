@@ -19,6 +19,7 @@ package net.spy.memcached.collection;
 
 import java.util.Arrays;
 
+import net.spy.memcached.KeyValidator;
 import net.spy.memcached.util.BTreeUtil;
 
 public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
@@ -37,7 +38,7 @@ public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
   private final byte[] bkey;
 
   public ByteArrayBKey(byte[] bkey) {
-    BTreeUtil.validateBkey(bkey);
+    KeyValidator.validateBKey(bkey);
     this.bkey = bkey;
   }
 

@@ -18,6 +18,8 @@ package net.spy.memcached.util;
 
 import java.util.Arrays;
 
+import net.spy.memcached.KeyValidator;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +92,7 @@ class BTreeUtilTest {
   @Test
   void testInValidSizeBkey() {
     assertThrows(IllegalArgumentException.class, () -> {
-      BTreeUtil.validateBkey(new byte[32]);
+      KeyValidator.validateBKey(new byte[32]);
     });
   }
 
@@ -98,7 +100,7 @@ class BTreeUtilTest {
   void testMinusLongBkey() {
     final long bkey = -1;
     assertThrows(IllegalArgumentException.class, () -> {
-      BTreeUtil.validateBkey(bkey);
+      KeyValidator.validateBKey(bkey);
     });
   }
 }
