@@ -27,7 +27,7 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to store collection data in a memcached server.
  */
-public final class CollectionBulkInsertOperationImpl extends PipeOperationImpl
+public final class CollectionBulkInsertOperationImpl extends MultiKeyPipeOperationImpl
         implements CollectionBulkInsertOperation {
 
   public CollectionBulkInsertOperationImpl(CollectionBulkInsert<?> insert, OperationCallback cb) {

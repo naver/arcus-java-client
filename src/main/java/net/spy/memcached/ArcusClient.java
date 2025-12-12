@@ -138,11 +138,12 @@ import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.GetAttrOperation;
+import net.spy.memcached.ops.MultiKeyPipedOperationCallback;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
-import net.spy.memcached.ops.PipedOperationCallback;
+import net.spy.memcached.ops.SingleKeyPipedOperationCallback;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.plugin.FrontCacheMemcachedClient;
@@ -1662,7 +1663,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             new PipedCollectionFuture<>(latch, operationTimeout);
 
     final List<Operation> ops = new ArrayList<>(insertList.size());
-    IntFunction<OperationCallback> makeCallback = opIdx -> new PipedOperationCallback() {
+    IntFunction<OperationCallback> makeCallback = opIdx -> new SingleKeyPipedOperationCallback() {
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
@@ -2031,7 +2032,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             new PipedCollectionFuture<>(latch, operationTimeout);
 
     final List<Operation> ops = new ArrayList<>(updateList.size());
-    IntFunction<OperationCallback> makeCallback = opIdx -> new PipedOperationCallback() {
+    IntFunction<OperationCallback> makeCallback = opIdx -> new SingleKeyPipedOperationCallback() {
 
       public void receivedStatus(OperationStatus status) {
         CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
@@ -2603,7 +2604,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch, operationTimeout);
 
     Operation op = opFact.collectionPipedExist(key, exist,
-        new PipedOperationCallback() {
+        new SingleKeyPipedOperationCallback() {
 
           private final Map<T, Boolean> result = new HashMap<>();
           private boolean hasAnError = false;
@@ -2878,7 +2879,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     for (final CollectionBulkInsert<T> insert : insertList) {
       Operation op = opFact.collectionBulkInsert(
-              insert, new PipedOperationCallback() {
+              insert, new MultiKeyPipedOperationCallback() {
                 public void receivedStatus(OperationStatus status) {
                   // Nothing to do here because the user MUST search the result Map instance.
                 }
@@ -2887,9 +2888,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                   latch.countDown();
                 }
 
-                public void gotStatus(Integer index, OperationStatus status) {
+                public void gotStatus(String key, OperationStatus status) {
                   if (!status.isSuccess()) {
-                    String key = insert.getKey(index);
                     CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
                     rv.addFailedResult(key, cstatus);
                   }

@@ -17,8 +17,6 @@
  */
 package net.spy.memcached.protocol.ascii;
 
-import java.util.Collections;
-
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.BTreePipedUpdate;
 import net.spy.memcached.collection.CollectionPipedUpdate.MapPipedUpdate;
@@ -31,12 +29,12 @@ import net.spy.memcached.ops.OperationType;
 /**
  * Operation to update collection data in a memcached server.
  */
-public final class CollectionPipedUpdateOperationImpl extends PipeOperationImpl implements
+public final class CollectionPipedUpdateOperationImpl extends SingleKeyPipeOperationImpl implements
         CollectionPipedUpdateOperation {
 
   public CollectionPipedUpdateOperationImpl(String key,
                                             CollectionPipedUpdate<?> update, OperationCallback cb) {
-    super(Collections.singletonList(key), update, cb);
+    super(key, update, cb);
     if (update instanceof BTreePipedUpdate) {
       setAPIType(APIType.BOP_UPDATE);
     } else if (update instanceof MapPipedUpdate) {

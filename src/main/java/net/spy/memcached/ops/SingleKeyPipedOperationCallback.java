@@ -1,5 +1,5 @@
 package net.spy.memcached.ops;
 
-public interface PipedOperationCallback extends OperationCallback {
+public interface SingleKeyPipedOperationCallback extends OperationCallback {
   void gotStatus(Integer index, OperationStatus status);
 }
