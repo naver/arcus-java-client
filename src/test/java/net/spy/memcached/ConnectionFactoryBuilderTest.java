@@ -225,8 +225,6 @@ class ConnectionFactoryBuilderTest {
             defaultConnectionFactory.getFrontCacheCopyOnRead());
     assertEquals(connectionFactory.getFrontCacheCopyOnWrite(),
             defaultConnectionFactory.getFrontCacheCopyOnWrite());
-    assertEquals(connectionFactory.getDefaultMaxSMGetKeyChunkSize(),
-            defaultConnectionFactory.getDefaultMaxSMGetKeyChunkSize());
     assertEquals(connectionFactory.getDelimiter(),
             defaultConnectionFactory.getDelimiter());
     assertEquals(connectionFactory.getReadPriority(),

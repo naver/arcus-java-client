@@ -193,9 +193,8 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   private final Transcoder<Object> collectionTranscoder;
 
-  private final int smgetKeyChunkSize;
-
   private static final int BOPGET_BULK_CHUNK_SIZE = 200;
+  private static final int SMGET_CHUNK_SIZE = 500;
   private static final int NON_PIPED_BULK_INSERT_CHUNK_SIZE = 500;
 
   private static final int MAX_GETBULK_ELEMENT_COUNT = 50;
@@ -361,7 +360,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       throw new IllegalStateException("DNS cache TTL is out of range from 0 to " + MAX_DNS_CACHE_TTL);
     }
     collectionTranscoder = cf.getDefaultCollectionTranscoder();
-    smgetKeyChunkSize = cf.getDefaultMaxSMGetKeyChunkSize();
     registerMbean(name);
   }
 
@@ -2667,7 +2665,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
+            groupingKeys(keyList, SMGET_CHUNK_SIZE, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
@@ -2694,7 +2692,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     }
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
-            groupingKeys(keyList, smgetKeyChunkSize, APIType.BOP_SMGET);
+            groupingKeys(keyList, SMGET_CHUNK_SIZE, APIType.BOP_SMGET);
     List<BTreeSMGet<Object>> smGetList = new ArrayList<>(
             arrangedKey.size());
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {

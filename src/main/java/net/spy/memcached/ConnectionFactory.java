@@ -209,7 +209,9 @@ public interface ConnectionFactory {
 
   /**
    * get max smget key chunk size
+   * @deprecated SMGet key chunk size is fixed to 500. So this method is no longer used.
    */
+  @Deprecated
   int getDefaultMaxSMGetKeyChunkSize();
 
   /**
