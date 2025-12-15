@@ -2625,7 +2625,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           int count, boolean unique) {
     KeyValidator.validateBKey(from, to);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     if (count < 1) {
       throw new IllegalArgumentException("Count must be larger than 0.");
     }
@@ -2652,7 +2652,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
           int count, boolean unique) {
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     if (count < 1) {
       throw new IllegalArgumentException("Count must be larger than 0.");
     }
@@ -2687,7 +2687,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     KeyValidator.validateBKey(bkey);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.BOP_INSERT);
 
@@ -2721,7 +2721,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     KeyValidator.validateBKey(bkey);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.BOP_INSERT);
     List<CollectionBulkInsert<T>> insertList = new ArrayList<>(
@@ -2753,7 +2753,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     keyValidator.validateMKey(mkey);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.MOP_INSERT);
 
@@ -2783,7 +2783,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.SOP_INSERT);
@@ -2813,7 +2813,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           List<String> keyList, int index, T value,
           CollectionAttributes attributesForCreate, Transcoder<T> tc) {
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
 
     Collection<Entry<MemcachedNode, List<String>>> arrangedKey =
             groupingKeys(keyList, NON_PIPED_BULK_INSERT_CHUNK_SIZE, APIType.LOP_INSERT);
@@ -2881,7 +2881,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           ElementFlagFilter eFlagFilter, int offset, int count, Transcoder<T> tc) {
     KeyValidator.validateBKey(from, to);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
     }
@@ -2920,7 +2920,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           Transcoder<T> tc) {
     KeyValidator.validateBKey(from, to);
     keyValidator.validateKey(keyList);
-    checkDupKey(keyList);
+    keyValidator.checkDupKey(keyList);
 
     if (offset < 0) {
       throw new IllegalArgumentException("Offset must be 0 or positive integer.");
@@ -3176,18 +3176,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(k, op);
     return rv;
-  }
-
-  private void checkDupKey(Collection<String> keyList) {
-    /*
-     * Dup Check -> insure elements sequentially added to keyList
-     * */
-    HashSet<String> keySet = new HashSet<>();
-    for (String key : keyList) {
-      if (!keySet.add(key)) {
-        throw new IllegalArgumentException("Duplicate keys exist in key list.");
-      }
-    }
   }
 
   private CollectionOperationStatus toCollectionOperationStatus(OperationStatus status) {

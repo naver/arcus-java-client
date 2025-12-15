@@ -18,6 +18,7 @@
 package net.spy.memcached;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Validator for memcached keys.
@@ -174,6 +175,18 @@ public final class KeyValidator {
       if (bkey < 0) {
         throw new IllegalArgumentException(
             String.format("not supported unsigned long bkey : %s, use byte array bkey", bkey));
+      }
+    }
+  }
+
+  /**
+   * Check duplicate keys in keyList.
+   */
+  public void checkDupKey(Collection<String> keyList) {
+    HashSet<String> keySet = new HashSet<>();
+    for (String key : keyList) {
+      if (!keySet.add(key)) {
+        throw new IllegalArgumentException("Duplicate keys exist in key list.");
       }
     }
   }
