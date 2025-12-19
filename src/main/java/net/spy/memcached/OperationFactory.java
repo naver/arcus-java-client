@@ -153,6 +153,26 @@ public interface OperationFactory {
   GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet);
 
   /**
+   * Get the key and resets its timeout.
+   *
+   * @param key the key to get a value for and reset its timeout
+   * @param expiration the new expiration for the key
+   * @param cb the callback that will contain the result
+   * @return a new GetAndTouchOperation
+   */
+  GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb);
+
+  /**
+   * Gets (with CAS support) the key and resets its timeout.
+   *
+   * @param key the key to get a value for and reset its timeout
+   * @param expiration the new expiration for the key
+   * @param cb the callback that will contain the result
+   * @return a new GetsAndTouchOperation
+   */
+  GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb);
+
+  /**
    * Create a mutator operation.
    *
    * @param m   the mutator type

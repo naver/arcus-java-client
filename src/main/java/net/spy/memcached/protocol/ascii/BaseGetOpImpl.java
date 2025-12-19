@@ -41,6 +41,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   private final String cmd;
   private final Collection<String> keys;
   private String currentKey = null;
+  private final int exp;
   private long casValue = 0;
   private int currentFlags = 0;
   private byte[] data = null;
@@ -55,7 +56,20 @@ abstract class BaseGetOpImpl extends OperationImpl {
     super(cb);
     cmd = c;
     keys = k;
+    exp = 0;
     setOperationType(OperationType.READ);
+  }
+
+  /**
+   * For GetAndTouchOperationImpl,  GetsAndTouchOperationImpl Only
+   */
+  public BaseGetOpImpl(String c, int e,
+                       OperationCallback cb, Collection<String> k) {
+    super(cb);
+    cmd = c;
+    keys = k;
+    exp = e;
+    setOperationType(OperationType.WRITE);
   }
 
   /**
@@ -73,6 +87,12 @@ abstract class BaseGetOpImpl extends OperationImpl {
       ...
       END\r\n
     */
+    /* ENABLE_REPLICATION if */
+    if (hasSwitchedOver(line)) {
+      prepareSwitchover(line);
+      return;
+    }
+    /* ENABLE_REPLICATION end */
     if (line.equals("END")) {
       getLogger().debug("Get complete!");
       /* ENABLE_MIGRATION if */
@@ -184,6 +204,14 @@ abstract class BaseGetOpImpl extends OperationImpl {
       commandBuilder.append(' ');
       commandBuilder.append(keysString);
       commandBuilder.append(RN_STRING);
+    } else if (cmd.equals("gat") || cmd.equals("gats")) {
+      // syntax: gat || gats <exp> <key>\r\n
+      commandBuilder.append(cmd);
+      commandBuilder.append(' ');
+      commandBuilder.append(exp);
+      commandBuilder.append(' ');
+      commandBuilder.append(keysString);
+      commandBuilder.append(RN_STRING);
     } else {
       assert (cmd.equals("mget") || cmd.equals("mgets"))
           : "Unknown Command " + cmd;
@@ -231,4 +259,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return keys.size() > 1;
   }
 
+  public int getExpiration() {
+    return exp;
+  }
 }

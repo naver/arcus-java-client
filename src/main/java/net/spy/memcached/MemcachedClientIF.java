@@ -78,6 +78,15 @@ public interface MemcachedClientIF {
 
   Future<CASValue<Object>> asyncGets(String key);
 
+  <T> Future<T> asyncGetAndTouch(final String key, final int exp, final Transcoder<T> tc);
+
+  Future<Object> asyncGetAndTouch(final String key, final int exp);
+
+  <T> Future<CASValue<T>> asyncGetsAndTouch(final String key, final int exp,
+                                            final Transcoder<T> tc);
+
+  Future<CASValue<Object>> asyncGetsAndTouch(final String key, final int exp);
+
   <T> CASValue<T> gets(String key, Transcoder<T> tc)
           throws OperationTimeoutException;
 
