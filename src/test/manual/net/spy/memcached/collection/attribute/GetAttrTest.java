@@ -118,4 +118,17 @@ class GetAttrTest extends BaseIntegrationTest {
     CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
     assertTrue(rattrs.getExpireTime() > 10);
   }
+
+//  @Test
+//  void testGetAttr_GetAndTouch() throws Exception {
+//    String key = "getattr_gat_attribute";
+//
+//    mc.set(key, 10, "v").get();
+//    GetFuture<Object> future = mc.asyncGetAndTouch(key, 100);
+//    assertNotNull(future.get());
+//    assertEquals(future.get(), "v");
+//
+//    CollectionAttributes rattrs = mc.asyncGetAttr(key).get(1000, TimeUnit.MILLISECONDS);
+//    assertTrue(rattrs.getExpireTime() > 10);
+//  }
 }

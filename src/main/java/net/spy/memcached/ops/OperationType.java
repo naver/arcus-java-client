@@ -25,6 +25,7 @@ public enum OperationType {
    * BTreeInsertAndGetOperationImpl (asyncBopInsertAndGetTrimmed)
    * FlushOperationImpl / FlushByPrefixOperationImpl (flush)
    * SetAttrOperationImpl (asyncSetAttr)
+   * GetAndTouchOperationImpl / GetsAndTouchOperationImpl (asyncGetAndTouch / asyncGetsAndTouch)
    */
   WRITE,
 

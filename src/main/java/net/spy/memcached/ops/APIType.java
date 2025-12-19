@@ -25,6 +25,7 @@ public enum APIType {
   INCR(OperationType.WRITE), DECR(OperationType.WRITE),
   DELETE(OperationType.WRITE),
   GET(OperationType.READ), GETS(OperationType.READ),
+  GAT(OperationType.WRITE), GATS(OperationType.WRITE),
 
   // List API Type
   LOP_CREATE(OperationType.WRITE),

@@ -248,6 +248,26 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
   }
 
   @Override
+  public <T> GetFuture<T> asyncGetAndTouch(String key, int exp, Transcoder<T> tc) {
+    return this.getClient().asyncGetAndTouch(key, exp, tc);
+  }
+
+  @Override
+  public GetFuture<Object> asyncGetAndTouch(String key, int exp) {
+    return this.getClient().asyncGetAndTouch(key, exp);
+  }
+
+  @Override
+  public <T> GetFuture<CASValue<T>> asyncGetsAndTouch(String key, int exp, Transcoder<T> tc) {
+    return this.getClient().asyncGetsAndTouch(key, exp, tc);
+  }
+
+  @Override
+  public GetFuture<CASValue<Object>> asyncGetsAndTouch(String key, int exp) {
+    return this.getClient().asyncGetsAndTouch(key, exp);
+  }
+
+  @Override
   public <T> CASValue<T> gets(String key, Transcoder<T> tc)
           throws OperationTimeoutException {
     return this.getClient().gets(key, tc);

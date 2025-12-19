@@ -109,6 +109,14 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new GetsOperationImpl(keys, cb, isMGet);
   }
 
+  public GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb) {
+    return new GetAndTouchOperationImpl(key, expiration, cb);
+  }
+
+  public GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb) {
+    return new GetsAndTouchOperationImpl(key, expiration, cb);
+  }
+
   public MutatorOperation mutate(Mutator m, String key, int by,
                                  long def, int exp, OperationCallback cb) {
     return new MutatorOperationImpl(m, key, by, def, exp, cb);

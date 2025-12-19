@@ -112,6 +112,16 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "multiple key gets is not supported in binary protocol yet.");
   }
 
+  public GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb) {
+    throw new RuntimeException(
+            "GetAndTouchOperation is not supported in binary protocol yet.");
+  }
+
+  public GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb) {
+    throw new RuntimeException(
+            "GetsAndTouchOperation is not supported in binary protocol yet.");
+  }
+
   public MutatorOperation mutate(Mutator m, String key, int by,
                                  long def, int exp, OperationCallback cb) {
     return new MutatorOperationImpl(m, key, by, def, exp, cb);

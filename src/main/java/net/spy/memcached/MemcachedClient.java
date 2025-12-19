@@ -981,6 +981,106 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
+   * Get the given key to reset its expiration time asynchronously.
+   *
+   * @param key the key to fetch
+   * @param exp the new expiration to set for the given key
+   * @param tc the transcoder to serialize and unserialize value
+   * @return a future that will hold the return value of the fetch
+   * @throws IllegalStateException in the rare circumstance where queue is too
+   *                               full to accept any more requests
+   */
+  public <T> GetFuture<T> asyncGetAndTouch(final String key, final int exp,
+                                           final Transcoder<T> tc) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final GetFuture<T> future = new GetFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.getAndTouch(key, exp,
+      new GetOperation.Callback() {
+        private GetResult<T> result = null;
+
+        public void receivedStatus(OperationStatus status) {
+          future.set(result, status);
+        }
+
+        public void gotData(String k, int flags, byte[] data) {
+          assert k.equals(key) : "Wrong key returned";
+          result = new GetResultImpl<>(new CachedData(flags, data, tc.getMaxSize()), tc);
+        }
+
+        public void complete() {
+          latch.countDown();
+        }
+      });
+    future.setOperation(op);
+    addOp(key, op);
+    return future;
+  }
+
+  /**
+   * Get the given key to reset its expiration time asynchronously.
+   *
+   * @param key the key to fetch
+   * @param exp the new expiration to set for the given key
+   * @return a future that will hold the return value of the fetch
+   * @throws IllegalStateException in the rare circumstance where queue is too
+   *                               full to accept any more requests
+   */
+  public GetFuture<Object> asyncGetAndTouch(final String key, final int exp) {
+    return asyncGetAndTouch(key, exp, transcoder);
+  }
+
+  /**
+   * Gets (with CAS support) the given key to reset its expiration time asynchronously.
+   *
+   * @param key the key to fetch
+   * @param exp the new expiration to set for the given key
+   * @param tc the transcoder to serialize and unserialize value
+   * @return a future that will hold the return value of the fetch
+   * @throws IllegalStateException in the rare circumstance where queue is too
+   *                               full to accept any more requests
+   */
+  public <T> GetFuture<CASValue<T>> asyncGetsAndTouch(final String key, final int exp,
+                                                      final Transcoder<T> tc) {
+    final CountDownLatch latch = new CountDownLatch(1);
+    final GetFuture<CASValue<T>> rv = new GetFuture<>(latch, operationTimeout);
+
+    Operation op = opFact.getsAndTouch(key, exp, new GetsOperation.Callback() {
+        private GetResult<CASValue<T>> val = null;
+
+        public void receivedStatus(OperationStatus status) {
+          rv.set(val, status);
+        }
+
+        public void gotData(String k, int flags, long cas, byte[] data) {
+          assert key.equals(k) : "Wrong key returned";
+          assert cas > 0 : "CAS was less than zero:  " + cas;
+          val = new GetsResultImpl<>(cas, new CachedData(flags, data, tc.getMaxSize()), tc);
+        }
+
+        public void complete() {
+          latch.countDown();
+        }
+      });
+    rv.setOperation(op);
+    addOp(key, op);
+    return rv;
+  }
+
+  /**
+   * Gets (with CAS support) the given key to reset its expiration time asynchronously.
+   *
+   * @param key the key to fetch
+   * @param exp the new expiration to set for the given key
+   * @return a future that will hold the return value of the fetch
+   * @throws IllegalStateException in the rare circumstance where queue is too
+   *                               full to accept any more requests
+   */
+  public GetFuture<CASValue<Object>> asyncGetsAndTouch(final String key, final int exp) {
+    return asyncGetsAndTouch(key, exp, transcoder);
+  }
+
+  /**
    * Gets (with CAS support) with a single key.
    *
    * @param <T>

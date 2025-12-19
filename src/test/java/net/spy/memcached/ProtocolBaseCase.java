@@ -122,6 +122,25 @@ abstract class ProtocolBaseCase extends ClientBaseCase {
     assertTrue(val.matches("\\[acctime=\\d+, exptime=\\d+\\]"), val + "doesn't match");
   }
 
+//  @Test
+//  void testGetAndTouch() throws Exception {
+//    assertNull(client.get("testgat"));
+//    assertTrue(client.set("testgat", 3, "testgatvalue").get());
+//    GetFuture<Object> future = client.asyncGetAndTouch("testgat", 5);
+//    assertNotNull(future.get());
+//    assertEquals("testgatvalue", future.get());
+//  }
+//
+//  @Test
+//  void testGetsAndTouch() throws Exception {
+//    assertNull(client.get("testgats"));
+//    assertTrue(client.set("testgats", 3, "testgatsvalue").get());
+//    GetFuture<CASValue<Object>> future = client.asyncGetsAndTouch("testgats", 5);
+//    assertNotNull(future.get());
+//    assertEquals("testgatsvalue", future.get().getValue());
+//    assertTrue(future.get().getCas() > 0);
+//  }
+
   @Test
   void testDelayedFlush() throws Exception {
     assertNull(client.get("test1"));
