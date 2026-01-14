@@ -635,11 +635,16 @@ public final class MemcachedConnection extends SpyObject {
       @Override
       public void receivedStatus(OperationStatus val) {
         String msg = val.getMessage();
-        // If the status we found was SASL_OK or NOT_SUPPORTED, we're authDone.
-        if ("SASL_OK".equals(msg) || "NOT_SUPPORTED".equals(msg)) {
+        // If the status we found was SASL_OK, we're authDone.
+        if ("SASL_OK".equals(msg)) {
           authDone = true;
           node.authComplete(true);
           getLogger().info("Authenticated to " + node.getSocketAddress());
+        } else if ("NOT_SUPPORTED".equals(msg)) {
+          authDone = true;
+          node.authComplete(true);
+          getLogger().warn("Authentication not supported by server, skipping auth flow: "
+                  + node.getSocketAddress());
         } else if (!val.isSuccess()) {
           authDone = true;
           node.authComplete(false);
