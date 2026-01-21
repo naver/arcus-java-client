@@ -196,12 +196,12 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   private final Transcoder<Object> collectionTranscoder;
 
-  private static final int BOPGET_BULK_CHUNK_SIZE = 200;
-  private static final int SMGET_CHUNK_SIZE = 500;
+  public static final int BOPGET_BULK_CHUNK_SIZE = 200;
+  public static final int SMGET_CHUNK_SIZE = 500;
   private static final int NON_PIPED_BULK_INSERT_CHUNK_SIZE = 500;
 
-  private static final int MAX_GETBULK_ELEMENT_COUNT = 50;
-  private static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
+  public static final int MAX_GETBULK_ELEMENT_COUNT = 50;
+  public static final int MAX_SMGET_COUNT = 1000; // server configuration is 2000.
 
   private static final int SHUTDOWN_TIMEOUT_MILLISECONDS = 2000;
   private static final AtomicInteger CLIENT_ID = new AtomicInteger(1);
