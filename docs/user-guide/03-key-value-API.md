@@ -13,6 +13,7 @@ Key-value item에 대해 수행가능한 연산들은 아래와 같다.
 - [Key-Value Item 값의 증감](03-key-value-API.md#key-value-item-incr-decr)
 - [Key-Value Item 삭제](03-key-value-API.md#key-value-item-delete)
 - [Key-Value Item 만료 시간 갱신](03-key-value-API.md#key-value-item-touch)
+- [Key-Value Item 만료 시간 갱신 및 조회](03-key-value-API.md#key-value-item-get-and-touch)
 
 <a id="key-value-item-store"></a>
 ## Key-Value Item 저장
@@ -224,3 +225,18 @@ future.getStatus().getStatusCode()          | 설명
 --------------------------------------------| ---------
 StatusCode.SUCCESS                          | 갱신 성공
 StatusCode.ERR_NOT_FOUND                    | 갱신 실패 (Key miss, 주어진 key에 해당하는 item이 없음)
+
+<a id="key-value-item-get-and-touch"></a>
+## Key-Value Item 만료 시간 갱신 및 조회
+하나의 key에 대한 item의 만료 시간을 갱신하고 값을 조회하는 API를 제공한다.
+
+```java
+Future<Object> asyncGetAndTouch(final String key, final int exp)
+```
+- 주어진 key를 가진 item의 만료 시간을 exp 초 이후 혹은 exp 값이 unixtime인 경우 해당 값으로 갱신하고, value를 조회하여 반환한다.
+
+수행 결과는 future 객체를 통해 얻는다.
+
+future.getStatus().getStatusCode()          | 설명
+--------------------------------------------| ---------
+StatusCode.SUCCESS                          | 갱신 성공
