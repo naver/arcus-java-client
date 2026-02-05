@@ -451,9 +451,10 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 - setTranscoder(Transcoder\<Object\> t)
 
   Key-Value 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
-  기본적으로 SerializingTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
-  Character set, 압축 기준, ClassLoader를 설정할 수 있다.
   
+  #### SerializingTranscoder
+  - 별도로 지정하지 않을 경우 이 타입을 사용한다.
+  - 압축 시 GZip 방식을 사용하며, Character set, 압축 기준, ClassLoader를 설정할 수 있다.  
   - Character set과 압축 기준은 setter로 설정 가능하다. Character set의 기본값은 UTF-8이다.
     압축 기준의 단위는 byte이며, 기본값은 16,384bytes이다.
     ```java
@@ -464,18 +465,52 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setTranscoder(transcoder);
     ```
-  
-  - ClassLoader는 생성자 인자로 설정 가능하다. Spring Devtools와 같이 클래스로더를 별도로 두는
-  라이브러리를 사용할 때, 캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
+  - ClassLoader는 생성자 인자로 설정 가능하다. Spring Devtools와 같이 클래스로더를 별도로 두는 라이브러리를 사용할 때,
+    캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
     ```java
     SerializingTranscoder tc = new SerializingTranscoder(CachedData.MAX_SIZE, this.getClass().getClassLoader());
     ```
+    
+  #### JsonSerializingTranscoder
+  - 제네릭 타입을 Object로 지정하지 않으면 setTranscoder 메서드 인자로 지정할 수 없다.
+    따라서 ArcusClient API 메서드 인자로 지정하는 것을 권장한다. 삽입 및 조회 시 동일한 타입을 갖는 transcoder를 사용해야 한다.
+    ```java
+    JsonSerializingTranscoder<MyClass> transcoder = new JsonSerializingTranscoder<>(MyClass.class);
+    arcusClient.set("key", 0, new MyClass("class1"), transcoder).get();
+    MyClass myClass = arcusClient.asyncGet("key", transcoder).get();
+    ```
+  - Jackson 라이브러리를 사용하여 객체를 JSON 형식으로 직렬화/역직렬화한다. 
+  - 타입 안전성을 보장하기 위해 생성자에서 특정 클래스 타입 또는 JavaType을 지정해야 한다.
+  - 기본 타입(String, Integer, Long, Boolean, Date 등)은 바로 직렬화하고, 사용자 정의 타입 객체는 JSON으로 변환하여 직렬화한다.
+    이 때 사용자 정의 타입에 기본 생성자나 `@JsonCreator` 어노테이션이 지정된 생성자가 없으면 워닝 로그와 함께 역직렬화 시 null이 반환될 수 있으므로 주의한다.
+  - 압축 시 GZip 방식을 사용하며, Character set, 압축 기준을 설정할 수 있다.
+  - Character set과 압축 기준은 setter로 설정 가능하다. Character set의 기본값은 UTF-8이다.
+
+  #### GenericJsonSerializingTranscoder
+  - Jackson 라이브러리를 사용하여 객체를 JSON 형식으로 직렬화/역직렬화한다.
+  - 기본 타입(String, Integer, Long, Boolean, Date 등)은 바로 직렬화하고, 사용자 정의 타입 객체는 JSON으로 변환하여 직렬화한다.
+    이 때 사용자 정의 타입에 기본 생성자나 `@JsonCreator` 어노테이션이 지정된 생성자가 없으면 워닝 로그와 함께 역직렬화 시 null이 반환될 수 있으므로 주의한다.
+  - 다형성 타입을 지원하여 객체의 구체적인 타입 정보를 보존할 수 있다.
+  - 생성자에서 ObjectMapper와 타입 힌트 프로퍼티 이름을 지정할 수 있다. DefaultTyping이 설정되지 않은 ObjectMapper 사용 시 타입 힌트 프로퍼티 이름을 지정해주어야 한다.
+  - 보안 취약점을 방지하기 위해, 신뢰할 수 없는 JSON 입력을 처리할 경우 적절한 BasicPolymorphicTypeValidator를 설정하는 것이 권장된다.
+  ```java
+  ObjectMapper objectMapper = new ObjectMapper();
+  BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
+      .allowIfBaseType("net.spy.memcached.") // 패키지 경로는 커스텀하게 설정해주어야 한다.
+      .allowIfSubType("net.spy.memcached.") // 패키지 경로는 커스텀하게 설정해주어야 한다.
+      .build();
+  GenericJsonSerializingTranscoder transcoder =
+      new GenericJsonSerializingTranscoder(objectMapper, "@class", CachedData.MAX_SIZE);
+  
+  ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+  cfb.setTranscoder(transcoder);
+  ``` 
 
 - setCollectionTranscoder(Transcoder\<Object\> t)
 
   Collection 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
-  기본적으로 SerializingTranscoder 객체를 사용한다. 압축 시 GZip 방식을 사용하며,
-  Character set, 압축 기준, ClassLoader를 설정할 수 있다.
+  기본적으로 SerializingTranscoder 객체를 사용하며, Character set, ClassLoader를 설정할 수 있다.
+  setTranscoder 메서드와 마찬가지로 GenericJsonSerializingTranscoder를 사용할 수 있다.
 
   - 빌더를 통해 SerializingTranscoder를 설정할 수 있다.
     ```java
@@ -486,11 +521,9 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
         .build();
     ```
 
-  - Character set과 압축 기준은 객체 생성 후 setter를 사용해 설정 가능하다. Character set의 기본값은 UTF-8이다.
-    압축 기준의 단위는 byte이며, 기본값은 16,384bytes이다.
+  - Character set은 객체 생성 후 setter를 사용해 설정 가능하다. Character set의 기본값은 UTF-8이다.
     ```java
     transcoder.setCharset("EUC-KR");
-    transcoder.setCompressionThreshold(4096);
     
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
     cfb.setCollectionTranscoder(transcoder);
@@ -562,6 +595,13 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
   ARCUS Java Client 구동 시에 DNS 캐시 TTL 검증을 활성화할 지 여부를 설정한다.
   기본값은 true이다. ZooKeeper Ensemble을 도메인 주소로 관리하고 있는 경우, DNS에 매핑된 IP 정보가 변경될 때 정상적으로 반영되도록 하기 위해
   DNS Cache TTL 값이 0 ~ 300초 내에 존재하는지 검증한다.
+
+- enableShardKey(boolean shardKey)
+
+  캐시 클러스터에서 특정 데이터가 어느 노드에 저장될지는 기본적으로 키 전체를 해싱하여 결정한다. 
+  키의 일부만을 기준으로 해싱하고 싶다면, shardKey 기능을 활성화해야 한다.
+  키 문자열에서 가장 첫 `{`와 가장 첫 `}` 사이의 문자로만 해싱하여 노드를 결정하므로, 해싱을 원하는 문자열을 중괄호로 감싸면 된다.
+  만약 shard key를 따로 지정하지 않았다면 기존대로 전체 키를 해싱한다. 
 
 - setAuthDescriptor(AuthDescriptor to);
 
