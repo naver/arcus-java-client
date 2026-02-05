@@ -1917,7 +1917,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
                                                   byte[] elementFlag, Object value,
                                                   CollectionAttributes attributesForCreate) {
-    return asyncBopInsert(key, bkey, elementFlag, value, attributesForCreate, collectionTranscoder);
+    return asyncBopUpsert(key, bkey, elementFlag, value, attributesForCreate, collectionTranscoder);
   }
 
   @Override

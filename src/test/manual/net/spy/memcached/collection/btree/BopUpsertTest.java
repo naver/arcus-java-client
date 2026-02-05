@@ -16,13 +16,18 @@
  */
 package net.spy.memcached.collection.btree;
 
+import java.util.Map;
+
 import net.spy.memcached.collection.BaseIntegrationTest;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.Element;
+import net.spy.memcached.internal.CollectionFuture;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -57,5 +62,26 @@ class BopUpsertTest extends BaseIntegrationTest {
     } catch (Exception e) {
       fail(e.getMessage());
     }
+  }
+
+  @Test
+  void upsertExistingElement() throws Exception {
+    // given
+    CollectionFuture<Boolean> future
+            = mc.asyncBopUpsert(KEY, BKEY, null, "INITIAL_VALUE", new CollectionAttributes());
+    boolean result = future.get();
+    assertTrue(result);
+
+    // when
+    future = mc.asyncBopUpsert(KEY, BKEY, null, "UPDATED_VALUE", null);
+    result = future.get();
+
+    // then
+    assertTrue(result);
+    CollectionFuture<Map<Long, Element<Object>>> futureToGet
+            = mc.asyncBopGet(KEY, BKEY, null, false, false);
+    Map<Long, Element<Object>> elements = futureToGet.get();
+    assertTrue(elements.containsKey(BKEY));
+    assertEquals("UPDATED_VALUE", elements.get(BKEY).getValue());
   }
 }
