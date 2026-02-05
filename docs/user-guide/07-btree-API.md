@@ -442,7 +442,7 @@ B+tree에 element 삽입하면서 암묵적으로 trim되는 element를 조회�
 
 ```java
 private String key = "BopStoreAndGetTest";
-private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L };
+private long[] longBkeys = { 10L, 11L, 12L, 13L, 14L, 15L, 16L, 17L, 18L, 19L };
 
 public void testInsertAndGetTrimmedLongBKey() throws Exception {
     // insert test data
