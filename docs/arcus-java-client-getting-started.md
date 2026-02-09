@@ -80,7 +80,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
         <dependency>
             <groupId>com.navercorp.arcus</groupId>
             <artifactId>arcus-java-client</artifactId>
-            <version>1.15.0</version>
+            <version>1.16.0</version>
         </dependency>
         
         <!-- 로거 의존성을 추가합니다. -->
