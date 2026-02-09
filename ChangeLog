@@ -1,3 +1,39 @@
+# 2026-02-09 [version 1.16.0]
+## 🐣 New Features
+  - Support JsonSerializingTranscoder, GenericJsonSerializingTranscoder
+  - Support SASL Authentication for ASCII/Binary protocol
+  - Support get and touch (GAT) command
+  - Support shard key for ketama hashing
+  - Add set/get replica methods to distribute read traffic for hot items
+  - Removed some deprecated methods. (old smget, asyncSetBulk, ...)
+  - Remove timeoutRatioThreshold option.
+  - Deprecate `SMGetMode` enum type and `setMaxSMGetKeyChunkSize` method.
+## 🔧 Enhancements
+  - Enhance version operation logic after connection established
+  - Enhance handling InputQ and WriteQ after connection lost when MemcachedNode needs auth process
+  - Allow queuing operations on nodes going to immediately reconnect
+  - Enhance ConnectionObserver logic
+## ⚙️ Internal Changes
+  - Add `@Nullable` annotation to `CollectionDelete#getAdditionalArgs()`
+  - Use more proper key separator for multi-keyed collection operations
+  - Move checkDupKey method into KeyValidator
+  - Increase default value of timeoutDurationThreshold from 1000ms to 1600ms
+  - Call offer() instead of add() for addedQueue
+## 🐛 Bug Fixes
+  - Reset the use of mget, mgets, " " separator, version info when connection is lost
+  - Check if writeQ is empty before move its operations to reconnectBlocked
+  - Remove infinite loop in attemptReconnects()
+  - Fix bug for ConnectionObserver
+  - Split piped operations into single-key and multi-key to resolve bug during migration
+  - Call correct method for overloaded asyncBopUpsert method
+## 📝 Documentation
+  - Fix docs link references
+## ✅ Testing
+  - Add printing docker logs on `docker compose up -d` failure
+  - Fix example for some APIs
+## ⬆️ Dependency Upgrades
+  - Upgrade log4j version to 2.25.3.
+
 # 2025-09-22 [version 1.15.0]
 ## 🐣 New Features
   - Add touch command to update item expiration
