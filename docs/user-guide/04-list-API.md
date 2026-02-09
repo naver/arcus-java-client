@@ -343,7 +343,7 @@ Future <Map<String, CollectionOperationStatus>>
 asyncLopInsertBulk(List<String> keyList, int index, Object value, CollectionAttributes attributesForCreate)
 ```
 
-keyList로 지정된 모든 key에 대해 하나의 element를 삽입니다.
+keyList로 지정된 모든 key에 대해 하나의 element를 삽입한다.
 
 - key: 삽입 대상 list들의 key list
 - index: 삽입 위치로 0-based index로 지정
@@ -359,18 +359,13 @@ keyList로 지정된 모든 key에 대해 하나의 element를 삽입니다.
 
 ```java
 String key = "Sample:ListBulk";
-List<Object> bulkData = getBulkData();
+List<Object> bulkData = Arrays.asList("value1", "value2", "value3");
 int index = -1; // List의 제일 뒤에 insert한다.
 CollectionAttributes attributesForCreate = new CollectionAttributes();
-if (bulkData.size() > client.getMaxPipedItemCount()) { // (1)
-    System.out.println("insert 할 아이템 개수는 client.getMaxPipedItemCount개를 초과할 수 없다.");
-    return;
-}
-
 CollectionFuture<Map<Integer, CollectionOperationStatus>> future = null;
 
 try {
-    future = client.asyncLopPipedInsertBulk(key, index, bulkData, attributesForCreate); // (2)
+    future = client.asyncLopPipedInsertBulk(key, index, bulkData, attributesForCreate); // (1)
 } catch (Exception e) {
     // handle exception
 }
@@ -379,12 +374,12 @@ if (future == null)
     return;
 
 try {
-    Map<Integer, CollectionOperationStatus> result = future.get(1000L, TimeUnit.MILLISECONDS); // (3)
-    if (!result.isEmpty()) { // (4)
+    Map<Integer, CollectionOperationStatus> result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+    if (!result.isEmpty()) { // (3)
         System.out.println("일부 item이 insert 실패 하였음.");
-        for (Entry<Integer, CollectionOperationStatus> entry : result.entrySet()) { // (5)
+        for (Entry<Integer, CollectionOperationStatus> entry : result.entrySet()) { // (4)
             System.out.print("실패한 아이템=" + bulkData.get(entry.getKey()));
-            System.out.println(", 실패원인=" + entry.getValue().getResponse()); // (6)
+            System.out.println(", 실패원인=" + entry.getValue().getResponse()); // (5)
         }
     } else {
         System.out.println("모두 insert 성공함.");
@@ -398,17 +393,15 @@ try {
 }
 ```
 
-1. 한꺼번에 insert할 아이템은 client.getMaxPipedItemCount()개를 초과할 수 없다. (기본값은 500개 이다.)
-   만약 개수를 초과하면 IllegalArguementException이 발생한다.
-2. Key에 저장된 List에 bulkData를 한꺼번에 insert하고 그 결과를 담은 future객체를 반환한다.
+1. Key에 저장된 List에 bulkData를 한꺼번에 insert하고 그 결과를 담은 future객체를 반환한다.
    이 future로부터 각 아이템의 insert성공 실패 여부를 조회할 수 있다.
    여기에서는 attributesForCreate값을 지정하여 bulk insert하기 전에 key가 없으면 생성하고 element를 insert되도록 하였다.
-3. delete timeout은 1초로 지정했다.
+2. timeout은 1초로 지정했다.
    지정한 시간에 모든 아이템의 insert 결과가 넘어 오지 않거나 JVM의 과부하로 operation queue에서 처리되지 않을 경우
    TimeoutException이 발생한다.
-4. 모든 아이템이 insert에 성공하면 empty map이 반환된다.
+3. 모든 아이템이 insert에 성공하면 empty map이 반환된다.
    - 반환된 Map의 Key= insert한 값(bulkData)를 iteration했을 때의 index값.
    - 반환된 Map의 Value= insert 실패사유
-5. 일부 실패한 아이템의 실패 원인을 조회하려면 insert할 때 사용된 값(bulkData)의 iteration 순서에 따라 결과
+4. 일부 실패한 아이템의 실패 원인을 조회하려면 insert할 때 사용된 값(bulkData)의 iteration 순서에 따라 결과
    Map을 조회하면 된다.
-6. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
+5. Future로부터 얻은 Map의 Key가 입력된 값(bulkData)의 index이기 때문에 위와 같은 방법으로 실패 원인을 조회하면 된다.
