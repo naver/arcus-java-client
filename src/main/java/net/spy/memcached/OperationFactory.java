@@ -531,4 +531,15 @@ public interface OperationFactory {
                                              BTreeInsertAndGet<?> get, byte[] dataToInsert,
                                              OperationCallback cb);
 
+  /**
+   * Create a pipeline operation for executing multiple commands in batch.
+   *
+   * @param ops  the list of operations to execute
+   * @param keys the unique keys related to the pipe operation
+   * @param cb   the status callback
+   * @return a new pipeline operation
+   */
+  Operation pipeline(List<KeyedOperation> ops, List<String> keys,
+                     OperationCallback cb);
+
 }

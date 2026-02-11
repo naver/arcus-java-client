@@ -66,6 +66,7 @@ public enum APIType {
   SETATTR(OperationType.WRITE), GETATTR(OperationType.READ),
 
   // Other API
+  PIPE(OperationType.WRITE),
   FLUSH(OperationType.WRITE),
   STATS(OperationType.ETC),
   VERSION(OperationType.ETC),

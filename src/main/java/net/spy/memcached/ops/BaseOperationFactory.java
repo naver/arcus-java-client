@@ -126,6 +126,8 @@ public abstract class BaseOperationFactory implements OperationFactory {
       return new MultiBTreeGetBulkOperationCallback(originalCallback, count);
     } else if (op instanceof BTreeSortMergeGetOperation) {
       return new MultiBTreeSortMergeGetOperationCallback(originalCallback, count);
+    } else if (op instanceof PipelineOperation) {
+      return new MultiPipelineOperationCallback(originalCallback, count);
     } else {
       assert false : "Unhandled operation type: " + op.getClass();
     }
@@ -151,6 +153,16 @@ public abstract class BaseOperationFactory implements OperationFactory {
     } else if (op instanceof BTreeSortMergeGetOperation) {
       final BTreeSMGet<?> smGet = ((BTreeSortMergeGetOperation) op).getSMGet();
       return bopsmget(smGet.clone(node, redirectKeys), (BTreeSortMergeGetOperation.Callback) mcb);
+    } else if (op instanceof PipelineOperation) {
+      List<KeyedOperation> originalOps = ((PipelineOperation) op).getOps();
+      List<KeyedOperation> redirectOps = new ArrayList<>();
+      for (KeyedOperation originalOp : originalOps) {
+        // PipelineOperation's internal op has only one key.
+        if (redirectKeys.contains(originalOp.getKeys().iterator().next())) {
+          redirectOps.add(originalOp);
+        }
+      }
+      return pipeline(redirectOps, redirectKeys, mcb);
     } else {
       assert false : "Unhandled operation type: " + op.getClass();
     }

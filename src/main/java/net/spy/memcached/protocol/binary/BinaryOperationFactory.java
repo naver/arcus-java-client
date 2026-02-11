@@ -17,6 +17,7 @@
 package net.spy.memcached.protocol.binary;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.security.sasl.SaslClient;
 
@@ -67,9 +68,11 @@ import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetOperation.Callback;
 import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -327,6 +330,13 @@ public class BinaryOperationFactory extends BaseOperationFactory {
                                                     OperationCallback cb) {
     throw new RuntimeException(
             "BTree insert and get operation is not supported in binary protocol yet.");
+  }
+
+  @Override
+  public Operation pipeline(List<KeyedOperation> ops, List<String> keys,
+                            OperationCallback cb) {
+    throw new RuntimeException(
+        "Pipeline operation is not supported in binary protocol yet.");
   }
 
 }
