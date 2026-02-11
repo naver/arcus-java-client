@@ -19,12 +19,15 @@ package net.spy.memcached.v2;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import net.spy.memcached.internal.CompositeException;
+import net.spy.memcached.v2.pipe.PipelineCompositeException;
+import net.spy.memcached.v2.pipe.PipelineOperationException;
 
 /**
  * A Future representing multiple underlying futures mapped by keys.
@@ -63,13 +66,21 @@ public final class ArcusMultiFuture<T> extends CompletableFuture<T> implements A
   private void completeExceptionally() {
     List<Exception> exceptions = new ArrayList<>();
     boolean hasNonCancellationException = false;
+    boolean hasPipelineCompositeException = false;
 
     for (CompletableFuture<?> future : futures) {
       if (future.isCompletedExceptionally()) {
         try {
           future.join();
         } catch (Exception e) {
-          exceptions.add(e);
+          if (e.getCause() instanceof PipelineCompositeException) {
+            // Flatten exceptions from PipelineCompositeException.
+            hasPipelineCompositeException = true;
+            exceptions.addAll(((PipelineCompositeException) e.getCause()).getExceptions());
+          } else {
+            exceptions.add(e);
+          }
+
           if (!future.isCancelled()) {
             hasNonCancellationException = true;
           }
@@ -85,6 +96,13 @@ public final class ArcusMultiFuture<T> extends CompletableFuture<T> implements A
 
     // If there are other exceptions, include all exceptions (including CancellationException)
     if (exceptions.size() > 1) {
+      if (hasPipelineCompositeException) {
+        // Sort by pipelineOperationException's index before creating CompositeException.
+        exceptions.sort(Comparator.comparingInt(
+            e -> e instanceof PipelineOperationException
+                ? ((PipelineOperationException) e).getIndex()
+                : Integer.MAX_VALUE));
+      }
       this.completeExceptionally(new CompositeException(exceptions));
     } else if (exceptions.size() == 1) {
       this.completeExceptionally(exceptions.get(0));

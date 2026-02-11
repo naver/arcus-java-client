@@ -24,6 +24,8 @@ import java.util.function.Function;
 
 import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.ops.Operation;
+import net.spy.memcached.protocol.ascii.PipelineOperationImpl;
+import net.spy.memcached.v2.pipe.PipelineCompositeException;
 
 public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFuture<T> {
 
@@ -94,16 +96,27 @@ public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFut
   private Exception getError() {
     List<Exception> exceptions = new ArrayList<>();
 
-    /*
-     * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / UNREADABLE
-     */
     if (this.arcusResult.hasError()) {
       exceptions.addAll(this.arcusResult.getError());
     }
 
     /*
-     * SERVER_ERROR / CLIENT_ERROR / ERROR
+     * For Internal Use.
+     * Create PipelineCompositeException to pass pipe result
+     * even if exception occurs.
+     * Exception from Operation is ignored because it already exists
+     * as PipelineOperationException in arcusResult.
      */
+    if (op instanceof PipelineOperationImpl) {
+      @SuppressWarnings("unchecked")
+      List<Boolean> pipeResult = (List<Boolean>) arcusResult.get();
+      if (!exceptions.isEmpty()) {
+        return new PipelineCompositeException(exceptions, pipeResult);
+      } else {
+        return null;
+      }
+    }
+
     if (op.hasErrored()) {
       exceptions.add(op.getException());
     }

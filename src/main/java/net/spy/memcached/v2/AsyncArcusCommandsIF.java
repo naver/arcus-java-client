@@ -28,6 +28,8 @@ import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
+import net.spy.memcached.v2.pipe.Pipeline;
+
 public interface AsyncArcusCommandsIF<T> {
 
   /**
@@ -261,4 +263,25 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
                                                 boolean unique, BopGetArgs args);
+
+  /**
+   * Create a pipeline for batch operations.
+   * Operations can be added by chaining methods up to 500 operations.
+   *
+   * @return pipeline instance.
+   */
+  Pipeline<T> pipeline();
+
+  /**
+   * Execute multiple operations in a pipeline using Arcus Command Pipelining feature.
+   * Does not guarantee atomicity.
+   * Does not guarantee order of execution when multiple keys are used in the pipeline.
+   *
+   * @param pipeline which contains multiple operations
+   * @return list of Boolean results for each operation in the pipeline.
+   * True/False if operation executed.
+   * null if operation not executed due to its failure/error or prior error.
+   */
+  ArcusFuture<List<Boolean>> execute(Pipeline<T> pipeline);
+
 }
