@@ -448,6 +448,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     this.shutdown(SHUTDOWN_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
   }
 
+  @Override
   public Transcoder<Object> getCollectionTranscoder() {
     return collectionTranscoder;
   }
