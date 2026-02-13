@@ -20,10 +20,15 @@ package net.spy.memcached.v2;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -56,18 +61,22 @@ import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
+import net.spy.memcached.ops.PipelineOperation;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.TranscoderUtils;
+import net.spy.memcached.v2.pipe.PipelineCompositeException;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
+import net.spy.memcached.v2.pipe.Pipeline;
 
 public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
@@ -962,5 +971,226 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           (byte[]) from.getData(), (byte[]) to.getData(), args.getElementFlagFilter(),
           args.getCount(), unique);
     }
+  }
+
+  public Pipeline<T> pipeline() {
+    ArcusClient arcusClient = arcusClientSupplier.get();
+    return new Pipeline<>(arcusClient.getOpFact(), tc);
+  }
+
+  public ArcusFuture<List<Boolean>> execute(Pipeline<T> pipeline) {
+    Set<String> keys = pipeline.getKeys();
+    List<KeyedOperation> ops = pipeline.getOps();
+
+    ArcusClient client = arcusClientSupplier.get();
+    validatePipeline(keys, ops);
+
+    Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys =
+        client.groupingKeys(keys, ArcusClient.MAX_PIPED_ITEM_COUNT, APIType.PIPE);
+
+    // If Pipeline's whole operations are mapped to single node,
+    // return result without index mapping.
+    if (arrangedKeys.size() == 1) {
+      Map.Entry<MemcachedNode, List<String>> entry = arrangedKeys.iterator().next();
+      PipeResourceForNode pipeResourceForNode = new PipeResourceForNode();
+      pipeResourceForNode.keys.addAll(entry.getValue());
+      for (int nodeIdx = 0; nodeIdx < ops.size(); nodeIdx++) {
+        pipeResourceForNode.opToNodeIdx.put(ops.get(nodeIdx), nodeIdx);
+      }
+      CompletableFuture<List<Boolean>> future =
+          executeByNode(client, entry.getKey(), pipeResourceForNode).toCompletableFuture();
+      return new ArcusMultiFuture<>(Collections.singletonList(future),
+          () -> joinResult(future, pipeResourceForNode.opToNodeIdx.size()));
+    }
+
+    Map<MemcachedNode, PipeResourceForNode> resourceByNode = getResourceByNode(ops, arrangedKeys);
+
+    Map<CompletableFuture<List<Boolean>>, MemcachedNode> futureToNode =
+        getFutureToNode(resourceByNode, client);
+
+    return new ArcusMultiFuture<>(new ArrayList<>(futureToNode.keySet()),
+        () -> combineResults(ops.size(), resourceByNode, futureToNode));
+  }
+
+  /*
+   * Map node with its PipeNodeResource for executing pipeline operations.
+   */
+  private Map<MemcachedNode, PipeResourceForNode> getResourceByNode(
+      List<KeyedOperation> ops, Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys) {
+    Map<MemcachedNode, PipeResourceForNode> resourceByNode = new HashMap<>();
+
+    // 1) Map key-to-node and save keys into NodeResource.
+    Map<String, MemcachedNode> keyToNode = new HashMap<>(500);
+    for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKeys) {
+      for (String key : entry.getValue()) {
+        keyToNode.put(key, entry.getKey());
+      }
+      resourceByNode
+          .computeIfAbsent(entry.getKey(), k -> new PipeResourceForNode())
+          .keys
+          .addAll(entry.getValue());
+    }
+
+    // 2) Map operations and indexes by node and save into NodeResource.
+    for (int pipeIdx = 0; pipeIdx < ops.size(); pipeIdx++) {
+      KeyedOperation op = ops.get(pipeIdx);
+      String key = op.getKeys().iterator().next();
+      MemcachedNode node = keyToNode.get(key);
+      Map<KeyedOperation, Integer> opToNodeIdx = resourceByNode.get(node).opToNodeIdx;
+      int nodeIdx = opToNodeIdx.size();
+      opToNodeIdx.put(op, nodeIdx);
+      resourceByNode.get(node).nodeIdxToPipeIdx.put(nodeIdx, pipeIdx);
+    }
+
+    return resourceByNode;
+  }
+
+  /*
+   * Map future from executeByNode with its MemcachedNode.
+   */
+  private Map<CompletableFuture<List<Boolean>>, MemcachedNode> getFutureToNode(
+      Map<MemcachedNode, PipeResourceForNode> resourceByNode, ArcusClient client) {
+    Map<CompletableFuture<List<Boolean>>, MemcachedNode> futureToNode =
+        new HashMap<>(resourceByNode.size());
+    for (Map.Entry<MemcachedNode, PipeResourceForNode> entry : resourceByNode.entrySet()) {
+      MemcachedNode node = entry.getKey();
+      PipeResourceForNode pipeResourceForNode = entry.getValue();
+
+      CompletableFuture<List<Boolean>> future = executeByNode(client, node, pipeResourceForNode)
+          .toCompletableFuture();
+      futureToNode.put(future, node);
+    }
+
+    return futureToNode;
+  }
+
+  private void validatePipeline(Collection<String> keys, List<KeyedOperation> ops) {
+    keyValidator.validateKey(keys);
+
+    if (ops.isEmpty() || ops.size() > 500) {
+      throw new IllegalArgumentException("Pipeline must have 1 to 500 operations.");
+    }
+  }
+
+  /**
+   * Use only in {@link AsyncArcusCommands#execute(Pipeline)}
+   *
+   * @param client              the ArcusClient instance to use
+   * @param node                the MemcachedNode to execute operations on
+   * @param pipeResourceForNode operations to execute and their pipeline indexes
+   * @return {@link ArcusFuture} with each pipe results as Boolean (true/false/null)
+   */
+  private ArcusFuture<List<Boolean>> executeByNode(ArcusClient client,
+                                                   MemcachedNode node,
+                                                   PipeResourceForNode pipeResourceForNode) {
+    AtomicReference<List<Boolean>> atomicReference = new AtomicReference<>(
+        new ArrayList<>(Collections.nCopies(pipeResourceForNode.opToNodeIdx.size(), null)));
+    PipelineArcusResult<List<Boolean>> result = new PipelineArcusResult<>(atomicReference);
+    ArcusFutureImpl<List<Boolean>> future = new ArcusFutureImpl<>(result);
+
+    OperationCallback cb = new PipelineOperation.Callback() {
+      @Override
+      public void gotStatus(Operation op, OperationStatus status) {
+        int nodeIdx = pipeResourceForNode.opToNodeIdx.get(op);
+        int pipeIdx;
+        if (!status.isSuccess()) {
+          switch (status.getStatusCode()) {
+            case ERR_NOT_FOUND:
+            case ERR_NOT_FOUND_ELEMENT:
+            case ERR_ELEMENT_EXISTS:
+            case ERR_NOTHING_TO_UPDATE:
+              break;
+            case ERR_INTERNAL:
+              pipeIdx = pipeResourceForNode.nodeIdxToPipeIdx.getOrDefault(nodeIdx, nodeIdx);
+              result.addError(pipeIdx, op.getException());
+              return;
+            default:
+              /*
+               * TYPE_MISMATCH, BKEY_MISMATCH, EFLAG_MISMATCH, OVERFLOWED,
+               * OUT_OF_RANGE, NOT_SUPPORTED
+               * or unknown statement
+               */
+              pipeIdx = pipeResourceForNode.nodeIdxToPipeIdx.getOrDefault(nodeIdx, nodeIdx);
+              result.addError(pipeIdx, status);
+              return;
+          }
+        }
+        result.get().set(nodeIdx, status.isSuccess());
+      }
+
+      /**
+       * @param status If `ERR_FAILED_END` or `ERR_INTERNAL` is received, gotStatus callback method
+       *               already handled failed status.
+       *               So in this method, only need to handle CANCELLED status.
+       */
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        if (status.getStatusCode() == StatusCode.CANCELLED) {
+          future.internalCancel();
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+
+    Operation pipelineOp = client.getOpFact()
+        .pipeline(new ArrayList<>(pipeResourceForNode.opToNodeIdx.keySet()),
+            pipeResourceForNode.keys,
+            cb);
+    future.setOp(pipelineOp);
+    client.addOp(node, pipelineOp);
+
+    return future;
+  }
+
+  /*
+   * Always return joined result from MemcachedNode with exception handling.
+   */
+  private List<Boolean> joinResult(CompletableFuture<List<Boolean>> future, int size) {
+    try {
+      return future.join();
+    } catch (CompletionException ce) {
+      if (ce.getCause() instanceof PipelineCompositeException) {
+        return ((PipelineCompositeException) ce.getCause()).getResult();
+      }
+      return new ArrayList<>(Collections.nCopies(size, null));
+    } catch (CancellationException ce) {
+      return new ArrayList<>(Collections.nCopies(size, null));
+    }
+  }
+
+  /*
+   * Combine into single List<Boolean> according to pipe indexes
+   * from each MemcachedNode's results.
+   */
+  private List<Boolean> combineResults(
+      int totalSize, Map<MemcachedNode, PipeResourceForNode> resourceToNode,
+      Map<CompletableFuture<List<Boolean>>, MemcachedNode> futureToNode) {
+    List<Boolean> results = new ArrayList<>(Collections.nCopies(totalSize, null));
+    for (Map.Entry<CompletableFuture<List<Boolean>>, MemcachedNode> entry
+        : futureToNode.entrySet()) {
+      PipeResourceForNode resource = resourceToNode.get(entry.getValue());
+      List<Boolean> joinResult = joinResult(entry.getKey(), resource.opToNodeIdx.size());
+      if (joinResult != null && !joinResult.isEmpty()) {
+        Map<Integer, Integer> nodeIdxToPipeIdx =
+            resourceToNode.get(entry.getValue()).nodeIdxToPipeIdx;
+        for (int i = 0; i < joinResult.size(); i++) {
+          results.set(nodeIdxToPipeIdx.get(i), joinResult.get(i));
+        }
+      }
+    }
+    return results;
+  }
+
+  /*
+   * Resources for operations and keys per MemcachedNode in Pipeline processing.
+   */
+  private static final class PipeResourceForNode {
+    private final Map<KeyedOperation, Integer> opToNodeIdx = new LinkedHashMap<>(500);
+    private final Map<Integer, Integer> nodeIdxToPipeIdx = new HashMap<>(500);
+    private final List<String> keys = new ArrayList<>(500);
   }
 }

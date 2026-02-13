@@ -17,6 +17,7 @@
 package net.spy.memcached.protocol.ascii;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.security.sasl.SaslClient;
 
@@ -66,9 +67,11 @@ import net.spy.memcached.ops.FlushOperation;
 import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.KeyedOperation;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 import net.spy.memcached.ops.NoopOperation;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.SASLAuthOperation;
 import net.spy.memcached.ops.SASLMechsOperation;
@@ -297,6 +300,12 @@ public class AsciiOperationFactory extends BaseOperationFactory {
                                                     BTreeInsertAndGet<?> get, byte[] dataToInsert,
                                                     OperationCallback cb) {
     return new BTreeInsertAndGetOperationImpl(key, get, dataToInsert, cb);
+  }
+
+  @Override
+  public Operation pipeline(List<KeyedOperation> ops, List<String> keys,
+                            OperationCallback cb) {
+    return new PipelineOperationImpl(ops, keys, cb);
   }
 
 }
