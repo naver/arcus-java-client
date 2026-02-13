@@ -48,6 +48,8 @@ import net.spy.memcached.v2.AsyncArcusCommands;
  */
 public interface ArcusClientIF extends MemcachedClientIF {
 
+  Transcoder<Object> getCollectionTranscoder();
+
   <T> AsyncArcusCommands<T> asyncCommands();
 
   /**

@@ -85,6 +85,11 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return client;
   }
 
+  @Override
+  public Transcoder<Object> getCollectionTranscoder() {
+    return this.getClient().getCollectionTranscoder();
+  }
+
   public <T> AsyncArcusCommands<T> asyncCommands() {
     return new AsyncArcusCommands<>(this::getClient);
   }
