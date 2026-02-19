@@ -30,6 +30,11 @@ class CollectionTranscoderTest extends BaseIntegrationTest {
   }
 
   @Test
+  void forceJDKSerializationReturnTrue() {
+    assertTrue(transcoder.isForceSerializeForCollection());
+  }
+
+  @Test
   void decodeIntegerAsString() throws ExecutionException, InterruptedException {
     // given
     Boolean b1 = mc.asyncMopInsert(KEY, "mkey1", "value", new CollectionAttributes()).get();

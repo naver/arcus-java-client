@@ -32,6 +32,11 @@ class SerializingTranscoderTest extends BaseTranscoderCase {
   }
 
   @Test
+  void forceJDKSerializationReturnFalse() {
+    assertFalse(tc.isForceSerializeForCollection());
+  }
+
+  @Test
   void testNonserializable() throws Exception {
     try {
       tc.encode(new Object());
