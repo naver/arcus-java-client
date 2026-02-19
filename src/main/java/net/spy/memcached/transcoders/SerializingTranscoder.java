@@ -138,6 +138,11 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     return rv;
   }
 
+  @Override
+  public boolean isForceSerializeForCollection() {
+    return forceJDKSerializeForCollection;
+  }
+
   public CachedData encode(Object o) {
     byte[] b;
     int flags = 0;

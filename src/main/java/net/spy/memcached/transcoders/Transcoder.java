@@ -30,4 +30,11 @@ public interface Transcoder<T> {
    * Get the maximum size of objects handled by this transcoder.
    */
   int getMaxSize();
+
+  /**
+   * Get if this transcoder forces serialization every type.
+   */
+  default boolean isForceSerializeForCollection() {
+    return false;
+  }
 }
