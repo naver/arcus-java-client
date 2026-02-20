@@ -32,25 +32,10 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
   private final int maxSize;
   private final CompressionUtils cu;
   private final TranscoderUtils tu;
+  private final boolean isCollection;
+  private final boolean forceJsonSerializeForCollection;
 
-  /**
-   * Construct a new GenericJsonSerializingTranscoder
-   *
-   * @param objectMapper         the object mapper to use. This transcoder enables
-   *                             polymorphic typing to preserve concrete types.
-   *                             Jackson polymorphic deserialization can be vulnerable
-   *                             for any untrusted JSON input if default typing is
-   *                             too permissive without proper validation.
-   *                             It is recommended to configure a restrictive
-   *                             {@code BasicPolymorphicTypeValidator}
-   * @param typeHintPropertyName the property name to use for type hints.
-   *                             If {@code null} is given, do not set DefaultTyping of ObjectMapper.
-   *                             If empty String is given, set DefaultTyping of ObjectMapper with
-   *                             default type property name ("@class").
-   *                             Otherwise, set DefaultTyping of ObjectMapper with given String
-   *                             to write type info into JSON.
-   * @param max                  the maximum size of a serialized object
-   */
+  @Deprecated
   public GenericJsonSerializingTranscoder(ObjectMapper objectMapper, String typeHintPropertyName,
                                           int max) {
     this(objectMapper, max);
@@ -66,6 +51,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
     }
   }
 
+  @Deprecated
   public GenericJsonSerializingTranscoder(ObjectMapper objectMapper, int max) {
     if (objectMapper == null) {
       throw new IllegalArgumentException("ObjectMapper must not be null");
@@ -74,11 +60,67 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
     this.maxSize = max;
     this.cu = new CompressionUtils();
     this.tu = new TranscoderUtils(true);
+    this.isCollection = false;
+    this.forceJsonSerializeForCollection = false;
+  }
+
+  /**
+   * Constructor with full customization.
+   * Use static factory methods forKV() or forCollection() for default settings,
+   * or Builder for custom configurations.
+   */
+  private GenericJsonSerializingTranscoder(ObjectMapper objectMapper, int max,
+                                           boolean isCollection,
+                                           boolean forceJsonSerializeForCollection) {
+    if (objectMapper == null) {
+      throw new IllegalArgumentException("ObjectMapper must not be null");
+    }
+    this.objectMapper = objectMapper;
+    this.maxSize = max;
+    this.cu = new CompressionUtils();
+    this.tu = new TranscoderUtils(true);
+    this.isCollection = isCollection;
+    this.forceJsonSerializeForCollection = forceJsonSerializeForCollection;
+  }
+
+  /**
+   * Factory method for general key-value usage.
+   *
+   * @param objectMapper the object mapper to use. This transcoder enables
+   *                     polymorphic typing to preserve concrete types.
+   *                     Jackson polymorphic deserialization can be vulnerable
+   *                     for any untrusted JSON input if default typing is
+   *                     too permissive without proper validation.
+   *                     It is recommended to configure a restrictive
+   *                     {@code BasicPolymorphicTypeValidator}
+   */
+  public static Builder forKV(ObjectMapper objectMapper) {
+    return new Builder(objectMapper).forKV();
+  }
+
+  /**
+   * Factory method for collection item usage.
+   *
+   * @param objectMapper the object mapper to use. This transcoder enables
+   *                     polymorphic typing to preserve concrete types.
+   *                     Jackson polymorphic deserialization can be vulnerable
+   *                     for any untrusted JSON input if default typing is
+   *                     too permissive without proper validation.
+   *                     It is recommended to configure a restrictive
+   *                     {@code BasicPolymorphicTypeValidator}
+   */
+  public static Builder forCollection(ObjectMapper objectMapper) {
+    return new Builder(objectMapper).forCollection();
   }
 
   @Override
   public int getMaxSize() {
     return maxSize;
+  }
+
+  @Override
+  public boolean isForceSerializeForCollection() {
+    return forceJsonSerializeForCollection;
   }
 
   /**
@@ -162,6 +204,12 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
     byte[] b;
     int flags = 0;
 
+    if (isCollection && forceJsonSerializeForCollection) {
+      b = serialize(o);
+      flags |= SERIALIZED;
+      return new CachedData(flags, b, getMaxSize());
+    }
+
     if (o instanceof String) {
       b = tu.encodeString((String) o);
     } else if (o instanceof Long) {
@@ -193,7 +241,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (cu.isCompressionCandidate(b)) {
+    if (!isCollection && cu.isCompressionCandidate(b)) {
       byte[] compressed = cu.compress(b);
       if (compressed.length < b.length) {
         getLogger().debug("Compressed %s from %d to %d",
@@ -227,6 +275,78 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
       return objectMapper.writeValueAsBytes(o);
     } catch (IOException e) {
       throw new IllegalArgumentException("Non-serializable object, cause=" + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Builder for constructing GenericJsonSerializingTranscoder instances with custom settings.
+   */
+  public static final class Builder {
+    private final ObjectMapper objectMapper;
+    private String typeHintPropertyName = "";
+    private int max;
+    private boolean isCollection;
+    private boolean forceJsonSerializeForCollection;
+
+    private Builder(ObjectMapper objectMapper) {
+      this.objectMapper = objectMapper;
+    }
+
+    Builder forKV() {
+      this.max = CachedData.MAX_SIZE;
+      this.isCollection = false;
+      this.forceJsonSerializeForCollection = false;
+      return this;
+    }
+
+    Builder forCollection() {
+      this.max = SerializingTranscoder.MAX_COLLECTION_ELEMENT_SIZE;
+      this.isCollection = true;
+      this.forceJsonSerializeForCollection = false;
+      return this;
+    }
+
+    public Builder maxSize(int max) {
+      this.max = max;
+      return this;
+    }
+
+    /**
+     * @param typeHintPropertyName the property name to use for type hints.
+     *                             Use "@class" by default without setting this method.
+     *                             If {@code null} is given, do not set DefaultTyping
+     *                             of given ObjectMapper.
+     *                             If empty String is given, set DefaultTyping of ObjectMapper with
+     *                             default type property name ("@class").
+     *                             Otherwise, set DefaultTyping of ObjectMapper with given String
+     *                             to write type info into JSON.
+     */
+    public Builder typeHintPropertyName(String typeHintPropertyName) {
+      this.typeHintPropertyName = typeHintPropertyName;
+      return this;
+    }
+
+    public Builder forceJsonSerializeForCollection() {
+      if (!isCollection) {
+        throw new IllegalStateException("forceJsonSerializationForCollection can only be " +
+            "used with collection transcoders");
+      }
+      this.forceJsonSerializeForCollection = true;
+      return this;
+    }
+
+    public GenericJsonSerializingTranscoder build() {
+      if (typeHintPropertyName != null) {
+        @SuppressWarnings("deprecation")
+        StdTypeResolverBuilder typer = new ObjectMapper.DefaultTypeResolverBuilder(
+            ObjectMapper.DefaultTyping.EVERYTHING, objectMapper.getPolymorphicTypeValidator());
+        typer = typer.init(JsonTypeInfo.Id.CLASS, null);
+        typer = typer.inclusion(JsonTypeInfo.As.PROPERTY);
+        typer = typer.typeProperty(typeHintPropertyName);
+        objectMapper.setDefaultTyping(typer);
+      }
+      return new GenericJsonSerializingTranscoder(objectMapper, max,
+          isCollection, forceJsonSerializeForCollection);
     }
   }
 }

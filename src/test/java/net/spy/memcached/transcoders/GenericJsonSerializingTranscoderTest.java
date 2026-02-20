@@ -42,12 +42,13 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class GenericJsonSerializingTranscoderTest {
 
-  private final ObjectMapper mapper = new ObjectMapper();
   private GenericJsonSerializingTranscoder tc;
 
   @BeforeEach
   void setUp() {
-    tc = new GenericJsonSerializingTranscoder(mapper, "", CachedData.MAX_SIZE);
+    tc = GenericJsonSerializingTranscoder
+        .forKV(new ObjectMapper())
+        .build();
   }
 
   @Test
@@ -239,14 +240,17 @@ class GenericJsonSerializingTranscoderTest {
 
   @Test
   void testObjectMapperWithoutDefaultTyping() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    GenericJsonSerializingTranscoder tcWithoutDefaultTyping
-        = new GenericJsonSerializingTranscoder(objectMapper, null, CachedData.MAX_SIZE);
+    GenericJsonSerializingTranscoder tcWithoutDefaultTyping =
+        GenericJsonSerializingTranscoder
+            .forKV(new ObjectMapper())
+            .typeHintPropertyName(null)
+            .build();
     TestPojo pojo = new TestPojo("test", 123);
 
     CachedData cd = tcWithoutDefaultTyping.encode(pojo);
     assertEquals(TranscoderUtils.SERIALIZED, cd.getFlags());
-    assertFalse(new String(cd.getData()).contains("@class"));
+    String s = new String(cd.getData());
+    assertFalse(s.contains("@class"));
 
     assertThrows(ClassCastException.class, () -> {
       TestPojo decoded = (TestPojo) tcWithoutDefaultTyping.decode(cd);
@@ -392,7 +396,10 @@ class GenericJsonSerializingTranscoderTest {
   @Test
   void testCustomTypePropertyName() {
     GenericJsonSerializingTranscoder custom =
-        new GenericJsonSerializingTranscoder(new ObjectMapper(), "type", CachedData.MAX_SIZE);
+        GenericJsonSerializingTranscoder
+            .forKV(new ObjectMapper())
+            .typeHintPropertyName("type")
+            .build();
     TestPojo p = new TestPojo("abc", 1);
     CachedData cd = custom.encode(p);
     String json = new String(cd.getData(), StandardCharsets.UTF_8);
