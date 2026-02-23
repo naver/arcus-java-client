@@ -20,7 +20,6 @@ package net.spy.memcached.protocol.ascii;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.Iterator;
 
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
@@ -238,20 +237,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   }
 
   private String generateKeysString() {
-    StringBuilder keyString = new StringBuilder();
-    Iterator<String> iterator = keys.iterator();
-
-    // make keys line
-    while (true) {
-      keyString.append(iterator.next());
-      if (iterator.hasNext()) {
-        keyString.append(' ');
-      } else {
-        break;
-      }
-    }
-
-    return keyString.toString();
+    return String.join(" ", keys);
   }
 
   @Override
