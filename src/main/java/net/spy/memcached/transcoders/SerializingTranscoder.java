@@ -94,8 +94,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
   public Object decode(CachedData d) {
     byte[] data = d.getData();
 
-    // Skip decompression for collections
-    if (!isCollection && (d.getFlags() & COMPRESSED) != 0) {
+    if ((d.getFlags() & COMPRESSED) != 0) {
       data = decompress(data);
     }
 
