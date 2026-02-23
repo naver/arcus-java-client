@@ -14,9 +14,7 @@ to support Arcus memcached cloud.
 
 ## JDK Requirements
 
-Compatible with jdk version
-- runtime requirements : At least 1.6
-- build requirements : At least 1.8
+Compatible with jdk version 1.8 or higher.
 
 ## Getting Started
 
