@@ -1995,21 +1995,23 @@ public class MemcachedClient extends SpyThread
             = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        if (!status.isSuccess()) {
+          rv.set(Boolean.FALSE, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        rv.complete();
+      }
+    };
+
     checkState();
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.flush(delay, new OperationCallback() {
-        @Override
-        public void receivedStatus(OperationStatus status) {
-          if (!status.isSuccess()) {
-            rv.set(Boolean.FALSE, status);
-          }
-        }
-
-        @Override
-        public void complete() {
-          rv.complete();
-        }
-      });
+      Operation op = opFact.flush(delay, cb);
       opsMap.put(node, op);
     }
     rv.addOperations(opsMap.values());
@@ -2037,21 +2039,23 @@ public class MemcachedClient extends SpyThread
             operationTimeout, resultMap, nodes.size());
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        for (String s : status.getMessage().split(" ")) {
+          resultMap.put(s, s);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+
     checkState();
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.saslMechs(false, new OperationCallback() {
-        @Override
-        public void receivedStatus(OperationStatus status) {
-          for (String s : status.getMessage().split(" ")) {
-            resultMap.put(s, s);
-          }
-        }
-
-        @Override
-        public void complete() {
-          future.complete();
-        }
-      });
+      Operation op = opFact.saslMechs(false, cb);
       opsMap.put(node, op);
     }
     future.addOperations(opsMap.values());
@@ -2159,16 +2163,19 @@ public class MemcachedClient extends SpyThread
     Collection<MemcachedNode> nodes = getAllNodes();
     final CountDownLatch latch = new CountDownLatch(nodes.size());
 
+    OperationCallback cb = new OperationCallback() {
+      public void receivedStatus(OperationStatus s) {
+        // Nothing special when receiving status, only
+        // necessary to complete the interface
+      }
+
+      public void complete() {
+        latch.countDown();
+      }
+    };
+
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.noop(new OperationCallback() {
-        public void receivedStatus(OperationStatus s) {
-          // Nothing special when receiving status, only
-          // necessary to complete the interface
-        }
-        public void complete() {
-          latch.countDown();
-        }
-      });
+      Operation op = opFact.noop(cb);
       conn.addOperation(node, op);
     }
     try {

@@ -1802,21 +1802,23 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             = new BroadcastFuture<>(operationTimeout, Boolean.TRUE, nodes.size());
     final Map<MemcachedNode, Operation> opsMap = new HashMap<>();
 
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        if (!status.isSuccess()) {
+          rv.set(Boolean.FALSE, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        rv.complete();
+      }
+    };
+
     checkState();
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.flush(prefix, delay, false, new OperationCallback() {
-        @Override
-        public void receivedStatus(OperationStatus status) {
-          if (!status.isSuccess()) {
-            rv.set(Boolean.FALSE, status);
-          }
-        }
-
-        @Override
-        public void complete() {
-          rv.complete();
-        }
-      });
+      Operation op = opFact.flush(prefix, delay, false, cb);
       opsMap.put(node, op);
     }
     rv.addOperations(opsMap.values());
@@ -2962,24 +2964,25 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final BulkOperationFuture<CollectionOperationStatus> rv =
             new BulkOperationFuture<>(latch, operationTimeout);
 
+    OperationCallback cb = new MultiKeyPipedOperationCallback() {
+      public void receivedStatus(OperationStatus status) {
+        // Nothing to do here because the user MUST search the result Map instance.
+      }
+
+      public void complete() {
+        latch.countDown();
+      }
+
+      public void gotStatus(String key, OperationStatus status) {
+        if (!status.isSuccess()) {
+          CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
+          rv.addFailedResult(key, cstatus);
+        }
+      }
+    };
+
     for (final CollectionBulkInsert<T> insert : insertList) {
-      Operation op = opFact.collectionBulkInsert(
-              insert, new MultiKeyPipedOperationCallback() {
-                public void receivedStatus(OperationStatus status) {
-                  // Nothing to do here because the user MUST search the result Map instance.
-                }
-
-                public void complete() {
-                  latch.countDown();
-                }
-
-                public void gotStatus(String key, OperationStatus status) {
-                  if (!status.isSuccess()) {
-                    CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
-                    rv.addFailedResult(key, cstatus);
-                  }
-                }
-              });
+      Operation op = opFact.collectionBulkInsert(insert, cb);
       rv.addOperation(op);
       addOp(insert.getMemcachedNode(), op);
     }
@@ -3086,35 +3089,36 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final GetResult<Map<String, BTreeGetResult<Long, T>>> result =
             new BopGetBulkResultImpl<>(cachedDataMap, opStatusMap, reverse, tc);
 
+    BTreeGetBulkOperation.Callback cb = new BTreeGetBulkOperation.Callback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        // Nothing to do here because the user MUST search the result Map instance.
+      }
+
+      @Override
+      public void complete() {
+        latch.countDown();
+      }
+
+      @Override
+      public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
+        List<BTreeElement<Long, CachedData>> elems = cachedDataMap.get(key);
+        assert elems != null : "Element list not prepared in bopGetBulk";
+        elems.add(new BTreeElement<>((Long) bkey, eflag,
+                new CachedData(flags, data, tc.getMaxSize())));
+      }
+
+      @Override
+      public void gotKey(String key, int elementCount, OperationStatus status) {
+        if (elementCount > 0) {
+          cachedDataMap.put(key, new ArrayList<>(elementCount));
+        }
+        opStatusMap.put(key, (CollectionOperationStatus) status);
+      }
+    };
+
     for (BTreeGetBulk<T> getBulk : getBulkList) {
-      final Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
-
-        @Override
-        public void receivedStatus(OperationStatus status) {
-          // Nothing to do here because the user MUST search the result Map instance.
-        }
-
-        @Override
-        public void complete() {
-          latch.countDown();
-        }
-
-        @Override
-        public void gotKey(String key, int elementCount, OperationStatus status) {
-          if (elementCount > 0) {
-            cachedDataMap.put(key, new ArrayList<>(elementCount));
-          }
-          opStatusMap.put(key, (CollectionOperationStatus) status);
-        }
-
-        @Override
-        public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          List<BTreeElement<Long, CachedData>> elems = cachedDataMap.get(key);
-          assert elems != null : "Element list not prepared in bopGetBulk";
-          elems.add(new BTreeElement<>((Long) bkey, eflag,
-                  new CachedData(flags, data, tc.getMaxSize())));
-        }
-      });
+      final Operation op = opFact.bopGetBulk(getBulk, cb);
       ops.add(op);
       addOp(getBulk.getMemcachedNode(), op);
     }
@@ -3146,34 +3150,37 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final GetResult<Map<String, BTreeGetResult<ByteArrayBKey, T>>> result =
             new BopGetBulkResultImpl<>(cachedDataMap, opStatusMap, reverse, tc);
 
+    BTreeGetBulkOperation.Callback cb = new BTreeGetBulkOperation.Callback() {
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+      }
+
+      @Override
+      public void complete() {
+        latch.countDown();
+      }
+
+      @Override
+      public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
+        List<BTreeElement<ByteArrayBKey, CachedData>> elems = cachedDataMap.get(key);
+        assert elems != null : "Element list not prepared in bopGetBulk";
+        elems.add(new BTreeElement<>(
+                new ByteArrayBKey((byte[]) bkey), eflag,
+                new CachedData(flags, data, tc.getMaxSize())));
+      }
+
+      @Override
+      public void gotKey(String key, int elementCount, OperationStatus status) {
+        if (elementCount > 0) {
+          cachedDataMap.put(key, new ArrayList<>(elementCount));
+        }
+        opStatusMap.put(key, (CollectionOperationStatus) status);
+      }
+    };
+
     for (BTreeGetBulk<T> getBulk : getBulkList) {
-      Operation op = opFact.bopGetBulk(getBulk, new BTreeGetBulkOperation.Callback() {
-        @Override
-        public void receivedStatus(OperationStatus status) {
-        }
-
-        @Override
-        public void complete() {
-          latch.countDown();
-        }
-
-        @Override
-        public void gotKey(String key, int elementCount, OperationStatus status) {
-          if (elementCount > 0) {
-            cachedDataMap.put(key, new ArrayList<>(elementCount));
-          }
-          opStatusMap.put(key, (CollectionOperationStatus) status);
-        }
-
-        @Override
-        public void gotElement(String key, int flags, Object bkey, byte[] eflag, byte[] data) {
-          List<BTreeElement<ByteArrayBKey, CachedData>> elems = cachedDataMap.get(key);
-          assert elems != null : "Element list not prepared in bopGetBulk";
-          elems.add(new BTreeElement<>(
-                  new ByteArrayBKey((byte[]) bkey), eflag,
-                  new CachedData(flags, data, tc.getMaxSize())));
-        }
-      });
+      Operation op = opFact.bopGetBulk(getBulk, cb);
       ops.add(op);
       addOp(getBulk.getMemcachedNode(), op);
     }
