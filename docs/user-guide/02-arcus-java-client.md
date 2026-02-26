@@ -416,200 +416,33 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 
 ### ConnectionFactoryBuilder 설정
 
+`ConnectionFactoryBuilder`는 ArcusClient의 동작 방식을 커스터마이징하기 위한 빌더 클래스다.
 
-- setOpQueueFactory(OperationQueueFactory q)
+> 더 자세한 내용은 [ConnectionFactoryBuilder 문서](13-connection-factory.md)를 참고한다.
 
-  명령어의 내용을 담는 operation이 최초로 담기는 Input Queue의 팩토리 객체를 지정한다.
-  지정하지 않을 경우 크기가 16,384인 ArrayBlockingQueue를 생성해 사용하게 된다.
-  - Arcus Java Client에서는 두 가지의 OperationQueueFactory 구현을 제공한다.
-    - ArrayOperationQueueFactory
-      - ArrayBlockingQueue를 생성한다.
-      - 생성자의 인자를 통해 큐의 크기를 지정할 수 있다.
-    - LinkedOperationQueueFactory
-      - LinkedBlockingQueue를 생성한다.
-      - 큐의 크기를 지정할 수 없다. LinkedBlockingQueue 자체에 큐 크기를 지정할 수 없기 때문이다.
-
-- setWriteOpQueueFactory(OperationQueueFactory q)
-
-  Arcus 캐시 서버에 요청을 보내기 위해 대기 중인 operation들을 담는 Write Queue의 팩토리 객체를 지정한다.
-
-- setReadOpQueueFactory(OperationQueueFactory q)
-
-  Arcus 캐시 서버로부터 응답을 받기 위해 대기 중인 operation들을 담는 Read Queue의 팩토리 객체를 지정한다.
-
-- setOpQueueMaxBlockTime(long t)
-
-  사용자의 요청이 들어오면 Operation 객체를 생성한다. Operation을 Input Queue에 등록하면, 비동기 방식으로 순차 처리된다.
-  OpQueueMaxBlockTime은 Input Queue가 꽉 찬 상태가 되었을 때 사용자의 스레드가 최대 기다리는 시간을 의미한다.
-  단위는 millisecond 이고, 기본값은 10000ms이다.
-
-- setOpTimeout(long t)
-
-  Future의 get() 메서드에서 캐시 서버로부터의 응답을 대기하는 최대 시간을 지정한다. 단위는 millisecond 이고, 기본값은 700ms이다.
-  기본 값을 사용하면 Future에서 `get()` 메서드 호출과 `get(700, TimeUnit.MILLISECONDS)` 메서드 호출이 동일하게 동작한다.
-
-- setTranscoder(Transcoder\<Object\> t)
-
-  Key-Value 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
-  
-  #### SerializingTranscoder
-  - 별도로 지정하지 않을 경우 이 타입을 사용한다.
-  - 압축 시 GZip 방식을 사용하며, Character set, 압축 기준, ClassLoader를 설정할 수 있다.  
-  - Character set과 압축 기준은 setter로 설정 가능하다. Character set의 기본값은 UTF-8이다.
-    압축 기준의 단위는 byte이며, 기본값은 16,384bytes이다.
-    ```java
-    SerializingTranscoder transcoder = new SerializingTranscoder();
-    transcoder.setCharset("EUC-KR");
-    transcoder.setCompressionThreshold(4096);
-    
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    cfb.setTranscoder(transcoder);
-    ```
-  - ClassLoader는 생성자 인자로 설정 가능하다. Spring Devtools와 같이 클래스로더를 별도로 두는 라이브러리를 사용할 때,
-    캐시에서 조회하여 역직렬화 할 때 사용하는 클래스 로더와 프로세스에서 사용되고 있는 클래스 로더를 일치시키기 위해 사용한다.
-    ```java
-    SerializingTranscoder tc = new SerializingTranscoder(CachedData.MAX_SIZE, this.getClass().getClassLoader());
-    ```
-    
-  #### JsonSerializingTranscoder
-  - 제네릭 타입을 Object로 지정하지 않으면 setTranscoder 메서드 인자로 지정할 수 없다.
-    따라서 ArcusClient API 메서드 인자로 지정하는 것을 권장한다. 삽입 및 조회 시 동일한 타입을 갖는 transcoder를 사용해야 한다.
-    ```java
-    JsonSerializingTranscoder<MyClass> transcoder = new JsonSerializingTranscoder<>(MyClass.class);
-    arcusClient.set("key", 0, new MyClass("class1"), transcoder).get();
-    MyClass myClass = arcusClient.asyncGet("key", transcoder).get();
-    ```
-  - Jackson 라이브러리를 사용하여 객체를 JSON 형식으로 직렬화/역직렬화한다. 
-  - 타입 안전성을 보장하기 위해 생성자에서 특정 클래스 타입 또는 JavaType을 지정해야 한다.
-  - 기본 타입(String, Integer, Long, Boolean, Date 등)은 바로 직렬화하고, 사용자 정의 타입 객체는 JSON으로 변환하여 직렬화한다.
-    이 때 사용자 정의 타입에 기본 생성자나 `@JsonCreator` 어노테이션이 지정된 생성자가 없으면 워닝 로그와 함께 역직렬화 시 null이 반환될 수 있으므로 주의한다.
-  - 압축 시 GZip 방식을 사용하며, Character set, 압축 기준을 설정할 수 있다.
-  - Character set과 압축 기준은 setter로 설정 가능하다. Character set의 기본값은 UTF-8이다.
-
-  #### GenericJsonSerializingTranscoder
-  - Jackson 라이브러리를 사용하여 객체를 JSON 형식으로 직렬화/역직렬화한다.
-  - 기본 타입(String, Integer, Long, Boolean, Date 등)은 바로 직렬화하고, 사용자 정의 타입 객체는 JSON으로 변환하여 직렬화한다.
-    이 때 사용자 정의 타입에 기본 생성자나 `@JsonCreator` 어노테이션이 지정된 생성자가 없으면 워닝 로그와 함께 역직렬화 시 null이 반환될 수 있으므로 주의한다.
-  - 다형성 타입을 지원하여 객체의 구체적인 타입 정보를 보존할 수 있다.
-  - 생성자에서 ObjectMapper와 타입 힌트 프로퍼티 이름을 지정할 수 있다. DefaultTyping이 설정되지 않은 ObjectMapper 사용 시 타입 힌트 프로퍼티 이름을 지정해주어야 한다.
-  - 보안 취약점을 방지하기 위해, 신뢰할 수 없는 JSON 입력을 처리할 경우 적절한 BasicPolymorphicTypeValidator를 설정하는 것이 권장된다.
-  ```java
-  ObjectMapper objectMapper = new ObjectMapper();
-  BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
-      .allowIfBaseType("net.spy.memcached.") // 패키지 경로는 커스텀하게 설정해주어야 한다.
-      .allowIfSubType("net.spy.memcached.") // 패키지 경로는 커스텀하게 설정해주어야 한다.
-      .build();
-  GenericJsonSerializingTranscoder transcoder =
-      new GenericJsonSerializingTranscoder(objectMapper, "@class", CachedData.MAX_SIZE);
-  
-  ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-  cfb.setTranscoder(transcoder);
-  ``` 
-
-- setCollectionTranscoder(Transcoder\<Object\> t)
-
-  Collection 타입의 캐시 데이터와 자바 객체 타입 간 변환 시에 사용할 Transcoder를 지정한다.
-  기본적으로 SerializingTranscoder 객체를 사용하며, Character set, ClassLoader를 설정할 수 있다.
-  setTranscoder 메서드와 마찬가지로 GenericJsonSerializingTranscoder를 사용할 수 있다.
-
-  - 빌더를 통해 SerializingTranscoder를 설정할 수 있다.
-    ```java
-    SerializingTranscoder transcoder = SerializingTranscoder.forCollection()
-        .forceJDKSerializationForCollection()
-        .maxSize(16384)
-        .classLoader(this.getClass().getClassLoader())
-        .build();
-    ```
-
-  - Character set은 객체 생성 후 setter를 사용해 설정 가능하다. Character set의 기본값은 UTF-8이다.
-    ```java
-    transcoder.setCharset("EUC-KR");
-    
-    ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    cfb.setCollectionTranscoder(transcoder);
-    ```
-
-- setShouldOptimize(boolean o)
-
-  최적화 로직 사용여부를 결정한다. 기본값은 false이다. **optimize 로직 사용을 권장하지 않고 있다.**
-  Operation Queue에 연속해서 존재하는 get 연산들을 조합하여 최대 100개의 키가 담긴 하나의 요청으로 ARCUS에 전달된다.
-
-- setReadBufferSize(int to)
-
-  ARCUS 캐시 서버와 소켓 통신할 때 사용되는 전역 ByteBuffer 크기를 설정한다. 단위는 byte이며, 기본값은 16,384이다.
-  (이름은 Read이지만 읽기/쓰기 버퍼 모두 이 값을 기준으로 생성된다.)
-  만약 ByteBuffer 크기를 넘어서는 데이터가 넘어오면 재사용성을 높이기 위해 ByteBuffer 크기만큼 처리한 후
-  ByteBuffer의 내용을 비우고, 다시 사용하도록 되어 있다.
-  
-- setDaemon(boolean d)
-
-  Memcached I/O 스레드를 Daemon으로 사용할 지 설정할 수 있다. 기본값은 true이다. 
-
-- setMaxReconnectDelay(long to)
-
-  Arcus 캐시 서버로부터 어떠한 오류가 발생했을 때 연결을 끊고 reconnect를 시도하는 경우 얼마 동안의 지연을 둘 지 정할 수 있다.
-  reconnect는 상황에 따라 즉시 수행하거나 일정 시간 후에 수행하는데, 이 메서드에서는 Arcus 캐시 서버와의 연결 부분에서 문제가 발생하여
-  일정 시간 후 Reconnect를 시도하는 경우에 대해 설정을 한다.
-  단위는 second이며, 기본값은 1초이다.
-
-- setTimeoutExceptionThreshold(int to) / setTimeoutDurationThreshold(int to)
-
-  요청을 처리하는 도중 네트워크 연결에 문제가 발생했을 때 reconnect가 적절히 수행되도록 하기 위해 threshold를 지정한다.
-
-  다음 조건을 만족하면 reconnect를 시도한다.
-  - 첫 Timeout이 발생한 시점부터 현재 시점까지 timeout이 지속적으로 TimeoutExceptionThreshold개 이상 발생하는 중이다.
-  - 첫 Timeout이 발생한 시점부터 현재 시점까지의 시간 간격이 TimeoutDurationThreshold 기간보다 길다.
-
-  동작 원리는 다음과 같다.
-  - reconnect를 시작하게 되면 연결이 끊긴 상태가 되므로, 사용자가 요청한 작업에 대해 timeout을 발생시키는 대신 실패 응답을 빠르게 전달할 수 있다.
-  - 네트워크 순단이 지속될 경우 reconnect를 시도하는 과정에서 실패하므로 이 때에 들어온 요청 역시 실패 응답을 빠르게 반환받게 된다. 
-  - 일시적으로 Burst 트래픽이 발생할 때 네트워크 장비 혹은 대역폭으로 인해 연속적인 timeout이 발생할 수 있지만, 이는 네트워크 순단이 발생했다고
-    보기 어려우므로 reconnect를 시도해도 의미가 없다. 따라서 이런 경우에는 reconnect가 발생하지 않도록 한다.
-  - 연속적인 timeout이 TimeoutDurationThreshold 이상으로 지속되는 경우에는 네트워크 연결에 문제가 발생한 것으로 간주하여 reconnect를 시도한다.
-
-  각 인자의 단위와 기본값은 다음과 같다.
-  - TimeoutExceptionThreshold Timeout의 발생 횟수를 단위로 하고, 기본값은 10이며, 2 이상 값을 지정해야 한다.
-  - TimeoutDurationThreshold의 단위는 millisecond 이고 기본값은 1600ms이다.
-    0을 지정해 비활성화하거나, 1000 ~ 5000 사이의 값을 지정할 수 있다.
- 
-  쉽게 이해하기 위한 예시 상황은 다음과 같다.
-    - TimeoutDurationThreshold를 1000으로 설정하고 TimeoutExceptionThreshold를 10으로 설정한 경우,
-      1초 동안 10회 이상의 timeout이 연속적으로 발생했고 현재까지도 timeout이 발생하는 상태이므로, reconnect를 시도한다.
-    - TimeoutDurationThreshold를 0으로 설정하고 TimeoutExceptionThreshold를 100로 설정한 경우,
-      100회 이상의 timeout이 연속적으로 발생하면 reconnect를 시도한다. 따라서 정말 네트워크 연결에 문제가 발생하지 않는 상황이더라도
-      reconnect가 발생할 수 있다. 따라서 burst 트래픽 요청이 자주 발생하는 애플리케이션이라면 TimeoutDurationThreshold를 0으로 설정하는 것을 권장하지 않는다.
-
-- setDelimiter(byte to)
-
-  Arcus 캐시 서버에 `-D <char>` 옵션으로 Prefix와 Subkey를 구분하기 위한 구분자를 직접 지정한 경우
-  Arcus Java Client에서도 동일한 구분자를 지정해주어야 한다. 서버에 옵션을 주지 않았다면 지정할 필요 없으며, 기본값은 콜론(`:`)이다. 
-
-- setKeepAlive(boolean on)
-
-  Arcus 캐시 서버와의 연결을 TCP KeepAlive 옵션을 통해 유지할지 여부를 설정한다. 기본값은 false이다.
-  이 옵션을 true로 설정하면, ARCUS 캐시 서버와의 연결이 끊어지지 않도록 한다. 
-  장시간 트래픽이 없는 TCP 연결을 강제 종료하는 환경에서 주기적인 트래픽을 발생시켜 강제 종료를 방지하는 용도로 사용할 수 있다.
-
-- setDnsCacheTtlCheck(boolean dnsCacheTtlCheck)
-
-  ARCUS Java Client 구동 시에 DNS 캐시 TTL 검증을 활성화할 지 여부를 설정한다.
-  기본값은 true이다. ZooKeeper Ensemble을 도메인 주소로 관리하고 있는 경우, DNS에 매핑된 IP 정보가 변경될 때 정상적으로 반영되도록 하기 위해
-  DNS Cache TTL 값이 0 ~ 300초 내에 존재하는지 검증한다.
-
-- enableShardKey(boolean shardKey)
-
-  캐시 클러스터에서 특정 데이터가 어느 노드에 저장될지는 기본적으로 키 전체를 해싱하여 결정한다. 
-  키의 일부만을 기준으로 해싱하고 싶다면, shardKey 기능을 활성화해야 한다.
-  키 문자열에서 가장 첫 `{`와 가장 첫 `}` 사이의 문자로만 해싱하여 노드를 결정하므로, 해싱을 원하는 문자열을 중괄호로 감싸면 된다.
-  만약 shard key를 따로 지정하지 않았다면 기존대로 전체 키를 해싱한다. 
-
-- setAuthDescriptor(AuthDescriptor to);
-
-  Arcus 캐시 서버와 연결 시 SASL 인증을 시도한다. 인증에 실패하는 경우 해당 연결을 종료하고 1초 뒤 재시도한다.
-  현재 scramSha256 방식만 지원된다.
-  ```java
-  ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-  cfb.setAuthDescriptor(AuthDescriptor.scramSha256("username", "password"));
-  ```
-
-- Front Cache 설정은 별도 [문서](11-front-cache.md#사용법)에 설명되어 있다.
+| Method                                          | Description                                           | Default                      | Unit  | Note                          |
+|:------------------------------------------------|:------------------------------------------------------|:-----------------------------|:------|:------------------------------|
+| `setOpQueueFactory(OperationQueueFactory)`      | Input Queue의 팩토리 객체 설정                                | `ArrayOperationQueueFactory` |       | 크기: 16,384                    |
+| `setWriteOpQueueFactory(OperationQueueFactory)` | Write Queue의 팩토리 객체 설정                                | `ArrayOperationQueueFactory` |       | 크기: 16,384                    |
+| `setReadOpQueueFactory(OperationQueueFactory)`  | Read Queue의 팩토리 객체 설정                                 | `ArrayOperationQueueFactory` |       | 크기: 16,384                    |
+| `setOpQueueMaxBlockTime(long)`                  | Input Queue가 가득 찬 상태일 때 유저 스레드가 대기하는 최대 시간            | 10,000                       | ms    |                               |
+| `setTranscoder(Transcoder<Object>)`             | Key-Value 타입의 캐시 데이터와 Java 객체 간 변환을 위한 Transcoder     | SerializingTranscoder        |       |                               |
+| `setCollectionTranscoder(Transcoder<Object>)`   | Collection 타입의 캐시 데이터와 Java 객체 간 변환을 위한 Transcoder    | SerializingTranscoder        |       |                               |
+| `setOpTimeout(long)`                            | `Future.get()` 호출 시 캐시 서버로부터 응답을 대기하는 최대 시간           | 700                          | ms    |                               |
+| `setShouldOptimize(boolean)`                    | Operation Queue 내 연속된 GET Operation을 조합하여 하나의 요청으로 처리 | false                        |       | 사용 비권장                        |
+| `setReadBufferSize(int)`                        | 캐시 서버와 소켓 통신 시 사용되는 전역 ByteBuffer 크기                  | 16,384                       | bytes | 읽기/쓰기 버퍼 모두 이 값을 기준으로 생성됨     |
+| `setDaemon(boolean)`                            | Memcached I/O 스레드를 데몬 스레드로 설정                         | true                         |       | 기본값(true) 유지 권장               |
+| `setUseNagleAlgorithm(boolean)`                 | Nagle 알고리즘 사용 여부 (false = TCP NoDelay 활성화)            | false                        |       |                               |
+| `setMaxReconnectDelay(long)`                    | 캐시 서버 연결 문제 발생 시 재연결 전 대기 시간                          | 1                            | s     |                               |
+| `setTimeoutExceptionThreshold(int)`             | 재연결 조건 판단 시 연속 Timeout 발생 횟수 임계값                      | 10                           | count | 최솟값: 2                        |
+| `setTimeoutDurationThreshold(int)`              | 재연결 조건 판단 시 첫 Timeout부터 현재까지의 지속 시간 임계값               | 1,600                        | ms    | 0: 비활성화, 제한 범위: 1,000~5,000   |
+| `setDelimiter(byte)`                            | 캐시 서버 `-D <char>` 옵션으로 지정된 Prefix/Subkey 구분자          | `:`                          |       | 서버 옵션과 반드시 일치해야 함             |
+| `setKeepAlive(boolean)`                         | 캐시 서버와의 TCP KeepAlive 옵션 설정                           | false                        |       |                               |
+| `setDnsCacheTtlCheck(boolean)`                  | 구동 시 DNS 캐시 TTL 검증 활성화 여부                             | true                         |       | ZooKeeper를 도메인 주소로 관리하는 경우 유효 |
+| `enableShardKey(boolean)`                       | 키의 `{`, `}` 로 감싸진 부분만을 해싱 대상으로 사용                     | false                        |       |                               |
+| `setAuthDescriptor(AuthDescriptor)`             | 캐시 서버 연결 시 SASL 인증을 위한 AuthDescriptor                 | null                         |       | 현재 `scramSha256` 만 지원         |
+| `setMaxFrontCacheElements(int)`                 | Front Cache에 저장할 수 있는 최대 아이템 수                        | 0                            | items | 0: 비활성화                       |
+| `setFrontCacheExpireTime(int)`                  | Front Cache 아이템 만료 시간                                 | 5                            | s     |                               |
+| `setReadPriority(ReadPriority)`                 | Replication 환경에서 읽기 요청의 우선순위 설정                       | MASTER                       |       |                               |
+| `setAPIReadPriority(APIType, ReadPriority)`     | Replication 환경에서 API 타입별 읽기 우선순위 설정                   | -                            |       | `setReadPriority`보다 우선 적용됨    |
+| `setFailureMode(FailureMode)`                   | 노드 장애 발생 시 동작 방식 설정                                   | Cancel                       |       | `Cancel`만 정상 동작               |
