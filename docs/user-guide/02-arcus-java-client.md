@@ -531,8 +531,10 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
 
 - setShouldOptimize(boolean o)
 
-  최적화 로직 사용여부를 결정한다. 기본값은 false이다. **optimize 로직 사용을 권장하지 않고 있다.**
-  Operation Queue에 연속해서 존재하는 get 연산들을 조합하여 최대 100개의 키가 담긴 하나의 요청으로 ARCUS에 전달된다.
+  Operation Queue 내 연속된 GET 요청을 최대 100개 단위로 조합하여 하나의 요청으로 처리하는 최적화 로직 사용 여부를 설정한다.
+  
+  이 기능은 기존 spymemcached 호환을 위해 존재하며, cancel, replication 등의 시나리오에서 검증이 충분히 이루어지지 않았다.  
+  따라서, 기본값인 비활성화(false) 사용을 권장한다.
 
 - setReadBufferSize(int to)
 
@@ -543,7 +545,12 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
   
 - setDaemon(boolean d)
 
-  Memcached I/O 스레드를 Daemon으로 사용할 지 설정할 수 있다. 기본값은 true이다. 
+  Memcached I/O 스레드를 Daemon으로 사용할 지 설정할 수 있다. 
+  
+  - 기본값은 true로 응용 종료 시 I/O 스레드가 함께 종료된다.
+  - 기본값을 유지하며, Graceful Shutdown이 필요한 경우 `shutdown(long timeout, TimeUnit unit)`을 명시적으로 호출하는 것을 권장한다.
+
+  `setDaemon(false)` 설정 후 명시적으로 `shutdown()`이 호출되지 않은 상태에서 프로세스 종료가 시도되면, 정상적으로 종료되지 않을 수 있다.
 
 - setMaxReconnectDelay(long to)
 
@@ -613,3 +620,40 @@ SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
   ```
 
 - Front Cache 설정은 별도 [문서](11-front-cache.md#사용법)에 설명되어 있다.
+
+- useNagleAlgorithm(boolean to)
+
+  Nagle 알고리즘을 통해 TCP NoDelay 옵션을 활성화할지 여부를 설정한다.
+  
+  - 기본값은 false로 TCP NoDelay 옵션을 활성화한다.
+  - 처리량보다 응답 속도가 중요한 ARCUS 환경에서는 기본값을 유지하는 것을 권장한다.
+  - 만약, true로 설정 시 네트워크 효율은 개선될 수 있으나, 캐시 응답 지연이 발생할 수 있다.
+
+- setInitialObservers(Collection<ConnectionObserver> obs)
+  
+  `setInitialObservers`는 노드 연결 상태를 모니터링하기 위한 Observer를 등록하는 메서드이다.
+
+  ArcusClient 또는 ArcusClientPool 생성 시 내부 초기화 과정에서 사용되어 등록한 Observer가 정상적으로 동작하지 않는다.
+  따라서, 연결 상태 모니터링이 필요한 경우 Client 초기화 후 `addObserver()`를 호출하여 Observer를 등록하는 것을 권장한다.
+
+- setReadPriority(ReadPriority priority)
+
+  Replication 환경에서 읽기 요청의 우선순위를 설정한다.
+
+  | 값                     | 동작                                               |
+  |:----------------------|:-------------------------------------------------|
+  | `ReadPriority.MASTER` | 읽기 요청을 Master 노드로 전송 (기본값)                       |
+  | `ReadPriority.SLAVE`  | 읽기 요청을 Slave 노드로 전송, Slave 부재 시 Master로 fallback |
+  | `ReadPriority.RR`     | Master/Slave 노드에 Round Robin 방식으로 읽기 요청을 분산      |
+
+- setAPIReadPriority(ReadPriority priority)
+
+  Replication 환경에서 API 타입별로 읽기 우선순위를 개별 설정한다.
+
+  - `setReadPriority()` 보다 우선 적용된다.
+
+  ```java
+  ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
+  cfb.setReadPriority(ReadPriority.SLAVE);
+  cfb.setAPIReadPriority(APIType.GET, ReadPriority.MASTER); // GET만 Master로 읽기
+  ```
