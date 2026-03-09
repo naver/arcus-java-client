@@ -55,6 +55,7 @@ import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
+import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
@@ -129,7 +130,55 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact()
-        .store(type, key, co.getFlags(), exp, co.getData(), cb);
+            .store(type, key, co.getFlags(), exp, co.getData(), cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> append(String key, T val) {
+    return concat(ConcatenationType.append, key, val);
+  }
+
+  public ArcusFuture<Boolean> prepend(String key, T val) {
+    return concat(ConcatenationType.prepend, key, val);
+  }
+
+  private ArcusFuture<Boolean> concat(ConcatenationType catType, String key, T val) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    CachedData co = tc.encode(val);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        StatusCode code = status.getStatusCode();
+
+        switch (code) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_STORED:
+            result.set(false);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            // TYPE_MISMATCH or unknown statement
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().cat(catType, 0L, key, co.getData(), cb);
     future.setOp(op);
     client.addOp(key, op);
 
