@@ -61,6 +61,24 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Boolean> replace(String key, int exp, T value);
 
   /**
+   * Append String or byte[] to an existing same type of value.
+   *
+   * @param key the key
+   * @param val the value to append
+   * @return {@code Boolean.True} if appended, otherwise {@code Boolean.False}
+   */
+  ArcusFuture<Boolean> append(String key, T val);
+
+  /**
+   * Prepend String or byte[] to an existing same type of value.
+   *
+   * @param key the key
+   * @param val the value to prepend
+   * @return {@code Boolean.True} if prepended, otherwise {@code Boolean.False}
+   */
+  ArcusFuture<Boolean> prepend(String key, T val);
+
+  /**
    * Set values for multiple keys.
    *
    * @param keys  list of keys to store

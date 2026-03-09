@@ -3,6 +3,7 @@ package net.spy.memcached.v2;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -173,5 +174,75 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         assertTrue(value == null || VALUE.equals(value));
       }
     }
+  }
+
+  @Test
+  void appendString() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String expected = "Hello, Arcus!";
+    String key = keys.get(0);
+
+    async.set(key, 60, "Hello, ")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.append(key, "Arcus!")
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.get(key);
+            })
+            // then
+            .thenAccept(result -> assertEquals(expected, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void prependString() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String expected = "Hello, World!";
+    String key = keys.get(1);
+
+    async.set(key, 60, "World!")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.prepend(key, "Hello, ")
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.get(key);
+            })
+            // then
+            .thenAccept(result -> assertEquals(expected, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void appendNonStringException() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, 123)
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    CompletableFuture<Object> future = async.append(key, "Arcus!")
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.get(key);
+            })
+            .toCompletableFuture();
+    // then
+    // AssertionError in the Transcoder causes the I/O thread to terminate abruptly.
+    // The future is never completed, leading to a TimeoutException in the main thread.
+    assertThrows(TimeoutException.class, () -> future.get(300L, TimeUnit.MILLISECONDS));
   }
 }
