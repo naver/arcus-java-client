@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import net.spy.memcached.ArcusClient;
+import net.spy.memcached.CASValue;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.KeyValidator;
 import net.spy.memcached.MemcachedClient;
@@ -39,6 +40,7 @@ import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
 import net.spy.memcached.collection.BTreeUpsert;
+import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
@@ -57,6 +59,7 @@ import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
@@ -185,6 +188,47 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
+  public ArcusFuture<Boolean> cas(String key, int exp, T value, long casId) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    CachedData co = tc.encode(value);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_FOUND:
+          case ERR_EXISTS:
+            result.set(false);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH or unknown statement */
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact()
+            .cas(StoreType.set, key, casId, co.getFlags(), exp, co.getData(), cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+
   public ArcusFuture<Map<String, Boolean>> multiSet(List<String> keys, int exp, T value) {
     return multiStore(StoreType.set, keys, exp, value);
   }
@@ -258,6 +302,43 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().get(key, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<CASValue<T>> gets(String key) {
+    AbstractArcusResult<GetsResultImpl<T>> result
+            = new AbstractArcusResult<>(new AtomicReference<>());
+    @SuppressWarnings("unchecked")
+    ArcusFutureImpl<CASValue<T>> future = new ArcusFutureImpl<>(
+            result, r -> r == null ? null : ((GetsResultImpl<T>) r).getDecodedValue());
+    ArcusClient client = arcusClientSupplier.get();
+
+    GetsOperation.Callback cb = new GetsOperation.Callback() {
+      @Override
+      public void gotData(String key, int flags, long cas, byte[] data) {
+        CachedData cachedData = new CachedData(flags, data, tc.getMaxSize());
+        result.set(new GetsResultImpl<>(cas, cachedData, tc));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        if (status.getStatusCode() == StatusCode.CANCELLED) {
+          future.internalCancel();
+        } else if (!status.isSuccess()) {
+          // unknown statement
+          result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    GetsOperation op = client.getOpFact().gets(key, cb);
     future.setOp(op);
     client.addOp(key, op);
 
