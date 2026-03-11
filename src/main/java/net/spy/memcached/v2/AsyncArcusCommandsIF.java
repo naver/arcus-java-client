@@ -20,6 +20,7 @@ package net.spy.memcached.v2;
 import java.util.List;
 import java.util.Map;
 
+import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
@@ -59,6 +60,19 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code Boolean.True} if stored, otherwise {@code Boolean.False}
    */
   ArcusFuture<Boolean> replace(String key, int exp, T value);
+
+
+  /**
+   * Perform a compare-and-set operation for the given key.
+   *
+   * @param key   the key to set
+   * @param exp   expiration time in seconds
+   * @param value the new value to set if the CAS ID matches
+   * @param casId the CAS ID obtained from {@link #gets(String)}
+   * @return {@code Boolean.True} if compared and set successfully,
+   *         {@code Boolean.False} if the key does not exist or CAS ID does not match
+   */
+  ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
 
   /**
    * Append String or byte[] to an existing same type of value.
@@ -115,6 +129,14 @@ public interface AsyncArcusCommandsIF<T> {
    * @return the value, or {@code null} if not found
    */
   ArcusFuture<T> get(String key);
+
+  /**
+   * Get a value and its CAS ID for the given key.
+   *
+   * @param key the key
+   * @return CASValue containing the value and CAS ID, or {@code null} if not found
+   */
+  ArcusFuture<CASValue<T>> gets(String key);
 
   /**
    * Get values for multiple keys.

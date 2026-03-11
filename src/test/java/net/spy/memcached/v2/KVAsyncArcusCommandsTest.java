@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.ops.CollectionOperationStatus;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -244,5 +246,123 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // AssertionError in the Transcoder causes the I/O thread to terminate abruptly.
     // The future is never completed, leading to a TimeoutException in the main thread.
     assertThrows(TimeoutException.class, () -> future.get(300L, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  void testGets() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, VALUE)
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.gets(key)
+            // then
+            .thenAccept(result -> {
+              assertEquals(VALUE, result.getValue());
+              assertTrue(result.getCas() > 0);
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void testCas() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    CASValue<Object> casValue = async.set(key, 60, "Hello")
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.gets(key);
+            })
+            .thenApply(result -> {
+              assertEquals("Hello", result.getValue());
+              assertTrue(result.getCas() >= 0);
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.cas(key, 60, "Arcus", casValue.getCas())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.get(key);
+            })
+            // then
+            .thenAccept(result -> assertEquals("Arcus", result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void casNotFound() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    long fakeCas = 1234L;
+
+    async.set(key, 60, "Hello")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.cas(key, 60, "Arcus", fakeCas)
+            // then
+            .thenCompose(result -> {
+              assertFalse(result);
+              return async.get(key);
+            })
+            .thenAccept(result -> {
+              assertNotEquals("Arcus", result);
+              assertEquals("Hello", result);
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void casExists() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    CASValue<Object> casValue = async.set(key, 60, "Hello")
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.gets(key);
+            })
+            .thenApply(result -> {
+              assertEquals("Hello", result.getValue());
+              assertTrue(result.getCas() >= 0);
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    /* already updated by another client */
+    async.cas(key, 60, "Update", casValue.getCas())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.cas(key, 60, "Arcus", 0L)
+            // then
+            .thenCompose(result -> {
+              assertFalse(result);
+              return async.get(key);
+            })
+            .thenAccept(result -> {
+              assertNotEquals("Arcus", result);
+              assertEquals("Update", result);
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
   }
 }
