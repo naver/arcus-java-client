@@ -232,7 +232,7 @@ public class MemcachedClient extends SpyThread
    */
   public Collection<SocketAddress> getAvailableServers() {
     ArrayList<SocketAddress> rv = new ArrayList<>();
-    for (MemcachedNode node : conn.getLocator().getAll()) {
+    for (MemcachedNode node : getAllNodes()) {
       if (node.isActive()) {
         rv.add(node.getSocketAddress());
       }
@@ -253,7 +253,7 @@ public class MemcachedClient extends SpyThread
    */
   public Collection<SocketAddress> getUnavailableServers() {
     ArrayList<SocketAddress> rv = new ArrayList<>();
-    for (MemcachedNode node : conn.getLocator().getAll()) {
+    for (MemcachedNode node : getAllNodes()) {
       if (!node.isActive()) {
         rv.add(node.getSocketAddress());
       }
@@ -2199,7 +2199,7 @@ public class MemcachedClient extends SpyThread
   public boolean addObserver(ConnectionObserver obs) {
     boolean rv = conn.addObserver(obs);
     if (rv) {
-      for (MemcachedNode node : conn.getLocator().getAll()) {
+      for (MemcachedNode node : getAllNodes()) {
         if (node.isConnected()) {
           obs.connectionEstablished(node, -1);
         }
@@ -2237,7 +2237,7 @@ public class MemcachedClient extends SpyThread
   }
 
   /**
-   * get all memcached nodes from node locator for mbean
+   * get all memcached nodes from node locator
    *
    * @return all memcached nodes from node locator
    */
@@ -2254,7 +2254,7 @@ public class MemcachedClient extends SpyThread
               .collect(Collectors.toList());
     }
     /* ENABLE_REPLICATION end */
-    return conn.getLocator().getAll();
+    return getAllNodes();
   }
 
   /**
