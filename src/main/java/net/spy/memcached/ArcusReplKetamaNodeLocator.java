@@ -43,7 +43,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
   private final TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaGroups;
   private final ConcurrentHashMap<String, MemcachedReplicaGroup> allGroups;
-  private final Collection<MemcachedNode> allNodes;
+  private volatile List<MemcachedNode> allNodes;
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaAlterGroups;
@@ -67,7 +67,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
   public ArcusReplKetamaNodeLocator(List<MemcachedNode> nodes,
                                     ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
-    allNodes = nodes;
+    allNodes = Collections.unmodifiableList(nodes);
     ketamaGroups = new TreeMap<>();
     allGroups = new ConcurrentHashMap<>();
     config = conf;
@@ -108,12 +108,12 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
   private ArcusReplKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedReplicaGroup>> kg,
                                      ConcurrentHashMap<String, MemcachedReplicaGroup> ag,
-                                     Collection<MemcachedNode> an,
+                                     List<MemcachedNode> nodes,
                                      ArcusReplKetamaNodeLocatorConfiguration conf) {
     super();
     ketamaGroups = kg;
     allGroups = ag;
-    allNodes = an;
+    allNodes = Collections.unmodifiableList(nodes);
     toDeleteGroups = new HashSet<>();
     config = conf;
     enableShardKey = conf.isShardKeyEnabled();
@@ -128,7 +128,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
   }
 
   public Collection<MemcachedNode> getAll() {
-    return Collections.unmodifiableCollection(allNodes);
+    return allNodes;
   }
 
   public Map<String, MemcachedReplicaGroup> getAllGroups() {
@@ -219,7 +219,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
       TreeMap<Long, SortedSet<MemcachedReplicaGroup>> ketamaCopy = new TreeMap<>();
       ConcurrentHashMap<String, MemcachedReplicaGroup> groupsCopy
               = new ConcurrentHashMap<>(allGroups.size());
-      Collection<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
+      List<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
 
       // Rewrite the values a copy of the map
       for (Map.Entry<Long, SortedSet<MemcachedReplicaGroup>> hashPoint : ketamaGroups.entrySet()) {
@@ -259,9 +259,11 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
      */
     lock.lock();
     try {
+      List<MemcachedNode> newNodes = new ArrayList<>(allNodes);
+
       // Remove memcached nodes.
       for (MemcachedNode node : toDelete) {
-        allNodes.remove(node);
+        newNodes.remove(node);
         removeNodeFromGroup(node);
         try {
           node.closeChannel();
@@ -277,7 +279,7 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
 
       // Add memcached nodes.
       for (MemcachedNode node : toAttach) {
-        allNodes.add(node);
+        newNodes.add(node);
         insertNodeIntoGroup(node);
       }
 
@@ -288,6 +290,8 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
         removeHash(group);
       }
       toDeleteGroups.clear();
+
+      allNodes = Collections.unmodifiableList(newNodes);
     } finally {
       /* ENABLE_MIGRATION if */
       if (migrationInProgress && alterNodes.isEmpty()) {

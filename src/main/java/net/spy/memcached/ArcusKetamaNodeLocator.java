@@ -41,7 +41,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocator {
 
   private final TreeMap<Long, SortedSet<MemcachedNode>> ketamaNodes;
-  private final Collection<MemcachedNode> allNodes;
+  private volatile List<MemcachedNode> allNodes;
 
   /* ENABLE_MIGRATION if */
   private TreeMap<Long, SortedSet<MemcachedNode>> ketamaAlterNodes;
@@ -67,7 +67,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
   public ArcusKetamaNodeLocator(List<MemcachedNode> nodes,
                                 ArcusKetamaNodeLocatorConfiguration conf) {
     super();
-    allNodes = nodes;
+    allNodes = Collections.unmodifiableList(nodes);
     ketamaNodes = new TreeMap<>();
     config = conf;
     enableShardKey = conf.isShardKeyEnabled();
@@ -90,11 +90,11 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
   }
 
   private ArcusKetamaNodeLocator(TreeMap<Long, SortedSet<MemcachedNode>> smn,
-                                 Collection<MemcachedNode> an,
+                                 List<MemcachedNode> nodes,
                                  ArcusKetamaNodeLocatorConfiguration conf) {
     super();
     ketamaNodes = smn;
-    allNodes = an;
+    allNodes = Collections.unmodifiableList(nodes);
     config = conf;
     enableShardKey = conf.isShardKeyEnabled();
 
@@ -107,7 +107,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
   }
 
   public Collection<MemcachedNode> getAll() {
-    return Collections.unmodifiableCollection(allNodes);
+    return allNodes;
   }
 
   /* ENABLE_MIGRATION if */
@@ -203,7 +203,7 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
     lock.lock();
     try {
       TreeMap<Long, SortedSet<MemcachedNode>> ketamaCopy = new TreeMap<>();
-      Collection<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
+      List<MemcachedNode> nodesCopy = new ArrayList<>(allNodes.size());
 
       // Rewrite the values a copy of the map.
       for (Map.Entry<Long, SortedSet<MemcachedNode>> hashPoint : ketamaNodes.entrySet()) {
@@ -228,15 +228,17 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
                      Collection<MemcachedNode> toDelete) {
     lock.lock();
     try {
+      List<MemcachedNode> newNodes = new ArrayList<>(allNodes);
+
       // Add memcached nodes.
       for (MemcachedNode node : toAttach) {
-        allNodes.add(node);
+        newNodes.add(node);
         insertHash(node);
       }
 
       // Remove memcached nodes.
       for (MemcachedNode node : toDelete) {
-        allNodes.remove(node);
+        newNodes.remove(node);
         removeHash(node);
         try {
           node.closeChannel();
@@ -245,6 +247,8 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
                   "Failed to closeChannel the node : " + node);
         }
       }
+
+      allNodes = Collections.unmodifiableList(newNodes);
     } finally {
       /* ENABLE_MIGRATION if */
       if (migrationInProgress && alterNodes.isEmpty()) {
