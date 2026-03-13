@@ -1,5 +1,6 @@
 package net.spy.memcached.v2;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,7 +92,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiSetFail() throws ExecutionException, InterruptedException, TimeoutException {
+  void multiAddFail() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     async.set(keys.get(0), 0, VALUE)
         // when
@@ -421,5 +423,198 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .thenAccept(result -> assertTrue(result.isEmpty()))
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiSetMapSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    Map<String, Object> elements = new HashMap<>();
+
+    for (int i = 0; i < keys.size(); i++) {
+      elements.put(keys.get(i), VALUE + i);
+    }
+
+    // when
+    async.multiSet(elements, 60)
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+          return async.multiGet(keys);
+        })
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (int i = 0; i < keys.size(); i++) {
+            assertEquals(VALUE + i, result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiAddMapSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    Map<String, Object> elements = new HashMap<>();
+    for (int i = 0; i < keys.size(); i++) {
+      elements.put(keys.get(i), VALUE + i);
+    }
+
+    // when
+    async.multiAdd(elements, 60)
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+          return async.multiGet(keys);
+        })
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (int i = 0; i < keys.size(); i++) {
+            assertEquals(VALUE + i, result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiAddMapPartialSuccess() throws ExecutionException, InterruptedException,
+      TimeoutException {
+
+    // given
+    Map<String, Object> elements = new HashMap<>();
+    for (int i = 0; i < keys.size(); i++) {
+      elements.put(keys.get(i), VALUE + i);
+    }
+
+    /* 0th key is added before multiAdd, so it should fail. */
+    async.set(keys.get(0), 60, VALUE + "-old")
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiAdd(elements, 60)
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          assertFalse(result.get(keys.get(0)));
+          for (int i = 1; i < keys.size(); i++) {
+            assertTrue(result.get(keys.get(i)));
+          }
+          return async.multiGet(keys);
+        })
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          assertEquals(VALUE + "-old", result.get(keys.get(0)));
+          for (int i = 1; i < keys.size(); i++) {
+            assertEquals(VALUE + i, result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiReplaceMapSuccess() throws ExecutionException, InterruptedException,
+      TimeoutException {
+
+    // given
+    Map<String, Object> oldElements = new HashMap<>();
+    for (int i = 0; i < keys.size(); i++) {
+      oldElements.put(keys.get(i), VALUE + "-old-" + i);
+    }
+
+    Map<String, Object> newElements = new HashMap<>();
+    for (int i = 0; i < keys.size(); i++) {
+      newElements.put(keys.get(i), VALUE + "-new-" + i);
+    }
+
+    async.multiSet(oldElements, 60)
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiReplace(newElements, 60)
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+          return async.multiGet(keys);
+        })
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (int i = 0; i < keys.size(); i++) {
+            assertEquals(VALUE + "-new-" + i, result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiReplaceMapPartialSuccess() throws ExecutionException, InterruptedException,
+      TimeoutException {
+
+    // given
+    Map<String, Object> oldElements = new HashMap<>();
+    for (int i = 0; i < 2; i++) {
+      oldElements.put(keys.get(i), VALUE + "-old-" + i);
+    }
+
+    Map<String, Object> newElements = new HashMap<>();
+    for (int i = 0; i < keys.size(); i++) {
+      newElements.put(keys.get(i), VALUE + "-new-" + i);
+    }
+
+    /* 0, 1st keys are added before multiReplace, so only they should succeed. */
+    async.multiSet(oldElements, 60)
+        .thenAccept(result -> {
+          assertEquals(oldElements.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiReplace(newElements, 60)
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          for (int i = 0; i < 2; i++) {
+            assertTrue(result.get(keys.get(i)));
+          }
+
+          for (int i = 2; i < keys.size(); i++) {
+            assertFalse(result.get(keys.get(i)));
+          }
+          return async.multiGet(keys);
+        })
+        // then
+        .thenAccept(result -> {
+          assertEquals(2, result.size());
+          for (int i = 0; i < 2; i++) {
+            assertEquals(VALUE + "-new-" + i, result.get(keys.get(i)));
+          }
+          for (int i = 2; i < keys.size(); i++) {
+            assertNull(result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 }
