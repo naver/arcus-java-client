@@ -228,17 +228,28 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
-
   public ArcusFuture<Map<String, Boolean>> multiSet(List<String> keys, int exp, T value) {
     return multiStore(StoreType.set, keys, exp, value);
+  }
+
+  public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp) {
+    return multiStore(StoreType.set, items, exp);
   }
 
   public ArcusFuture<Map<String, Boolean>> multiAdd(List<String> keys, int exp, T value) {
     return multiStore(StoreType.add, keys, exp, value);
   }
 
+  public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp) {
+    return multiStore(StoreType.add, items, exp);
+  }
+
   public ArcusFuture<Map<String, Boolean>> multiReplace(List<String> keys, int exp, T value) {
     return multiStore(StoreType.replace, keys, exp, value);
+  }
+
+  public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp) {
+    return multiStore(StoreType.replace, items, exp);
   }
 
   /**
@@ -258,15 +269,46 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       keyToFuture.put(key, future);
     }
 
+    return buildMultiFuture(keyToFuture);
+  }
+
+  /**
+   * @param type     store type
+   * @param items map of key to value to store
+   * @param exp      expiration time
+   * @return ArcusFuture with Map of key to Boolean result. If an operation fails exceptionally,
+   * the corresponding value in the map will be null.
+   */
+  private ArcusFuture<Map<String, Boolean>> multiStore(StoreType type,
+                                                       Map<String, T> items,
+                                                       int exp) {
+    Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(items.size());
+
+    items.forEach((key, value) -> {
+      CompletableFuture<Boolean> future = store(type, key, exp, value).toCompletableFuture();
+      keyToFuture.put(key, future);
+    });
+
+    return buildMultiFuture(keyToFuture);
+  }
+
+  /**
+   * Combine multiple CompletableFutures into a single ArcusFuture.
+   *
+   * @param keyToFuture a map of keys to their corresponding CompletableFutures
+   * @return an ArcusFuture that completes with a map of keys to their Boolean results.
+   */
+  private ArcusMultiFuture<Map<String, Boolean>> buildMultiFuture(
+      Map<String, CompletableFuture<?>> keyToFuture) {
     return new ArcusMultiFuture<>(keyToFuture.values(), () -> {
       Map<String, Boolean> results = new HashMap<>();
-      for (Map.Entry<String, CompletableFuture<?>> entry : keyToFuture.entrySet()) {
-        if (entry.getValue().isCompletedExceptionally()) {
-          results.put(entry.getKey(), null);
+      keyToFuture.forEach((key, future) -> {
+        if (future.isCompletedExceptionally()) {
+          results.put(key, null);
         } else {
-          results.put(entry.getKey(), (Boolean) entry.getValue().join());
+          results.put(key, (Boolean) future.join());
         }
-      }
+      });
       return results;
     });
   }
@@ -932,7 +974,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKeys) {
       BTreeGetBulk<T> getBulk =
-              createBTreeGetBulk(entry.getKey(), entry.getValue(), from, to, args);
+          createBTreeGetBulk(entry.getKey(), entry.getValue(), from, to, args);
       CompletableFuture<Map<String, BTreeElements<T>>> future =
           bopMultiGetPerNode(client, getBulk).toCompletableFuture();
       futureToKeys.put(future, entry.getValue());
