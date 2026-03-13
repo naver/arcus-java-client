@@ -365,4 +365,61 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
   }
+
+  @Test
+  void multiGetsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    async.multiSet(keys, 60, VALUE)
+            .thenAccept(result -> {
+              for (Boolean b : result.values()) {
+                assertTrue(b);
+              }
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiGets(keys)
+            // then
+            .thenAccept(result -> {
+              assertEquals(keys.size(), result.size());
+              for (Map.Entry<String, CASValue<Object>> entry : result.entrySet()) {
+                assertEquals(VALUE, entry.getValue().getValue());
+                assertTrue(entry.getValue().getCas() >= 0);
+              }
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiGetsPartialFailure() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    async.set(keys.get(0), 60, VALUE)
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiGets(keys)
+            // then
+            .thenAccept(result -> {
+              assertEquals(1, result.size());
+              assertTrue(result.containsKey(keys.get(0)));
+              assertEquals(VALUE, result.get(keys.get(0)).getValue());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiGetsNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    // when
+    async.multiGets(keys)
+            // then
+            .thenAccept(result -> assertTrue(result.isEmpty()))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
 }

@@ -440,6 +440,90 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
+  public ArcusFuture<Map<String, CASValue<T>>> multiGets(List<String> keys) {
+    ArcusClient client = arcusClientSupplier.get();
+    Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys
+            = client.groupingKeys(keys, MemcachedClient.GET_BULK_CHUNK_SIZE, APIType.GETS);
+
+    Collection<CompletableFuture<?>> futures = new ArrayList<>();
+    Map<CompletableFuture<Map<String, CASValue<T>>>, List<String>> futureToKeys = new HashMap<>();
+
+    for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKeys) {
+      MemcachedNode node = entry.getKey();
+      List<String> keyList = entry.getValue();
+      CompletableFuture<Map<String, CASValue<T>>> future
+              = gets(client, node, keyList).toCompletableFuture();
+      futureToKeys.put(future, keyList);
+      futures.add(future);
+    }
+
+    return new ArcusMultiFuture<>(futures, () -> {
+      Map<String, CASValue<T>> results = new HashMap<>();
+      futureToKeys.forEach((future, keyList) -> {
+        if (future.isCompletedExceptionally()) {
+          keyList.forEach(key -> results.put(key, null));
+        } else {
+          Map<String, CASValue<T>> result = future.join();
+          if (result != null) {
+            results.putAll(result);
+          }
+        }
+      });
+      return results;
+    });
+  }
+
+  /**
+   * Use only in multiGets method.
+   *
+   * @param keyList key list to get from single node
+   * @return ArcusFuture with results.
+   */
+  private ArcusFuture<Map<String, CASValue<T>>> gets(ArcusClient client, MemcachedNode node,
+                                                     List<String> keyList) {
+    AbstractArcusResult<Map<String, GetsResultImpl<T>>> result
+            = new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
+
+    @SuppressWarnings("unchecked")
+    ArcusFutureImpl<Map<String, CASValue<T>>> future = new ArcusFutureImpl<>(result, r -> {
+      Map<String, CASValue<T>> decodedMap = new HashMap<>();
+      ((Map<String, GetsResultImpl<T>>) r).forEach((key, getsResult) ->
+              decodedMap.put(key, getsResult.getDecodedValue()));
+      return decodedMap;
+    });
+
+    GetsOperation.Callback cb = new GetsOperation.Callback() {
+      @Override
+      public void gotData(String key, int flags, long cas, byte[] data) {
+        Map<String, GetsResultImpl<T>> map = result.get();
+        CachedData cachedData = new CachedData(flags, data, tc.getMaxSize());
+        map.put(key, new GetsResultImpl<>(cas, cachedData, tc));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        if (status.getStatusCode() == StatusCode.CANCELLED) {
+          future.internalCancel();
+        } else if (!status.isSuccess()) {
+          // unknown statement
+          for (String key : keyList) {
+            result.addError(key, status);
+          }
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().gets(keyList, cb, node.enabledMGetOp());
+    future.setOp(op);
+    client.addOp(node, op);
+
+    return future;
+  }
+
   public ArcusFuture<Boolean> flush(int delay) {
     ArcusClient client = arcusClientSupplier.get();
     Collection<MemcachedNode> nodes = client.getFlushNodes();
