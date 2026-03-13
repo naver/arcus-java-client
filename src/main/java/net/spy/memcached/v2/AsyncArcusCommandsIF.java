@@ -147,6 +147,14 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Map<String, T>> multiGet(List<String> keys);
 
   /**
+   * Get values with CAS for multiple keys.
+   *
+   * @param keys list of keys to get
+   * @return Map of key to value with CAS.
+   */
+  ArcusFuture<Map<String, CASValue<T>>> multiGets(List<String> keys);
+
+  /**
    * Flush all items from all servers.
    *
    * @param delay delay in seconds before flushing
