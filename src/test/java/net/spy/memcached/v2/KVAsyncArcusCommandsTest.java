@@ -9,12 +9,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.CASValue;
+import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.ops.OperationException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -616,6 +620,267 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
                 assertFalse(b);
               }
             })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void incrSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    async.set(key, 60, "100")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.incr(key, delta)
+            // then
+            .thenAccept(result -> assertEquals(110L, result))
+            .toCompletableFuture()
+            .get(300, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void incrNonExistingKey() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    // when
+    async.incr(key, delta)
+            // then
+            .thenAccept(result -> assertEquals(-1, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void incrInitialNonExistingKeySuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    // when
+    async.incr(key, delta, 100, 60)
+            // then
+            .thenAccept(result -> assertEquals(100L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void incrInitialExistingKeySuccess() {
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    async.set(key, 60, "100")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .join();
+
+    // when
+    async.incr(key, delta, 1000, 60)
+            // then
+            .thenAccept(result -> assertEquals(110L, result))
+            .toCompletableFuture()
+            .join();
+  }
+
+  @Test
+  void incrTypeNotNumberException() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, "not a number")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.incr(key, 10)
+            // then
+            .handle((res, ex) -> {
+              assertInstanceOf(ExecutionException.class, ex);
+              Throwable cause = ex.getCause();
+              assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
+              return res;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void incrTypeMisMatchException() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.incr(key, 10)
+            // then
+            .handle((res, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return res;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    async.set(key, 60, "100")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.decr(key, delta)
+            // then
+            .thenAccept(result -> assertEquals(90L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrNonExistingKey() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    // when
+    async.decr(key, delta)
+            // then
+            .thenAccept(result -> assertEquals(-1, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrInitialNonExistingKeySuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    // when
+    async.decr(key, delta, 100, 60)
+            // then
+            .thenAccept(result -> assertEquals(100L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrInitialExistingKeySuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    async.set(key, 60, "100")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+                    .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.decr(key, delta, 1000, 60)
+            // then
+            .thenAccept(result -> assertEquals(90L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrTypeNotNumberException() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, "not a number")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.decr(key, 10)
+            // then
+            .handle((res, ex) -> {
+              assertInstanceOf(ExecutionException.class, ex);
+              Throwable cause = ex.getCause();
+              assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
+              return res;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrTypeMismatchException() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+
+    // collection 타입 키를 생성해서 TypeMismatch 발생
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+
+    // when
+    async.decr(key, 10)
+            // then
+            .handle((res, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return res;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void decrResultUnderZero() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+    int delta = 10;
+
+    async.set(key, 60, "5")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+                    .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.decr(key, delta)
+            // then
+            .thenAccept(result -> assertEquals(0L, result))
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
   }

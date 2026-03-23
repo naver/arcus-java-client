@@ -144,6 +144,52 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Map<String, T>> multiGet(List<String> keys);
 
   /**
+   * Increments a numeric value stored at the given key by {@code delta}.
+   *
+   * @param key   the key
+   * @param delta the amount to increment (&gt; 0)
+   * @return the new value after increment, or -1 if the key is not found
+   */
+  ArcusFuture<Long> incr(String key, int delta);
+
+  /**
+   * Increments a numeric value stored at the given key by {@code delta}.
+   * If the key does not exist,
+   * it is created with the value of {@code initial} and expiration time of {@code exp}.
+   *
+   * @param key     the key
+   * @param delta   the amount to increment (&gt; 0)
+   * @param initial the value to store if the key does not exist ({@code delta} is ignored) (&ge; 0)
+   * @param exp     expiration time in seconds, applied only when a new key is created
+   * @return the new value after increment, or {@code initial} if the key did not exist
+   */
+  ArcusFuture<Long> incr(String key, int delta, long initial, int exp);
+
+  /**
+   * Decrements a numeric value stored at the given key by {@code delta}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key   the key
+   * @param delta the amount to decrement (&gt; 0)
+   * @return the new value after decrement, or -1 if the key is not found
+   */
+  ArcusFuture<Long> decr(String key, int delta);
+
+  /**
+   * Decrements a numeric value stored at the given key by {@code delta}.
+   * If the key does not exist,
+   * it is created with the value of {@code initial} and expiration time of {@code exp}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key     the key
+   * @param delta   the amount to decrement (&gt; 0)
+   * @param initial the value to store if the key does not exist ({@code delta} is ignored) (&ge; 0)
+   * @param exp     expiration time in seconds, applied only when a new key is created
+   * @return the new value after decrement, or {@code initial} if the key did not exist
+   */
+  ArcusFuture<Long> decr(String key, int delta, long initial, int exp);
+
+  /**
    * Get values with CAS for multiple keys.
    *
    * @param keys list of keys to get

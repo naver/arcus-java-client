@@ -59,6 +59,7 @@ import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetOperation;
+import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
@@ -436,6 +437,70 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     Operation op = client.getOpFact().get(keyList, cb, node.enabledMGetOp());
     future.setOp(op);
     client.addOp(node, op);
+
+    return future;
+  }
+
+
+  public ArcusFuture<Long> incr(String key, int delta) {
+    return mutate(Mutator.incr, key, delta, -1L, 0);
+  }
+
+  public ArcusFuture<Long> incr(String key, int delta, long initial, int exp) {
+    if (initial < 0) {
+      throw new IllegalArgumentException("Initial value must be 0 or greater.");
+    }
+    return mutate(Mutator.incr, key, delta, initial, exp);
+  }
+
+  public ArcusFuture<Long> decr(String key, int delta) {
+    return mutate(Mutator.decr, key, delta, -1L, 0);
+  }
+
+  public ArcusFuture<Long> decr(String key, int delta, long initial, int exp) {
+    if (initial < 0) {
+      throw new IllegalArgumentException("Initial value must be 0 or greater.");
+    }
+    return mutate(Mutator.decr, key, delta, initial, exp);
+  }
+
+  private ArcusFuture<Long> mutate(Mutator mutator, String key, int delta, long initial, int exp) {
+    if (delta <= 0) {
+      throw new IllegalArgumentException("Delta must be greater than 0.");
+    }
+
+    AbstractArcusResult<Long> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Long> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(Long.parseLong(status.getMessage()));
+            break;
+          case ERR_NOT_FOUND:
+            result.set(-1L);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            // TYPE_MISMATCH or unknown statement
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().mutate(mutator, key, delta, initial, exp, cb);
+    future.setOp(op);
+    client.addOp(key, op);
 
     return future;
   }
