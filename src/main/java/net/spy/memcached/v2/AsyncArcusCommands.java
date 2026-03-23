@@ -39,7 +39,9 @@ import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
+import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.BTreeUpsert;
+import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.collection.BTreeSMGet;
@@ -71,6 +73,7 @@ import net.spy.memcached.transcoders.TranscoderUtils;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
@@ -824,6 +827,63 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     CollectionInsertOperation op = client.getOpFact()
         .collectionInsert(key, internalKey, collectionInsert, co.getData(), cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element) {
+    BTreeUpdate<T> update = new BTreeUpdate<>(element.getValue(), element.getEFlagUpdate(), false);
+    return collectionUpdate(key, element.getBkey().toString(), update);
+  }
+
+  private ArcusFuture<Boolean> collectionUpdate(String key,
+                                                String internalKey,
+                                                CollectionUpdate<T> collectionUpdate) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    CachedData co = null;
+    if (collectionUpdate.getNewValue() != null) {
+      co = tcForCollection.encode(collectionUpdate.getNewValue());
+      collectionUpdate.setFlags(co.getFlags());
+    }
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(false);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+            * TYPE_MISMATCH / BKEY_MISMATCH / EFLAG_MISMATCH / NOTHING_TO_UPDATE /
+            * OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED or unknown statement
+            */
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact()
+            .collectionUpdate(key, internalKey, collectionUpdate,
+                    (co == null) ? null : co.getData(), cb);
     future.setOp(op);
     client.addOp(key, op);
 

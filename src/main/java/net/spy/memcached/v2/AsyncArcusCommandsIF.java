@@ -26,6 +26,7 @@ import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
@@ -274,6 +275,16 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code Boolean.True} if upserted, {@code Boolean.False} otherwise
    */
   ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element);
+
+  /**
+   * Update an element in a btree item
+   *
+   * @param key     key to update
+   * @param element btree element to update.
+   * @return {@code Boolean.True} if updated, {@code Boolean.False} if element does not exist,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element);
 
   /**
    * Insert an element into a btree item and get trimmed element if overflow trim occurs.
