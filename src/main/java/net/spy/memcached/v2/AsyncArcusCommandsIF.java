@@ -130,7 +130,6 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp);
 
-
   /**
    * Replace the same value for multiple keys if they exist.
    *
@@ -181,6 +180,23 @@ public interface AsyncArcusCommandsIF<T> {
    * @return Map of key to value with CAS.
    */
   ArcusFuture<Map<String, CASValue<T>>> multiGets(List<String> keys);
+
+  /**
+   * Delete a value for the given key.
+   *
+   * @param key the key
+   * @return {@code Boolean.True} if deleted, otherwise {@code Boolean.False}
+   */
+  ArcusFuture<Boolean> delete(String key);
+
+
+  /**
+   * Delete values for multiple keys.
+   *
+   * @param keys list of keys to delete
+   * @return Map of key to Boolean result
+   */
+  ArcusFuture<Map<String, Boolean>> multiDelete(List<String> keys);
 
   /**
    * Flush all items from all servers.
