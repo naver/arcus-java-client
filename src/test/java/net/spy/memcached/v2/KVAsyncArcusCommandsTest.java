@@ -617,4 +617,104 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
   }
+
+  @Test
+  void deleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 0, VALUE)
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.delete(key)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.get(key);
+            })
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void deleteNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    // when
+    async.delete(key)
+            // then
+            .thenAccept(Assertions::assertFalse)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    async.multiSet(keys, 0, VALUE)
+            .thenAccept(result -> {
+              for (Boolean b : result.values()) {
+                assertTrue(b);
+              }
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiDelete(keys)
+            // then
+            .thenCompose(result -> {
+              assertEquals(keys.size(), result.size());
+              result.values().forEach(Assertions::assertTrue);
+              return async.multiGet(keys);
+            })
+            .thenAccept(result -> assertEquals(0, result.size()))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiDeletePartialSuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    async.set(keys.get(0), 0, VALUE)
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.multiDelete(keys)
+            // then
+            .thenAccept(result -> {
+              assertEquals(keys.size(), result.size());
+              assertTrue(result.get(keys.get(0)));
+              for (int i = 1; i < keys.size(); i++) {
+                assertFalse(result.get(keys.get(i)));
+              }
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void multiDeleteNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    // when
+    async.multiDelete(keys)
+            // then
+            .thenAccept(result -> {
+              assertEquals(keys.size(), result.size());
+              for (Boolean b : result.values()) {
+                assertFalse(b);
+              }
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
 }

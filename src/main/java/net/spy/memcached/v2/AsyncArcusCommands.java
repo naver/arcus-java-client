@@ -595,6 +595,64 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     });
   }
 
+  public ArcusFuture<Boolean> delete(String key) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(false);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            // unknown statement
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().delete(key, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Map<String, Boolean>> multiDelete(List<String> keys) {
+    Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(keys.size());
+
+    for (String key : keys) {
+      CompletableFuture<Boolean> future = delete(key).toCompletableFuture();
+      keyToFuture.put(key, future);
+    }
+
+    return new ArcusMultiFuture<>(keyToFuture.values(), () -> {
+      Map<String, Boolean> results = new HashMap<>();
+
+      keyToFuture.forEach((key, future) -> {
+        if (future.isCompletedExceptionally()) {
+          results.put(key, null);
+        } else {
+          results.put(key, (Boolean) future.join());
+        }
+      });
+      return results;
+    });
+  }
+
   /**
    * Use only in flush method.
    *
