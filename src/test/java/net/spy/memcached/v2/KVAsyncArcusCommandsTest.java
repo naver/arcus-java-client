@@ -1,7 +1,6 @@
 package net.spy.memcached.v2;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -10,16 +9,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.CASValue;
-import net.spy.memcached.collection.CollectionAttributes;
-import net.spy.memcached.internal.CompositeException;
-import net.spy.memcached.ops.CollectionOperationStatus;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,83 +65,11 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiSetAndGet() throws ExecutionException, InterruptedException, TimeoutException {
-    // given
-    // when
-    async.multiSet(keys, 0, VALUE)
-        .thenAccept(result -> {
-          for (Boolean b : result.values()) {
-            assertTrue(b);
-          }
-        })
-        .thenCompose(v -> async.multiGet(keys))
-        // then
-        .thenAccept(result -> {
-          assertEquals(keys.size(), result.size());
-          for (Object o : result.values()) {
-            assertEquals(VALUE, o);
-          }
-        })
-        .toCompletableFuture()
-        .get(300, TimeUnit.MILLISECONDS);
-  }
-
-  @Test
-  void multiAddFail() throws ExecutionException, InterruptedException, TimeoutException {
-    // given
-    async.set(keys.get(0), 0, VALUE)
-        // when
-        .thenCompose(result -> {
-          assertTrue(result);
-          return async.multiAdd(keys, 0, VALUE);
-        })
-        // then
-        .thenAccept(result -> {
-          assertEquals(keys.size(), result.size());
-          assertFalse(result.get(keys.get(0)));
-          for (int i = 1; i < 4; i++) {
-            assertTrue(result.get(keys.get(i)));
-          }
-        })
-        .toCompletableFuture()
-        .get(300, TimeUnit.MILLISECONDS);
-  }
-
-  @Test
-  void multiSetTypeMismatchException()
-      throws ExecutionException, InterruptedException, TimeoutException {
-    // given
-    Map<String, CollectionOperationStatus> result =
-        arcusClient.asyncLopInsertBulk(keys.subList(0, 2), 0, "value",
-            new CollectionAttributes()).get();
-    assertTrue(result.isEmpty());
-
-    // when
-    async.multiSet(keys, 0, VALUE)
-        // then
-        .handle((res, ex) -> {
-              assertInstanceOf(CompositeException.class, ex);
-              CompositeException ex2 = (CompositeException) ex;
-              List<Exception> exceptions = ex2.getExceptions();
-              assertEquals(2, exceptions.size());
-              for (Exception exception : exceptions) {
-                assertTrue(exception.getMessage().contains("TYPE_MISMATCH"));
-              }
-              return res;
-            }
-        )
-        .toCompletableFuture()
-        .get(300, TimeUnit.MILLISECONDS);
-  }
-
-  @Test
   void multiGetNothing() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     async.multiGet(keys)
         // then
-        .thenAccept(result -> {
-          assertTrue(result.isEmpty());
-        })
+        .thenAccept(result -> assertTrue(result.isEmpty()))
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
@@ -154,7 +77,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   @Test
   void cancelMultiGet() throws ExecutionException, InterruptedException, TimeoutException {
     // given
-    async.multiSet(keys, 0, VALUE)
+    async.multiSet(items, 0)
         .thenAccept(result -> {
           for (Boolean b : result.values()) {
             assertTrue(b);
@@ -371,7 +294,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   @Test
   void multiGetsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
-    async.multiSet(keys, 60, VALUE)
+    async.multiSet(items, 60)
             .thenAccept(result -> {
               for (Boolean b : result.values()) {
                 assertTrue(b);
@@ -426,16 +349,10 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiSetMapSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+  void multiSetSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
-    Map<String, Object> elements = new HashMap<>();
-
-    for (int i = 0; i < keys.size(); i++) {
-      elements.put(keys.get(i), VALUE + i);
-    }
-
     // when
-    async.multiSet(elements, 60)
+    async.multiSet(items, 60)
         .thenCompose(result -> {
           assertEquals(keys.size(), result.size());
           for (Boolean b : result.values()) {
@@ -446,8 +363,8 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenAccept(result -> {
           assertEquals(keys.size(), result.size());
-          for (int i = 0; i < keys.size(); i++) {
-            assertEquals(VALUE + i, result.get(keys.get(i)));
+          for (String key : keys) {
+            assertEquals(VALUE, result.get(key));
           }
         })
         .toCompletableFuture()
@@ -455,15 +372,10 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiAddMapSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+  void multiAddSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
-    Map<String, Object> elements = new HashMap<>();
-    for (int i = 0; i < keys.size(); i++) {
-      elements.put(keys.get(i), VALUE + i);
-    }
-
     // when
-    async.multiAdd(elements, 60)
+    async.multiAdd(items, 60)
         .thenCompose(result -> {
           assertEquals(keys.size(), result.size());
           for (Boolean b : result.values()) {
@@ -474,8 +386,8 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenAccept(result -> {
           assertEquals(keys.size(), result.size());
-          for (int i = 0; i < keys.size(); i++) {
-            assertEquals(VALUE + i, result.get(keys.get(i)));
+          for (String key : keys) {
+            assertEquals(VALUE, result.get(key));
           }
         })
         .toCompletableFuture()
@@ -483,15 +395,10 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiAddMapPartialSuccess() throws ExecutionException, InterruptedException,
+  void multiAddPartialSuccess() throws ExecutionException, InterruptedException,
       TimeoutException {
 
     // given
-    Map<String, Object> elements = new HashMap<>();
-    for (int i = 0; i < keys.size(); i++) {
-      elements.put(keys.get(i), VALUE + i);
-    }
-
     /* 0th key is added before multiAdd, so it should fail. */
     async.set(keys.get(0), 60, VALUE + "-old")
         .thenAccept(Assertions::assertTrue)
@@ -499,7 +406,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.multiAdd(elements, 60)
+    async.multiAdd(items, 60)
         .thenCompose(result -> {
           assertEquals(keys.size(), result.size());
           assertFalse(result.get(keys.get(0)));
@@ -513,7 +420,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(keys.size(), result.size());
           assertEquals(VALUE + "-old", result.get(keys.get(0)));
           for (int i = 1; i < keys.size(); i++) {
-            assertEquals(VALUE + i, result.get(keys.get(i)));
+            assertEquals(VALUE, result.get(keys.get(i)));
           }
         })
         .toCompletableFuture()
@@ -521,21 +428,16 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiReplaceMapSuccess() throws ExecutionException, InterruptedException,
+  void multiReplaceSuccess() throws ExecutionException, InterruptedException,
       TimeoutException {
 
     // given
-    Map<String, Object> oldElements = new HashMap<>();
+    Map<String, Object> newItems = new HashMap<>();
     for (int i = 0; i < keys.size(); i++) {
-      oldElements.put(keys.get(i), VALUE + "-old-" + i);
+      newItems.put(keys.get(i), VALUE + "-new-" + i);
     }
 
-    Map<String, Object> newElements = new HashMap<>();
-    for (int i = 0; i < keys.size(); i++) {
-      newElements.put(keys.get(i), VALUE + "-new-" + i);
-    }
-
-    async.multiSet(oldElements, 60)
+    async.multiSet(items, 60)
         .thenAccept(result -> {
           assertEquals(keys.size(), result.size());
           for (Boolean b : result.values()) {
@@ -546,7 +448,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.multiReplace(newElements, 60)
+    async.multiReplace(newItems, 60)
         .thenCompose(result -> {
           assertEquals(keys.size(), result.size());
           for (Boolean b : result.values()) {
@@ -566,24 +468,24 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
-  void multiReplaceMapPartialSuccess() throws ExecutionException, InterruptedException,
+  void multiReplacePartialSuccess() throws ExecutionException, InterruptedException,
       TimeoutException {
 
     // given
-    Map<String, Object> oldElements = new HashMap<>();
+    Map<String, Object> oldItems = new HashMap<>();
     for (int i = 0; i < 2; i++) {
-      oldElements.put(keys.get(i), VALUE + "-old-" + i);
+      oldItems.put(keys.get(i), VALUE + "-old-" + i);
     }
 
-    Map<String, Object> newElements = new HashMap<>();
+    Map<String, Object> newItems = new HashMap<>();
     for (int i = 0; i < keys.size(); i++) {
-      newElements.put(keys.get(i), VALUE + "-new-" + i);
+      newItems.put(keys.get(i), VALUE + "-new-" + i);
     }
 
     /* 0, 1st keys are added before multiReplace, so only they should succeed. */
-    async.multiSet(oldElements, 60)
+    async.multiSet(oldItems, 60)
         .thenAccept(result -> {
-          assertEquals(oldElements.size(), result.size());
+          assertEquals(oldItems.size(), result.size());
           for (Boolean b : result.values()) {
             assertTrue(b);
           }
@@ -592,7 +494,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.multiReplace(newElements, 60)
+    async.multiReplace(newItems, 60)
         .thenCompose(result -> {
           assertEquals(keys.size(), result.size());
           for (int i = 0; i < 2; i++) {
@@ -656,7 +558,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   @Test
   void multiDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
-    async.multiSet(keys, 0, VALUE)
+    async.multiSet(items, 0)
             .thenAccept(result -> {
               for (Boolean b : result.values()) {
                 assertTrue(b);

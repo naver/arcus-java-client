@@ -93,16 +93,6 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Boolean> prepend(String key, T val);
 
   /**
-   * Sets the same value for multiple keys.
-   *
-   * @param keys  list of keys to store
-   * @param exp   expiration time in seconds
-   * @param value the value to store for all keys
-   * @return Map of key to Boolean result
-   */
-  ArcusFuture<Map<String, Boolean>> multiSet(List<String> keys, int exp, T value);
-
-  /**
    * Sets multiple key-value pairs.
    *
    * @param items map of keys and values to store
@@ -112,16 +102,6 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp);
 
   /**
-   * Add the same value for multiple keys if they do not exist.
-   *
-   * @param keys  list of keys to store
-   * @param exp   expiration time in seconds
-   * @param value the value to store for all keys
-   * @return Map of key to Boolean result
-   */
-  ArcusFuture<Map<String, Boolean>> multiAdd(List<String> keys, int exp, T value);
-
-  /**
    * Add multiple key-value pairs if they do not exist.
    *
    * @param items map of keys and values to store
@@ -129,16 +109,6 @@ public interface AsyncArcusCommandsIF<T> {
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp);
-
-  /**
-   * Replace the same value for multiple keys if they exist.
-   *
-   * @param keys  list of keys to store
-   * @param exp   expiration time in seconds
-   * @param value the value to store for all keys
-   * @return Map of key to Boolean result
-   */
-  ArcusFuture<Map<String, Boolean>> multiReplace(List<String> keys, int exp, T value);
 
   /**
    * Replace multiple key-value pairs if they exist.

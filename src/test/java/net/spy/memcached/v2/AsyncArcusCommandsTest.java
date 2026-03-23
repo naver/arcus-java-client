@@ -1,7 +1,9 @@
 package net.spy.memcached.v2;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -18,6 +20,11 @@ abstract class AsyncArcusCommandsTest {
   protected static AsyncArcusCommands<Object> async;
   protected static final List<String> keys = Arrays.asList("key0", "key1", "key2", "key3");
   protected static final String VALUE = "value";
+  protected static final Map<String, Object> items = new HashMap<>();
+
+  static {
+    keys.forEach(k -> items.put(k, VALUE));
+  }
 
   @BeforeAll
   static void setUp() {
