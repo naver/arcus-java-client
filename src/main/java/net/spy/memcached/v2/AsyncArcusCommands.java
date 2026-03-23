@@ -228,48 +228,16 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
-  public ArcusFuture<Map<String, Boolean>> multiSet(List<String> keys, int exp, T value) {
-    return multiStore(StoreType.set, keys, exp, value);
-  }
-
   public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp) {
     return multiStore(StoreType.set, items, exp);
-  }
-
-  public ArcusFuture<Map<String, Boolean>> multiAdd(List<String> keys, int exp, T value) {
-    return multiStore(StoreType.add, keys, exp, value);
   }
 
   public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp) {
     return multiStore(StoreType.add, items, exp);
   }
 
-  public ArcusFuture<Map<String, Boolean>> multiReplace(List<String> keys, int exp, T value) {
-    return multiStore(StoreType.replace, keys, exp, value);
-  }
-
   public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp) {
     return multiStore(StoreType.replace, items, exp);
-  }
-
-  /**
-   * @param type  store type
-   * @param keys  key list to store
-   * @param exp   expiration time
-   * @param value value to store for whole keys
-   * @return ArcusFuture with Map of key to Boolean result. If an operation fails exceptionally,
-   * the corresponding value in the map will be null.
-   */
-  private ArcusFuture<Map<String, Boolean>> multiStore(StoreType type,
-                                                       List<String> keys, int exp, T value) {
-    Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(keys.size());
-
-    for (String key : keys) {
-      CompletableFuture<Boolean> future = store(type, key, exp, value).toCompletableFuture();
-      keyToFuture.put(key, future);
-    }
-
-    return buildMultiFuture(keyToFuture);
   }
 
   /**
@@ -289,17 +257,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       keyToFuture.put(key, future);
     });
 
-    return buildMultiFuture(keyToFuture);
-  }
-
-  /**
-   * Combine multiple CompletableFutures into a single ArcusFuture.
-   *
-   * @param keyToFuture a map of keys to their corresponding CompletableFutures
-   * @return an ArcusFuture that completes with a map of keys to their Boolean results.
-   */
-  private ArcusMultiFuture<Map<String, Boolean>> buildMultiFuture(
-      Map<String, CompletableFuture<?>> keyToFuture) {
+    /* Combine multiple CompletableFutures into a single ArcusFuture. */
     return new ArcusMultiFuture<>(keyToFuture.values(), () -> {
       Map<String, Boolean> results = new HashMap<>();
       keyToFuture.forEach((key, future) -> {
