@@ -2,22 +2,27 @@ package net.spy.memcached.v2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
+import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -826,5 +831,147 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         })
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopUpdateSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+            })
+            .thenAccept(element -> {
+              assertNotNull(element);
+              assertEquals(ELEMENTS.get(0).getBkey(), element.getBkey());
+              assertEquals(ELEMENTS.get(0).getValue(), element.getValue());
+              assertNull(element.getEFlag());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
+    BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
+            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+
+    // when
+    async.bopUpdate(key, updatedElement)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(updatedElement.getValue(), result.getValue());
+              assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopUpdateValueSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
+            .withValue(BKey.of(1L), "updated_value");
+
+    // when
+    async.bopUpdate(key, updatedElement)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(updatedElement.getValue(), result.getValue());
+              assertNull(result.getEFlag());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopUpdateEFlagSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
+    BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
+            .withEFlagUpdate(BKey.of(1L), eFlagUpdate);
+
+    // when
+    async.bopUpdate(key, updatedElement)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(ELEMENTS.get(0).getValue(), result.getValue());
+              assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopUpdateNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
+    BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
+            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+
+    // when
+    async.bopUpdate(key, updatedElement)
+            // then
+            .thenAccept(Assertions::assertFalse)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopUpdateNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
+    BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
+            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+
+    // when
+    async.bopUpdate(key, updatedElement)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
   }
 }
