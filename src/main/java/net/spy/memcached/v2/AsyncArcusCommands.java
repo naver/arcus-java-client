@@ -37,32 +37,34 @@ import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCreate;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
-import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
-import net.spy.memcached.collection.BTreeUpdate;
-import net.spy.memcached.collection.BTreeUpsert;
-import net.spy.memcached.collection.CollectionUpdate;
-import net.spy.memcached.internal.result.GetsResultImpl;
-import net.spy.memcached.ops.BTreeGetBulkOperation;
-import net.spy.memcached.collection.BTreeSMGet;
-import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
-import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
-import net.spy.memcached.ops.BTreeSortMergeGetOperation;
+import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeInsert;
 import net.spy.memcached.collection.BTreeInsertAndGet;
+import net.spy.memcached.collection.BTreeMutate;
+import net.spy.memcached.collection.BTreeSMGet;
+import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
+import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
+import net.spy.memcached.collection.BTreeUpdate;
+import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionInsert;
+import net.spy.memcached.collection.CollectionMutate;
+import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.BTreeGetBulkOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
+import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.ConcatenationType;
 import net.spy.memcached.ops.GetOperation;
-import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.GetsOperation;
+import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
@@ -1359,5 +1361,66 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           (byte[]) from.getData(), (byte[]) to.getData(), args.getElementFlagFilter(),
           args.getCount(), unique);
     }
+  }
+
+  public ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta) {
+    CollectionMutate mutate = new BTreeMutate(Mutator.incr, delta);
+    return collectionMutate(key, bKey.toString(), mutate);
+  }
+
+  public ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta, long initial, byte[] eFlag) {
+    CollectionMutate mutate = new BTreeMutate(Mutator.incr, delta, initial, eFlag);
+    return collectionMutate(key, bKey.toString(), mutate);
+  }
+
+  public ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta) {
+    CollectionMutate mutate = new BTreeMutate(Mutator.decr, delta);
+    return collectionMutate(key, bKey.toString(), mutate);
+  }
+
+  public ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag) {
+    CollectionMutate mutate = new BTreeMutate(Mutator.decr, delta, initial, eFlag);
+    return collectionMutate(key, bKey.toString(), mutate);
+  }
+
+  private ArcusFuture<Long> collectionMutate(String key, String internalKey,
+                                             CollectionMutate mutate) {
+    AbstractArcusResult<Long> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Long> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(Long.parseLong(status.getMessage()));
+            break;
+          case ERR_NOT_FOUND:
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE /
+             * OVERFLOWED / NOT_SUPPORTED or unknown statement
+             */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionMutate(key, internalKey, mutate, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
   }
 }

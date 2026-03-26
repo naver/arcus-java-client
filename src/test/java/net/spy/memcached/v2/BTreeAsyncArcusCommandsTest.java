@@ -11,6 +11,7 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -971,6 +973,312 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.bopUpdate(key, updatedElement)
             // then
             .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
+
+    async.bopInsert(key, element, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, bKey, 10)
+            // then
+            .thenAccept(result -> assertEquals(110L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    // when
+    async.bopIncr(key, bKey, 10)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrNotFoundElement() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, bKey, 10)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrInitialNotExistsElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, bKey, 10, 100L, null)
+            // then
+            .thenCompose(result -> {
+              assertEquals(100L, result);
+              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertEquals(bKey, result.getBkey());
+              assertEquals("100", result.getValue());
+              assertNull(result.getEFlag());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrInitialExistingElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
+
+    async.bopInsert(key, element, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, bKey, 10, 1000L, null)
+            // then
+            .thenAccept(result -> assertEquals(110L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrTypeMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, bKey, 10)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopIncrBKeyMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopIncr(key, BKey.of(new byte[]{0x01}), 10)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
+
+    async.bopInsert(key, element, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10)
+            // then
+            .thenAccept(result -> assertEquals(90L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    // when
+    async.bopDecr(key, bKey, 10)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrNotFoundElement() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrInitialNotExistsElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10, 100L, null)
+            // then
+            .thenAccept(result -> assertEquals(100L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrInitialExistingElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
+
+    async.bopInsert(key, element, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10, 1000L, null)
+            // then
+            .thenAccept(result -> assertEquals(90L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrResultUnderZero() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "5", null);
+
+    async.bopInsert(key, element, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10)
+            // then
+            .thenAccept(result -> assertEquals(0L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrTypeMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, bKey, 10)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDecrBKeyMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDecr(key, BKey.of(new byte[]{0x01}), 10)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
   }
