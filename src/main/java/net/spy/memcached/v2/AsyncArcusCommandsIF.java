@@ -380,4 +380,56 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
                                                 boolean unique, BopGetArgs args);
+
+  /**
+   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to increment
+   * @param delta the amount to increment (&gt; 0)
+   * @return the new value after increment, or {@code null} if the key or element is not found.
+   */
+  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta);
+
+  /**
+   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
+   *
+   * @param key     key of the btree item
+   * @param bKey    BKey of the element to increment
+   * @param delta   the amount to increment (&gt; 0)
+   * @param initial the value to store if the element does not exist
+   *                ({@code delta} is ignored) (&ge; 0)
+   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
+   * @return the new value after increment,
+   * or {@code initial} if the element did not exist.
+   */
+  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
+
+  /**
+   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to decrement
+   * @param delta the amount to decrement (&gt; 0)
+   * @return the new value after decrement, or {@code null} if the key or element is not found.
+   */
+  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta);
+
+  /**
+   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key     key of the btree item
+   * @param bKey    BKey of the element to decrement
+   * @param delta   the amount to decrement (&gt; 0)
+   * @param initial the value to store if the element does not exist
+   *                ({@code delta} is ignored) (&ge; 0)
+   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
+   * @return the new value after decrement,
+   *         or {@code initial} if the element did not exist.
+   */
+  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
 }
