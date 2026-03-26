@@ -22,6 +22,7 @@ import java.util.Map;
 
 import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
@@ -432,4 +433,16 @@ public interface AsyncArcusCommandsIF<T> {
    *         or {@code initial} if the element did not exist.
    */
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
+
+  /**
+   * Count elements in a bKey range from a btree item.
+   *
+   * @param key         key of the btree item
+   * @param from        BKey range start (inclusive)
+   * @param to          BKey range end (inclusive)
+   * @param eFlagFilter eFlag filter condition, or {@code null} to count all elements in the range
+   * @return the number of elements in the range (0 if none exist),
+   * or {@code null} if the key is not found.
+   */
+  ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
 }
