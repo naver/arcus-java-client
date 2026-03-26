@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
@@ -1273,6 +1274,155 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopDecr(key, BKey.of(new byte[]{0x01}), 10)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(2));
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    BKey from = ELEMENTS.get(0).getBkey();
+    BKey to = ELEMENTS.get(2).getBkey();
+
+    async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
+            // then
+            .thenAccept(result -> assertEquals(3L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountEFlagFilter() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    byte[] eFlag = new byte[]{0x01};
+    BTreeElement<Object> elementWithFlag1 = new BTreeElement<>(BKey.of(1L), "value1", eFlag);
+    BTreeElement<Object> elementWithFlag2 = new BTreeElement<>(BKey.of(2L), "value2", eFlag);
+    BTreeElement<Object> elementWithoutFlag = new BTreeElement<>(BKey.of(3L), "value3", null);
+
+    async.bopInsert(key, elementWithFlag1, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, elementWithFlag2);
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, elementWithoutFlag);
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal, eFlag);
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    async.bopCount(key, from, to, filter)
+            // then
+            .thenAccept(result -> assertEquals(2L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountZero() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(100L);
+
+    async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
+            // then
+            .thenAccept(result -> assertEquals(0L, result))
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    // when
+    async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountTypeMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopCountBKeyMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    BKey from = BKey.of(new byte[]{0x00});
+    BKey to = BKey.of(new byte[]{0x10});
+
+    async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
             // then
             .handle((result, ex) -> {
               assertInstanceOf(OperationException.class, ex);

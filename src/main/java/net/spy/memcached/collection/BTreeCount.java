@@ -26,14 +26,17 @@ public class BTreeCount extends CollectionCount {
 
   protected final ElementFlagFilter elementFlagFilter;
 
-  public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
+  public BTreeCount(String from, String to, ElementFlagFilter elementFlagFilter) {
     this.range = from + ".." + to;
     this.elementFlagFilter = elementFlagFilter;
   }
 
+  public BTreeCount(long from, long to, ElementFlagFilter elementFlagFilter) {
+    this(String.valueOf(from), String.valueOf(to), elementFlagFilter);
+  }
+
   public BTreeCount(byte[] from, byte[] to, ElementFlagFilter elementFlagFilter) {
-    this.range = BTreeUtil.toHex(from) + ".." + BTreeUtil.toHex(to);
-    this.elementFlagFilter = elementFlagFilter;
+    this(BTreeUtil.toHex(from), BTreeUtil.toHex(to), elementFlagFilter);
   }
 
   public String stringify() {
