@@ -34,6 +34,7 @@ import net.spy.memcached.KeyValidator;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.collection.BKeyObject;
+import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.BTreeCreate;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
@@ -48,10 +49,12 @@ import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
@@ -1418,6 +1421,46 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionMutate(key, internalKey, mutate, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter) {
+    verifyBKeyRange(from, to);
+
+    AbstractArcusResult<Long> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Long> future = new ArcusFutureImpl<>(result);
+    CollectionCount collectionCount = new BTreeCount(from.toString(), to.toString(), eFlagFilter);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            long count = Long.parseLong(status.getMessage());
+            result.set(count);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionCount(key, collectionCount, cb);
     future.setOp(op);
     client.addOp(key, op);
 
