@@ -18,6 +18,7 @@ import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
+import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
@@ -1275,6 +1276,337 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // when
     async.bopDecr(key, BKey.of(new byte[]{0x01}), 10)
             // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = ELEMENTS.get(0).getBkey();
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertNull(result.getValue());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteDropIfEmpty() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = ELEMENTS.get(0).getBkey();
+    BopDeleteArgs args = new BopDeleteArgs.Builder()
+            .dropIfEmpty()
+            .build();
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, bKey, args)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    // when
+    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+            // then
+            .thenAccept(Assertions::assertFalse)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteTypeMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteBKeyMismatch() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(new byte[]{0x01});
+
+    async.bopInsert(key, ELEMENTS.get(0) /* long BKey */, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = ELEMENTS.get(0).getBkey();
+    BKey to = ELEMENTS.get(2).getBkey();
+    BopDeleteArgs deleteArgs = new BopDeleteArgs.Builder()
+            .count(1)
+            .build();
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(2));
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, deleteArgs)
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              List<BTreeElement<Object>> elements = result.getElements();
+              assertEquals(2, elements.size());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeCountZero() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+    BopDeleteArgs args = BopDeleteArgs.DEFAULT;
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(2));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(3));
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, args)
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertTrue(result.getElements().isEmpty());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeEFlag() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    byte[] eFlag = new byte[]{0x01};
+    BTreeElement<Object> elementWithFlag = new BTreeElement<>(BKey.of(1L), "value1", eFlag);
+    BTreeElement<Object> elementWithoutFlag = new BTreeElement<>(BKey.of(2L), "value2", null);
+
+    ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal, eFlag);
+    BopDeleteArgs args = new BopDeleteArgs.Builder()
+            .eFlagFilter(filter)
+            .build();
+
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    async.bopInsert(key, elementWithFlag, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, elementWithoutFlag);
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, args)
+            // then
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+            })
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(1, result.getElements().size());
+              assertEquals(elementWithoutFlag.getBkey(), result.getElements().get(0).getBkey());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeNotFound() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    // when
+    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(100L);
+    BKey to = BKey.of(200L);
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+            // then
+            .thenAccept(Assertions::assertFalse)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeTypeMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(0L);
+    BKey to = BKey.of(10L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopDeleteByRangeBKeyMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey from = BKey.of(new byte[]{0x00});
+    BKey to = BKey.of(new byte[]{0x10});
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
             .handle((result, ex) -> {
               assertInstanceOf(OperationException.class, ex);
               assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));

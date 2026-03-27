@@ -36,6 +36,7 @@ import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.BTreeCreate;
+import net.spy.memcached.collection.BTreeDelete;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
@@ -51,6 +52,7 @@ import net.spy.memcached.collection.BTreeUpsert;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionCreate;
+import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionUpdate;
@@ -79,6 +81,7 @@ import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
+import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
@@ -1421,6 +1424,59 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionMutate(key, internalKey, mutate, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args) {
+    BTreeDelete delete = new BTreeDelete(bKey.toString(),
+            args.getEFlagFilter(), args.isDropIfEmpty(), false);
+    return collectionDelete(key, delete);
+  }
+
+  public ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args) {
+    verifyBKeyRange(from, to);
+    BTreeDelete delete = new BTreeDelete(from.toString(), to.toString(),
+            args.getCount(), args.getEFlagFilter(), args.isDropIfEmpty(), false);
+    return collectionDelete(key, delete);
+  }
+
+  private ArcusFuture<Boolean> collectionDelete(String key, CollectionDelete delete) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(false);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / BKEY_MISMATCH / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionDelete(key, delete, cb);
     future.setOp(op);
     client.addOp(key, op);
 
