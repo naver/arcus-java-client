@@ -28,6 +28,7 @@ import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
+import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
@@ -433,6 +434,35 @@ public interface AsyncArcusCommandsIF<T> {
    *         or {@code initial} if the element did not exist.
    */
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
+
+  /**
+   * Delete an element with the given bKey from a btree item.
+   *
+   * @param key  key of the btree item
+   * @param bKey BKey of the element to delete
+   * @param args delete arguments (eFlagFilter, dropIfEmpty)
+   * @return {@code true} if the element was deleted,
+   * {@code null} if the key is not found,
+   * {@code false} if the element is not found.
+   */
+  ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args);
+
+  /**
+   * Delete elements in a bKey range from a btree item.
+   * Elements are deleted in order from {@code from} to {@code to}.
+   * <p>If {@code args.count} is 0 (default), all elements in the range are deleted. </p>
+   * Otherwise, only the first {@code args.count} elements (in {@code from}-to-{@code to} order)
+   * are deleted.
+   *
+   * @param key  key of the btree item
+   * @param from BKey range start (inclusive)
+   * @param to   BKey range end (inclusive)
+   * @param args delete arguments (count, eFlagFilter, dropIfEmpty)
+   * @return {@code true} if at least one element was deleted,
+   * {@code null} if the key is not found,
+   * {@code false} if no elements are found in the range.
+   */
+  ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args);
 
   /**
    * Count elements in a bKey range from a btree item.
