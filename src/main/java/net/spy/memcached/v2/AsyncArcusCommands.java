@@ -961,8 +961,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotData(int flags, BKeyObject bKeyObject, byte[] eFlag, byte[] data) {
-        trimmedElement = new BTreeElement<>(BKey.of(bKeyObject),
-            tcForCollection.decode(new CachedData(flags, data, tc.getMaxSize())), eFlag);
+        trimmedElement = new BTreeElement<>(
+                BKey.of(bKeyObject),
+                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
+                eFlag);
       }
     };
     Operation op = client.getOpFact()
@@ -1022,8 +1024,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
-        result.set(new BTreeElement<>(BKey.of(bKey),
-            tcForCollection.decode(new CachedData(flags, data, tc.getMaxSize())), eflag));
+        result.set(new BTreeElement<>(
+                BKey.of(bKey),
+                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
+                eflag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1083,8 +1087,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
-        result.get().addElement(new BTreeElement<>(BKey.of(bKey), tcForCollection.decode(
-            new CachedData(flags, data, tc.getMaxSize())), eflag));
+        BTreeElements<T> elements = result.get();
+        elements.addElement(new BTreeElement<>(
+                BKey.of(bKey),
+                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
+                eflag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1225,8 +1232,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       @Override
       public void gotElement(String key, int flags, Object bKey, byte[] eFlag, byte[] data) {
         BTreeElements<T> elements = result.get().get(key);
-        elements.addElement(new BTreeElement<>(BKey.of(bKey), tcForCollection.decode(
-            new CachedData(flags, data, tc.getMaxSize())), eFlag));
+        elements.addElement(new BTreeElement<>(
+                BKey.of(bKey),
+                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
+                eFlag));
       }
     };
     Operation op = client.getOpFact().bopGetBulk(getBulk, cb);
@@ -1335,8 +1344,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotData(String key, int flags, Object bKey, byte[] eFlag, byte[] data) {
-        BTreeElement<T> btreeElement = new BTreeElement<>(BKey.of(bKey),
-            tcForCollection.decode(new CachedData(flags, data, tc.getMaxSize())), eFlag);
+        BTreeElement<T> btreeElement = new BTreeElement<>(
+                BKey.of(bKey),
+                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
+                eFlag);
         elementList.add(new SMGetElements.Element<>(key, btreeElement));
       }
 
