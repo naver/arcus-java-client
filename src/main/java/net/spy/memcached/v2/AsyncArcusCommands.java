@@ -808,24 +808,27 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     OperationCallback cb = new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        if (!status.isSuccess()) {
-          switch (status.getStatusCode()) {
-            case ERR_ELEMENT_EXISTS:
-            case ERR_NOT_FOUND:
-              break;
-            case CANCELLED:
-              future.internalCancel();
-              return;
-            default:
-              /*
-               * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED
-               * or unknown statement
-               */
-              result.addError(key, status);
-              return;
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_ELEMENT_EXISTS:
+            result.set(false);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED
+             * or unknown statement
+             */
+            result.addError(key, status);
+            break;
         }
-        result.set(status.isSuccess());
       }
 
       @Override
