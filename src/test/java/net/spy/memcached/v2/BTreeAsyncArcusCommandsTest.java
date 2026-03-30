@@ -79,9 +79,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           return async.bopGet(key, element.getBkey(), BopGetArgs.DEFAULT);
         })
         // then
-        .thenAccept(result -> {
-          assertNotEquals(element, result);
-        })
+        .thenAccept(result -> assertNotEquals(element, result))
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
@@ -91,7 +89,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given & when
     async.bopInsert(keys.get(0), ELEMENTS.get(0))
         // then
-        .thenAccept(Assertions::assertFalse)
+        .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
@@ -276,7 +274,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenAccept(element -> assertEquals(ELEMENTS.get(0), element))
         .thenCompose(v -> async.bopInsert(key, ELEMENTS.get(1)))
-        .thenAccept(Assertions::assertFalse) // NOT FOUND (key miss)
+        .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
@@ -369,7 +367,6 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
-
 
   @Test
   void bopMultiGet() throws Exception {
