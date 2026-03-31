@@ -58,6 +58,10 @@ import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionUpdate;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.collection.ListCreate;
+import net.spy.memcached.collection.ListDelete;
+import net.spy.memcached.collection.ListGet;
+import net.spy.memcached.collection.ListInsert;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -83,6 +87,7 @@ import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
+import net.spy.memcached.v2.vo.GetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
 public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
@@ -1535,5 +1540,124 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     client.addOp(key, op);
 
     return future;
+  }
+
+  public ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
+                                        CollectionAttributes attributes) {
+    if (attributes == null) {
+      throw new IllegalArgumentException("CollectionAttributes cannot be null");
+    }
+
+    ListCreate create = new ListCreate(TranscoderUtils.examineFlags(type),
+            attributes.getExpireTime(), attributes.getMaxCount(),
+            attributes.getOverflowAction(), attributes.getReadable(), false);
+    return collectionCreate(key, create);
+  }
+
+  public ArcusFuture<Boolean> lopInsert(String key, int index, T value) {
+    return lopInsert(key, index, value, null);
+  }
+
+  public ArcusFuture<Boolean> lopInsert(String key, int index, T value,
+                                        CollectionAttributes attributes) {
+    ListInsert<T> insert = new ListInsert<>(value, null, attributes);
+    return collectionInsert(key, String.valueOf(index), insert);
+  }
+
+  public ArcusFuture<T> lopGet(String key, int index, GetArgs args) {
+    AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
+    ListGet get = new ListGet(index, args.isWithDelete(), args.isDropIfEmpty());
+    ArcusClient client = arcusClientSupplier.get();
+
+    CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case ERR_NOT_FOUND:
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+
+      @Override
+      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.set(tcForCollection.decode(cachedData));
+      }
+    };
+    Operation op = client.getOpFact().collectionGet(key, get, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<List<T>> lopGet(String key, int from, int to, GetArgs args) {
+    AbstractArcusResult<List<T>> result =
+        new AbstractArcusResult<>(new AtomicReference<>(new ArrayList<>()));
+    ArcusFutureImpl<List<T>> future = new ArcusFutureImpl<>(result);
+    ListGet get = new ListGet(from, to, args.isWithDelete(), args.isDropIfEmpty());
+    ArcusClient client = arcusClientSupplier.get();
+
+    CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+          }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+
+      @Override
+      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().add(tcForCollection.decode(cachedData));
+      }
+    };
+    Operation op = client.getOpFact().collectionGet(key, get, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> lopDelete(String key, int index, boolean dropIfEmpty) {
+    ListDelete delete = new ListDelete(index, dropIfEmpty, false);
+    return collectionDelete(key, delete);
+  }
+
+  public ArcusFuture<Boolean> lopDelete(String key, int from, int to, boolean dropIfEmpty) {
+    ListDelete delete = new ListDelete(from, to, dropIfEmpty, false);
+    return collectionDelete(key, delete);
   }
 }

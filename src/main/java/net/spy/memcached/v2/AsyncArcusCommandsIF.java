@@ -30,6 +30,7 @@ import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
+import net.spy.memcached.v2.vo.GetArgs;
 import net.spy.memcached.v2.vo.SMGetElements;
 
 public interface AsyncArcusCommandsIF<T> {
@@ -73,7 +74,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the new value to set if the CAS ID matches
    * @param casId the CAS ID obtained from {@link #gets(String)}
    * @return {@code Boolean.True} if compared and set successfully,
-   *         {@code Boolean.False} if the key does not exist or CAS ID does not match
+   * {@code Boolean.False} if the key does not exist or CAS ID does not match
    */
   ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
 
@@ -99,7 +100,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Sets multiple key-value pairs.
    *
    * @param items map of keys and values to store
-   * @param exp      expiration time in seconds
+   * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp);
@@ -108,7 +109,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Add multiple key-value pairs if they do not exist.
    *
    * @param items map of keys and values to store
-   * @param exp      expiration time in seconds
+   * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp);
@@ -117,7 +118,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Replace multiple key-value pairs if they exist.
    *
    * @param items map of keys and values to store
-   * @param exp      expiration time in seconds
+   * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp);
@@ -431,7 +432,7 @@ public interface AsyncArcusCommandsIF<T> {
    *                ({@code delta} is ignored) (&ge; 0)
    * @param eFlag   eFlag of the element to create, or {@code null} if not needed
    * @return the new value after decrement,
-   *         or {@code initial} if the element did not exist.
+   * or {@code initial} if the element did not exist.
    */
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
 
@@ -475,4 +476,82 @@ public interface AsyncArcusCommandsIF<T> {
    * or {@code null} if the key is not found.
    */
   ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
+
+  /**
+   * Create a list with the given attributes.
+   *
+   * @param key        key of the list to create
+   * @param type       element value type
+   * @param attributes initial attributes of the list
+   * @return {@code true} if created, {@code false} if the key already exists.
+   */
+  ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Insert an element at the given index into a list.
+   *
+   * @param key   key of the list
+   * @param index index at which to insert the element
+   * @param value the value to insert
+   * @return {@code true} if the element was inserted, {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> lopInsert(String key, int index, T value);
+
+  /**
+   * Insert an element at the given index into a list.
+   * If the list does not exist, it is created with the given attributes.
+   *
+   * @param key        key of the list
+   * @param index      index at which to insert the element
+   * @param value      the value to insert
+   * @param attributes attributes to use when creating the list, or {@code null} to not create
+   * @return {@code true} if the element was inserted, {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> lopInsert(String key, int index, T value, CollectionAttributes attributes);
+
+  /**
+   * Get an element at the given index from a list.
+   *
+   * @param key   key of the list
+   * @param index index of the element to get
+   * @param args  arguments for get operation
+   * @return the element value, {@code null} if the key or element is not found.
+   */
+  ArcusFuture<T> lopGet(String key, int index, GetArgs args);
+
+  /**
+   * Get elements in an index range from a list.
+   *
+   * @param key  key of the list
+   * @param from index range start (inclusive)
+   * @param to   index range end (inclusive)
+   * @param args arguments for get operation
+   * @return list of element values in order, an empty list if no elements are found in the range,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<List<T>> lopGet(String key, int from, int to, GetArgs args);
+
+  /**
+   * Delete an element at the given index from a list.
+   *
+   * @param key         key of the list
+   * @param index       index of the element to delete
+   * @param dropIfEmpty whether to delete the list if it becomes empty after deletion
+   * @return {@code true} if the element was deleted, {@code null} if the key is not found,
+   * {@code false} if the element is not found.
+   */
+  ArcusFuture<Boolean> lopDelete(String key, int index, boolean dropIfEmpty);
+
+  /**
+   * Delete elements in an index range from a list.
+   *
+   * @param key         key of the list
+   * @param from        index range start (inclusive)
+   * @param to          index range end (inclusive)
+   * @param dropIfEmpty whether to delete the list if it becomes empty after deletion
+   * @return {@code true} if at least one element was deleted, {@code null} if the key is not found,
+   * {@code false} if no elements are found in the range.
+   */
+  ArcusFuture<Boolean> lopDelete(String key, int from, int to, boolean dropIfEmpty);
 }
