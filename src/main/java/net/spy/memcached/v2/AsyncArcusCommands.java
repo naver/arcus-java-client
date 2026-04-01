@@ -21,8 +21,10 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -62,6 +64,11 @@ import net.spy.memcached.collection.ListCreate;
 import net.spy.memcached.collection.ListDelete;
 import net.spy.memcached.collection.ListGet;
 import net.spy.memcached.collection.ListInsert;
+import net.spy.memcached.collection.SetCreate;
+import net.spy.memcached.collection.SetDelete;
+import net.spy.memcached.collection.SetExist;
+import net.spy.memcached.collection.SetGet;
+import net.spy.memcached.collection.SetInsert;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
@@ -1658,6 +1665,119 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> lopDelete(String key, int from, int to, boolean dropIfEmpty) {
     ListDelete delete = new ListDelete(from, to, dropIfEmpty, false);
+    return collectionDelete(key, delete);
+  }
+
+  public ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
+                                        CollectionAttributes attributes) {
+    if (attributes == null) {
+      throw new IllegalArgumentException("CollectionAttributes cannot be null");
+    }
+
+    SetCreate create = new SetCreate(
+            TranscoderUtils.examineFlags(type), attributes.getExpireTime(),
+            attributes.getMaxCount(), attributes.getReadable(), false);
+    return collectionCreate(key, create);
+  }
+
+  public ArcusFuture<Boolean> sopInsert(String key, T value) {
+    return sopInsert(key, value, null);
+  }
+
+  public ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes) {
+    SetInsert<T> insert = new SetInsert<>(value, null, attributes);
+    return collectionInsert(key, "", insert);
+  }
+
+  public ArcusFuture<Boolean> sopExist(String key, T value) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    SetExist<T> exist = new SetExist<>(value, tcForCollection);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case EXIST:
+            result.set(true);
+            break;
+          case NOT_EXIST:
+            result.set(false);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement
+             */
+            result.addError(key, status);
+            break;
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionExist(key, "", exist, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args) {
+    AbstractArcusResult<Set<T>> result
+            = new AbstractArcusResult<>(new AtomicReference<>(new HashSet<>()));
+    ArcusFutureImpl<Set<T>> future = new ArcusFutureImpl<>(result);
+    SetGet get = new SetGet(count, args.isWithDelete(), args.isDropIfEmpty());
+    ArcusClient client = arcusClientSupplier.get();
+
+    CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
+      @Override
+      public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().add(tcForCollection.decode(cachedData));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionGet(key, get, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> sopDelete(String key, T value, boolean dropIfEmpty) {
+    SetDelete<T> delete = new SetDelete<>(value, dropIfEmpty, false, tcForCollection);
     return collectionDelete(key, delete);
   }
 }

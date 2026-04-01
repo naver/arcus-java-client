@@ -19,6 +19,7 @@ package net.spy.memcached.v2;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.CollectionAttributes;
@@ -554,4 +555,69 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code false} if no elements are found in the range.
    */
   ArcusFuture<Boolean> lopDelete(String key, int from, int to, boolean dropIfEmpty);
+
+  /**
+   * Create a set with the given attributes.
+   *
+   * @param key        key of the set to create
+   * @param type       element value type
+   * @param attributes initial attributes of the set
+   * @return {@code true} if created, {@code false} if the key already exists.
+   */
+  ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Insert an element into a set.
+   *
+   * @param key   key of the set
+   * @param value the value to insert
+   * @return {@code true} if the element was inserted, {@code false} if the element already exists,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> sopInsert(String key, T value);
+
+  /**
+   * Insert an element into a set.
+   * If the set does not exist, it is created with the given attributes.
+   *
+   * @param key        key of the set
+   * @param value      the value to insert
+   * @param attributes attributes to use when creating the set, or {@code null} to not create
+   * @return {@code true} if the element was inserted, {@code false} if the element already exists,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes);
+
+  /**
+   * Check whether an element exists in a set.
+   *
+   * @param key   key of the set
+   * @param value the value to check
+   * @return {@code true} if the element exists, {@code false} if the element is not found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> sopExist(String key, T value);
+
+  /**
+   * Get elements randomly from a set.
+   *
+   * @param key   key of the set
+   * @param count number of elements to retrieve randomly (0 means all elements, max 1000)
+   * @param args  arguments for get operation
+   * @return set of element values, an empty set if no elements are found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args);
+
+  /**
+   * Delete an element from a set.
+   *
+   * @param key         key of the set
+   * @param value       the value to delete
+   * @param dropIfEmpty whether to delete the set if it becomes empty after deletion
+   * @return {@code true} if the element was deleted, {@code false} if the element is not found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> sopDelete(String key, T value, boolean dropIfEmpty);
 }
