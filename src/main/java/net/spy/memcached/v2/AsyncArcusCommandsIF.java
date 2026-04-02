@@ -671,4 +671,141 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code null} if the key is not found.
    */
   ArcusFuture<Boolean> sopDelete(String key, T value, boolean dropIfEmpty);
+
+  /**
+   * Create an empty map with the given attributes.
+   *
+   * @param key        key of the map to create
+   * @param type       element value type
+   * @param attributes initial attributes of the map
+   * @return {@code true} if created, {@code false} if the key already exists.
+   */
+  ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Insert an element with the given MKey into a map.
+   *
+   * @param key   key of the map
+   * @param mKey  MKey of the element to insert
+   * @param value the value to insert
+   * @return {@code true} if the element was inserted, {@code false} if the MKey already exists,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopInsert(String key, String mKey, T value);
+
+  /**
+   * Insert an element with the given MKey into a map.
+   * If the map does not exist, it is created with the given attributes.
+   *
+   * @param key        key of the map
+   * @param mKey       MKey of the element to insert
+   * @param value      the value to insert
+   * @param attributes attributes to use when creating the map
+   * @return {@code true} if the element was inserted, {@code false} if the MKey already exists,
+   * {@code null} if the key is not found.
+   *
+   */
+  ArcusFuture<Boolean> mopInsert(String key, String mKey, T value, CollectionAttributes attributes);
+
+  /**
+   * Upsert an element with the given MKey in a map.
+   * If an element with the given MKey exists, it is replaced, otherwise a new element is inserted.
+   *
+   * @param key   key of the map
+   * @param mKey  MKey of the element to upsert
+   * @param value the value to insert or replace with
+   * @return {@code true} if the element was inserted or replaced,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value);
+
+  /**
+   * Upsert an element with the given MKey in a map.
+   * If an element with the given MKey exists, it is replaced, otherwise a new element is inserted.
+   * If the map does not exist, it is created with the given attributes.
+   *
+   * @param key        key of the map
+   * @param mKey       MKey of the element to upsert
+   * @param value      the value to insert or replace with
+   * @param attributes attributes to use when creating the map
+   * @return {@code true} if the element was inserted or replaced,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value, CollectionAttributes attributes);
+
+  /**
+   * Update the value of an element with the given MKey in a map.
+   *
+   * @param key   key of the map
+   * @param mKey  MKey of the element to update
+   * @param value the new value
+   * @return {@code true} if the element was updated, {@code null} if the key is not found,
+   * {@code false} if the MKey is not found.
+   */
+  ArcusFuture<Boolean> mopUpdate(String key, String mKey, T value);
+
+  /**
+   * Get all elements from a map.
+   *
+   * @param key  key of the map
+   * @param args arguments for get operation
+   * @return map of MKey to value, empty map if no elements exist,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Map<String, T>> mopGet(String key, GetArgs args);
+
+  /**
+   * Get an element with the given MKey from a map.
+   *
+   * @param key  key of the map
+   * @param mKey MKey of the element to get
+   * @param args arguments for get operation
+   * @return the element value, {@code null} if the key or MKey is not found.
+   */
+  ArcusFuture<T> mopGet(String key, String mKey, GetArgs args);
+
+  /**
+   * Get elements with the MKeys from a map.
+   *
+   * @param key   key of the map
+   * @param mKeys list of MKeys to get
+   * @param args  arguments for get operation
+   * @return map of MKey to value for found elements, empty map if no MKeys are found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args);
+
+  /**
+   * Delete all elements from a map.
+   *
+   * @param key         key of the map
+   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
+   * @return {@code true} if the elements were deleted, {@code false} if no elements exist,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopDelete(String key, boolean dropIfEmpty);
+
+  /**
+   * Delete an element with the given MKey from a map.
+   *
+   * @param key         key of the map
+   * @param mKey        MKey of the element to delete
+   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
+   * @return {@code true} if the element was deleted, {@code false} if the MKey is not found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopDelete(String key, String mKey, boolean dropIfEmpty);
+
+  /**
+   * Delete elements with the given MKeys from a map.
+   *
+   * @param key         key of the map
+   * @param mKeys       MKey of the element to delete
+   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
+   * @return {@code true} if the element was deleted, {@code false} if the MKey is not found,
+   * {@code null} if the key is not found.
+   */
+  ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty);
+
 }

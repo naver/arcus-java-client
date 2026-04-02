@@ -20,6 +20,7 @@ package net.spy.memcached.v2;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,6 +74,12 @@ import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
 import net.spy.memcached.collection.SetGet;
 import net.spy.memcached.collection.SetInsert;
+import net.spy.memcached.collection.MapCreate;
+import net.spy.memcached.collection.MapDelete;
+import net.spy.memcached.collection.MapGet;
+import net.spy.memcached.collection.MapInsert;
+import net.spy.memcached.collection.MapUpdate;
+import net.spy.memcached.collection.MapUpsert;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
@@ -1978,6 +1985,144 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> sopDelete(String key, T value, boolean dropIfEmpty) {
     SetDelete<T> delete = new SetDelete<>(value, dropIfEmpty, false, tcForCollection);
+    return collectionDelete(key, delete);
+  }
+
+  public ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
+                                        CollectionAttributes attributes) {
+    MapCreate create = new MapCreate(TranscoderUtils.examineFlags(type),
+            attributes.getExpireTime(), attributes.getMaxCount(),
+            attributes.getReadable(), false);
+    return collectionCreate(key, create);
+  }
+
+  public ArcusFuture<Boolean> mopInsert(String key, String mKey, T value) {
+    return mopInsert(key, mKey, value, null);
+  }
+
+  public ArcusFuture<Boolean> mopInsert(String key, String mKey, T value,
+                                        CollectionAttributes attributes) {
+    MapInsert<T> insert = new MapInsert<>(value, null, attributes);
+    return collectionInsert(key, mKey, insert);
+  }
+
+  public ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value) {
+    return mopUpsert(key, mKey, value, null);
+  }
+
+  public ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value,
+                                        CollectionAttributes attributes) {
+    MapUpsert<T> upsert = new MapUpsert<>(value, attributes);
+    return collectionInsert(key, mKey, upsert);
+  }
+
+  public ArcusFuture<Boolean> mopUpdate(String key, String mKey, T value) {
+    MapUpdate<T> update = new MapUpdate<>(value, false);
+    return collectionUpdate(key, mKey, update);
+  }
+
+  public ArcusFuture<Map<String, T>> mopGet(String key, GetArgs args) {
+    return mopGet(key, new ArrayList<>(), args);
+  }
+
+  public ArcusFuture<T> mopGet(String key, String mKey, GetArgs args) {
+    AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
+    List<String> mKeys = Collections.singletonList(mKey);
+    MapGet get = new MapGet(mKeys, args.isWithDelete(), args.isDropIfEmpty());
+    ArcusClient client = arcusClientSupplier.get();
+
+    CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
+      @Override
+      public void gotData(String mKey, int flags, byte[] data, byte[] eFlag) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.set(tcForCollection.decode(cachedData));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case ERR_NOT_FOUND_ELEMENT:
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionGet(key, get, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args) {
+    AbstractArcusResult<Map<String, T>> result =
+            new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
+    ArcusFutureImpl<Map<String, T>> future = new ArcusFutureImpl<>(result);
+    MapGet get = new MapGet(mKeys, args.isWithDelete(), args.isDropIfEmpty());
+    ArcusClient client = arcusClientSupplier.get();
+
+    CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
+      @Override
+      public void gotData(String mKey, int flags, byte[] data, byte[] eFlag) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().put(mKey, tcForCollection.decode(cachedData));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().collectionGet(key, get, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<Boolean> mopDelete(String key, boolean dropIfEmpty) {
+    return mopDelete(key, new ArrayList<>(), dropIfEmpty);
+  }
+
+  public ArcusFuture<Boolean> mopDelete(String key, String mKey, boolean dropIfEmpty) {
+    return mopDelete(key, Collections.singletonList(mKey), dropIfEmpty);
+  }
+
+  public ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty) {
+    MapDelete delete = new MapDelete(mKeys, dropIfEmpty, false);
     return collectionDelete(key, delete);
   }
 }
