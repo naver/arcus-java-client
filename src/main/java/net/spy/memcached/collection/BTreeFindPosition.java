@@ -36,14 +36,24 @@ public class BTreeFindPosition {
   private final BTreeOrder order;
   private String str;
 
-  public BTreeFindPosition(long longBKey, BTreeOrder order) {
-    this.bkey = String.valueOf(longBKey);
+  public BTreeFindPosition(String bkey, BTreeOrder order) {
+    if (bkey == null || bkey.isEmpty()) {
+      throw new IllegalArgumentException("BKey must not be null or empty.");
+    }
+    if (order == null) {
+      throw new IllegalArgumentException("BTreeOrder must not be null.");
+    }
+
+    this.bkey = bkey;
     this.order = order;
   }
 
+  public BTreeFindPosition(long longBKey, BTreeOrder order) {
+    this(String.valueOf(longBKey), order);
+  }
+
   public BTreeFindPosition(byte[] byteArrayBKey, BTreeOrder order) {
-    this.bkey = BTreeUtil.toHex(byteArrayBKey);
-    this.order = order;
+    this(BTreeUtil.toHex(byteArrayBKey), order);
   }
 
   public String stringify() {

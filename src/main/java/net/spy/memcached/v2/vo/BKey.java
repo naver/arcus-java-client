@@ -52,6 +52,13 @@ public final class BKey implements Comparable<BKey> {
     }
   }
 
+  public BKeyObject toBKeyObject() {
+    if (this.type == BKeyType.LONG) {
+      return new BKeyObject((Long) this.data);
+    }
+    return new BKeyObject((byte[]) this.data);
+  }
+
   public static BKey of(BKeyObject bkeyObject) {
     if (bkeyObject == null) {
       throw new IllegalArgumentException("BKeyObject cannot be null");

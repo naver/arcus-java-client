@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.ElementFlagFilter;
@@ -1283,6 +1284,406 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
+  void bopGetPositionSuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = ELEMENTS.get(1).getBkey();
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(0));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetPosition(key, bKey, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(1, result);
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetPositionNotFound() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    // when
+    async.bopGetPosition(key, bKey, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetPositionNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetPosition(key, bKey, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetPositionTypeMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetPosition(key, bKey, BTreeOrder.ASC)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionSuccess() throws ExecutionException, InterruptedException, TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+    BTreeElement<Object> element = new BTreeElement<>(bKey, "value", null);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, element);
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(result, element);
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionNotFound() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    // when
+    async.bopGetByPosition(key, 0, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionTypeMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, BTreeOrder.ASC)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionRangeSuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(0));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(2));
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(3, result.size());
+              assertEquals(ELEMENTS.get(0), result.get(0));
+              assertEquals(ELEMENTS.get(1), result.get(1));
+              assertEquals(ELEMENTS.get(2), result.get(2));
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionRangeNotFound() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    // when
+    async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionRangeNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertTrue(result.isEmpty());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopGetByPositionRangeTypeMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopPositionWithGetSuccess() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = ELEMENTS.get(1).getBkey();
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(0));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(1));
+            })
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(2));
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertNotNull(result);
+              assertEquals(3, result.size());
+              assertEquals(ELEMENTS.get(0).getBkey(), result.get(0).getBkey());
+              assertEquals(ELEMENTS.get(0).getValue(), result.get(0).getValue());
+              assertEquals(ELEMENTS.get(0).getEFlag(), result.get(0).getEFlag());
+              assertEquals(0, result.get(0).getPosition());
+              assertEquals(ELEMENTS.get(1).getBkey(), result.get(1).getBkey());
+              assertEquals(ELEMENTS.get(1).getValue(), result.get(1).getValue());
+              assertEquals(ELEMENTS.get(1).getEFlag(), result.get(1).getEFlag());
+              assertEquals(1, result.get(1).getPosition());
+              assertEquals(ELEMENTS.get(2).getBkey(), result.get(2).getBkey());
+              assertEquals(ELEMENTS.get(2).getValue(), result.get(2).getValue());
+              assertEquals(ELEMENTS.get(2).getEFlag(), result.get(2).getEFlag());
+              assertEquals(2, result.get(2).getPosition());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopPositionWithGetNotFound() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    // when
+    async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
+            // then
+            .thenAccept(Assertions::assertNull)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopPositionWithGetNotFoundElement() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(999L);
+
+    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+            .thenCompose(result -> {
+              assertTrue(result);
+              return async.bopInsert(key, ELEMENTS.get(0));
+            })
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
+            // then
+            .thenAccept(result -> {
+              assertEquals(0, result.size());
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopPositionWithGetTypeMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(1L);
+
+    async.set(key, 60, "invalid-type-value")
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
+  void bopPositionWithGetBKeyMismatch() throws ExecutionException, InterruptedException,
+          TimeoutException {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(new byte[]{0x01});
+
+    async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
+            .thenAccept(Assertions::assertTrue)
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+
+    // when
+    async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
+            // then
+            .handle((result, ex) -> {
+              assertInstanceOf(OperationException.class, ex);
+              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+              return result;
+            })
+            .toCompletableFuture()
+            .get(300L, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
   void bopDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     String key = keys.get(0);
@@ -1522,7 +1923,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .thenAccept(result -> {
               assertNotNull(result);
               assertEquals(1, result.getElements().size());
-              assertEquals(elementWithoutFlag.getBkey(), result.getElements().get(0).getBkey());
+              assertEquals(elementWithoutFlag, result.getElements().get(0));
             })
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);

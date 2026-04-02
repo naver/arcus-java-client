@@ -38,14 +38,18 @@ import net.spy.memcached.MemcachedNode;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.BTreeCreate;
+import net.spy.memcached.collection.BTreeFindPosition;
+import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeDelete;
 import net.spy.memcached.collection.BTreeGet;
 import net.spy.memcached.collection.BTreeGetBulk;
 import net.spy.memcached.collection.BTreeGetBulkWithByteTypeBkey;
 import net.spy.memcached.collection.BTreeGetBulkWithLongTypeBkey;
+import net.spy.memcached.collection.BTreeGetByPosition;
 import net.spy.memcached.collection.BTreeInsert;
 import net.spy.memcached.collection.BTreeInsertAndGet;
 import net.spy.memcached.collection.BTreeMutate;
+import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.BTreeSMGet;
 import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
 import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
@@ -71,7 +75,10 @@ import net.spy.memcached.collection.SetGet;
 import net.spy.memcached.collection.SetInsert;
 import net.spy.memcached.internal.result.GetsResultImpl;
 import net.spy.memcached.ops.APIType;
+import net.spy.memcached.ops.BTreeFindPositionOperation;
+import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
 import net.spy.memcached.ops.BTreeGetBulkOperation;
+import net.spy.memcached.ops.BTreeGetByPositionOperation;
 import net.spy.memcached.ops.BTreeInsertAndGetOperation;
 import net.spy.memcached.ops.BTreeSortMergeGetOperation;
 import net.spy.memcached.ops.CollectionCreateOperation;
@@ -90,6 +97,7 @@ import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.TranscoderUtils;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
+import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
@@ -1274,6 +1282,198 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           (byte[]) from.getData(), (byte[]) to.getData(), args.getElementFlagFilter(),
           args.getOffset(), args.getCount());
     }
+  }
+
+  public ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order) {
+    AbstractArcusResult<Integer> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Integer> future = new ArcusFutureImpl<>(result);
+    BTreeFindPosition findPosition = new BTreeFindPosition(bKey.toString(), order);
+    ArcusClient client = arcusClientSupplier.get();
+
+    BTreeFindPositionOperation.Callback cb = new BTreeFindPositionOperation.Callback() {
+      @Override
+      public void gotData(int position) {
+        result.set(position);
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case ERR_NOT_FOUND:
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().bopFindPosition(key, findPosition, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<BTreeElement<T>> bopGetByPosition(String key, int pos, BTreeOrder order) {
+    AbstractArcusResult<BTreeElement<T>> result
+            = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<BTreeElement<T>> future = new ArcusFutureImpl<>(result);
+    BTreeGetByPosition getByPosition = new BTreeGetByPosition(order, pos);
+    ArcusClient client = arcusClientSupplier.get();
+
+    BTreeGetByPositionOperation.Callback cb = new BTreeGetByPositionOperation.Callback() {
+      @Override
+      public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
+        result.set(buildBTreeElement(flags, bKey, eFlag, data));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case ERR_NOT_FOUND:
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().bopGetByPosition(key, getByPosition, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<List<BTreeElement<T>>> bopGetByPosition(String key,
+                                                             int from, int to,
+                                                             BTreeOrder order) {
+    if (from > to) {
+      throw new IllegalArgumentException("from should be less than or equal to to.");
+    }
+
+    AbstractArcusResult<List<BTreeElement<T>>> result
+            = new AbstractArcusResult<>(new AtomicReference<>(new ArrayList<>()));
+    ArcusFutureImpl<List<BTreeElement<T>>> future = new ArcusFutureImpl<>(result);
+    BTreeGetByPosition getByPosition = new BTreeGetByPosition(order, from, to);
+    ArcusClient client = arcusClientSupplier.get();
+
+    BTreeGetByPositionOperation.Callback cb = new BTreeGetByPositionOperation.Callback() {
+      @Override
+      public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
+        result.get().add(buildBTreeElement(flags, bKey, eFlag, data));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().bopGetByPosition(key, getByPosition, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  public ArcusFuture<List<BTreePositionElement<T>>> bopPositionWithGet(String key,
+                                                                      BKey bKey,
+                                                                      int count,
+                                                                      BTreeOrder order) {
+    AbstractArcusResult<List<BTreePositionElement<T>>> result =
+            new AbstractArcusResult<>(new AtomicReference<>(new ArrayList<>()));
+    ArcusFutureImpl<List<BTreePositionElement<T>>> future = new ArcusFutureImpl<>(result);
+    BTreeFindPositionWithGet findPositionWithGet =
+            new BTreeFindPositionWithGet(bKey.toBKeyObject(), order, count);
+    ArcusClient client = arcusClientSupplier.get();
+
+    BTreeFindPositionWithGetOperation.Callback cb = new BTreeFindPositionWithGetOperation
+            .Callback() {
+
+      @Override
+      public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
+        T decodedData = tcForCollection.decode(
+                new CachedData(flags, data, tcForCollection.getMaxSize()));
+        result.get().add(new BTreePositionElement<>(BKey.of(bKey), decodedData, eFlag, pos));
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().bopFindPositionWithGet(key, findPositionWithGet, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  private BTreeElement<T> buildBTreeElement(int flags, BKeyObject bKey,
+                                            byte[] eFlag, byte[] data) {
+    T decodedData = tcForCollection.decode(
+            new CachedData(flags, data, tcForCollection.getMaxSize()));
+    return new BTreeElement<>(BKey.of(bKey), decodedData, eFlag);
   }
 
   public ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
