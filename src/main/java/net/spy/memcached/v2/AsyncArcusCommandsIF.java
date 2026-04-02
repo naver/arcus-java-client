@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.spy.memcached.CASValue;
+import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
+import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
@@ -370,6 +372,55 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(List<String> keys,
                                                          BKey from, BKey to,
                                                          BopGetArgs args);
+
+  /**
+   * Get the position of an element with the given bKey in a btree item.
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to find
+   * @param order the order of the btree to determine position
+   * @return the 0-based position of the element,
+   * or {@code null} if the key or element is not found.
+   */
+  ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order);
+
+  /**
+   * Get an element at the given position in a btree item.
+   *
+   * @param key   key of the btree item
+   * @param pos   0-based position of the element to get
+   * @param order the order of the btree to determine position
+   * @return the {@code BTreeElement} at the given position,
+   * or {@code null} if the key or element is not found.
+   */
+  ArcusFuture<BTreeElement<T>> bopGetByPosition(String key, int pos, BTreeOrder order);
+
+  /**
+   * Get elements in a position range from a btree item.
+   *
+   * @param key   key of the btree item
+   * @param from  start position (inclusive)
+   * @param to    end position (inclusive); must be greater than or equal to {@code from}
+   * @param order the order of the btree to determine position
+   * @return list of {@code BTreeElement} in the given position range, in traversal order,
+   * empty list if no elements exist in the range, {@code null} if the key is not found.
+   */
+  ArcusFuture<List<BTreeElement<T>>> bopGetByPosition(String key,
+                                                      int from, int to, BTreeOrder order);
+
+  /**
+   * Get an element by bKey and its neighboring elements with position information.
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to find
+   * @param count the number of neighboring elements to retrieve on each side
+   *             (0 &le; count &le; 100)
+   * @param order the order of the btree to determine position
+   * @return list of {@code BTreePositionElement} in traversal order,
+   * empty list if the element is not found, {@code null} if the key is not found.
+   */
+  ArcusFuture<List<BTreePositionElement<T>>> bopPositionWithGet(String key, BKey bKey,
+                                                                int count, BTreeOrder order);
 
   /**
    * Get sort-merged elements from multiple btree items.
