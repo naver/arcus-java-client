@@ -803,7 +803,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
                                         CollectionAttributes attributes) {
     BTreeInsert<T> insert = new BTreeInsert<>(element.getValue(), element.getEFlag(),
         null, attributes);
-    return collectionInsert(key, element.getBkey().toString(), insert);
+    return collectionInsert(key, element.getBKey().toString(), insert);
   }
 
   public ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element) {
@@ -815,7 +815,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
                                         CollectionAttributes attributes) {
     BTreeUpsert<T> upsert = new BTreeUpsert<>(element.getValue(), element.getEFlag(),
         null, attributes);
-    return collectionInsert(key, element.getBkey().toString(), upsert);
+    return collectionInsert(key, element.getBKey().toString(), upsert);
   }
 
   @Override
@@ -873,7 +873,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element) {
     BTreeUpdate<T> update = new BTreeUpdate<>(element.getValue(), element.getEFlagUpdate(), false);
-    return collectionUpdate(key, element.getBkey().toString(), update);
+    return collectionUpdate(key, element.getBKey().toString(), update);
   }
 
   private ArcusFuture<Boolean> collectionUpdate(String key,
@@ -1006,11 +1006,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
                                                                   boolean isUpsert,
                                                                   CollectionAttributes attributes) {
     BTreeInsertAndGet<T> insertAndGet;
-    if (element.getBkey().getType() == BKey.BKeyType.LONG) {
-      insertAndGet = new BTreeInsertAndGet<>((Long) element.getBkey().getData(),
+    if (element.getBKey().getType() == BKey.BKeyType.LONG) {
+      insertAndGet = new BTreeInsertAndGet<>((Long) element.getBKey().getData(),
           element.getEFlag(), element.getValue(), isUpsert, attributes);
     } else {
-      insertAndGet = new BTreeInsertAndGet<>((byte[]) element.getBkey().getData(),
+      insertAndGet = new BTreeInsertAndGet<>((byte[]) element.getBKey().getData(),
           element.getEFlag(), element.getValue(), isUpsert, attributes);
     }
     return insertAndGet;
@@ -1050,11 +1050,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         future.complete();
       }
 
-      public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
+      public void gotData(String bKey, int flags, byte[] data, byte[] eFlag) {
         result.set(new BTreeElement<>(
                 BKey.of(bKey),
                 tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eflag));
+                eFlag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1113,12 +1113,12 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         future.complete();
       }
 
-      public void gotData(String bKey, int flags, byte[] data, byte[] eflag) {
+      public void gotData(String bKey, int flags, byte[] data, byte[] eFlag) {
         BTreeElements<T> elements = result.get();
         elements.addElement(new BTreeElement<>(
                 BKey.of(bKey),
                 tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eflag));
+                eFlag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1948,7 +1948,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
       @Override
-      public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+      public void gotData(String subkey, int flags, byte[] data, byte[] eFlag) {
         CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
         result.get().add(tcForCollection.decode(cachedData));
       }

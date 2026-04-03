@@ -42,7 +42,7 @@ public final class SMGetElements<V> {
 
     // 3) Remove trimmed keys outside the final element range
     if (!elements.isEmpty()) {
-      BKey lastBKey = elements.get(elements.size() - 1).getbTreeElement().getBkey();
+      BKey lastBKey = elements.get(elements.size() - 1).getbTreeElement().getBKey();
       trimmedKeys.removeIf(trimmedKey -> {
         int comp = trimmedKey.getBKey().compareTo(lastBKey);
         return ascending ? comp >= 0 : comp <= 0;
@@ -79,10 +79,10 @@ public final class SMGetElements<V> {
     // 3) Merge elements until reach desired element count
     while (!pq.isEmpty() && elements.size() < count) {
       ElementWithIndex<T> current = pq.poll();
-      BKey bkey = current.element.getbTreeElement().getBkey();
-      // Deduplicate based on bkey if unique option is set
+      BKey bKey = current.element.getbTreeElement().getBKey();
+      // Deduplicate based on bKey if unique option is set
       if (unique && !elements.isEmpty()) {
-        if (!elements.get(elements.size() - 1).getbTreeElement().getBkey().equals(bkey)) {
+        if (!elements.get(elements.size() - 1).getbTreeElement().getBKey().equals(bKey)) {
           elements.add(current.element);
         }
       } else {
