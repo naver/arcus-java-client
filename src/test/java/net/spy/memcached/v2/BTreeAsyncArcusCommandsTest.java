@@ -77,7 +77,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         })
         .thenCompose(result -> {
           assertTrue(result);
-          return async.bopGet(key, element.getBkey(), BopGetArgs.DEFAULT);
+          return async.bopGet(key, element.getBKey(), BopGetArgs.DEFAULT);
         })
         // then
         .thenAccept(result -> assertNotEquals(element, result))
@@ -251,7 +251,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenAccept(element -> {
           // ELEMENT NOT FOUND
           assertNotNull(element);
-          assertEquals(BKey.of(2L), element.getBkey());
+          assertEquals(BKey.of(2L), element.getBKey());
           assertNull(element.getValue());
           assertNull(element.getEFlag());
         })
@@ -742,7 +742,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
           SMGetElements.TrimmedKey trimmedKey = smGetElements.getTrimmedKeys().get(0);
           assertEquals(keys.get(0), trimmedKey.getKey());
-          assertEquals(ELEMENTS.get(2).getBkey(), trimmedKey.getBKey());
+          assertEquals(ELEMENTS.get(2).getBKey(), trimmedKey.getBKey());
 
           List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(0), elements.get(0).getKey());
@@ -847,7 +847,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             })
             .thenAccept(element -> {
               assertNotNull(element);
-              assertEquals(ELEMENTS.get(0).getBkey(), element.getBkey());
+              assertEquals(ELEMENTS.get(0).getBKey(), element.getBKey());
               assertEquals(ELEMENTS.get(0).getValue(), element.getValue());
               assertNull(element.getEFlag());
             })
@@ -867,7 +867,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             })
             .thenAccept(result -> {
               assertNotNull(result);
-              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(updatedElement.getBKey(), result.getBKey());
               assertEquals(updatedElement.getValue(), result.getValue());
               assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
             })
@@ -897,7 +897,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             })
             .thenAccept(result -> {
               assertNotNull(result);
-              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(updatedElement.getBKey(), result.getBKey());
               assertEquals(updatedElement.getValue(), result.getValue());
               assertNull(result.getEFlag());
             })
@@ -928,7 +928,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             })
             .thenAccept(result -> {
               assertNotNull(result);
-              assertEquals(updatedElement.getBkey(), result.getBkey());
+              assertEquals(updatedElement.getBKey(), result.getBKey());
               assertEquals(ELEMENTS.get(0).getValue(), result.getValue());
               assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
             })
@@ -1050,7 +1050,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
               return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
             })
             .thenAccept(result -> {
-              assertEquals(bKey, result.getBkey());
+              assertEquals(bKey, result.getBKey());
               assertEquals("100", result.getValue());
               assertNull(result.getEFlag());
             })
@@ -1288,7 +1288,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           TimeoutException {
     // given
     String key = keys.get(0);
-    BKey bKey = ELEMENTS.get(1).getBkey();
+    BKey bKey = ELEMENTS.get(1).getBKey();
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
             .thenCompose(result -> {
@@ -1553,7 +1553,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           TimeoutException {
     // given
     String key = keys.get(0);
-    BKey bKey = ELEMENTS.get(1).getBkey();
+    BKey bKey = ELEMENTS.get(1).getBKey();
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
             .thenCompose(result -> {
@@ -1578,15 +1578,15 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .thenAccept(result -> {
               assertNotNull(result);
               assertEquals(3, result.size());
-              assertEquals(ELEMENTS.get(0).getBkey(), result.get(0).getBkey());
+              assertEquals(ELEMENTS.get(0).getBKey(), result.get(0).getBKey());
               assertEquals(ELEMENTS.get(0).getValue(), result.get(0).getValue());
               assertEquals(ELEMENTS.get(0).getEFlag(), result.get(0).getEFlag());
               assertEquals(0, result.get(0).getPosition());
-              assertEquals(ELEMENTS.get(1).getBkey(), result.get(1).getBkey());
+              assertEquals(ELEMENTS.get(1).getBKey(), result.get(1).getBKey());
               assertEquals(ELEMENTS.get(1).getValue(), result.get(1).getValue());
               assertEquals(ELEMENTS.get(1).getEFlag(), result.get(1).getEFlag());
               assertEquals(1, result.get(1).getPosition());
-              assertEquals(ELEMENTS.get(2).getBkey(), result.get(2).getBkey());
+              assertEquals(ELEMENTS.get(2).getBKey(), result.get(2).getBKey());
               assertEquals(ELEMENTS.get(2).getValue(), result.get(2).getValue());
               assertEquals(ELEMENTS.get(2).getEFlag(), result.get(2).getEFlag());
               assertEquals(2, result.get(2).getPosition());
@@ -1687,7 +1687,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void bopDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     String key = keys.get(0);
-    BKey bKey = ELEMENTS.get(0).getBkey();
+    BKey bKey = ELEMENTS.get(0).getBKey();
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
             .thenAccept(Assertions::assertTrue)
@@ -1713,7 +1713,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void bopDeleteDropIfEmpty() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     String key = keys.get(0);
-    BKey bKey = ELEMENTS.get(0).getBkey();
+    BKey bKey = ELEMENTS.get(0).getBKey();
     BopDeleteArgs args = new BopDeleteArgs.Builder()
             .dropIfEmpty()
             .build();
@@ -1817,8 +1817,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void bopDeleteByRangeSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     String key = keys.get(0);
-    BKey from = ELEMENTS.get(0).getBkey();
-    BKey to = ELEMENTS.get(2).getBkey();
+    BKey from = ELEMENTS.get(0).getBKey();
+    BKey to = ELEMENTS.get(2).getBKey();
     BopDeleteArgs deleteArgs = new BopDeleteArgs.Builder()
             .count(1)
             .build();
@@ -2033,8 +2033,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    BKey from = ELEMENTS.get(0).getBkey();
-    BKey to = ELEMENTS.get(2).getBkey();
+    BKey from = ELEMENTS.get(0).getBKey();
+    BKey to = ELEMENTS.get(2).getBKey();
 
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
             // then

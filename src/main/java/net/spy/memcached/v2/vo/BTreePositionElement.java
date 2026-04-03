@@ -6,13 +6,13 @@ public final class BTreePositionElement<V> implements Comparable<BTreePositionEl
   private final BTreeElement<V> element;
   private final int position;
 
-  public BTreePositionElement(BKey bkey, V value, byte[] eFlag, int position) {
-    this.element = new BTreeElement<>(bkey, value, eFlag);
+  public BTreePositionElement(BKey bKey, V value, byte[] eFlag, int position) {
+    this.element = new BTreeElement<>(bKey, value, eFlag);
     this.position = position;
   }
 
-  public BKey getBkey() {
-    return element.getBkey();
+  public BKey getBKey() {
+    return element.getBKey();
   }
 
   public V getValue() {
