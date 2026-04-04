@@ -337,7 +337,7 @@ public interface ArcusClientIF extends MemcachedClientIF {
    * @param index               list index
    *                            (the item will be inserted before the element with the given index)
    * @param value               a value to insert into each list
-   * @param attributesForCreate if not true, a list should be created when key does not exist
+   * @param attributesForCreate if not null, a list should be created when key does not exist
    * @param tc                  transcoder to encode value
    * @return a future that will indicate the failure list of each operation
    */
