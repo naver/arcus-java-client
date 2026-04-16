@@ -2241,7 +2241,7 @@ public class MemcachedClient extends SpyThread
    *
    * @return all memcached nodes from node locator
    */
-  protected Collection<MemcachedNode> getAllNodes() {
+  public Collection<MemcachedNode> getAllNodes() {
     return conn.getLocator().getAll();
   }
 
