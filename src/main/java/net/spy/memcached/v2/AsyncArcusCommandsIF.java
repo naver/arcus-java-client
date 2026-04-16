@@ -17,6 +17,7 @@
  */
 package net.spy.memcached.v2;
 
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -220,14 +221,6 @@ public interface AsyncArcusCommandsIF<T> {
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiDelete(List<String> keys);
-
-  /**
-   * Flush all items from all servers.
-   *
-   * @param delay delay in seconds before flushing
-   * @return {@code Boolean.True} if flushed successfully, otherwise {@code Boolean.False}
-   */
-  ArcusFuture<Boolean> flush(int delay);
 
   /**
    * Create a btree item.
@@ -808,4 +801,60 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty);
 
+
+  /**
+   * Flush all items from all servers immediately.
+   *
+   * @return {@code true} if all servers flushed successfully, {@code false} otherwise
+   */
+  ArcusFuture<Boolean> flush();
+
+  /**
+   * Flush all items from all servers after a given delay.
+   *
+   * @param delay delay in seconds before flushing. (&ge; -1)
+   * @return {@code true} if all servers flushed successfully, {@code false} otherwise
+   */
+  ArcusFuture<Boolean> flush(int delay);
+
+  /**
+   * Flush all items with the given prefix from all servers immediately.
+   *
+   * @param prefix the prefix of the items to flush. Use {@code ""} for items with no prefix.
+   * @return {@code true} if flushed successfully,
+   * {@code false} if no items with the given prefix exist
+   */
+  ArcusFuture<Boolean> flush(String prefix);
+
+  /**
+   * Flush all items with the given prefix from all servers after a given delay.
+   *
+   * @param prefix the prefix of the items to flush. Use {@code ""} for items with no prefix.
+   * @param delay  delay in seconds before flushing. (&ge; -1)
+   * @return {@code true} if flushed successfully,
+   * {@code false} if no items with the given prefix exist
+   */
+  ArcusFuture<Boolean> flush(String prefix, int delay);
+
+  /**
+   * Get statistics from all connected servers.
+   *
+   * @return a map of each server's {@link java.net.SocketAddress} to its stats key-value pairs
+   */
+  ArcusFuture<Map<SocketAddress, Map<String, String>>> stats();
+
+  /**
+   * Get a specific set of statistics from all connected servers.
+   *
+   * @param arg the stats argument ({@link net.spy.memcached.v2.StatsArg})
+   * @return a map of each server's {@link java.net.SocketAddress} to its stats key-value pairs
+   */
+  ArcusFuture<Map<SocketAddress, Map<String, String>>> stats(StatsArg arg);
+
+  /**
+   * Get the version string from all connected servers.
+   *
+   * @return a map of each server's {@link java.net.SocketAddress} to its version string
+   */
+  ArcusFuture<Map<SocketAddress, String>> versions();
 }
