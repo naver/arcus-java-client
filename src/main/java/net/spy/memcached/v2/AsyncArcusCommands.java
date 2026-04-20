@@ -100,7 +100,6 @@ import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationCallback;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatsOperation;
-import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.TranscoderUtils;
@@ -150,8 +149,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     OperationCallback cb = new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        StatusCode code = status.getStatusCode();
-        switch (code) {
+        switch (status.getStatusCode()) {
           case SUCCESS:
             result.set(true);
             break;
@@ -162,9 +160,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            // TYPE_MISMATCH or unknown statement
+            /*
+             * TYPE_MISMATCH or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -198,9 +197,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     OperationCallback cb = new OperationCallback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        StatusCode code = status.getStatusCode();
-
-        switch (code) {
+        switch (status.getStatusCode()) {
           case SUCCESS:
             result.set(true);
             break;
@@ -211,9 +208,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            // TYPE_MISMATCH or unknown statement
+            /*
+             * TYPE_MISMATCH or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -250,9 +248,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH or unknown statement */
+            /*
+             * TYPE_MISMATCH or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -321,19 +320,23 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     GetOperation.Callback cb = new GetOperation.Callback() {
       @Override
       public void gotData(String key, int flags, byte[] data) {
-        result.set(new CachedData(flags, data, tc.getMaxSize()));
+        CachedData cachedData = new CachedData(flags, data, tc.getMaxSize());
+        result.set(cachedData);
       }
 
       @Override
       public void receivedStatus(OperationStatus status) {
-        /*
-         * For propagating internal cancel to the future.
-         */
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          // unknown statement
-          result.addError(key, status);
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * Unknown statement.
+             */
+            result.addError(key, status);
         }
       }
 
@@ -366,11 +369,17 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void receivedStatus(OperationStatus status) {
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          // unknown statement
-          result.addError(key, status);
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * Unknown statement.
+             */
+            result.addError(key, status);
         }
       }
 
@@ -409,19 +418,17 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
      */
     return new ArcusMultiFuture<>(futures, () -> {
       Map<String, T> results = new HashMap<>();
-      for (Map.Entry<CompletableFuture<Map<String, T>>, List<String>> entry
-          : futureToKeys.entrySet()) {
-        if (entry.getKey().isCompletedExceptionally()) {
-          for (String s : entry.getValue()) {
-            results.put(s, null);
-          }
+
+      futureToKeys.forEach((future, keyList) -> {
+        if (future.isCompletedExceptionally()) {
+          keyList.forEach(key -> results.put(key, null));
         } else {
-          Map<String, T> result = entry.getKey().join();
+          Map<String, T> result = future.join();
           if (result != null) {
             results.putAll(result);
           }
         }
-      }
+      });
       return results;
     });
   }
@@ -451,21 +458,25 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       @Override
       public void gotData(String key, int flags, byte[] data) {
         Map<String, CachedData> map = result.get();
-        map.put(key, new CachedData(flags, data, tc.getMaxSize()));
+        CachedData cachedData = new CachedData(flags, data, tc.getMaxSize());
+        map.put(key, cachedData);
       }
 
       @Override
       public void receivedStatus(OperationStatus status) {
-        /*
-         * For propagating internal cancel to the future.
-         */
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          // unknown statement
-          for (String key : keyList) {
-            result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * Unknown statement.
+             */
+            for (String key : keyList) {
+              result.addError(key, status);
+            }
         }
       }
 
@@ -527,9 +538,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            // TYPE_MISMATCH or unknown statement
+            /*
+             * TYPE_MISMATCH or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -607,13 +619,19 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void receivedStatus(OperationStatus status) {
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          // unknown statement
-          for (String key : keyList) {
-            result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * Unknown statement.
+             */
+            for (String key : keyList) {
+              result.addError(key, status);
+            }
         }
       }
 
@@ -649,7 +667,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            // unknown statement
+            /*
+             * Unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -720,7 +740,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            // NOT_SUPPORTED or unknown statement
+            /*
+             * NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -790,10 +812,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           default:
             /*
              * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED
-             * or unknown statement
+             * or unknown statement.
              */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -845,11 +866,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             break;
           default:
             /*
-            * TYPE_MISMATCH / BKEY_MISMATCH / EFLAG_MISMATCH / NOTHING_TO_UPDATE /
-            * OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED or unknown statement
-            */
+             * TYPE_MISMATCH / BKEY_MISMATCH / EFLAG_MISMATCH / NOTHING_TO_UPDATE /
+             * OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -901,24 +921,25 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       private BTreeElement<T> trimmedElement = null;
 
       public void receivedStatus(OperationStatus status) {
-        if (!status.isSuccess()) {
-          switch (status.getStatusCode()) {
-            case ERR_ELEMENT_EXISTS:
-            case ERR_NOT_FOUND:
-              break;
-            case CANCELLED:
-              future.internalCancel();
-              return;
-            default:
-              /*
-               * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED
-               * or unknown statement
-               */
-              result.addError(key, status);
-              return;
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case TRIMMED:
+            result.set(new AbstractMap.SimpleEntry<>(true, trimmedElement));
+            break;
+          case ERR_ELEMENT_EXISTS:
+          case ERR_NOT_FOUND:
+            result.set(new AbstractMap.SimpleEntry<>(false, trimmedElement));
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OVERFLOWED / OUT_OF_RANGE / NOT_SUPPORTED
+             * or unknown statement.
+             */
+            result.addError(key, status);
         }
-        result.set(new AbstractMap.SimpleEntry<>(status.isSuccess(), trimmedElement));
       }
 
       public void complete() {
@@ -927,10 +948,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotData(int flags, BKeyObject bKeyObject, byte[] eFlag, byte[] data) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
         trimmedElement = new BTreeElement<>(
-                BKey.of(bKeyObject),
-                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eFlag);
+                BKey.of(bKeyObject), tcForCollection.decode(cachedData), eFlag);
       }
     };
     Operation op = client.getOpFact()
@@ -964,24 +984,24 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
-        if (!status.isSuccess()) {
-          switch (status.getStatusCode()) {
-            case ERR_NOT_FOUND:
-              result.set(null);
-              break;
-            case ERR_NOT_FOUND_ELEMENT:
-              result.set(new BTreeElement<>(bKey, null, null));
-              break;
-            case CANCELLED:
-              future.internalCancel();
-              break;
-            default:
-              /*
-               * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / UNREADABLE / NOT_SUPPORTED
-               * or unknown statement
-               */
-              result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case ERR_NOT_FOUND_ELEMENT:
+            result.set(new BTreeElement<>(bKey, null, null));
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / UNREADABLE / NOT_SUPPORTED
+             * or unknown statement.
+             */
+            result.addError(key, status);
         }
       }
 
@@ -990,10 +1010,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       public void gotData(String bKey, int flags, byte[] data, byte[] eFlag) {
-        result.set(new BTreeElement<>(
-                BKey.of(bKey),
-                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eFlag));
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.set(new BTreeElement<>(BKey.of(bKey), tcForCollection.decode(cachedData), eFlag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1026,25 +1044,26 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
       public void receivedStatus(OperationStatus status) {
-        if (status.getStatusCode() == StatusCode.TRIMMED) {
-          result.get().trimmed();
-        } else if (!status.isSuccess()) {
-          switch (status.getStatusCode()) {
-            case ERR_NOT_FOUND:
-              result.set(null);
-              break;
-            case ERR_NOT_FOUND_ELEMENT:
-              break;
-            case CANCELLED:
-              future.internalCancel();
-              break;
-            default:
-              /*
-               * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / UNREADABLE / NOT_SUPPORTED
-               * or unknown statement
-               */
-              result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case TRIMMED:
+            result.get().trimmed();
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case ERR_NOT_FOUND_ELEMENT:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / UNREADABLE / NOT_SUPPORTED
+             * or unknown statement.
+             */
+            result.addError(key, status);
         }
       }
 
@@ -1053,11 +1072,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       public void gotData(String bKey, int flags, byte[] data, byte[] eFlag) {
-        BTreeElements<T> elements = result.get();
-        elements.addElement(new BTreeElement<>(
-                BKey.of(bKey),
-                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eFlag));
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().addElement(new BTreeElement<>(
+                BKey.of(bKey), tcForCollection.decode(cachedData), eFlag));
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
@@ -1152,15 +1169,19 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     BTreeGetBulkOperation.Callback cb = new BTreeGetBulkOperation.Callback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          /*
-           * NOT_SUPPORTED or unknown statement
-           */
-          for (String key : getBulk.getKeyList()) {
-            result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * NOT_SUPPORTED or unknown statement.
+             */
+            for (String key : getBulk.getKeyList()) {
+              result.addError(key, status);
+            }
         }
       }
 
@@ -1171,15 +1192,15 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotKey(String key, int elementCount, OperationStatus status) {
-        if (status.isSuccess()) {
-          BTreeElements<T> elements = new BTreeElements<>(new ArrayList<>());
-          result.get().put(key, elements);
-          if (status.getStatusCode() == StatusCode.TRIMMED) {
-            elements.trimmed();
-          }
-          return;
-        }
         switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.get().put(key, new BTreeElements<>(new ArrayList<>()));
+            break;
+          case TRIMMED:
+            BTreeElements<T> elements = new BTreeElements<>(new ArrayList<>());
+            elements.trimmed();
+            result.get().put(key, elements);
+            break;
           case ERR_NOT_FOUND:
             break;
           case ERR_NOT_FOUND_ELEMENT:
@@ -1189,7 +1210,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           default:
             /*
              * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / UNREADABLE
-             * or unknown statement
+             * or unknown statement.
              */
             result.addError(key, status);
         }
@@ -1197,11 +1218,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotElement(String key, int flags, Object bKey, byte[] eFlag, byte[] data) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
         BTreeElements<T> elements = result.get().get(key);
         elements.addElement(new BTreeElement<>(
-                BKey.of(bKey),
-                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eFlag));
+                BKey.of(bKey), tcForCollection.decode(cachedData), eFlag));
       }
     };
     Operation op = client.getOpFact().bopGetBulk(getBulk, cb);
@@ -1255,7 +1275,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1282,7 +1304,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     BTreeGetByPositionOperation.Callback cb = new BTreeGetByPositionOperation.Callback() {
       @Override
       public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
-        result.set(buildBTreeElement(flags, bKey, eFlag, data));
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.set(new BTreeElement<>(BKey.of(bKey), tcForCollection.decode(cachedData), eFlag));
       }
 
       @Override
@@ -1298,7 +1321,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1331,7 +1356,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     BTreeGetByPositionOperation.Callback cb = new BTreeGetByPositionOperation.Callback() {
       @Override
       public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
-        result.get().add(buildBTreeElement(flags, bKey, eFlag, data));
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().add(new BTreeElement<>(
+                BKey.of(bKey), tcForCollection.decode(cachedData), eFlag));
       }
 
       @Override
@@ -1347,7 +1374,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1380,9 +1409,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotData(int pos, int flags, BKeyObject bKey, byte[] eFlag, byte[] data) {
-        T decodedData = tcForCollection.decode(
-                new CachedData(flags, data, tcForCollection.getMaxSize()));
-        result.get().add(new BTreePositionElement<>(BKey.of(bKey), decodedData, eFlag, pos));
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
+        result.get().add(new BTreePositionElement<>(
+                BKey.of(bKey), tcForCollection.decode(cachedData), eFlag, pos));
       }
 
       @Override
@@ -1398,7 +1427,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1413,13 +1444,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     client.addOp(key, op);
 
     return future;
-  }
-
-  private BTreeElement<T> buildBTreeElement(int flags, BKeyObject bKey,
-                                            byte[] eFlag, byte[] data) {
-    T decodedData = tcForCollection.decode(
-            new CachedData(flags, data, tcForCollection.getMaxSize()));
-    return new BTreeElement<>(BKey.of(bKey), decodedData, eFlag);
   }
 
   public ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
@@ -1483,15 +1507,22 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     BTreeSortMergeGetOperation.Callback cb = new BTreeSortMergeGetOperation.Callback() {
       @Override
       public void receivedStatus(OperationStatus status) {
-        if (status.getStatusCode() == StatusCode.CANCELLED) {
-          future.internalCancel();
-        } else if (!status.isSuccess()) {
-          /*
-           * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / NOT_SUPPORTED or unknown statement
-           */
-          for (String key : smGet.getKeyList()) {
-            result.addError(key, status);
-          }
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+          case TRIMMED:
+          case DUPLICATED:
+          case DUPLICATED_TRIMMED:
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE / NOT_SUPPORTED or unknown statement.
+             */
+            for (String key : smGet.getKeyList()) {
+              result.addError(key, status);
+            }
         }
       }
 
@@ -1502,10 +1533,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       @Override
       public void gotData(String key, int flags, Object bKey, byte[] eFlag, byte[] data) {
+        CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
         BTreeElement<T> btreeElement = new BTreeElement<>(
-                BKey.of(bKey),
-                tcForCollection.decode(new CachedData(flags, data, tcForCollection.getMaxSize())),
-                eFlag);
+                BKey.of(bKey), tcForCollection.decode(cachedData), eFlag);
         elementList.add(new SMGetElements.Element<>(key, btreeElement));
       }
 
@@ -1584,7 +1614,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           default:
             /*
              * TYPE_MISMATCH / BKEY_MISMATCH / OUT_OF_RANGE /
-             * OVERFLOWED / NOT_SUPPORTED or unknown statement
+             * OVERFLOWED / NOT_SUPPORTED or unknown statement.
              */
             result.addError(key, status);
         }
@@ -1637,9 +1667,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / BKEY_MISMATCH / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
-            break;
         }
       }
 
@@ -1678,7 +1709,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / BKEY_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1737,7 +1770,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1781,9 +1816,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
-          }
+        }
       }
 
       @Override
@@ -1859,7 +1896,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             break;
           default:
             /*
-             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
              */
             result.addError(key, status);
             break;
@@ -1887,7 +1924,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
       @Override
-      public void gotData(String subkey, int flags, byte[] data, byte[] eFlag) {
+      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
         CachedData cachedData = new CachedData(flags, data, tcForCollection.getMaxSize());
         result.get().add(tcForCollection.decode(cachedData));
       }
@@ -1905,7 +1942,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -1991,7 +2030,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -2035,7 +2076,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             future.internalCancel();
             break;
           default:
-            /* TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement */
+            /*
+             * TYPE_MISMATCH / UNREADABLE / NOT_SUPPORTED or unknown statement.
+             */
             result.addError(key, status);
         }
       }
@@ -2201,8 +2244,17 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
         @Override
         public void receivedStatus(OperationStatus status) {
-          if (status.getStatusCode() == StatusCode.CANCELLED) {
-            future.internalCancel();
+          switch (status.getStatusCode()) {
+            case SUCCESS:
+              break;
+            case CANCELLED:
+              future.internalCancel();
+              break;
+            default:
+              /*
+               * Unknown statement.
+               */
+              result.addError(address.toString(), status);
           }
         }
 
@@ -2247,11 +2299,19 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       OperationCallback cb = new OperationCallback() {
         @Override
         public void receivedStatus(OperationStatus status) {
-          if (status.getStatusCode() == StatusCode.CANCELLED) {
-            future.internalCancel();
-            return;
+          switch (status.getStatusCode()) {
+            case SUCCESS:
+              result.set(status.getMessage());
+              break;
+            case CANCELLED:
+              future.internalCancel();
+              break;
+            default:
+              /*
+               * Unknown statement.
+               */
+              result.addError(address.toString(), status);
           }
-          result.set(status.getMessage());
         }
 
         @Override
