@@ -49,7 +49,7 @@ class BaseSerializingTranscoderTest {
     try {
       ex.compress(null);
       fail("Expected an assertion error");
-    } catch (NullPointerException e) {
+    } catch (IllegalArgumentException e) {
       // pass
     }
   }

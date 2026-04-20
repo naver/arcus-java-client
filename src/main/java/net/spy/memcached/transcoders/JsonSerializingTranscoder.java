@@ -26,6 +26,8 @@ import java.util.Objects;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.transcoders.compression.CompressionCodec;
+import net.spy.memcached.transcoders.compression.GZIPCompressionCodec;
 
 import static net.spy.memcached.transcoders.TranscoderUtils.COMPRESSED;
 import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
@@ -48,7 +50,7 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
   private final ObjectMapper objectMapper;
   private final JavaType javaType;
   private final int maxSize;
-  private final CompressionUtils cu;
+  private final CompressionCodec compressionCodec;
   private final TranscoderUtils tu;
 
   public JsonSerializingTranscoder(Class<T> clazz) {
@@ -60,18 +62,26 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
   }
 
   public JsonSerializingTranscoder(int max, Class<T> clazz) {
-    this.maxSize = max;
-    this.objectMapper = new ObjectMapper();
-    this.javaType = objectMapper.getTypeFactory().constructType(clazz);
-    this.cu = new CompressionUtils();
-    this.tu = new TranscoderUtils(true);
+    this(max, clazz, new GZIPCompressionCodec());
   }
 
   public JsonSerializingTranscoder(int max, JavaType javaType) {
+    this(max, javaType, new GZIPCompressionCodec());
+  }
+
+  public JsonSerializingTranscoder(int max, Class<T> clazz, CompressionCodec codec) {
+    this.maxSize = max;
+    this.objectMapper = new ObjectMapper();
+    this.javaType = objectMapper.getTypeFactory().constructType(clazz);
+    this.compressionCodec = codec;
+    this.tu = new TranscoderUtils(true);
+  }
+
+  public JsonSerializingTranscoder(int max, JavaType javaType, CompressionCodec codec) {
     this.maxSize = max;
     this.objectMapper = new ObjectMapper();
     this.javaType = Objects.requireNonNull(javaType, "JavaType must not be null");
-    this.cu = new CompressionUtils();
+    this.compressionCodec = codec;
     this.tu = new TranscoderUtils(true);
   }
 
@@ -88,7 +98,7 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
    * @param threshold the number of bytes
    */
   public void setCompressionThreshold(int threshold) {
-    cu.setCompressionThreshold(threshold);
+    this.compressionCodec.setCompressionThreshold(threshold);
   }
 
   /**
@@ -110,7 +120,7 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
     }
 
     if ((d.getFlags() & COMPRESSED) != 0) {
-      data = cu.decompress(data);
+      data = compressionCodec.decompress(data);
     }
 
     Object rv = null;
@@ -192,8 +202,8 @@ public class JsonSerializingTranscoder<T> extends SpyObject implements Transcode
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (cu.isCompressionCandidate(b)) {
-      byte[] compressed = cu.compress(b);
+    if (compressionCodec.isCompressionCandidate(b)) {
+      byte[] compressed = compressionCodec.compress(b);
       if (compressed.length < b.length) {
         getLogger().debug("Compressed %s from %d to %d",
                 o.getClass().getName(), b.length, compressed.length);
