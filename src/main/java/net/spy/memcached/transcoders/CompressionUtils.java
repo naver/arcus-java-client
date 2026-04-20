@@ -12,6 +12,7 @@ import net.spy.memcached.compat.SpyObject;
 /**
  * Utility class for compression and decompression operations.
  */
+@Deprecated
 public class CompressionUtils extends SpyObject {
 
   public static final int DEFAULT_COMPRESSION_THRESHOLD = 16384;

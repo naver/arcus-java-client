@@ -21,6 +21,8 @@ package net.spy.memcached.transcoders;
 import java.util.Date;
 
 import net.spy.memcached.CachedData;
+import net.spy.memcached.transcoders.compression.CompressionCodec;
+import net.spy.memcached.transcoders.compression.GZIPCompressionCodec;
 
 import static net.spy.memcached.transcoders.TranscoderUtils.COMPRESSED;
 import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
@@ -54,15 +56,20 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
    * Get a serializing transcoder with the default max data size.
    */
   public SerializingTranscoder() {
-    this(CachedData.MAX_SIZE, null, false, false);
+    this(CachedData.MAX_SIZE, null, false, false, new GZIPCompressionCodec());
   }
 
   public SerializingTranscoder(int max) {
-    this(max, null, false, false);
+    this(max, null, false, false, new GZIPCompressionCodec());
   }
 
   public SerializingTranscoder(int max, ClassLoader cl) {
-    this(max, cl, false, false);
+    this(max, cl, false, false, new GZIPCompressionCodec());
+  }
+
+  protected SerializingTranscoder(int max, ClassLoader cl, boolean isCollection,
+                               boolean forceJDKSerializeForCollection) {
+    this(max, cl, isCollection, forceJDKSerializeForCollection, new GZIPCompressionCodec());
   }
 
   /**
@@ -71,8 +78,9 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
    * or Builder for custom configurations.
    */
   protected SerializingTranscoder(int max, ClassLoader cl, boolean isCollection,
-                               boolean forceJDKSerializeForCollection) {
-    super(max, cl);
+                               boolean forceJDKSerializeForCollection,
+                               CompressionCodec codec) {
+    super(max, cl, true, codec);
     this.isCollection = isCollection;
     this.forceJDKSerializeForCollection = forceJDKSerializeForCollection;
   }
@@ -207,6 +215,7 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     private ClassLoader cl;
     private boolean isCollection;
     private boolean forceJDKSerializeForCollection;
+    private CompressionCodec compressionCodec = new GZIPCompressionCodec();
 
     private Builder() {}
 
@@ -236,6 +245,11 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
       return this;
     }
 
+    public Builder compressionCodec(CompressionCodec codec) {
+      this.compressionCodec = codec;
+      return this;
+    }
+
     /**
      * By default, this transcoder uses Java serialization only if the type is a user-defined class.
      * This mechanism may cause malfunction if you store Object type values
@@ -255,7 +269,8 @@ public class SerializingTranscoder extends BaseSerializingTranscoder
     }
 
     public SerializingTranscoder build() {
-      return new SerializingTranscoder(max, cl, isCollection, forceJDKSerializeForCollection);
+      return new SerializingTranscoder(max, cl, isCollection,
+              forceJDKSerializeForCollection, compressionCodec);
     }
   }
 }

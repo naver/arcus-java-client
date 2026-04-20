@@ -26,6 +26,8 @@ import java.io.ObjectStreamClass;
 import java.lang.reflect.Proxy;
 
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.transcoders.compression.CompressionCodec;
+import net.spy.memcached.transcoders.compression.GZIPCompressionCodec;
 
 /**
  * Base class for any transcoders that may want to work with serialized or
@@ -42,7 +44,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    */
   private final ClassLoader classLoader;
 
-  private final CompressionUtils cu = new CompressionUtils();
+  private final CompressionCodec compressionCodec;
   protected final TranscoderUtils tu;
 
   /**
@@ -57,9 +59,15 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
   }
 
   public BaseSerializingTranscoder(int max, ClassLoader cl, boolean pack) {
+    this(max, cl, pack, new GZIPCompressionCodec());
+  }
+
+  public BaseSerializingTranscoder(int max, ClassLoader cl, boolean pack,
+                                   CompressionCodec codec) {
     super();
     this.maxSize = max;
     this.classLoader = cl;
+    this.compressionCodec = codec;
     this.tu = new TranscoderUtils(pack);
   }
 
@@ -71,7 +79,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * @param threshold the number of bytes
    */
   public void setCompressionThreshold(int threshold) {
-    cu.setCompressionThreshold(threshold);
+    compressionCodec.setCompressionThreshold(threshold);
   }
 
   public String getCharset() {
@@ -127,7 +135,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * @throws NullPointerException if the input is null
    */
   protected byte[] compress(byte[] in) {
-    return cu.compress(in);
+    return compressionCodec.compress(in);
   }
 
   /**
@@ -137,7 +145,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * @return the decompressed byte array, or null if input is null or decompression fails
    */
   protected byte[] decompress(byte[] in) {
-    return cu.decompress(in);
+    return compressionCodec.decompress(in);
   }
 
   /**
@@ -147,7 +155,7 @@ public abstract class BaseSerializingTranscoder extends SpyObject {
    * @return true if the data should be compressed, false otherwise
    */
   protected boolean isCompressionCandidate(byte[] data) {
-    return cu.isCompressionCandidate(data);
+    return compressionCodec.isCompressionCandidate(data);
   }
 
   public int getMaxSize() {

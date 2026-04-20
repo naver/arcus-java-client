@@ -10,6 +10,8 @@ import java.util.Date;
 
 import net.spy.memcached.CachedData;
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.transcoders.compression.CompressionCodec;
+import net.spy.memcached.transcoders.compression.GZIPCompressionCodec;
 
 import static net.spy.memcached.transcoders.TranscoderUtils.COMPRESSED;
 import static net.spy.memcached.transcoders.TranscoderUtils.SERIALIZED;
@@ -30,7 +32,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
 
   private final ObjectMapper objectMapper;
   private final int maxSize;
-  private final CompressionUtils cu;
+  private final CompressionCodec compressionCodec;
   private final TranscoderUtils tu;
   private final boolean isCollection;
   private final boolean forceJsonSerializeForCollection;
@@ -53,15 +55,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
 
   @Deprecated
   public GenericJsonSerializingTranscoder(ObjectMapper objectMapper, int max) {
-    if (objectMapper == null) {
-      throw new IllegalArgumentException("ObjectMapper must not be null");
-    }
-    this.objectMapper = objectMapper;
-    this.maxSize = max;
-    this.cu = new CompressionUtils();
-    this.tu = new TranscoderUtils(true);
-    this.isCollection = false;
-    this.forceJsonSerializeForCollection = false;
+    this(objectMapper, max, false, false, new GZIPCompressionCodec());
   }
 
   /**
@@ -71,13 +65,14 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
    */
   private GenericJsonSerializingTranscoder(ObjectMapper objectMapper, int max,
                                            boolean isCollection,
-                                           boolean forceJsonSerializeForCollection) {
+                                           boolean forceJsonSerializeForCollection,
+                                           CompressionCodec codec) {
     if (objectMapper == null) {
       throw new IllegalArgumentException("ObjectMapper must not be null");
     }
     this.objectMapper = objectMapper;
     this.maxSize = max;
-    this.cu = new CompressionUtils();
+    this.compressionCodec = codec;
     this.tu = new TranscoderUtils(true);
     this.isCollection = isCollection;
     this.forceJsonSerializeForCollection = forceJsonSerializeForCollection;
@@ -131,7 +126,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
    * @param threshold the number of bytes
    */
   public void setCompressionThreshold(int threshold) {
-    cu.setCompressionThreshold(threshold);
+    compressionCodec.setCompressionThreshold(threshold);
   }
 
   /**
@@ -153,7 +148,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
     }
 
     if ((d.getFlags() & COMPRESSED) != 0) {
-      data = cu.decompress(data);
+      data = compressionCodec.decompress(data);
     }
 
     Object rv = null;
@@ -241,8 +236,8 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
       flags |= SERIALIZED;
     }
     assert b != null;
-    if (!isCollection && cu.isCompressionCandidate(b)) {
-      byte[] compressed = cu.compress(b);
+    if (!isCollection && compressionCodec.isCompressionCandidate(b)) {
+      byte[] compressed = compressionCodec.compress(b);
       if (compressed.length < b.length) {
         getLogger().debug("Compressed %s from %d to %d",
             o.getClass().getName(), b.length, compressed.length);
@@ -287,6 +282,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
     private int max;
     private boolean isCollection;
     private boolean forceJsonSerializeForCollection;
+    private CompressionCodec compressionCodec = new GZIPCompressionCodec();
 
     private Builder(ObjectMapper objectMapper) {
       this.objectMapper = objectMapper;
@@ -326,6 +322,11 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
       return this;
     }
 
+    public Builder compressionCodec(CompressionCodec codec) {
+      this.compressionCodec = codec;
+      return this;
+    }
+
     public Builder forceJsonSerializeForCollection() {
       if (!isCollection) {
         throw new IllegalStateException("forceJsonSerializationForCollection can only be " +
@@ -346,7 +347,7 @@ public class GenericJsonSerializingTranscoder extends SpyObject implements Trans
         objectMapper.setDefaultTyping(typer);
       }
       return new GenericJsonSerializingTranscoder(objectMapper, max,
-          isCollection, forceJsonSerializeForCollection);
+          isCollection, forceJsonSerializeForCollection, compressionCodec);
     }
   }
 }
