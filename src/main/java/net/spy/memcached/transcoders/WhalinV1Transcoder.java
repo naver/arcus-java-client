@@ -141,32 +141,40 @@ public class WhalinV1Transcoder extends BaseSerializingTranscoder
   }
 
   private Byte decodeByte(byte[] in) {
-    assert in.length == 2 : "Wrong length for a byte";
+    if (in.length != 2) {
+      throw new IllegalStateException("Wrong length for a byte");
+    }
     byte value = in[1];
     return Byte.valueOf(value);
-
   }
 
   private Integer decodeInteger(byte[] in) {
-    assert in.length == 5 : "Wrong length for an int";
+    if (in.length != 5) {
+      throw new IllegalStateException("Wrong length for an int");
+    }
     return Integer.valueOf((int) decodeLong(in).longValue());
-
   }
 
   private Float decodeFloat(byte[] in) {
-    assert in.length == 5 : "Wrong length for a float";
+    if (in.length != 5) {
+      throw new IllegalStateException("Wrong length for a float");
+    }
     Integer l = decodeInteger(in);
     return Float.valueOf(Float.intBitsToFloat(l.intValue()));
   }
 
   private Double decodeDouble(byte[] in) {
-    assert in.length == 9 : "Wrong length for a double";
+    if (in.length != 9) {
+      throw new IllegalStateException("Wrong length for a double");
+    }
     Long l = decodeLong(in);
     return Double.valueOf(Double.longBitsToDouble(l.longValue()));
   }
 
   private Boolean decodeBoolean(byte[] in) {
-    assert in.length == 2 : "Wrong length for a boolean";
+    if (in.length != 2) {
+      throw new IllegalStateException("Wrong length for a boolean");
+    }
     return Boolean.valueOf(in[1] == 1);
   }
 

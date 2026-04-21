@@ -94,8 +94,8 @@ class AddrUtilTest {
     try {
       List<InetSocketAddress> addrs = AddrUtil.getAddresses(s);
       fail("Expected failure, got " + addrs);
-    } catch (NullPointerException e) {
-      assertEquals("Null host list", e.getMessage());
+    } catch (IllegalArgumentException e) {
+      assertEquals("Hosts must not be null", e.getMessage());
     }
   }
 

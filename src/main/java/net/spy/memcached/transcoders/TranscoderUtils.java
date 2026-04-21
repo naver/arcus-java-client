@@ -107,6 +107,10 @@ public final class TranscoderUtils {
   }
 
   public long decodeLong(byte[] b) {
+    if (b.length > 8) {
+      throw new IllegalStateException("Too long to be an long (" + b.length + ") bytes");
+    }
+
     long rv = 0;
     for (byte i : b) {
       rv = (rv << 8) | (i < 0 ? 256 + i : i);
@@ -119,8 +123,9 @@ public final class TranscoderUtils {
   }
 
   public int decodeInt(byte[] in) {
-    assert in.length <= 4
-            : "Too long to be an int (" + in.length + ") bytes";
+    if (in.length > 4) {
+      throw new IllegalStateException("Too long to be an int (" + in.length + ") bytes");
+    }
     return (int) decodeLong(in);
   }
 
@@ -129,12 +134,10 @@ public final class TranscoderUtils {
   }
 
   public byte decodeByte(byte[] in) {
-    assert in.length <= 1 : "Too long for a byte";
-    byte rv = 0;
-    if (in.length == 1) {
-      rv = in[0];
+    if (in.length != 1) {
+      throw new IllegalStateException("Wrong length for a byte");
     }
-    return rv;
+    return in[0];
   }
 
   public byte[] encodeBoolean(boolean b) {
@@ -144,7 +147,9 @@ public final class TranscoderUtils {
   }
 
   public boolean decodeBoolean(byte[] in) {
-    assert in.length == 1 : "Wrong length for a boolean";
+    if (in.length != 1) {
+      throw new IllegalStateException("Wrong length for a boolean");
+    }
     return in[0] == '1';
   }
 

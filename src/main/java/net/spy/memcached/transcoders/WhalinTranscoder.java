@@ -177,7 +177,9 @@ public class WhalinTranscoder extends BaseSerializingTranscoder
   }
 
   public boolean decodeBoolean(byte[] in) {
-    assert in.length == 1 : "Wrong length for a boolean";
+    if (in.length != 1) {
+      throw new IllegalStateException("Wrong length for a boolean");
+    }
     return in[0] == 1;
   }
 
