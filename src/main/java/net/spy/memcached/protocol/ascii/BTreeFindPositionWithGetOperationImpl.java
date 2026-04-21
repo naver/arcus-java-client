@@ -105,14 +105,12 @@ public final class BTreeFindPositionWithGetOperationImpl extends OperationImpl i
      */
     if (line.startsWith("VALUE ")) {
       String[] stuff = line.split(" ");
-      assert stuff.length == 5;
 
       position = Integer.parseInt(stuff[1]);
       flags = Integer.parseInt(stuff[2]);
       count = Integer.parseInt(stuff[3]);
       index = Integer.parseInt(stuff[4]);
 
-      assert count > 0;
       // position counter
       pos = position - index;
       posDiff = 1;
@@ -171,13 +169,6 @@ public final class BTreeFindPositionWithGetOperationImpl extends OperationImpl i
       return;
     }
 
-    // Read data
-    assert key != null;
-    assert data != null;
-    // This will be the case, because we'll clear them when it's not.
-    assert readOffset <= data.length
-            : "readOffset is " + readOffset + " data.length is " + data.length;
-
     getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
 
     if (lookingFor == '\0') {
@@ -205,19 +196,14 @@ public final class BTreeFindPositionWithGetOperationImpl extends OperationImpl i
     if (lookingFor != '\0' && bb.hasRemaining()) {
       do {
         byte tmp = bb.get();
-        assert tmp == lookingFor : "Expecting " + lookingFor + ", got "
-                + (char) tmp;
+        if (tmp != lookingFor) {
+          throw new IllegalStateException("Expecting " + lookingFor + ", got " + (char) tmp);
+        }
 
-        switch (lookingFor) {
-          case '\r':
-            lookingFor = '\n';
-            break;
-          case '\n':
-            lookingFor = '\0';
-            break;
-          default:
-            assert false : "Looking for unexpected char: "
-                    + (char) lookingFor;
+        if (lookingFor == '\r') {
+          lookingFor = '\n';
+        } else { // lookingFor == '\n';
+          lookingFor = '\0';
         }
       } while (lookingFor != '\0' && bb.hasRemaining());
 

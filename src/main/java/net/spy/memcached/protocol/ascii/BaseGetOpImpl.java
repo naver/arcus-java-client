@@ -106,7 +106,6 @@ abstract class BaseGetOpImpl extends OperationImpl {
     } else if (line.startsWith("VALUE ")) {
       getLogger().debug("Got line %s", line);
       String[] stuff = line.split(" ");
-      assert stuff[0].equals("VALUE");
       currentKey = stuff[1];
       currentFlags = Integer.parseInt(stuff[2]);
       data = new byte[Integer.parseInt(stuff[3])];
@@ -129,12 +128,6 @@ abstract class BaseGetOpImpl extends OperationImpl {
 
   @Override
   public final void handleRead(ByteBuffer bb) {
-    assert currentKey != null;
-    assert data != null;
-    // This will be the case, because we'll clear them when it's not.
-    assert readOffset <= data.length : "readOffset is " + readOffset
-        + " data.length is " + data.length;
-
     getLogger().debug("readOffset: %d, length: %d", readOffset, data.length);
     // If we're not looking for termination, we're still looking for data
     if (lookingFor == '\0') {
@@ -163,17 +156,14 @@ abstract class BaseGetOpImpl extends OperationImpl {
     if (lookingFor != '\0' && bb.hasRemaining()) {
       do {
         byte tmp = bb.get();
-        assert tmp == lookingFor : "Expecting " + lookingFor + ", got "
-                + (char) tmp;
-        switch (lookingFor) {
-          case '\r':
-            lookingFor = '\n';
-            break;
-          case '\n':
-            lookingFor = '\0';
-            break;
-          default:
-            assert false : "Looking for unexpected char: " + (char) lookingFor;
+        if (tmp != lookingFor) {
+          throw new IllegalStateException("Expecting " + lookingFor + ", got " + (char) tmp);
+        }
+
+        if (lookingFor == '\r') {
+          lookingFor = '\n';
+        } else { // lookingFor == '\n';
+          lookingFor = '\0';
         }
       } while (lookingFor != '\0' && bb.hasRemaining());
       // Completed the read, reset stuff.
@@ -197,34 +187,39 @@ abstract class BaseGetOpImpl extends OperationImpl {
 
     String keysString = generateKeysString();
 
-    if (cmd.equals("get") || cmd.equals("gets")) {
-      // syntax: get <keys...>\r\n
-      commandBuilder.append(cmd);
-      commandBuilder.append(' ');
-      commandBuilder.append(keysString);
-      commandBuilder.append(RN_STRING);
-    } else if (cmd.equals("gat") || cmd.equals("gats")) {
-      // syntax: gat || gats <exp> <key>\r\n
-      commandBuilder.append(cmd);
-      commandBuilder.append(' ');
-      commandBuilder.append(exp);
-      commandBuilder.append(' ');
-      commandBuilder.append(keysString);
-      commandBuilder.append(RN_STRING);
-    } else {
-      assert (cmd.equals("mget") || cmd.equals("mgets"))
-          : "Unknown Command " + cmd;
-      // syntax: mget <lenKeys> <numkeys>\r\n<keys>\r\n
-      int lenKeys = keysString.getBytes().length;
-      int numKeys = keys.size();
-      commandBuilder.append(cmd);
-      commandBuilder.append(' ');
-      commandBuilder.append(lenKeys);
-      commandBuilder.append(' ');
-      commandBuilder.append(numKeys);
-      commandBuilder.append(RN_STRING);
-      commandBuilder.append(keysString);
-      commandBuilder.append(RN_STRING);
+    switch (cmd) {
+      case "get":
+      case "gets":
+        // syntax: get || gets <keys...>\r\n
+        commandBuilder.append(cmd);
+        commandBuilder.append(' ');
+        commandBuilder.append(keysString);
+        commandBuilder.append(RN_STRING);
+        break;
+      case "gat":
+      case "gats":
+        // syntax: gat || gats <exp> <key>\r\n
+        commandBuilder.append(cmd);
+        commandBuilder.append(' ');
+        commandBuilder.append(exp);
+        commandBuilder.append(' ');
+        commandBuilder.append(keysString);
+        commandBuilder.append(RN_STRING);
+        break;
+      case "mget":
+      case "mgets":
+        // syntax: mget || mgets <lenKeys> <numkeys>\r\n<keys>\r\n
+        commandBuilder.append(cmd);
+        commandBuilder.append(' ');
+        commandBuilder.append(keysString.getBytes().length);
+        commandBuilder.append(' ');
+        commandBuilder.append(keys.size());
+        commandBuilder.append(RN_STRING);
+        commandBuilder.append(keysString);
+        commandBuilder.append(RN_STRING);
+        break;
+      default:
+        assert false : "Unknown command: " + cmd;
     }
 
     commandLine = commandBuilder.toString().getBytes();

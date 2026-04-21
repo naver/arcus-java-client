@@ -21,29 +21,21 @@ public final class AddrUtil {
    *
    * Note that colon-delimited IPv6 is also supported.
    * For example:  ::1:11211
-   * @param s The {@link java.util.List} of {@link java.lang.String}
+   * @param hosts The {@link java.util.List} of {@link java.lang.String}
    *          containing {@code host:port}
    * @return The {@link java.util.List} of {@link java.net.InetSocketAddress}
    */
-  public static List<InetSocketAddress> getAddresses(List<String> s) {
-    if (s == null) {
-      throw new NullPointerException("Null host list");
-    }
-    ArrayList<InetSocketAddress> addrs =
-            new ArrayList<>();
-
-    if (s.isEmpty()) {
-      return addrs;
+  public static List<InetSocketAddress> getAddresses(List<String> hosts) {
+    if (hosts == null) {
+      throw new IllegalArgumentException("Hosts must not be null");
     }
 
-    for (String hoststuff : s) {
-      hoststuff = hoststuff.trim();
-      if (hoststuff.equals("")) {
-        continue;
+    ArrayList<InetSocketAddress> addrs = new ArrayList<>();
+    for (String host : hosts) {
+      if (!host.trim().isEmpty()) {
+        addrs.add(getAddress(host));
       }
-      addrs.add(getAddress(hoststuff));
     }
-    assert !addrs.isEmpty() : "No addrs found";
     return Collections.unmodifiableList(addrs);
   }
 
