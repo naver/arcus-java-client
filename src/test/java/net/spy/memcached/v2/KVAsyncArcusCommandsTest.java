@@ -172,9 +172,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             })
             .toCompletableFuture();
     // then
-    // AssertionError in the Transcoder causes the I/O thread to terminate abruptly.
-    // The future is never completed, leading to a TimeoutException in the main thread.
-    assertThrows(TimeoutException.class, () -> future.get(300L, TimeUnit.MILLISECONDS));
+    assertThrows(ExecutionException.class, () -> future.get(300L, TimeUnit.MILLISECONDS));
   }
 
   @Test

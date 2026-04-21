@@ -27,7 +27,7 @@ class TranscoderUtilsTest {
     try {
       boolean b = tu.decodeBoolean(oversizeBytes);
       fail("Got " + b + " expected assertion.");
-    } catch (AssertionError e) {
+    } catch (IllegalStateException e) {
       // pass
     }
   }
@@ -37,7 +37,7 @@ class TranscoderUtilsTest {
     try {
       byte b = tu.decodeByte(oversizeBytes);
       fail("Got " + b + " expected assertion.");
-    } catch (AssertionError e) {
+    } catch (IllegalStateException e) {
       // pass
     }
   }
@@ -47,7 +47,7 @@ class TranscoderUtilsTest {
     try {
       int b = tu.decodeInt(oversizeBytes);
       fail("Got " + b + " expected assertion.");
-    } catch (AssertionError e) {
+    } catch (IllegalStateException e) {
       // pass
     }
   }
@@ -57,7 +57,7 @@ class TranscoderUtilsTest {
     try {
       long b = tu.decodeLong(oversizeBytes);
       fail("Got " + b + " expected assertion.");
-    } catch (AssertionError e) {
+    } catch (IllegalStateException e) {
       // pass
     }
   }
