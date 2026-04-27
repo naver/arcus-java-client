@@ -28,9 +28,9 @@ import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
-import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
@@ -45,7 +45,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   the key
    * @param exp   expiration time in seconds
    * @param value the value to store
-   * @return {@code Boolean.True} if stored, otherwise {@code Boolean.False}
+   * @return {@code true} if stored, otherwise {@code false}
    */
   ArcusFuture<Boolean> set(String key, int exp, T value);
 
@@ -55,7 +55,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   the key
    * @param exp   expiration time in seconds
    * @param value the value to store
-   * @return {@code Boolean.True} if stored, otherwise {@code Boolean.False}
+   * @return {@code true} if stored, otherwise {@code false}
    */
   ArcusFuture<Boolean> add(String key, int exp, T value);
 
@@ -65,7 +65,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   the key
    * @param exp   expiration time in seconds
    * @param value the value to store
-   * @return {@code Boolean.True} if stored, otherwise {@code Boolean.False}
+   * @return {@code true} if stored, otherwise {@code false}
    */
   ArcusFuture<Boolean> replace(String key, int exp, T value);
 
@@ -77,28 +77,28 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @param value the new value to set if the CAS ID matches
    * @param casId the CAS ID obtained from {@link #gets(String)}
-   * @return {@code Boolean.True} if compared and set successfully,
-   * {@code Boolean.False} if the key does not exist or CAS ID does not match
+   * @return {@code true} if compared and set successfully,
+   * {@code false} if the key does not exist or CAS ID does not match
    */
   ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
 
   /**
    * Append String or byte[] to an existing same type of value.
    *
-   * @param key the key
-   * @param val the value to append
-   * @return {@code Boolean.True} if appended, otherwise {@code Boolean.False}
+   * @param key   the key
+   * @param value the value to append
+   * @return {@code true} if appended, otherwise {@code false}
    */
-  ArcusFuture<Boolean> append(String key, T val);
+  ArcusFuture<Boolean> append(String key, T value);
 
   /**
    * Prepend String or byte[] to an existing same type of value.
    *
-   * @param key the key
-   * @param val the value to prepend
-   * @return {@code Boolean.True} if prepended, otherwise {@code Boolean.False}
+   * @param key   the key
+   * @param value the value to prepend
+   * @return {@code true} if prepended, otherwise {@code false}
    */
-  ArcusFuture<Boolean> prepend(String key, T val);
+  ArcusFuture<Boolean> prepend(String key, T value);
 
   /**
    * Sets multiple key-value pairs.
@@ -139,7 +139,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Get a value and its CAS ID for the given key.
    *
    * @param key the key
-   * @return CASValue containing the value and CAS ID, or {@code null} if not found
+   * @return {@link CASValue}, {@code null} if not found
    */
   ArcusFuture<CASValue<T>> gets(String key);
 
@@ -201,7 +201,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Get values with CAS for multiple keys.
    *
    * @param keys list of keys to get
-   * @return Map of key to value with CAS.
+   * @return Map of key to {@link CASValue}
    */
   ArcusFuture<Map<String, CASValue<T>>> multiGets(List<String> keys);
 
@@ -209,7 +209,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Delete a value for the given key.
    *
    * @param key the key
-   * @return {@code Boolean.True} if deleted, otherwise {@code Boolean.False}
+   * @return {@code true} if deleted, otherwise {@code false}
    */
   ArcusFuture<Boolean> delete(String key);
 
@@ -228,7 +228,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key to create
    * @param type       btree element value type
    * @param attributes collection attributes (must not be null)
-   * @return {@code Boolean.True} if created, otherwise {@code Boolean.False}
+   * @return {@code true} if created, otherwise {@code false}
    */
   ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
                                  CollectionAttributes attributes);
@@ -239,7 +239,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key to insert
    * @param element    btree element to insert
    * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code Boolean.True} if inserted, {@code Boolean.False} if element exists,
+   * @return {@code true} if inserted,
+   * {@code false} if element exists,
    * {@code null} if key is not found
    */
   ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element,
@@ -250,7 +251,8 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key     key to insert
    * @param element btree element to insert
-   * @return {@code Boolean.True} if inserted, {@code Boolean.False} if element exists,
+   * @return {@code true} if inserted,
+   * {@code false} if element exists,
    * {@code null} if key is not found
    */
   ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element);
@@ -261,7 +263,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key to upsert
    * @param element    btree element to upsert
    * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code Boolean.True} if upserted, {@code Boolean.False} otherwise
+   * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
                                  CollectionAttributes attributes);
@@ -271,7 +273,7 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key     key to upsert
    * @param element btree element to upsert
-   * @return {@code Boolean.True} if upserted, {@code Boolean.False} otherwise
+   * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element);
 
@@ -279,8 +281,9 @@ public interface AsyncArcusCommandsIF<T> {
    * Update an element in a btree item
    *
    * @param key     key to update
-   * @param element btree element to update.
-   * @return {@code Boolean.True} if updated, {@code Boolean.False} if element does not exist,
+   * @param element btree element to update
+   * @return {@code true} if updated,
+   * {@code false} if element does not exist,
    * {@code null} if key is not found
    */
   ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element);
@@ -333,8 +336,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key  key to get
    * @param bKey BKey of the element to get
    * @param args arguments for get operation
-   * @return {@code BTreeElement} if found, {@code BTreeElement} with null value and eFlag
-   * if element is not found but key exists, {@code null} if key is not found
+   * @return the {@code BTreeElement} if found,
+   * {@code BTreeElement} with null value and null eFlag if element is not found but key exists,
+   * {@code null} if key is not found
    */
   ArcusFuture<BTreeElement<T>> bopGet(String key, BKey bKey, BopGetArgs args);
 
@@ -345,9 +349,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param from BKey range start
    * @param to   BKey range end
    * @param args arguments for get operation
-   * @return {@code BTreeElements} that contains trimmed or not and elements.
-   * If element is not found but key exists, {@code BTreeElements} with empty map will be returned.
-   * If key is not found, {@code null} will be returned.
+   * @return {@code BTreeElements} with found elements,
+   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * {@code null} if key is not found
    */
   ArcusFuture<BTreeElements<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
 
@@ -358,9 +362,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param from BKey range start
    * @param to   BKey range end
    * @param args arguments for get operation
-   * @return Map of key to BTreeElements. If element is not found but key exists,
-   * empty {@code BTreeElements} will be set for entry value. If key is not found,
-   * the corresponding entry will not be present in the map.
+   * @return map of key to {@code BTreeElements} with found elements,
+   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * no {@code Map.Entry} in the map if the key is not found
    */
   ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(List<String> keys,
                                                          BKey from, BKey to,
@@ -373,7 +377,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param bKey  BKey of the element to find
    * @param order the order of the btree to determine position
    * @return the 0-based position of the element,
-   * or {@code null} if the key or element is not found.
+   * {@code null} if the key or element is not found
    */
   ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order);
 
@@ -384,7 +388,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param pos   0-based position of the element to get
    * @param order the order of the btree to determine position
    * @return the {@code BTreeElement} at the given position,
-   * or {@code null} if the key or element is not found.
+   * {@code null} if the key or element is not found
    */
   ArcusFuture<BTreeElement<T>> bopGetByPosition(String key, int pos, BTreeOrder order);
 
@@ -396,7 +400,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to    end position (inclusive); must be greater than or equal to {@code from}
    * @param order the order of the btree to determine position
    * @return list of {@code BTreeElement} in the given position range, in traversal order,
-   * empty list if no elements exist in the range, {@code null} if the key is not found.
+   * empty list if no elements exist in the range,
+   * {@code null} if the key is not found
    */
   ArcusFuture<List<BTreeElement<T>>> bopGetByPosition(String key,
                                                       int from, int to, BTreeOrder order);
@@ -407,10 +412,11 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the btree item
    * @param bKey  BKey of the element to find
    * @param count the number of neighboring elements to retrieve on each side
-   *             (0 &le; count &le; 100)
+   *              (0 &le; count &le; 100)
    * @param order the order of the btree to determine position
    * @return list of {@code BTreePositionElement} in traversal order,
-   * empty list if the element is not found, {@code null} if the key is not found.
+   * empty list if the element is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<List<BTreePositionElement<T>>> bopPositionWithGet(String key, BKey bKey,
                                                                 int count, BTreeOrder order);
@@ -423,8 +429,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to     BKey range end
    * @param unique whether to return unique elements only
    * @param args   arguments for get operation
-   * @return {@code SMGetElements} containing sort-merged elements. Never return {@code null}.
-   * If matching elements not exist, the elements list in the {@code SMGetElements} will be empty.
+   * @return {@code SMGetElements} containing sort-merged elements,
+   * empty {@code SMGetElements} if no matching elements exist
    */
   ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
                                                 boolean unique, BopGetArgs args);
@@ -435,7 +441,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the btree item
    * @param bKey  BKey of the element to increment
    * @param delta the amount to increment (&gt; 0)
-   * @return the new value after increment, or {@code null} if the key or element is not found.
+   * @return the new value after increment, or {@code null} if the key or element is not found
    */
   ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta);
 
@@ -449,8 +455,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param initial the value to store if the element does not exist
    *                ({@code delta} is ignored) (&ge; 0)
    * @param eFlag   eFlag of the element to create, or {@code null} if not needed
-   * @return the new value after increment,
-   * or {@code initial} if the element did not exist.
+   * @return the new value after increment, or {@code initial} if the element did not exist
    */
   ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
 
@@ -461,7 +466,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the btree item
    * @param bKey  BKey of the element to decrement
    * @param delta the amount to decrement (&gt; 0)
-   * @return the new value after decrement, or {@code null} if the key or element is not found.
+   * @return the new value after decrement, or {@code null} if the key or element is not found
    */
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta);
 
@@ -476,8 +481,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param initial the value to store if the element does not exist
    *                ({@code delta} is ignored) (&ge; 0)
    * @param eFlag   eFlag of the element to create, or {@code null} if not needed
-   * @return the new value after decrement,
-   * or {@code initial} if the element did not exist.
+   * @return the new value after decrement, or {@code initial} if the element did not exist
    */
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
 
@@ -488,8 +492,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param bKey BKey of the element to delete
    * @param args delete arguments (eFlagFilter, dropIfEmpty)
    * @return {@code true} if the element was deleted,
-   * {@code null} if the key is not found,
-   * {@code false} if the element is not found.
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args);
 
@@ -505,8 +509,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to   BKey range end (inclusive)
    * @param args delete arguments (count, eFlagFilter, dropIfEmpty)
    * @return {@code true} if at least one element was deleted,
-   * {@code null} if the key is not found,
-   * {@code false} if no elements are found in the range.
+   * {@code false} if no elements are found in the range,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args);
 
@@ -518,7 +522,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to          BKey range end (inclusive)
    * @param eFlagFilter eFlag filter condition, or {@code null} to count all elements in the range
    * @return the number of elements in the range (0 if none exist),
-   * or {@code null} if the key is not found.
+   * {@code null} if the key is not found
    */
   ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
 
@@ -528,7 +532,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the list to create
    * @param type       element value type
    * @param attributes initial attributes of the list
-   * @return {@code true} if created, {@code false} if the key already exists.
+   * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
                                  CollectionAttributes attributes);
@@ -539,7 +543,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the list
    * @param index index at which to insert the element
    * @param value the value to insert
-   * @return {@code true} if the element was inserted, {@code null} if the key is not found.
+   * @return {@code true} if the element was inserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> lopInsert(String key, int index, T value);
 
@@ -551,7 +555,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param index      index at which to insert the element
    * @param value      the value to insert
    * @param attributes attributes to use when creating the list, or {@code null} to not create
-   * @return {@code true} if the element was inserted, {@code null} if the key is not found.
+   * @return {@code true} if the element was inserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> lopInsert(String key, int index, T value, CollectionAttributes attributes);
 
@@ -561,7 +565,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the list
    * @param index index of the element to get
    * @param args  arguments for get operation
-   * @return the element value, {@code null} if the key or element is not found.
+   * @return the element value, {@code null} if the key or element is not found
    */
   ArcusFuture<T> lopGet(String key, int index, GetArgs args);
 
@@ -573,7 +577,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to   index range end (inclusive)
    * @param args arguments for get operation
    * @return list of element values in order, an empty list if no elements are found in the range,
-   * {@code null} if the key is not found.
+   * {@code null} if the key is not found
    */
   ArcusFuture<List<T>> lopGet(String key, int from, int to, GetArgs args);
 
@@ -583,8 +587,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key         key of the list
    * @param index       index of the element to delete
    * @param dropIfEmpty whether to delete the list if it becomes empty after deletion
-   * @return {@code true} if the element was deleted, {@code null} if the key is not found,
-   * {@code false} if the element is not found.
+   * @return {@code true} if the element was deleted,
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> lopDelete(String key, int index, boolean dropIfEmpty);
 
@@ -595,8 +600,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param from        index range start (inclusive)
    * @param to          index range end (inclusive)
    * @param dropIfEmpty whether to delete the list if it becomes empty after deletion
-   * @return {@code true} if at least one element was deleted, {@code null} if the key is not found,
-   * {@code false} if no elements are found in the range.
+   * @return {@code true} if at least one element was deleted,
+   * {@code false} if no elements are found in the range,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> lopDelete(String key, int from, int to, boolean dropIfEmpty);
 
@@ -606,7 +612,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the set to create
    * @param type       element value type
    * @param attributes initial attributes of the set
-   * @return {@code true} if created, {@code false} if the key already exists.
+   * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
                                  CollectionAttributes attributes);
@@ -616,8 +622,9 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the set
    * @param value the value to insert
-   * @return {@code true} if the element was inserted, {@code false} if the element already exists,
-   * {@code null} if the key is not found.
+   * @return {@code true} if the element was inserted,
+   * {@code false} if the element already exists,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> sopInsert(String key, T value);
 
@@ -628,8 +635,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the set
    * @param value      the value to insert
    * @param attributes attributes to use when creating the set, or {@code null} to not create
-   * @return {@code true} if the element was inserted, {@code false} if the element already exists,
-   * {@code null} if the key is not found.
+   * @return {@code true} if the element was inserted,
+   * {@code false} if the element already exists,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes);
 
@@ -638,8 +646,9 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the set
    * @param value the value to check
-   * @return {@code true} if the element exists, {@code false} if the element is not found,
-   * {@code null} if the key is not found.
+   * @return {@code true} if the element exists,
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> sopExist(String key, T value);
 
@@ -650,7 +659,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param count number of elements to retrieve randomly (0 means all elements, max 1000)
    * @param args  arguments for get operation
    * @return set of element values, an empty set if no elements are found,
-   * {@code null} if the key is not found.
+   * {@code null} if the key is not found
    */
   ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args);
 
@@ -660,8 +669,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key         key of the set
    * @param value       the value to delete
    * @param dropIfEmpty whether to delete the set if it becomes empty after deletion
-   * @return {@code true} if the element was deleted, {@code false} if the element is not found,
-   * {@code null} if the key is not found.
+   * @return {@code true} if the element was deleted,
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> sopDelete(String key, T value, boolean dropIfEmpty);
 
@@ -671,7 +681,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the map to create
    * @param type       element value type
    * @param attributes initial attributes of the map
-   * @return {@code true} if created, {@code false} if the key already exists.
+   * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
                                  CollectionAttributes attributes);
@@ -682,8 +692,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the map
    * @param mKey  MKey of the element to insert
    * @param value the value to insert
-   * @return {@code true} if the element was inserted, {@code false} if the MKey already exists,
-   * {@code null} if the key is not found.
+   * @return {@code true} if the element was inserted,
+   * {@code false} if the MKey already exists,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopInsert(String key, String mKey, T value);
 
@@ -695,9 +706,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param mKey       MKey of the element to insert
    * @param value      the value to insert
    * @param attributes attributes to use when creating the map
-   * @return {@code true} if the element was inserted, {@code false} if the MKey already exists,
-   * {@code null} if the key is not found.
-   *
+   * @return {@code true} if the element was inserted,
+   * {@code false} if the MKey already exists,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopInsert(String key, String mKey, T value, CollectionAttributes attributes);
 
@@ -708,8 +719,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the map
    * @param mKey  MKey of the element to upsert
    * @param value the value to insert or replace with
-   * @return {@code true} if the element was inserted or replaced,
-   * {@code null} if the key is not found.
+   * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value);
 
@@ -722,8 +732,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param mKey       MKey of the element to upsert
    * @param value      the value to insert or replace with
    * @param attributes attributes to use when creating the map
-   * @return {@code true} if the element was inserted or replaced,
-   * {@code null} if the key is not found.
+   * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value, CollectionAttributes attributes);
 
@@ -733,8 +742,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the map
    * @param mKey  MKey of the element to update
    * @param value the new value
-   * @return {@code true} if the element was updated, {@code null} if the key is not found,
-   * {@code false} if the MKey is not found.
+   * @return {@code true} if the element was updated,
+   * {@code false} if the MKey is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopUpdate(String key, String mKey, T value);
 
@@ -743,8 +753,9 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key  key of the map
    * @param args arguments for get operation
-   * @return map of MKey to value, empty map if no elements exist,
-   * {@code null} if the key is not found.
+   * @return map of MKey to value,
+   * empty map if no elements exist,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Map<String, T>> mopGet(String key, GetArgs args);
 
@@ -754,7 +765,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key  key of the map
    * @param mKey MKey of the element to get
    * @param args arguments for get operation
-   * @return the element value, {@code null} if the key or MKey is not found.
+   * @return the element value,
+   * {@code null} if the key or MKey is not found
    */
   ArcusFuture<T> mopGet(String key, String mKey, GetArgs args);
 
@@ -764,8 +776,9 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key   key of the map
    * @param mKeys list of MKeys to get
    * @param args  arguments for get operation
-   * @return map of MKey to value for found elements, empty map if no MKeys are found,
-   * {@code null} if the key is not found.
+   * @return map of MKey to value for found elements,
+   * empty map if no MKeys are found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args);
 
@@ -773,9 +786,10 @@ public interface AsyncArcusCommandsIF<T> {
    * Delete all elements from a map.
    *
    * @param key         key of the map
-   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
-   * @return {@code true} if the elements were deleted, {@code false} if no elements exist,
-   * {@code null} if the key is not found.
+   * @param dropIfEmpty whether to drop the map if it becomes empty after deletion
+   * @return {@code true} if at least one element was deleted,
+   * {@code false} if no elements exist,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopDelete(String key, boolean dropIfEmpty);
 
@@ -784,9 +798,10 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key         key of the map
    * @param mKey        MKey of the element to delete
-   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
-   * @return {@code true} if the element was deleted, {@code false} if the MKey is not found,
-   * {@code null} if the key is not found.
+   * @param dropIfEmpty whether to drop the map if it becomes empty after deletion
+   * @return {@code true} if the element was deleted,
+   * {@code false} if the MKey is not found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopDelete(String key, String mKey, boolean dropIfEmpty);
 
@@ -794,10 +809,11 @@ public interface AsyncArcusCommandsIF<T> {
    * Delete elements with the given MKeys from a map.
    *
    * @param key         key of the map
-   * @param mKeys       MKey of the element to delete
-   * @param dropIfEmpty whether to drop the map if it becomes empty after delection
-   * @return {@code true} if the element was deleted, {@code false} if the MKey is not found,
-   * {@code null} if the key is not found.
+   * @param mKeys       MKeys of the elements to delete
+   * @param dropIfEmpty whether to drop the map if it becomes empty after deletion
+   * @return {@code true} if at least one element was deleted,
+   * {@code false} if no MKeys are found,
+   * {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty);
 
