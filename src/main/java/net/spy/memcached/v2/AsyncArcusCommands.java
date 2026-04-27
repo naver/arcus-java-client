@@ -180,18 +180,18 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
-  public ArcusFuture<Boolean> append(String key, T val) {
-    return concat(ConcatenationType.append, key, val);
+  public ArcusFuture<Boolean> append(String key, T value) {
+    return concat(ConcatenationType.append, key, value);
   }
 
-  public ArcusFuture<Boolean> prepend(String key, T val) {
-    return concat(ConcatenationType.prepend, key, val);
+  public ArcusFuture<Boolean> prepend(String key, T value) {
+    return concat(ConcatenationType.prepend, key, value);
   }
 
-  private ArcusFuture<Boolean> concat(ConcatenationType catType, String key, T val) {
+  private ArcusFuture<Boolean> concat(ConcatenationType catType, String key, T value) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
-    CachedData co = tc.encode(val);
+    CachedData co = tc.encode(value);
     ArcusClient client = arcusClientSupplier.get();
 
     OperationCallback cb = new OperationCallback() {
