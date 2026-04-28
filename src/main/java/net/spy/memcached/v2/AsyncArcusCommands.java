@@ -927,8 +927,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
             result.set(new AbstractMap.SimpleEntry<>(true, trimmedElement));
             break;
           case ERR_ELEMENT_EXISTS:
-          case ERR_NOT_FOUND:
             result.set(new AbstractMap.SimpleEntry<>(false, trimmedElement));
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
             break;
           case CANCELLED:
             future.internalCancel();
@@ -1046,14 +1048,13 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       public void receivedStatus(OperationStatus status) {
         switch (status.getStatusCode()) {
           case SUCCESS:
+          case ERR_NOT_FOUND_ELEMENT:
             break;
           case TRIMMED:
             result.get().trimmed();
             break;
           case ERR_NOT_FOUND:
             result.set(null);
-            break;
-          case ERR_NOT_FOUND_ELEMENT:
             break;
           case CANCELLED:
             future.internalCancel();
