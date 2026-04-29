@@ -280,13 +280,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return multiStore(StoreType.replace, items, exp);
   }
 
-  /**
-   * @param type     store type
-   * @param items map of key to value to store
-   * @param exp      expiration time
-   * @return ArcusFuture with Map of key to Boolean result. If an operation fails exceptionally,
-   * the corresponding value in the map will be null.
-   */
   private ArcusFuture<Map<String, Boolean>> multiStore(StoreType type,
                                                        Map<String, T> items,
                                                        int exp) {
@@ -297,7 +290,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       keyToFuture.put(key, future);
     });
 
-    /* Combine multiple CompletableFutures into a single ArcusFuture. */
     return new ArcusMultiFuture<>(keyToFuture.values(), () -> {
       Map<String, Boolean> results = new HashMap<>();
       keyToFuture.forEach((key, future) -> {
@@ -396,6 +388,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Map<String, T>> multiGet(List<String> keys) {
+    keyValidator.validateKey(keys);
+    keyValidator.checkDupKey(keys);
+
     ArcusClient client = arcusClientSupplier.get();
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys
         = client.groupingKeys(keys, MemcachedClient.GET_BULK_CHUNK_SIZE, APIType.GET);
@@ -411,11 +406,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       futures.add(future);
     }
 
-    /*
-     * Combine all futures. If any future fails exceptionally,
-     * the corresponding keys will have null values in the result map.
-     * If cache miss occurs, the corresponding key will not be present in the result map.
-     */
     return new ArcusMultiFuture<>(futures, () -> {
       Map<String, T> results = new HashMap<>();
 
@@ -558,6 +548,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Map<String, CASValue<T>>> multiGets(List<String> keys) {
+    keyValidator.validateKey(keys);
+    keyValidator.checkDupKey(keys);
+
     ArcusClient client = arcusClientSupplier.get();
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys
             = client.groupingKeys(keys, MemcachedClient.GET_BULK_CHUNK_SIZE, APIType.GETS);
@@ -687,8 +680,9 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Map<String, Boolean>> multiDelete(List<String> keys) {
-    Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(keys.size());
+    keyValidator.checkDupKey(keys);
 
+    Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(keys.size());
     for (String key : keys) {
       CompletableFuture<Boolean> future = delete(key).toCompletableFuture();
       keyToFuture.put(key, future);
@@ -1101,12 +1095,12 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   public ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(List<String> keys,
                                                                 BKey from, BKey to,
                                                                 BopGetArgs args) {
+    keyValidator.validateKey(keys);
+    keyValidator.checkDupKey(keys);
     verifyBKeyRange(from, to);
     verifyPositiveCountArg(args, ArcusClient.MAX_GETBULK_ELEMENT_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
-    keyValidator.validateKey(keys);
-    keyValidator.checkDupKey(keys);
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys =
         client.groupingKeys(keys, ArcusClient.BOPGET_BULK_CHUNK_SIZE, APIType.BOP_GET);
 
@@ -1448,13 +1442,12 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
                                                        boolean unique, BopGetArgs args) {
+    keyValidator.validateKey(keys);
+    keyValidator.checkDupKey(keys);
     verifyBKeyRange(from, to);
     verifyPositiveCountArg(args, ArcusClient.MAX_SMGET_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
-    keyValidator.validateKey(keys);
-    keyValidator.checkDupKey(keys);
-
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys =
         client.groupingKeys(keys, ArcusClient.SMGET_CHUNK_SIZE, APIType.BOP_SMGET);
 
@@ -1968,6 +1961,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
                                         CollectionAttributes attributes) {
+    if (attributes == null) {
+      throw new IllegalArgumentException("CollectionAttributes cannot be null");
+    }
+
     MapCreate create = new MapCreate(TranscoderUtils.examineFlags(type),
             attributes.getExpireTime(), attributes.getMaxCount(),
             attributes.getReadable(), false);
@@ -1980,6 +1977,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> mopInsert(String key, String mKey, T value,
                                         CollectionAttributes attributes) {
+    keyValidator.validateMKey(mKey);
+
     MapInsert<T> insert = new MapInsert<>(value, null, attributes);
     return collectionInsert(key, mKey, insert);
   }
@@ -1990,11 +1989,15 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   public ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value,
                                         CollectionAttributes attributes) {
+    keyValidator.validateMKey(mKey);
+
     MapUpsert<T> upsert = new MapUpsert<>(value, attributes);
     return collectionInsert(key, mKey, upsert);
   }
 
   public ArcusFuture<Boolean> mopUpdate(String key, String mKey, T value) {
+    keyValidator.validateMKey(mKey);
+
     MapUpdate<T> update = new MapUpdate<>(value, false);
     return collectionUpdate(key, mKey, update);
   }
@@ -2004,6 +2007,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<T> mopGet(String key, String mKey, GetArgs args) {
+    keyValidator.validateMKey(mKey);
+
     AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
     List<String> mKeys = Collections.singletonList(mKey);
@@ -2050,6 +2055,14 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args) {
+    if (mKeys == null) {
+      throw new IllegalArgumentException("mKeys cannot be null");
+    }
+
+    if (!mKeys.isEmpty()) {
+      keyValidator.validateMKey(mKeys);
+    }
+
     AbstractArcusResult<Map<String, T>> result =
             new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
     ArcusFutureImpl<Map<String, T>> future = new ArcusFutureImpl<>(result);
@@ -2104,6 +2117,14 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty) {
+    if (mKeys == null) {
+      throw new IllegalArgumentException("mKeys cannot be null");
+    }
+
+    if (!mKeys.isEmpty()) {
+      keyValidator.validateMKey(mKeys);
+    }
+
     MapDelete delete = new MapDelete(mKeys, dropIfEmpty, false);
     return collectionDelete(key, delete);
   }
