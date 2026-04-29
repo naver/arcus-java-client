@@ -47,7 +47,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslClient;
 
 import net.spy.memcached.auth.AuthDescriptor;
@@ -64,6 +63,8 @@ import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.OperationState;
 import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.OperationType;
+
+import static net.spy.memcached.auth.ScramSaslClient.ScramSaslClientFactory;
 
 /**
  * Connection to a cluster of memcached servers.
@@ -618,7 +619,7 @@ public final class MemcachedConnection extends SpyObject {
 
     final SaslClient sc;
     try {
-      sc = Sasl.createSaslClient(authDescriptor.getMechs(), null,
+      sc = new ScramSaslClientFactory().createSaslClient(authDescriptor.getMechs(), null,
               "memcached", node.getSocketAddress().toString(), null, authDescriptor.getCallback());
     } catch (Exception e) {
       throw new IllegalStateException("Can't create SaslClient", e);
