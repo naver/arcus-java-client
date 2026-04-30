@@ -122,9 +122,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @SuppressWarnings("unchecked")
   public AsyncArcusCommands(Supplier<ArcusClient> arcusClientSupplier) {
-    this.tc = (Transcoder<T>) arcusClientSupplier.get().getTranscoder();
-    this.tcForCollection = (Transcoder<T>) arcusClientSupplier.get().getCollectionTranscoder();
-    this.keyValidator = arcusClientSupplier.get().getKeyValidator();
+    ArcusClient client = arcusClientSupplier.get();
+    this.tc = (Transcoder<T>) client.getTranscoder();
+    this.tcForCollection = (Transcoder<T>) client.getCollectionTranscoder();
+    this.keyValidator = client.getKeyValidator();
     this.arcusClientSupplier = arcusClientSupplier;
   }
 
@@ -401,7 +402,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKeys) {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
-      CompletableFuture<Map<String, T>> future = get(client, node, keyList).toCompletableFuture();
+      CompletableFuture<Map<String, T>> future = getPerNode(client, node, keyList)
+              .toCompletableFuture();
       futureToKeys.put(future, keyList);
       futures.add(future);
     }
@@ -423,14 +425,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     });
   }
 
-  /**
-   * Use only in multiGet method.
-   *
-   * @param keyList key list to get from single node
-   * @return ArcusFuture with results
-   */
-  private ArcusFuture<Map<String, T>> get(ArcusClient client, MemcachedNode node,
-                                          List<String> keyList) {
+  private ArcusFuture<Map<String, T>> getPerNode(ArcusClient client, MemcachedNode node,
+                                                 List<String> keyList) {
     AbstractArcusResult<Map<String, CachedData>> result
         = new AbstractArcusResult<>((new AtomicReference<>(new HashMap<>())));
     @SuppressWarnings("unchecked")
@@ -481,7 +477,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     return future;
   }
-
 
   public ArcusFuture<Long> incr(String key, int delta) {
     return mutate(Mutator.incr, key, delta, -1L, 0);
@@ -562,7 +557,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       MemcachedNode node = entry.getKey();
       List<String> keyList = entry.getValue();
       CompletableFuture<Map<String, CASValue<T>>> future
-              = gets(client, node, keyList).toCompletableFuture();
+              = getsPerNode(client, node, keyList).toCompletableFuture();
       futureToKeys.put(future, keyList);
       futures.add(future);
     }
@@ -583,14 +578,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     });
   }
 
-  /**
-   * Use only in multiGets method.
-   *
-   * @param keyList key list to get from single node
-   * @return ArcusFuture with results.
-   */
-  private ArcusFuture<Map<String, CASValue<T>>> gets(ArcusClient client, MemcachedNode node,
-                                                     List<String> keyList) {
+  private ArcusFuture<Map<String, CASValue<T>>> getsPerNode(ArcusClient client, MemcachedNode node,
+                                                            List<String> keyList) {
     AbstractArcusResult<Map<String, GetsResultImpl<T>>> result
             = new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
 
@@ -639,7 +628,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     return future;
   }
-
 
   public ArcusFuture<Boolean> delete(String key) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
@@ -1030,7 +1018,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<BTreeElements<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args) {
-    verifyBKeyRange(from, to);
+    verifyBKeyTypesMatch(from, to);
 
     AbstractArcusResult<BTreeElements<T>> result =
         new AbstractArcusResult<>(new AtomicReference<>(new BTreeElements<>(new ArrayList<>())));
@@ -1098,7 +1086,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
                                                                 BopGetArgs args) {
     keyValidator.validateKey(keys);
     keyValidator.checkDupKey(keys);
-    verifyBKeyRange(from, to);
+    verifyBKeyTypesMatch(from, to);
     verifyPositiveCountArg(args, ArcusClient.MAX_GETBULK_ELEMENT_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
@@ -1226,7 +1214,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
-  private static void verifyBKeyRange(BKey from, BKey to) {
+  private static void verifyBKeyTypesMatch(BKey from, BKey to) {
     if (from.getType() != to.getType()) {
       throw new IllegalArgumentException("Two BKey types(from, to) must be the same.");
     }
@@ -1445,7 +1433,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
                                                        boolean unique, BopGetArgs args) {
     keyValidator.validateKey(keys);
     keyValidator.checkDupKey(keys);
-    verifyBKeyRange(from, to);
+    verifyBKeyTypesMatch(from, to);
     verifyPositiveCountArg(args, ArcusClient.MAX_SMGET_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
@@ -1633,7 +1621,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args) {
-    verifyBKeyRange(from, to);
+    verifyBKeyTypesMatch(from, to);
     BTreeDelete delete = new BTreeDelete(from.toString(), to.toString(),
             args.getCount(), args.getEFlagFilter(), args.isDropIfEmpty(), false);
     return collectionDelete(key, delete);
@@ -1681,7 +1669,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   public ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter) {
-    verifyBKeyRange(from, to);
+    verifyBKeyTypesMatch(from, to);
 
     AbstractArcusResult<Long> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Long> future = new ArcusFutureImpl<>(result);
@@ -2152,7 +2140,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         public void receivedStatus(OperationStatus status) {
           switch (status.getStatusCode()) {
             case SUCCESS:
-              result.set(true);
               break;
             case CANCELLED:
               future.internalCancel();
@@ -2230,7 +2217,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       client.addOp(node, op);
       futures.add(future);
     }
-
 
     return new ArcusMultiFuture<>(futures, () -> {
       for (CompletableFuture<?> future : futures) {
