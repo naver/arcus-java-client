@@ -821,7 +821,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Flush all items from all servers immediately.
    *
-   * @return {@code true} if all servers flushed successfully, {@code false} otherwise
+   * @return always {@code true}
    */
   ArcusFuture<Boolean> flush();
 
@@ -829,7 +829,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Flush all items from all servers after a given delay.
    *
    * @param delay delay in seconds before flushing. (&ge; -1)
-   * @return {@code true} if all servers flushed successfully, {@code false} otherwise
+   * @return always {@code true}
    */
   ArcusFuture<Boolean> flush(int delay);
 
