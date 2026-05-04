@@ -69,37 +69,6 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<Boolean> replace(String key, int exp, T value);
 
-
-  /**
-   * Perform a compare-and-set operation for the given key.
-   *
-   * @param key   the key to set
-   * @param exp   expiration time in seconds
-   * @param value the new value to set if the CAS ID matches
-   * @param casId the CAS ID obtained from {@link #gets(String)}
-   * @return {@code true} if compared and set successfully,
-   * {@code false} if the key does not exist or CAS ID does not match
-   */
-  ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
-
-  /**
-   * Append String or byte[] to an existing same type of value.
-   *
-   * @param key   the key
-   * @param value the value to append
-   * @return {@code true} if appended, otherwise {@code false}
-   */
-  ArcusFuture<Boolean> append(String key, T value);
-
-  /**
-   * Prepend String or byte[] to an existing same type of value.
-   *
-   * @param key   the key
-   * @param value the value to prepend
-   * @return {@code true} if prepended, otherwise {@code false}
-   */
-  ArcusFuture<Boolean> prepend(String key, T value);
-
   /**
    * Sets multiple key-value pairs.
    *
@@ -128,28 +97,34 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp);
 
   /**
-   * Get a value for the given key.
+   * Prepend String or byte[] to an existing same type of value.
    *
-   * @param key the key
-   * @return the value, or {@code null} if not found
+   * @param key   the key
+   * @param value the value to prepend
+   * @return {@code true} if prepended, otherwise {@code false}
    */
-  ArcusFuture<T> get(String key);
+  ArcusFuture<Boolean> prepend(String key, T value);
 
   /**
-   * Get a value and its CAS ID for the given key.
+   * Append String or byte[] to an existing same type of value.
    *
-   * @param key the key
-   * @return {@link CASValue}, {@code null} if not found
+   * @param key   the key
+   * @param value the value to append
+   * @return {@code true} if appended, otherwise {@code false}
    */
-  ArcusFuture<CASValue<T>> gets(String key);
+  ArcusFuture<Boolean> append(String key, T value);
 
   /**
-   * Get values for multiple keys.
+   * Perform a compare-and-set operation for the given key.
    *
-   * @param keys list of keys to get
-   * @return Map of key to value
+   * @param key   the key to set
+   * @param exp   expiration time in seconds
+   * @param value the new value to set if the CAS ID matches
+   * @param casId the CAS ID obtained from {@link #gets(String)}
+   * @return {@code true} if compared and set successfully,
+   * {@code false} if the key does not exist or CAS ID does not match
    */
-  ArcusFuture<Map<String, T>> multiGet(List<String> keys);
+  ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
 
   /**
    * Increments a numeric value stored at the given key by {@code delta}.
@@ -198,6 +173,31 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Long> decr(String key, int delta, long initial, int exp);
 
   /**
+   * Get a value for the given key.
+   *
+   * @param key the key
+   * @return the value, or {@code null} if not found
+   */
+  ArcusFuture<T> get(String key);
+
+  /**
+   * Get a value and its CAS ID for the given key.
+   *
+   * @param key the key
+   * @return {@link CASValue}, {@code null} if not found
+   */
+  ArcusFuture<CASValue<T>> gets(String key);
+
+  /**
+   * Get values for multiple keys.
+   *
+   * @param keys list of keys to get
+   * @return Map of key to value
+   */
+  ArcusFuture<Map<String, T>> multiGet(List<String> keys);
+
+
+  /**
    * Get values with CAS for multiple keys.
    *
    * @param keys list of keys to get
@@ -221,310 +221,6 @@ public interface AsyncArcusCommandsIF<T> {
    * @return Map of key to Boolean result
    */
   ArcusFuture<Map<String, Boolean>> multiDelete(List<String> keys);
-
-  /**
-   * Create a btree item.
-   *
-   * @param key        key to create
-   * @param type       btree element value type
-   * @param attributes collection attributes (must not be null)
-   * @return {@code true} if created, otherwise {@code false}
-   */
-  ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
-                                 CollectionAttributes attributes);
-
-  /**
-   * Insert an element into a btree item.
-   *
-   * @param key        key to insert
-   * @param element    btree element to insert
-   * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code true} if inserted,
-   * {@code false} if element exists,
-   * {@code null} if key is not found
-   */
-  ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element,
-                                 CollectionAttributes attributes);
-
-  /**
-   * Insert an element into a btree item.
-   *
-   * @param key     key to insert
-   * @param element btree element to insert
-   * @return {@code true} if inserted,
-   * {@code false} if element exists,
-   * {@code null} if key is not found
-   */
-  ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element);
-
-  /**
-   * Upsert an element into a btree item.
-   *
-   * @param key        key to upsert
-   * @param element    btree element to upsert
-   * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code true} if upserted, {@code null} if the key is not found
-   */
-  ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
-                                 CollectionAttributes attributes);
-
-  /**
-   * Upsert an element into a btree item.
-   *
-   * @param key     key to upsert
-   * @param element btree element to upsert
-   * @return {@code true} if upserted, {@code null} if the key is not found
-   */
-  ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element);
-
-  /**
-   * Update an element in a btree item
-   *
-   * @param key     key to update
-   * @param element btree element to update
-   * @return {@code true} if updated,
-   * {@code false} if element does not exist,
-   * {@code null} if key is not found
-   */
-  ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element);
-
-  /**
-   * Insert an element into a btree item and get trimmed element if overflow trim occurs.
-   *
-   * @param key        key to insert
-   * @param element    btree element to insert
-   * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code Map.Entry} with insertion result and trimmed element
-   */
-  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
-          String key, BTreeElement<T> element, CollectionAttributes attributes);
-
-  /**
-   * Insert an element into a btree item and get trimmed element if overflow trim occurs.
-   *
-   * @param key     key to insert
-   * @param element btree element to insert
-   * @return {@code Map.Entry} with insertion result and trimmed element
-   */
-  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(String key,
-                                                                          BTreeElement<T> element);
-
-  /**
-   * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
-   *
-   * @param key        key to upsert
-   * @param element    btree element to upsert
-   * @param attributes collection attributes for creation when the btree does not exist
-   * @return {@code Map.Entry} with upsertion result and trimmed element
-   */
-  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
-          String key, BTreeElement<T> element, CollectionAttributes attributes);
-
-  /**
-   * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
-   *
-   * @param key     key to upsert
-   * @param element btree element to upsert
-   * @return {@code Map.Entry} with upsertion result and trimmed element
-   */
-  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(String key,
-                                                                          BTreeElement<T> element);
-
-  /**
-   * Get an element from a btree item.
-   *
-   * @param key  key to get
-   * @param bKey BKey of the element to get
-   * @param args arguments for get operation
-   * @return the {@code BTreeElement} if found,
-   * {@code BTreeElement} with null value and null eFlag if element is not found but key exists,
-   * {@code null} if key is not found
-   */
-  ArcusFuture<BTreeElement<T>> bopGet(String key, BKey bKey, BopGetArgs args);
-
-  /**
-   * Get elements from a btree item.
-   *
-   * @param key  key to get
-   * @param from BKey range start
-   * @param to   BKey range end
-   * @param args arguments for get operation
-   * @return {@code BTreeElements} with found elements,
-   * empty {@code BTreeElements} if no elements are found in the range but key exists,
-   * {@code null} if key is not found
-   */
-  ArcusFuture<BTreeElements<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
-
-  /**
-   * Get elements from multiple btree items.
-   *
-   * @param keys list of keys to get
-   * @param from BKey range start
-   * @param to   BKey range end
-   * @param args arguments for get operation
-   * @return map of key to {@code BTreeElements} with found elements,
-   * empty {@code BTreeElements} if no elements are found in the range but key exists,
-   * no {@code Map.Entry} in the map if the key is not found
-   */
-  ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(List<String> keys,
-                                                         BKey from, BKey to,
-                                                         BopGetArgs args);
-
-  /**
-   * Get the position of an element with the given bKey in a btree item.
-   *
-   * @param key   key of the btree item
-   * @param bKey  BKey of the element to find
-   * @param order the order of the btree to determine position
-   * @return the 0-based position of the element,
-   * {@code null} if the key or element is not found
-   */
-  ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order);
-
-  /**
-   * Get an element at the given position in a btree item.
-   *
-   * @param key   key of the btree item
-   * @param pos   0-based position of the element to get
-   * @param order the order of the btree to determine position
-   * @return the {@code BTreeElement} at the given position,
-   * {@code null} if the key or element is not found
-   */
-  ArcusFuture<BTreeElement<T>> bopGetByPosition(String key, int pos, BTreeOrder order);
-
-  /**
-   * Get elements in a position range from a btree item.
-   *
-   * @param key   key of the btree item
-   * @param from  start position (inclusive)
-   * @param to    end position (inclusive); must be greater than or equal to {@code from}
-   * @param order the order of the btree to determine position
-   * @return list of {@code BTreeElement} in the given position range, in traversal order,
-   * empty list if no elements exist in the range,
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<List<BTreeElement<T>>> bopGetByPosition(String key,
-                                                      int from, int to, BTreeOrder order);
-
-  /**
-   * Get an element by bKey and its neighboring elements with position information.
-   *
-   * @param key   key of the btree item
-   * @param bKey  BKey of the element to find
-   * @param count the number of neighboring elements to retrieve on each side
-   *              (0 &le; count &le; 100)
-   * @param order the order of the btree to determine position
-   * @return list of {@code BTreePositionElement} in traversal order,
-   * empty list if the element is not found,
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<List<BTreePositionElement<T>>> bopPositionWithGet(String key, BKey bKey,
-                                                                int count, BTreeOrder order);
-
-  /**
-   * Get sort-merged elements from multiple btree items.
-   *
-   * @param keys   list of keys to get
-   * @param from   BKey range start
-   * @param to     BKey range end
-   * @param unique whether to return unique elements only
-   * @param args   arguments for get operation
-   * @return {@code SMGetElements} containing sort-merged elements,
-   * empty {@code SMGetElements} if no matching elements exist
-   */
-  ArcusFuture<SMGetElements<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
-                                                boolean unique, BopGetArgs args);
-
-  /**
-   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}
-   *
-   * @param key   key of the btree item
-   * @param bKey  BKey of the element to increment
-   * @param delta the amount to increment (&gt; 0)
-   * @return the new value after increment, or {@code null} if the key or element is not found
-   */
-  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta);
-
-  /**
-   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}.
-   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
-   *
-   * @param key     key of the btree item
-   * @param bKey    BKey of the element to increment
-   * @param delta   the amount to increment (&gt; 0)
-   * @param initial the value to store if the element does not exist
-   *                ({@code delta} is ignored) (&ge; 0)
-   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
-   * @return the new value after increment, or {@code initial} if the element did not exist
-   */
-  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
-
-  /**
-   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
-   * <p>If the value is decremented below 0, it will be set to 0.</p>
-   *
-   * @param key   key of the btree item
-   * @param bKey  BKey of the element to decrement
-   * @param delta the amount to decrement (&gt; 0)
-   * @return the new value after decrement, or {@code null} if the key or element is not found
-   */
-  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta);
-
-  /**
-   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
-   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
-   * <p>If the value is decremented below 0, it will be set to 0.</p>
-   *
-   * @param key     key of the btree item
-   * @param bKey    BKey of the element to decrement
-   * @param delta   the amount to decrement (&gt; 0)
-   * @param initial the value to store if the element does not exist
-   *                ({@code delta} is ignored) (&ge; 0)
-   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
-   * @return the new value after decrement, or {@code initial} if the element did not exist
-   */
-  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
-
-  /**
-   * Delete an element with the given bKey from a btree item.
-   *
-   * @param key  key of the btree item
-   * @param bKey BKey of the element to delete
-   * @param args delete arguments (eFlagFilter, dropIfEmpty)
-   * @return {@code true} if the element was deleted,
-   * {@code false} if the element is not found,
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args);
-
-  /**
-   * Delete elements in a bKey range from a btree item.
-   * Elements are deleted in order from {@code from} to {@code to}.
-   * <p>If {@code args.count} is 0 (default), all elements in the range are deleted. </p>
-   * Otherwise, only the first {@code args.count} elements (in {@code from}-to-{@code to} order)
-   * are deleted.
-   *
-   * @param key  key of the btree item
-   * @param from BKey range start (inclusive)
-   * @param to   BKey range end (inclusive)
-   * @param args delete arguments (count, eFlagFilter, dropIfEmpty)
-   * @return {@code true} if at least one element was deleted,
-   * {@code false} if no elements are found in the range,
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args);
-
-  /**
-   * Count elements in a bKey range from a btree item.
-   *
-   * @param key         key of the btree item
-   * @param from        BKey range start (inclusive)
-   * @param to          BKey range end (inclusive)
-   * @param eFlagFilter eFlag filter condition, or {@code null} to count all elements in the range
-   * @return the number of elements in the range (0 if none exist),
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
 
   /**
    * Create a list with the given attributes.
@@ -642,17 +338,6 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes);
 
   /**
-   * Check whether an element exists in a set.
-   *
-   * @param key   key of the set
-   * @param value the value to check
-   * @return {@code true} if the element exists,
-   * {@code false} if the element is not found,
-   * {@code null} if the key is not found
-   */
-  ArcusFuture<Boolean> sopExist(String key, T value);
-
-  /**
    * Get elements randomly from a set.
    *
    * @param key   key of the set
@@ -662,6 +347,17 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code null} if the key is not found
    */
   ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args);
+
+  /**
+   * Check whether an element exists in a set.
+   *
+   * @param key   key of the set
+   * @param value the value to check
+   * @return {@code true} if the element exists,
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<Boolean> sopExist(String key, T value);
 
   /**
    * Delete an element from a set.
@@ -817,6 +513,309 @@ public interface AsyncArcusCommandsIF<T> {
    */
   ArcusFuture<Boolean> mopDelete(String key, List<String> mKeys, boolean dropIfEmpty);
 
+  /**
+   * Create a btree item.
+   *
+   * @param key        key to create
+   * @param type       btree element value type
+   * @param attributes collection attributes (must not be null)
+   * @return {@code true} if created, otherwise {@code false}
+   */
+  ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Insert an element into a btree item.
+   *
+   * @param key     key to insert
+   * @param element btree element to insert
+   * @return {@code true} if inserted,
+   * {@code false} if element exists,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element);
+
+  /**
+   * Insert an element into a btree item.
+   *
+   * @param key        key to insert
+   * @param element    btree element to insert
+   * @param attributes collection attributes for creation when the btree does not exist
+   * @return {@code true} if inserted,
+   * {@code false} if element exists,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Insert an element into a btree item and get trimmed element if overflow trim occurs.
+   *
+   * @param key     key to insert
+   * @param element btree element to insert
+   * @return {@code Map.Entry} with insertion result and trimmed element
+   */
+  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
+      String key, BTreeElement<T> element);
+
+  /**
+   * Insert an element into a btree item and get trimmed element if overflow trim occurs.
+   *
+   * @param key        key to insert
+   * @param element    btree element to insert
+   * @param attributes collection attributes for creation when the btree does not exist
+   * @return {@code Map.Entry} with insertion result and trimmed element
+   */
+  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
+      String key, BTreeElement<T> element, CollectionAttributes attributes);
+
+  /**
+   * Upsert an element into a btree item.
+   *
+   * @param key     key to upsert
+   * @param element btree element to upsert
+   * @return {@code true} if upserted, {@code null} if the key is not found
+   */
+  ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element);
+
+  /**
+   * Upsert an element into a btree item.
+   *
+   * @param key        key to upsert
+   * @param element    btree element to upsert
+   * @param attributes collection attributes for creation when the btree does not exist
+   * @return {@code true} if upserted, {@code null} if the key is not found
+   */
+  ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
+                                 CollectionAttributes attributes);
+
+  /**
+   * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
+   *
+   * @param key     key to upsert
+   * @param element btree element to upsert
+   * @return {@code Map.Entry} with upsertion result and trimmed element
+   */
+  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
+      String key, BTreeElement<T> element);
+
+  /**
+   * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
+   *
+   * @param key        key to upsert
+   * @param element    btree element to upsert
+   * @param attributes collection attributes for creation when the btree does not exist
+   * @return {@code Map.Entry} with upsertion result and trimmed element
+   */
+  ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
+      String key, BTreeElement<T> element, CollectionAttributes attributes);
+
+  /**
+   * Update an element in a btree item
+   *
+   * @param key     key to update
+   * @param element btree element to update
+   * @return {@code true} if updated,
+   * {@code false} if element does not exist,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<Boolean> bopUpdate(String key, BTreeUpdateElement<T> element);
+
+  /**
+   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to increment
+   * @param delta the amount to increment (&gt; 0)
+   * @return the new value after increment, or {@code null} if the key or element is not found
+   */
+  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta);
+
+  /**
+   * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
+   *
+   * @param key     key of the btree item
+   * @param bKey    BKey of the element to increment
+   * @param delta   the amount to increment (&gt; 0)
+   * @param initial the value to store if the element does not exist
+   *                ({@code delta} is ignored) (&ge; 0)
+   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
+   * @return the new value after increment, or {@code initial} if the element did not exist
+   */
+  ArcusFuture<Long> bopIncr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
+
+  /**
+   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to decrement
+   * @param delta the amount to decrement (&gt; 0)
+   * @return the new value after decrement, or {@code null} if the key or element is not found
+   */
+  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta);
+
+  /**
+   * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
+   * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
+   * <p>If the value is decremented below 0, it will be set to 0.</p>
+   *
+   * @param key     key of the btree item
+   * @param bKey    BKey of the element to decrement
+   * @param delta   the amount to decrement (&gt; 0)
+   * @param initial the value to store if the element does not exist
+   *                ({@code delta} is ignored) (&ge; 0)
+   * @param eFlag   eFlag of the element to create, or {@code null} if not needed
+   * @return the new value after decrement, or {@code initial} if the element did not exist
+   */
+  ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
+
+  /**
+   * Get an element from a btree item.
+   *
+   * @param key  key to get
+   * @param bKey BKey of the element to get
+   * @param args arguments for get operation
+   * @return the {@code BTreeElement} if found,
+   * {@code BTreeElement} with null value and null eFlag if element is not found but key exists,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<BTreeElement<T>> bopGet(String key, BKey bKey, BopGetArgs args);
+
+  /**
+   * Get elements from a btree item.
+   *
+   * @param key  key to get
+   * @param from BKey range start
+   * @param to   BKey range end
+   * @param args arguments for get operation
+   * @return {@code BTreeElements} with found elements,
+   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * {@code null} if key is not found
+   */
+  ArcusFuture<BTreeElements<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
+
+  /**
+   * Get elements from multiple btree items.
+   *
+   * @param keys list of keys to get
+   * @param from BKey range start
+   * @param to   BKey range end
+   * @param args arguments for get operation
+   * @return map of key to {@code BTreeElements} with found elements,
+   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * no {@code Map.Entry} in the map if the key is not found
+   */
+  ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(
+      List<String> keys, BKey from, BKey to, BopGetArgs args);
+
+  /**
+   * Get sort-merged elements from multiple btree items.
+   *
+   * @param keys   list of keys to get
+   * @param from   BKey range start
+   * @param to     BKey range end
+   * @param unique whether to return unique elements only
+   * @param args   arguments for get operation
+   * @return {@code SMGetElements} containing sort-merged elements,
+   * empty {@code SMGetElements} if no matching elements exist
+   */
+  ArcusFuture<SMGetElements<T>> bopSortMergeGet(
+      List<String> keys, BKey from, BKey to, boolean unique, BopGetArgs args);
+
+  /**
+   * Get the position of an element with the given bKey in a btree item.
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to find
+   * @param order the order of the btree to determine position
+   * @return the 0-based position of the element,
+   * {@code null} if the key or element is not found
+   */
+  ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order);
+
+  /**
+   * Get an element at the given position in a btree item.
+   *
+   * @param key   key of the btree item
+   * @param pos   0-based position of the element to get
+   * @param order the order of the btree to determine position
+   * @return the {@code BTreeElement} at the given position,
+   * {@code null} if the key or element is not found
+   */
+  ArcusFuture<BTreeElement<T>> bopGetByPosition(
+      String key, int pos, BTreeOrder order);
+
+  /**
+   * Get elements in a position range from a btree item.
+   *
+   * @param key   key of the btree item
+   * @param from  start position (inclusive)
+   * @param to    end position (inclusive); must be greater than or equal to {@code from}
+   * @param order the order of the btree to determine position
+   * @return list of {@code BTreeElement} in the given position range, in traversal order,
+   * empty list if no elements exist in the range,
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<List<BTreeElement<T>>> bopGetByPosition(
+      String key, int from, int to, BTreeOrder order);
+
+  /**
+   * Get an element by bKey and its neighboring elements with position information.
+   *
+   * @param key   key of the btree item
+   * @param bKey  BKey of the element to find
+   * @param count the number of neighboring elements to retrieve on each side
+   *              (0 &le; count &le; 100)
+   * @param order the order of the btree to determine position
+   * @return list of {@code BTreePositionElement} in traversal order,
+   * empty list if the element is not found,
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<List<BTreePositionElement<T>>> bopPositionWithGet(
+      String key, BKey bKey, int count, BTreeOrder order);
+
+  /**
+   * Count elements in a bKey range from a btree item.
+   *
+   * @param key         key of the btree item
+   * @param from        BKey range start (inclusive)
+   * @param to          BKey range end (inclusive)
+   * @param eFlagFilter eFlag filter condition, or {@code null} to count all elements in the range
+   * @return the number of elements in the range (0 if none exist),
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
+
+  /**
+   * Delete an element with the given bKey from a btree item.
+   *
+   * @param key  key of the btree item
+   * @param bKey BKey of the element to delete
+   * @param args delete arguments (eFlagFilter, dropIfEmpty)
+   * @return {@code true} if the element was deleted,
+   * {@code false} if the element is not found,
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args);
+
+  /**
+   * Delete elements in a bKey range from a btree item.
+   * Elements are deleted in order from {@code from} to {@code to}.
+   * <p>If {@code args.count} is 0 (default), all elements in the range are deleted. </p>
+   * Otherwise, only the first {@code args.count} elements (in {@code from}-to-{@code to} order)
+   * are deleted.
+   *
+   * @param key  key of the btree item
+   * @param from BKey range start (inclusive)
+   * @param to   BKey range end (inclusive)
+   * @param args delete arguments (count, eFlagFilter, dropIfEmpty)
+   * @return {@code true} if at least one element was deleted,
+   * {@code false} if no elements are found in the range,
+   * {@code null} if the key is not found
+   */
+  ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args);
 
   /**
    * Flush all items from all servers immediately.
