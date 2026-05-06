@@ -23,6 +23,7 @@ import net.spy.memcached.ops.OperationStatus;
 
 /**
  * Class to hold the result and errors occurred during Arcus operation.
+ *
  * @param <T> the type of the result
  */
 public interface ArcusResult<T> {
