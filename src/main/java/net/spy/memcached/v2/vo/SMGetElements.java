@@ -34,7 +34,7 @@ public final class SMGetElements<V> {
 
     // 1) Collect elements considering unique, count option.
     mergeSMGetElements(smGetElementsList, elements, missedKeys, trimmedKeys,
-            ascending, unique, count);
+        ascending, unique, count);
 
     // 2) Sort missed keys, and trimmed keys
     Collections.sort(missedKeys);
@@ -53,15 +53,15 @@ public final class SMGetElements<V> {
   }
 
   private static <T> void mergeSMGetElements(
-          List<SMGetElements<T>> smGetElementsList,
-          List<Element<T>> elements,
-          List<MissedKey> missedKeys,
-          List<TrimmedKey> trimmedKeys,
-          boolean ascending, boolean unique, int count) {
+      List<SMGetElements<T>> smGetElementsList,
+      List<Element<T>> elements,
+      List<MissedKey> missedKeys,
+      List<TrimmedKey> trimmedKeys,
+      boolean ascending, boolean unique, int count) {
     // 1) Create Priority queue to hold the current smallest/largest element from each list
     Comparator<ElementWithIndex<T>> comparator = ascending
-            ? Comparator.naturalOrder()
-            : Comparator.reverseOrder();
+        ? Comparator.naturalOrder()
+        : Comparator.reverseOrder();
     PriorityQueue<ElementWithIndex<T>> pq = new PriorityQueue<>(comparator);
 
     // 2) Initialize the priority queue with the first element from each list
@@ -93,7 +93,7 @@ public final class SMGetElements<V> {
       List<Element<T>> sourceList = smGetElementsList.get(current.listIndex).getElements();
       if (nextIndex < sourceList.size()) {
         pq.offer(new ElementWithIndex<>(sourceList.get(nextIndex),
-                current.listIndex, nextIndex));
+            current.listIndex, nextIndex));
       }
     }
   }

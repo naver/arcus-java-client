@@ -7,6 +7,12 @@ import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.util.BTreeUtil;
 
 public final class BKey implements Comparable<BKey> {
+
+  public enum BKeyType {
+    BYTE_ARRAY,
+    LONG
+  }
+
   private final BKeyType type;
   private final Object data;
 
@@ -69,11 +75,6 @@ public final class BKey implements Comparable<BKey> {
     } else {
       return new BKey(bkeyObject.getLongBKey());
     }
-  }
-
-  public enum BKeyType {
-    BYTE_ARRAY,
-    LONG;
   }
 
   public Object getData() {

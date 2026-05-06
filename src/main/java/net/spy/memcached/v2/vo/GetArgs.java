@@ -7,17 +7,17 @@ public final class GetArgs {
   private final boolean withDelete;
   private final boolean dropIfEmpty;
 
+  private GetArgs(boolean withDelete, boolean dropIfEmpty) {
+    this.withDelete = withDelete;
+    this.dropIfEmpty = dropIfEmpty;
+  }
+
   public boolean isWithDelete() {
     return withDelete;
   }
 
   public boolean isDropIfEmpty() {
     return dropIfEmpty;
-  }
-
-  private GetArgs(boolean withDelete, boolean dropIfEmpty) {
-    this.withDelete = withDelete;
-    this.dropIfEmpty = dropIfEmpty;
   }
 
   public static class Builder {

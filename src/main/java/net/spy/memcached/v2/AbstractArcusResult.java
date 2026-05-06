@@ -28,12 +28,12 @@ import net.spy.memcached.ops.OperationStatus;
 
 public class AbstractArcusResult<T> implements ArcusResult<T> {
 
-  protected AtomicReference<T> value;
-
-  private final List<Exception> exceptions = new ArrayList<>();
+  private final AtomicReference<T> value;
+  private final List<Exception> exceptions;
 
   public AbstractArcusResult(AtomicReference<T> value) {
     this.value = value;
+    this.exceptions = new ArrayList<>();
   }
 
   @Override

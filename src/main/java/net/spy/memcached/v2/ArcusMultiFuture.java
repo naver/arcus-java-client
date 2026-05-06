@@ -32,8 +32,6 @@ import net.spy.memcached.internal.CompositeException;
  * also completes exceptionally. If multiple futures completed exceptionally,
  * This future will throw CompositeException containing all exceptions.
  * And the combined result can be obtained.
- *
- * @param <T>
  */
 public final class ArcusMultiFuture<T> extends CompletableFuture<T> implements ArcusFuture<T> {
 
