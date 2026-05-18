@@ -17,6 +17,10 @@ public final class BTreeElement<V> implements Comparable<BTreeElement<V>> {
     this.eFlag = eFlag;
   }
 
+  public BTreeElement(BKey bKey, V value) {
+    this(bKey, value, null);
+  }
+
   public BKey getBKey() {
     return bKey;
   }
