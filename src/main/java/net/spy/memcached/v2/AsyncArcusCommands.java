@@ -110,7 +110,7 @@ import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
-import net.spy.memcached.v2.vo.GetArgs;
+import net.spy.memcached.v2.vo.GetOption;
 import net.spy.memcached.v2.vo.SMGetElements;
 
 public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
@@ -735,10 +735,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<T> lopGet(String key, int index, GetArgs args) {
+  public ArcusFuture<T> lopGet(String key, int index, GetOption option) {
     AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
-    ListGet get = new ListGet(index, args.isWithDelete(), args.isDropIfEmpty());
+    ListGet get = new ListGet(index, option.isWithDelete(), option.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -781,11 +781,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<List<T>> lopGet(String key, int from, int to, GetArgs args) {
+  public ArcusFuture<List<T>> lopGet(String key, int from, int to, GetOption option) {
     AbstractArcusResult<List<T>> result =
         new AbstractArcusResult<>(new AtomicReference<>(new ArrayList<>()));
     ArcusFutureImpl<List<T>> future = new ArcusFutureImpl<>(result);
-    ListGet get = new ListGet(from, to, args.isWithDelete(), args.isDropIfEmpty());
+    ListGet get = new ListGet(from, to, option.isWithDelete(), option.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -864,11 +864,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args) {
+  public ArcusFuture<Set<T>> sopGet(String key, int count, GetOption option) {
     AbstractArcusResult<Set<T>> result
         = new AbstractArcusResult<>(new AtomicReference<>(new HashSet<>()));
     ArcusFutureImpl<Set<T>> future = new ArcusFutureImpl<>(result);
-    SetGet get = new SetGet(count, args.isWithDelete(), args.isDropIfEmpty());
+    SetGet get = new SetGet(count, option.isWithDelete(), option.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -1009,18 +1009,18 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, T>> mopGet(String key, GetArgs args) {
-    return mopGet(key, new ArrayList<>(), args);
+  public ArcusFuture<Map<String, T>> mopGet(String key, GetOption option) {
+    return mopGet(key, new ArrayList<>(), option);
   }
 
   @Override
-  public ArcusFuture<T> mopGet(String key, String mKey, GetArgs args) {
+  public ArcusFuture<T> mopGet(String key, String mKey, GetOption option) {
     keyValidator.validateMKey(mKey);
 
     AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
     List<String> mKeys = Collections.singletonList(mKey);
-    MapGet get = new MapGet(mKeys, args.isWithDelete(), args.isDropIfEmpty());
+    MapGet get = new MapGet(mKeys, option.isWithDelete(), option.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -1063,7 +1063,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args) {
+  public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetOption option) {
     if (mKeys == null) {
       throw new IllegalArgumentException("mKeys cannot be null");
     }
@@ -1075,7 +1075,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     AbstractArcusResult<Map<String, T>> result =
         new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
     ArcusFutureImpl<Map<String, T>> future = new ArcusFutureImpl<>(result);
-    MapGet get = new MapGet(mKeys, args.isWithDelete(), args.isDropIfEmpty());
+    MapGet get = new MapGet(mKeys, option.isWithDelete(), option.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {

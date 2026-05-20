@@ -9,7 +9,7 @@ import java.util.concurrent.TimeoutException;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
-import net.spy.memcached.v2.vo.GetArgs;
+import net.spy.memcached.v2.vo.GetOption;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -99,7 +99,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, MKEY1, GetArgs.DEFAULT);
+              return async.mopGet(key, MKEY1, GetOption.NONE);
             })
             .thenAccept(result -> assertEquals(VALUE1, result))
             .toCompletableFuture()
@@ -161,7 +161,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, MKEY1, GetArgs.DEFAULT);
+              return async.mopGet(key, MKEY1, GetOption.NONE);
             })
             .thenAccept(result -> assertEquals(VALUE1, result))
             .toCompletableFuture()
@@ -183,7 +183,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, MKEY1, GetArgs.DEFAULT);
+              return async.mopGet(key, MKEY1, GetOption.NONE);
             })
             .thenAccept(result -> assertEquals(VALUE2, result))
             .toCompletableFuture()
@@ -215,7 +215,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, MKEY1, GetArgs.DEFAULT);
+              return async.mopGet(key, MKEY1, GetOption.NONE);
             })
             .thenAccept(result -> assertEquals(VALUE2, result))
             .toCompletableFuture()
@@ -264,7 +264,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, GetArgs.DEFAULT)
+    async.mopGet(key, GetOption.NONE)
             // then
             .thenAccept(result -> {
               assertNotNull(result);
@@ -281,7 +281,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void mopGetAllNotFound() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     // when
-    async.mopGet(keys.get(0), GetArgs.DEFAULT)
+    async.mopGet(keys.get(0), GetOption.NONE)
             // then
             .thenAccept(Assertions::assertNull)
             .toCompletableFuture()
@@ -300,7 +300,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, GetArgs.DEFAULT)
+    async.mopGet(key, GetOption.NONE)
             // then
             .thenAccept(result -> {
               assertNotNull(result);
@@ -321,7 +321,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, MKEY1, GetArgs.DEFAULT)
+    async.mopGet(key, MKEY1, GetOption.NONE)
             // then
             .thenAccept(result -> assertEquals(VALUE1, result))
             .toCompletableFuture()
@@ -332,7 +332,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void mopGetSingleNotFound() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     // when
-    async.mopGet(keys.get(0), MKEY1, GetArgs.DEFAULT)
+    async.mopGet(keys.get(0), MKEY1, GetOption.NONE)
             // then
             .thenAccept(Assertions::assertNull)
             .toCompletableFuture()
@@ -351,7 +351,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, MKEY1, GetArgs.DEFAULT)
+    async.mopGet(key, MKEY1, GetOption.NONE)
             // then
             .thenAccept(Assertions::assertNull)
             .toCompletableFuture()
@@ -371,7 +371,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, mKeys, GetArgs.DEFAULT)
+    async.mopGet(key, mKeys, GetOption.NONE)
             // then
             .thenAccept(result -> {
               assertNotNull(result);
@@ -395,7 +395,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, Arrays.asList(MKEY1, MKEY2), GetArgs.DEFAULT)
+    async.mopGet(key, Arrays.asList(MKEY1, MKEY2), GetOption.NONE)
             // then
             .thenAccept(result -> {
               assertNotNull(result);
@@ -417,7 +417,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, Arrays.asList(MKEY1, MKEY2, MKEY3), GetArgs.DEFAULT)
+    async.mopGet(key, Arrays.asList(MKEY1, MKEY2, MKEY3), GetOption.NONE)
             // then
             .thenAccept(result -> {
               assertNotNull(result);
@@ -433,10 +433,6 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void mopGetAllWithDelete() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     String key = keys.get(0);
-    GetArgs args = new GetArgs.Builder()
-            .withDelete()
-            .dropIfEmpty()
-            .build();
 
     async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
             .thenAccept(Assertions::assertTrue)
@@ -444,11 +440,11 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopGet(key, args)
+    async.mopGet(key, GetOption.DROP)
             .thenCompose(result -> {
               assertNotNull(result);
               assertEquals(1, result.size());
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             // then
             .thenAccept(Assertions::assertNull)
@@ -471,7 +467,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             .thenAccept(result -> {
               assertNotNull(result);
@@ -495,7 +491,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.mopDelete(key, true)
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             // then
             .thenAccept(Assertions::assertNull)
@@ -528,7 +524,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             .thenAccept(result -> {
               assertNotNull(result);
@@ -584,7 +580,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.mopDelete(key, MKEY1, true)
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             // then
             .thenAccept(Assertions::assertNull)
@@ -615,7 +611,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             .thenAccept(result -> {
               assertNotNull(result);
@@ -667,7 +663,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             // then
             .thenCompose(result -> {
               assertTrue(result);
-              return async.mopGet(key, GetArgs.DEFAULT);
+              return async.mopGet(key, GetOption.NONE);
             })
             .thenAccept(Assertions::assertNull)
             .toCompletableFuture()

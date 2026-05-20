@@ -841,38 +841,38 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
-            })
-            .thenAccept(element -> {
-              assertNotNull(element);
-              assertEquals(ELEMENTS.get(0).getBKey(), element.getBKey());
-              assertEquals(ELEMENTS.get(0).getValue(), element.getValue());
-              assertNull(element.getEFlag());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+        })
+        .thenAccept(element -> {
+          assertNotNull(element);
+          assertEquals(ELEMENTS.get(0).getBKey(), element.getBKey());
+          assertEquals(ELEMENTS.get(0).getValue(), element.getValue());
+          assertNull(element.getEFlag());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
     BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
-            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+        .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
 
     // when
     async.bopUpdate(key, updatedElement)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(updatedElement.getBKey(), result.getBKey());
-              assertEquals(updatedElement.getValue(), result.getValue());
-              assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(updatedElement.getBKey(), result.getBKey());
+          assertEquals(updatedElement.getValue(), result.getValue());
+          assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -881,28 +881,28 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
-            .withValue(BKey.of(1L), "updated_value");
+        .withValue(BKey.of(1L), "updated_value");
 
     // when
     async.bopUpdate(key, updatedElement)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(updatedElement.getBKey(), result.getBKey());
-              assertEquals(updatedElement.getValue(), result.getValue());
-              assertNull(result.getEFlag());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(updatedElement.getBKey(), result.getBKey());
+          assertEquals(updatedElement.getValue(), result.getValue());
+          assertNull(result.getEFlag());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -911,53 +911,53 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
     BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
-            .withEFlagUpdate(BKey.of(1L), eFlagUpdate);
+        .withEFlagUpdate(BKey.of(1L), eFlagUpdate);
 
     // when
     async.bopUpdate(key, updatedElement)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(updatedElement.getBKey(), result.getBKey());
-              assertEquals(ELEMENTS.get(0).getValue(), result.getValue());
-              assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, BKey.of(1L), BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(updatedElement.getBKey(), result.getBKey());
+          assertEquals(ELEMENTS.get(0).getValue(), result.getValue());
+          assertArrayEquals(eFlagUpdate.getElementFlag(), result.getEFlag());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopUpdateNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
     BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
-            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+        .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
 
     // when
     async.bopUpdate(key, updatedElement)
-            // then
-            .thenAccept(Assertions::assertFalse)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertFalse)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -967,14 +967,14 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     ElementFlagUpdate eFlagUpdate = new ElementFlagUpdate(new byte[]{1, 2, 3});
     BTreeUpdateElement<Object> updatedElement = BTreeUpdateElement
-            .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
+        .withValueAndEFlag(BKey.of(1L), "updated_value", eFlagUpdate);
 
     // when
     async.bopUpdate(key, updatedElement)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -985,16 +985,16 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
 
     async.bopInsert(key, element, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, bKey, 10)
-            // then
-            .thenAccept(result -> assertEquals(110L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(110L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1005,10 +1005,10 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopIncr(key, bKey, 10)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1018,65 +1018,65 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, bKey, 10)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopIncrInitialNotExistsElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, bKey, 10, 100L, null)
-            // then
-            .thenCompose(result -> {
-              assertEquals(100L, result);
-              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertEquals(bKey, result.getBKey());
-              assertEquals("100", result.getValue());
-              assertNull(result.getEFlag());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertEquals(100L, result);
+          return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertEquals(bKey, result.getBKey());
+          assertEquals("100", result.getValue());
+          assertNull(result.getEFlag());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopIncrInitialExistingElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
     BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
 
     async.bopInsert(key, element, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, bKey, 10, 1000L, null)
-            // then
-            .thenAccept(result -> assertEquals(110L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(110L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1086,20 +1086,20 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(1L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, bKey, 10)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1108,20 +1108,20 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopIncr(key, BKey.of(new byte[]{0x01}), 10)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1132,16 +1132,16 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
 
     async.bopInsert(key, element, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10)
-            // then
-            .thenAccept(result -> assertEquals(90L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(90L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1152,10 +1152,10 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopDecr(key, bKey, 10)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1165,57 +1165,57 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDecrInitialNotExistsElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10, 100L, null)
-            // then
-            .thenAccept(result -> assertEquals(100L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(100L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDecrInitialExistingElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
     BTreeElement<Object> element = new BTreeElement<>(bKey, "100", null);
 
     async.bopInsert(key, element, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10, 1000L, null)
-            // then
-            .thenAccept(result -> assertEquals(90L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(90L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1226,16 +1226,16 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> element = new BTreeElement<>(bKey, "5", null);
 
     async.bopInsert(key, element, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10)
-            // then
-            .thenAccept(result -> assertEquals(0L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(0L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1245,20 +1245,20 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(1L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, bKey, 10)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1267,51 +1267,51 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDecr(key, BKey.of(new byte[]{0x01}), 10)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetPositionSuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = ELEMENTS.get(1).getBKey();
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(0));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(0));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetPosition(key, bKey, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(1, result);
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(1, result);
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1322,53 +1322,53 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopGetPosition(key, bKey, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetPositionNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetPosition(key, bKey, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetPositionTypeMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetPosition(key, bKey, BTreeOrder.ASC)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1379,308 +1379,306 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> element = new BTreeElement<>(bKey, "value", null);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, element);
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, element);
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(result, element);
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(result, element);
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionNotFound() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     // when
     async.bopGetByPosition(key, 0, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionTypeMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, BTreeOrder.ASC)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionRangeSuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(0));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(2));
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(0));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(2));
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(3, result.size());
-              assertEquals(ELEMENTS.get(0), result.get(0));
-              assertEquals(ELEMENTS.get(1), result.get(1));
-              assertEquals(ELEMENTS.get(2), result.get(2));
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(3, result.size());
+          assertEquals(ELEMENTS.get(0), result.get(0));
+          assertEquals(ELEMENTS.get(1), result.get(1));
+          assertEquals(ELEMENTS.get(2), result.get(2));
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionRangeNotFound() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     // when
     async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionRangeNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertTrue(result.isEmpty());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertTrue(result.isEmpty());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopGetByPositionRangeTypeMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopGetByPosition(key, 0, 2, BTreeOrder.ASC)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopPositionWithGetSuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = ELEMENTS.get(1).getBKey();
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(0));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(2));
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(0));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(2));
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(3, result.size());
-              assertEquals(ELEMENTS.get(0).getBKey(), result.get(0).getBKey());
-              assertEquals(ELEMENTS.get(0).getValue(), result.get(0).getValue());
-              assertEquals(ELEMENTS.get(0).getEFlag(), result.get(0).getEFlag());
-              assertEquals(0, result.get(0).getPosition());
-              assertEquals(ELEMENTS.get(1).getBKey(), result.get(1).getBKey());
-              assertEquals(ELEMENTS.get(1).getValue(), result.get(1).getValue());
-              assertEquals(ELEMENTS.get(1).getEFlag(), result.get(1).getEFlag());
-              assertEquals(1, result.get(1).getPosition());
-              assertEquals(ELEMENTS.get(2).getBKey(), result.get(2).getBKey());
-              assertEquals(ELEMENTS.get(2).getValue(), result.get(2).getValue());
-              assertEquals(ELEMENTS.get(2).getEFlag(), result.get(2).getEFlag());
-              assertEquals(2, result.get(2).getPosition());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(3, result.size());
+          assertEquals(ELEMENTS.get(0).getBKey(), result.get(0).getBKey());
+          assertEquals(ELEMENTS.get(0).getValue(), result.get(0).getValue());
+          assertEquals(ELEMENTS.get(0).getEFlag(), result.get(0).getEFlag());
+          assertEquals(0, result.get(0).getPosition());
+          assertEquals(ELEMENTS.get(1).getBKey(), result.get(1).getBKey());
+          assertEquals(ELEMENTS.get(1).getValue(), result.get(1).getValue());
+          assertEquals(ELEMENTS.get(1).getEFlag(), result.get(1).getEFlag());
+          assertEquals(1, result.get(1).getPosition());
+          assertEquals(ELEMENTS.get(2).getBKey(), result.get(2).getBKey());
+          assertEquals(ELEMENTS.get(2).getValue(), result.get(2).getValue());
+          assertEquals(ELEMENTS.get(2).getEFlag(), result.get(2).getEFlag());
+          assertEquals(2, result.get(2).getPosition());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopPositionWithGetNotFound() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
 
     // when
     async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopPositionWithGetNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(0));
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(0));
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
-            // then
-            .thenAccept(result -> {
-              assertEquals(0, result.size());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(0, result.size()))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopPositionWithGetTypeMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(1L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopPositionWithGetBKeyMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(new byte[]{0x01});
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopPositionWithGet(key, bKey, 1, BTreeOrder.ASC)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1690,23 +1688,23 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = ELEMENTS.get(0).getBKey();
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertNull(result.getValue());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertNull(result.getValue());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1715,24 +1713,24 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
     BKey bKey = ELEMENTS.get(0).getBKey();
     BopDeleteArgs args = new BopDeleteArgs.Builder()
-            .dropIfEmpty()
-            .build();
+        .dropIfEmpty()
+        .build();
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, bKey, args)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1743,30 +1741,30 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey bKey = BKey.of(999L);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
-            // then
-            .thenAccept(Assertions::assertFalse)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertFalse)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1776,19 +1774,19 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(1L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1798,19 +1796,19 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(new byte[]{0x01});
 
     async.bopInsert(key, ELEMENTS.get(0) /* long BKey */, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1820,38 +1818,38 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey from = ELEMENTS.get(0).getBKey();
     BKey to = ELEMENTS.get(2).getBKey();
     BopDeleteArgs deleteArgs = new BopDeleteArgs.Builder()
-            .count(1)
-            .build();
+        .count(1)
+        .build();
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(2));
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(2));
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, deleteArgs)
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              List<BTreeElement<Object>> elements = result.getElements();
-              assertEquals(2, elements.size());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          List<BTreeElement<Object>> elements = result.getElements();
+          assertEquals(2, elements.size());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteByRangeCountZero() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey from = BKey.of(0L);
@@ -1859,33 +1857,33 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BopDeleteArgs args = BopDeleteArgs.DEFAULT;
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(2));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(3));
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(2));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(3));
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, args)
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertTrue(result.getElements().isEmpty());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertTrue(result.getElements().isEmpty());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -1898,40 +1896,40 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal, eFlag);
     BopDeleteArgs args = new BopDeleteArgs.Builder()
-            .eFlagFilter(filter)
-            .build();
+        .eFlagFilter(filter)
+        .build();
 
     BKey from = BKey.of(0L);
     BKey to = BKey.of(10L);
 
     async.bopInsert(key, elementWithFlag, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, elementWithoutFlag);
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, elementWithoutFlag);
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, args)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
-            })
-            .thenAccept(result -> {
-              assertNotNull(result);
-              assertEquals(1, result.getElements().size());
-              assertEquals(elementWithoutFlag, result.getElements().get(0));
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+        })
+        .thenAccept(result -> {
+          assertNotNull(result);
+          assertEquals(1, result.getElements().size());
+          assertEquals(elementWithoutFlag, result.getElements().get(0));
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteByRangeNotFound() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey from = BKey.of(0L);
@@ -1939,79 +1937,79 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteByRangeNotFoundElement() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey from = BKey.of(100L);
     BKey to = BKey.of(200L);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
-            // then
-            .thenAccept(Assertions::assertFalse)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertFalse)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteByRangeTypeMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey from = BKey.of(0L);
     BKey to = BKey.of(10L);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void bopDeleteByRangeBKeyMismatch() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
     BKey from = BKey.of(new byte[]{0x00});
     BKey to = BKey.of(new byte[]{0x10});
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2020,27 +2018,27 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(1));
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, ELEMENTS.get(2));
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(1));
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, ELEMENTS.get(2));
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     BKey from = ELEMENTS.get(0).getBKey();
     BKey to = ELEMENTS.get(2).getBKey();
 
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
-            // then
-            .thenAccept(result -> assertEquals(3L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(3L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2053,17 +2051,17 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> elementWithoutFlag = new BTreeElement<>(BKey.of(3L), "value3", null);
 
     async.bopInsert(key, elementWithFlag1, new CollectionAttributes())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, elementWithFlag2);
-            })
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.bopInsert(key, elementWithoutFlag);
-            })
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, elementWithFlag2);
+        })
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.bopInsert(key, elementWithoutFlag);
+        })
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal, eFlag);
@@ -2071,10 +2069,10 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey to = BKey.of(10L);
 
     async.bopCount(key, from, to, filter)
-            // then
-            .thenAccept(result -> assertEquals(2L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(2L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2083,19 +2081,19 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     BKey from = BKey.of(0L);
     BKey to = BKey.of(100L);
 
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
-            // then
-            .thenAccept(result -> assertEquals(0L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(0L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2107,10 +2105,10 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
-            // then
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2119,23 +2117,23 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.set(key, 60, "invalid-type-value")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     BKey from = BKey.of(0L);
     BKey to = BKey.of(10L);
 
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -2144,22 +2142,22 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     BKey from = BKey.of(new byte[]{0x00});
     BKey to = BKey.of(new byte[]{0x10});
 
     async.bopCount(key, from, to, ElementFlagFilter.DO_NOT_FILTER)
-            // then
-            .handle((result, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((result, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 }
