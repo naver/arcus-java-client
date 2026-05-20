@@ -34,7 +34,7 @@ import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
-import net.spy.memcached.v2.vo.GetArgs;
+import net.spy.memcached.v2.vo.GetOption;
 import net.spy.memcached.v2.vo.SMGetElements;
 
 public interface AsyncArcusCommandsIF<T> {
@@ -260,10 +260,10 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the list
    * @param index index of the element to get
-   * @param args  arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return the element value, {@code null} if the key or element is not found
    */
-  ArcusFuture<T> lopGet(String key, int index, GetArgs args);
+  ArcusFuture<T> lopGet(String key, int index, GetOption option);
 
   /**
    * Get elements in an index range from a list.
@@ -271,11 +271,11 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key  key of the list
    * @param from index range start (inclusive)
    * @param to   index range end (inclusive)
-   * @param args arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return list of element values in order, an empty list if no elements are found in the range,
    * {@code null} if the key is not found
    */
-  ArcusFuture<List<T>> lopGet(String key, int from, int to, GetArgs args);
+  ArcusFuture<List<T>> lopGet(String key, int from, int to, GetOption option);
 
   /**
    * Delete an element at the given index from a list.
@@ -342,11 +342,11 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the set
    * @param count number of elements to retrieve randomly (0 means all elements, max 1000)
-   * @param args  arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return set of element values, an empty set if no elements are found,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Set<T>> sopGet(String key, int count, GetArgs args);
+  ArcusFuture<Set<T>> sopGet(String key, int count, GetOption option);
 
   /**
    * Check whether an element exists in a set.
@@ -448,35 +448,35 @@ public interface AsyncArcusCommandsIF<T> {
    * Get all elements from a map.
    *
    * @param key  key of the map
-   * @param args arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return map of MKey to value,
    * empty map if no elements exist,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Map<String, T>> mopGet(String key, GetArgs args);
+  ArcusFuture<Map<String, T>> mopGet(String key, GetOption option);
 
   /**
    * Get an element with the given MKey from a map.
    *
    * @param key  key of the map
    * @param mKey MKey of the element to get
-   * @param args arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return the element value,
    * {@code null} if the key or MKey is not found
    */
-  ArcusFuture<T> mopGet(String key, String mKey, GetArgs args);
+  ArcusFuture<T> mopGet(String key, String mKey, GetOption option);
 
   /**
    * Get elements with the MKeys from a map.
    *
    * @param key   key of the map
    * @param mKeys list of MKeys to get
-   * @param args  arguments for get operation
+   * @param option get option - {@link GetOption}
    * @return map of MKey to value for found elements,
    * empty map if no MKeys are found,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetArgs args);
+  ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetOption option);
 
   /**
    * Delete all elements from a map.

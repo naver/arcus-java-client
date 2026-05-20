@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -114,20 +114,20 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.set(key, 60, "Hello, ")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.append(key, "Arcus!")
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(key);
-            })
-            // then
-            .thenAccept(result -> assertEquals(expected, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(key);
+        })
+        // then
+        .thenAccept(result -> assertEquals(expected, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -137,40 +137,40 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(1);
 
     async.set(key, 60, "World!")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.prepend(key, "Hello, ")
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(key);
-            })
-            // then
-            .thenAccept(result -> assertEquals(expected, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(key);
+        })
+        // then
+        .thenAccept(result -> assertEquals(expected, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void appendNonStringException() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
     // given
     String key = keys.get(0);
 
     async.set(key, 60, 123)
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     CompletableFuture<Object> future = async.append(key, "Arcus!")
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(key);
-            })
-            .toCompletableFuture();
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(key);
+        })
+        .toCompletableFuture();
     // then
     assertThrows(ExecutionException.class, () -> future.get(300L, TimeUnit.MILLISECONDS));
   }
@@ -181,19 +181,19 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.set(key, 60, VALUE)
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.gets(key)
-            // then
-            .thenAccept(result -> {
-              assertEquals(VALUE, result.getValue());
-              assertTrue(result.getCas() > 0);
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertEquals(VALUE, result.getValue());
+          assertTrue(result.getCas() > 0);
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -202,56 +202,56 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     CASValue<Object> casValue = async.set(key, 60, "Hello")
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.gets(key);
-            })
-            .thenApply(result -> {
-              assertEquals("Hello", result.getValue());
-              assertTrue(result.getCas() >= 0);
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.gets(key);
+        })
+        .thenApply(result -> {
+          assertEquals("Hello", result.getValue());
+          assertTrue(result.getCas() >= 0);
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.cas(key, 60, "Arcus", casValue.getCas())
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(key);
-            })
-            // then
-            .thenAccept(result -> assertEquals("Arcus", result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(key);
+        })
+        // then
+        .thenAccept(result -> assertEquals("Arcus", result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void casNotFound() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
     long fakeCas = 1234L;
 
     async.set(key, 60, "Hello")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.cas(key, 60, "Arcus", fakeCas)
-            // then
-            .thenCompose(result -> {
-              assertFalse(result);
-              return async.get(key);
-            })
-            .thenAccept(result -> {
-              assertNotEquals("Arcus", result);
-              assertEquals("Hello", result);
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertFalse(result);
+          return async.get(key);
+        })
+        .thenAccept(result -> {
+          assertNotEquals("Arcus", result);
+          assertEquals("Hello", result);
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -260,83 +260,83 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     CASValue<Object> casValue = async.set(key, 60, "Hello")
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.gets(key);
-            })
-            .thenApply(result -> {
-              assertEquals("Hello", result.getValue());
-              assertTrue(result.getCas() >= 0);
-              return result;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.gets(key);
+        })
+        .thenApply(result -> {
+          assertEquals("Hello", result.getValue());
+          assertTrue(result.getCas() >= 0);
+          return result;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     /* already updated by another client */
     async.cas(key, 60, "Update", casValue.getCas())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.cas(key, 60, "Arcus", 0L)
-            // then
-            .thenCompose(result -> {
-              assertFalse(result);
-              return async.get(key);
-            })
-            .thenAccept(result -> {
-              assertNotEquals("Arcus", result);
-              assertEquals("Update", result);
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertFalse(result);
+          return async.get(key);
+        })
+        .thenAccept(result -> {
+          assertNotEquals("Arcus", result);
+          assertEquals("Update", result);
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void multiGetsSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     async.multiSet(items, 60)
-            .thenAccept(result -> {
-              for (Boolean b : result.values()) {
-                assertTrue(b);
-              }
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(result -> {
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.multiGets(keys)
-            // then
-            .thenAccept(result -> {
-              assertEquals(keys.size(), result.size());
-              for (Map.Entry<String, CASValue<Object>> entry : result.entrySet()) {
-                assertEquals(VALUE, entry.getValue().getValue());
-                assertTrue(entry.getValue().getCas() >= 0);
-              }
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Map.Entry<String, CASValue<Object>> entry : result.entrySet()) {
+            assertEquals(VALUE, entry.getValue().getValue());
+            assertTrue(entry.getValue().getCas() >= 0);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void multiGetsPartialFailure() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     async.set(keys.get(0), 60, VALUE)
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.multiGets(keys)
-            // then
-            .thenAccept(result -> {
-              assertEquals(1, result.size());
-              assertTrue(result.containsKey(keys.get(0)));
-              assertEquals(VALUE, result.get(keys.get(0)).getValue());
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertEquals(1, result.size());
+          assertTrue(result.containsKey(keys.get(0)));
+          assertEquals(VALUE, result.get(keys.get(0)).getValue());
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -344,10 +344,10 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     // when
     async.multiGets(keys)
-            // then
-            .thenAccept(result -> assertTrue(result.isEmpty()))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertTrue(result.isEmpty()))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -528,20 +528,20 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     async.set(key, 0, VALUE)
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.delete(key)
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(key);
-            })
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(key);
+        })
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -551,59 +551,59 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.delete(key)
-            // then
-            .thenAccept(Assertions::assertFalse)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(Assertions::assertFalse)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void multiDeleteSuccess() throws ExecutionException, InterruptedException, TimeoutException {
     // given
     async.multiSet(items, 0)
-            .thenAccept(result -> {
-              for (Boolean b : result.values()) {
-                assertTrue(b);
-              }
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(result -> {
+          for (Boolean b : result.values()) {
+            assertTrue(b);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.multiDelete(keys)
-            // then
-            .thenCompose(result -> {
-              assertEquals(keys.size(), result.size());
-              result.values().forEach(Assertions::assertTrue);
-              return async.multiGet(keys);
-            })
-            .thenAccept(result -> assertEquals(0, result.size()))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertEquals(keys.size(), result.size());
+          result.values().forEach(Assertions::assertTrue);
+          return async.multiGet(keys);
+        })
+        .thenAccept(result -> assertEquals(0, result.size()))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void multiDeletePartialSuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     async.set(keys.get(0), 0, VALUE)
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.multiDelete(keys)
-            // then
-            .thenAccept(result -> {
-              assertEquals(keys.size(), result.size());
-              assertTrue(result.get(keys.get(0)));
-              for (int i = 1; i < keys.size(); i++) {
-                assertFalse(result.get(keys.get(i)));
-              }
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          assertTrue(result.get(keys.get(0)));
+          for (int i = 1; i < keys.size(); i++) {
+            assertFalse(result.get(keys.get(i)));
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -611,15 +611,15 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     // when
     async.multiDelete(keys)
-            // then
-            .thenAccept(result -> {
-              assertEquals(keys.size(), result.size());
-              for (Boolean b : result.values()) {
-                assertFalse(b);
-              }
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> {
+          assertEquals(keys.size(), result.size());
+          for (Boolean b : result.values()) {
+            assertFalse(b);
+          }
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -629,16 +629,16 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     int delta = 10;
 
     async.set(key, 60, "100")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.incr(key, delta)
-            // then
-            .thenAccept(result -> assertEquals(110L, result))
-            .toCompletableFuture()
-            .get(300, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(110L, result))
+        .toCompletableFuture()
+        .get(300, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -649,15 +649,15 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.incr(key, delta)
-            // then
-            .thenAccept(result -> assertEquals(-1, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(-1, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void incrInitialNonExistingKeySuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
@@ -665,10 +665,10 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.incr(key, delta, 100, 60)
-            // then
-            .thenAccept(result -> assertEquals(100L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(100L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -678,65 +678,65 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     int delta = 10;
 
     async.set(key, 60, "100")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .join();
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .join();
 
     // when
     async.incr(key, delta, 1000, 60)
-            // then
-            .thenAccept(result -> assertEquals(110L, result))
-            .toCompletableFuture()
-            .join();
+        // then
+        .thenAccept(result -> assertEquals(110L, result))
+        .toCompletableFuture()
+        .join();
   }
 
   @Test
   void incrTypeNotNumberException() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
 
     async.set(key, 60, "not a number")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.incr(key, 10)
-            // then
-            .handle((res, ex) -> {
-              assertInstanceOf(ExecutionException.class, ex);
-              Throwable cause = ex.getCause();
-              assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
-              return res;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((res, ex) -> {
+          assertInstanceOf(ExecutionException.class, ex);
+          Throwable cause = ex.getCause();
+          assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
+          return res;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void incrTypeMisMatchException() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
 
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.incr(key, 10)
-            // then
-            .handle((res, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return res;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((res, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return res;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -746,21 +746,21 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     int delta = 10;
 
     async.set(key, 60, "100")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.decr(key, delta)
-            // then
-            .thenAccept(result -> assertEquals(90L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(90L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrNonExistingKey() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
@@ -768,15 +768,15 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.decr(key, delta)
-            // then
-            .thenAccept(result -> assertEquals(-1, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(-1, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrInitialNonExistingKeySuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
@@ -784,102 +784,102 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.decr(key, delta, 100, 60)
-            // then
-            .thenAccept(result -> assertEquals(100L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(100L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrInitialExistingKeySuccess() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
     int delta = 10;
 
     async.set(key, 60, "100")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-                    .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.decr(key, delta, 1000, 60)
-            // then
-            .thenAccept(result -> assertEquals(90L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(90L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrTypeNotNumberException() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
 
     async.set(key, 60, "not a number")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.decr(key, 10)
-            // then
-            .handle((res, ex) -> {
-              assertInstanceOf(ExecutionException.class, ex);
-              Throwable cause = ex.getCause();
-              assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
-              return res;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((res, ex) -> {
+          assertInstanceOf(ExecutionException.class, ex);
+          Throwable cause = ex.getCause();
+          assertTrue(cause.getMessage().contains("CLIENT_ERROR"));
+          return res;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrTypeMismatchException() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
 
     // collection 타입 키를 생성해서 TypeMismatch 발생
     async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
 
     // when
     async.decr(key, 10)
-            // then
-            .handle((res, ex) -> {
-              assertInstanceOf(OperationException.class, ex);
-              assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
-              return res;
-            })
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .handle((res, ex) -> {
+          assertInstanceOf(OperationException.class, ex);
+          assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
+          return res;
+        })
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
   void decrResultUnderZero() throws ExecutionException, InterruptedException,
-          TimeoutException {
+      TimeoutException {
 
     // given
     String key = keys.get(0);
     int delta = 10;
 
     async.set(key, 60, "5")
-            .thenAccept(Assertions::assertTrue)
-            .toCompletableFuture()
-                    .get(300L, TimeUnit.MILLISECONDS);
+        .thenAccept(Assertions::assertTrue)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
 
     // when
     async.decr(key, delta)
-            // then
-            .thenAccept(result -> assertEquals(0L, result))
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenAccept(result -> assertEquals(0L, result))
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 }

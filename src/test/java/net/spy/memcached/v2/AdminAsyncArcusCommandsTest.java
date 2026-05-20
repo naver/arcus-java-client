@@ -128,19 +128,19 @@ class AdminAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.flush("")
-            // then
-            .thenCompose(result -> {
-              assertTrue(result);
-              return async.get(prefixKey);
-            })
-            .thenCompose(result -> {
-              assertNotNull(result);
-              assertEquals(VALUE, result);
-              return async.get(nonPrefixKey);
-            })
-            .thenAccept(Assertions::assertNull)
-            .toCompletableFuture()
-            .get(300L, TimeUnit.MILLISECONDS);
+        // then
+        .thenCompose(result -> {
+          assertTrue(result);
+          return async.get(prefixKey);
+        })
+        .thenCompose(result -> {
+          assertNotNull(result);
+          assertEquals(VALUE, result);
+          return async.get(nonPrefixKey);
+        })
+        .thenAccept(Assertions::assertNull)
+        .toCompletableFuture()
+        .get(300L, TimeUnit.MILLISECONDS);
   }
 
   @Test
@@ -166,10 +166,10 @@ class AdminAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     for (StatsArg arg : StatsArg.values()) {
       // when
       async.stats(arg)
-              // then
-              .thenAccept(Assertions::assertNotNull)
-              .toCompletableFuture()
-              .get(300L, TimeUnit.MILLISECONDS);
+          // then
+          .thenAccept(Assertions::assertNotNull)
+          .toCompletableFuture()
+          .get(300L, TimeUnit.MILLISECONDS);
     }
   }
 
