@@ -29,13 +29,13 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
-import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreeGetResult;
 import net.spy.memcached.v2.vo.BTreePositionElement;
+import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.GetOption;
-import net.spy.memcached.v2.vo.SMGetElements;
 
 public interface AsyncArcusCommandsIF<T> {
 
@@ -690,11 +690,11 @@ public interface AsyncArcusCommandsIF<T> {
    * @param from BKey range start
    * @param to   BKey range end
    * @param args arguments for get operation
-   * @return {@code BTreeElements} with found elements,
-   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * @return {@code BTreeGetResult} with found elements,
+   * empty {@code BTreeGetResult} if no elements are found in the range but key exists,
    * {@code null} if key is not found
    */
-  ArcusFuture<BTreeElements<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
+  ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
 
   /**
    * Get elements from multiple btree items.
@@ -703,11 +703,11 @@ public interface AsyncArcusCommandsIF<T> {
    * @param from BKey range start
    * @param to   BKey range end
    * @param args arguments for get operation
-   * @return map of key to {@code BTreeElements} with found elements,
-   * empty {@code BTreeElements} if no elements are found in the range but key exists,
+   * @return map of key to {@code BTreeGetResult} with found elements,
+   * empty {@code BTreeGetResult} if no elements are found in the range but key exists,
    * no {@code Map.Entry} in the map if the key is not found
    */
-  ArcusFuture<Map<String, BTreeElements<T>>> bopMultiGet(
+  ArcusFuture<Map<String, BTreeGetResult<T>>> bopMultiGet(
       List<String> keys, BKey from, BKey to, BopGetArgs args);
 
   /**
@@ -718,10 +718,10 @@ public interface AsyncArcusCommandsIF<T> {
    * @param to     BKey range end
    * @param unique whether to return unique elements only
    * @param args   arguments for get operation
-   * @return {@code SMGetElements} containing sort-merged elements,
-   * empty {@code SMGetElements} if no matching elements exist
+   * @return {@code BTreeSMGetResult} containing sort-merged elements,
+   * empty {@code BTreeSMGetResult} if no matching elements exist
    */
-  ArcusFuture<SMGetElements<T>> bopSortMergeGet(
+  ArcusFuture<BTreeSMGetResult<T>> bopSortMergeGet(
       List<String> keys, BKey from, BKey to, boolean unique, BopGetArgs args);
 
   /**

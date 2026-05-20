@@ -17,11 +17,11 @@ import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
-import net.spy.memcached.v2.vo.BTreeElements;
+import net.spy.memcached.v2.vo.BTreeGetResult;
+import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
-import net.spy.memcached.v2.vo.SMGetElements;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -387,17 +387,17 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenAccept(map -> {
           assertEquals(3, map.size());
 
-          BTreeElements<Object> elements0 = map.get(testKeys.get(0));
+          BTreeGetResult<Object> elements0 = map.get(testKeys.get(0));
           assertEquals(2, elements0.getElements().size());
           assertEquals(ELEMENTS.get(0), elements0.getElements().get(0));
           assertEquals(ELEMENTS.get(1), elements0.getElements().get(1));
 
-          BTreeElements<Object> elements1 = map.get(testKeys.get(1));
+          BTreeGetResult<Object> elements1 = map.get(testKeys.get(1));
           assertEquals(2, elements1.getElements().size());
           assertEquals(ELEMENTS.get(2), elements1.getElements().get(0));
           assertEquals(ELEMENTS.get(3), elements1.getElements().get(1));
 
-          BTreeElements<Object> elements2 = map.get(testKeys.get(2));
+          BTreeGetResult<Object> elements2 = map.get(testKeys.get(2));
           assertEquals(1, elements2.getElements().size());
           assertEquals(ELEMENTS.get(4), elements2.getElements().get(0));
         })
@@ -423,11 +423,11 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenAccept(map -> {
           assertEquals(3, map.size());
 
-          BTreeElements<Object> elements0 = map.get(testKeys.get(0));
+          BTreeGetResult<Object> elements0 = map.get(testKeys.get(0));
           assertEquals(2, elements0.getElements().size());
-          BTreeElements<Object> elements1 = map.get(testKeys.get(1));
+          BTreeGetResult<Object> elements1 = map.get(testKeys.get(1));
           assertEquals(2, elements1.getElements().size());
-          BTreeElements<Object> elements2 = map.get(testKeys.get(2));
+          BTreeGetResult<Object> elements2 = map.get(testKeys.get(2));
           assertEquals(1, elements2.getElements().size());
 
           // Make sure that the order is descending
@@ -461,7 +461,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(1, map.size());
 
           // NOT FOUND ELEMENT
-          BTreeElements<Object> elements = map.get(testKeys.get(0));
+          BTreeGetResult<Object> elements = map.get(testKeys.get(0));
           assertNotNull(elements);
           assertEquals(0, elements.getElements().size());
 
@@ -492,7 +492,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
           assertEquals(4, smGetElements.getElements().size());
 
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(0), elements.get(0).getKey());
           assertEquals(ELEMENTS.get(0), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(1), elements.get(1).getKey());
@@ -526,7 +526,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
           assertEquals(4, smGetElements.getElements().size());
 
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(2), elements.get(0).getKey());
           assertEquals(ELEMENTS.get(3), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(0), elements.get(1).getKey());
@@ -558,19 +558,19 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
           assertEquals(4, smGetElements.getElements().size());
 
-          SMGetElements.Element<Object> element1 = smGetElements.getElements().get(0);
+          BTreeSMGetResult.Element<Object> element1 = smGetElements.getElements().get(0);
           assertEquals(ELEMENTS.get(0), element1.getbTreeElement());
           assertEquals(testKeys.get(0), element1.getKey());
 
-          SMGetElements.Element<Object> element2 = smGetElements.getElements().get(1);
+          BTreeSMGetResult.Element<Object> element2 = smGetElements.getElements().get(1);
           assertEquals(ELEMENTS.get(0), element2.getbTreeElement());
           assertEquals(testKeys.get(1), element2.getKey());
 
-          SMGetElements.Element<Object> element3 = smGetElements.getElements().get(2);
+          BTreeSMGetResult.Element<Object> element3 = smGetElements.getElements().get(2);
           assertEquals(ELEMENTS.get(1), element3.getbTreeElement());
           assertEquals(testKeys.get(0), element3.getKey());
 
-          SMGetElements.Element<Object> element4 = smGetElements.getElements().get(3);
+          BTreeSMGetResult.Element<Object> element4 = smGetElements.getElements().get(3);
           assertEquals(ELEMENTS.get(1), element4.getbTreeElement());
           assertEquals(testKeys.get(1), element4.getKey());
         })
@@ -596,19 +596,19 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
           assertEquals(4, smGetElements.getElements().size());
 
-          SMGetElements.Element<Object> element1 = smGetElements.getElements().get(0);
+          BTreeSMGetResult.Element<Object> element1 = smGetElements.getElements().get(0);
           assertEquals(ELEMENTS.get(1), element1.getbTreeElement());
           assertEquals(testKeys.get(1), element1.getKey());
 
-          SMGetElements.Element<Object> element2 = smGetElements.getElements().get(1);
+          BTreeSMGetResult.Element<Object> element2 = smGetElements.getElements().get(1);
           assertEquals(ELEMENTS.get(1), element2.getbTreeElement());
           assertEquals(testKeys.get(0), element2.getKey());
 
-          SMGetElements.Element<Object> element3 = smGetElements.getElements().get(2);
+          BTreeSMGetResult.Element<Object> element3 = smGetElements.getElements().get(2);
           assertEquals(ELEMENTS.get(0), element3.getbTreeElement());
           assertEquals(testKeys.get(1), element3.getKey());
 
-          SMGetElements.Element<Object> element4 = smGetElements.getElements().get(3);
+          BTreeSMGetResult.Element<Object> element4 = smGetElements.getElements().get(3);
           assertEquals(ELEMENTS.get(0), element4.getbTreeElement());
           assertEquals(testKeys.get(0), element4.getKey());
         })
@@ -633,7 +633,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
           assertEquals(1, smGetElements.getElements().size());
 
-          SMGetElements.Element<Object> element = smGetElements.getElements().get(0);
+          BTreeSMGetResult.Element<Object> element = smGetElements.getElements().get(0);
           assertEquals(ELEMENTS.get(0), element.getbTreeElement());
           assertEquals(keys.get(0), element.getKey());
         })
@@ -656,12 +656,12 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertNotNull(smGetElements);
 
           assertEquals(1, smGetElements.getElements().size());
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(ELEMENTS.get(0), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(0), elements.get(0).getKey());
 
           assertEquals(1, smGetElements.getMissedKeys().size());
-          SMGetElements.MissedKey missedKey = smGetElements.getMissedKeys().get(0);
+          BTreeSMGetResult.MissedKey missedKey = smGetElements.getMissedKeys().get(0);
           assertEquals(testKeys.get(1), missedKey.getKey());
           assertEquals(StatusCode.ERR_NOT_FOUND, missedKey.getStatusCode());
         })
@@ -684,7 +684,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(3, smGetElements.getMissedKeys().size());
           assertEquals(0, smGetElements.getTrimmedKeys().size());
           assertIterableEquals(testKeys, smGetElements.getMissedKeys().stream()
-              .map(SMGetElements.MissedKey::getKey).collect(Collectors.toList()));
+              .map(BTreeSMGetResult.MissedKey::getKey).collect(Collectors.toList()));
         })
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
@@ -709,7 +709,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(1, smGetElements.getMissedKeys().size());
           assertEquals(0, smGetElements.getTrimmedKeys().size());
 
-          SMGetElements.MissedKey missedKey = smGetElements.getMissedKeys().get(0);
+          BTreeSMGetResult.MissedKey missedKey = smGetElements.getMissedKeys().get(0);
           assertEquals(testKeys.get(2), missedKey.getKey());
           assertEquals(StatusCode.ERR_NOT_FOUND, missedKey.getStatusCode());
         })
@@ -740,11 +740,11 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(1, smGetElements.getMissedKeys().size());
           assertEquals(1, smGetElements.getTrimmedKeys().size());
 
-          SMGetElements.TrimmedKey trimmedKey = smGetElements.getTrimmedKeys().get(0);
+          BTreeSMGetResult.TrimmedKey trimmedKey = smGetElements.getTrimmedKeys().get(0);
           assertEquals(keys.get(0), trimmedKey.getKey());
           assertEquals(ELEMENTS.get(2).getBKey(), trimmedKey.getBKey());
 
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(0), elements.get(0).getKey());
           assertEquals(ELEMENTS.get(3), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(1), elements.get(1).getKey());
@@ -782,7 +782,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertTrue(smGetElements.getMissedKeys().isEmpty());
           assertTrue(smGetElements.getTrimmedKeys().isEmpty());
 
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(1), elements.get(0).getKey());
           assertEquals(ELEMENTS.get(3), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(0), elements.get(1).getKey());
@@ -821,7 +821,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertTrue(smGetElements.getMissedKeys().isEmpty());
           assertTrue(smGetElements.getTrimmedKeys().isEmpty());
 
-          List<SMGetElements.Element<Object>> elements = smGetElements.getElements();
+          List<BTreeSMGetResult.Element<Object>> elements = smGetElements.getElements();
           assertEquals(testKeys.get(0), elements.get(0).getKey());
           assertEquals(ELEMENTS.get(0), elements.get(0).getbTreeElement());
           assertEquals(testKeys.get(1), elements.get(1).getKey());

@@ -9,14 +9,14 @@ import java.util.PriorityQueue;
 
 import net.spy.memcached.ops.StatusCode;
 
-public final class SMGetElements<V> {
+public final class BTreeSMGetResult<V> {
   private final List<Element<V>> elements;
   private final List<MissedKey> missedKeys;
   private final List<TrimmedKey> trimmedKeys;
 
-  public SMGetElements(List<Element<V>> elements,
-                       List<MissedKey> missedKeys,
-                       List<TrimmedKey> trimmedKeys) {
+  public BTreeSMGetResult(List<Element<V>> elements,
+                          List<MissedKey> missedKeys,
+                          List<TrimmedKey> trimmedKeys) {
     if (elements == null || missedKeys == null || trimmedKeys == null) {
       throw new IllegalArgumentException("Arguments cannot be null");
     }
@@ -25,9 +25,9 @@ public final class SMGetElements<V> {
     this.trimmedKeys = trimmedKeys;
   }
 
-  public static <T> SMGetElements<T> mergeSMGetElements(List<SMGetElements<T>> smGetElementsList,
-                                                        boolean ascending,
-                                                        boolean unique, int count) {
+  public static <T> BTreeSMGetResult<T> mergeSMGetElements(
+      List<BTreeSMGetResult<T>> smGetElementsList,
+      boolean ascending, boolean unique, int count) {
     List<Element<T>> elements = new ArrayList<>();
     List<MissedKey> missedKeys = new ArrayList<>();
     List<TrimmedKey> trimmedKeys = new ArrayList<>();
@@ -49,11 +49,11 @@ public final class SMGetElements<V> {
       });
     }
 
-    return new SMGetElements<>(elements, missedKeys, trimmedKeys);
+    return new BTreeSMGetResult<>(elements, missedKeys, trimmedKeys);
   }
 
   private static <T> void mergeSMGetElements(
-      List<SMGetElements<T>> smGetElementsList,
+      List<BTreeSMGetResult<T>> smGetElementsList,
       List<Element<T>> elements,
       List<MissedKey> missedKeys,
       List<TrimmedKey> trimmedKeys,
@@ -67,7 +67,7 @@ public final class SMGetElements<V> {
     // 2) Initialize the priority queue with the first element from each list
     //    and collect missed keys and trimmed keys
     for (int i = 0; i < smGetElementsList.size(); i++) {
-      SMGetElements<T> smGetElements = smGetElementsList.get(i);
+      BTreeSMGetResult<T> smGetElements = smGetElementsList.get(i);
       List<Element<T>> eachElements = smGetElements.getElements();
       if (!eachElements.isEmpty()) {
         pq.offer(new ElementWithIndex<>(eachElements.get(0), i, 0));
