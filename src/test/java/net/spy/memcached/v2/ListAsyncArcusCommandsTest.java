@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
-import net.spy.memcached.v2.vo.GetOption;
+import net.spy.memcached.v2.vo.GetMode;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -92,7 +92,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenCompose(result -> {
           assertTrue(result);
-          return async.lopGet(key, 0, GetOption.NONE);
+          return async.lopGet(key, 0, GetMode.NONE);
         })
         .thenAccept(result -> assertEquals(VALUES.get(0), result))
         .toCompletableFuture()
@@ -132,7 +132,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 0, GetOption.NONE)
+    async.lopGet(key, 0, GetMode.NONE)
         // then
         .thenAccept(result -> assertEquals(VALUES.get(0), result))
         .toCompletableFuture()
@@ -143,7 +143,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void lopGetSingleNotFound() throws Exception {
     // given
     // when
-    async.lopGet(keys.get(0), 0, GetOption.NONE)
+    async.lopGet(keys.get(0), 0, GetMode.NONE)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -161,7 +161,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 5, GetOption.NONE)
+    async.lopGet(key, 5, GetMode.NONE)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -179,11 +179,11 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 0, GetOption.DROP)
+    async.lopGet(key, 0, GetMode.DROP)
         // then
         .thenCompose(result -> {
           assertEquals(VALUES.get(0), result);
-          return async.lopGet(key, 0, GetOption.NONE);
+          return async.lopGet(key, 0, GetMode.NONE);
         })
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -202,7 +202,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 0, 2, GetOption.NONE)
+    async.lopGet(key, 0, 2, GetMode.NONE)
         // then
         .thenAccept(result -> {
           result.forEach(Assertions::assertNotNull);
@@ -216,7 +216,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void lopGetRangeNotFound() throws Exception {
     // given
     // when
-    async.lopGet(keys.get(0), 0, 2, GetOption.NONE)
+    async.lopGet(keys.get(0), 0, 2, GetMode.NONE)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -234,7 +234,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 5, 10, GetOption.NONE)
+    async.lopGet(key, 5, 10, GetMode.NONE)
         // then
         .thenAccept(result -> assertTrue(result.isEmpty()))
         .toCompletableFuture()
@@ -253,11 +253,11 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopGet(key, 0, 2, GetOption.DROP)
+    async.lopGet(key, 0, 2, GetMode.DROP)
         .thenCompose(result -> {
           assertNotNull(result);
           assertIterableEquals(VALUES.subList(0, 3), result);
-          return async.lopGet(key, 0, 2, GetOption.NONE);
+          return async.lopGet(key, 0, 2, GetMode.NONE);
         })
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -278,7 +278,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenCompose(result -> {
           assertTrue(result);
-          return async.lopGet(key, 0, GetOption.NONE);
+          return async.lopGet(key, 0, GetMode.NONE);
         })
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -301,7 +301,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenCompose(result -> {
           assertTrue(result);
-          return async.lopGet(key, 0, 2, GetOption.NONE);
+          return async.lopGet(key, 0, 2, GetMode.NONE);
         })
         .thenAccept(result -> assertTrue(result.isEmpty()))
         .toCompletableFuture()

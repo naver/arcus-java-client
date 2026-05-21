@@ -35,7 +35,10 @@ import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
-import net.spy.memcached.v2.vo.GetOption;
+import net.spy.memcached.v2.vo.BopMultiGetArgs;
+import net.spy.memcached.v2.vo.BopRangeGetArgs;
+import net.spy.memcached.v2.vo.BopSMGetArgs;
+import net.spy.memcached.v2.vo.GetMode;
 
 public interface AsyncArcusCommandsIF<T> {
 
@@ -260,10 +263,10 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the list
    * @param index index of the element to get
-   * @param option get option - {@link GetOption}
+   * @param mode  get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return the element value, {@code null} if the key or element is not found
    */
-  ArcusFuture<T> lopGet(String key, int index, GetOption option);
+  ArcusFuture<T> lopGet(String key, int index, GetMode mode);
 
   /**
    * Get elements in an index range from a list.
@@ -271,11 +274,11 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key  key of the list
    * @param from index range start (inclusive)
    * @param to   index range end (inclusive)
-   * @param option get option - {@link GetOption}
+   * @param mode get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return list of element values in order, an empty list if no elements are found in the range,
    * {@code null} if the key is not found
    */
-  ArcusFuture<List<T>> lopGet(String key, int from, int to, GetOption option);
+  ArcusFuture<List<T>> lopGet(String key, int from, int to, GetMode mode);
 
   /**
    * Delete an element at the given index from a list.
@@ -342,11 +345,11 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key   key of the set
    * @param count number of elements to retrieve randomly (0 means all elements, max 1000)
-   * @param option get option - {@link GetOption}
+   * @param mode  get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return set of element values, an empty set if no elements are found,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Set<T>> sopGet(String key, int count, GetOption option);
+  ArcusFuture<Set<T>> sopGet(String key, int count, GetMode mode);
 
   /**
    * Check whether an element exists in a set.
@@ -448,35 +451,35 @@ public interface AsyncArcusCommandsIF<T> {
    * Get all elements from a map.
    *
    * @param key  key of the map
-   * @param option get option - {@link GetOption}
+   * @param mode get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return map of MKey to value,
    * empty map if no elements exist,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Map<String, T>> mopGet(String key, GetOption option);
+  ArcusFuture<Map<String, T>> mopGet(String key, GetMode mode);
 
   /**
    * Get an element with the given MKey from a map.
    *
    * @param key  key of the map
    * @param mKey MKey of the element to get
-   * @param option get option - {@link GetOption}
+   * @param mode get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return the element value,
    * {@code null} if the key or MKey is not found
    */
-  ArcusFuture<T> mopGet(String key, String mKey, GetOption option);
+  ArcusFuture<T> mopGet(String key, String mKey, GetMode mode);
 
   /**
    * Get elements with the MKeys from a map.
    *
    * @param key   key of the map
    * @param mKeys list of MKeys to get
-   * @param option get option - {@link GetOption}
+   * @param mode  get mode - {@link net.spy.memcached.v2.vo.GetMode}
    * @return map of MKey to value for found elements,
    * empty map if no MKeys are found,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetOption option);
+  ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetMode mode);
 
   /**
    * Delete all elements from a map.
@@ -694,7 +697,7 @@ public interface AsyncArcusCommandsIF<T> {
    * empty {@code BTreeGetResult} if no elements are found in the range but key exists,
    * {@code null} if key is not found
    */
-  ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args);
+  ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to, BopRangeGetArgs args);
 
   /**
    * Get elements from multiple btree items.
@@ -708,21 +711,20 @@ public interface AsyncArcusCommandsIF<T> {
    * no {@code Map.Entry} in the map if the key is not found
    */
   ArcusFuture<Map<String, BTreeGetResult<T>>> bopMultiGet(
-      List<String> keys, BKey from, BKey to, BopGetArgs args);
+      List<String> keys, BKey from, BKey to, BopMultiGetArgs args);
 
   /**
    * Get sort-merged elements from multiple btree items.
    *
-   * @param keys   list of keys to get
-   * @param from   BKey range start
-   * @param to     BKey range end
-   * @param unique whether to return unique elements only
-   * @param args   arguments for get operation
+   * @param keys list of keys to get
+   * @param from BKey range start
+   * @param to   BKey range end
+   * @param args arguments for get operation {@link BopSMGetArgs}
    * @return {@code BTreeSMGetResult} containing sort-merged elements,
    * empty {@code BTreeSMGetResult} if no matching elements exist
    */
   ArcusFuture<BTreeSMGetResult<T>> bopSortMergeGet(
-      List<String> keys, BKey from, BKey to, boolean unique, BopGetArgs args);
+      List<String> keys, BKey from, BKey to, BopSMGetArgs args);
 
   /**
    * Get the position of an element with the given bKey in a btree item.

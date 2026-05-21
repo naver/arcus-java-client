@@ -1,6 +1,6 @@
 package net.spy.memcached.v2.vo;
 
-public enum GetOption {
+public enum GetMode {
   /**
    * Retrieves elements without deleting them.
    */
@@ -19,7 +19,7 @@ public enum GetOption {
   private final boolean withDelete;
   private final boolean dropIfEmpty;
 
-  GetOption(boolean withDelete, boolean dropIfEmpty) {
+  GetMode(boolean withDelete, boolean dropIfEmpty) {
     this.withDelete = withDelete;
     this.dropIfEmpty = dropIfEmpty;
   }
