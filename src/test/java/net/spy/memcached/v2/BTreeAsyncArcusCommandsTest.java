@@ -22,6 +22,10 @@ import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
+import net.spy.memcached.v2.vo.BopMultiGetArgs;
+import net.spy.memcached.v2.vo.BopRangeGetArgs;
+import net.spy.memcached.v2.vo.BopSMGetArgs;
+import net.spy.memcached.v2.vo.GetMode;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -216,7 +220,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.bopInsert(key, ELEMENTS.get(0), attrs)
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(1)))
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(2)))
-        .thenCompose(result -> async.bopGet(key, BKey.of(1L), BKey.of(3L), BopGetArgs.DEFAULT))
+        .thenCompose(result -> async.bopGet(key, BKey.of(1L), BKey.of(3L), BopRangeGetArgs.DEFAULT))
         // then
         .thenAccept(elements -> {
           assertEquals(3, elements.getElements().size());
@@ -235,10 +239,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
     CollectionAttributes attrs = new CollectionAttributes();
-    BopGetArgs getArgsWithDelete = new BopGetArgs.Builder()
-        .withDelete()
-        .count(10)
-        .build();
+    BopGetArgs getArgsWithDelete
+        = new BopGetArgs(ElementFlagFilter.DO_NOT_FILTER, GetMode.DELETE);
 
     // when
     async.bopInsert(key, ELEMENTS.get(0), attrs)
@@ -263,15 +265,11 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void bopGetWithDeleteAndDropIfEmpty() throws Exception {
     // given
     String key = keys.get(0);
-    BopGetArgs getArgsWithDeleteAndDrop = new BopGetArgs.Builder()
-        .withDelete()
-        .dropIfEmpty()
-        .count(10)
-        .build();
+    BopGetArgs getArgsWithDrop = new BopGetArgs(ElementFlagFilter.DO_NOT_FILTER, GetMode.DROP);
 
     // when
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
-        .thenCompose(result -> async.bopGet(key, BKey.of(1L), getArgsWithDeleteAndDrop))
+        .thenCompose(result -> async.bopGet(key, BKey.of(1L), getArgsWithDrop))
         // then
         .thenAccept(element -> assertEquals(ELEMENTS.get(0), element))
         .thenCompose(v -> async.bopInsert(key, ELEMENTS.get(1)))
@@ -286,7 +284,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.bopGet(key, BKey.of(1L), BKey.of(10L), BopGetArgs.DEFAULT)
+    async.bopGet(key, BKey.of(1L), BKey.of(10L), BopRangeGetArgs.DEFAULT)
         // then
         .thenAccept(Assertions::assertNull) // NOT FOUND (key miss)
         .toCompletableFuture()
@@ -303,7 +301,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(1)))
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(2)))
         .thenCompose(result -> async.bopGet(key,
-            BKey.of(10L), BKey.of(20L), BopGetArgs.DEFAULT))
+            BKey.of(10L), BKey.of(20L), BopRangeGetArgs.DEFAULT))
         // then
         .thenAccept(elements -> {
           // NOT FOUND ELEMENT
@@ -319,10 +317,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
     CollectionAttributes attrs = new CollectionAttributes();
-    BopGetArgs getArgsWithDelete = new BopGetArgs.Builder()
-        .withDelete()
-        .count(10)
-        .build();
+    BopRangeGetArgs getArgsWithDelete
+        = new BopRangeGetArgs(ElementFlagFilter.DO_NOT_FILTER, 0, 10, GetMode.DELETE);
 
     // when
     async.bopInsert(key, ELEMENTS.get(0), attrs)
@@ -337,7 +333,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertEquals(ELEMENTS.get(1), elements.getElements().get(0));
           assertEquals(ELEMENTS.get(2), elements.getElements().get(1));
         })
-        .thenCompose(v -> async.bopGet(key, BKey.of(2L), BKey.of(3L), BopGetArgs.DEFAULT))
+        .thenCompose(v -> async.bopGet(key, BKey.of(2L), BKey.of(3L), BopRangeGetArgs.DEFAULT))
         .thenAccept(elements -> {
           assertNotNull(elements);
           assertTrue(elements.getElements().isEmpty());
@@ -356,7 +352,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(1)))
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(2)))
         .thenCompose(result -> async.bopInsert(key, ELEMENTS.get(3)))
-        .thenCompose(result -> async.bopGet(key, BKey.of(10L), BKey.of(1L), BopGetArgs.DEFAULT))
+        .thenCompose(result -> async.bopGet(key, BKey.of(10L), BKey.of(1L),
+            BopRangeGetArgs.DEFAULT))
         // then
         .thenAccept(elements -> {
           assertNotNull(elements);
@@ -383,7 +380,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(2), ELEMENTS.get(4), attr))
         // then
         .thenCompose(result -> async
-            .bopMultiGet(testKeys, BKey.of(1L), BKey.of(10L), BopGetArgs.DEFAULT))
+            .bopMultiGet(testKeys, BKey.of(1L), BKey.of(10L), BopMultiGetArgs.DEFAULT))
         .thenAccept(map -> {
           assertEquals(3, map.size());
 
@@ -419,7 +416,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(2), ELEMENTS.get(4), attr))
         // then
         .thenCompose(result -> async
-            .bopMultiGet(testKeys, BKey.of(10L), BKey.of(1L), BopGetArgs.DEFAULT))
+            .bopMultiGet(testKeys, BKey.of(10L), BKey.of(1L), BopMultiGetArgs.DEFAULT))
         .thenAccept(map -> {
           assertEquals(3, map.size());
 
@@ -455,7 +452,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // when
     async.bopInsert(testKeys.get(0), ELEMENTS.get(0), attrs)
         .thenCompose(result -> async
-            .bopMultiGet(testKeys, BKey.of(10L), BKey.of(20L), BopGetArgs.DEFAULT))
+            .bopMultiGet(testKeys, BKey.of(10L), BKey.of(20L), BopMultiGetArgs.DEFAULT))
         // then
         .thenAccept(map -> {
           assertEquals(1, map.size());
@@ -477,6 +474,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     List<String> testKeys = Arrays.asList(keys.get(0), keys.get(1), keys.get(2));
     CollectionAttributes attrs = new CollectionAttributes();
+    BopSMGetArgs getArgs = new BopSMGetArgs(ElementFlagFilter.DO_NOT_FILTER, 1000, true);
 
     async.bopInsert(testKeys.get(0), ELEMENTS.get(0), attrs)
         .thenCompose(result -> async.bopInsert(testKeys.get(0), ELEMENTS.get(2)))
@@ -486,7 +484,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(2), ELEMENTS.get(3)))
         // when
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(1L), BKey.of(10L), true, BopGetArgs.DEFAULT))
+            BKey.of(1L), BKey.of(10L), getArgs))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -511,6 +509,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     List<String> testKeys = Arrays.asList(keys.get(0), keys.get(1), keys.get(2));
     CollectionAttributes attrs = new CollectionAttributes();
+    BopSMGetArgs getArgs = new BopSMGetArgs(ElementFlagFilter.DO_NOT_FILTER, 1000, true);
 
     async.bopInsert(testKeys.get(0), ELEMENTS.get(0), attrs)
         .thenCompose(result -> async.bopInsert(testKeys.get(0), ELEMENTS.get(2)))
@@ -520,7 +519,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(2), ELEMENTS.get(3)))
         // when
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(10L), BKey.of(1L), true, BopGetArgs.DEFAULT))
+            BKey.of(10L), BKey.of(1L), getArgs))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -552,7 +551,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(1)))
         // when
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(1L), BKey.of(2L), false, BopGetArgs.DEFAULT))
+            BKey.of(1L), BKey.of(2L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -590,7 +589,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(1)))
         // when
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(2L), BKey.of(1L), false, BopGetArgs.DEFAULT))
+            BKey.of(2L), BKey.of(1L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -620,6 +619,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void bopSortMergeGetUnique() throws Exception {
     // given
     CollectionAttributes attrs = new CollectionAttributes();
+    BopSMGetArgs getArgs = new BopSMGetArgs(ElementFlagFilter.DO_NOT_FILTER, 1000, true);
 
     async.bopInsert(keys.get(0), ELEMENTS.get(0), attrs)
         .thenCompose(result -> async.bopInsert(keys.get(1), ELEMENTS.get(0), attrs))
@@ -627,7 +627,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(keys.get(3), ELEMENTS.get(0), attrs))
         // when
         .thenCompose(result -> async.bopSortMergeGet(keys,
-            BKey.of(1L), BKey.of(3L), true, BopGetArgs.DEFAULT))
+            BKey.of(1L), BKey.of(3L), getArgs))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -650,7 +650,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.bopInsert(testKeys.get(0), ELEMENTS.get(0), attrs)
         // when
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(1L), BKey.of(10L), false, BopGetArgs.DEFAULT))
+            BKey.of(1L), BKey.of(10L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -676,7 +676,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
 
     // when
     async.bopSortMergeGet(testKeys,
-            BKey.of(10L), BKey.of(20L), false, BopGetArgs.DEFAULT)
+            BKey.of(10L), BKey.of(20L), BopSMGetArgs.DEFAULT)
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -701,7 +701,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(0), ELEMENTS.get(1), attrs))
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(2), attrs))
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(10L), BKey.of(20L), false, BopGetArgs.DEFAULT))
+            BKey.of(10L), BKey.of(20L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -732,7 +732,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(1), attrs))
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(2)))
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(10L), BKey.of(1L), false, BopGetArgs.DEFAULT))
+            BKey.of(10L), BKey.of(1L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -773,8 +773,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(2), attrs))
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(3)))
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(10L), BKey.of(1L), false,
-            new BopGetArgs.Builder().build()))
+            BKey.of(10L), BKey.of(1L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -812,8 +811,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(1), attrs))
         .thenCompose(result -> async.bopInsert(testKeys.get(1), ELEMENTS.get(0)))
         .thenCompose(result -> async.bopSortMergeGet(testKeys,
-            BKey.of(1L), BKey.of(10L), false,
-            new BopGetArgs.Builder().build()))
+            BKey.of(1L), BKey.of(10L), BopSMGetArgs.DEFAULT))
         // then
         .thenAccept(smGetElements -> {
           assertNotNull(smGetElements);
@@ -1837,7 +1835,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.bopDelete(key, from, to, deleteArgs)
         .thenCompose(result -> {
           assertTrue(result);
-          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+          return async.bopGet(key, from, to, BopRangeGetArgs.DEFAULT);
         })
         .thenAccept(result -> {
           List<BTreeElement<Object>> elements = result.getElements();
@@ -1876,7 +1874,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     async.bopDelete(key, from, to, args)
         .thenCompose(result -> {
           assertTrue(result);
-          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+          return async.bopGet(key, from, to, BopRangeGetArgs.DEFAULT);
         })
         .thenAccept(result -> {
           assertNotNull(result);
@@ -1916,7 +1914,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenCompose(result -> {
           assertTrue(result);
-          return async.bopGet(key, from, to, BopGetArgs.DEFAULT);
+          return async.bopGet(key, from, to, BopRangeGetArgs.DEFAULT);
         })
         .thenAccept(result -> {
           assertNotNull(result);

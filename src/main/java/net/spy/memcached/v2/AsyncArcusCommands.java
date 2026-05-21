@@ -111,7 +111,10 @@ import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
 import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
-import net.spy.memcached.v2.vo.GetOption;
+import net.spy.memcached.v2.vo.BopMultiGetArgs;
+import net.spy.memcached.v2.vo.BopRangeGetArgs;
+import net.spy.memcached.v2.vo.BopSMGetArgs;
+import net.spy.memcached.v2.vo.GetMode;
 
 public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
@@ -735,10 +738,10 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<T> lopGet(String key, int index, GetOption option) {
+  public ArcusFuture<T> lopGet(String key, int index, GetMode mode) {
     AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
-    ListGet get = new ListGet(index, option.isWithDelete(), option.isDropIfEmpty());
+    ListGet get = new ListGet(index, mode.isWithDelete(), mode.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -781,11 +784,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<List<T>> lopGet(String key, int from, int to, GetOption option) {
+  public ArcusFuture<List<T>> lopGet(String key, int from, int to, GetMode mode) {
     AbstractArcusResult<List<T>> result =
         new AbstractArcusResult<>(new AtomicReference<>(new ArrayList<>()));
     ArcusFutureImpl<List<T>> future = new ArcusFutureImpl<>(result);
-    ListGet get = new ListGet(from, to, option.isWithDelete(), option.isDropIfEmpty());
+    ListGet get = new ListGet(from, to, mode.isWithDelete(), mode.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -864,11 +867,11 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Set<T>> sopGet(String key, int count, GetOption option) {
+  public ArcusFuture<Set<T>> sopGet(String key, int count, GetMode mode) {
     AbstractArcusResult<Set<T>> result
         = new AbstractArcusResult<>(new AtomicReference<>(new HashSet<>()));
     ArcusFutureImpl<Set<T>> future = new ArcusFutureImpl<>(result);
-    SetGet get = new SetGet(count, option.isWithDelete(), option.isDropIfEmpty());
+    SetGet get = new SetGet(count, mode.isWithDelete(), mode.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -1009,18 +1012,18 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, T>> mopGet(String key, GetOption option) {
-    return mopGet(key, new ArrayList<>(), option);
+  public ArcusFuture<Map<String, T>> mopGet(String key, GetMode mode) {
+    return mopGet(key, new ArrayList<>(), mode);
   }
 
   @Override
-  public ArcusFuture<T> mopGet(String key, String mKey, GetOption option) {
+  public ArcusFuture<T> mopGet(String key, String mKey, GetMode mode) {
     keyValidator.validateMKey(mKey);
 
     AbstractArcusResult<T> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<T> future = new ArcusFutureImpl<>(result);
     List<String> mKeys = Collections.singletonList(mKey);
-    MapGet get = new MapGet(mKeys, option.isWithDelete(), option.isDropIfEmpty());
+    MapGet get = new MapGet(mKeys, mode.isWithDelete(), mode.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -1063,7 +1066,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetOption option) {
+  public ArcusFuture<Map<String, T>> mopGet(String key, List<String> mKeys, GetMode mode) {
     if (mKeys == null) {
       throw new IllegalArgumentException("mKeys cannot be null");
     }
@@ -1075,7 +1078,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     AbstractArcusResult<Map<String, T>> result =
         new AbstractArcusResult<>(new AtomicReference<>(new HashMap<>()));
     ArcusFutureImpl<Map<String, T>> future = new ArcusFutureImpl<>(result);
-    MapGet get = new MapGet(mKeys, option.isWithDelete(), option.isDropIfEmpty());
+    MapGet get = new MapGet(mKeys, mode.isWithDelete(), mode.isDropIfEmpty());
     ArcusClient client = arcusClientSupplier.get();
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
@@ -1353,7 +1356,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to, BopGetArgs args) {
+  public ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to,
+                                               BopRangeGetArgs args) {
     verifyBKeyTypesMatch(from, to);
 
     AbstractArcusResult<BTreeGetResult<T>> result =
@@ -1405,34 +1409,33 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   private static BTreeGet createBTreeGet(BKey bKey, BopGetArgs args) {
     if (bKey.getType() == BKey.BKeyType.LONG) {
-      return new BTreeGet((long) bKey.getData(), args.getElementFlagFilter(),
+      return new BTreeGet((long) bKey.getData(), args.getEFlagFilter(),
           args.isWithDelete(), args.isDropIfEmpty());
     }
 
-    return new BTreeGet((byte[]) bKey.getData(), args.getElementFlagFilter(),
+    return new BTreeGet((byte[]) bKey.getData(), args.getEFlagFilter(),
         args.isWithDelete(), args.isDropIfEmpty());
   }
 
-  private static BTreeGet createBTreeGet(BKey from, BKey to, BopGetArgs args) {
+  private static BTreeGet createBTreeGet(BKey from, BKey to, BopRangeGetArgs args) {
     if (from.getType() == BKey.BKeyType.LONG) {
       return new BTreeGet((long) from.getData(), (long) to.getData(),
-          args.getElementFlagFilter(), args.getOffset(), args.getCount(),
+          args.getEFlagFilter(), args.getOffset(), args.getCount(),
           args.isWithDelete(), args.isDropIfEmpty());
     }
 
     return new BTreeGet((byte[]) from.getData(), (byte[]) to.getData(),
-        args.getElementFlagFilter(), args.getOffset(), args.getCount(),
+        args.getEFlagFilter(), args.getOffset(), args.getCount(),
         args.isWithDelete(), args.isDropIfEmpty());
   }
 
   @Override
   public ArcusFuture<Map<String, BTreeGetResult<T>>> bopMultiGet(List<String> keys,
                                                                  BKey from, BKey to,
-                                                                 BopGetArgs args) {
+                                                                 BopMultiGetArgs args) {
     keyValidator.validateKey(keys);
     keyValidator.checkDupKey(keys);
     verifyBKeyTypesMatch(from, to);
-    verifyPositiveCountArg(args, ArcusClient.MAX_GETBULK_ELEMENT_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys =
@@ -1542,25 +1545,24 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   private BTreeGetBulk<T> createBTreeGetBulk(MemcachedNode node, List<String> keys,
-                                             BKey from, BKey to, BopGetArgs args) {
+                                             BKey from, BKey to, BopMultiGetArgs args) {
     if (from.getType() == BKey.BKeyType.LONG) {
       return new BTreeGetBulkWithLongTypeBkey<>(node, keys,
-          (long) from.getData(), (long) to.getData(), args.getElementFlagFilter(),
+          (long) from.getData(), (long) to.getData(), args.getEFlagFilter(),
           args.getOffset(), args.getCount());
     }
 
     return new BTreeGetBulkWithByteTypeBkey<>(node, keys,
-        (byte[]) from.getData(), (byte[]) to.getData(), args.getElementFlagFilter(),
+        (byte[]) from.getData(), (byte[]) to.getData(), args.getEFlagFilter(),
         args.getOffset(), args.getCount());
   }
 
   @Override
   public ArcusFuture<BTreeSMGetResult<T>> bopSortMergeGet(List<String> keys, BKey from, BKey to,
-                                                          boolean unique, BopGetArgs args) {
+                                                          BopSMGetArgs args) {
     keyValidator.validateKey(keys);
     keyValidator.checkDupKey(keys);
     verifyBKeyTypesMatch(from, to);
-    verifyPositiveCountArg(args, ArcusClient.MAX_SMGET_COUNT);
 
     ArcusClient client = arcusClientSupplier.get();
     Collection<Map.Entry<MemcachedNode, List<String>>> arrangedKeys =
@@ -1569,7 +1571,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     List<CompletableFuture<BTreeSMGetResult<T>>> smGetFutures = new ArrayList<>();
 
     for (Map.Entry<MemcachedNode, List<String>> entry : arrangedKeys) {
-      BTreeSMGet<T> smGet = createBTreeSMGet(from, to, args, unique, entry);
+      BTreeSMGet<T> smGet = createBTreeSMGet(from, to, args, entry);
       CompletableFuture<BTreeSMGetResult<T>> future =
           bopSortMergeGetPerNode(client, smGet).toCompletableFuture();
       smGetFutures.add(future);
@@ -1585,8 +1587,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           results.add(future.join());
         }
       }
-      return BTreeSMGetResult.mergeSMGetElements(results, from.compareTo(to) <= 0, unique,
-          args.getCount());
+      return BTreeSMGetResult.mergeSMGetElements(results, from.compareTo(to) <= 0,
+          args.isUnique(), args.getCount());
     });
   }
 
@@ -1656,18 +1658,17 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     return future;
   }
 
-  private BTreeSMGet<T> createBTreeSMGet(BKey from, BKey to, BopGetArgs args,
-                                         boolean unique,
+  private BTreeSMGet<T> createBTreeSMGet(BKey from, BKey to, BopSMGetArgs args,
                                          Map.Entry<MemcachedNode, List<String>> entry) {
     if (from.getType() == BKey.BKeyType.LONG) {
       return new BTreeSMGetWithLongTypeBkey<>(entry.getKey(), entry.getValue(),
-          (long) from.getData(), (long) to.getData(), args.getElementFlagFilter(),
-          args.getCount(), unique);
+          (long) from.getData(), (long) to.getData(),
+          args.getEFlagFilter(), args.getCount(), args.isUnique());
     }
 
     return new BTreeSMGetWithByteTypeBkey<>(entry.getKey(), entry.getValue(),
-        (byte[]) from.getData(), (byte[]) to.getData(), args.getElementFlagFilter(),
-        args.getCount(), unique);
+        (byte[]) from.getData(), (byte[]) to.getData(),
+        args.getEFlagFilter(), args.getCount(), args.isUnique());
   }
 
   @Override
@@ -1930,13 +1931,6 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   private static void verifyBKeyTypesMatch(BKey from, BKey to) {
     if (from.getType() != to.getType()) {
       throw new IllegalArgumentException("Two BKey types(from, to) must be the same.");
-    }
-  }
-
-  private static void verifyPositiveCountArg(BopGetArgs args, int maxCount) {
-    int count = args.getCount();
-    if (count <= 0 || count > maxCount) {
-      throw new IllegalArgumentException("Count should be between 1 to " + maxCount);
     }
   }
 

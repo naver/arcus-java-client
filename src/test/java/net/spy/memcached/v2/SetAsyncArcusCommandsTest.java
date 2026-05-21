@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
-import net.spy.memcached.v2.vo.GetOption;
+import net.spy.memcached.v2.vo.GetMode;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -214,7 +214,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.sopGet(key, 10, GetOption.NONE)
+    async.sopGet(key, 10, GetMode.NONE)
         // then
         .thenAccept(result -> {
           assertNotNull(result);
@@ -228,7 +228,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   void sopGetNotFound() throws Exception {
     // given
     // when
-    async.sopGet(keys.get(0), 10, GetOption.NONE)
+    async.sopGet(keys.get(0), 10, GetMode.NONE)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -246,7 +246,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.sopGet(key, 10, GetOption.NONE)
+    async.sopGet(key, 10, GetMode.NONE)
         // then
         .thenAccept(result -> assertTrue(result.isEmpty()))
         .toCompletableFuture()
@@ -264,11 +264,11 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.sopGet(key, 10, GetOption.DROP)
+    async.sopGet(key, 10, GetMode.DROP)
         .thenCompose(result -> {
           assertNotNull(result);
           assertEquals(1, result.size());
-          return async.sopGet(key, 10, GetOption.NONE);
+          return async.sopGet(key, 10, GetMode.NONE);
         })
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -340,7 +340,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then: set 자체가 삭제되어 null
         .thenCompose(result -> {
           assertTrue(result);
-          return async.sopGet(key, 10, GetOption.NONE);
+          return async.sopGet(key, 10, GetMode.NONE);
         })
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
