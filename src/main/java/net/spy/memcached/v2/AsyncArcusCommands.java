@@ -109,7 +109,6 @@ import net.spy.memcached.v2.vo.BTreeGetResult;
 import net.spy.memcached.v2.vo.BTreePositionElement;
 import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
-import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.BopMultiGetArgs;
 import net.spy.memcached.v2.vo.BopRangeGetArgs;
@@ -1914,17 +1913,20 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> bopDelete(String key, BKey bKey, BopDeleteArgs args) {
-    BTreeDelete delete = new BTreeDelete(bKey.toString(),
-        args.getEFlagFilter(), args.isDropIfEmpty(), false);
+  public ArcusFuture<Boolean> bopDelete(String key, BKey bKey,
+                                        ElementFlagFilter eFlagFilter,
+                                        boolean dropIfEmpty) {
+    BTreeDelete delete = new BTreeDelete(bKey.toString(), eFlagFilter, dropIfEmpty, false);
     return collectionDelete(key, delete);
   }
 
   @Override
-  public ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to, BopDeleteArgs args) {
+  public ArcusFuture<Boolean> bopDelete(String key, BKey from, BKey to,
+                                        ElementFlagFilter eFlagFilter, int count,
+                                        boolean dropIfEmpty) {
     verifyBKeyTypesMatch(from, to);
     BTreeDelete delete = new BTreeDelete(from.toString(), to.toString(),
-        args.getCount(), args.getEFlagFilter(), args.isDropIfEmpty(), false);
+        count, eFlagFilter, dropIfEmpty, false);
     return collectionDelete(key, delete);
   }
 
