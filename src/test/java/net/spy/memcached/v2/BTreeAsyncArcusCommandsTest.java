@@ -20,7 +20,6 @@ import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeGetResult;
 import net.spy.memcached.v2.vo.BTreeSMGetResult;
 import net.spy.memcached.v2.vo.BTreeUpdateElement;
-import net.spy.memcached.v2.vo.BopDeleteArgs;
 import net.spy.memcached.v2.vo.BopGetArgs;
 import net.spy.memcached.v2.vo.BopMultiGetArgs;
 import net.spy.memcached.v2.vo.BopRangeGetArgs;
@@ -1691,7 +1690,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, false)
         // then
         .thenCompose(result -> {
           assertTrue(result);
@@ -1710,17 +1709,13 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
     BKey bKey = ELEMENTS.get(0).getBKey();
-    BopDeleteArgs args = new BopDeleteArgs.Builder()
-        .dropIfEmpty()
-        .build();
-
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, bKey, args)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, true)
         // then
         .thenCompose(result -> {
           assertTrue(result);
@@ -1738,7 +1733,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey bKey = BKey.of(1L);
 
     // when
-    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, false)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -1758,7 +1753,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, false)
         // then
         .thenAccept(Assertions::assertFalse)
         .toCompletableFuture()
@@ -1777,7 +1772,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, false)
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
           assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
@@ -1799,7 +1794,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, bKey, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, bKey, ElementFlagFilter.DO_NOT_FILTER, false)
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
           assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
@@ -1815,10 +1810,6 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
     BKey from = ELEMENTS.get(0).getBKey();
     BKey to = ELEMENTS.get(2).getBKey();
-    BopDeleteArgs deleteArgs = new BopDeleteArgs.Builder()
-        .count(1)
-        .build();
-
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
         .thenCompose(result -> {
           assertTrue(result);
@@ -1832,7 +1823,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, deleteArgs)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 1, false)
         .thenCompose(result -> {
           assertTrue(result);
           return async.bopGet(key, from, to, BopRangeGetArgs.DEFAULT);
@@ -1852,8 +1843,6 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
     BKey from = BKey.of(0L);
     BKey to = BKey.of(10L);
-    BopDeleteArgs args = BopDeleteArgs.DEFAULT;
-
     async.bopInsert(key, ELEMENTS.get(0), new CollectionAttributes())
         .thenCompose(result -> {
           assertTrue(result);
@@ -1871,7 +1860,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, args)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, false)
         .thenCompose(result -> {
           assertTrue(result);
           return async.bopGet(key, from, to, BopRangeGetArgs.DEFAULT);
@@ -1893,10 +1882,6 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BTreeElement<Object> elementWithoutFlag = new BTreeElement<>(BKey.of(2L), "value2", null);
 
     ElementFlagFilter filter = new ElementFlagFilter(ElementFlagFilter.CompOperands.Equal, eFlag);
-    BopDeleteArgs args = new BopDeleteArgs.Builder()
-        .eFlagFilter(filter)
-        .build();
-
     BKey from = BKey.of(0L);
     BKey to = BKey.of(10L);
 
@@ -1910,7 +1895,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, args)
+    async.bopDelete(key, from, to, filter, 0, false)
         // then
         .thenCompose(result -> {
           assertTrue(result);
@@ -1934,7 +1919,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     BKey to = BKey.of(10L);
 
     // when
-    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, false)
         // then
         .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
@@ -1955,7 +1940,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, false)
         // then
         .thenAccept(Assertions::assertFalse)
         .toCompletableFuture()
@@ -1976,7 +1961,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, false)
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
           assertTrue(ex.getMessage().contains("TYPE_MISMATCH"));
@@ -2000,7 +1985,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.bopDelete(key, from, to, BopDeleteArgs.DEFAULT)
+    async.bopDelete(key, from, to, ElementFlagFilter.DO_NOT_FILTER, 0, false)
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
           assertTrue(ex.getMessage().contains("BKEY_MISMATCH"));
