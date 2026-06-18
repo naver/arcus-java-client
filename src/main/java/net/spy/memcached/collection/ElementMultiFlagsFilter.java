@@ -22,8 +22,8 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class ElementMultiFlagsFilter extends ElementFlagFilter {
 
-  final static int MAX_EFLAGS = 100;
-  private ArrayList<byte[]> compValue = new ArrayList<>();
+  private static final int MAX_COMP_VALUE_COUNT = 100;
+  private final ArrayList<byte[]> compValue = new ArrayList<>();
 
   public ElementMultiFlagsFilter() {
   }
@@ -61,10 +61,10 @@ public class ElementMultiFlagsFilter extends ElementFlagFilter {
                       + MAX_EFLAG_LENGTH);
     }
 
-    if (this.compValue.size() > MAX_EFLAGS) {
+    if (this.compValue.size() >= MAX_COMP_VALUE_COUNT) {
       throw new IllegalArgumentException(
-              "Count of comparison values must be less than "
-                      + MAX_EFLAGS);
+              "Count of comparison values must not exceed "
+                      + MAX_COMP_VALUE_COUNT);
     }
 
     if (!this.compValue.isEmpty()
