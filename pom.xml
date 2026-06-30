@@ -18,7 +18,7 @@
         <junit.version>5.10.2</junit.version>
         <jmock.version>2.13.1</jmock.version>
         <bolyartech.version>2.0.2</bolyartech.version>
-        <jackson.version>2.19.0</jackson.version>
+        <jackson.version>2.22.0</jackson.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
     </properties>
