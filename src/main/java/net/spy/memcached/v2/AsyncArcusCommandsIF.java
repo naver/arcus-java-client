@@ -229,7 +229,7 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key        key of the list to create
    * @param type       element value type
-   * @param attributes initial attributes of the list
+   * @param attributes initial attributes of the list (must not be null)
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
@@ -238,7 +238,6 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Insert an element at the given index into a list.
    * Negative indexes are counted backward from the end of the list.
-   *
    *
    * @param key   key of the list
    * @param index index at which to insert the element
@@ -314,7 +313,7 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key        key of the set to create
    * @param type       element value type
-   * @param attributes initial attributes of the set
+   * @param attributes initial attributes of the set (must not be null)
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
@@ -383,7 +382,7 @@ public interface AsyncArcusCommandsIF<T> {
    *
    * @param key        key of the map to create
    * @param type       element value type
-   * @param attributes initial attributes of the map
+   * @param attributes initial attributes of the map (must not be null)
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
@@ -408,7 +407,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the map
    * @param mKey       mKey of the element to insert
    * @param value      the value to insert
-   * @param attributes attributes to use when creating the map
+   * @param attributes attributes to use when creating the map, or {@code null} to not create
    * @return {@code true} if the element was inserted,
    * {@code false} if the mKey already exists,
    * {@code null} if the key is not found
@@ -434,7 +433,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param key        key of the map
    * @param mKey       mKey of the element to upsert
    * @param value      the value to insert or replace with
-   * @param attributes attributes to use when creating the map
+   * @param attributes attributes to use when creating the map, or {@code null} to not create
    * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value, CollectionAttributes attributes);
@@ -523,9 +522,9 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Create a btree item.
    *
-   * @param key        key to create
-   * @param type       btree element value type
-   * @param attributes collection attributes (must not be null)
+   * @param key        key of the btree to create
+   * @param type       element value type
+   * @param attributes initial attributes of the btree (must not be null)
    * @return {@code true} if created, otherwise {@code false}
    */
   ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
@@ -534,7 +533,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Insert an element into a btree item.
    *
-   * @param key     key to insert
+   * @param key     key of the btree
    * @param element btree element to insert
    * @return {@code true} if inserted,
    * {@code false} if element exists,
@@ -545,9 +544,9 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Insert an element into a btree item.
    *
-   * @param key        key to insert
+   * @param key        key of the btree
    * @param element    btree element to insert
-   * @param attributes collection attributes for creation when the btree does not exist
+   * @param attributes attributes to use when creating the btree, or {@code null} to not create
    * @return {@code true} if inserted,
    * {@code false} if element exists,
    * {@code null} if key is not found
@@ -558,7 +557,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Insert an element into a btree item and get trimmed element if overflow trim occurs.
    *
-   * @param key     key to insert
+   * @param key     key of the btree
    * @param element btree element to insert
    * @return {@code Map.Entry} with insertion result and trimmed element
    */
@@ -568,9 +567,9 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Insert an element into a btree item and get trimmed element if overflow trim occurs.
    *
-   * @param key        key to insert
+   * @param key        key of the btree
    * @param element    btree element to insert
-   * @param attributes collection attributes for creation when the btree does not exist
+   * @param attributes attributes to use when creating the btree, or {@code null} to not create
    * @return {@code Map.Entry} with insertion result and trimmed element
    */
   ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
@@ -579,7 +578,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Upsert an element into a btree item.
    *
-   * @param key     key to upsert
+   * @param key     key of the btree
    * @param element btree element to upsert
    * @return {@code true} if upserted, {@code null} if the key is not found
    */
@@ -588,9 +587,9 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Upsert an element into a btree item.
    *
-   * @param key        key to upsert
+   * @param key        key of the btree
    * @param element    btree element to upsert
-   * @param attributes collection attributes for creation when the btree does not exist
+   * @param attributes attributes to use when creating the btree, or {@code null} to not create
    * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
@@ -599,7 +598,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
    *
-   * @param key     key to upsert
+   * @param key     key of the btree
    * @param element btree element to upsert
    * @return {@code Map.Entry} with upsertion result and trimmed element
    */
@@ -609,9 +608,9 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
    *
-   * @param key        key to upsert
+   * @param key        key of the btree
    * @param element    btree element to upsert
-   * @param attributes collection attributes for creation when the btree does not exist
+   * @param attributes attributes to use when creating the btree, or {@code null} to not create
    * @return {@code Map.Entry} with upsertion result and trimmed element
    */
   ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
@@ -620,7 +619,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Update an element in a btree item
    *
-   * @param key     key to update
+   * @param key     key of the btree
    * @param element btree element to update
    * @return {@code true} if updated,
    * {@code false} if element does not exist,
@@ -631,7 +630,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param bKey  bKey of the element to increment
    * @param delta the amount to increment (&gt; 0)
    * @return the new value after increment, or {@code null} if the key or element is not found
@@ -642,7 +641,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Increments a numeric value of an element with the given bKey in a btree item by {@code delta}.
    * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
    *
-   * @param key     key of the btree item
+   * @param key     key of the btree
    * @param bKey    bKey of the element to increment
    * @param delta   the amount to increment (&gt; 0)
    * @param initial the value to store if the element does not exist
@@ -656,7 +655,7 @@ public interface AsyncArcusCommandsIF<T> {
    * Decrements a numeric value of an element with the given bKey in a btree item by {@code delta}.
    * <p>If the value is decremented below 0, it will be set to 0.</p>
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param bKey  bKey of the element to decrement
    * @param delta the amount to decrement (&gt; 0)
    * @return the new value after decrement, or {@code null} if the key or element is not found
@@ -668,7 +667,7 @@ public interface AsyncArcusCommandsIF<T> {
    * If the element does not exist, it is created with {@code initial} value and {@code eFlag}.
    * <p>If the value is decremented below 0, it will be set to 0.</p>
    *
-   * @param key     key of the btree item
+   * @param key     key of the btree
    * @param bKey    bKey of the element to decrement
    * @param delta   the amount to decrement (&gt; 0)
    * @param initial the value to store if the element does not exist
@@ -679,9 +678,9 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Long> bopDecr(String key, BKey bKey, int delta, long initial, byte[] eFlag);
 
   /**
-   * Get an element from a btree item.
+   * Get an element with the given bKey from a btree.
    *
-   * @param key  key to get
+   * @param key  key of the btree
    * @param bKey bKey of the element to get
    * @param args arguments for get operation
    * @return the {@code BTreeElement} if found,
@@ -691,9 +690,9 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<BTreeElement<T>> bopGet(String key, BKey bKey, BopGetArgs args);
 
   /**
-   * Get elements from a btree item.
+   * Get elements in a bKey range from a btree.
    *
-   * @param key  key to get
+   * @param key  key of the btree
    * @param from bKey range start
    * @param to   bKey range end
    * @param args arguments for get operation
@@ -704,9 +703,9 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<BTreeGetResult<T>> bopGet(String key, BKey from, BKey to, BopRangeGetArgs args);
 
   /**
-   * Get elements from multiple btree items.
+   * Get elements in a bKey range from multiple btrees.
    *
-   * @param keys list of keys to get
+   * @param keys list of btree keys
    * @param from bKey range start
    * @param to   bKey range end
    * @param args arguments for get operation
@@ -718,9 +717,9 @@ public interface AsyncArcusCommandsIF<T> {
       List<String> keys, BKey from, BKey to, BopMultiGetArgs args);
 
   /**
-   * Get sort-merged elements from multiple btree items.
+   * Get sort-merged elements in a bKey range from multiple btrees.
    *
-   * @param keys list of keys to get
+   * @param keys list of btree keys
    * @param from bKey range start
    * @param to   bKey range end
    * @param args arguments for get operation {@link BopSMGetArgs}
@@ -731,9 +730,9 @@ public interface AsyncArcusCommandsIF<T> {
       List<String> keys, BKey from, BKey to, BopSMGetArgs args);
 
   /**
-   * Get the position of an element with the given bKey in a btree item.
+   * Get the position of an element with the given bKey from a btree.
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param bKey  bKey of the element to find
    * @param order the order of the btree to determine position
    * @return the 0-based position of the element,
@@ -742,9 +741,9 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Integer> bopGetPosition(String key, BKey bKey, BTreeOrder order);
 
   /**
-   * Get an element at the given position in a btree item.
+   * Get an element at the given position from a btree.
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param pos   0-based position of the element to get
    * @param order the order of the btree to determine position
    * @return the {@code BTreeElement} at the given position,
@@ -754,9 +753,9 @@ public interface AsyncArcusCommandsIF<T> {
       String key, int pos, BTreeOrder order);
 
   /**
-   * Get elements in a position range from a btree item.
+   * Get elements in a position range from a btree.
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param from  start position (inclusive)
    * @param to    end position (inclusive); must be greater than or equal to {@code from}
    * @param order the order of the btree to determine position
@@ -770,7 +769,7 @@ public interface AsyncArcusCommandsIF<T> {
   /**
    * Get an element by bKey and its neighboring elements with position information.
    *
-   * @param key   key of the btree item
+   * @param key   key of the btree
    * @param bKey  bKey of the element to find
    * @param count the number of neighboring elements to retrieve on each side
    *              (0 &le; count &le; 100)
@@ -783,9 +782,9 @@ public interface AsyncArcusCommandsIF<T> {
       String key, BKey bKey, int count, BTreeOrder order);
 
   /**
-   * Count elements in a bKey range from a btree item.
+   * Count elements in a bKey range from a btree.
    *
-   * @param key         key of the btree item
+   * @param key         key of the btree
    * @param from        bKey range start (inclusive)
    * @param to          bKey range end (inclusive)
    * @param eFlagFilter eFlag filter condition, or {@code null} to count all elements in the range
@@ -795,9 +794,9 @@ public interface AsyncArcusCommandsIF<T> {
   ArcusFuture<Long> bopCount(String key, BKey from, BKey to, ElementFlagFilter eFlagFilter);
 
   /**
-   * Delete an element with the given bKey from a btree item.
+   * Delete an element with the given bKey from a btree.
    *
-   * @param key         key of the btree item
+   * @param key         key of the btree
    * @param bKey        bKey of the element to delete
    * @param eFlagFilter eFlag filter condition, or {@code ElementFlagFilter.DO_NOT_FILTER}
    *                    to delete the element without checking eFlag
@@ -815,7 +814,7 @@ public interface AsyncArcusCommandsIF<T> {
    * If {@code count} is 0, all matching elements are deleted; otherwise,
    * up to {@code count} matching elements are deleted.
    *
-   * @param key         key of the btree item
+   * @param key         key of the btree
    * @param from        bKey range start (inclusive)
    * @param to          bKey range end (inclusive)
    * @param eFlagFilter eFlag filter condition, or {@code ElementFlagFilter.DO_NOT_FILTER}
