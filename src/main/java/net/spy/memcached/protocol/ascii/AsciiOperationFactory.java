@@ -85,143 +85,173 @@ import net.spy.memcached.ops.VersionOperation;
  */
 public class AsciiOperationFactory extends BaseOperationFactory {
 
+  @Override
   public DeleteOperation delete(String key, OperationCallback cb) {
     return new DeleteOperationImpl(key, cb);
   }
 
+  @Override
   public FlushOperation flush(int delay, OperationCallback cb) {
     return new FlushOperationImpl(delay, cb);
   }
 
+  @Override
   public GetOperation get(String key, GetOperation.Callback cb) {
     return new GetOperationImpl(key, cb);
   }
 
+  @Override
   public GetOperation get(Collection<String> keys, GetOperation.Callback cb, boolean isMGet) {
     return new GetOperationImpl(keys, cb, isMGet);
   }
 
+  @Override
   public GetsOperation gets(String key, GetsOperation.Callback cb) {
     return new GetsOperationImpl(key, cb);
   }
 
+  @Override
   public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet) {
     return new GetsOperationImpl(keys, cb, isMGet);
   }
 
-  public GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb) {
-    return new GetAndTouchOperationImpl(key, expiration, cb);
+  @Override
+  public GetOperation getAndTouch(String key, long exp, GetOperation.Callback cb) {
+    return new GetAndTouchOperationImpl(key, exp, cb);
   }
 
-  public GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb) {
-    return new GetsAndTouchOperationImpl(key, expiration, cb);
+  @Override
+  public GetsOperation getsAndTouch(String key, long exp, GetsOperation.Callback cb) {
+    return new GetsAndTouchOperationImpl(key, exp, cb);
   }
 
+  @Override
   public MutatorOperation mutate(Mutator m, String key, int by,
-                                 long def, int exp, OperationCallback cb) {
+                                 long def, long exp, OperationCallback cb) {
     return new MutatorOperationImpl(m, key, by, def, exp, cb);
   }
 
+  @Override
   public StatsOperation stats(String arg, StatsOperation.Callback cb) {
     return new StatsOperationImpl(arg, cb);
   }
 
+  @Override
   public StoreOperation store(StoreType storeType, String key, int flags,
-                              int exp, byte[] data, OperationCallback cb) {
+                              long exp, byte[] data, OperationCallback cb) {
     return new StoreOperationImpl(storeType, key, flags, exp, data, cb);
   }
 
-  public TouchOperation touch(String key, int expiration, OperationCallback cb) {
-    return new TouchOperationImpl(key, expiration, cb);
+  @Override
+  public TouchOperation touch(String key, long exp, OperationCallback cb) {
+    return new TouchOperationImpl(key, exp, cb);
   }
 
+  @Override
   public VersionOperation version(OperationCallback cb) {
     return new VersionOperationImpl(cb);
   }
 
+  @Override
   public NoopOperation noop(OperationCallback cb) {
     return new VersionOperationImpl(cb);
   }
 
+  @Override
   public CASOperation cas(StoreType type, String key, long casId, int flags,
-                          int exp, byte[] data, OperationCallback cb) {
+                          long exp, byte[] data, OperationCallback cb) {
     return new CASOperationImpl(key, casId, flags, exp, data, cb);
   }
 
+  @Override
   public ConcatenationOperation cat(ConcatenationType catType,
                                     long casId,
                                     String key, byte[] data, OperationCallback cb) {
     return new ConcatenationOperationImpl(catType, key, data, cb);
   }
 
+  @Override
   public SASLMechsOperation saslMechs(boolean isInternal, OperationCallback cb) {
     return new SASLMechsOperationImpl(isInternal, cb);
   }
 
+  @Override
   public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
     return new SASLStepOperationImpl(sc, challenge, cb);
   }
 
+  @Override
   public SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb) {
     return new SASLAuthOperationImpl(sc, cb);
   }
 
+  @Override
   public SetAttrOperation setAttr(String key, Attributes attrs,
                                   OperationCallback cb) {
     return new SetAttrOperationImpl(key, attrs, cb);
   }
 
+  @Override
   public GetAttrOperation getAttr(String key, GetAttrOperation.Callback cb) {
     return new GetAttrOperationImpl(key, cb);
   }
 
+  @Override
   public CollectionInsertOperation collectionInsert(String key, String subkey,
                                                     CollectionInsert<?> collectionInsert,
                                                     byte[] data, OperationCallback cb) {
     return new CollectionInsertOperationImpl(key, subkey,
-            collectionInsert, data, cb);
+        collectionInsert, data, cb);
   }
 
+  @Override
   public CollectionPipedInsertOperation collectionPipedInsert(String key,
                                                               CollectionPipedInsert<?> insert,
                                                               OperationCallback cb) {
     return new CollectionPipedInsertOperationImpl(key, insert, cb);
   }
 
+  @Override
   public CollectionGetOperation collectionGet(String key,
                                               CollectionGet collectionGet,
                                               CollectionGetOperation.Callback cb) {
     return new CollectionGetOperationImpl(key, collectionGet, cb);
   }
 
+  @Override
   public CollectionDeleteOperation collectionDelete(String key,
                                                     CollectionDelete collectionDelete,
                                                     OperationCallback cb) {
     return new CollectionDeleteOperationImpl(key, collectionDelete, cb);
   }
 
+  @Override
   public CollectionExistOperation collectionExist(String key, String subkey,
                                                   CollectionExist collectionExist,
                                                   OperationCallback cb) {
     return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
   }
 
+  @Override
   public CollectionCreateOperation collectionCreate(String key,
                                                     CollectionCreate collectionCreate,
                                                     OperationCallback cb) {
     return new CollectionCreateOperationImpl(key, collectionCreate, cb);
   }
 
+  @Override
   public CollectionCountOperation collectionCount(String key,
                                                   CollectionCount collectionCount,
                                                   OperationCallback cb) {
     return new CollectionCountOperationImpl(key, collectionCount, cb);
   }
 
+  @Override
   public FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb) {
     return new FlushByPrefixOperationImpl(prefix, delay, noreply, cb);
   }
 
+  @Override
   public BTreeSortMergeGetOperation bopsmget(BTreeSMGet<?> smGet,
                                              BTreeSortMergeGetOperation.Callback cb) {
     return new BTreeSortMergeGetOperationImpl(smGet, cb);
@@ -234,7 +264,7 @@ public class AsciiOperationFactory extends BaseOperationFactory {
                                                     byte[] data,
                                                     OperationCallback cb) {
     return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
-            data, cb);
+        data, cb);
   }
 
   @Override

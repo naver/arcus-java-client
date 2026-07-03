@@ -49,7 +49,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> set(String key, int exp, T value);
+  ArcusFuture<Boolean> set(String key, long exp, T value);
 
   /**
    * Add a value for the given key if it does not exist.
@@ -59,7 +59,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> add(String key, int exp, T value);
+  ArcusFuture<Boolean> add(String key, long exp, T value);
 
   /**
    * Replace a value for the given key if it exists.
@@ -69,7 +69,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> replace(String key, int exp, T value);
+  ArcusFuture<Boolean> replace(String key, long exp, T value);
 
   /**
    * Sets multiple key-value pairs.
@@ -78,7 +78,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, long exp);
 
   /**
    * Add multiple key-value pairs if they do not exist.
@@ -87,7 +87,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, long exp);
 
   /**
    * Replace multiple key-value pairs if they exist.
@@ -96,7 +96,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, long exp);
 
   /**
    * Prepend String or byte[] to an existing same type of value.
@@ -126,7 +126,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if compared and set successfully,
    * {@code false} if the key does not exist or CAS ID does not match
    */
-  ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
+  ArcusFuture<Boolean> cas(String key, long exp, T value, long casId);
 
   /**
    * Increments a numeric value stored at the given key by {@code delta}.
@@ -148,7 +148,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp     expiration time in seconds, applied only when a new key is created
    * @return the new value after increment, or {@code initial} if the key did not exist
    */
-  ArcusFuture<Long> incr(String key, int delta, long initial, int exp);
+  ArcusFuture<Long> incr(String key, int delta, long initial, long exp);
 
   /**
    * Decrements a numeric value stored at the given key by {@code delta}.
@@ -172,7 +172,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp     expiration time in seconds, applied only when a new key is created
    * @return the new value after decrement, or {@code initial} if the key did not exist
    */
-  ArcusFuture<Long> decr(String key, int delta, long initial, int exp);
+  ArcusFuture<Long> decr(String key, int delta, long initial, long exp);
 
   /**
    * Get a value for the given key.

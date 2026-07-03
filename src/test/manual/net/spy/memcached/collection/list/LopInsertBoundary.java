@@ -88,9 +88,10 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_PrependHeadTrim() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.head_trim);
+    assertTrue(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
     assertTrue(mc.asyncLopInsert(key, 9, 10L, null).get(1000,
@@ -112,8 +113,9 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_PrependOverflowError() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.error))
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attr)
             .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
@@ -148,9 +150,10 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_AppendHeadTrim() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.head_trim);
+    assertTrue(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
     assertTrue(mc.asyncLopInsert(key, 9, 10L, null).get(1000,
@@ -172,8 +175,9 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_AppendOverflowError() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.error))
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attr)
             .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
@@ -207,9 +211,10 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_InsertHeadTrim() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.head_trim);
+    assertTrue(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
     assertTrue(mc.asyncLopInsert(key, 9, 10L, null).get(1000,
@@ -230,8 +235,9 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_InsertOverflowError() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.error))
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attr)
             .get(1000, TimeUnit.MILLISECONDS));
 
     // Insert an item to make the list full
@@ -244,8 +250,9 @@ class LopInsertBoundary extends BaseIntegrationTest {
 
   @Test
   void testLopInsert_SetMaxCountUnderCurrentSize() throws Exception {
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.error))
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attr)
             .get(1000, TimeUnit.MILLISECONDS));
   }
 

@@ -20,7 +20,7 @@ public class ListCreate extends CollectionCreate {
 
   private static final String COMMAND = "lop create";
 
-  public ListCreate(int flags, Integer expTime, Long maxCount,
+  public ListCreate(int flags, Long expTime, Long maxCount,
                     CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
     super(CollectionType.list, flags, expTime, maxCount, overflowAction, readable, noreply);
   }

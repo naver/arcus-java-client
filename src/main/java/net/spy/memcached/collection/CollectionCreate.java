@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 public abstract class CollectionCreate {
   protected int flags;
-  protected int expTime;
+  protected long expTime;
   protected long maxCount;
   protected CollectionOverflowAction overflowAction;
   protected Boolean readable;
@@ -26,7 +26,7 @@ public abstract class CollectionCreate {
 
   protected String str;
 
-  protected CollectionCreate(CollectionType type, int flags, Integer expTime, Long maxCount,
+  protected CollectionCreate(CollectionType type, int flags, Long expTime, Long maxCount,
                           CollectionOverflowAction overflowAction, Boolean readable,
                           boolean noreply) {
     checkOverflowAction(type, overflowAction);

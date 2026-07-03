@@ -132,21 +132,21 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> set(String key, int exp, T value) {
+  public ArcusFuture<Boolean> set(String key, long exp, T value) {
     return store(StoreType.set, key, exp, value);
   }
 
   @Override
-  public ArcusFuture<Boolean> add(String key, int exp, T value) {
+  public ArcusFuture<Boolean> add(String key, long exp, T value) {
     return store(StoreType.add, key, exp, value);
   }
 
   @Override
-  public ArcusFuture<Boolean> replace(String key, int exp, T value) {
+  public ArcusFuture<Boolean> replace(String key, long exp, T value) {
     return store(StoreType.replace, key, exp, value);
   }
 
-  private ArcusFuture<Boolean> store(StoreType type, String key, int exp, T value) {
+  private ArcusFuture<Boolean> store(StoreType type, String key, long exp, T value) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
     CachedData co = tc.encode(value);
@@ -187,23 +187,23 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, long exp) {
     return multiStore(StoreType.set, items, exp);
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, long exp) {
     return multiStore(StoreType.add, items, exp);
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, long exp) {
     return multiStore(StoreType.replace, items, exp);
   }
 
   private ArcusFuture<Map<String, Boolean>> multiStore(StoreType type,
                                                        Map<String, T> items,
-                                                       int exp) {
+                                                       long exp) {
     Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(items.size());
 
     items.forEach((key, value) -> {
@@ -274,7 +274,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> cas(String key, int exp, T value, long casId) {
+  public ArcusFuture<Boolean> cas(String key, long exp, T value, long casId) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
     CachedData co = tc.encode(value);
@@ -321,7 +321,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Long> incr(String key, int delta, long initial, int exp) {
+  public ArcusFuture<Long> incr(String key, int delta, long initial, long exp) {
     if (initial < 0) {
       throw new IllegalArgumentException("Initial value must be 0 or greater.");
     }
@@ -334,14 +334,14 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Long> decr(String key, int delta, long initial, int exp) {
+  public ArcusFuture<Long> decr(String key, int delta, long initial, long exp) {
     if (initial < 0) {
       throw new IllegalArgumentException("Initial value must be 0 or greater.");
     }
     return mutate(Mutator.decr, key, delta, initial, exp);
   }
 
-  private ArcusFuture<Long> mutate(Mutator mutator, String key, int delta, long initial, int exp) {
+  private ArcusFuture<Long> mutate(Mutator mutator, String key, int delta, long initial, long exp) {
     if (delta <= 0) {
       throw new IllegalArgumentException("Delta must be greater than 0.");
     }

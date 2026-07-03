@@ -71,7 +71,7 @@ class UnReadableListTest extends BaseIntegrationTest {
 
       assertEquals(Long.valueOf(0), attr.getCount());
       assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      assertEquals(Long.valueOf(0), attr.getExpireTime());
       assertFalse(attr.getReadable());
 
       // insert an item
@@ -117,7 +117,7 @@ class UnReadableListTest extends BaseIntegrationTest {
 
       assertEquals(Long.valueOf(0), attr.getCount());
       assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      assertEquals(Long.valueOf(0), attr.getExpireTime());
       assertTrue(attr.getReadable());
 
       // insert an item

@@ -35,11 +35,11 @@ class MutatorOperationImpl extends OperationImpl implements
   private final Mutator mutator;
   private final String key;
   private final long by;
-  private final int exp;
+  private final long exp;
   private final long def;
 
   public MutatorOperationImpl(Mutator m, String k, long b,
-                              long d, int e, OperationCallback cb) {
+                              long d, long e, OperationCallback cb) {
     super(m == Mutator.incr ? CMD_INCR : CMD_DECR, generateOpaque(), cb);
     assert d >= 0 : "Default value is below zero";
     mutator = m;
@@ -87,7 +87,7 @@ class MutatorOperationImpl extends OperationImpl implements
     return def;
   }
 
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

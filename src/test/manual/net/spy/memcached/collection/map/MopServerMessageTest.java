@@ -87,7 +87,7 @@ class MopServerMessageTest extends BaseIntegrationTest {
     future = mc.asyncMopInsert(key, "0", 0, new CollectionAttributes());
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
-    future = mc.asyncSetAttr(key, new CollectionAttributes(null, 2L,
+    future = mc.asyncSetAttr(key, new CollectionAttributes(30, 2L,
                                                            CollectionOverflowAction.error));
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 

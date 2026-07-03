@@ -63,7 +63,7 @@ class CreateEmptyBTreeTest extends BaseIntegrationTest {
 
       assertEquals(Long.valueOf(0), attr.getCount());
       assertEquals(Long.valueOf(4000), attr.getMaxCount());
-      assertEquals(Integer.valueOf(0), attr.getExpireTime());
+      assertEquals(Long.valueOf(0), attr.getExpireTime());
     } catch (Exception e) {
       e.printStackTrace();
       fail(e.getMessage());

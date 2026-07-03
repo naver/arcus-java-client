@@ -20,7 +20,7 @@ public class MapCreate extends CollectionCreate {
 
   private static final String COMMAND = "mop create";
 
-  public MapCreate(int flags, Integer expTime, Long maxCount, Boolean readable, boolean noreply) {
+  public MapCreate(int flags, Long expTime, Long maxCount, Boolean readable, boolean noreply) {
     super(CollectionType.map, flags, expTime, maxCount, null, readable, noreply);
   }
 

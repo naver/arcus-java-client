@@ -29,7 +29,7 @@ import net.spy.memcached.ops.GetOperation;
 class GetAndTouchOperationImpl extends BaseGetOpImpl implements GetOperation {
   private static final String CMD = "gat";
 
-  public GetAndTouchOperationImpl(String k, int e, GetOperation.Callback cb) {
+  public GetAndTouchOperationImpl(String k, long e, GetOperation.Callback cb) {
     super(CMD, e, cb, Collections.singleton(k));
     setAPIType(APIType.GAT);
   }

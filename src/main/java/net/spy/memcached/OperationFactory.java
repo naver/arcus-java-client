@@ -160,7 +160,7 @@ public interface OperationFactory {
    * @param cb the callback that will contain the result
    * @return a new GetAndTouchOperation
    */
-  GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb);
+  GetOperation getAndTouch(String key, long expiration, GetOperation.Callback cb);
 
   /**
    * Gets (with CAS support) the key and resets its timeout.
@@ -170,7 +170,7 @@ public interface OperationFactory {
    * @param cb the callback that will contain the result
    * @return a new GetsAndTouchOperation
    */
-  GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb);
+  GetsOperation getsAndTouch(String key, long expiration, GetsOperation.Callback cb);
 
   /**
    * Create a mutator operation.
@@ -184,7 +184,7 @@ public interface OperationFactory {
    * @return the new mutator operation
    */
   MutatorOperation mutate(Mutator m, String key, int by,
-                          long def, int exp, OperationCallback cb);
+                          long def, long exp, OperationCallback cb);
 
   /**
    * Get a new StatsOperation.
@@ -206,7 +206,7 @@ public interface OperationFactory {
    * @param cb        the status callback
    * @return the new store operation
    */
-  StoreOperation store(StoreType storeType, String key, int flags, int exp,
+  StoreOperation store(StoreType storeType, String key, int flags, long exp,
                        byte[] data, OperationCallback cb);
 
   /**
@@ -217,7 +217,7 @@ public interface OperationFactory {
    * @param cb          the status callback
    * @return the new touch operation
    */
-  TouchOperation touch(String key, int expiration, OperationCallback cb);
+  TouchOperation touch(String key, long expiration, OperationCallback cb);
 
   /**
    * Get a concatenation operation.
@@ -244,7 +244,7 @@ public interface OperationFactory {
    * @return the new store operation
    */
   CASOperation cas(StoreType t, String key, long casId, int flags,
-                   int exp, byte[] data, OperationCallback cb);
+                   long exp, byte[] data, OperationCallback cb);
 
   /**
    * Create a new version operation.

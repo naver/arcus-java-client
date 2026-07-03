@@ -94,7 +94,7 @@ class LopServerMessageTest extends BaseIntegrationTest {
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, 1L, CollectionOverflowAction.error))
+            new CollectionAttributes(30, 1L, CollectionOverflowAction.error))
             .get(1000, TimeUnit.MILLISECONDS));
 
     future = mc.asyncLopInsert(key, 1, 1, new CollectionAttributes());
@@ -111,7 +111,7 @@ class LopServerMessageTest extends BaseIntegrationTest {
     assertTrue(future.get(1000, TimeUnit.MILLISECONDS));
 
     assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, 2L, CollectionOverflowAction.error))
+            new CollectionAttributes(30, 2L, CollectionOverflowAction.error))
             .get(1000, TimeUnit.MILLISECONDS));
 
     future = mc.asyncLopInsert(key, 0, 1, new CollectionAttributes());

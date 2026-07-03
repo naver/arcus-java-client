@@ -43,7 +43,7 @@ class StoreOperationImpl extends OperationImpl
   private final String key;
   private final StoreType storeType;
   private final int flags;
-  private final int exp;
+  private final long exp;
   private final long cas;
   private final byte[] data;
 
@@ -65,7 +65,7 @@ class StoreOperationImpl extends OperationImpl
     return rv;
   }
 
-  public StoreOperationImpl(StoreType t, String k, int f, int e,
+  public StoreOperationImpl(StoreType t, String k, int f, long e,
                             byte[] d, long c, OperationCallback cb) {
     super(cmdMap(t), generateOpaque(), cb);
     key = k;
@@ -107,7 +107,7 @@ class StoreOperationImpl extends OperationImpl
     return cas;
   }
 
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

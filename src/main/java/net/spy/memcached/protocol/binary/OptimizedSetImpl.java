@@ -99,7 +99,7 @@ public final class OptimizedSetImpl extends OperationImpl {
       bb.putLong(so.getCasValue()); // cas
       // Extras
       bb.putInt(so.getFlags());
-      bb.putInt(so.getExpiration());
+      bb.putInt((int) so.getExpiration());
       // the actual key
       bb.put(keyBytes);
       // And the value

@@ -23,7 +23,7 @@ public interface CASOperation extends KeyedOperation {
   /**
    * Get the expiration to be set for this operation.
    */
-  int getExpiration();
+  long getExpiration();
 
   /**
    * Get the bytes to be set during this operation.

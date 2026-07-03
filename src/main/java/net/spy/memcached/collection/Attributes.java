@@ -20,10 +20,10 @@ import net.spy.memcached.compat.SpyObject;
 
 public class Attributes extends SpyObject {
   public static final Integer DEFAULT_FLAGS = 0;
-  public static final Integer DEFAULT_EXPIRETIME = 0;
+  public static final Long DEFAULT_EXPIRETIME = 0L;
 
   protected Integer flags;
-  protected Integer expireTime;
+  protected Long expireTime;
   protected CollectionType type;
 
   private String str;
@@ -31,7 +31,7 @@ public class Attributes extends SpyObject {
   public Attributes() {
   }
 
-  public Attributes(Integer expireTime) {
+  public Attributes(long expireTime) {
     this.expireTime = expireTime;
   }
 
@@ -79,7 +79,7 @@ public class Attributes extends SpyObject {
       if ("flags".equals(name)) {
         flags = Integer.parseInt(value);
       } else if ("expiretime".equals(name)) {
-        expireTime = Integer.parseInt(value);
+        expireTime = Long.parseLong(value);
       } else if ("type".equals(name)) {
         type = CollectionType.find(value);
       }
@@ -89,7 +89,7 @@ public class Attributes extends SpyObject {
     }
   }
 
-  public void setExpireTime(Integer expireTime) {
+  public void setExpireTime(long expireTime) {
     this.expireTime = expireTime;
   }
 
@@ -97,7 +97,7 @@ public class Attributes extends SpyObject {
     return flags;
   }
 
-  public Integer getExpireTime() {
+  public Long getExpireTime() {
     return expireTime;
   }
 

@@ -574,7 +574,7 @@ class MultibyteKeyTest {
   void CollectionCreateOperationImplTest() {
     try {
       opFact.collectionCreate(MULTIBYTE_KEY,
-              new BTreeCreate(0, 0, 10000L, CollectionOverflowAction.error, true, false),
+              new BTreeCreate(0, 0L, 10000L, CollectionOverflowAction.error, true, false),
               genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       fail();

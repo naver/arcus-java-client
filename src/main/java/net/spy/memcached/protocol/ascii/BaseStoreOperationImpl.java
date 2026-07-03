@@ -50,10 +50,10 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
   protected final String type;
   protected final String key;
   protected final int flags;
-  protected final int exp;
+  protected final long exp;
   protected final byte[] data;
 
-  public BaseStoreOperationImpl(String t, String k, int f, int e,
+  public BaseStoreOperationImpl(String t, String k, int f, long e,
                                 byte[] d, OperationCallback cb) {
     super(cb);
     type = t;
@@ -111,7 +111,7 @@ abstract class BaseStoreOperationImpl extends OperationImpl {
     return flags;
   }
 
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

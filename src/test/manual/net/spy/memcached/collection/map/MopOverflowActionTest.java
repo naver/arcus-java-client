@@ -110,29 +110,30 @@ class MopOverflowActionTest extends BaseIntegrationTest {
 
     // Set OverflowAction
     // error
-    assertTrue(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.error))
+    CollectionAttributes attr = new CollectionAttributes();
+    attr.setOverflowAction(CollectionOverflowAction.error);
+    assertTrue(mc.asyncSetAttr(key, attr)
             .get(1000, TimeUnit.MILLISECONDS));
 
     // head_trim
-    assertFalse(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.head_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    attr.setOverflowAction(CollectionOverflowAction.head_trim);
+    assertFalse(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // tail_trim
-    assertFalse(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.tail_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    attr.setOverflowAction(CollectionOverflowAction.tail_trim);
+    assertFalse(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // smallest_trim
-    assertFalse(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.smallest_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    attr.setOverflowAction(CollectionOverflowAction.smallest_trim);
+    assertFalse(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     // largest_trim
-    assertFalse(mc.asyncSetAttr(key,
-            new CollectionAttributes(null, null, CollectionOverflowAction.largest_trim)).get(1000,
-            TimeUnit.MILLISECONDS));
+    attr.setOverflowAction(CollectionOverflowAction.largest_trim);
+    assertFalse(mc.asyncSetAttr(key, attr)
+        .get(1000, TimeUnit.MILLISECONDS));
 
     mc.asyncMopDelete(key, true).get(1000, TimeUnit.MILLISECONDS);
   }

@@ -41,7 +41,7 @@ public class CollectionAttributes extends Attributes {
   public CollectionAttributes() {
   }
 
-  public CollectionAttributes(Integer expireTime,
+  public CollectionAttributes(long expireTime,
                               Long maxCount, CollectionOverflowAction overflowAction) {
     this.expireTime = expireTime;
     this.maxCount = maxCount;
@@ -100,7 +100,7 @@ public class CollectionAttributes extends Attributes {
       if ("flags".equals(name)) {
         flags = Integer.parseInt(value);
       } else if ("expiretime".equals(name)) {
-        expireTime = Integer.parseInt(value);
+        expireTime = Long.parseLong(value);
       } else if ("type".equals(name)) {
         type = CollectionType.find(value);
       } else if ("count".equals(name)) {
