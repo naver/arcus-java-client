@@ -684,8 +684,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param bKey bKey of the element to get
    * @param args arguments for get operation
    * @return the {@code BTreeElement} if found,
-   * {@code BTreeElement} with null value and null eFlag if element is not found but key exists,
-   * {@code null} if key is not found
+   * {@code null} if the key or element is not found
    */
   ArcusFuture<BTreeElement<T>> bopGet(String key, BKey bKey, BopGetArgs args);
 

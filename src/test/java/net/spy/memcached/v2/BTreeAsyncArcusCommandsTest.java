@@ -249,13 +249,8 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         // then
         .thenAccept(element -> assertEquals(ELEMENTS.get(1), element))
         .thenCompose(v -> async.bopGet(key, BKey.of(2L), BopGetArgs.DEFAULT))
-        .thenAccept(element -> {
-          // ELEMENT NOT FOUND
-          assertNotNull(element);
-          assertEquals(BKey.of(2L), element.getBKey());
-          assertNull(element.getValue());
-          assertNull(element.getEFlag());
-        })
+        // ELEMENT NOT FOUND
+        .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
         .get(300, TimeUnit.MILLISECONDS);
   }
@@ -1696,10 +1691,7 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
           assertTrue(result);
           return async.bopGet(key, bKey, BopGetArgs.DEFAULT);
         })
-        .thenAccept(result -> {
-          assertNotNull(result);
-          assertNull(result.getValue());
-        })
+        .thenAccept(Assertions::assertNull)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
   }
