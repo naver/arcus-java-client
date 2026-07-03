@@ -1321,10 +1321,8 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           case SUCCESS:
             break;
           case ERR_NOT_FOUND:
-            result.set(null);
-            break;
           case ERR_NOT_FOUND_ELEMENT:
-            result.set(new BTreeElement<>(bKey, null, null));
+            result.set(null);
             break;
           case CANCELLED:
             future.internalCancel();
