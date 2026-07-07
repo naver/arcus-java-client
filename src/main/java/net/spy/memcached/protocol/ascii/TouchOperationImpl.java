@@ -42,12 +42,12 @@ final class TouchOperationImpl extends OperationImpl implements TouchOperation {
           StatusCode.ERR_NOT_FOUND);
 
   private final String key;
-  private final int exp;
+  private final long exp;
 
-  public TouchOperationImpl(String k, int t, OperationCallback cb) {
+  public TouchOperationImpl(String k, long e, OperationCallback cb) {
     super(cb);
     key = k;
-    exp = t;
+    exp = e;
   }
 
   public Collection<String> getKeys() {
@@ -83,7 +83,7 @@ final class TouchOperationImpl extends OperationImpl implements TouchOperation {
   }
 
   @Override
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

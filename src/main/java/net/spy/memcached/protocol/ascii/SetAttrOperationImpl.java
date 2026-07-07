@@ -23,9 +23,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.spy.memcached.KeyUtil;
-import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionResponse;
+import net.spy.memcached.collection.SetAttributes;
 import net.spy.memcached.ops.APIType;
 import net.spy.memcached.ops.CollectionOperationStatus;
 import net.spy.memcached.ops.OperationCallback;
@@ -52,9 +52,9 @@ class SetAttrOperationImpl extends OperationImpl
               false, "ATTR_ERROR bad value", CollectionResponse.ATTR_ERROR_BAD_VALUE);
 
   protected final String key;
-  protected final Attributes attrs;
+  protected final SetAttributes attrs;
 
-  public SetAttrOperationImpl(String key, Attributes attrs,
+  public SetAttrOperationImpl(String key, SetAttributes attrs,
                               OperationCallback cb) {
     super(cb);
     this.key = key;
@@ -88,10 +88,11 @@ class SetAttrOperationImpl extends OperationImpl
 
   @Override
   public void initialize() {
+    String stringify = attrs.stringify();
     ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length +
             attrs.getLength() + OVERHEAD);
 
-    setArguments(bb, "setattr", key, attrs);
+    setArguments(bb, "setattr", key, stringify);
 
     ((Buffer) bb).flip();
     setBuffer(bb);
@@ -106,7 +107,8 @@ class SetAttrOperationImpl extends OperationImpl
     return Collections.singleton(key);
   }
 
-  public Attributes getAttributes() {
+  @Override
+  public SetAttributes getAttributes() {
     return attrs;
   }
 

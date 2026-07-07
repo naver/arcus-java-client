@@ -18,7 +18,7 @@ public interface StoreOperation extends KeyedOperation {
   /**
    * Get the expiration value to be set.
    */
-  int getExpiration();
+  long getExpiration();
 
   /**
    * Get the bytes to be set during this operation.

@@ -48,7 +48,12 @@ public class CollectionAttributes extends Attributes {
     this.overflowAction = overflowAction;
   }
 
-  protected String stringify() {
+  @Override
+  public String stringify() {
+    if (stringCache != null) {
+      return stringCache;
+    }
+
     StringBuilder b = new StringBuilder();
 
     if (flags != null) {
@@ -81,14 +86,11 @@ public class CollectionAttributes extends Attributes {
   }
 
   @Override
-  public String toString() {
-    return (stringCache == null) ? stringify() : stringCache;
-  }
-
   public int getLength() {
     return (stringCache == null) ? stringify().length() : stringCache.length();
   }
 
+  @Override
   public void setAttribute(String attribute) {
     String[] splited = attribute.split("=");
     assert splited.length == 2 : "An attribute should be given in \"name=value\" format.";
@@ -97,13 +99,7 @@ public class CollectionAttributes extends Attributes {
     String value = splited[1];
 
     try {
-      if ("flags".equals(name)) {
-        flags = Integer.parseInt(value);
-      } else if ("expiretime".equals(name)) {
-        expireTime = Integer.parseInt(value);
-      } else if ("type".equals(name)) {
-        type = CollectionType.find(value);
-      } else if ("count".equals(name)) {
+      if ("count".equals(name)) {
         count = Long.parseLong(value);
       } else if ("maxcount".equals(name)) {
         maxCount = Long.parseLong(value);
@@ -138,6 +134,9 @@ public class CollectionAttributes extends Attributes {
         }
       } else if ("trimmed".equals(name)) {
         trimmed = Long.parseLong(value);
+      } else {
+        // flags, expiretime, type are handled by the base class.
+        super.setAttribute(attribute);
       }
     } catch (Exception e) {
       getLogger().info(e, e);

@@ -45,6 +45,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import net.spy.memcached.collection.Attributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.BKeyObject;
 import net.spy.memcached.collection.BTreeCount;
 import net.spy.memcached.collection.BTreeCreate;
@@ -1073,10 +1074,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementValueType valueType,
                                                   CollectionAttributes attributes) {
     int flag = TranscoderUtils.examineFlags(valueType);
-    boolean noreply = false;
-    CollectionCreate bTreeCreate = new BTreeCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(),
-            attributes.getOverflowAction(), attributes.getReadable(), noreply);
+    CollectionCreate bTreeCreate = new BTreeCreate(flag, CreateAttributes.of(attributes), false);
     return asyncCollectionCreate(key, bTreeCreate);
   }
 
@@ -1085,10 +1083,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
     int flag = TranscoderUtils.examineFlags(type);
-    boolean noreply = false;
-    CollectionCreate mapCreate = new MapCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(),
-            attributes.getReadable(), noreply);
+    CollectionCreate mapCreate = new MapCreate(flag, CreateAttributes.of(attributes), false);
     return asyncCollectionCreate(key, mapCreate);
   }
 
@@ -1097,10 +1092,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
     int flag = TranscoderUtils.examineFlags(type);
-    boolean noreply = false;
-    CollectionCreate setCreate = new SetCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(),
-            attributes.getReadable(), noreply);
+    CollectionCreate setCreate = new SetCreate(flag, CreateAttributes.of(attributes), false);
     return asyncCollectionCreate(key, setCreate);
   }
 
@@ -1109,10 +1101,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                   ElementValueType type,
                                                   CollectionAttributes attributes) {
     int flag = TranscoderUtils.examineFlags(type);
-    boolean noreply = false;
-    CollectionCreate listCreate = new ListCreate(flag,
-            attributes.getExpireTime(), attributes.getMaxCount(),
-            attributes.getOverflowAction(), attributes.getReadable(), noreply);
+    CollectionCreate listCreate = new ListCreate(flag, CreateAttributes.of(attributes), false);
     return asyncCollectionCreate(key, listCreate);
   }
 
@@ -1549,7 +1538,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     KeyValidator.validateBKey(bkey);
-    BTreeInsert<T> bTreeInsert = new BTreeInsert<>(value, eFlag, null, attributesForCreate);
+    BTreeInsert<T> bTreeInsert = new BTreeInsert<>(value, eFlag, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeInsert, tc);
   }
 
@@ -1559,7 +1548,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     keyValidator.validateMKey(mkey);
-    MapInsert<T> mapInsert = new MapInsert<>(value, null, attributesForCreate);
+    MapInsert<T> mapInsert = new MapInsert<>(value, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, mkey, mapInsert, tc);
   }
 
@@ -1568,7 +1557,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       T value,
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
-    ListInsert<T> listInsert = new ListInsert<>(value, null, attributesForCreate);
+    ListInsert<T> listInsert = new ListInsert<>(value, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, String.valueOf(index), listInsert, tc);
   }
 
@@ -1576,7 +1565,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
   public <T> CollectionFuture<Boolean> asyncSopInsert(String key, T value,
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
-    SetInsert<T> setInsert = new SetInsert<>(value, null, attributesForCreate);
+    SetInsert<T> setInsert = new SetInsert<>(value, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, "", setInsert, tc);
   }
 
@@ -1628,11 +1617,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionPipedInsert<T>> insertList = new ArrayList<>();
 
     if (elements.size() <= MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new BTreePipedInsert<>(key, elements, attributesForCreate, tc));
+      insertList.add(new BTreePipedInsert<>(key, elements, CreateAttributes.of(attributesForCreate), tc));
     } else {
       PartitionedMap<Long, T> list = new PartitionedMap<>(elements, MAX_PIPED_ITEM_COUNT);
       for (Map<Long, T> elementMap : list) {
-        insertList.add(new BTreePipedInsert<>(key, elementMap, attributesForCreate, tc));
+        insertList.add(new BTreePipedInsert<>(key, elementMap, CreateAttributes.of(attributesForCreate), tc));
       }
     }
     return syncCollectionPipedInsert(key, insertList);
@@ -1651,11 +1640,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionPipedInsert<T>> insertList = new ArrayList<>();
 
     if (elements.size() <= MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new ByteArraysBTreePipedInsert<>(key, elements, attributesForCreate, tc));
+      insertList.add(new ByteArraysBTreePipedInsert<>(key, elements, CreateAttributes.of(attributesForCreate), tc));
     } else {
       PartitionedList<Element<T>> list = new PartitionedList<>(elements, MAX_PIPED_ITEM_COUNT);
       for (List<Element<T>> elementList : list) {
-        insertList.add(new ByteArraysBTreePipedInsert<>(key, elementList, attributesForCreate, tc));
+        insertList.add(new ByteArraysBTreePipedInsert<>(key, elementList, CreateAttributes.of(attributesForCreate), tc));
       }
     }
     return syncCollectionPipedInsert(key, insertList);
@@ -1676,11 +1665,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionPipedInsert<T>> insertList = new ArrayList<>();
 
     if (elements.size() <= MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new MapPipedInsert<>(key, elements, attributesForCreate, tc));
+      insertList.add(new MapPipedInsert<>(key, elements, CreateAttributes.of(attributesForCreate), tc));
     } else {
       PartitionedMap<String, T> list = new PartitionedMap<>(elements, MAX_PIPED_ITEM_COUNT);
       for (Map<String, T> elementMap : list) {
-        insertList.add(new MapPipedInsert<>(key, elementMap, attributesForCreate, tc));
+        insertList.add(new MapPipedInsert<>(key, elementMap, CreateAttributes.of(attributesForCreate), tc));
       }
     }
     return syncCollectionPipedInsert(key, insertList);
@@ -1699,11 +1688,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionPipedInsert<T>> insertList = new ArrayList<>();
 
     if (valueList.size() <= MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new ListPipedInsert<>(key, index, valueList, attributesForCreate, tc));
+      insertList.add(new ListPipedInsert<>(key, index, valueList, CreateAttributes.of(attributesForCreate), tc));
     } else {
       PartitionedList<T> list = new PartitionedList<>(valueList, MAX_PIPED_ITEM_COUNT);
       for (List<T> elementList : list) {
-        insertList.add(new ListPipedInsert<>(key, index, elementList, attributesForCreate, tc));
+        insertList.add(new ListPipedInsert<>(key, index, elementList, CreateAttributes.of(attributesForCreate), tc));
         if (index >= 0) {
           index += elementList.size();
         }
@@ -1725,11 +1714,11 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     List<CollectionPipedInsert<T>> insertList = new ArrayList<>();
 
     if (valueList.size() <= MAX_PIPED_ITEM_COUNT) {
-      insertList.add(new SetPipedInsert<>(key, valueList, attributesForCreate, tc));
+      insertList.add(new SetPipedInsert<>(key, valueList, CreateAttributes.of(attributesForCreate), tc));
     } else {
       PartitionedList<T> list = new PartitionedList<>(valueList, MAX_PIPED_ITEM_COUNT);
       for (List<T> elementList : list) {
-        insertList.add(new SetPipedInsert<>(key, elementList, attributesForCreate, tc));
+        insertList.add(new SetPipedInsert<>(key, elementList, CreateAttributes.of(attributesForCreate), tc));
       }
     }
     return syncCollectionPipedInsert(key, insertList);
@@ -1930,7 +1919,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       Transcoder<T> tc) {
 
     KeyValidator.validateBKey(bkey);
-    BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<>(value, elementFlag, null, attributesForCreate);
+    BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<>(value, elementFlag, null, CreateAttributes.of(attributesForCreate));
 
     return asyncCollectionInsert(key, String.valueOf(bkey), bTreeUpsert, tc);
   }
@@ -1946,7 +1935,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     keyValidator.validateMKey(mkey);
-    MapUpsert<T> mapUpsert = new MapUpsert<>(value, attributesForCreate);
+    MapUpsert<T> mapUpsert = new MapUpsert<>(value, CreateAttributes.of(attributesForCreate));
 
     return asyncCollectionInsert(key, mkey, mapUpsert, tc);
   }
@@ -2171,7 +2160,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     KeyValidator.validateBKey(bkey);
-    BTreeInsert<T> bTreeInsert = new BTreeInsert<>(value, eFlag, null, attributesForCreate);
+    BTreeInsert<T> bTreeInsert = new BTreeInsert<>(value, eFlag, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeInsert, tc);
   }
 
@@ -2509,7 +2498,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, long bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
     BTreeInsertAndGet<E> insertAndGet
-            = new BTreeInsertAndGet<>(bkey, eFlag, value, false, attributesForCreate);
+            = new BTreeInsertAndGet<>(bkey, eFlag, value, false, CreateAttributes.of(attributesForCreate));
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -2525,7 +2514,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
     BTreeInsertAndGet<E> insertAndGet
-            = new BTreeInsertAndGet<>(bkey, eFlag, value, false, attributesForCreate);
+            = new BTreeInsertAndGet<>(bkey, eFlag, value, false, CreateAttributes.of(attributesForCreate));
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -2541,7 +2530,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, long bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
     BTreeInsertAndGet<E> insertAndGet
-            = new BTreeInsertAndGet<>(bkey, eFlag, value, true, attributesForCreate);
+            = new BTreeInsertAndGet<>(bkey, eFlag, value, true, CreateAttributes.of(attributesForCreate));
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -2557,7 +2546,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
           String key, byte[] bkey, byte[] eFlag, E value,
           CollectionAttributes attributesForCreate, Transcoder<E> transcoder) {
     BTreeInsertAndGet<E> insertAndGet
-            = new BTreeInsertAndGet<>(bkey, eFlag, value, true, attributesForCreate);
+            = new BTreeInsertAndGet<>(bkey, eFlag, value, true, CreateAttributes.of(attributesForCreate));
     return asyncBTreeInsertAndGet(key, insertAndGet, transcoder);
   }
 
@@ -2639,7 +2628,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
                                                       CollectionAttributes attributesForCreate,
                                                       Transcoder<T> tc) {
     KeyValidator.validateBKey(bkey);
-    BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<>(value, elementFlag, null, attributesForCreate);
+    BTreeUpsert<T> bTreeUpsert = new BTreeUpsert<>(value, elementFlag, null, CreateAttributes.of(attributesForCreate));
     return asyncCollectionInsert(key, BTreeUtil.toHex(bkey), bTreeUpsert, tc);
   }
 
@@ -2818,7 +2807,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       insertList.add(new CollectionBulkInsert.BTreeBulkInsert<>(
               entry.getKey(), entry.getValue(),
               String.valueOf(bkey), BTreeUtil.toHex(eFlag),
-              insertValue, attributesForCreate));
+              insertValue, CreateAttributes.of(attributesForCreate)));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -2851,7 +2840,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
       insertList.add(new CollectionBulkInsert.BTreeBulkInsert<>(
               entry.getKey(), entry.getValue(),
               BTreeUtil.toHex(bkey), BTreeUtil.toHex(eFlag),
-              insertValue, attributesForCreate));
+              insertValue, CreateAttributes.of(attributesForCreate)));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -2883,7 +2872,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       insertList.add(new CollectionBulkInsert.MapBulkInsert<>(
               entry.getKey(), entry.getValue(),
-              mkey, insertValue, attributesForCreate));
+              mkey, insertValue, CreateAttributes.of(attributesForCreate)));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -2913,7 +2902,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       insertList.add(new CollectionBulkInsert.SetBulkInsert<>(
               entry.getKey(), entry.getValue(),
-              insertValue, attributesForCreate));
+              insertValue, CreateAttributes.of(attributesForCreate)));
     }
 
     return asyncCollectionInsertBulk2(insertList);
@@ -2943,7 +2932,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     for (Entry<MemcachedNode, List<String>> entry : arrangedKey) {
       insertList.add(new CollectionBulkInsert.ListBulkInsert<>(
               entry.getKey(), entry.getValue(),
-              index, insertValue, attributesForCreate));
+              index, insertValue, CreateAttributes.of(attributesForCreate)));
     }
 
     return asyncCollectionInsertBulk2(insertList);

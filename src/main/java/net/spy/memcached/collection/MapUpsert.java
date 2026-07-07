@@ -4,8 +4,8 @@ public class MapUpsert<T> extends CollectionInsert<T> {
 
   private static final String COMMAND = "mop upsert";
 
-  public MapUpsert(T value, CollectionAttributes attr) {
-    super(CollectionType.map, value, null, null, attr);
+  public MapUpsert(T value, CreateAttributes attributes) {
+    super(CollectionType.map, value, null, null, attributes);
   }
 
   @Override

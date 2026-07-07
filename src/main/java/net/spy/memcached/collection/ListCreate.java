@@ -20,9 +20,8 @@ public class ListCreate extends CollectionCreate {
 
   private static final String COMMAND = "lop create";
 
-  public ListCreate(int flags, Integer expTime, Long maxCount,
-                    CollectionOverflowAction overflowAction, Boolean readable, boolean noreply) {
-    super(CollectionType.list, flags, expTime, maxCount, overflowAction, readable, noreply);
+  public ListCreate(int flags, CreateAttributes attributes, boolean noreply) {
+    super(CollectionType.list, flags, attributes, noreply);
   }
 
   public String getCommand() {

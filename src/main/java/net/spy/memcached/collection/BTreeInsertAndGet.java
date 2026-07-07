@@ -40,27 +40,28 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
   private BKeyObject bKey;
 
   public BTreeInsertAndGet(long bkey, byte[] eFlag, T value, boolean updateIfExist,
-                           CollectionAttributes attributesForCreate) {
-    if (updateIfExist) {
-      this.collection = new BTreeUpsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
-    } else {
-      this.collection = new BTreeInsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
-    }
-    this.updateIfExist = updateIfExist;
-    this.bKey = new BKeyObject(bkey);
-    this.eHeadCount = 2;
-    this.eFlagIndex = 1;
+                           CreateAttributes attributes) {
+    this(new BKeyObject(bkey), eFlag, value, updateIfExist, attributes);
   }
 
   public BTreeInsertAndGet(byte[] bkey, byte[] eFlag, T value, boolean updateIfExist,
-                           CollectionAttributes attributesForCreate) {
+                           CreateAttributes attributes) {
+    this(new BKeyObject(bkey), eFlag, value, updateIfExist, attributes);
+  }
+
+  private BTreeInsertAndGet(BKeyObject bKey, byte[] eFlag, T value, boolean updateIfExist,
+                            CreateAttributes attributes) {
     if (updateIfExist) {
-      this.collection = new BTreeUpsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeUpsert<>(
+          value, eFlag, RequestMode.GET_TRIM, attributes
+      );
     } else {
-      this.collection = new BTreeInsert<>(value, eFlag, RequestMode.GET_TRIM, attributesForCreate);
+      this.collection = new BTreeInsert<>(
+          value, eFlag, RequestMode.GET_TRIM, attributes
+      );
     }
     this.updateIfExist = updateIfExist;
-    this.bKey = new BKeyObject(bkey);
+    this.bKey = bKey;
     this.eHeadCount = 2;
     this.eFlagIndex = 1;
   }

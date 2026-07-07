@@ -16,13 +16,13 @@
  */
 package net.spy.memcached.ops;
 
-import net.spy.memcached.collection.Attributes;
+import net.spy.memcached.collection.SetAttributes;
 
 /**
  * SetAttr operation.
  */
 public interface SetAttrOperation extends KeyedOperation {
 
-  Attributes getAttributes();
+  SetAttributes getAttributes();
 
 }

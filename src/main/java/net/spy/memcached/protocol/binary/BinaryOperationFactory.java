@@ -20,7 +20,6 @@ import java.util.Collection;
 
 import javax.security.sasl.SaslClient;
 
-import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
 import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
@@ -38,6 +37,7 @@ import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.SetAttributes;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -86,107 +86,139 @@ import net.spy.memcached.ops.VersionOperation;
  */
 public class BinaryOperationFactory extends BaseOperationFactory {
 
+  @Override
   public DeleteOperation delete(String key,
                                 OperationCallback operationCallback) {
     return new DeleteOperationImpl(key, operationCallback);
   }
 
+  @Override
   public FlushOperation flush(int delay, OperationCallback cb) {
     return new FlushOperationImpl(cb);
   }
 
+  @Override
   public GetOperation get(String key, Callback callback) {
     return new GetOperationImpl(key, callback);
   }
 
+  @Override
   public GetOperation get(Collection<String> keys, Callback cb, boolean isMGet) {
     return new MultiGetOperationImpl(keys, cb);
   }
 
+  @Override
   public GetsOperation gets(String key, GetsOperation.Callback cb) {
     return new GetOperationImpl(key, cb);
   }
 
+  @Override
   public GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet) {
     throw new RuntimeException(
             "multiple key gets is not supported in binary protocol yet.");
   }
 
-  public GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb) {
+  @Override
+  public GetOperation getAndTouch(String key, long exp, GetOperation.Callback cb) {
     throw new RuntimeException(
             "GetAndTouchOperation is not supported in binary protocol yet.");
   }
 
-  public GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb) {
+  @Override
+  public GetsOperation getsAndTouch(String key, long exp, GetsOperation.Callback cb) {
     throw new RuntimeException(
             "GetsAndTouchOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public MutatorOperation mutate(Mutator m, String key, int by,
-                                 long def, int exp, OperationCallback cb) {
-    return new MutatorOperationImpl(m, key, by, def, exp, cb);
+                                 long def, long exp, OperationCallback cb) {
+    if (exp > Integer.MAX_VALUE) {
+      throw new IllegalArgumentException(
+          "Binary protocol does not support expiration time beyond int range.");
+    }
+    return new MutatorOperationImpl(m, key, by, def, (int) exp, cb);
   }
 
+  @Override
   public StatsOperation stats(String arg,
                               net.spy.memcached.ops.StatsOperation.Callback cb) {
     return new StatsOperationImpl(arg, cb);
   }
 
+  @Override
   public StoreOperation store(StoreType storeType, String key, int flags,
-                              int exp, byte[] data, OperationCallback cb) {
-    return new StoreOperationImpl(storeType, key, flags, exp, data, 0, cb);
+                              long exp, byte[] data, OperationCallback cb) {
+    if (exp > Integer.MAX_VALUE) {
+      throw new IllegalArgumentException(
+          "Binary protocol does not support expiration time beyond int range.");
+    }
+    return new StoreOperationImpl(storeType, key, flags, (int) exp, data, 0, cb);
   }
 
-  public TouchOperation touch(String key, int expiration, OperationCallback cb) {
+  @Override
+  public TouchOperation touch(String key, long exp, OperationCallback cb) {
     throw new RuntimeException(
             "TouchOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public VersionOperation version(OperationCallback cb) {
     return new VersionOperationImpl(cb);
   }
 
+  @Override
   public NoopOperation noop(OperationCallback cb) {
     return new NoopOperationImpl(cb);
   }
 
+  @Override
   public CASOperation cas(StoreType type, String key, long casId, int flags,
-                          int exp, byte[] data, OperationCallback cb) {
-    return new StoreOperationImpl(type, key, flags, exp, data,
-            casId, cb);
+                          long exp, byte[] data, OperationCallback cb) {
+    if (exp > Integer.MAX_VALUE) {
+      throw new IllegalArgumentException(
+          "Binary protocol does not support expiration time beyond int range.");
+    }
+    return new StoreOperationImpl(type, key, flags, (int) exp, data, casId, cb);
   }
 
+  @Override
   public ConcatenationOperation cat(ConcatenationType catType, long casId,
                                     String key, byte[] data, OperationCallback cb) {
     return new ConcatenationOperationImpl(catType, key, data, casId, cb);
   }
 
+  @Override
   public SASLAuthOperation saslAuth(SaslClient sc, OperationCallback cb) {
     return new SASLAuthOperationImpl(sc, cb);
   }
 
+  @Override
   public SASLMechsOperation saslMechs(boolean isInternal, OperationCallback cb) {
     return new SASLMechsOperationImpl(isInternal, cb);
   }
 
+  @Override
   public SASLStepOperation saslStep(SaslClient sc, byte[] challenge, OperationCallback cb) {
     return new SASLStepOperationImpl(sc, challenge, cb);
   }
 
   //// UNSUPPORTED ////
-
-  public SetAttrOperation setAttr(String key, Attributes attrs,
+  @Override
+  public SetAttrOperation setAttr(String key, SetAttributes attrs,
                                   OperationCallback cb) {
     throw new RuntimeException(
             "SetAttrOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public GetAttrOperation getAttr(String key,
                                   net.spy.memcached.ops.GetAttrOperation.Callback cb) {
     throw new RuntimeException(
             "GetAttrOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionInsertOperation collectionInsert(String key, String subkey,
                                                     CollectionInsert<?> collectionInsert,
                                                     byte[] data,
@@ -195,6 +227,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionInsertOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionPipedInsertOperation collectionPipedInsert(String key,
                                                               CollectionPipedInsert<?> insert,
                                                               OperationCallback cb) {
@@ -202,6 +235,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionPipedInsertOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionGetOperation collectionGet(String key,
                                               CollectionGet collectionGet,
                                               CollectionGetOperation.Callback cb) {
@@ -209,6 +243,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionGetOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionDeleteOperation collectionDelete(String key,
                                                     CollectionDelete collectionDelete,
                                                     OperationCallback cb) {
@@ -216,6 +251,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionDeleteOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionExistOperation collectionExist(String key, String subkey,
                                                   CollectionExist collectionExist,
                                                   OperationCallback cb) {
@@ -223,6 +259,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionExistOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionCreateOperation collectionCreate(String key,
                                                     CollectionCreate collectionCreate,
                                                     OperationCallback cb) {
@@ -230,6 +267,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionCreateOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public CollectionCountOperation collectionCount(String key,
                                                   CollectionCount collectionCount,
                                                   OperationCallback cb) {
@@ -237,6 +275,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
             "CollectionCountOperation is not supported in binary protocol yet.");
   }
 
+  @Override
   public FlushOperation flush(String prefix, int delay, boolean noreply, OperationCallback cb) {
     throw new RuntimeException(
             "Flush by prefix operation is not supported in binary protocol yet.");

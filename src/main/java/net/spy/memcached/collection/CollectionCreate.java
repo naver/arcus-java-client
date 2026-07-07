@@ -18,23 +18,16 @@ package net.spy.memcached.collection;
 
 public abstract class CollectionCreate {
   protected int flags;
-  protected int expTime;
-  protected long maxCount;
-  protected CollectionOverflowAction overflowAction;
-  protected Boolean readable;
+  protected CreateAttributes attributes;
   protected boolean noreply;
 
   protected String str;
 
-  protected CollectionCreate(CollectionType type, int flags, Integer expTime, Long maxCount,
-                          CollectionOverflowAction overflowAction, Boolean readable,
-                          boolean noreply) {
-    checkOverflowAction(type, overflowAction);
+  protected CollectionCreate(CollectionType type, int flags,
+                             CreateAttributes attributes, boolean noreply) {
+    checkOverflowAction(type, attributes.getOverflowAction());
     this.flags = flags;
-    this.expTime = (null == expTime) ? CollectionAttributes.DEFAULT_EXPIRETIME : expTime;
-    this.maxCount = (null == maxCount) ? CollectionAttributes.DEFAULT_MAXCOUNT : maxCount;
-    this.overflowAction = overflowAction;
-    this.readable = readable;
+    this.attributes = attributes;
     this.noreply = noreply;
   }
 
@@ -46,14 +39,14 @@ public abstract class CollectionCreate {
     StringBuilder b = new StringBuilder();
 
     b.append(flags);
-    b.append(' ').append(expTime);
-    b.append(' ').append(maxCount);
+    b.append(' ').append(attributes.getExpireTime());
+    b.append(' ').append(attributes.getMaxCount());
 
-    if (null != overflowAction) {
-      b.append(' ').append(overflowAction);
+    if (null != attributes.getOverflowAction()) {
+      b.append(' ').append(attributes.getOverflowAction());
     }
 
-    if (null != readable && !readable) {
+    if (!attributes.getReadable()) {
       b.append(' ').append("unreadable");
     }
 
@@ -65,20 +58,18 @@ public abstract class CollectionCreate {
     return str;
   }
 
-  public static String makeCreateClause(CollectionAttributes attribute, int flags) {
-    if (attribute == null) {
+  public static String makeCreateClause(CreateAttributes attributes, int flags) {
+    if (attributes == null) {
       return null;
     }
     StringBuilder b = new StringBuilder();
     b.append("create ").append(flags)
-        .append(" ").append((attribute.getExpireTime() == null) ?
-            CollectionAttributes.DEFAULT_EXPIRETIME : attribute.getExpireTime())
-        .append(" ").append((attribute.getMaxCount() == null) ?
-            CollectionAttributes.DEFAULT_MAXCOUNT : attribute.getMaxCount());
-    if (attribute.getOverflowAction() != null) {
-      b.append(" ").append(attribute.getOverflowAction());
+        .append(" ").append(attributes.getExpireTime())
+        .append(" ").append(attributes.getMaxCount());
+    if (attributes.getOverflowAction() != null) {
+      b.append(" ").append(attributes.getOverflowAction());
     }
-    if (attribute.getReadable() != null && !attribute.getReadable()) {
+    if (!attributes.getReadable()) {
       b.append(" ").append("unreadable");
     }
     return b.toString();

@@ -107,7 +107,7 @@ class StoreOperationImpl extends OperationImpl
     return cas;
   }
 
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

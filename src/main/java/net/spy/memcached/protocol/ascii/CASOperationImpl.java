@@ -57,10 +57,10 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
   private final String key;
   private final long casValue;
   private final int flags;
-  private final int exp;
+  private final long exp;
   private final byte[] data;
 
-  public CASOperationImpl(String k, long c, int f, int e,
+  public CASOperationImpl(String k, long c, int f, long e,
                           byte[] d, OperationCallback cb) {
     super(cb);
     key = k;
@@ -118,7 +118,7 @@ class CASOperationImpl extends OperationImpl implements CASOperation {
     return casValue;
   }
 
-  public int getExpiration() {
+  public long getExpiration() {
     return exp;
   }
 

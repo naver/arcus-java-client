@@ -30,15 +30,15 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
   protected final MemcachedNode node;
   protected final List<String> keyList;
   protected final CachedData cachedData;
-  protected final CollectionAttributes attribute;
+  protected final CreateAttributes attributes;
 
   protected CollectionBulkInsert(MemcachedNode node, List<String> keyList,
-                                 CachedData cachedData, CollectionAttributes attribute) {
+                                 CachedData cachedData, CreateAttributes attributes) {
     super(keyList.size());
     this.node = node;
     this.keyList = keyList;
     this.cachedData = cachedData;
-    this.attribute = attribute;
+    this.attributes = attributes;
   }
 
   public String getKey(int index) {
@@ -67,10 +67,13 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final String eflag;
 
     public BTreeBulkInsert(MemcachedNode node, List<String> keyList, String bkey,
-                              String eflag, CachedData cachedData, CollectionAttributes attr) {
-      super(node, keyList, cachedData, attr);
-      if (attr != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.btree, attr.getOverflowAction());
+                           String eflag, CachedData cachedData,
+                           CreateAttributes attributes) {
+      super(node, keyList, cachedData, attributes);
+      if (attributes != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(
+            CollectionType.btree, attributes.getOverflowAction()
+        );
       }
       this.bkey = bkey;
       this.eflag = eflag;
@@ -81,8 +84,8 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
       // estimate the buffer capacity
       int eachExtraSize = bkey.length()
-              + ((eflag != null) ? eflag.length() : 0)
-              + cachedData.getData().length + 128;
+          + ((eflag != null) ? eflag.length() : 0)
+          + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -94,12 +97,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       // create ascii operation string
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
-      String createOption = attribute != null ?
-          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
+      String createClause = attributes != null ?
+          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, bkey, (eflag != null) ? eflag : "", value.length,
-                     createOption,  (i < kSize - 1) ? PIPE : "");
+            createClause, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -113,7 +116,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new BTreeBulkInsert<>(node, keyList, bkey, eflag, cachedData, attribute);
+      return new BTreeBulkInsert<>(node, keyList, bkey, eflag, cachedData, attributes);
     }
   }
 
@@ -123,10 +126,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final String mkey;
 
     public MapBulkInsert(MemcachedNode node, List<String> keyList, String mkey,
-                         CachedData cachedData, CollectionAttributes attr) {
-      super(node, keyList, cachedData, attr);
-      if (attr != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.map, attr.getOverflowAction());
+                         CachedData cachedData, CreateAttributes attributes) {
+      super(node, keyList, cachedData, attributes);
+      if (attributes != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(
+            CollectionType.map, attributes.getOverflowAction()
+        );
       }
       this.mkey = mkey;
     }
@@ -136,7 +141,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
       // estimate the buffer capacity
       int eachExtraSize = KeyUtil.getKeyBytes(mkey).length
-              + cachedData.getData().length + 128;
+          + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -148,12 +153,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       // create ascii operation string
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
-      String createOption = attribute != null ?
-          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
+      String createClause = attributes != null ?
+          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, mkey, value.length,
-                     createOption, (i < kSize - 1) ? PIPE : "");
+            createClause, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -167,7 +172,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new MapBulkInsert<>(node, keyList, mkey, cachedData, attribute);
+      return new MapBulkInsert<>(node, keyList, mkey, cachedData, attributes);
     }
   }
 
@@ -176,10 +181,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private static final String COMMAND = "sop insert";
 
     public SetBulkInsert(MemcachedNode node, List<String> keyList,
-                         CachedData cachedData, CollectionAttributes attr) {
-      super(node, keyList, cachedData, attr);
-      if (attr != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.set, attr.getOverflowAction());
+                         CachedData cachedData, CreateAttributes attributes) {
+      super(node, keyList, cachedData, attributes);
+      if (attributes != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(
+            CollectionType.set, attributes.getOverflowAction()
+        );
       }
     }
 
@@ -199,12 +206,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       // create ascii operation string
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
-      String createOption = attribute != null ?
-          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
+      String createClause = attributes != null ?
+          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, value.length,
-                     createOption, (i < kSize - 1) ? PIPE : "");
+            createClause, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -217,7 +224,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new SetBulkInsert<>(node, keyList, cachedData, attribute);
+      return new SetBulkInsert<>(node, keyList, cachedData, attributes);
     }
   }
 
@@ -227,10 +234,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     private final int index;
 
     public ListBulkInsert(MemcachedNode node, List<String> keyList, int index,
-                          CachedData cachedData, CollectionAttributes attr) {
-      super(node, keyList, cachedData, attr);
-      if (attr != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.list, attr.getOverflowAction());
+                          CachedData cachedData, CreateAttributes attributes) {
+      super(node, keyList, cachedData, attributes);
+      if (attributes != null) { /* item creation option */
+        CollectionCreate.checkOverflowAction(
+            CollectionType.list, attributes.getOverflowAction()
+        );
       }
       this.index = index;
     }
@@ -240,7 +249,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
 
       // estimate the buffer capacity
       int eachExtraSize = String.valueOf(index).length()
-              + cachedData.getData().length + 128;
+          + cachedData.getData().length + 128;
       for (String eachKey : keyList) {
         capacity += KeyUtil.getKeyBytes(eachKey).length;
       }
@@ -252,12 +261,12 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       // create ascii operation string
       int kSize = keyList.size();
       byte[] value = cachedData.getData();
-      String createOption = attribute != null ?
-          CollectionCreate.makeCreateClause(attribute, cachedData.getFlags()) : "";
+      String createClause = attributes != null ?
+          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = this.keyList.get(i);
         setArguments(bb, COMMAND, key, index, value.length,
-                     createOption, (i < kSize - 1) ? PIPE : "");
+            createClause, (i < kSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -271,7 +280,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
     @Override
     public CollectionBulkInsert<T> clone(MemcachedNode node,
                                          List<String> keyList) {
-      return new ListBulkInsert<>(node, keyList, index, cachedData, attribute);
+      return new ListBulkInsert<>(node, keyList, index, cachedData, attributes);
     }
   }
 }

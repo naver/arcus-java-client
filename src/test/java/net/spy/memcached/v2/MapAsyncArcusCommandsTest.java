@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.v2.vo.GetMode;
@@ -35,7 +35,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             // then
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
@@ -47,13 +47,13 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             // then
             .thenAccept(Assertions::assertFalse)
             .toCompletableFuture()
@@ -65,7 +65,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -95,7 +95,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             // then
             .thenCompose(result -> {
               assertTrue(result);
@@ -111,7 +111,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -135,7 +135,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
             .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             // then
             .handle((result, ex) -> {
               assertInstanceOf(OperationException.class, ex);
@@ -151,7 +151,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -173,7 +173,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -205,7 +205,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -228,7 +228,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -257,7 +257,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> async.mopInsert(key, MKEY2, VALUE2))
             .thenCompose(result -> async.mopInsert(key, MKEY3, VALUE3))
             .toCompletableFuture()
@@ -294,7 +294,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -315,7 +315,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -345,7 +345,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -364,7 +364,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
     List<String> mKeys = Arrays.asList(MKEY1, MKEY2);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> async.mopInsert(key, MKEY2, VALUE2))
             .thenCompose(result -> async.mopInsert(key, MKEY3, VALUE3))
             .toCompletableFuture()
@@ -389,7 +389,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -411,7 +411,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> async.mopInsert(key, MKEY2, VALUE2))
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -434,7 +434,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -457,7 +457,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> async.mopInsert(key, MKEY2, VALUE2))
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -482,7 +482,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -514,7 +514,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> async.mopInsert(key, MKEY2, VALUE2))
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -542,7 +542,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -571,7 +571,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -593,7 +593,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> {
               assertTrue(result);
               return async.mopInsert(key, MKEY2, VALUE2);
@@ -630,7 +630,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.mopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
             .thenAccept(Assertions::assertTrue)
             .toCompletableFuture()
             .get(300L, TimeUnit.MILLISECONDS);
@@ -649,7 +649,7 @@ class MapAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.mopInsert(key, MKEY1, VALUE1, new CollectionAttributes())
+    async.mopInsert(key, MKEY1, VALUE1, CreateAttributes.DEFAULT)
             .thenCompose(result -> {
               assertTrue(result);
               return async.mopInsert(key, MKEY2, VALUE2);
