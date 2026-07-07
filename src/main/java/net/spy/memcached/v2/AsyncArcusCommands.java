@@ -57,13 +57,13 @@ import net.spy.memcached.collection.BTreeSMGetWithByteTypeBkey;
 import net.spy.memcached.collection.BTreeSMGetWithLongTypeBkey;
 import net.spy.memcached.collection.BTreeUpdate;
 import net.spy.memcached.collection.BTreeUpsert;
-import net.spy.memcached.collection.CollectionAttributes;
 import net.spy.memcached.collection.CollectionCount;
 import net.spy.memcached.collection.CollectionCreate;
 import net.spy.memcached.collection.CollectionDelete;
 import net.spy.memcached.collection.CollectionInsert;
 import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.ListCreate;
@@ -132,21 +132,21 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> set(String key, int exp, T value) {
+  public ArcusFuture<Boolean> set(String key, long exp, T value) {
     return store(StoreType.set, key, exp, value);
   }
 
   @Override
-  public ArcusFuture<Boolean> add(String key, int exp, T value) {
+  public ArcusFuture<Boolean> add(String key, long exp, T value) {
     return store(StoreType.add, key, exp, value);
   }
 
   @Override
-  public ArcusFuture<Boolean> replace(String key, int exp, T value) {
+  public ArcusFuture<Boolean> replace(String key, long exp, T value) {
     return store(StoreType.replace, key, exp, value);
   }
 
-  private ArcusFuture<Boolean> store(StoreType type, String key, int exp, T value) {
+  private ArcusFuture<Boolean> store(StoreType type, String key, long exp, T value) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
     CachedData co = tc.encode(value);
@@ -187,23 +187,23 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, long exp) {
     return multiStore(StoreType.set, items, exp);
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, long exp) {
     return multiStore(StoreType.add, items, exp);
   }
 
   @Override
-  public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp) {
+  public ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, long exp) {
     return multiStore(StoreType.replace, items, exp);
   }
 
   private ArcusFuture<Map<String, Boolean>> multiStore(StoreType type,
                                                        Map<String, T> items,
-                                                       int exp) {
+                                                       long exp) {
     Map<String, CompletableFuture<?>> keyToFuture = new HashMap<>(items.size());
 
     items.forEach((key, value) -> {
@@ -274,7 +274,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> cas(String key, int exp, T value, long casId) {
+  public ArcusFuture<Boolean> cas(String key, long exp, T value, long casId) {
     AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
     CachedData co = tc.encode(value);
@@ -321,7 +321,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Long> incr(String key, int delta, long initial, int exp) {
+  public ArcusFuture<Long> incr(String key, int delta, long initial, long exp) {
     if (initial < 0) {
       throw new IllegalArgumentException("Initial value must be 0 or greater.");
     }
@@ -334,14 +334,14 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Long> decr(String key, int delta, long initial, int exp) {
+  public ArcusFuture<Long> decr(String key, int delta, long initial, long exp) {
     if (initial < 0) {
       throw new IllegalArgumentException("Initial value must be 0 or greater.");
     }
     return mutate(Mutator.decr, key, delta, initial, exp);
   }
 
-  private ArcusFuture<Long> mutate(Mutator mutator, String key, int delta, long initial, int exp) {
+  private ArcusFuture<Long> mutate(Mutator mutator, String key, int delta, long initial, long exp) {
     if (delta <= 0) {
       throw new IllegalArgumentException("Delta must be greater than 0.");
     }
@@ -713,14 +713,13 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     if (attributes == null) {
       throw new IllegalArgumentException("CollectionAttributes cannot be null");
     }
 
     ListCreate create = new ListCreate(TranscoderUtils.examineFlags(type),
-        attributes.getExpireTime(), attributes.getMaxCount(),
-        attributes.getOverflowAction(), attributes.getReadable(), false);
+        attributes, false);
     return collectionCreate(key, create);
   }
 
@@ -731,7 +730,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> lopInsert(String key, int index, T value,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     ListInsert<T> insert = new ListInsert<>(value, null, attributes);
     return collectionInsert(key, String.valueOf(index), insert);
   }
@@ -843,14 +842,13 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     if (attributes == null) {
       throw new IllegalArgumentException("CollectionAttributes cannot be null");
     }
 
-    SetCreate create = new SetCreate(
-        TranscoderUtils.examineFlags(type), attributes.getExpireTime(),
-        attributes.getMaxCount(), attributes.getReadable(), false);
+    SetCreate create = new SetCreate(TranscoderUtils.examineFlags(type),
+        attributes, false);
     return collectionCreate(key, create);
   }
 
@@ -860,7 +858,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   }
 
   @Override
-  public ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes) {
+  public ArcusFuture<Boolean> sopInsert(String key, T value, CreateAttributes attributes) {
     SetInsert<T> insert = new SetInsert<>(value, null, attributes);
     return collectionInsert(key, "", insert);
   }
@@ -963,14 +961,13 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     if (attributes == null) {
       throw new IllegalArgumentException("CollectionAttributes cannot be null");
     }
 
     MapCreate create = new MapCreate(TranscoderUtils.examineFlags(type),
-        attributes.getExpireTime(), attributes.getMaxCount(),
-        attributes.getReadable(), false);
+        attributes, false);
     return collectionCreate(key, create);
   }
 
@@ -981,7 +978,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> mopInsert(String key, String mKey, T value,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     keyValidator.validateMKey(mKey);
 
     MapInsert<T> insert = new MapInsert<>(value, null, attributes);
@@ -995,7 +992,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     keyValidator.validateMKey(mKey);
 
     MapUpsert<T> upsert = new MapUpsert<>(value, attributes);
@@ -1145,14 +1142,13 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     if (attributes == null) {
       throw new IllegalArgumentException("CollectionAttributes cannot be null");
     }
 
     CollectionCreate create = new BTreeCreate(TranscoderUtils.examineFlags(type),
-        attributes.getExpireTime(), attributes.getMaxCount(),
-        attributes.getOverflowAction(), attributes.getReadable(), false);
+        attributes, false);
 
     return collectionCreate(key, create);
   }
@@ -1164,7 +1160,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     BTreeInsert<T> insert = new BTreeInsert<>(element.getValue(), element.getEFlag(),
         null, attributes);
     return collectionInsert(key, element.getBKey().toString(), insert);
@@ -1178,7 +1174,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
-      String key, BTreeElement<T> element, CollectionAttributes attributes) {
+      String key, BTreeElement<T> element, CreateAttributes attributes) {
     return bopInsertOrUpsertAndGetTrimmed(key, element, false, attributes);
   }
 
@@ -1189,7 +1185,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
-                                        CollectionAttributes attributes) {
+                                        CreateAttributes attributes) {
     BTreeUpsert<T> upsert = new BTreeUpsert<>(element.getValue(), element.getEFlag(),
         null, attributes);
     return collectionInsert(key, element.getBKey().toString(), upsert);
@@ -1203,12 +1199,12 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   @Override
   public ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
-      String key, BTreeElement<T> element, CollectionAttributes attributes) {
+      String key, BTreeElement<T> element, CreateAttributes attributes) {
     return bopInsertOrUpsertAndGetTrimmed(key, element, true, attributes);
   }
 
   private ArcusFutureImpl<Map.Entry<Boolean, BTreeElement<T>>> bopInsertOrUpsertAndGetTrimmed(
-      String key, BTreeElement<T> element, boolean isUpsert, CollectionAttributes attributes) {
+      String key, BTreeElement<T> element, boolean isUpsert, CreateAttributes attributes) {
     AbstractArcusResult<Map.Entry<Boolean, BTreeElement<T>>> result =
         new AbstractArcusResult<>(new AtomicReference<>());
     ArcusFutureImpl<Map.Entry<Boolean, BTreeElement<T>>> future = new ArcusFutureImpl<>(result);
@@ -1267,7 +1263,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
   private static <T> BTreeInsertAndGet<T> createBTreeInsertAndGet(BTreeElement<T> element,
                                                                   boolean isUpsert,
-                                                                  CollectionAttributes attributes) {
+                                                                  CreateAttributes attributes) {
     if (element.getBKey().getType() == BKey.BKeyType.LONG) {
       return new BTreeInsertAndGet<>((long) element.getBKey().getData(),
           element.getEFlag(), element.getValue(), isUpsert, attributes);

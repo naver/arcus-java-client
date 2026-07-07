@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.v2.vo.GetMode;
@@ -28,7 +28,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         // then
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
@@ -40,13 +40,13 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         // then
         .thenAccept(Assertions::assertFalse)
         .toCompletableFuture()
@@ -58,7 +58,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -88,7 +88,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         // then
         .thenCompose(result -> {
           assertTrue(result);
@@ -110,7 +110,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         // then
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
@@ -126,7 +126,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -155,7 +155,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -173,7 +173,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -195,7 +195,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .thenCompose(result -> async.lopInsert(key, 1, VALUES.get(1)))
         .thenCompose(result -> async.lopInsert(key, 2, VALUES.get(2)))
         .toCompletableFuture()
@@ -228,7 +228,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -246,7 +246,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .thenCompose(result -> async.lopInsert(key, 1, VALUES.get(1)))
         .thenCompose(result -> async.lopInsert(key, 2, VALUES.get(2)))
         .toCompletableFuture()
@@ -269,7 +269,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
 
@@ -290,7 +290,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopInsert(key, 0, VALUES.get(0), new CollectionAttributes())
+    async.lopInsert(key, 0, VALUES.get(0), CreateAttributes.DEFAULT)
         .thenCompose(result -> async.lopInsert(key, 1, VALUES.get(1)))
         .thenCompose(result -> async.lopInsert(key, 2, VALUES.get(2)))
         .toCompletableFuture()
@@ -313,7 +313,7 @@ class ListAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.lopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.lopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
 

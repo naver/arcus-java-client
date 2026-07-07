@@ -21,7 +21,6 @@ import java.util.List;
 
 import javax.security.sasl.SaslClient;
 
-import net.spy.memcached.collection.Attributes;
 import net.spy.memcached.collection.BTreeFindPosition;
 import net.spy.memcached.collection.BTreeFindPositionWithGet;
 import net.spy.memcached.collection.BTreeGetBulk;
@@ -39,6 +38,7 @@ import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
 import net.spy.memcached.collection.CollectionUpdate;
+import net.spy.memcached.collection.SetAttributes;
 import net.spy.memcached.collection.SetPipedExist;
 import net.spy.memcached.ops.BTreeFindPositionOperation;
 import net.spy.memcached.ops.BTreeFindPositionWithGetOperation;
@@ -135,9 +135,9 @@ public interface OperationFactory {
   /**
    * Create a get operation.
    *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @param isMGet   true if the handling node provides mget command
+   * @param keys   the collection of keys to get
+   * @param cb     the callback that will contain the results
+   * @param isMGet true if the handling node provides mget command
    * @return a new GetOperation
    */
   GetOperation get(Collection<String> keys, GetOperation.Callback cb, boolean isMGet);
@@ -145,9 +145,9 @@ public interface OperationFactory {
   /**
    * Create a gets operation.
    *
-   * @param keys the collection of keys to get
-   * @param cb   the callback that will contain the results
-   * @param isMGet   true if the handling node provides mgets command
+   * @param keys   the collection of keys to get
+   * @param cb     the callback that will contain the results
+   * @param isMGet true if the handling node provides mgets command
    * @return a new GetsOperation
    */
   GetsOperation gets(Collection<String> keys, GetsOperation.Callback cb, boolean isMGet);
@@ -156,27 +156,27 @@ public interface OperationFactory {
    * Get the key and resets its timeout.
    *
    * @param key the key to get a value for and reset its timeout
-   * @param expiration the new expiration for the key
-   * @param cb the callback that will contain the result
+   * @param exp the new expiration for the key
+   * @param cb  the callback that will contain the result
    * @return a new GetAndTouchOperation
    */
-  GetOperation getAndTouch(String key, int expiration, GetOperation.Callback cb);
+  GetOperation getAndTouch(String key, long exp, GetOperation.Callback cb);
 
   /**
    * Gets (with CAS support) the key and resets its timeout.
    *
    * @param key the key to get a value for and reset its timeout
-   * @param expiration the new expiration for the key
-   * @param cb the callback that will contain the result
+   * @param exp the new expiration for the key
+   * @param cb  the callback that will contain the result
    * @return a new GetsAndTouchOperation
    */
-  GetsOperation getsAndTouch(String key, int expiration, GetsOperation.Callback cb);
+  GetsOperation getsAndTouch(String key, long exp, GetsOperation.Callback cb);
 
   /**
    * Create a mutator operation.
    *
    * @param m   the mutator type
-   * @param key the mutatee key
+   * @param key the mutate key
    * @param by  the amount to increment or decrement
    * @param def the default value
    * @param exp expiration in case we need to default (0 if no default)
@@ -184,7 +184,7 @@ public interface OperationFactory {
    * @return the new mutator operation
    */
   MutatorOperation mutate(Mutator m, String key, int by,
-                          long def, int exp, OperationCallback cb);
+                          long def, long exp, OperationCallback cb);
 
   /**
    * Get a new StatsOperation.
@@ -206,18 +206,18 @@ public interface OperationFactory {
    * @param cb        the status callback
    * @return the new store operation
    */
-  StoreOperation store(StoreType storeType, String key, int flags, int exp,
+  StoreOperation store(StoreType storeType, String key, int flags, long exp,
                        byte[] data, OperationCallback cb);
 
   /**
    * Create a touch operation.
    *
-   * @param key        the key to touch
-   * @param expiration the new expiration time
-   * @param cb          the status callback
+   * @param key the key to touch
+   * @param exp the new expiration time
+   * @param cb  the status callback
    * @return the new touch operation
    */
-  TouchOperation touch(String key, int expiration, OperationCallback cb);
+  TouchOperation touch(String key, long exp, OperationCallback cb);
 
   /**
    * Get a concatenation operation.
@@ -244,7 +244,7 @@ public interface OperationFactory {
    * @return the new store operation
    */
   CASOperation cas(StoreType t, String key, long casId, int flags,
-                   int exp, byte[] data, OperationCallback cb);
+                   long exp, byte[] data, OperationCallback cb);
 
   /**
    * Create a new version operation.
@@ -274,8 +274,7 @@ public interface OperationFactory {
    * @param cb    the status callback
    * @return a new SetAttrOperation
    */
-  SetAttrOperation setAttr(String key, Attributes attrs,
-                           OperationCallback cb);
+  SetAttrOperation setAttr(String key, SetAttributes attrs, OperationCallback cb);
 
   /**
    * Get item attributes
@@ -289,11 +288,11 @@ public interface OperationFactory {
   /**
    * Insert operation for collection items.
    *
-   * @param key             collection item's key
-   * @param subkey          element key (list index, b+tree bkey)
+   * @param key              collection item's key
+   * @param subkey           element key (list index, b+tree bkey)
    * @param collectionInsert operation parameters (value, eflags, attributes, and so on)
-   * @param data            the serialized value
-   * @param cb              the status callback
+   * @param data             the serialized value
+   * @param cb               the status callback
    * @return a new CollectionInsertOperation
    */
   CollectionInsertOperation collectionInsert(String key, String subkey,
@@ -374,6 +373,7 @@ public interface OperationFactory {
 
   Operation cloneMultiOperation(KeyedOperation op, MemcachedNode node,
                                 List<String> redirectKeys, MultiOperationCallback mcb);
+
   /**
    * Create operation for collection items.
    *

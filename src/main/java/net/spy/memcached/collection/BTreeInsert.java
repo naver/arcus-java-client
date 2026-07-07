@@ -20,8 +20,9 @@ public class BTreeInsert<T> extends CollectionInsert<T> {
 
   private static final String COMMAND = "bop insert";
 
-  public BTreeInsert(T value, byte[] eFlag, RequestMode requestMode, CollectionAttributes attr) {
-    super(CollectionType.btree, value, eFlag, requestMode, attr);
+  public BTreeInsert(T value, byte[] eFlag, RequestMode requestMode,
+                     CreateAttributes attributes) {
+    super(CollectionType.btree, value, eFlag, requestMode, attributes);
   }
 
   public String getCommand() {

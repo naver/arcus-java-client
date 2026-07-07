@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.spy.memcached.CASValue;
-import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
 
@@ -722,7 +722,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.bopCreate(key, ElementValueType.STRING, CreateAttributes.builder().build())
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -844,7 +844,7 @@ class KVAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // collection 타입 키를 생성해서 TypeMismatch 발생
-    async.bopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.bopCreate(key, ElementValueType.STRING, CreateAttributes.builder().build())
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);

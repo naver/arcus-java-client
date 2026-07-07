@@ -40,7 +40,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   private final String cmd;
   private final Collection<String> keys;
   private String currentKey = null;
-  private final int exp;
+  private final long exp; // using only gat, gats
   private long casValue = 0;
   private int currentFlags = 0;
   private byte[] data = null;
@@ -62,7 +62,7 @@ abstract class BaseGetOpImpl extends OperationImpl {
   /**
    * For GetAndTouchOperationImpl,  GetsAndTouchOperationImpl Only
    */
-  public BaseGetOpImpl(String c, int e,
+  public BaseGetOpImpl(String c, long e,
                        OperationCallback cb, Collection<String> k) {
     super(cb);
     cmd = c;
@@ -240,7 +240,4 @@ abstract class BaseGetOpImpl extends OperationImpl {
     return keys.size() > 1;
   }
 
-  public int getExpiration() {
-    return exp;
-  }
 }

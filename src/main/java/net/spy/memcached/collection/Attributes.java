@@ -18,7 +18,7 @@ package net.spy.memcached.collection;
 
 import net.spy.memcached.compat.SpyObject;
 
-public class Attributes extends SpyObject {
+public class Attributes extends SpyObject implements SetAttributes {
   public static final Integer DEFAULT_FLAGS = 0;
   public static final Integer DEFAULT_EXPIRETIME = 0;
 
@@ -35,7 +35,8 @@ public class Attributes extends SpyObject {
     this.expireTime = expireTime;
   }
 
-  protected String stringify() {
+  @Override
+  public String stringify() {
     if (str != null) {
       return str;
     }
@@ -64,6 +65,7 @@ public class Attributes extends SpyObject {
     return (str == null) ? stringify() : str;
   }
 
+  @Override
   public int getLength() {
     return (str == null) ? stringify().length() : str.length();
   }

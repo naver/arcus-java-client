@@ -46,6 +46,7 @@ import net.spy.memcached.collection.CollectionMutate;
 import net.spy.memcached.collection.CollectionOverflowAction;
 import net.spy.memcached.collection.CollectionPipedInsert;
 import net.spy.memcached.collection.CollectionPipedUpdate;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.Element;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
@@ -328,9 +329,10 @@ class MultibyteKeyTest {
     for (int i = 0; i < 10; i++) {
       elements.add(new Element<>(Long.valueOf(i), new Random().nextInt(), new byte[]{1, 1}));
     }
+    CollectionAttributes attr = new CollectionAttributes();
     CollectionPipedInsert<Integer> insert =
             new CollectionPipedInsert.ByteArraysBTreePipedInsert<>(
-                    MULTIBYTE_KEY, elements, new CollectionAttributes(), new IntegerTranscoder());
+                    MULTIBYTE_KEY, elements, CreateAttributes.of(attr), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -342,7 +344,7 @@ class MultibyteKeyTest {
       elementsMap.put(Long.valueOf(i), new Random().nextInt());
     }
     insert = new CollectionPipedInsert.BTreePipedInsert<>(
-            MULTIBYTE_KEY, elementsMap, new CollectionAttributes(), new IntegerTranscoder());
+            MULTIBYTE_KEY, elementsMap, CreateAttributes.of(attr), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -354,7 +356,7 @@ class MultibyteKeyTest {
       elementsList.add(new Random().nextInt());
     }
     insert = new CollectionPipedInsert.ListPipedInsert<>(
-            MULTIBYTE_KEY, 0, elementsList, new CollectionAttributes(),
+            MULTIBYTE_KEY, 0, elementsList, CreateAttributes.of(attr),
             new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
@@ -367,7 +369,7 @@ class MultibyteKeyTest {
       elementsSet.add(new Random().nextInt());
     }
     insert = new CollectionPipedInsert.SetPipedInsert<>(
-            MULTIBYTE_KEY, elementsSet, new CollectionAttributes(), new IntegerTranscoder());
+            MULTIBYTE_KEY, elementsSet, CreateAttributes.of(attr), new IntegerTranscoder());
     try {
       opFact.collectionPipedInsert(MULTIBYTE_KEY, insert, cpsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -446,10 +448,13 @@ class MultibyteKeyTest {
           }
         };
 
+    CollectionAttributes attr = new CollectionAttributes();
     insert = new CollectionBulkInsert.BTreeBulkInsert<>(null, keyList,
-            String.valueOf(1L), BTreeUtil.toHex(new byte[]{0, 0}),
-            new IntegerTranscoder().encode(new Random().nextInt()),
-            new CollectionAttributes());
+        String.valueOf(1L), BTreeUtil.toHex(new byte[]{0, 0}),
+        new IntegerTranscoder().encode(new Random().nextInt()),
+        CreateAttributes.of(attr)
+    );
+
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -458,7 +463,7 @@ class MultibyteKeyTest {
 
     insert = new CollectionBulkInsert.ListBulkInsert<>(null, keyList,
             0, new IntegerTranscoder().encode(new Random().nextInt()),
-            new CollectionAttributes());
+            CreateAttributes.of(attr));
 
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
@@ -468,7 +473,7 @@ class MultibyteKeyTest {
 
     insert = new CollectionBulkInsert.SetBulkInsert<>(null, keyList,
             new IntegerTranscoder().encode(new Random().nextInt()),
-            new CollectionAttributes());
+            CreateAttributes.of(attr));
     try {
       opFact.collectionBulkInsert(insert, cbsCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
@@ -573,9 +578,15 @@ class MultibyteKeyTest {
   @Test
   void CollectionCreateOperationImplTest() {
     try {
-      opFact.collectionCreate(MULTIBYTE_KEY,
-              new BTreeCreate(0, 0, 10000L, CollectionOverflowAction.error, true, false),
-              genericCallback).initialize();
+      CreateAttributes attributes = CreateAttributes.builder()
+          .expireTime(0L)
+          .maxCount(10_000L)
+          .overflowAction(CollectionOverflowAction.error)
+          .readable(true)
+          .build();
+
+      BTreeCreate create = new BTreeCreate(0, attributes, false);
+      opFact.collectionCreate(MULTIBYTE_KEY, create, genericCallback).initialize();
     } catch (java.nio.BufferOverflowException e) {
       fail();
     }
@@ -624,7 +635,7 @@ class MultibyteKeyTest {
     try {
       opFact.bopInsertAndGet(MULTIBYTE_KEY,
               new BTreeInsertAndGet<>(1L, new byte[]{0, 0}, new Random().nextInt(),
-                      false, new CollectionAttributes()),
+                      false, CreateAttributes.of(new CollectionAttributes())),
           testData, new BTreeInsertAndGetOperation.Callback() {
             @Override
             public void gotData(int flags, BKeyObject bkeyObject, byte[] elementFlag, byte[] data) {

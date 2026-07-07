@@ -51,9 +51,9 @@ final class MutatorOperationImpl extends OperationImpl
   private final String key;
   private final int amount;
   private final long def;
-  private final int exp;
+  private final long exp;
 
-  public MutatorOperationImpl(Mutator m, String k, int amt, long d, int e,
+  public MutatorOperationImpl(Mutator m, String k, int amt, long d, long e,
                               OperationCallback c) {
     super(c);
     mutator = m;

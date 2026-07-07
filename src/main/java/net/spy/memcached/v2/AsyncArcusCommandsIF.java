@@ -24,7 +24,7 @@ import java.util.Set;
 
 import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.BTreeOrder;
-import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.v2.vo.BKey;
@@ -49,7 +49,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> set(String key, int exp, T value);
+  ArcusFuture<Boolean> set(String key, long exp, T value);
 
   /**
    * Add a value for the given key if it does not exist.
@@ -59,7 +59,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> add(String key, int exp, T value);
+  ArcusFuture<Boolean> add(String key, long exp, T value);
 
   /**
    * Replace a value for the given key if it exists.
@@ -69,7 +69,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param value the value to store
    * @return {@code true} if stored, otherwise {@code false}
    */
-  ArcusFuture<Boolean> replace(String key, int exp, T value);
+  ArcusFuture<Boolean> replace(String key, long exp, T value);
 
   /**
    * Sets multiple key-value pairs.
@@ -78,7 +78,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiSet(Map<String, T> items, long exp);
 
   /**
    * Add multiple key-value pairs if they do not exist.
@@ -87,7 +87,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiAdd(Map<String, T> items, long exp);
 
   /**
    * Replace multiple key-value pairs if they exist.
@@ -96,7 +96,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp   expiration time in seconds
    * @return Map of key to Boolean result
    */
-  ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, int exp);
+  ArcusFuture<Map<String, Boolean>> multiReplace(Map<String, T> items, long exp);
 
   /**
    * Prepend String or byte[] to an existing same type of value.
@@ -126,7 +126,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if compared and set successfully,
    * {@code false} if the key does not exist or CAS ID does not match
    */
-  ArcusFuture<Boolean> cas(String key, int exp, T value, long casId);
+  ArcusFuture<Boolean> cas(String key, long exp, T value, long casId);
 
   /**
    * Increments a numeric value stored at the given key by {@code delta}.
@@ -148,7 +148,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp     expiration time in seconds, applied only when a new key is created
    * @return the new value after increment, or {@code initial} if the key did not exist
    */
-  ArcusFuture<Long> incr(String key, int delta, long initial, int exp);
+  ArcusFuture<Long> incr(String key, int delta, long initial, long exp);
 
   /**
    * Decrements a numeric value stored at the given key by {@code delta}.
@@ -172,7 +172,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param exp     expiration time in seconds, applied only when a new key is created
    * @return the new value after decrement, or {@code initial} if the key did not exist
    */
-  ArcusFuture<Long> decr(String key, int delta, long initial, int exp);
+  ArcusFuture<Long> decr(String key, int delta, long initial, long exp);
 
   /**
    * Get a value for the given key.
@@ -233,7 +233,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> lopCreate(String key, ElementValueType type,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Insert an element at the given index into a list.
@@ -257,7 +257,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @param attributes attributes to use when creating the list, or {@code null} to not create
    * @return {@code true} if the element was inserted, {@code null} if the key is not found
    */
-  ArcusFuture<Boolean> lopInsert(String key, int index, T value, CollectionAttributes attributes);
+  ArcusFuture<Boolean> lopInsert(String key, int index, T value, CreateAttributes attributes);
 
   /**
    * Get an element at the given index from a list.
@@ -317,7 +317,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> sopCreate(String key, ElementValueType type,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Insert an element into a set.
@@ -341,7 +341,7 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code false} if the element already exists,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Boolean> sopInsert(String key, T value, CollectionAttributes attributes);
+  ArcusFuture<Boolean> sopInsert(String key, T value, CreateAttributes attributes);
 
   /**
    * Get elements randomly from a set.
@@ -386,7 +386,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if created, {@code false} if the key already exists
    */
   ArcusFuture<Boolean> mopCreate(String key, ElementValueType type,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Insert an element with the given mKey into a map.
@@ -412,7 +412,8 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code false} if the mKey already exists,
    * {@code null} if the key is not found
    */
-  ArcusFuture<Boolean> mopInsert(String key, String mKey, T value, CollectionAttributes attributes);
+  ArcusFuture<Boolean> mopInsert(String key, String mKey, T value,
+                                 CreateAttributes attributes);
 
   /**
    * Upsert an element with the given mKey in a map.
@@ -436,7 +437,8 @@ public interface AsyncArcusCommandsIF<T> {
    * @param attributes attributes to use when creating the map, or {@code null} to not create
    * @return {@code true} if upserted, {@code null} if the key is not found
    */
-  ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value, CollectionAttributes attributes);
+  ArcusFuture<Boolean> mopUpsert(String key, String mKey, T value,
+                                 CreateAttributes attributes);
 
   /**
    * Update the value of an element with the given mKey in a map.
@@ -528,7 +530,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if created, otherwise {@code false}
    */
   ArcusFuture<Boolean> bopCreate(String key, ElementValueType type,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Insert an element into a btree item.
@@ -552,7 +554,7 @@ public interface AsyncArcusCommandsIF<T> {
    * {@code null} if key is not found
    */
   ArcusFuture<Boolean> bopInsert(String key, BTreeElement<T> element,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Insert an element into a btree item and get trimmed element if overflow trim occurs.
@@ -573,7 +575,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code Map.Entry} with insertion result and trimmed element
    */
   ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopInsertAndGetTrimmed(
-      String key, BTreeElement<T> element, CollectionAttributes attributes);
+      String key, BTreeElement<T> element, CreateAttributes attributes);
 
   /**
    * Upsert an element into a btree item.
@@ -593,7 +595,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code true} if upserted, {@code null} if the key is not found
    */
   ArcusFuture<Boolean> bopUpsert(String key, BTreeElement<T> element,
-                                 CollectionAttributes attributes);
+                                 CreateAttributes attributes);
 
   /**
    * Upsert an element into a btree item and get trimmed element if overflow trim occurs.
@@ -614,7 +616,7 @@ public interface AsyncArcusCommandsIF<T> {
    * @return {@code Map.Entry} with upsertion result and trimmed element
    */
   ArcusFuture<Map.Entry<Boolean, BTreeElement<T>>> bopUpsertAndGetTrimmed(
-      String key, BTreeElement<T> element, CollectionAttributes attributes);
+      String key, BTreeElement<T> element, CreateAttributes attributes);
 
   /**
    * Update an element in a btree item

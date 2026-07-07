@@ -26,5 +26,5 @@ public interface TouchOperation extends KeyedOperation {
   /**
    * Get the expiration to set in case of a new entry.
    */
-  int getExpiration();
+  long getExpiration();
 }

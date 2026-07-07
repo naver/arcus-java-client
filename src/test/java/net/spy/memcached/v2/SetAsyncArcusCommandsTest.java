@@ -2,7 +2,7 @@ package net.spy.memcached.v2;
 
 import java.util.concurrent.TimeUnit;
 
-import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.ops.OperationException;
 import net.spy.memcached.v2.vo.GetMode;
@@ -23,7 +23,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         // then
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
@@ -35,13 +35,13 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         // then
         .thenAccept(Assertions::assertFalse)
         .toCompletableFuture()
@@ -53,7 +53,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -82,7 +82,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     String key = keys.get(0);
 
     // when
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         // then
         .thenCompose(result -> {
           assertTrue(result);
@@ -98,7 +98,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -122,7 +122,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
         .get(300L, TimeUnit.MILLISECONDS);
 
     // when
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         // then
         .handle((result, ex) -> {
           assertInstanceOf(OperationException.class, ex);
@@ -138,7 +138,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -156,7 +156,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -207,7 +207,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, "v0", new CollectionAttributes())
+    async.sopInsert(key, "v0", CreateAttributes.DEFAULT)
         .thenCompose(result -> async.sopInsert(key, "v1"))
         .thenCompose(result -> async.sopInsert(key, "v2"))
         .toCompletableFuture()
@@ -240,7 +240,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -258,7 +258,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -280,7 +280,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -312,7 +312,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopCreate(key, ElementValueType.STRING, new CollectionAttributes())
+    async.sopCreate(key, ElementValueType.STRING, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);
@@ -330,7 +330,7 @@ class SetAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
     // given
     String key = keys.get(0);
 
-    async.sopInsert(key, VALUE, new CollectionAttributes())
+    async.sopInsert(key, VALUE, CreateAttributes.DEFAULT)
         .thenAccept(Assertions::assertTrue)
         .toCompletableFuture()
         .get(300L, TimeUnit.MILLISECONDS);

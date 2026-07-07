@@ -23,7 +23,7 @@ public abstract class CollectionInsert<T> {
   protected int flags = 0;
   protected T value;
   protected RequestMode requestMode;
-  protected CollectionAttributes attribute;
+  protected CreateAttributes attributes;
   protected byte[] elementFlag;
   protected String str;
 
@@ -31,9 +31,9 @@ public abstract class CollectionInsert<T> {
   }
 
   protected CollectionInsert(CollectionType type, T value, byte[] elementFlag,
-                          RequestMode requestMode, CollectionAttributes attr) {
-    if (attr != null) { /* item creation option */
-      CollectionCreate.checkOverflowAction(type, attr.getOverflowAction());
+                          RequestMode requestMode, CreateAttributes attributes) {
+    if (attributes != null) { /* item creation option */
+      CollectionCreate.checkOverflowAction(type, attributes.getOverflowAction());
     }
     if (elementFlag != null) {
       if (elementFlag.length < 1 || elementFlag.length > ElementFlagFilter.MAX_EFLAG_LENGTH) {
@@ -45,7 +45,7 @@ public abstract class CollectionInsert<T> {
     this.value = value;
     this.elementFlag = elementFlag;
     this.requestMode = requestMode;
-    this.attribute = attr;
+    this.attributes = attributes;
   }
 
   public String stringify() {
@@ -55,8 +55,8 @@ public abstract class CollectionInsert<T> {
 
     StringBuilder b = new StringBuilder();
 
-    if (attribute != null) {
-      b.append(CollectionCreate.makeCreateClause(attribute, flags));
+    if (attributes != null) {
+      b.append(CollectionCreate.makeCreateClause(attributes, flags));
     }
 
     // an optional request mode like noreply, pipe and getrim
