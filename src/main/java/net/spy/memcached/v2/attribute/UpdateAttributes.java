@@ -29,7 +29,7 @@ public final class UpdateAttributes implements SetAttributes {
       b.append(" overflowaction=").append(builder.overflowAction);
     }
     if (builder.readable != null) {
-      b.append(" readable=").append(builder.readable ? "on" : "off");
+      b.append(" readable=").append("on");
     }
     if (builder.maxBKeyRange != null) {
       b.append(" maxbkeyrange=").append(builder.maxBKeyRange);
@@ -66,6 +66,25 @@ public final class UpdateAttributes implements SetAttributes {
       return this;
     }
 
+    /**
+     * Sets the maximum number of elements the collection may hold.
+     *
+     * <p>The value is interpreted by the server, and two cases are handled
+     * specially:
+     * <ul>
+     *   <li>
+     *     If the value is {@code 0}, the server applies its default count (4,000).
+     *   </li>
+     *   <li>
+     *     If the value is greater than the server's configured maximum,
+     *     the server silently clamps it to that maximum
+     *     and still reports the operation as successful.
+     *   </li>
+     * </ul>
+     *
+     * @param maxCount the maximum number of elements
+     * @return this Builder
+     */
     public Builder maxCount(long maxCount) {
       this.maxCount = maxCount;
       return this;
@@ -76,8 +95,8 @@ public final class UpdateAttributes implements SetAttributes {
       return this;
     }
 
-    public Builder readable(boolean readable) {
-      this.readable = readable;
+    public Builder readable() {
+      this.readable = true;
       return this;
     }
 

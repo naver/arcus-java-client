@@ -38,7 +38,7 @@ class UpdateAttributesTest {
     UpdateAttributes attributes = UpdateAttributes.builder()
         .maxCount(2_000L)
         .overflowAction(CollectionOverflowAction.error)
-        .readable(true)
+        .readable()
         .build();
 
     assertEquals("maxcount=2000 overflowaction=error readable=on", attributes.stringify());

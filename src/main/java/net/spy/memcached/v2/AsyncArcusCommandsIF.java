@@ -27,6 +27,8 @@ import net.spy.memcached.collection.BTreeOrder;
 import net.spy.memcached.collection.CreateAttributes;
 import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementValueType;
+import net.spy.memcached.v2.attribute.ItemAttributes;
+import net.spy.memcached.v2.attribute.UpdateAttributes;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeGetResult;
@@ -885,4 +887,21 @@ public interface AsyncArcusCommandsIF<T> {
    * @return a map of each server's {@link java.net.SocketAddress} to its version string
    */
   ArcusFuture<Map<SocketAddress, String>> versions();
+
+  /**
+   * Set the attributes of the item stored at the given key.
+   *
+   * @param key        the key
+   * @param attributes the attributes to set
+   * @return {@code true} if the attributes were set, otherwise {@code false}
+   */
+  ArcusFuture<Boolean> setAttributes(String key, UpdateAttributes attributes);
+
+  /**
+   * Get the attributes of the item stored at the given key.
+   *
+   * @param key the key
+   * @return the {@link ItemAttributes} of the item, or {@code null} if not found
+   */
+  ArcusFuture<ItemAttributes> getAttributes(String key);
 }
