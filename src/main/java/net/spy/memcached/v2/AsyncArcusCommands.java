@@ -93,6 +93,7 @@ import net.spy.memcached.ops.CollectionCreateOperation;
 import net.spy.memcached.ops.CollectionGetOperation;
 import net.spy.memcached.ops.CollectionInsertOperation;
 import net.spy.memcached.ops.ConcatenationType;
+import net.spy.memcached.ops.GetAttrOperation;
 import net.spy.memcached.ops.GetOperation;
 import net.spy.memcached.ops.GetsOperation;
 import net.spy.memcached.ops.Mutator;
@@ -103,6 +104,8 @@ import net.spy.memcached.ops.StatsOperation;
 import net.spy.memcached.ops.StoreType;
 import net.spy.memcached.transcoders.Transcoder;
 import net.spy.memcached.transcoders.TranscoderUtils;
+import net.spy.memcached.v2.attribute.ItemAttributes;
+import net.spy.memcached.v2.attribute.UpdateAttributes;
 import net.spy.memcached.v2.vo.BKey;
 import net.spy.memcached.v2.vo.BTreeElement;
 import net.spy.memcached.v2.vo.BTreeGetResult;
@@ -2381,5 +2384,89 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       });
       return resultMap;
     });
+  }
+
+  @Override
+  public ArcusFuture<Boolean> setAttributes(String key, UpdateAttributes attributes) {
+    AbstractArcusResult<Boolean> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<Boolean> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    OperationCallback cb = new OperationCallback() {
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(true);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(false);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * ATTR_ERROR or unknown statement.
+             */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().setAttr(key, attributes, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
+  }
+
+  @Override
+  public ArcusFuture<ItemAttributes> getAttributes(String key) {
+    AbstractArcusResult<ItemAttributes> result = new AbstractArcusResult<>(new AtomicReference<>());
+    ArcusFutureImpl<ItemAttributes> future = new ArcusFutureImpl<>(result);
+    ArcusClient client = arcusClientSupplier.get();
+
+    ItemAttributes attributes = new ItemAttributes();
+    GetAttrOperation.Callback cb = new GetAttrOperation.Callback() {
+      @Override
+      public void gotAttribute(String key, String attr) {
+        attributes.setAttribute(attr);
+      }
+
+      @Override
+      public void receivedStatus(OperationStatus status) {
+        switch (status.getStatusCode()) {
+          case SUCCESS:
+            result.set(attributes);
+            break;
+          case ERR_NOT_FOUND:
+            result.set(null);
+            break;
+          case CANCELLED:
+            future.internalCancel();
+            break;
+          default:
+            /*
+             * ATTR_ERROR or unknown statement.
+             */
+            result.addError(key, status);
+        }
+      }
+
+      @Override
+      public void complete() {
+        future.complete();
+      }
+    };
+    Operation op = client.getOpFact().getAttr(key, cb);
+    future.setOp(op);
+    client.addOp(key, op);
+
+    return future;
   }
 }
