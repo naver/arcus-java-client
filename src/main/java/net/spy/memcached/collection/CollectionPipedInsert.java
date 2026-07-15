@@ -55,8 +55,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
                            CreateAttributes attributes, Transcoder<T> tc) {
       super(key, attributes, tc, list.size());
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.list,
-            attributes.getOverflowAction());
+        CollectionType.list.checkOverflowAction(attributes.getOverflowAction());
       }
       this.index = index;
       this.list = list;
@@ -88,7 +87,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       // create ascii operation string
       int eSize = encodedList.size();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cd.getFlags()) : "";
+          attributes.toCreateClause(cd.getFlags()) : "";
       for (i = 0; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         int eIndex = index;
@@ -96,7 +95,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
           eIndex += (i + nextOpIndex);
         }
         setArguments(bb, COMMAND, key, eIndex, each.length,
-                     createClause, (i < eSize - 1) ? PIPE : "");
+            createClause, (i < eSize - 1) ? PIPE : "");
         bb.put(each);
         bb.put(CRLF);
       }
@@ -120,8 +119,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
                           CreateAttributes attributes, Transcoder<T> tc) {
       super(key, attributes, tc, set.size());
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.set,
-            attributes.getOverflowAction());
+        CollectionType.set.checkOverflowAction(attributes.getOverflowAction());
       }
       this.set = set;
     }
@@ -152,7 +150,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
       // create ascii operation string
       int eSize = encodedList.size();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cd.getFlags()) : "";
+          attributes.toCreateClause(cd.getFlags()) : "";
       for (i = 0; i < eSize; i++) {
         byte[] each = encodedList.get(i);
         setArguments(bb, COMMAND, key, each.length,
@@ -180,8 +178,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
                             CreateAttributes attributes, Transcoder<T> tc) {
       super(key, attributes, tc, map.size());
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.btree,
-            attributes.getOverflowAction());
+        CollectionType.btree.checkOverflowAction(attributes.getOverflowAction());
       }
       this.map = map;
     }
@@ -215,7 +212,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
       // create ascii operation string
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cd.getFlags()) : "";
+          attributes.toCreateClause(cd.getFlags()) : "";
       for (i = 0; i < eSize; i++) {
         Long bkey = bkeyList.get(i);
         byte[] value = encodedList.get(i);
@@ -244,8 +241,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
                                       CreateAttributes attributes, Transcoder<T> tc) {
       super(key, attributes, tc, elements.size());
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.btree,
-            attributes.getOverflowAction());
+        CollectionType.btree.checkOverflowAction(attributes.getOverflowAction());
       }
       this.elements = elements;
     }
@@ -279,13 +275,13 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
       // create ascii operation string
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cd.getFlags()) : "";
+          attributes.toCreateClause(cd.getFlags()) : "";
       for (i = 0; i < eSize; i++) {
         Element<T> element = elements.get(i + nextOpIndex);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key,
-                     element.getStringBkey(), element.getStringEFlag(), value.length,
-                     createClause, (i < eSize - 1) ? PIPE : "");
+            element.getStringBkey(), element.getStringEFlag(), value.length,
+            createClause, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }
@@ -309,8 +305,7 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
                           CreateAttributes attributes, Transcoder<T> tc) {
       super(key, attributes, tc, map.size());
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(CollectionType.map,
-            attributes.getOverflowAction());
+        CollectionType.map.checkOverflowAction(attributes.getOverflowAction());
       }
       this.map = map;
     }
@@ -344,12 +339,12 @@ public abstract class CollectionPipedInsert<T> extends CollectionPipe {
 
       // create ascii operation string
       String createClause = attributes != null ?
-              CollectionCreate.makeCreateClause(attributes, cd.getFlags()) : "";
+          attributes.toCreateClause(cd.getFlags()) : "";
       for (i = 0; i < eSize; i++) {
         String mkey = mkeyList.get(i);
         byte[] value = encodedList.get(i);
         setArguments(bb, COMMAND, key, mkey, value.length,
-                     createClause, (i < eSize - 1) ? PIPE : "");
+            createClause, (i < eSize - 1) ? PIPE : "");
         bb.put(value);
         bb.put(CRLF);
       }

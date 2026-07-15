@@ -71,9 +71,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
                            CreateAttributes attributes) {
       super(node, keyList, cachedData, attributes);
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(
-            CollectionType.btree, attributes.getOverflowAction()
-        );
+        CollectionType.btree.checkOverflowAction(attributes.getOverflowAction());
       }
       this.bkey = bkey;
       this.eflag = eflag;
@@ -98,7 +96,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
+          attributes.toCreateClause(cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, bkey, (eflag != null) ? eflag : "", value.length,
@@ -129,9 +127,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
                          CachedData cachedData, CreateAttributes attributes) {
       super(node, keyList, cachedData, attributes);
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(
-            CollectionType.map, attributes.getOverflowAction()
-        );
+        CollectionType.map.checkOverflowAction(attributes.getOverflowAction());
       }
       this.mkey = mkey;
     }
@@ -154,7 +150,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
+          attributes.toCreateClause(cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, mkey, value.length,
@@ -184,9 +180,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
                          CachedData cachedData, CreateAttributes attributes) {
       super(node, keyList, cachedData, attributes);
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(
-            CollectionType.set, attributes.getOverflowAction()
-        );
+        CollectionType.set.checkOverflowAction(attributes.getOverflowAction());
       }
     }
 
@@ -207,7 +201,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       int kSize = this.keyList.size();
       byte[] value = cachedData.getData();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
+          attributes.toCreateClause(cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = keyList.get(i);
         setArguments(bb, COMMAND, key, value.length,
@@ -237,9 +231,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
                           CachedData cachedData, CreateAttributes attributes) {
       super(node, keyList, cachedData, attributes);
       if (attributes != null) { /* item creation option */
-        CollectionCreate.checkOverflowAction(
-            CollectionType.list, attributes.getOverflowAction()
-        );
+        CollectionType.list.checkOverflowAction(attributes.getOverflowAction());
       }
       this.index = index;
     }
@@ -262,7 +254,7 @@ public abstract class CollectionBulkInsert<T> extends CollectionPipe {
       int kSize = keyList.size();
       byte[] value = cachedData.getData();
       String createClause = attributes != null ?
-          CollectionCreate.makeCreateClause(attributes, cachedData.getFlags()) : "";
+          attributes.toCreateClause(cachedData.getFlags()) : "";
       for (int i = this.nextOpIndex; i < kSize; i++) {
         String key = this.keyList.get(i);
         setArguments(bb, COMMAND, key, index, value.length,

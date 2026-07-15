@@ -72,7 +72,10 @@ public enum CollectionType {
     return null;
   }
 
-  public boolean isAvailableOverflowAction(CollectionOverflowAction overflowAction) {
-    return availableOverflowAction.contains(overflowAction);
+  public void checkOverflowAction(CollectionOverflowAction overflowAction) {
+    if (overflowAction != null && !availableOverflowAction.contains(overflowAction)) {
+      throw new IllegalArgumentException(
+          overflowAction + " is unavailable overflow action in " + this + ".");
+    }
   }
 }
