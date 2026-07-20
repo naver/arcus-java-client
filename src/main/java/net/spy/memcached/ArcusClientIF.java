@@ -31,7 +31,6 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.internal.CollectionGetBulkFuture;
@@ -1395,23 +1394,6 @@ public interface ArcusClientIF extends MemcachedClientIF {
   OperationFuture<Boolean> flush(final String prefix, final int delay);
 
   /**
-   * Get elements that matched both filter and bkey range criteria from
-   * multiple b+tree. The result is sorted by order of bkey.
-   *
-   * @param keyList     b+ tree key list
-   * @param from        bkey index from
-   * @param to          bkey index to
-   * @param eFlagFilter element flag filter
-   * @param count       number of returning values. must be larger than 0 and not more than 1000.
-   * @param smgetMode   smgetMode
-   * @return a future that will hold the return value list of the fetch.
-   */
-  @Deprecated
-  SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
-          int count, SMGetMode smgetMode);
-
-  /**
    * Update or insert an element.
    * <p>
    * Element that matched both key and bkey criteria will updated.
@@ -1927,23 +1909,6 @@ public interface ArcusClientIF extends MemcachedClientIF {
           String key, byte[] from, byte[] to, ElementFlagFilter eFlagFilter, int offset,
           int count, boolean withDelete, boolean dropIfEmpty,
           Transcoder<T> tc);
-
-  /**
-   * Get elements that matched both filter and bkey range criteria from
-   * multiple b+tree. The result is sorted by order of bkey.
-   *
-   * @param keyList     b+ tree key list
-   * @param from        bkey index from
-   * @param to          bkey index to
-   * @param eFlagFilter element flag filter
-   * @param count       number of returning values. must be larger than 0 and not more than 1000.
-   * @param smgetMode   smgetMode
-   * @return a future that will hold the return value list of the fetch.
-   */
-  @Deprecated
-  SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int count, SMGetMode smgetMode);
 
   /**
    * Get elements that matched both filter and bkey range criteria from

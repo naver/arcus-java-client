@@ -104,7 +104,6 @@ import net.spy.memcached.collection.MapInsert;
 import net.spy.memcached.collection.MapUpdate;
 import net.spy.memcached.collection.MapUpsert;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.collection.SetCreate;
 import net.spy.memcached.collection.SetDelete;
 import net.spy.memcached.collection.SetExist;
@@ -1815,14 +1814,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     return rv;
   }
 
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, long from, long to, ElementFlagFilter eFlagFilter,
-          int count, SMGetMode smgetMode) {
-    return this.asyncBopSortMergeGet(keyList, from, to, eFlagFilter, count, smgetMode == SMGetMode.UNIQUE);
-  }
-
   private <T> SMGetFuture<List<SMGetElement<T>>> smget(
           final List<BTreeSMGet<T>> smGetList, final int count, final boolean unique,
           final boolean reverse, final Transcoder<T> tc) {
@@ -2716,14 +2707,6 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     rv.setOperation(op);
     addOp(key, op);
     return rv;
-  }
-
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, byte[] from, byte[] to, ElementFlagFilter eFlagFilter,
-          int count, SMGetMode smgetMode) {
-    return this.asyncBopSortMergeGet(keyList, from, to, eFlagFilter, count, smgetMode == SMGetMode.UNIQUE);
   }
 
   @Override

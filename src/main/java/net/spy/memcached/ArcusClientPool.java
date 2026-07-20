@@ -37,7 +37,6 @@ import net.spy.memcached.collection.ElementFlagFilter;
 import net.spy.memcached.collection.ElementFlagUpdate;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.collection.SMGetElement;
-import net.spy.memcached.collection.SMGetMode;
 import net.spy.memcached.internal.BTreeStoreAndGetFuture;
 import net.spy.memcached.internal.BulkFuture;
 import net.spy.memcached.internal.CollectionFuture;
@@ -1148,15 +1147,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
     return this.getClient().flush(prefix, delay);
   }
 
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, long from, long to,
-          ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
-    return this.getClient().asyncBopSortMergeGet(keyList, from, to,
-            eFlagFilter, count, smgetMode);
-  }
-
   @Override
   public CollectionFuture<Boolean> asyncBopUpsert(String key, long bkey,
                                                   byte[] elementFlag, Object value,
@@ -1398,15 +1388,6 @@ public class ArcusClientPool implements MemcachedClientIF, ArcusClientIF {
           Transcoder<T> tc) {
     return this.getClient().asyncBopGet(key, from, to, eFlagFilter, offset,
             count, withDelete, dropIfEmpty, tc);
-  }
-
-  @Deprecated
-  @Override
-  public SMGetFuture<List<SMGetElement<Object>>> asyncBopSortMergeGet(
-          List<String> keyList, byte[] from, byte[] to,
-          ElementFlagFilter eFlagFilter, int count, SMGetMode smgetMode) {
-    return this.getClient().asyncBopSortMergeGet(keyList, from, to,
-            eFlagFilter, count, smgetMode);
   }
 
   @Override
