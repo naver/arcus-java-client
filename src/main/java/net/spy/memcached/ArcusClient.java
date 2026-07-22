@@ -1784,6 +1784,10 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
   @Override
   public OperationFuture<Boolean> flush(final String prefix, final int delay) {
+    if (prefix == null) {
+      throw new IllegalArgumentException("Prefix should not be null");
+    }
+
     Collection<MemcachedNode> nodes = getFlushNodes();
 
     final BroadcastFuture<Boolean> rv
@@ -1806,7 +1810,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
 
     checkState();
     for (MemcachedNode node : nodes) {
-      Operation op = opFact.flush(prefix, delay, false, cb);
+      Operation op = opFact.flush(prefix.isEmpty() ? "<null>" : prefix, delay, false, cb);
       opsMap.put(node, op);
     }
     rv.addOperations(opsMap.values());
