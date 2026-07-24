@@ -25,6 +25,7 @@ import net.spy.memcached.ops.OperationStatus;
 import net.spy.memcached.ops.StatusCode;
 import net.spy.memcached.ops.TouchOperation;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,7 +79,7 @@ final class TouchOperationImpl extends OperationImpl implements TouchOperation {
     ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
             + String.valueOf(exp).length() + OVERHEAD);
     setArguments(bb, "touch", key, String.valueOf(exp));
-    bb.flip();
+    ((Buffer) bb).flip();
     setBuffer(bb);
   }
 
