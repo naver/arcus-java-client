@@ -12,7 +12,7 @@
 아래 예제는 ARCUS cache에 key가 “sample:testKey”이고 value가 “testValue”인 cache item을 저장한다.
 
 ```java
-package com.navercorp.arcus.example; 
+package com.jam2in.arcus.example; 
 
 import java.util.concurrent.ExecutionException; 
 import java.util.concurrent.Future; 
@@ -367,7 +367,7 @@ log4j, logback과 같은 대표적인 자바의 로그 라이브러리들은 slf
 ```xml
 <!-- slf4j + log4j 사용시 -->
 <dependency>
-    <groupId>com.navercorp.arcus</groupId>
+    <groupId>com.jam2in.arcus</groupId>
     <artifactId>arcus-java-client</artifactId>
     <version>${arcus-java-client.version}</version>
 </dependency>
@@ -391,7 +391,7 @@ log4j, logback과 같은 대표적인 자바의 로그 라이브러리들은 slf
 ```xml
 <!-- slf4j + logback 사용시 -->
 <dependency>
-    <groupId>com.navercorp.arcus</groupId>
+    <groupId>com.jam2in.arcus</groupId>
     <artifactId>arcus-java-client</artifactId>
     <version>${arcus-java-client.version}</version>
 </dependency>
