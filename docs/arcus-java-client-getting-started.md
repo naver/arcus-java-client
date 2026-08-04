@@ -36,7 +36,7 @@ ARCUS는 오픈소스 memcached를 기반으로 데이터 분산과 fault-tolera
 우선 다음과 같이 비어 있는 자바 프로젝트를 생성합니다.
 
 ```bash
-$ mvn archetype:generate -DgroupId=com.navercorp.arcus -DartifactId=arcus-quick-start -DinteractiveMode=false
+$ mvn archetype:generate -DgroupId=com.jam2in.arcus -DartifactId=arcus-quick-start -DinteractiveMode=false
 $ cd arcus-quick-start
 $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 이클립스 프로젝트를 생성하여 활용합니다.
 ```
@@ -50,7 +50,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.navercorp.arcus</groupId>
+    <groupId>com.jam2in.arcus</groupId>
     <artifactId>arcus-quick-start</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -78,9 +78,9 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 
         <!-- ARCUS 클라이언트 의존성을 추가합니다. -->
         <dependency>
-            <groupId>com.navercorp.arcus</groupId>
+            <groupId>com.jam2in.arcus</groupId>
             <artifactId>arcus-java-client</artifactId>
-            <version>1.16.1</version>
+            <version>1.16.2</version>
         </dependency>
         
         <!-- 로거 의존성을 추가합니다. -->
@@ -112,7 +112,7 @@ $ mvn eclipse:eclipse // 이클립스 IDE를 사용하는 경우 실행하여 �
 
 ```java
 // HelloArcusTest.java
-package com.navercorp.arcus;
+package com.jam2in.arcus;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -137,7 +137,7 @@ public class HelloArcusTest {
 
 ```java
 // HelloArcus.java
-package com.navercorp.arcus;
+package com.jam2in.arcus;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

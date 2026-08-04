@@ -24,7 +24,7 @@ To use it, add the following dependency to your pom.xml.
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.navercorp.arcus</groupId>
+        <groupId>com.jam2in.arcus</groupId>
         <artifactId>arcus-java-client</artifactId>
         <version>1.16.1</version>
     </dependency>
