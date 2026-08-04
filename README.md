@@ -26,7 +26,7 @@ To use it, add the following dependency to your pom.xml.
     <dependency>
         <groupId>com.jam2in.arcus</groupId>
         <artifactId>arcus-java-client</artifactId>
-        <version>1.16.1</version>
+        <version>1.16.2</version>
     </dependency>
 </dependencies>
 ```

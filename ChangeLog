@@ -1,3 +1,34 @@
+# 2026-08-04 [version 1.16.2]
+## 🐣 New Features
+- Add beta version of CompletableFuture(v2) APIs
+- Add pluggable compression codec support with Snappy algorithm
+- Remove deprecated SMGetMode class
+
+## ⚙️ Internal Changes
+- Add isForceSerializeForCollection method to Transcoder
+- Do not skip decompress even if collection transcoder
+- Reuse callback instance for repeated Op creation
+- Unify BKey, EFlag naming
+- Unify OperationCallback patterns
+- Replace assert statements with proper exception handling
+- Align code style settings with checkstyle rules
+- Updated the devtools/maketags.sh
+- Separate CollectionAttributes into CreateAttributes, SetAttributes, ItemAttributes, UpdateAttributes to support long type exptime in v2 apis
+
+## 🐛 Bug Fixes
+- Remove Concurrency problem in locator allNodes
+- Add null/empty string behavior for the flush prefix argument
+- Prevent NoSuchMethodError in TouchOperationImpl
+
+## 📝 Documentation
+- Update JDK requirements in README
+- Update ConnectionFactoryBuilder docs
+- Use correct limit validation for compValue
+
+## ⬆️ Dependency Upgrades
+- Update log4j-core version to 2.25.4
+- Update jackson-databind version to 2.22.0
+
 # 2026-04-29 [version 1.16.1]
 ## 🐛 Bug Fixes
   - Use ScramSaslClientFactory only in SASL Authentication
