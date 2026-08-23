@@ -644,7 +644,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         future.complete();
       }
     };
-    Operation op = client.getOpFact().gets(keyList, cb, node.enabledMGetOp());
+    Operation op = client.getOpFact().gets(keyList, cb, node.enabledMGetsOp());
     future.setOp(op);
     client.addOp(node, op);
 
