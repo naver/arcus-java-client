@@ -29,9 +29,9 @@ public final class BKey implements Comparable<BKey> {
       throw new IllegalArgumentException("BKey byte array cannot be null.");
     }
 
-    if (data.length > 31) {
+    if (data.length < 1 || data.length > 31) {
       throw new IllegalArgumentException(
-          "BKey byte array size must be between 0 and 31. Given size: " + data.length);
+          "BKey byte array size must be between 1 and 31. Given size: " + data.length);
     }
 
     this.type = BKeyType.BYTE_ARRAY;
@@ -62,7 +62,7 @@ public final class BKey implements Comparable<BKey> {
     if (this.type == BKeyType.LONG) {
       return new BKeyObject((Long) this.data);
     }
-    return new BKeyObject((byte[]) this.data);
+    return new BKeyObject(Arrays.copyOf((byte[]) this.data, ((byte[]) this.data).length));
   }
 
   public static BKey of(BKeyObject bkeyObject) {
