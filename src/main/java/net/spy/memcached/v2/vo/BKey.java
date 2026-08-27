@@ -8,6 +8,15 @@ import net.spy.memcached.util.BTreeUtil;
 
 public final class BKey implements Comparable<BKey> {
 
+  public static final BKey MIN_BYTE_ARRAY_BKEY = new BKey(new byte[]{(byte) 0x00});
+  public static final BKey MAX_BYTE_ARRAY_BKEY;
+
+  static {
+    byte[] bytes = new byte[31];
+    Arrays.fill(bytes, (byte) 0xFF);
+    MAX_BYTE_ARRAY_BKEY = new BKey(bytes);
+  }
+
   public enum BKeyType {
     BYTE_ARRAY,
     LONG

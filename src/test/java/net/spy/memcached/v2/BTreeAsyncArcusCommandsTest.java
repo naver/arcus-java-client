@@ -277,6 +277,28 @@ class BTreeAsyncArcusCommandsTest extends AsyncArcusCommandsTest {
   }
 
   @Test
+  void bopGetRangeWithByteArrayBKey() throws Exception {
+    // given
+    String key = keys.get(0);
+    BKey bKey = BKey.of(new byte[]{1, 2, 3});
+    String value = "value1";
+
+    // when
+    async.bopInsert(key, new BTreeElement<>(bKey, value, null), CreateAttributes.DEFAULT)
+        .thenCompose(result -> async.bopGet(key,
+            BKey.MIN_BYTE_ARRAY_BKEY, BKey.MAX_BYTE_ARRAY_BKEY, BopRangeGetArgs.DEFAULT))
+        // then
+        .thenAccept(elements -> {
+          assertNotNull(elements);
+          assertEquals(1, elements.getElements().size());
+          assertEquals(bKey, elements.getElements().get(0).getBKey());
+          assertEquals(value, elements.getElements().get(0).getValue());
+        })
+        .toCompletableFuture()
+        .get(300, TimeUnit.MILLISECONDS);
+  }
+
+  @Test
   void bopGetRangeNotExistKey() {
     // given
     String key = keys.get(0);
