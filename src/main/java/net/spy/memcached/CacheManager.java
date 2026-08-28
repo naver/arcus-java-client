@@ -23,7 +23,6 @@ import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -718,7 +717,7 @@ public final class CacheManager extends SpyThread implements Watcher,
         }
       }
     };
-    cfb.setInitialObservers(Collections.singleton(observer));
+    cfb.addInitialObserver(observer);
 
     int poolId = CacheManager.POOL_ID.getAndIncrement();
     client = new ArcusClient[poolSize];
@@ -740,6 +739,8 @@ public final class CacheManager extends SpyThread implements Watcher,
       }
       client = null;
       return;
+    } finally {
+      cfb.removeInitialObserver(observer);
     }
 
     try {
