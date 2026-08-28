@@ -19,8 +19,8 @@ package net.spy.memcached;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +51,7 @@ public class ConnectionFactoryBuilder {
 
   private FailureMode failureMode = FailureMode.Cancel;
 
-  private Collection<ConnectionObserver> initialObservers
-          = Collections.emptyList();
+  private List<ConnectionObserver> initialObservers = new ArrayList<>();
 
   private OperationFactory opFact;
 
@@ -202,14 +201,30 @@ public class ConnectionFactoryBuilder {
   /**
    * Set the initial connection observers (will observe initial connection).
    */
-  public ConnectionFactoryBuilder setInitialObservers(
-          Collection<ConnectionObserver> obs) {
+  public ConnectionFactoryBuilder setInitialObservers(Collection<ConnectionObserver> obs) {
     if (obs == null || obs.isEmpty()) {
       throw new IllegalArgumentException("Initial observers must not be null or empty.");
     }
 
-    initialObservers = obs;
+    initialObservers.clear();
+    initialObservers.addAll(obs);
     return this;
+  }
+
+  void addInitialObserver(ConnectionObserver observer) {
+    if (observer == null) {
+      throw new IllegalArgumentException("Initial observer must not be null.");
+    }
+
+    initialObservers.add(observer);
+  }
+
+  void removeInitialObserver(ConnectionObserver observer) {
+    if (observer == null) {
+      throw new IllegalArgumentException("Initial observer must not be null.");
+    }
+
+    initialObservers.remove(observer);
   }
 
   /**
