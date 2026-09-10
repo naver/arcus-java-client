@@ -931,7 +931,13 @@ public final class MemcachedConnection extends SpyObject {
     qa.setupForAuth();
     qa.connected();
     for (ConnectionObserver observer : connObservers) {
-      observer.connectionEstablished(qa, rt);
+      try {
+        observer.connectionEstablished(qa, rt);
+      } catch (Exception e) {
+        getLogger().warn(
+            "Exception in connectionEstablished observer %s for %s",
+            observer.getClass().getName(), qa, e);
+      }
     }
     prepareVersionInfo(qa);
     prepareAuthentication(qa);
@@ -940,7 +946,13 @@ public final class MemcachedConnection extends SpyObject {
   private void lostConnection(MemcachedNode qa, ReconnDelay type, String cause) {
     queueReconnect(qa, type, cause);
     for (ConnectionObserver observer : connObservers) {
-      observer.connectionLost(qa);
+      try {
+        observer.connectionLost(qa);
+      } catch (Exception e) {
+        getLogger().warn(
+            "Exception in connectionLost observer %s for %s",
+            observer.getClass().getName(), qa, e);
+      }
     }
   }
 
