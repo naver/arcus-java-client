@@ -35,15 +35,16 @@ public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFut
   /**
    * Use only when the result needs to be decoded.
    */
-  public ArcusFutureImpl(ArcusResult<?> arcusResult, Function<Object, T> decoder) {
+  @SuppressWarnings("unchecked")
+  public <R> ArcusFutureImpl(ArcusResult<R> arcusResult, Function<R, T> decoder) {
     this.arcusResult = arcusResult;
-    this.decoder = decoder;
+    this.decoder = (Function<Object, T>) decoder;
   }
 
   /**
    * Use only when the result doesn't need to be decoded.
    */
-  public ArcusFutureImpl(ArcusResult<?> arcusResult) {
+  public ArcusFutureImpl(ArcusResult<T> arcusResult) {
     this.arcusResult = arcusResult;
     this.decoder = null;
   }
