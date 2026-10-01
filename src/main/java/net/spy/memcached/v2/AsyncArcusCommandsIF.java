@@ -21,6 +21,7 @@ import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import net.spy.memcached.CASValue;
 import net.spy.memcached.collection.BTreeOrder;
@@ -42,6 +43,29 @@ import net.spy.memcached.v2.vo.BopSMGetArgs;
 import net.spy.memcached.v2.vo.GetMode;
 
 public interface AsyncArcusCommandsIF<T> {
+
+  /**
+   * Returns a new command instance that uses the given operation timeout.
+   *
+   * <p>
+   * This instance is not modified. The timeout is a relative duration, so every operation
+   * issued through the returned instance starts its own deadline when it is submitted.
+   * The returned instance holds no deadline state and can be reused or cached.
+   * Without this override, the operation timeout is the
+   * {@code ConnectionFactoryBuilder.setOpTimeout()} value of the client.
+   * </p>
+   *
+   * <p>
+   * The period covered by the operation timeout is described in {@link ArcusFuture}.
+   * The given value is truncated to milliseconds.
+   * </p>
+   *
+   * @param duration the operation timeout duration
+   * @param unit     the time unit of the timeout duration
+   * @return a new command instance using the given operation timeout
+   * @throws IllegalArgumentException if unit is null or the duration is less than 1 millisecond
+   */
+  AsyncArcusCommandsIF<T> withOperationTimeout(long duration, TimeUnit unit);
 
   /**
    * Set a value for the given key.
