@@ -20,8 +20,30 @@ package net.spy.memcached.v2;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
+/**
+ * Result of an asynchronous Arcus operation.
+ *
+ * <p>Timeout and cancellation apply from submission until the complete response arrives
+ * from the cache server; decoding and dependent stages are not included. On timeout, the
+ * operation is cancelled and this future completes exceptionally with
+ * {@link net.spy.memcached.OperationTimeoutException}. Once the response has arrived,
+ * {@link #cancel(boolean)} returns {@code false} and the result is delivered.
+ * For a future that combines several operations, each operation is timed out and
+ * cancelled independently.</p>
+ *
+ * <p>Non-async dependent stages may run on Arcus internal threads, so they must be short
+ * and non-blocking. Use async methods with your own executor for blocking work.</p>
+ *
+ * <p><b>Do not complete the future returned by {@link #toCompletableFuture()} directly;</b>
+ * it does not cancel the Arcus operation.</p>
+ *
+ * @param <T> operation result type
+ */
 public interface ArcusFuture<T> extends CompletionStage<T>, Future<T> {
 
+  /**
+   * Internal completion callback. Not for application use.
+   */
   void complete();
 
 }
