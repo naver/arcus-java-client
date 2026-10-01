@@ -279,6 +279,15 @@ public class MemcachedClient extends SpyThread
     return transcoder;
   }
 
+  /**
+   * Get the operation timeout in milliseconds
+   *
+   * @return this instance's operation timeout
+   */
+  public long getOperationTimeout() {
+    return operationTimeout;
+  }
+
   public OperationFactory getOpFact() {
     return opFact;
   }
