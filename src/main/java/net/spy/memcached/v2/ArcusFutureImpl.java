@@ -20,17 +20,34 @@ package net.spy.memcached.v2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import net.spy.memcached.MemcachedConnection;
+import net.spy.memcached.MemcachedNode;
+import net.spy.memcached.OperationTimeoutException;
 import net.spy.memcached.internal.CompositeException;
 import net.spy.memcached.ops.Operation;
 
+import static net.spy.memcached.v2.ArcusFutureState.DECIDED;
+import static net.spy.memcached.v2.ArcusFutureState.RESPONSE_RECEIVED;
+import static net.spy.memcached.v2.ArcusFutureState.WAITING_RESPONSE;
+
+/**
+ * {@link ArcusFuture} for a single Arcus operation.
+ *
+ * @param <T> result type
+ */
 public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFuture<T> {
 
   private Operation op;
 
   private final ArcusResult<?> arcusResult;
   private final Function<Object, T> decoder;
+  private final AtomicReference<ScheduledFuture<?>> timeoutFuture = new AtomicReference<>();
+  private final AtomicReference<ArcusFutureState> state = new AtomicReference<>(WAITING_RESPONSE);
 
   /**
    * Use only when the result needs to be decoded.
@@ -50,37 +67,39 @@ public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFut
   }
 
   /**
-   * Called by the IO(Internal) Thread when all Operations are completed.
-   * Submits the decoding task to a dedicated thread pool and completes the future.
-   * If there is an error in the response, completes the CompletableFuture with an exception.
+   * Called by the operation callback when the complete response has arrived.
+   *
+   * <p>
+   * Stops the operation timeout and resets the node timeout count,
+   * then completes this future. An error, or a result that needs no decoding,
+   * completes it on the calling thread.
+   * Otherwise, the result is decoded and completed on the completion executor.
+   * Does nothing if a timeout or cancellation came first.
+   * </p>
    */
   @Override
   public void complete() {
-    if (this.isDone()) {
+    if (!state.compareAndSet(WAITING_RESPONSE, RESPONSE_RECEIVED)) {
       return;
     }
 
-    Exception exception = getError();
-    if (exception != null) {
-      this.completeExceptionally(exception);
+    cancelTimeoutTask();
+    MemcachedConnection.opSucceeded(op);
+
+    Exception error = getError();
+    if (error != null) {
+      failResponse(error);
       return;
     }
 
     if (decoder == null) {
       @SuppressWarnings("unchecked")
-      T result = (T) this.arcusResult.get();
-      this.complete(result);
+      T value = (T) this.arcusResult.get();
+      finishResponse(value);
       return;
     }
 
-    ArcusExecutors.COMPLETION_EXECUTOR.execute(() -> {
-      try {
-        T result = decoder.apply(this.arcusResult.get());
-        this.complete(result);
-      } catch (Exception e) {
-        this.completeExceptionally(e);
-      }
-    });
+    ArcusExecutors.COMPLETION_EXECUTOR.execute(this::decodeResponse);
   }
 
   /**
@@ -118,33 +137,144 @@ public class ArcusFutureImpl<T> extends CompletableFuture<T> implements ArcusFut
     }
   }
 
+  private void finishResponse(T value) {
+    if (state.compareAndSet(RESPONSE_RECEIVED, DECIDED)) {
+      super.complete(value);
+    }
+  }
+
+  private void failResponse(Exception exception) {
+    if (state.compareAndSet(RESPONSE_RECEIVED, DECIDED)) {
+      super.completeExceptionally(exception);
+    }
+  }
+
+  private void decodeResponse() {
+    // Skip decoding if cancelled after the response arrived.
+    if (state.get() != RESPONSE_RECEIVED) {
+      return;
+    }
+
+    try {
+      T value = decoder.apply(arcusResult.get());
+      finishResponse(value);
+    } catch (Exception e) {
+      failResponse(e);
+    }
+  }
+
   /**
-   * Cancel this future and the related operations.
-   * This method is thread-safe and prevents multiple concurrent cancellation attempts.
+   * Cancels this future. If the response has not arrived, the operation is cancelled too;
+   * otherwise only this future is cancelled and the pending result is discarded.
    *
-   * @param mayInterruptIfRunning this value has no effect in this
-   *                              implementation because interrupts are not used to control
-   *                              processing.
-   * @return {@code true} if this future and all the operations were cancelled,
-   * {@code false} if this future was already cancelled or completed.
+   * @param mayInterruptIfRunning ignored
+   * @return {@code true} if this call cancelled the future; {@code false} if the outcome was
+   * already decided, even when the future is not done yet
    */
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
-    if (this.isDone()) {
+    ArcusFutureState previous = state.getAndSet(DECIDED);
+
+    if (previous == DECIDED) {
       return false;
     }
 
-    return op.cancel("by application.");
-  }
+    cancelTimeoutTask();
 
-  void internalCancel() {
-    super.cancel(true);
+    boolean cancelled;
+    try {
+      if (previous == WAITING_RESPONSE) {
+        op.cancel("by application");
+      }
+    } finally {
+      cancelled = super.cancel(false);
+    }
+
+    return cancelled;
   }
 
   /**
-   * For internal use only.
+   * Cancels this future when the operation is cancelled outside this future, for example on
+   * connection loss. Does nothing if the outcome is already decided.
+   */
+  void internalCancel() {
+    if (!state.compareAndSet(WAITING_RESPONSE, DECIDED)) {
+      return;
+    }
+
+    cancelTimeoutTask();
+    super.cancel(false);
+  }
+
+  /**
+   * Sets the operation backing this future. Must be called before the operation is submitted.
    */
   void setOp(Operation op) {
     this.op = op;
+  }
+
+  /**
+   * Starts the operation timeout. Called once, right after the operation is submitted.
+   * Does nothing if the outcome is already decided.
+   *
+   * @param timeoutMillis operation timeout in milliseconds
+   * @throws IllegalStateException if the timeout is already scheduled
+   */
+  void scheduleTimeout(long timeoutMillis) {
+    if (state.get() != WAITING_RESPONSE) {
+      return;
+    }
+
+    ScheduledFuture<?> task = ArcusExecutors.TIMEOUT_SCHEDULER.schedule(
+        () -> timeout(timeoutMillis),
+        timeoutMillis,
+        TimeUnit.MILLISECONDS);
+
+    if (!timeoutFuture.compareAndSet(null, task)) {
+      task.cancel(false);
+      throw new IllegalStateException("Operation timeout is already scheduled.");
+    }
+
+    // A response or cancellation may have come first while scheduling.
+    if (state.get() != WAITING_RESPONSE) {
+      cancelTimeoutTask();
+    }
+  }
+
+  /**
+   * Handles operation timeout expiration.
+   *
+   * <p>If still awaiting a response, updates the node timeout count, cancels the operation,
+   * and completes this future exceptionally on the completion executor so that dependent
+   * stages do not run on the timeout scheduler thread.</p>
+   *
+   * @param timeoutMillis operation timeout in milliseconds
+   */
+  private void timeout(long timeoutMillis) {
+    if (!state.compareAndSet(WAITING_RESPONSE, DECIDED)) {
+      return;
+    }
+
+    OperationTimeoutException exception = new OperationTimeoutException(
+        op.getAPIType() + " operation timed out after " + timeoutMillis
+            + " milliseconds while waiting for a response"
+            + " @ " + getHandlingNodeName() + ".");
+
+    MemcachedConnection.opTimedOut(op);
+    op.cancel("by operation timeout");
+
+    ArcusExecutors.COMPLETION_EXECUTOR.execute(() -> super.completeExceptionally(exception));
+  }
+
+  private String getHandlingNodeName() {
+    MemcachedNode node = op.getHandlingNode();
+    return node == null ? "<unknown>" : node.getNodeName();
+  }
+
+  private void cancelTimeoutTask() {
+    ScheduledFuture<?> task = timeoutFuture.getAndSet(null);
+    if (task != null) {
+      task.cancel(false);
+    }
   }
 }

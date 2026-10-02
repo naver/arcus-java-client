@@ -19,6 +19,7 @@ package net.spy.memcached.v2;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Provides shared thread pool executors for Arcus v2 async operations.
@@ -40,6 +41,28 @@ final class ArcusExecutors {
             t.setDaemon(true);
             return t;
           });
+
+  /**
+   * Shared scheduler for operation timeouts.
+   *
+   * <p>
+   * Future completion is delegated to {@link #COMPLETION_EXECUTOR}
+   * to keep dependent stages off the scheduler thread.
+   * </p>
+   *
+   * <p>The remove-on-cancel policy removes cancelled timeout tasks immediately.</p>
+   */
+  static final ScheduledThreadPoolExecutor TIMEOUT_SCHEDULER =
+      new ScheduledThreadPoolExecutor(1, r -> {
+        Thread t = new Thread(r);
+        t.setName("arcus-timeout");
+        t.setDaemon(true);
+        return t;
+      });
+
+  static {
+    TIMEOUT_SCHEDULER.setRemoveOnCancelPolicy(true);
+  }
 
   private ArcusExecutors() {
   }

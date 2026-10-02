@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -123,6 +124,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
   private final Transcoder<T> tcForCollection;
   private final KeyValidator keyValidator;
   private final Supplier<ArcusClient> arcusClientSupplier;
+  private final long operationTimeout;
 
   @SuppressWarnings("unchecked")
   public AsyncArcusCommands(Supplier<ArcusClient> arcusClientSupplier) {
@@ -131,6 +133,29 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     this.tcForCollection = (Transcoder<T>) client.getCollectionTranscoder();
     this.keyValidator = client.getKeyValidator();
     this.arcusClientSupplier = arcusClientSupplier;
+    this.operationTimeout = client.getOperationTimeout();
+  }
+
+  private AsyncArcusCommands(AsyncArcusCommands<T> origin, long operationTimeout) {
+    this.tc = origin.tc;
+    this.tcForCollection = origin.tcForCollection;
+    this.keyValidator = origin.keyValidator;
+    this.arcusClientSupplier = origin.arcusClientSupplier;
+    this.operationTimeout = operationTimeout;
+  }
+
+  @Override
+  public AsyncArcusCommands<T> withOperationTimeout(long duration, TimeUnit unit) {
+    if (unit == null) {
+      throw new IllegalArgumentException("TimeUnit cannot be null");
+    }
+
+    long timeoutMillis = unit.toMillis(duration);
+    if (timeoutMillis <= 0) {
+      throw new IllegalArgumentException("Operation timeout must be greater than 0 milliseconds");
+    }
+
+    return new AsyncArcusCommands<>(this, timeoutMillis);
   }
 
   @Override
@@ -182,8 +207,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     Operation op = client.getOpFact()
         .store(type, key, co.getFlags(), exp, co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -269,8 +293,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().cat(concatType, 0L, key, co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -311,8 +334,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     Operation op = client.getOpFact()
         .cas(StoreType.set, key, casId, co.getFlags(), exp, co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -379,8 +401,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().mutate(mutator, key, delta, initial, exp, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -420,8 +441,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().get(key, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -462,8 +482,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     GetsOperation op = client.getOpFact().gets(key, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -544,8 +563,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().get(keyList, cb, node.enabledMGetOp());
-    future.setOp(op);
-    client.addOp(node, op);
+    submit(client, future, node, op);
 
     return future;
   }
@@ -627,8 +645,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().gets(keyList, cb, node.enabledMGetsOp());
-    future.setOp(op);
-    client.addOp(node, op);
+    submit(client, future, node, op);
 
     return future;
   }
@@ -666,8 +683,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().delete(key, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -759,8 +775,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -805,8 +820,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -886,8 +900,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -929,8 +942,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionExist(key, "", exist, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1036,8 +1048,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1090,8 +1101,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1235,8 +1245,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     Operation op = client.getOpFact()
         .bopInsertAndGet(key, insertAndGet, co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1323,8 +1332,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1375,8 +1383,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionGet(key, get, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1512,8 +1519,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopGetBulk(getBulk, cb);
-    future.setOp(op);
-    client.addOp(getBulk.getMemcachedNode(), op);
+    submit(client, future, getBulk.getMemcachedNode(), op);
 
     return future;
   }
@@ -1628,8 +1634,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopsmget(smGet, cb);
-    future.setOp(op);
-    client.addOp(smGet.getMemcachedNode(), op);
+    submit(client, future, smGet.getMemcachedNode(), op);
 
     return future;
   }
@@ -1686,8 +1691,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopFindPosition(key, findPosition, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1734,8 +1738,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopGetByPosition(key, getByPosition, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1788,8 +1791,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopGetByPosition(key, getByPosition, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1841,8 +1843,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().bopFindPositionWithGet(key, findPositionWithGet, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1884,8 +1885,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionCount(key, collectionCount, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1947,8 +1947,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     CollectionCreateOperation op = client.getOpFact()
         .collectionCreate(key, collectionCreate, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -1994,8 +1993,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     };
     CollectionInsertOperation op = client.getOpFact()
         .collectionInsert(key, internalKey, collectionInsert, co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2045,8 +2043,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
     Operation op = client.getOpFact()
         .collectionUpdate(key, internalKey, collectionUpdate,
             (co == null) ? null : co.getData(), cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2086,8 +2083,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionMutate(key, internalKey, mutate, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2127,8 +2123,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().collectionDelete(key, delete, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2173,8 +2168,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       };
 
       Operation op = client.getOpFact().flush(delay, cb);
-      future.setOp(op);
-      client.addOp(node, op);
+      submit(client, future, node, op);
       futures.add(future);
     }
 
@@ -2230,8 +2224,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
       Operation op = client.getOpFact()
           .flush(prefix.isEmpty() ? "<null>" : prefix, delay, false, cb);
-      future.setOp(op);
-      client.addOp(node, op);
+      submit(client, future, node, op);
       futures.add(future);
     }
 
@@ -2291,8 +2284,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         }
       };
       Operation op = client.getOpFact().stats(arg.getArg(), cb);
-      future.setOp(op);
-      client.addOp(node, op);
+      submit(client, future, node, op);
 
       addressToFuture.put(address, future);
     }
@@ -2348,8 +2340,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
         }
       };
       Operation op = client.getOpFact().version(cb);
-      future.setOp(op);
-      client.addOp(node, op);
+      submit(client, future, node, op);
 
       addressToFuture.put(address, future);
     }
@@ -2400,8 +2391,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().setAttr(key, attributes, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2445,8 +2435,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
     };
     Operation op = client.getOpFact().getAttr(key, cb);
-    future.setOp(op);
-    client.addOp(key, op);
+    submit(client, future, key, op);
 
     return future;
   }
@@ -2612,5 +2601,19 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
           decodeElement(rawElement.getValue()), rawElement.getEFlag(), rawElement.getPosition()));
     }
     return decoded;
+  }
+
+  private void submit(ArcusClient client, ArcusFutureImpl<?> future,
+                      String key, Operation op) {
+    future.setOp(op);
+    client.addOp(key, op);
+    future.scheduleTimeout(operationTimeout);
+  }
+
+  private void submit(ArcusClient client, ArcusFutureImpl<?> future,
+                      MemcachedNode node, Operation op) {
+    future.setOp(op);
+    client.addOp(node, op);
+    future.scheduleTimeout(operationTimeout);
   }
 }
