@@ -443,6 +443,14 @@ public abstract class TCPMemcachedNodeImpl extends SpyObject
 
   public final void setVersion(String vr) {
     version = vr;
+
+    if (isAsciiProtocol && version.endsWith("-P")) {
+      enabledMGetOp = true;
+      enabledMGetsOp = true;
+      enabledSpaceSeparate = true;
+      return;
+    }
+
     StringTokenizer tokens = new StringTokenizer(version, ".");
     int majorVersion = Integer.parseInt(tokens.nextToken());
     int minorVersion = Integer.parseInt(tokens.nextToken());
