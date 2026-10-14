@@ -90,8 +90,8 @@ class BopGetBulkTest extends BaseIntegrationTest {
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
       CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> f = mc
-              .asyncBopGetBulk(keyList, ByteArrayBKey.MIN,
-                      ByteArrayBKey.MAX, filter, 0, 10);
+              .asyncBopGetBulk(keyList, ByteArrayBKey.getMin(),
+                      ByteArrayBKey.getMax(), filter, 0, 10);
 
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
@@ -158,8 +158,8 @@ class BopGetBulkTest extends BaseIntegrationTest {
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
       CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> f = mc
-              .asyncBopGetBulk(keyList, ByteArrayBKey.MIN,
-                      ByteArrayBKey.MAX, filter, 0, 10);
+              .asyncBopGetBulk(keyList, ByteArrayBKey.getMin(),
+                      ByteArrayBKey.getMax(), filter, 0, 10);
 
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
@@ -210,8 +210,8 @@ class BopGetBulkTest extends BaseIntegrationTest {
       ElementFlagFilter filter = ElementFlagFilter.DO_NOT_FILTER;
 
       CollectionGetBulkFuture<Map<String, BTreeGetResult<ByteArrayBKey, Object>>> f = mc
-              .asyncBopGetBulk(keyList, ByteArrayBKey.MIN,
-                      ByteArrayBKey.MAX, filter, 0, 10);
+              .asyncBopGetBulk(keyList, ByteArrayBKey.getMin(),
+                      ByteArrayBKey.getMax(), filter, 0, 10);
 
       Map<String, BTreeGetResult<ByteArrayBKey, Object>> results = f.get(
               1000L, TimeUnit.MILLISECONDS);
