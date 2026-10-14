@@ -2,6 +2,8 @@ package net.spy.memcached;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import net.spy.memcached.util.ArcusKetamaNodeLocatorConfiguration;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ArcusKetamaHashingTest {
@@ -58,6 +61,74 @@ class ArcusKetamaHashingTest {
     sb.add("28.67.1." + (++maxIdx) + ":11211 ");
     stringNode2 = new ArrayList<>(sb);
     runThisManyNodes(stringNode1, stringNode2);
+  }
+
+  @Test
+  void testRemoveNodeWithDuplicateHashPointInSelf() {
+    /* "127.0.7.1:12932" has a duplicate hash point in its own hash points. */
+    List<MemcachedNode> nodes = createNodes(
+            AddrUtil.getAddresses(Arrays.asList("127.0.0.1:11211", "127.0.0.2:11211")));
+    MemcachedNode dupNode = new MockMemcachedNode(
+            new InetSocketAddress("127.0.7.1", 12932));
+
+    ArcusKetamaNodeLocator locator =
+            new ArcusKetamaNodeLocator(nodes, new ArcusKetamaNodeLocatorConfiguration());
+    locator.update(Collections.singletonList(dupNode),
+            Collections.<MemcachedNode>emptyList());
+    assertTrue(locator.getAll().contains(dupNode));
+
+    locator.update(Collections.<MemcachedNode>emptyList(),
+            Collections.singletonList(dupNode));
+    assertFalse(locator.getAll().contains(dupNode));
+    assertNoHashPointOf(locator, dupNode);
+  }
+
+  @Test
+  void testRemoveJoiningAlterNodeWithDuplicateHashPointInSelf() {
+    /* "127.0.7.1:12932" has a duplicate hash point in its own hash points. */
+    List<MemcachedNode> nodes = createNodes(
+            AddrUtil.getAddresses(Arrays.asList("127.0.0.1:11211", "127.0.0.2:11211")));
+    MemcachedNode dupNode = new MockMemcachedNode(
+            new InetSocketAddress("127.0.7.1", 12932));
+
+    ArcusKetamaNodeLocator locator =
+            new ArcusKetamaNodeLocator(nodes, new ArcusKetamaNodeLocatorConfiguration());
+    locator.prepareMigration(Collections.singletonList(dupNode), MigrationType.JOIN);
+    assertTrue(locator.getAlterAll().contains(dupNode));
+
+    locator.updateAlter(Collections.<MemcachedNode>emptyList(),
+            Collections.singletonList(dupNode));
+    assertTrue(locator.getAlterAll().isEmpty());
+    assertNoHashPointOf(locator, dupNode);
+  }
+
+  @Test
+  void testRemoveLeavingAlterNodeWithDuplicateHashPointInSelf() {
+    /* "127.0.7.1:12932" has a duplicate hash point in its own hash points. */
+    List<MemcachedNode> nodes = createNodes(
+            AddrUtil.getAddresses(Arrays.asList("127.0.0.1:11211", "127.0.0.2:11211")));
+    MemcachedNode dupNode = new MockMemcachedNode(
+            new InetSocketAddress("127.0.7.1", 12932));
+
+    ArcusKetamaNodeLocator locator =
+            new ArcusKetamaNodeLocator(nodes, new ArcusKetamaNodeLocatorConfiguration());
+    locator.update(Collections.singletonList(dupNode),
+            Collections.<MemcachedNode>emptyList());
+    locator.prepareMigration(Collections.singletonList(dupNode), MigrationType.LEAVE);
+    assertTrue(locator.getAlterAll().contains(dupNode));
+
+    locator.updateAlter(Collections.<MemcachedNode>emptyList(),
+            Collections.singletonList(dupNode));
+    assertTrue(locator.getAlterAll().isEmpty());
+    assertNoHashPointOf(locator, dupNode);
+  }
+
+  private void assertNoHashPointOf(ArcusKetamaNodeLocator locator, MemcachedNode target) {
+    for (SortedSet<MemcachedNode> nodeSet : locator.getKetamaNodes().values()) {
+      for (MemcachedNode node : nodeSet) {
+        assertNotSame(target, node);
+      }
+    }
   }
 
   /**
