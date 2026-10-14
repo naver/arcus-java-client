@@ -315,7 +315,10 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
       for (int h = 0; h < 4; h++) {
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedNode> nodeSet = ketamaNodes.get(k);
-        assert nodeSet != null;
+        if (nodeSet == null) {
+          // The hash point is duplicated in the node itself and already removed.
+          continue;
+        }
         nodeSet.remove(node);
         if (nodeSet.isEmpty()) {
           ketamaNodes.remove(k);
@@ -384,12 +387,14 @@ public final class ArcusKetamaNodeLocator extends SpyObject implements NodeLocat
           }
         } else {
           nodeSet = ketamaNodes.get(k);
-          assert nodeSet != null;
-          boolean removed = nodeSet.remove(node);
+          if (nodeSet == null) {
+            // The hash point is duplicated in the node itself and already removed.
+            continue;
+          }
+          nodeSet.remove(node);
           if (nodeSet.isEmpty()) {
             ketamaNodes.remove(k);
           }
-          assert removed;
         }
       }
     }
