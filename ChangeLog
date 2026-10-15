@@ -1,3 +1,23 @@
+# 2026-10-15 [version 1.16.3]
+## 🐣 New Features
+- Add min/max BKey static field in v2 APIs
+
+## ⚙️ Internal Changes
+- Move result decoding off the IO thread in v2 APIs
+- Add dependabot.yml to check in develop branch
+- Enable all ASCII command features when connected to Arcus Proxy
+
+## 🐛 Bug Fixes
+- Correct version flag used to build gets operation in v2 APIs
+- Verify correct byte length and not expose origin data object in BKey in v2 APIs
+- Preserve initial connection observers during `ArcusClient` initialization
+- Isolate connection observer exceptions
+- Skip remove if nodeSet return null when already node removed by same hash point
+
+## ⬆️ Dependency Upgrades
+- Update jackson-databind version to 2.22.1
+- Update log4j-api version to 2.25.5
+
 # 2026-08-04 [version 1.16.2]
 ## 🐣 New Features
 - Add beta version of CompletableFuture(v2) APIs
