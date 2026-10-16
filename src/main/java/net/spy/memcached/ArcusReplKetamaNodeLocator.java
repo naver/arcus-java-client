@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -167,6 +168,10 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
     return null;
   }
   /* ENABLE_MIGRATION end */
+
+  SortedMap<Long, SortedSet<MemcachedReplicaGroup>> getKetamaGroups() {
+    return Collections.unmodifiableSortedMap(ketamaGroups);
+  }
 
   public Collection<MemcachedNode> getMasterNodes() {
     List<MemcachedNode> masterNodes = new ArrayList<>(allGroups.size());
@@ -430,6 +435,10 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
       for (int h = 0; h < 4; h++) {
         Long k = getKetamaHashPoint(digest, h);
         SortedSet<MemcachedReplicaGroup> nodeSet = ketamaGroups.get(k);
+        if (nodeSet == null) {
+          // The hash point is duplicated in the group itself and already removed.
+          continue;
+        }
         nodeSet.remove(group);
         if (nodeSet.isEmpty()) {
           ketamaGroups.remove(k);
@@ -496,12 +505,14 @@ public final class ArcusReplKetamaNodeLocator extends SpyObject implements NodeL
           }
         } else {
           groupSet = ketamaGroups.get(k);
-          assert groupSet != null;
-          boolean removed = groupSet.remove(group);
+          if (groupSet == null) {
+            // The hash point is duplicated in the group itself and already removed.
+            continue;
+          }
+          groupSet.remove(group);
           if (groupSet.isEmpty()) {
             ketamaGroups.remove(k);
           }
-          assert removed;
         }
       }
     }
