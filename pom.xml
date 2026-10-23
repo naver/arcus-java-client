@@ -11,7 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>8</java.version>
-        <zookeeper.version>3.5.9</zookeeper.version>
+        <zookeeper.version>3.9.6</zookeeper.version>
         <log4j.version>2.26.1</log4j.version>
         <slf4j.version>2.0.20</slf4j.version>
         <ehcache.version>3.10.8</ehcache.version>
