@@ -24,8 +24,16 @@ import net.spy.memcached.util.BTreeUtil;
 
 public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
 
+  /**
+   * @deprecated Replaced by {@link ByteArrayBKey#getMin()}
+   */
+  @Deprecated
   public static final byte[] MIN = new byte[]{(byte) 0};
 
+  /**
+   * @deprecated Replaced by {@link ByteArrayBKey#getMax()}
+   */
+  @Deprecated
   public static final byte[] MAX = new byte[]{(byte) 255, (byte) 255,
       (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
       (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
@@ -34,6 +42,21 @@ public class ByteArrayBKey implements Comparable<ByteArrayBKey> {
       (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
       (byte) 255, (byte) 255, (byte) 255, (byte) 255
   };
+
+  public static byte[] getMin() {
+    return new byte[]{(byte) 0};
+  }
+
+  public static byte[] getMax() {
+    return new byte[]{(byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255,
+      (byte) 255, (byte) 255, (byte) 255, (byte) 255
+    };
+  }
 
   private final byte[] bkey;
 
