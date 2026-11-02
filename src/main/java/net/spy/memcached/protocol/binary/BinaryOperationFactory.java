@@ -219,7 +219,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionInsertOperation collectionInsert(String key, String subkey,
+  public CollectionInsertOperation collectionInsert(String key, String elementKey,
                                                     CollectionInsert<?> collectionInsert,
                                                     byte[] data,
                                                     OperationCallback cb) {
@@ -252,7 +252,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionExistOperation collectionExist(String key, String subkey,
+  public CollectionExistOperation collectionExist(String key, String elementKey,
                                                   CollectionExist collectionExist,
                                                   OperationCallback cb) {
     throw new RuntimeException(
@@ -290,7 +290,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionUpdateOperation collectionUpdate(String key,
-                                                    String subkey,
+                                                    String elementKey,
                                                     CollectionUpdate<?> collectionUpdate,
                                                     byte[] data,
                                                     OperationCallback cb) {
@@ -308,7 +308,7 @@ public class BinaryOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionMutateOperation collectionMutate(String key,
-                                                    String subkey,
+                                                    String elementKey,
                                                     CollectionMutate collectionMutate,
                                                     OperationCallback cb) {
     throw new RuntimeException(

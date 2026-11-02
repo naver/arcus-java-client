@@ -54,14 +54,14 @@ public final class CollectionExistOperationImpl extends OperationImpl
           false, "UNREADABLE", CollectionResponse.UNREADABLE);
 
   private final String key;
-  private final String subkey;
+  private final String elementKey;
   private final CollectionExist collectionExist;
 
-  public CollectionExistOperationImpl(String key, String subkey,
+  public CollectionExistOperationImpl(String key, String elementKey,
                                       CollectionExist collectionExist, OperationCallback cb) {
     super(cb);
     this.key = key;
-    this.subkey = subkey;
+    this.elementKey = elementKey;
     this.collectionExist = collectionExist;
     if (this.collectionExist instanceof SetExist) {
       setAPIType(APIType.SOP_EXIST);
@@ -91,10 +91,10 @@ public final class CollectionExistOperationImpl extends OperationImpl
     byte[] additionalArgs = collectionExist.getAdditionalArgs();
     ByteBuffer bb = ByteBuffer.allocate((null == additionalArgs ? 0 : additionalArgs.length)
             + KeyUtil.getKeyBytes(key).length
-            + KeyUtil.getKeyBytes(subkey).length
+            + KeyUtil.getKeyBytes(elementKey).length
             + args.length()
             + OVERHEAD);
-    setArguments(bb, collectionExist.getCommand(), key, subkey, args);
+    setArguments(bb, collectionExist.getCommand(), key, elementKey, args);
 
     if (null != additionalArgs) {
       bb.put(additionalArgs);
@@ -114,8 +114,8 @@ public final class CollectionExistOperationImpl extends OperationImpl
     return Collections.singleton(key);
   }
 
-  public String getSubKey() {
-    return subkey;
+  public String getElementKey() {
+    return elementKey;
   }
 
   public CollectionExist getExist() {

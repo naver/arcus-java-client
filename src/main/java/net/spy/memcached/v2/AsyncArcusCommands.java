@@ -770,7 +770,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       @Override
-      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
+      public void gotData(String elementKey, int flags, byte[] data, byte[] eFlag) {
         result.set(new CachedData(flags, data, tcForCollection.getMaxSize()));
       }
     };
@@ -815,7 +815,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
       }
 
       @Override
-      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
+      public void gotData(String elementKey, int flags, byte[] data, byte[] eFlag) {
         result.get().add(new CachedData(flags, data, tcForCollection.getMaxSize()));
       }
     };
@@ -870,7 +870,7 @@ public class AsyncArcusCommands<T> implements AsyncArcusCommandsIF<T> {
 
     CollectionGetOperation.Callback cb = new CollectionGetOperation.Callback() {
       @Override
-      public void gotData(String subKey, int flags, byte[] data, byte[] eFlag) {
+      public void gotData(String elementKey, int flags, byte[] data, byte[] eFlag) {
         result.get().add(new CachedData(flags, data, tcForCollection.getMaxSize()));
       }
 

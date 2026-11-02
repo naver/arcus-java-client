@@ -67,16 +67,16 @@ public final class CollectionInsertOperationImpl extends OperationImpl
           false, "BKEY_MISMATCH", CollectionResponse.BKEY_MISMATCH);
 
   private final String key;
-  private final String subkey;    // e.g.) 0 or 0x00
+  private final String elementKey;    // e.g.) 0 or 0x00
   private final CollectionInsert<?> collectionInsert;
   private final byte[] data;
 
-  public CollectionInsertOperationImpl(String key, String subkey,
+  public CollectionInsertOperationImpl(String key, String elementKey,
                                        CollectionInsert<?> collectionInsert, byte[] data,
                                        OperationCallback cb) {
     super(cb);
     this.key = key;
-    this.subkey = subkey;
+    this.elementKey = elementKey;
     this.collectionInsert = collectionInsert;
     this.data = data;
     if (this.collectionInsert instanceof ListInsert) {
@@ -124,11 +124,11 @@ public final class CollectionInsertOperationImpl extends OperationImpl
     String args = collectionInsert.stringify();
     ByteBuffer bb = ByteBuffer.allocate(data.length
             + KeyUtil.getKeyBytes(key).length
-            + KeyUtil.getKeyBytes(subkey).length
+            + KeyUtil.getKeyBytes(elementKey).length
             + KeyUtil.getKeyBytes(collectionInsert.getElementFlagByHex()).length
             + args.length()
             + OVERHEAD);
-    setArguments(bb, collectionInsert.getCommand(), key, subkey,
+    setArguments(bb, collectionInsert.getCommand(), key, elementKey,
             collectionInsert.getElementFlagByHex(), data.length, args);
     bb.put(data);
     bb.put(CRLF);
@@ -145,8 +145,8 @@ public final class CollectionInsertOperationImpl extends OperationImpl
     return Collections.singleton(key);
   }
 
-  public String getSubKey() {
-    return subkey;
+  public String getElementKey() {
+    return elementKey;
   }
 
   public CollectionInsert<?> getInsert() {

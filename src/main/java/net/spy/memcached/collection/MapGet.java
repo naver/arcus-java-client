@@ -98,7 +98,7 @@ public class MapGet extends CollectionGet {
 
   @Override
   public void decodeElemHeader(List<String> tokens) {
-    this.subkey = tokens.get(0);
+    this.elementKey = tokens.get(0);
     this.dataLength = Integer.parseInt(tokens.get(1));
   }
 }

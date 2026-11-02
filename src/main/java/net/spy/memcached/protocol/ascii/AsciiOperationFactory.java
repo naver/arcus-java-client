@@ -196,10 +196,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionInsertOperation collectionInsert(String key, String subkey,
+  public CollectionInsertOperation collectionInsert(String key, String elementKey,
                                                     CollectionInsert<?> collectionInsert,
                                                     byte[] data, OperationCallback cb) {
-    return new CollectionInsertOperationImpl(key, subkey,
+    return new CollectionInsertOperationImpl(key, elementKey,
         collectionInsert, data, cb);
   }
 
@@ -225,10 +225,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
   }
 
   @Override
-  public CollectionExistOperation collectionExist(String key, String subkey,
+  public CollectionExistOperation collectionExist(String key, String elementKey,
                                                   CollectionExist collectionExist,
                                                   OperationCallback cb) {
-    return new CollectionExistOperationImpl(key, subkey, collectionExist, cb);
+    return new CollectionExistOperationImpl(key, elementKey, collectionExist, cb);
   }
 
   @Override
@@ -258,11 +258,11 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionUpdateOperation collectionUpdate(String key,
-                                                    String subkey,
+                                                    String elementKey,
                                                     CollectionUpdate<?> collectionUpdate,
                                                     byte[] data,
                                                     OperationCallback cb) {
-    return new CollectionUpdateOperationImpl(key, subkey, collectionUpdate,
+    return new CollectionUpdateOperationImpl(key, elementKey, collectionUpdate,
         data, cb);
   }
 
@@ -294,10 +294,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
 
   @Override
   public CollectionMutateOperation collectionMutate(String key,
-                                                    String subkey,
+                                                    String elementKey,
                                                     CollectionMutate collectionMutate,
                                                     OperationCallback cb) {
-    return new CollectionMutateOperationImpl(key, subkey, collectionMutate, cb);
+    return new CollectionMutateOperationImpl(key, elementKey, collectionMutate, cb);
   }
 
   @Override

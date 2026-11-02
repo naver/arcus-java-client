@@ -23,7 +23,7 @@ import net.spy.memcached.collection.CollectionExist;
  */
 public interface CollectionExistOperation extends KeyedOperation {
 
-  String getSubKey();
+  String getElementKey();
 
   CollectionExist getExist();
 
