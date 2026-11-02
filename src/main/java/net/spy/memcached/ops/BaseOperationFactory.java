@@ -93,7 +93,7 @@ public abstract class BaseOperationFactory implements OperationFactory {
               (GetAttrOperation.Callback) c.getCallback()));
     } else if (op instanceof CollectionInsertOperation) {
       CollectionInsertOperation c = (CollectionInsertOperation) op;
-      rv.add(collectionInsert(first(c.getKeys()), c.getSubKey(),
+      rv.add(collectionInsert(first(c.getKeys()), c.getElementKey(),
               c.getInsert(), c.getData(), c.getCallback()));
     } else if (op instanceof CollectionGetOperation) {
       CollectionGetOperation c = (CollectionGetOperation) op;
@@ -105,7 +105,7 @@ public abstract class BaseOperationFactory implements OperationFactory {
               c.getCallback()));
     } else if (op instanceof CollectionExistOperation) {
       CollectionExistOperation c = (CollectionExistOperation) op;
-      rv.add(collectionExist(first(c.getKeys()), c.getSubKey(),
+      rv.add(collectionExist(first(c.getKeys()), c.getElementKey(),
               c.getExist(), c.getCallback()));
     } else {
       assert false : "Unhandled operation type: " + op.getClass();

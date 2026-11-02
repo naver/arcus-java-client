@@ -655,7 +655,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+          public void gotData(String elementKey, int flags, byte[] data, byte[] eflag) {
             cachedDataList.add(new CachedData(flags, data, tc.getMaxSize()));
           }
         });
@@ -711,7 +711,7 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
             latch.countDown();
           }
 
-          public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+          public void gotData(String elementKey, int flags, byte[] data, byte[] eflag) {
             cachedDataSet.add(new CachedData(flags, data, tc.getMaxSize()));
           }
         });
@@ -814,18 +814,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Public methods for collection items call this method.
    *
    * @param key             collection item's key
-   * @param subkey          element key (list index, b+tree bkey)
+   * @param elementKey      element key (list index, b+tree bkey)
    * @param collectionInsert operation parameters (value, eflags, attributes, and so on)
    * @param tc              transcoder to serialize and unserialize value
    * @return future holding the success/failure of the operation
    */
   private <T> CollectionFuture<Boolean> asyncCollectionInsert(String key,
-                                                              String subkey,
+                                                              String elementKey,
                                                               CollectionInsert<T> collectionInsert,
                                                               Transcoder<T> tc) {
     CachedData co = tc.encode(collectionInsert.getValue());
     collectionInsert.setFlags(co.getFlags());
-    return asyncCollectionInsert(key, subkey, collectionInsert, co);
+    return asyncCollectionInsert(key, elementKey, collectionInsert, co);
   }
 
   /**
@@ -833,30 +833,30 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Public methods for collection items call this method.
    *
    * @param key             collection item's key
-   * @param subkey          element key (list index, b+tree bkey)
+   * @param elementKey      element key (list index, b+tree bkey)
    * @param collectionInsert operation parameters (value, eflags, attributes, and so on)
    * @param co              transcoded value
    * @return future holding the success/failure of the operation
    */
   <T> CollectionFuture<Boolean> asyncCollectionInsert(final String key,
-                                                      final String subkey,
+                                                      final String elementKey,
                                                       final CollectionInsert<T> collectionInsert,
                                                       final CachedData co) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
             latch, operationTimeout);
-    Operation op = opFact.collectionInsert(key, subkey, collectionInsert,
+    Operation op = opFact.collectionInsert(key, elementKey, collectionInsert,
             co.getData(), new OperationCallback() {
               public void receivedStatus(OperationStatus status) {
                 CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
                 rv.set(cstatus.isSuccess(), cstatus);
                 if (!cstatus.isSuccess()) {
                   getLogger().debug(
-                          "Insertion to the collection failed : %s (type=%s, key=%s, subkey=%s, value=%s)",
+                          "Insertion to the collection failed : %s (type=%s, key=%s, elementKey=%s, value=%s)",
                           cstatus.getMessage(),
                           collectionInsert.getClass().getName(),
                           key,
-                          subkey,
+                          elementKey,
                           collectionInsert.getValue());
                 }
               }
@@ -910,27 +910,27 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Public methods for collection items call this method.
    *
    * @param key             collection item's key
-   * @param subkey          element key (list index, b+tree bkey)
+   * @param elementKey      element key (list index, b+tree bkey)
    * @param collectionExist operation parameters (element value and so on)
    * @return future holding the success/failure of the operation
    */
-  private <T> CollectionFuture<Boolean> asyncCollectionExist(final String key, final String subkey,
+  private <T> CollectionFuture<Boolean> asyncCollectionExist(final String key, final String elementKey,
                                                              final CollectionExist collectionExist) {
     final CountDownLatch latch = new CountDownLatch(1);
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
             latch, operationTimeout);
-    Operation op = opFact.collectionExist(key, subkey, collectionExist,
+    Operation op = opFact.collectionExist(key, elementKey, collectionExist,
         new OperationCallback() {
           public void receivedStatus(OperationStatus status) {
             CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
             boolean isExist = CollectionResponse.EXIST == cstatus.getResponse();
             rv.set(isExist, cstatus);
             if (!cstatus.isSuccess()) {
-              getLogger().debug("Exist command to the collection failed : %s (type=%s, key=%s, subkey=%s)",
+              getLogger().debug("Exist command to the collection failed : %s (type=%s, key=%s, elementKey=%s)",
                       cstatus.getMessage(),
                       collectionExist.getClass().getName(),
                       key,
-                      subkey);
+                      elementKey);
             }
           }
 
@@ -1986,13 +1986,13 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Public methods for collection items call this method.
    *
    * @param key              collection item's key
-   * @param subkey           element key (list index, b+tree bkey)
+   * @param elementKey       element key (list index, b+tree bkey)
    * @param collectionUpdate operation parameters (element value and so on)
    * @param tc               transcoder to serialize and unserialize value
    * @return future holding the success/failure of the operation
    */
   private <T> CollectionFuture<Boolean> asyncCollectionUpdate(
-          final String key, final String subkey,
+          final String key, final String elementKey,
           final CollectionUpdate<T> collectionUpdate, Transcoder<T> tc) {
 
     CachedData co = null;
@@ -2005,18 +2005,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
     final CollectionFuture<Boolean> rv = new CollectionFuture<>(
             latch, operationTimeout);
 
-    Operation op = opFact.collectionUpdate(key, subkey, collectionUpdate,
+    Operation op = opFact.collectionUpdate(key, elementKey, collectionUpdate,
             ((co == null) ? null : co.getData()), new OperationCallback() {
               public void receivedStatus(OperationStatus status) {
                 CollectionOperationStatus cstatus = toCollectionOperationStatus(status);
                 rv.set(cstatus.isSuccess(), cstatus);
                 if (!cstatus.isSuccess()) {
                   getLogger().debug(
-                          "Insertion to the collection failed : %s (type=%s, key=%s, subkey=%s, value=%s)",
+                          "Insertion to the collection failed : %s (type=%s, key=%s, elementKey=%s, value=%s)",
                           cstatus.getMessage(),
                           collectionUpdate.getClass().getName(),
                           key,
-                          subkey,
+                          elementKey,
                           collectionUpdate.getNewValue());
                 }
               }
@@ -3233,18 +3233,18 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
    * Generic increment/decrement operation for b+tree items. Public methods call this method.
    *
    * @param k                b+tree item's key
-   * @param subkey           element key
+   * @param elementKey       element key
    * @param collectionMutate operation parameters (increment amount and so on)
    * @return future holding the incremented or decremented value
    */
-  private CollectionFuture<Long> asyncCollectionMutate(final String k, final String subkey,
+  private CollectionFuture<Long> asyncCollectionMutate(final String k, final String elementKey,
                                                        final CollectionMutate collectionMutate) {
 
     final CountDownLatch latch = new CountDownLatch(1);
 
     final CollectionFuture<Long> rv = new CollectionFuture<>(latch, operationTimeout);
 
-    Operation op = opFact.collectionMutate(k, subkey, collectionMutate,
+    Operation op = opFact.collectionMutate(k, elementKey, collectionMutate,
         new OperationCallback() {
 
           @Override
@@ -3256,14 +3256,14 @@ public class ArcusClient extends FrontCacheMemcachedClient implements ArcusClien
               } catch (NumberFormatException e) {
                 rv.set(null, new CollectionOperationStatus(false, status.getMessage(), CollectionResponse.EXCEPTION));
 
-                getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, subkey, status);
+                getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, elementKey, status);
               }
               return;
             }
 
             rv.set(null, new CollectionOperationStatus(status));
 
-            getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, subkey, status);
+            getLogger().debug("Key(%s), Bkey(%s) Unknown response : %s", k, elementKey, status);
           }
 
           @Override

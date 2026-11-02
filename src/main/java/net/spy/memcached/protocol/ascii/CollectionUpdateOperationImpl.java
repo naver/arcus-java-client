@@ -60,16 +60,16 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
           false, "EFLAG_MISMATCH", CollectionResponse.EFLAG_MISMATCH);
 
   private final String key;
-  private final String subkey; // e.g.) 0 or 0x00
+  private final String elementKey; // e.g.) 0 or 0x00
   private final CollectionUpdate<?> collectionUpdate;
   private final byte[] data;
 
-  public CollectionUpdateOperationImpl(String key, String subkey,
+  public CollectionUpdateOperationImpl(String key, String elementKey,
                                        CollectionUpdate<?> collectionUpdate, byte[] data,
                                        OperationCallback cb) {
     super(cb);
     this.key = key;
-    this.subkey = subkey;
+    this.elementKey = elementKey;
     this.collectionUpdate = collectionUpdate;
     this.data = data;
     if (this.collectionUpdate instanceof BTreeUpdate) {
@@ -121,11 +121,11 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     ByteBuffer bb = ByteBuffer
             .allocate(((data != null) ? data.length : 0)
                     + KeyUtil.getKeyBytes(key).length
-                    + KeyUtil.getKeyBytes(subkey).length
+                    + KeyUtil.getKeyBytes(elementKey).length
                     + eflagStr.length() + args.length()
                     + OVERHEAD);
 
-    setArguments(bb, collectionUpdate.getCommand(), key, subkey,
+    setArguments(bb, collectionUpdate.getCommand(), key, elementKey,
             eflagStr, (data != null ? data.length : "-1"), args);
 
     if (data != null) {
@@ -146,8 +146,8 @@ public final class CollectionUpdateOperationImpl extends OperationImpl implement
     return Collections.singleton(key);
   }
 
-  public String getSubKey() {
-    return subkey;
+  public String getElementKey() {
+    return elementKey;
   }
 
   public CollectionUpdate<?> getUpdate() {

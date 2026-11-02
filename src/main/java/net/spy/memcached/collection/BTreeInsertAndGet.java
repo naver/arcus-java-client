@@ -68,11 +68,11 @@ public class BTreeInsertAndGet<T> extends CollectionGet {
 
   @Override
   public void decodeElemHeader(List<String> tokens) {
-    subkey = tokens.get(0);
-    if (subkey.startsWith("0x")) {
-      bKey =  new BKeyObject(BTreeUtil.hexStringToByteArrays(subkey.substring(2)));
+    elementKey = tokens.get(0);
+    if (elementKey.startsWith("0x")) {
+      bKey =  new BKeyObject(BTreeUtil.hexStringToByteArrays(elementKey.substring(2)));
     } else {
-      bKey = new BKeyObject(Long.parseLong(subkey));
+      bKey = new BKeyObject(Long.parseLong(elementKey));
     }
     if (tokens.size() == 2) {
       dataLength = Integer.parseInt(tokens.get(1));

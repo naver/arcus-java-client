@@ -289,13 +289,13 @@ public interface OperationFactory {
    * Insert operation for collection items.
    *
    * @param key              collection item's key
-   * @param subkey           element key (list index, b+tree bkey)
+   * @param elementKey       element key (list index, b+tree bkey)
    * @param collectionInsert operation parameters (value, eflags, attributes, and so on)
    * @param data             the serialized value
    * @param cb               the status callback
    * @return a new CollectionInsertOperation
    */
-  CollectionInsertOperation collectionInsert(String key, String subkey,
+  CollectionInsertOperation collectionInsert(String key, String elementKey,
                                              CollectionInsert<?> collectionInsert, byte[] data,
                                              OperationCallback cb);
 
@@ -339,12 +339,12 @@ public interface OperationFactory {
    * Existence operation for collection items.
    *
    * @param key             collection item's key
-   * @param subkey          element key (list index, b+tree bkey)
+   * @param elementKey      element key (list index, b+tree bkey)
    * @param collectionExist operation parameters (element value and so on)
    * @param cb              the callback that will contain the results
    * @return a new CollectionExistOperation
    */
-  CollectionExistOperation collectionExist(String key, String subkey,
+  CollectionExistOperation collectionExist(String key, String elementKey,
                                            CollectionExist collectionExist, OperationCallback cb);
 
   /**
@@ -421,13 +421,13 @@ public interface OperationFactory {
    * Update operation for collection items.
    *
    * @param key              collection item's key
-   * @param subkey           element key (list index, b+tree bkey)
+   * @param elementKey       element key (list index, b+tree bkey)
    * @param collectionUpdate (element value and so on)
    * @param data             the serialized value
    * @param cb               the status callback
    * @return a new CollectionUpdateOperation
    */
-  CollectionUpdateOperation collectionUpdate(String key, String subkey,
+  CollectionUpdateOperation collectionUpdate(String key, String elementKey,
                                              CollectionUpdate<?> collectionUpdate, byte[] data,
                                              OperationCallback cb);
 
@@ -447,12 +447,12 @@ public interface OperationFactory {
    * Increment/Decrement operation for collection items (b+tree items).
    *
    * @param key              b+tree item's key
-   * @param subkey           element key
+   * @param elementKey       element key (b+tree bkey)
    * @param collectionMutate operation parameters (increment/decrement amount and so on)
    * @param cb               the callback that will contain the incremented/decremented result
    * @return a new CollectionMutateOperation
    */
-  CollectionMutateOperation collectionMutate(String key, String subkey,
+  CollectionMutateOperation collectionMutate(String key, String elementKey,
                                              CollectionMutate collectionMutate,
                                              OperationCallback cb);
 

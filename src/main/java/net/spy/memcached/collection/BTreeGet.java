@@ -114,7 +114,7 @@ public class BTreeGet extends CollectionGet {
 
   @Override
   public void decodeElemHeader(List<String> tokens) {
-    subkey = tokens.get(0);
+    elementKey = tokens.get(0);
     if (tokens.size() == 2) {
       dataLength = Integer.parseInt(tokens.get(1));
     } else {

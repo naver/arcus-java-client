@@ -25,7 +25,7 @@ public abstract class CollectionGet {
 
   protected String range;
   protected String str;
-  protected String subkey;
+  protected String elementKey;
   protected int dataLength;
 
   protected byte[] elementFlag;
@@ -40,8 +40,8 @@ public abstract class CollectionGet {
     return dropIfEmpty;
   }
 
-  public String getSubkey() {
-    return subkey;
+  public String getElementKey() {
+    return elementKey;
   }
 
   public int getDataLength() {

@@ -23,7 +23,7 @@ import net.spy.memcached.collection.CollectionInsert;
  */
 public interface CollectionInsertOperation extends KeyedOperation {
 
-  String getSubKey();
+  String getElementKey();
 
   CollectionInsert<?> getInsert();
 

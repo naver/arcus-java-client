@@ -57,14 +57,14 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
           false, "OUT_OF_RANGE", CollectionResponse.OUT_OF_RANGE);
 
   private final String key;
-  private final String subkey;
+  private final String elementKey;
   private final CollectionMutate collectionMutate;
 
-  public CollectionMutateOperationImpl(String key, String subkey,
+  public CollectionMutateOperationImpl(String key, String elementKey,
                                        CollectionMutate collectionMutate, OperationCallback cb) {
     super(cb);
     this.key = key;
-    this.subkey = subkey;
+    this.elementKey = elementKey;
     this.collectionMutate = collectionMutate;
     if (this.collectionMutate instanceof BTreeMutate) {
       if (((BTreeMutate) this.collectionMutate).getMutator() == Mutator.incr) {
@@ -111,10 +111,10 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
     String cmd = collectionMutate.getCommand();
     String args = collectionMutate.stringify();
     ByteBuffer bb = ByteBuffer.allocate(KeyUtil.getKeyBytes(key).length
-            + KeyUtil.getKeyBytes(subkey).length
+            + KeyUtil.getKeyBytes(elementKey).length
             + cmd.length() + args.length() + 16);
 
-    setArguments(bb, cmd, key, subkey, args);
+    setArguments(bb, cmd, key, elementKey, args);
     ((Buffer) bb).flip();
     setBuffer(bb);
 
@@ -128,8 +128,8 @@ public final class CollectionMutateOperationImpl extends OperationImpl implement
     return Collections.singleton(key);
   }
 
-  public String getSubKey() {
-    return subkey;
+  public String getElementKey() {
+    return elementKey;
   }
 
   @Override

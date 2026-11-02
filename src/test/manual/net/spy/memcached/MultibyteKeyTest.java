@@ -163,7 +163,7 @@ class MultibyteKeyTest {
         }
       }, new CollectionGetOperation.Callback() {
         @Override
-        public void gotData(String subkey, int flags, byte[] data, byte[] eflag) {
+        public void gotData(String elementKey, int flags, byte[] data, byte[] eflag) {
         }
 
         @Override
