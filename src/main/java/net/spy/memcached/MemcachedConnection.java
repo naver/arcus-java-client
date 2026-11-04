@@ -1251,7 +1251,7 @@ public final class MemcachedConnection extends SpyObject {
     /* ENABLE_REPLICATION if */
     if (arcusReplEnabled) {
       MemcachedReplicaGroup group = qa.getReplicaGroup();
-      if (group.isDelayedSwitchover() && group.getMasterNode() == qa) {
+      if (group != null && group.isDelayedSwitchover() && group.getMasterNode() == qa) {
         clearDelayedSwitchoverGroup(group);
         ((ArcusReplKetamaNodeLocator) locator).switchoverReplGroup(group);
 
